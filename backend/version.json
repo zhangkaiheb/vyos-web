@@ -1,0 +1,6 @@
+{
+  "version": "1.0.0",
+  "build_date": "2026-07-23",
+  "commit": "initial",
+  "changelog": "Initial deployment infrastructure for VyOS Web Config."
+}

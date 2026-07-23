@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Development server for VyOS Web Config.
+Production should use Apache + mod_wsgi.
+"""
+
+import os
+import sys
+import argparse
+from wsgiref.simple_server import make_server
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, BASE_DIR)
+sys.path.insert(0, os.path.join(BASE_DIR, 'backend'))
+sys.path.insert(0, '/usr/libexec/vyos')
+sys.path.insert(0, '/usr/lib/python3/dist-packages')
+
+from backend.app import application
+
+
+def static_app(environ, start_response):
+    """Serve static files from frontend directory."""
+    path = environ.get('PATH_INFO', '/')
+    if path == '/':
+        path = '/index.html'
+    static_root = os.path.join(BASE_DIR, 'frontend')
+    file_path = os.path.join(static_root, path.lstrip('/'))
+    if os.path.isfile(file_path):
+        content_type = 'text/html'
+        if file_path.endswith('.js'):
+            content_type = 'application/javascript'
+        elif file_path.endswith('.css'):
+            content_type = 'text/css'
+        elif file_path.endswith('.json'):
+            content_type = 'application/json'
+        start_response('200 OK', [('Content-Type', content_type)])
+        with open(file_path, 'rb') as f:
+            return [f.read()]
+    # SPA fallback: serve index.html for unknown paths
+    index_path = os.path.join(static_root, 'index.html')
+    start_response('200 OK', [('Content-Type', 'text/html')])
+    with open(index_path, 'rb') as f:
+        return [f.read()]
+
+
+def combined_app(environ, start_response):
+    path = environ.get('PATH_INFO', '')
+    if path.startswith('/api/'):
+        return application(environ, start_response)
+    return static_app(environ, start_response)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--host', default='0.0.0.0')
+    parser.add_argument('--port', type=int, default=8080)
+    args = parser.parse_args()
+    httpd = make_server(args.host, args.port, combined_app)
+    print(f'Serving on http://{args.host}:{args.port}')
+    httpd.serve_forever()

@@ -1,0 +1,23 @@
+{
+  "zh-CN": {
+    "interfaces": { "title": "接口", "name": "接口名称", "type": "类型", "address": "地址", "description": "描述", "disable": "禁用", "mtu": "MTU", "vrf": "VRF", "vif": "VIF", "member": "成员", "peer": "对端", "ethernet": "以太网", "bonding": "绑定", "bridge": "桥接", "wireguard": "WireGuard", "vxlan": "VXLAN", "tunnel": "隧道", "openvpn": "OpenVPN", "pppoe": "PPPoE" }
+  },
+  "zh-TW": {
+    "interfaces": { "title": "介面", "name": "介面名稱", "type": "類型", "address": "位址", "description": "描述", "disable": "停用", "mtu": "MTU", "vrf": "VRF", "vif": "VIF", "member": "成員", "peer": "對端", "ethernet": "乙太網", "bonding": "繫結", "bridge": "橋接", "wireguard": "WireGuard", "vxlan": "VXLAN", "tunnel": "通道", "openvpn": "OpenVPN", "pppoe": "PPPoE" }
+  },
+  "en": {
+    "interfaces": { "title": "Interfaces", "name": "Interface Name", "type": "Type", "address": "Address", "description": "Description", "disable": "Disable", "mtu": "MTU", "vrf": "VRF", "vif": "VIF", "member": "Member", "peer": "Peer", "ethernet": "Ethernet", "bonding": "Bonding", "bridge": "Bridge", "wireguard": "WireGuard", "vxlan": "VXLAN", "tunnel": "Tunnel", "openvpn": "OpenVPN", "pppoe": "PPPoE" }
+  },
+  "ru": {
+    "interfaces": { "title": "Интерфейсы", "name": "Имя интерфейса", "type": "Тип", "address": "Адрес", "description": "Описание", "disable": "Отключить", "mtu": "MTU", "vrf": "VRF", "vif": "VIF", "member": "Участник", "peer": "Пир", "ethernet": "Ethernet", "bonding": "Bonding", "bridge": "Bridge", "wireguard": "WireGuard", "vxlan": "VXLAN", "tunnel": "Туннель", "openvpn": "OpenVPN", "pppoe": "PPPoE" }
+  },
+  "de": {
+    "interfaces": { "title": "Schnittstellen", "name": "Schnittstellenname", "type": "Typ", "address": "Adresse", "description": "Beschreibung", "disable": "Deaktivieren", "mtu": "MTU", "vrf": "VRF", "vif": "VIF", "member": "Mitglied", "peer": "Peer", "ethernet": "Ethernet", "bonding": "Bonding", "bridge": "Bridge", "wireguard": "WireGuard", "vxlan": "VXLAN", "tunnel": "Tunnel", "openvpn": "OpenVPN", "pppoe": "PPPoE" }
+  },
+  "fr": {
+    "interfaces": { "title": "Interfaces", "name": "Nom de l'interface", "type": "Type", "address": "Adresse", "description": "Description", "disable": "Désactiver", "mtu": "MTU", "vrf": "VRF", "vif": "VIF", "member": "Membre", "peer": "Pair", "ethernet": "Ethernet", "bonding": "Bonding", "bridge": "Bridge", "wireguard": "WireGuard", "vxlan": "VXLAN", "tunnel": "Tunnel", "openvpn": "OpenVPN", "pppoe": "PPPoE" }
+  },
+  "ko": {
+    "interfaces": { "title": "인터페이스", "name": "인터페이스 이름", "type": "유형", "address": "주소", "description": "설명", "disable": "비활성화", "mtu": "MTU", "vrf": "VRF", "vif": "VIF", "member": "멤버", "peer": "피어", "ethernet": "이더넷", "bonding": "본딩", "bridge": "브리지", "wireguard": "WireGuard", "vxlan": "VXLAN", "tunnel": "터널", "openvpn": "OpenVPN", "pppoe": "PPPoE" }
+  }
+}

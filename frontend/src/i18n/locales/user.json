@@ -1,0 +1,23 @@
+{
+  "zh-CN": {
+    "user": { "title": "用户", "username": "用户名", "password": "密码", "fullName": "全名", "email": "邮箱", "allowedIps": "允许 IP", "allowedMacs": "允许 MAC", "acl": "ACL", "enabled": "启用", "changePassword": "修改密码", "ipsHint": "每行一个，最多8个", "macsHint": "每行一个，最多8个" }
+  },
+  "zh-TW": {
+    "user": { "title": "使用者", "username": "使用者名稱", "password": "密碼", "fullName": "全名", "email": "電子郵件", "allowedIps": "允許 IP", "allowedMacs": "允許 MAC", "acl": "ACL", "enabled": "啟用", "changePassword": "修改密碼", "ipsHint": "每行一個，最多8個", "macsHint": "每行一個，最多8個" }
+  },
+  "en": {
+    "user": { "title": "Users", "username": "Username", "password": "Password", "fullName": "Full Name", "email": "Email", "allowedIps": "Allowed IPs", "allowedMacs": "Allowed MACs", "acl": "ACL", "enabled": "Enabled", "changePassword": "Change Password", "ipsHint": "One per line, max 8", "macsHint": "One per line, max 8" }
+  },
+  "ru": {
+    "user": { "title": "Пользователи", "username": "Имя пользователя", "password": "Пароль", "fullName": "Полное имя", "email": "Email", "allowedIps": "Разрешённые IP", "allowedMacs": "Разрешённые MAC", "acl": "ACL", "enabled": "Включён", "changePassword": "Изменить пароль", "ipsHint": "По одному на строку, макс. 8", "macsHint": "По одному на строку, макс. 8" }
+  },
+  "de": {
+    "user": { "title": "Benutzer", "username": "Benutzername", "password": "Passwort", "fullName": "Vollständiger Name", "email": "E-Mail", "allowedIps": "Erlaubte IPs", "allowedMacs": "Erlaubte MACs", "acl": "ACL", "enabled": "Aktiviert", "changePassword": "Passwort ändern", "ipsHint": "Eine pro Zeile, max. 8", "macsHint": "Eine pro Zeile, max. 8" }
+  },
+  "fr": {
+    "user": { "title": "Utilisateurs", "username": "Nom d'utilisateur", "password": "Mot de passe", "fullName": "Nom complet", "email": "E-mail", "allowedIps": "IP autorisées", "allowedMacs": "MAC autorisées", "acl": "ACL", "enabled": "Activé", "changePassword": "Changer le mot de passe", "ipsHint": "Une par ligne, max 8", "macsHint": "Une par ligne, max 8" }
+  },
+  "ko": {
+    "user": { "title": "사용자", "username": "사용자 이름", "password": "비밀번호", "fullName": "전체 이름", "email": "이메일", "allowedIps": "허용 IP", "allowedMacs": "허용 MAC", "acl": "ACL", "enabled": "활성화", "changePassword": "비밀번호 변경", "ipsHint": "줄당 하나, 최대 8개", "macsHint": "줄당 하나, 최대 8개" }
+  }
+}

@@ -1,0 +1,1301 @@
+[
+  {
+    "id": "monitor",
+    "label": "监控",
+    "label_en": "Monitor",
+    "icon": "MonitorOutlined",
+    "children": [
+      {
+        "id": "dashboard",
+        "label": "监控面板",
+        "label_en": "Dashboard",
+        "icon": "",
+        "children": [],
+        "route": "/monitor/dashboard",
+        "component": "MonitorDashboard"
+      },
+      {
+        "id": "cpu",
+        "label": "CPU",
+        "label_en": "CPU",
+        "icon": "",
+        "children": [],
+        "route": "/monitor/cpu",
+        "component": "MonitorWidget"
+      },
+      {
+        "id": "memory",
+        "label": "内存",
+        "label_en": "Memory",
+        "icon": "",
+        "children": [],
+        "route": "/monitor/memory",
+        "component": "MonitorWidget"
+      },
+      {
+        "id": "interface-traffic",
+        "label": "接口流量",
+        "label_en": "Interface Traffic",
+        "icon": "",
+        "children": [],
+        "route": "/monitor/interface-traffic",
+        "component": "MonitorWidget"
+      },
+      {
+        "id": "conntrack",
+        "label": "连接跟踪",
+        "label_en": "Conntrack",
+        "icon": "",
+        "children": [],
+        "route": "/monitor/conntrack",
+        "component": "MonitorWidget"
+      }
+    ],
+    "route": null,
+    "component": null
+  },
+  {
+    "id": "logs",
+    "label": "日志",
+    "label_en": "Logs",
+    "icon": "FileTextOutlined",
+    "children": [
+      {
+        "id": "audit",
+        "label": "操作日志",
+        "label_en": "Audit Log",
+        "icon": "",
+        "children": [],
+        "route": "/logs/audit",
+        "component": "LogPage"
+      },
+      {
+        "id": "system",
+        "label": "系统日志",
+        "label_en": "System Log",
+        "icon": "",
+        "children": [],
+        "route": "/logs/system",
+        "component": "LogPage"
+      },
+      {
+        "id": "firewall",
+        "label": "防火墙日志",
+        "label_en": "Firewall Log",
+        "icon": "",
+        "children": [],
+        "route": "/logs/firewall",
+        "component": "LogPage"
+      },
+      {
+        "id": "conntrack",
+        "label": "连接跟踪日志",
+        "label_en": "Conntrack Log",
+        "icon": "",
+        "children": [],
+        "route": "/logs/conntrack",
+        "component": "LogPage"
+      }
+    ],
+    "route": null,
+    "component": null
+  },
+  {
+    "id": "system",
+    "label": "系统管理",
+    "label_en": "System Management",
+    "icon": "SettingOutlined",
+    "children": [
+      {
+        "id": "interfaces",
+        "label": "网络接口",
+        "label_en": "Interfaces",
+        "icon": "GlobalOutlined",
+        "children": [
+          {
+            "id": "ethernet",
+            "label": "以太网",
+            "label_en": "Ethernet",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/ethernet",
+            "component": "EthernetPage"
+          },
+          {
+            "id": "bonding",
+            "label": "链路聚合",
+            "label_en": "Bonding",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/bonding",
+            "component": "TablePage"
+          },
+          {
+            "id": "bridge",
+            "label": "桥接",
+            "label_en": "Bridge",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/bridge",
+            "component": "TablePage"
+          },
+          {
+            "id": "wireguard",
+            "label": "WireGuard",
+            "label_en": "WireGuard",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/wireguard",
+            "component": "TablePage"
+          },
+          {
+            "id": "openvpn",
+            "label": "OpenVPN",
+            "label_en": "OpenVPN",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/openvpn",
+            "component": "TablePage"
+          },
+          {
+            "id": "vxlan",
+            "label": "VXLAN",
+            "label_en": "VXLAN",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/vxlan",
+            "component": "TablePage"
+          },
+          {
+            "id": "pppoe",
+            "label": "PPPoE",
+            "label_en": "PPPoE",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/pppoe",
+            "component": "TablePage"
+          },
+          {
+            "id": "tunnel",
+            "label": "隧道",
+            "label_en": "Tunnel",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/tunnel",
+            "component": "TablePage"
+          },
+          {
+            "id": "dummy",
+            "label": "Dummy",
+            "label_en": "Dummy",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/dummy",
+            "component": "TablePage"
+          },
+          {
+            "id": "loopback",
+            "label": "Loopback",
+            "label_en": "Loopback",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/loopback",
+            "component": "TablePage"
+          },
+          {
+            "id": "input",
+            "label": "Input",
+            "label_en": "Input",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/input",
+            "component": "ConfigPage"
+          }
+        ],
+        "route": null,
+        "component": null
+      },
+      {
+        "id": "settings",
+        "label": "系统设置",
+        "label_en": "Settings",
+        "icon": "",
+        "children": [],
+        "route": "/system/settings",
+        "component": "SettingsPage"
+      },
+      {
+        "id": "host-name",
+        "label": "主机名",
+        "label_en": "Host Name",
+        "icon": "",
+        "children": [],
+        "route": "/system/host-name",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "name-server",
+        "label": "DNS服务器",
+        "label_en": "Name Server",
+        "icon": "",
+        "children": [],
+        "route": "/system/name-server",
+        "component": "TablePage"
+      },
+      {
+        "id": "ntp",
+        "label": "NTP客户端",
+        "label_en": "NTP Client",
+        "icon": "",
+        "children": [],
+        "route": "/system/ntp",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "login",
+        "label": "登录设置",
+        "label_en": "Login",
+        "icon": "",
+        "children": [],
+        "route": "/system/login",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "netns",
+        "label": "网络命名空间",
+        "label_en": "Network Namespace",
+        "icon": "",
+        "children": [],
+        "route": "/system/netns",
+        "component": "TablePage"
+      },
+      {
+        "id": "vrf",
+        "label": "VRF",
+        "label_en": "VRF",
+        "icon": "",
+        "children": [],
+        "route": "/system/vrf",
+        "component": "TablePage"
+      },
+      {
+        "id": "container",
+        "label": "容器",
+        "label_en": "Container",
+        "icon": "",
+        "children": [
+          {
+            "id": "name",
+            "label": "容器",
+            "label_en": "Container",
+            "icon": "",
+            "children": [],
+            "route": "/system/container/name",
+            "component": "TablePage"
+          },
+          {
+            "id": "network",
+            "label": "容器网络",
+            "label_en": "Network",
+            "icon": "",
+            "children": [],
+            "route": "/system/container/network",
+            "component": "TablePage"
+          },
+          {
+            "id": "registry",
+            "label": "镜像仓库",
+            "label_en": "Registry",
+            "icon": "",
+            "children": [],
+            "route": "/system/container/registry",
+            "component": "TablePage"
+          }
+        ],
+        "route": null,
+        "component": null
+      },
+      {
+        "id": "pki",
+        "label": "PKI",
+        "label_en": "PKI",
+        "icon": "",
+        "children": [],
+        "route": "/system/pki",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "high-availability",
+        "label": "高可用性",
+        "label_en": "High Availability",
+        "icon": "",
+        "children": [],
+        "route": "/system/high-availability",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "conntrack",
+        "label": "连接跟踪",
+        "label_en": "Conntrack",
+        "icon": "",
+        "children": [],
+        "route": "/system/conntrack",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "table-size",
+        "label": "表项规格",
+        "label_en": "Table Size",
+        "icon": "",
+        "children": [],
+        "route": "/system/table-size",
+        "component": "TablePage"
+      },
+      {
+        "id": "maintenance",
+        "label": "维护工具",
+        "label_en": "Maintenance",
+        "icon": "",
+        "children": [
+          {
+            "id": "ping",
+            "label": "Ping",
+            "label_en": "Ping",
+            "icon": "",
+            "children": [],
+            "route": "/system/maintenance/ping",
+            "component": "ToolPage"
+          },
+          {
+            "id": "traceroute",
+            "label": "路由追踪",
+            "label_en": "Traceroute",
+            "icon": "",
+            "children": [],
+            "route": "/system/maintenance/traceroute",
+            "component": "ToolPage"
+          },
+          {
+            "id": "tcpdump",
+            "label": "抓包",
+            "label_en": "TCPDump",
+            "icon": "",
+            "children": [],
+            "route": "/system/maintenance/tcpdump",
+            "component": "ToolPage"
+          },
+          {
+            "id": "reboot",
+            "label": "重启",
+            "label_en": "Reboot",
+            "icon": "",
+            "children": [],
+            "route": "/system/maintenance/reboot",
+            "component": "ToolPage"
+          },
+          {
+            "id": "poweroff",
+            "label": "关机",
+            "label_en": "Poweroff",
+            "icon": "",
+            "children": [],
+            "route": "/system/maintenance/poweroff",
+            "component": "ToolPage"
+          }
+        ],
+        "route": null,
+        "component": null
+      },
+      {
+        "id": "users",
+        "label": "用户管理",
+        "label_en": "Users",
+        "icon": "",
+        "children": [],
+        "route": "/system/users",
+        "component": "UserPage"
+      },
+      {
+        "id": "webapp",
+        "label": "Web应用升级",
+        "label_en": "Web App Upgrade",
+        "icon": "",
+        "children": [],
+        "route": "/system/webapp",
+        "component": "WebAppPage"
+      },
+      {
+        "id": "import-export",
+        "label": "导入/导出",
+        "label_en": "Import/Export",
+        "icon": "",
+        "children": [],
+        "route": "/system/import-export",
+        "component": "ImportExportPage"
+      }
+    ],
+    "route": null,
+    "component": null
+  },
+  {
+    "id": "firewall",
+    "label": "防火墙",
+    "label_en": "Firewall",
+    "icon": "FireOutlined",
+    "children": [
+      {
+        "id": "global-options",
+        "label": "全局选项",
+        "label_en": "Global Options",
+        "icon": "",
+        "children": [],
+        "route": "/firewall/global-options",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "ipv4",
+        "label": "IPv4防火墙",
+        "label_en": "IPv4 Firewall",
+        "icon": "",
+        "children": [
+          {
+            "id": "forward",
+            "label": "转发规则",
+            "label_en": "Forward",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/ipv4/forward",
+            "component": "RuleTablePage"
+          },
+          {
+            "id": "input",
+            "label": "输入规则",
+            "label_en": "Input",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/ipv4/input",
+            "component": "RuleTablePage"
+          },
+          {
+            "id": "output",
+            "label": "输出规则",
+            "label_en": "Output",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/ipv4/output",
+            "component": "RuleTablePage"
+          },
+          {
+            "id": "prerouting",
+            "label": "预路由规则",
+            "label_en": "Prerouting",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/ipv4/prerouting",
+            "component": "RuleTablePage"
+          },
+          {
+            "id": "name",
+            "label": "自定义规则",
+            "label_en": "Custom",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/ipv4/name",
+            "component": "RuleTablePage"
+          }
+        ],
+        "route": null,
+        "component": null
+      },
+      {
+        "id": "ipv6",
+        "label": "IPv6防火墙",
+        "label_en": "IPv6 Firewall",
+        "icon": "",
+        "children": [
+          {
+            "id": "forward",
+            "label": "转发规则",
+            "label_en": "Forward",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/ipv6/forward",
+            "component": "RuleTablePage"
+          },
+          {
+            "id": "input",
+            "label": "输入规则",
+            "label_en": "Input",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/ipv6/input",
+            "component": "RuleTablePage"
+          },
+          {
+            "id": "output",
+            "label": "输出规则",
+            "label_en": "Output",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/ipv6/output",
+            "component": "RuleTablePage"
+          },
+          {
+            "id": "prerouting",
+            "label": "预路由规则",
+            "label_en": "Prerouting",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/ipv6/prerouting",
+            "component": "RuleTablePage"
+          },
+          {
+            "id": "name",
+            "label": "自定义规则",
+            "label_en": "Custom",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/ipv6/name",
+            "component": "RuleTablePage"
+          }
+        ],
+        "route": null,
+        "component": null
+      },
+      {
+        "id": "bridge",
+        "label": "桥接防火墙",
+        "label_en": "Bridge Firewall",
+        "icon": "",
+        "children": [
+          {
+            "id": "forward",
+            "label": "转发规则",
+            "label_en": "Forward",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/bridge/forward",
+            "component": "RuleTablePage"
+          },
+          {
+            "id": "input",
+            "label": "输入规则",
+            "label_en": "Input",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/bridge/input",
+            "component": "RuleTablePage"
+          },
+          {
+            "id": "output",
+            "label": "输出规则",
+            "label_en": "Output",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/bridge/output",
+            "component": "RuleTablePage"
+          }
+        ],
+        "route": null,
+        "component": null
+      },
+      {
+        "id": "group",
+        "label": "防火墙组",
+        "label_en": "Firewall Group",
+        "icon": "",
+        "children": [
+          {
+            "id": "address-group",
+            "label": "地址组",
+            "label_en": "Address Group",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/group/address-group",
+            "component": "TablePage"
+          },
+          {
+            "id": "network-group",
+            "label": "网络组",
+            "label_en": "Network Group",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/group/network-group",
+            "component": "TablePage"
+          },
+          {
+            "id": "port-group",
+            "label": "端口组",
+            "label_en": "Port Group",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/group/port-group",
+            "component": "TablePage"
+          },
+          {
+            "id": "domain-group",
+            "label": "域名组",
+            "label_en": "Domain Group",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/group/domain-group",
+            "component": "TablePage"
+          },
+          {
+            "id": "interface-group",
+            "label": "接口组",
+            "label_en": "Interface Group",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/group/interface-group",
+            "component": "TablePage"
+          },
+          {
+            "id": "mac-group",
+            "label": "MAC组",
+            "label_en": "MAC Group",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/group/mac-group",
+            "component": "TablePage"
+          },
+          {
+            "id": "ipv6-address-group",
+            "label": "IPv6地址组",
+            "label_en": "IPv6 Address Group",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/group/ipv6-address-group",
+            "component": "TablePage"
+          },
+          {
+            "id": "ipv6-network-group",
+            "label": "IPv6网络组",
+            "label_en": "IPv6 Network Group",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/group/ipv6-network-group",
+            "component": "TablePage"
+          },
+          {
+            "id": "dynamic-group",
+            "label": "动态组",
+            "label_en": "Dynamic Group",
+            "icon": "",
+            "children": [],
+            "route": "/firewall/group/dynamic-group",
+            "component": "TablePage"
+          }
+        ],
+        "route": null,
+        "component": null
+      },
+      {
+        "id": "zone",
+        "label": "区域策略",
+        "label_en": "Zone Policy",
+        "icon": "",
+        "children": [],
+        "route": "/firewall/zone",
+        "component": "TablePage"
+      },
+      {
+        "id": "flowtable",
+        "label": "流表",
+        "label_en": "Flowtable",
+        "icon": "",
+        "children": [],
+        "route": "/firewall/flowtable",
+        "component": "TablePage"
+      },
+      {
+        "id": "protocol",
+        "label": "协议列表",
+        "label_en": "Protocol List",
+        "icon": "",
+        "children": [],
+        "route": "/firewall/protocol",
+        "component": "ProtocolPage"
+      },
+      {
+        "id": "qos",
+        "label": "服务质量",
+        "label_en": "QoS",
+        "icon": "ControlOutlined",
+        "children": [
+          {
+            "id": "interface",
+            "label": "接口QoS",
+            "label_en": "Interface QoS",
+            "icon": "",
+            "children": [],
+            "route": "/qos/interface",
+            "component": "TablePage"
+          },
+          {
+            "id": "policy",
+            "label": "QoS策略",
+            "label_en": "QoS Policy",
+            "icon": "",
+            "children": [],
+            "route": "/qos/policy",
+            "component": "TablePage"
+          },
+          {
+            "id": "traffic-match-group",
+            "label": "流量匹配组",
+            "label_en": "Traffic Match Group",
+            "icon": "",
+            "children": [],
+            "route": "/qos/traffic-match-group",
+            "component": "TablePage"
+          }
+        ],
+        "route": null,
+        "component": null
+      },
+      {
+        "id": "load-balancing",
+        "label": "负载均衡",
+        "label_en": "Load Balancing",
+        "icon": "ApartmentOutlined",
+        "children": [
+          {
+            "id": "wan",
+            "label": "WAN负载均衡",
+            "label_en": "WAN LB",
+            "icon": "",
+            "children": [],
+            "route": "/load-balancing/wan",
+            "component": "ConfigPage"
+          },
+          {
+            "id": "reverse-proxy",
+            "label": "反向代理",
+            "label_en": "Reverse Proxy",
+            "icon": "",
+            "children": [],
+            "route": "/load-balancing/reverse-proxy",
+            "component": "ConfigPage"
+          }
+        ],
+        "route": null,
+        "component": null
+      }
+    ],
+    "route": null,
+    "component": null
+  },
+  {
+    "id": "nat",
+    "label": "网络地址转换",
+    "label_en": "NAT",
+    "icon": "SwapOutlined",
+    "children": [
+      {
+        "id": "source",
+        "label": "源NAT",
+        "label_en": "Source NAT",
+        "icon": "",
+        "children": [],
+        "route": "/nat/source",
+        "component": "RuleTablePage"
+      },
+      {
+        "id": "destination",
+        "label": "目的NAT",
+        "label_en": "Destination NAT",
+        "icon": "",
+        "children": [],
+        "route": "/nat/destination",
+        "component": "RuleTablePage"
+      },
+      {
+        "id": "static",
+        "label": "静态NAT",
+        "label_en": "Static NAT",
+        "icon": "",
+        "children": [],
+        "route": "/nat/static",
+        "component": "RuleTablePage"
+      },
+      {
+        "id": "cgnat",
+        "label": "CGNAT",
+        "label_en": "CGNAT",
+        "icon": "",
+        "children": [],
+        "route": "/nat/cgnat",
+        "component": "RuleTablePage"
+      },
+      {
+        "id": "nat64",
+        "label": "NAT64",
+        "label_en": "NAT64",
+        "icon": "",
+        "children": [
+          {
+            "id": "source",
+            "label": "源NAT64",
+            "label_en": "Source",
+            "icon": "",
+            "children": [],
+            "route": "/nat64/source",
+            "component": "RuleTablePage"
+          }
+        ],
+        "route": null,
+        "component": null
+      },
+      {
+        "id": "nat66",
+        "label": "NAT66",
+        "label_en": "NAT66",
+        "icon": "",
+        "children": [
+          {
+            "id": "source",
+            "label": "源NAT66",
+            "label_en": "Source",
+            "icon": "",
+            "children": [],
+            "route": "/nat66/source",
+            "component": "RuleTablePage"
+          },
+          {
+            "id": "destination",
+            "label": "目的NAT66",
+            "label_en": "Destination",
+            "icon": "",
+            "children": [],
+            "route": "/nat66/destination",
+            "component": "RuleTablePage"
+          }
+        ],
+        "route": null,
+        "component": null
+      }
+    ],
+    "route": null,
+    "component": null
+  },
+  {
+    "id": "policy",
+    "label": "路由",
+    "label_en": "Routing",
+    "icon": "NodeIndexOutlined",
+    "children": [
+      {
+        "id": "route",
+        "label": "策略路由",
+        "label_en": "Policy Route",
+        "icon": "",
+        "children": [],
+        "route": "/policy/route",
+        "component": "TablePage"
+      },
+      {
+        "id": "route6",
+        "label": "IPv6策略路由",
+        "label_en": "Policy Route6",
+        "icon": "",
+        "children": [],
+        "route": "/policy/route6",
+        "component": "TablePage"
+      },
+      {
+        "id": "local-route",
+        "label": "本地策略路由",
+        "label_en": "Local Route",
+        "icon": "",
+        "children": [],
+        "route": "/policy/local-route",
+        "component": "TablePage"
+      },
+      {
+        "id": "local-route6",
+        "label": "本地策略路由6",
+        "label_en": "Local Route6",
+        "icon": "",
+        "children": [],
+        "route": "/policy/local-route6",
+        "component": "TablePage"
+      },
+      {
+        "id": "routing-policy",
+        "label": "路由策略",
+        "label_en": "Routing Policy",
+        "icon": "",
+        "children": [
+          {
+            "id": "access-list",
+            "label": "访问列表",
+            "label_en": "Access List",
+            "icon": "",
+            "children": [],
+            "route": "/policy/access-list",
+            "component": "RuleTablePage"
+          },
+          {
+            "id": "access-list6",
+            "label": "访问列表6",
+            "label_en": "Access List6",
+            "icon": "",
+            "children": [],
+            "route": "/policy/access-list6",
+            "component": "RuleTablePage"
+          },
+          {
+            "id": "as-path-list",
+            "label": "AS路径列表",
+            "label_en": "AS Path List",
+            "icon": "",
+            "children": [],
+            "route": "/policy/as-path-list",
+            "component": "TablePage"
+          },
+          {
+            "id": "community-list",
+            "label": "团体列表",
+            "label_en": "Community List",
+            "icon": "",
+            "children": [],
+            "route": "/policy/community-list",
+            "component": "TablePage"
+          },
+          {
+            "id": "extcommunity-list",
+            "label": "扩展团体列表",
+            "label_en": "Extcommunity List",
+            "icon": "",
+            "children": [],
+            "route": "/policy/extcommunity-list",
+            "component": "TablePage"
+          },
+          {
+            "id": "large-community-list",
+            "label": "大型团体列表",
+            "label_en": "Large Community List",
+            "icon": "",
+            "children": [],
+            "route": "/policy/large-community-list",
+            "component": "TablePage"
+          },
+          {
+            "id": "prefix-list",
+            "label": "前缀列表",
+            "label_en": "Prefix List",
+            "icon": "",
+            "children": [],
+            "route": "/policy/prefix-list",
+            "component": "TablePage"
+          },
+          {
+            "id": "prefix-list6",
+            "label": "前缀列表6",
+            "label_en": "Prefix List6",
+            "icon": "",
+            "children": [],
+            "route": "/policy/prefix-list6",
+            "component": "TablePage"
+          },
+          {
+            "id": "route-map",
+            "label": "路由映射",
+            "label_en": "Route Map",
+            "icon": "",
+            "children": [],
+            "route": "/policy/route-map",
+            "component": "RuleTablePage"
+          }
+        ],
+        "route": null,
+        "component": null
+      },
+      {
+        "id": "protocols",
+        "label": "路由协议",
+        "label_en": "Protocols",
+        "icon": "",
+        "children": [
+          {
+            "id": "bgp",
+            "label": "BGP",
+            "label_en": "BGP",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/bgp",
+            "component": "ConfigPage"
+          },
+          {
+            "id": "ospf",
+            "label": "OSPF",
+            "label_en": "OSPF",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/ospf",
+            "component": "ConfigPage"
+          },
+          {
+            "id": "ospfv3",
+            "label": "OSPFv3",
+            "label_en": "OSPFv3",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/ospfv3",
+            "component": "ConfigPage"
+          },
+          {
+            "id": "static",
+            "label": "静态路由",
+            "label_en": "Static",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/static",
+            "component": "ConfigPage"
+          },
+          {
+            "id": "isis",
+            "label": "IS-IS",
+            "label_en": "IS-IS",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/isis",
+            "component": "ConfigPage"
+          },
+          {
+            "id": "rip",
+            "label": "RIP",
+            "label_en": "RIP",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/rip",
+            "component": "ConfigPage"
+          },
+          {
+            "id": "ripng",
+            "label": "RIPng",
+            "label_en": "RIPng",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/ripng",
+            "component": "ConfigPage"
+          },
+          {
+            "id": "pim",
+            "label": "PIM",
+            "label_en": "PIM",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/pim",
+            "component": "ConfigPage"
+          }
+        ],
+        "route": null,
+        "component": null
+      }
+    ],
+    "route": null,
+    "component": null
+  },
+  {
+    "id": "service",
+    "label": "系统服务",
+    "label_en": "Services",
+    "icon": "CloudServerOutlined",
+    "children": [
+      {
+        "id": "dhcp-server",
+        "label": "DHCP服务器",
+        "label_en": "DHCP Server",
+        "icon": "",
+        "children": [],
+        "route": "/service/dhcp-server",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "dhcp-relay",
+        "label": "DHCP中继",
+        "label_en": "DHCP Relay",
+        "icon": "",
+        "children": [],
+        "route": "/service/dhcp-relay",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "dhcpv6-server",
+        "label": "DHCPv6服务器",
+        "label_en": "DHCPv6 Server",
+        "icon": "",
+        "children": [],
+        "route": "/service/dhcpv6-server",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "dns",
+        "label": "DNS",
+        "label_en": "DNS",
+        "icon": "",
+        "children": [],
+        "route": "/service/dns",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "ntp",
+        "label": "NTP",
+        "label_en": "NTP",
+        "icon": "",
+        "children": [],
+        "route": "/service/ntp",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "ssh",
+        "label": "SSH",
+        "label_en": "SSH",
+        "icon": "",
+        "children": [],
+        "route": "/service/ssh",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "https",
+        "label": "HTTPS",
+        "label_en": "HTTPS",
+        "icon": "",
+        "children": [],
+        "route": "/service/https",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "snmp",
+        "label": "SNMP",
+        "label_en": "SNMP",
+        "icon": "",
+        "children": [],
+        "route": "/service/snmp",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "lldp",
+        "label": "LLDP",
+        "label_en": "LLDP",
+        "icon": "",
+        "children": [],
+        "route": "/service/lldp",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "webproxy",
+        "label": "Web代理",
+        "label_en": "Web Proxy",
+        "icon": "",
+        "children": [],
+        "route": "/service/webproxy",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "suricata",
+        "label": "Suricata",
+        "label_en": "Suricata",
+        "icon": "",
+        "children": [],
+        "route": "/service/suricata",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "conntrack-sync",
+        "label": "连接跟踪同步",
+        "label_en": "Conntrack Sync",
+        "icon": "",
+        "children": [],
+        "route": "/service/conntrack-sync",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "config-sync",
+        "label": "配置同步",
+        "label_en": "Config Sync",
+        "icon": "",
+        "children": [],
+        "route": "/service/config-sync",
+        "component": "ConfigPage"
+      }
+    ],
+    "route": null,
+    "component": null
+  },
+  {
+    "id": "vpn",
+    "label": "虚拟专用网络",
+    "label_en": "VPN",
+    "icon": "SafetyOutlined",
+    "children": [
+      {
+        "id": "ipsec",
+        "label": "IPsec",
+        "label_en": "IPsec",
+        "icon": "",
+        "children": [],
+        "route": "/vpn/ipsec",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "openvpn",
+        "label": "OpenVPN",
+        "label_en": "OpenVPN",
+        "icon": "",
+        "children": [],
+        "route": "/vpn/openvpn",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "l2tp",
+        "label": "L2TP",
+        "label_en": "L2TP",
+        "icon": "",
+        "children": [],
+        "route": "/vpn/l2tp",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "pptp",
+        "label": "PPTP",
+        "label_en": "PPTP",
+        "icon": "",
+        "children": [],
+        "route": "/vpn/pptp",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "sstp",
+        "label": "SSTP",
+        "label_en": "SSTP",
+        "icon": "",
+        "children": [],
+        "route": "/vpn/sstp",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "wireguard",
+        "label": "WireGuard",
+        "label_en": "WireGuard",
+        "icon": "",
+        "children": [],
+        "route": "/vpn/wireguard",
+        "component": "ConfigPage"
+      },
+      {
+        "id": "vti",
+        "label": "VTI",
+        "label_en": "VTI",
+        "icon": "",
+        "children": [],
+        "route": "/vpn/vti",
+        "component": "ConfigPage"
+      }
+    ],
+    "route": null,
+    "component": null
+  }
+]

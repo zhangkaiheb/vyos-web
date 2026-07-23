@@ -1,0 +1,23 @@
+{
+  "zh-CN": {
+    "monitor": { "title": "监控", "cpu": "CPU", "memory": "内存", "conntrack": "连接跟踪", "interfaceTraffic": "接口流量", "duration": "时间范围", "addWidget": "添加 Widget", "removeWidget": "移除", "configure": "配置", "fullscreen": "全屏", "restore": "还原", "refresh": "刷新", "interface": "接口", "value": "当前值", "history": "历史数据" }
+  },
+  "zh-TW": {
+    "monitor": { "title": "監控", "cpu": "CPU", "memory": "記憶體", "conntrack": "連線追蹤", "interfaceTraffic": "介面流量", "duration": "時間範圍", "addWidget": "新增 Widget", "removeWidget": "移除", "configure": "設定", "fullscreen": "全螢幕", "restore": "還原", "refresh": "重新整理", "interface": "介面", "value": "目前值", "history": "歷史資料" }
+  },
+  "en": {
+    "monitor": { "title": "Monitor", "cpu": "CPU", "memory": "Memory", "conntrack": "Conntrack", "interfaceTraffic": "Interface Traffic", "duration": "Time Range", "addWidget": "Add Widget", "removeWidget": "Remove", "configure": "Configure", "fullscreen": "Fullscreen", "restore": "Restore", "refresh": "Refresh", "interface": "Interface", "value": "Current Value", "history": "History" }
+  },
+  "ru": {
+    "monitor": { "title": "Мониторинг", "cpu": "CPU", "memory": "Память", "conntrack": "Conntrack", "interfaceTraffic": "Трафик интерфейса", "duration": "Диапазон времени", "addWidget": "Добавить виджет", "removeWidget": "Удалить", "configure": "Настроить", "fullscreen": "Полный экран", "restore": "Восстановить", "refresh": "Обновить", "interface": "Интерфейс", "value": "Текущее значение", "history": "История" }
+  },
+  "de": {
+    "monitor": { "title": "Überwachung", "cpu": "CPU", "memory": "Speicher", "conntrack": "Conntrack", "interfaceTraffic": "Schnittstellenverkehr", "duration": "Zeitraum", "addWidget": "Widget hinzufügen", "removeWidget": "Entfernen", "configure": "Konfigurieren", "fullscreen": "Vollbild", "restore": "Wiederherstellen", "refresh": "Aktualisieren", "interface": "Schnittstelle", "value": "Aktueller Wert", "history": "Verlauf" }
+  },
+  "fr": {
+    "monitor": { "title": "Surveillance", "cpu": "CPU", "memory": "Mémoire", "conntrack": "Conntrack", "interfaceTraffic": "Trafic d'interface", "duration": "Plage horaire", "addWidget": "Ajouter un widget", "removeWidget": "Supprimer", "configure": "Configurer", "fullscreen": "Plein écran", "restore": "Restaurer", "refresh": "Actualiser", "interface": "Interface", "value": "Valeur actuelle", "history": "Historique" }
+  },
+  "ko": {
+    "monitor": { "title": "모니터링", "cpu": "CPU", "memory": "메모리", "conntrack": "Conntrack", "interfaceTraffic": "인터페이스 트래픽", "duration": "시간 범위", "addWidget": "위젯 추가", "removeWidget": "제거", "configure": "구성", "fullscreen": "전체 화면", "restore": "복원", "refresh": "새로고침", "interface": "인터페이스", "value": "현재 값", "history": "기록" }
+  }
+}
