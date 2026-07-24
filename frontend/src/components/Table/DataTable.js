@@ -1,5 +1,6 @@
 import { defineComponent, ref, computed, watch } from '/src/utils/vue-import.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 
 const ACTION_LABELS = {
   create: '创建',
@@ -34,9 +35,10 @@ export default defineComponent({
     disabled: { type: Boolean, default: false },
     tableKey: { type: String, default: '' },
     filterFields: { type: Array, default: null },
+    externalToolbar: { type: Boolean, default: false },
   },
   emits: ['create', 'edit', 'delete', 'move', 'move-up', 'move-down', 'copy', 'refresh', 'selection-change', 'row-click', 'filter-change'],
-  setup(props, { emit }) {
+  setup(props, { emit, expose }) {
     const currentPage = ref(1);
     const selectedKeys = ref(new Set());
     const quickFilter = ref('');
@@ -285,6 +287,13 @@ export default defineComponent({
       return col?.title || key;
     }
 
+    expose({
+      setQuickFilter: (value) => { quickFilter.value = value; currentPage.value = 1; },
+      openFilter,
+      openColumnSetting,
+      clearFilters,
+    });
+
     return {
       ACTION_LABELS,
       currentPage, selectedKeys, quickFilter, sortKey, sortOrder, visibleColumns,
@@ -298,52 +307,53 @@ export default defineComponent({
     };
   },
   template: `
-    <div>
-      <div class="toolbar">
+    <div class="data-table-page">
+      <div class="toolbar" v-if="!externalToolbar">
         <div class="toolbar-left">
-          <button v-for="a in actions" :key="a" @click="handleAction(a)"
-                  :class="{ danger: a === 'delete' }" :disabled="actionDisabled(a)">
-            {{ a === 'moveUp' ? '上移' : a === 'moveDown' ? '下移' : (ACTION_LABELS[a] || a) }}
-          </button>
+          <ToolbarButton v-for="a in actions" :key="a" :icon="a" @click="handleAction(a)" :disabled="actionDisabled(a)">
+            {{ a === 'moveUp' ? $t('app.moveUp') : a === 'moveDown' ? $t('app.moveDown') : (ACTION_LABELS[a] || a) }}
+          </ToolbarButton>
         </div>
         <div class="toolbar-right">
           <input v-model="quickFilter" placeholder="搜索..." />
-          <button @click="openFilter">边界过滤</button>
-          <button @click="openColumnSetting">列设定</button>
+          <ToolbarButton icon="filter" @click="openFilter">边界过滤</ToolbarButton>
+          <ToolbarButton icon="columnSetting" @click="openColumnSetting">列设定</ToolbarButton>
         </div>
       </div>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th v-if="selectable" style="width:40px;">
-              <input type="checkbox" :checked="allPageSelected()" @change="toggleSelectAll" />
-            </th>
-            <th v-for="col in columns.filter(c => visibleColumns.includes(c.key))" :key="col.key"
-                @click="toggleSort(col.key)" style="cursor:pointer;">
-              {{ col.title }}
-              <span v-if="sortKey === col.key">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="row in pagedData" :key="row[rowKey]" :class="{ selected: isSelected(row) }"
-              @click="$emit('row-click', row)">
-            <td v-if="selectable" @click.stop>
-              <input type="checkbox" :checked="isSelected(row)" @change="toggleSelect(row[rowKey])" />
-            </td>
-            <td v-for="col in columns.filter(c => visibleColumns.includes(c.key))" :key="col.key">
-              <slot :name="col.key" :row="row" :value="row[col.key]">
-                {{ row[col.key] }}
-              </slot>
-            </td>
-          </tr>
-          <tr v-if="!pagedData.length">
-            <td :colspan="columns.filter(c => visibleColumns.includes(c.key)).length + (selectable ? 1 : 0)" class="text-center">
-              暂无数据
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th v-if="selectable" style="width:40px;">
+                <input type="checkbox" :checked="allPageSelected()" @change="toggleSelectAll" />
+              </th>
+              <th v-for="col in columns.filter(c => visibleColumns.includes(c.key))" :key="col.key"
+                  @click="toggleSort(col.key)" style="cursor:pointer;">
+                {{ col.title }}
+                <span v-if="sortKey === col.key">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="row in pagedData" :key="row[rowKey]" :class="{ selected: isSelected(row) }"
+                @click="$emit('row-click', row)">
+              <td v-if="selectable" @click.stop>
+                <input type="checkbox" :checked="isSelected(row)" @change="toggleSelect(row[rowKey])" />
+              </td>
+              <td v-for="col in columns.filter(c => visibleColumns.includes(c.key))" :key="col.key">
+                <slot :name="col.key" :row="row" :value="row[col.key]">
+                  {{ row[col.key] }}
+                </slot>
+              </td>
+            </tr>
+            <tr v-if="!pagedData.length">
+              <td :colspan="columns.filter(c => visibleColumns.includes(c.key)).length + (selectable ? 1 : 0)" class="text-center">
+                暂无数据
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div class="pagination">
         <button @click="currentPage = 1" :disabled="currentPage === 1">首页</button>
         <button @click="currentPage--" :disabled="currentPage === 1">上一页</button>
@@ -386,8 +396,8 @@ export default defineComponent({
           </div>
         </div>
         <template #footer>
-          <button @click="cancelColumnSetting">取消</button>
-          <button class="primary" @click="confirmColumnSetting">确定</button>
+          <ToolbarButton icon="cancel" @click="cancelColumnSetting">取消</ToolbarButton>
+          <ToolbarButton icon="confirm" primary @click="confirmColumnSetting">确定</ToolbarButton>
         </template>
       </DraggableModal>
 
@@ -434,12 +444,12 @@ export default defineComponent({
                 <input type="checkbox" v-model="filterForm.caseSensitive" />
               </div>
               <div style="display:flex;justify-content:flex-end;margin-top:8px;">
-                <button @click="addFilterEntry">添加条件</button>
+                <ToolbarButton icon="create" @click="addFilterEntry">添加条件</ToolbarButton>
               </div>
               <div style="margin-top:12px;border-top:1px solid #ddd;padding-top:8px;">
                 <div v-for="(entry, i) in filterEntries" :key="i" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
                   <span :style="{ opacity: entry.enabled ? 1 : 0.5 }">{{ fieldTitle(entry.field) }} {{ entry.not ? '不' : '' }}{{ entry.section }} "{{ entry.text }}"</span>
-                  <button @click="removeFilterEntry(i)" class="danger" style="padding:2px 6px;">删除</button>
+                  <ToolbarButton icon="delete" @click="removeFilterEntry(i)">删除</ToolbarButton>
                 </div>
                 <div v-if="!filterEntries.length" style="color:#999;font-size:12px;">暂无过滤条件</div>
               </div>
@@ -447,12 +457,12 @@ export default defineComponent({
           </div>
         </div>
         <template #footer>
-          <button @click="clearFilters">清除所有</button>
-          <button @click="cancelFilter">取消</button>
-          <button class="primary" @click="confirmFilter">确定</button>
+          <ToolbarButton icon="clear" @click="clearFilters">清除所有</ToolbarButton>
+          <ToolbarButton icon="cancel" @click="cancelFilter">取消</ToolbarButton>
+          <ToolbarButton icon="confirm" primary @click="confirmFilter">确定</ToolbarButton>
         </template>
       </DraggableModal>
     </div>
   `,
-  components: { DraggableModal },
+  components: { DraggableModal, ToolbarButton },
 });

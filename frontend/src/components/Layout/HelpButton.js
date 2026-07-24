@@ -48,7 +48,7 @@ export default defineComponent({
     return { visible, loading, error, displayContent };
   },
   template: `
-    <button @click="visible = true" title="帮助">?</button>
+    <button class="help-btn" @click="visible = true" title="帮助">?</button>
     <DraggableModal v-model:visible="visible" :title="title">
       <div v-if="loading" style="padding:20px;text-align:center;">加载中...</div>
       <div v-else-if="error" style="color:red;">{{ error }}</div>

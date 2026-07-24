@@ -76,8 +76,8 @@ export default defineComponent({
         </div>
         <div class="modal-footer">
           <slot name="footer">
-            <button @click="close">取消</button>
-            <button class="primary" @click="confirm">确定</button>
+            <ToolbarButton icon="cancel" @click="close">取消</ToolbarButton>
+            <ToolbarButton icon="confirm" primary @click="confirm">确定</ToolbarButton>
           </slot>
         </div>
       </div>

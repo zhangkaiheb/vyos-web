@@ -380,7 +380,7 @@ class ConfigService:
             if quota_error:
                 return quota_error
         if isinstance(value, dict):
-            session.set_section(path_list, value)
+            self._set_config_dict(session, path_list, value)
         elif isinstance(value, list):
             try:
                 session.delete(path_list)
@@ -802,6 +802,112 @@ class ConfigService:
         ''', (path, path + ' %')).fetchall()
         conn.close()
         return [dict(r) for r in rows]
+
+    # ---------- dynamic suggestions ----------
+
+    def get_suggestions(self, path, field):
+        """Return suggestion list for a dynamic form field based on config path/field."""
+        path_list = _path_to_list(path or '')
+        try:
+            suggestions = []
+            parent_key = path_list[-1] if path_list else ''
+            grandparent = path_list[-2] if len(path_list) > 1 else ''
+
+            # Interface names
+            if field == 'name' and parent_key in ('inbound-interface', 'outbound-interface'):
+                suggestions = self._list_interfaces()
+            # Interface groups
+            elif field == 'group' and parent_key in ('inbound-interface', 'outbound-interface'):
+                suggestions = self._list_config_keys(['firewall', 'group', 'interface-group'])
+            # Firewall groups
+            elif field == 'address-group':
+                suggestions = self._list_config_keys(['firewall', 'group', 'address-group'])
+            elif field == 'network-group':
+                suggestions = self._list_config_keys(['firewall', 'group', 'network-group'])
+            elif field == 'port-group':
+                suggestions = self._list_config_keys(['firewall', 'group', 'port-group'])
+            elif field == 'domain-group':
+                suggestions = self._list_config_keys(['firewall', 'group', 'domain-group'])
+            elif field == 'mac-group':
+                suggestions = self._list_config_keys(['firewall', 'group', 'mac-group'])
+            elif field == 'dynamic-address-group':
+                suggestions = self._list_config_keys(['firewall', 'group', 'dynamic-group'])
+            # Firewall chain targets (jump-target)
+            elif field == 'jump-target':
+                suggestions = self._list_firewall_chains(path_list)
+            # Flowtable offload targets
+            elif field == 'offload-target':
+                suggestions = self._list_config_keys(['firewall', 'flowtable'])
+            # Protocols
+            elif field == 'protocol':
+                suggestions = self._list_protocols()
+            # Mark / connection-mark plain text suggestions from current marks
+            elif field in ('mark', 'connection-mark'):
+                suggestions = []
+
+            return {'success': True, 'path': path, 'field': field, 'suggestions': suggestions}
+        except Exception as e:
+            return _structured_error('SUGGESTIONS_ERROR', str(e), traceback.format_exc())
+
+    def _list_interfaces(self):
+        try:
+            stdout, stderr, rc = _run_op_show(['interfaces'])
+            if rc == 0:
+                # Parse lines like "eth0        ..." or "Codes: ..."
+                names = set()
+                for line in stdout.splitlines():
+                    parts = line.split()
+                    if not parts:
+                        continue
+                    name = parts[0]
+                    if name.startswith(('eth', 'br', 'bond', 'lo', 'tun', 'vtun', 'wg', 'ppp', 'pppoe', 'vxlan', 'dum', 'ifb', 'wlan')):
+                        names.add(name)
+                return sorted(names)
+        except Exception:
+            pass
+        return []
+
+    def _list_config_keys(self, config_path):
+        try:
+            cfg = vyos.config.Config()
+            data = cfg.get_config_dict(config_path, effective=True, get_first_key=True)
+            if isinstance(data, dict):
+                return sorted(data.keys())
+        except Exception:
+            pass
+        return []
+
+    def _list_firewall_chains(self, path_list):
+        """List available firewall chains for jump target."""
+        chains = []
+        try:
+            cfg = vyos.config.Config()
+            # Custom chains under firewall ipv4 name / ipv6 name / bridge name
+            for family in ['ipv4', 'ipv6', 'bridge']:
+                try:
+                    data = cfg.get_config_dict(['firewall', family, 'name'], effective=True, get_first_key=True)
+                    if isinstance(data, dict):
+                        chains.extend(data.keys())
+                except Exception:
+                    pass
+        except Exception:
+            pass
+        return sorted(set(chains))
+
+    def _list_protocols(self):
+        protocols = ['all', 'tcp_udp', 'icmp', 'tcp', 'udp']
+        try:
+            with open('/etc/protocols', 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith('#'):
+                        continue
+                    parts = line.split()
+                    if parts and parts[0] not in protocols:
+                        protocols.append(parts[0])
+        except Exception:
+            pass
+        return protocols
 
     # ---------- help documentation ----------
 

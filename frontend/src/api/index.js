@@ -16,7 +16,9 @@ async function request(method, url, data = null, query = null) {
   }
 
   const options = { method, headers };
-  if (data !== null) options.body = JSON.stringify(data);
+  if (data !== undefined && ['POST', 'PUT', 'PATCH'].includes(method)) {
+    options.body = JSON.stringify(data);
+  }
 
   const res = await fetch(fullUrl, options);
   const json = await res.json().catch(() => ({}));
@@ -53,6 +55,7 @@ export const configApi = {
   load: (source, password) => api.post('/config/load', { source, password }),
   compare: (left, right) => api.post('/config/compare', { left, right }),
   commands: (path) => api.get('/config/commands', { path }),
+  suggestions: (path, field) => api.get('/config/suggestions', { path, field }),
   sessionChanged: () => api.get('/config/session-changed'),
   export: (password) => api.post('/config/export', { password }),
   import: (type, data, password = '') => api.post('/config/import', { type, data, password }),

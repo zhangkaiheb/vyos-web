@@ -3,6 +3,7 @@ import { userApi, aclApi } from '/src/api/index.js';
 import { t } from '/src/i18n/index.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 
 export default defineComponent({
   name: 'UserPage',
@@ -112,18 +113,18 @@ export default defineComponent({
     };
   },
   template: `
-    <div>
+    <div class="page-container">
       <div v-if="message" class="alert alert-success">{{ message }}</div>
       <div class="toolbar">
         <div class="toolbar-left">
-          <button @click="create">{{ $t('app.create') }}</button>
-          <button @click="edit">{{ $t('app.edit') }}</button>
-          <button @click="changePassword">{{ $t('user.changePassword') }}</button>
-          <button class="danger" @click="remove">{{ $t('app.delete') }}</button>
-          <button @click="load">{{ $t('app.refresh') }}</button>
+          <ToolbarButton icon="create" @click="create">{{ $t('app.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="edit">{{ $t('app.edit') }}</ToolbarButton>
+          <ToolbarButton icon="changePassword" @click="changePassword">{{ $t('user.changePassword') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="remove">{{ $t('app.delete') }}</ToolbarButton>
+          <ToolbarButton icon="refresh" @click="load">{{ $t('app.refresh') }}</ToolbarButton>
         </div>
       </div>
-      <DataTable :columns="columns" :data="users" @selection-change="selected = $event">
+      <DataTable :columns="columns" :data="users" :externalToolbar="true" @selection-change="selected = $event">
         <template #enabled="{ value }">
           <span v-if="value">✓</span><span v-else style="opacity:0.3">-</span>
         </template>
@@ -157,5 +158,5 @@ export default defineComponent({
       </DraggableModal>
     </div>
   `,
-  components: { DataTable, DraggableModal },
+  components: { DataTable, DraggableModal, ToolbarButton },
 });

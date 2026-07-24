@@ -1,7 +1,7 @@
 import { defineComponent, ref, computed, h, onMounted, onUnmounted } from '/src/utils/vue-import.js';
 import { useRoute, useRouter } from '/src/utils/vue-router-import.js';
 import { useAuthStore } from '/src/stores/auth.js';
-import { locale } from '/src/i18n/index.js';
+import { emitMenuRefresh } from '/src/utils/eventBus.js';
 
 const CLOSE_DELAY = 600;
 
@@ -27,8 +27,17 @@ function renderSubmenu(items, state, keepParentOpen, clearParent, setOpen, clear
     }, [
       item.route && !hasChildren
         ? h('a', {
+            class: 'menu-leaf',
             href: 'javascript:;',
-            onClick: (e) => { e.stopPropagation(); router.push(item.route); closeAll(); }
+            onClick: (e) => {
+              e.stopPropagation();
+              if (route.path === item.route) {
+                emitMenuRefresh(route.path);
+              } else {
+                router.push(item.route);
+              }
+              closeAll();
+            }
           }, item.label)
         : h('span', {
             style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
@@ -110,10 +119,27 @@ export default defineComponent({
       openChild.value.openId = openChild.value.openId === id ? '' : id;
     }
 
+    function logout() {
+      auth.logout();
+    }
+
+    const userMenuOpen = ref(false);
+    function toggleUserMenu(e) {
+      e.stopPropagation();
+      userMenuOpen.value = !userMenuOpen.value;
+    }
+    function closeUserMenu() {
+      userMenuOpen.value = false;
+    }
+
     function onDocumentClick(e) {
       const menuEl = document.querySelector('.top-menu-outer');
       if (menuEl && !menuEl.contains(e.target)) {
         closeAll();
+      }
+      const userMenuEl = document.querySelector('.user-menu');
+      if (userMenuEl && !userMenuEl.contains(e.target)) {
+        closeUserMenu();
       }
     }
 
@@ -123,14 +149,6 @@ export default defineComponent({
     onUnmounted(() => {
       document.removeEventListener('click', onDocumentClick);
     });
-
-    function changeLanguage(e) {
-      locale.value = e.target.value;
-      localStorage.setItem('locale', locale.value);
-    }
-    function logout() {
-      auth.logout();
-    }
 
     return () => h('div', { class: 'top-menu-outer' }, [
       h('nav', { class: 'top-menu' }, topItems.value.map(l1 => {
@@ -155,12 +173,24 @@ export default defineComponent({
           h('span', null, '🔔'),
           h('span', { class: 'notification-badge' }, '0')
         ]),
-        h('span', null, auth.user?.username || ''),
-        h('select', { value: locale.value, onChange: changeLanguage }, [
-          h('option', { value: 'zh-CN' }, '中文'),
-          h('option', { value: 'en' }, 'English')
+        h('div', { class: ['user-menu', { open: userMenuOpen.value }] }, [
+          h('button', {
+            class: 'user-menu-trigger',
+            type: 'button',
+            onClick: toggleUserMenu,
+          }, [
+            h('span', null, auth.user?.username || ''),
+            h('span', { class: 'user-menu-arrow' }, '▾'),
+          ]),
+          userMenuOpen.value
+            ? h('div', { class: 'user-menu-dropdown' }, [
+                h('div', {
+                  class: 'user-menu-item',
+                  onClick: (e) => { e.stopPropagation(); logout(); closeUserMenu(); }
+                }, '注销')
+              ])
+            : null,
         ]),
-        h('button', { onClick: logout }, '注销')
       ])
     ]);
   }

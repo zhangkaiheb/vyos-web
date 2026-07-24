@@ -137,10 +137,10 @@ export default defineComponent({
           <select v-model="selectedInterface">
             <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
           </select>
-          <button @click="addInterfaceWidget">{{ $t('monitor.addWidget') }} (Interface)</button>
-          <button @click="addWidget('cpu')">+ CPU</button>
-          <button @click="addWidget('memory')">+ Memory</button>
-          <button @click="addWidget('conntrack')">+ Conntrack</button>
+          <ToolbarButton icon="addWidget" @click="addInterfaceWidget">{{ $t('monitor.addWidget') }} (Interface)</ToolbarButton>
+          <ToolbarButton icon="addWidget" @click="addWidget('cpu')">CPU</ToolbarButton>
+          <ToolbarButton icon="addWidget" @click="addWidget('memory')">Memory</ToolbarButton>
+          <ToolbarButton icon="addWidget" @click="addWidget('conntrack')">Conntrack</ToolbarButton>
         </div>
       </div>
       <div class="widget-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;padding:16px;">

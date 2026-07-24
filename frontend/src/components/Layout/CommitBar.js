@@ -76,10 +76,10 @@ export default defineComponent({
         <span v-if="diff.length" style="color:#666;font-size:12px;">（{{ diff.length }} 行差异）</span>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
-        <button @click="showDiff = !showDiff">{{ showDiff ? '隐藏差异' : '查看差异' }}</button>
-        <button @click="save">保存配置</button>
-        <button @click="commit" class="primary">提交配置</button>
-        <button @click="discard" class="danger">丢弃变更</button>
+        <ToolbarButton icon="diff" @click="showDiff = !showDiff">{{ showDiff ? '隐藏差异' : '查看差异' }}</ToolbarButton>
+        <ToolbarButton icon="save" @click="save">保存配置</ToolbarButton>
+        <ToolbarButton icon="commit" primary @click="commit">提交配置</ToolbarButton>
+        <ToolbarButton icon="discard" @click="discard">丢弃变更</ToolbarButton>
       </div>
       <span v-if="message" style="color:#d48806;font-size:12px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ message }}</span>
     </div>

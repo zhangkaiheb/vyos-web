@@ -1,6 +1,6 @@
 {
   "zh-CN": {
-    "app": { "title": "VyOS Web Config", "login": "登录", "logout": "注销", "submit": "提交", "cancel": "取消", "save": "保存", "delete": "删除", "edit": "编辑", "create": "创建", "move": "移动", "copy": "复制", "refresh": "刷新", "search": "搜索", "columnSetting": "列设定", "filter": "筛选", "advanced": "高级选项", "commands": "命令行", "close": "关闭", "confirm": "确定", "loading": "加载中", "actions": "操作" },
+    "app": { "title": "VyOS", "login": "登录", "logout": "注销", "submit": "提交", "cancel": "取消", "save": "保存", "delete": "删除", "edit": "编辑", "create": "创建", "move": "移动", "moveUp": "上移", "moveDown": "下移", "copy": "复制", "refresh": "刷新", "search": "搜索", "columnSetting": "列设定", "filter": "筛选", "advanced": "高级选项", "commands": "命令行", "close": "关闭", "confirm": "确定", "loading": "加载中", "actions": "操作" },
     "login": { "username": "用户名", "password": "密码", "remember": "记住我", "language": "语言" },
     "menu": { "monitor": "监控", "logs": "日志", "firewall": "防火墙", "interfaces": "网络接口", "nat": "网络地址转换", "policy": "路由策略与协议", "qos": "服务质量", "service": "系统服务", "system": "系统参数", "vpn": "虚拟专用网络", "load-balancing": "负载均衡" },
     "table": { "total": "共 {total} 条", "page": "第 {page}/{pages} 页", "itemsPerPage": "每页条数", "noData": "暂无数据" },
@@ -9,7 +9,7 @@
     "msg": { "saved": "保存成功", "deleted": "删除成功", "confirmDelete": "确认删除选中的项？", "noSelection": "请选择一行" }
   },
   "zh-TW": {
-    "app": { "title": "VyOS Web Config", "login": "登入", "logout": "登出", "submit": "送出", "cancel": "取消", "save": "儲存", "delete": "刪除", "edit": "編輯", "create": "建立", "move": "移動", "copy": "複製", "refresh": "重新整理", "search": "搜尋", "columnSetting": "欄位設定", "filter": "篩選", "advanced": "進階選項", "commands": "指令", "close": "關閉", "confirm": "確定", "loading": "載入中", "actions": "操作" },
+    "app": { "title": "VyOS", "login": "登入", "logout": "登出", "submit": "送出", "cancel": "取消", "save": "儲存", "delete": "刪除", "edit": "編輯", "create": "建立", "move": "移動", "moveUp": "上移", "moveDown": "下移", "copy": "複製", "refresh": "重新整理", "search": "搜尋", "columnSetting": "欄位設定", "filter": "篩選", "advanced": "進階選項", "commands": "指令", "close": "關閉", "confirm": "確定", "loading": "載入中", "actions": "操作" },
     "login": { "username": "使用者名稱", "password": "密碼", "remember": "記住我", "language": "語言" },
     "menu": { "monitor": "監控", "logs": "日誌", "firewall": "防火牆", "interfaces": "網路介面", "nat": "網路位址轉換", "policy": "路由策略與協定", "qos": "服務品質", "service": "系統服務", "system": "系統參數", "vpn": "虛擬私人網路", "load-balancing": "負載平衡" },
     "table": { "total": "共 {total} 筆", "page": "第 {page}/{pages} 頁", "itemsPerPage": "每頁筆數", "noData": "暫無資料" },
@@ -18,7 +18,7 @@
     "msg": { "saved": "儲存成功", "deleted": "刪除成功", "confirmDelete": "確認刪除選取的項目？", "noSelection": "請選取一列" }
   },
   "en": {
-    "app": { "title": "VyOS Web Config", "login": "Login", "logout": "Logout", "submit": "Submit", "cancel": "Cancel", "save": "Save", "delete": "Delete", "edit": "Edit", "create": "Create", "move": "Move", "copy": "Copy", "refresh": "Refresh", "search": "Search", "columnSetting": "Column Setting", "filter": "Filter", "advanced": "Advanced Options", "commands": "CLI Commands", "close": "Close", "confirm": "Confirm", "loading": "Loading", "actions": "Actions" },
+    "app": { "title": "VyOS", "login": "Login", "logout": "Logout", "submit": "Submit", "cancel": "Cancel", "save": "Save", "delete": "Delete", "edit": "Edit", "create": "Create", "move": "Move", "moveUp": "Move Up", "moveDown": "Move Down", "copy": "Copy", "refresh": "Refresh", "search": "Search", "columnSetting": "Column Setting", "filter": "Filter", "advanced": "Advanced Options", "commands": "CLI Commands", "close": "Close", "confirm": "Confirm", "loading": "Loading", "actions": "Actions" },
     "login": { "username": "Username", "password": "Password", "remember": "Remember me", "language": "Language" },
     "menu": { "monitor": "Monitor", "logs": "Logs", "firewall": "Firewall", "interfaces": "Interfaces", "nat": "NAT", "policy": "Policy & Protocols", "qos": "QoS", "service": "Services", "system": "System", "vpn": "VPN", "load-balancing": "Load Balancing" },
     "table": { "total": "Total {total}", "page": "Page {page}/{pages}", "itemsPerPage": "Items per page", "noData": "No data" },
@@ -27,7 +27,7 @@
     "msg": { "saved": "Saved successfully", "deleted": "Deleted successfully", "confirmDelete": "Confirm delete selected items?", "noSelection": "Please select a row" }
   },
   "ru": {
-    "app": { "title": "VyOS Web Config", "login": "Вход", "logout": "Выход", "submit": "Отправить", "cancel": "Отмена", "save": "Сохранить", "delete": "Удалить", "edit": "Изменить", "create": "Создать", "move": "Переместить", "copy": "Копировать", "refresh": "Обновить", "search": "Поиск", "columnSetting": "Настройка столбцов", "filter": "Фильтр", "advanced": "Дополнительные параметры", "commands": "Команды CLI", "close": "Закрыть", "confirm": "Подтвердить", "loading": "Загрузка", "actions": "Действия" },
+    "app": { "title": "VyOS", "login": "Вход", "logout": "Выход", "submit": "Отправить", "cancel": "Отмена", "save": "Сохранить", "delete": "Удалить", "edit": "Изменить", "create": "Создать", "move": "Переместить", "moveUp": "Вверх", "moveDown": "Вниз", "copy": "Копировать", "refresh": "Обновить", "search": "Поиск", "columnSetting": "Настройка столбцов", "filter": "Фильтр", "advanced": "Дополнительные параметры", "commands": "Команды CLI", "close": "Закрыть", "confirm": "Подтвердить", "loading": "Загрузка", "actions": "Действия" },
     "login": { "username": "Имя пользователя", "password": "Пароль", "remember": "Запомнить меня", "language": "Язык" },
     "menu": { "monitor": "Мониторинг", "logs": "Журналы", "firewall": "Брандмауэр", "interfaces": "Интерфейсы", "nat": "NAT", "policy": "Политики и протоколы", "qos": "QoS", "service": "Службы", "system": "Система", "vpn": "VPN", "load-balancing": "Балансировка нагрузки" },
     "table": { "total": "Всего {total}", "page": "Страница {page}/{pages}", "itemsPerPage": "На странице", "noData": "Нет данных" },
@@ -36,7 +36,7 @@
     "msg": { "saved": "Успешно сохранено", "deleted": "Успешно удалено", "confirmDelete": "Подтвердить удаление выбранных элементов?", "noSelection": "Выберите строку" }
   },
   "de": {
-    "app": { "title": "VyOS Web Config", "login": "Anmelden", "logout": "Abmelden", "submit": "Senden", "cancel": "Abbrechen", "save": "Speichern", "delete": "Löschen", "edit": "Bearbeiten", "create": "Erstellen", "move": "Verschieben", "copy": "Kopieren", "refresh": "Aktualisieren", "search": "Suchen", "columnSetting": "Spalteneinstellung", "filter": "Filter", "advanced": "Erweiterte Optionen", "commands": "CLI-Befehle", "close": "Schließen", "confirm": "Bestätigen", "loading": "Laden", "actions": "Aktionen" },
+    "app": { "title": "VyOS", "login": "Anmelden", "logout": "Abmelden", "submit": "Senden", "cancel": "Abbrechen", "save": "Speichern", "delete": "Löschen", "edit": "Bearbeiten", "create": "Erstellen", "move": "Verschieben", "moveUp": "Nach oben", "moveDown": "Nach unten", "copy": "Kopieren", "refresh": "Aktualisieren", "search": "Suchen", "columnSetting": "Spalteneinstellung", "filter": "Filter", "advanced": "Erweiterte Optionen", "commands": "CLI-Befehle", "close": "Schließen", "confirm": "Bestätigen", "loading": "Laden", "actions": "Aktionen" },
     "login": { "username": "Benutzername", "password": "Passwort", "remember": "Angemeldet bleiben", "language": "Sprache" },
     "menu": { "monitor": "Überwachung", "logs": "Protokolle", "firewall": "Firewall", "interfaces": "Schnittstellen", "nat": "NAT", "policy": "Richtlinien & Protokolle", "qos": "QoS", "service": "Dienste", "system": "System", "vpn": "VPN", "load-balancing": "Lastverteilung" },
     "table": { "total": "Insgesamt {total}", "page": "Seite {page}/{pages}", "itemsPerPage": "Einträge pro Seite", "noData": "Keine Daten" },
@@ -45,7 +45,7 @@
     "msg": { "saved": "Erfolgreich gespeichert", "deleted": "Erfolgreich gelöscht", "confirmDelete": "Ausgewählte Elemente löschen?", "noSelection": "Bitte eine Zeile auswählen" }
   },
   "fr": {
-    "app": { "title": "VyOS Web Config", "login": "Connexion", "logout": "Déconnexion", "submit": "Envoyer", "cancel": "Annuler", "save": "Enregistrer", "delete": "Supprimer", "edit": "Modifier", "create": "Créer", "move": "Déplacer", "copy": "Copier", "refresh": "Actualiser", "search": "Rechercher", "columnSetting": "Configuration des colonnes", "filter": "Filtrer", "advanced": "Options avancées", "commands": "Commandes CLI", "close": "Fermer", "confirm": "Confirmer", "loading": "Chargement", "actions": "Actions" },
+    "app": { "title": "VyOS", "login": "Connexion", "logout": "Déconnexion", "submit": "Envoyer", "cancel": "Annuler", "save": "Enregistrer", "delete": "Supprimer", "edit": "Modifier", "create": "Créer", "move": "Déplacer", "moveUp": "Monter", "moveDown": "Descendre", "copy": "Copier", "refresh": "Actualiser", "search": "Rechercher", "columnSetting": "Configuration des colonnes", "filter": "Filtrer", "advanced": "Options avancées", "commands": "Commandes CLI", "close": "Fermer", "confirm": "Confirmer", "loading": "Chargement", "actions": "Actions" },
     "login": { "username": "Nom d'utilisateur", "password": "Mot de passe", "remember": "Se souvenir de moi", "language": "Langue" },
     "menu": { "monitor": "Surveillance", "logs": "Journaux", "firewall": "Pare-feu", "interfaces": "Interfaces", "nat": "NAT", "policy": "Politiques & Protocoles", "qos": "QoS", "service": "Services", "system": "Système", "vpn": "VPN", "load-balancing": "Équilibrage de charge" },
     "table": { "total": "Total {total}", "page": "Page {page}/{pages}", "itemsPerPage": "Éléments par page", "noData": "Aucune donnée" },
@@ -54,7 +54,7 @@
     "msg": { "saved": "Enregistré avec succès", "deleted": "Supprimé avec succès", "confirmDelete": "Confirmer la suppression des éléments sélectionnés?", "noSelection": "Veuillez sélectionner une ligne" }
   },
   "ko": {
-    "app": { "title": "VyOS Web Config", "login": "로그인", "logout": "로그아웃", "submit": "제출", "cancel": "취소", "save": "저장", "delete": "삭제", "edit": "편집", "create": "생성", "move": "이동", "copy": "복사", "refresh": "새로고침", "search": "검색", "columnSetting": "열 설정", "filter": "필터", "advanced": "고급 옵션", "commands": "CLI 명령", "close": "닫기", "confirm": "확인", "loading": "로딩 중", "actions": "작업" },
+    "app": { "title": "VyOS", "login": "로그인", "logout": "로그아웃", "submit": "제출", "cancel": "취소", "save": "저장", "delete": "삭제", "edit": "편집", "create": "생성", "move": "이동", "moveUp": "위로", "moveDown": "아래로", "copy": "복사", "refresh": "새로고침", "search": "검색", "columnSetting": "열 설정", "filter": "필터", "advanced": "고급 옵션", "commands": "CLI 명령", "close": "닫기", "confirm": "확인", "loading": "로딩 중", "actions": "작업" },
     "login": { "username": "사용자 이름", "password": "비밀번호", "remember": "기억하기", "language": "언어" },
     "menu": { "monitor": "모니터링", "logs": "로그", "firewall": "방화벽", "interfaces": "인터페이스", "nat": "NAT", "policy": "정책 및 프로토콜", "qos": "QoS", "service": "서비스", "system": "시스템", "vpn": "VPN", "load-balancing": "부하 분산" },
     "table": { "total": "총 {total}개", "page": "페이지 {page}/{pages}", "itemsPerPage": "페이지당 항목", "noData": "데이터 없음" },

@@ -104,7 +104,7 @@ export default defineComponent({
       </div>
       <div class="form-row">
         <label class="form-label"></label>
-        <button class="primary" @click="save">{{ $t('app.save') }}</button>
+        <ToolbarButton icon="save" primary @click="save">{{ $t('app.save') }}</ToolbarButton>
       </div>
       </div>
     </div>

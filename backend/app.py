@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-VyOS Web Config Backend Application
+VyOS Web Backend Application
 WSGI compatible backend using standard Python libraries.
 """
 
@@ -102,6 +102,7 @@ class VyOSWebApp:
                 '/api/menu': self.handle_get_menu,
                 '/api/config': self.handle_get_config,
                 '/api/config/commands': self.handle_get_commands,
+                '/api/config/suggestions': self.handle_get_suggestions,
                 '/api/monitor': self.handle_monitor,
                 '/api/logs': self.handle_logs,
                 '/api/system/info': self.handle_system_info,
@@ -323,6 +324,12 @@ class VyOSWebApp:
         query = parse_qs(environ.get('QUERY_STRING', ''))
         path = query.get('path', [''])[0]
         return self.config_service.get_commands(path)
+
+    def handle_get_suggestions(self, environ, body):
+        query = parse_qs(environ.get('QUERY_STRING', ''))
+        path = query.get('path', [''])[0]
+        field = query.get('field', [''])[0]
+        return self.config_service.get_suggestions(path, field)
 
     def handle_monitor(self, environ, body):
         query = parse_qs(environ.get('QUERY_STRING', ''))

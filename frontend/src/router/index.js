@@ -8,11 +8,20 @@ import MonitorWidget from '/src/pages/MonitorWidget.js';
 import LogPage from '/src/pages/LogPage.js';
 import UserPage from '/src/pages/UserPage.js';
 import ProtocolPage from '/src/pages/ProtocolPage.js';
+import FirewallGlobalOptionsPage from '/src/pages/FirewallGlobalOptionsPage.js';
+import FirewallGroupPage from '/src/pages/FirewallGroupPage.js';
 import SettingsPage from '/src/pages/SettingsPage.js';
 import ToolPage from '/src/pages/ToolPage.js';
 import ImportExportPage from '/src/pages/ImportExportPage.js';
 import WebAppPage from '/src/pages/WebAppPage.js';
 import ShellPage from '/src/pages/ShellPage.js';
+import IpsecPage from '/src/pages/IpsecPage.js';
+import IpsecConnectionsPage from '/src/pages/IpsecConnectionsPage.js';
+import IpsecSaPage from '/src/pages/IpsecSaPage.js';
+import L2tpPage from '/src/pages/L2tpPage.js';
+import PptpPage from '/src/pages/PptpPage.js';
+import PptpSessionsPage from '/src/pages/PptpSessionsPage.js';
+import PptpStatisticsPage from '/src/pages/PptpStatisticsPage.js';
 
 const componentMap = {
   TablePage: GenericTablePage,
@@ -24,11 +33,20 @@ const componentMap = {
   LogPage,
   UserPage,
   ProtocolPage,
+  FirewallGlobalOptionsPage,
+  FirewallGroupPage,
   SettingsPage,
   ToolPage,
   ImportExportPage,
   WebAppPage,
   ShellPage,
+  IpsecPage,
+  IpsecConnectionsPage,
+  IpsecSaPage,
+  L2tpPage,
+  PptpPage,
+  PptpSessionsPage,
+  PptpStatisticsPage,
 };
 
 function buildRoutes(menu, parentPath = '') {

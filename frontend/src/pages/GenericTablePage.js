@@ -91,7 +91,7 @@ export default defineComponent({
     };
   },
   template: `
-    <div>
+    <div class="page-container">
       <DataTable :columns="columns" :data="data" :loading="loading" :disabled="writeDisabled"
                  @create="create" @edit="edit" @delete="remove" @refresh="load"
                  @selection-change="selected = $event" />

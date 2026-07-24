@@ -87,8 +87,8 @@ export default defineComponent({
       <div class="form-row"><label class="form-label">配置内容</label><textarea class="form-control" v-model="configText" rows="10"></textarea></div>
       <div class="form-row"><label class="form-label"></label>
         <div style="display:flex;gap:8px;">
-          <button class="primary" @click="doExport">{{ $t('config.export') }}</button>
-          <button @click="doImport">{{ $t('config.import') }}</button>
+          <ToolbarButton icon="export" primary @click="doExport">{{ $t('config.export') }}</ToolbarButton>
+          <ToolbarButton icon="import" @click="doImport">{{ $t('config.import') }}</ToolbarButton>
         </div>
       </div>
       <hr style="margin:20px 0;" />
@@ -103,8 +103,8 @@ export default defineComponent({
       <div class="form-row"><label class="form-label">导入文件</label><input type="file" @change="importFile = $event.target.files[0]" /></div>
       <div class="form-row"><label class="form-label"></label>
         <div style="display:flex;gap:8px;">
-          <button class="primary" @click="exportFirewall">导出规则</button>
-          <button @click="importFirewall">导入规则</button>
+          <ToolbarButton icon="export" primary @click="exportFirewall">导出规则</ToolbarButton>
+          <ToolbarButton icon="import" @click="importFirewall">导入规则</ToolbarButton>
         </div>
       </div>
     </div>

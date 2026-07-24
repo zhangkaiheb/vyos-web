@@ -15,7 +15,7 @@ const localeNames = {
 
 const defaultMessages = {
   'zh-CN': {
-    app: { title: 'VyOS Web Config', login: '登录', logout: '注销', submit: '提交', cancel: '取消', save: '保存', delete: '删除', edit: '编辑', create: '创建', move: '移动', copy: '复制', refresh: '刷新', search: '搜索', columnSetting: '列设定', filter: '筛选', advanced: '高级选项', commands: '命令行', close: '关闭', confirm: '确定', loading: '加载中', actions: '操作' },
+    app: { title: 'VyOS', login: '登录', logout: '注销', submit: '提交', cancel: '取消', save: '保存', delete: '删除', edit: '编辑', create: '创建', move: '移动', moveUp: '上移', moveDown: '下移', copy: '复制', refresh: '刷新', search: '搜索', columnSetting: '列设定', filter: '筛选', advanced: '高级选项', commands: '命令行', close: '关闭', confirm: '确定', loading: '加载中', actions: '操作' },
     login: { username: '用户名', password: '密码', remember: '记住我', language: '语言' },
     menu: { monitor: '监控', logs: '日志', firewall: '防火墙', interfaces: '网络接口', nat: '网络地址转换', policy: '路由策略与协议', qos: '服务质量', service: '系统服务', system: '系统参数', vpn: '虚拟专用网络', 'load-balancing': '负载均衡' },
     table: { total: '共 {total} 条', page: '第 {page}/{pages} 页', itemsPerPage: '每页条数', noData: '暂无数据' },
@@ -24,7 +24,7 @@ const defaultMessages = {
     msg: { saved: '保存成功', deleted: '删除成功', confirmDelete: '确认删除选中的项？', noSelection: '请选择一行' },
   },
   'en': {
-    app: { title: 'VyOS Web Config', login: 'Login', logout: 'Logout', submit: 'Submit', cancel: 'Cancel', save: 'Save', delete: 'Delete', edit: 'Edit', create: 'Create', move: 'Move', copy: 'Copy', refresh: 'Refresh', search: 'Search', columnSetting: 'Column Setting', filter: 'Filter', advanced: 'Advanced Options', commands: 'CLI Commands', close: 'Close', confirm: 'Confirm', loading: 'Loading', actions: 'Actions' },
+    app: { title: 'VyOS', login: 'Login', logout: 'Logout', submit: 'Submit', cancel: 'Cancel', save: 'Save', delete: 'Delete', edit: 'Edit', create: 'Create', move: 'Move', moveUp: 'Move Up', moveDown: 'Move Down', copy: 'Copy', refresh: 'Refresh', search: 'Search', columnSetting: 'Column Setting', filter: 'Filter', advanced: 'Advanced Options', commands: 'CLI Commands', close: 'Close', confirm: 'Confirm', loading: 'Loading', actions: 'Actions' },
     login: { username: 'Username', password: 'Password', remember: 'Remember me', language: 'Language' },
     menu: { monitor: 'Monitor', logs: 'Logs', firewall: 'Firewall', interfaces: 'Interfaces', nat: 'NAT', policy: 'Policy & Protocols', qos: 'QoS', service: 'Services', system: 'System', vpn: 'VPN', 'load-balancing': 'Load Balancing' },
     table: { total: 'Total {total}', page: 'Page {page}/{pages}', itemsPerPage: 'Items per page', noData: 'No data' },

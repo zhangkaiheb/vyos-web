@@ -118,7 +118,7 @@ export default defineComponent({
             <option value="1w">1w</option>
             <option value="24h">24h</option>
           </select>
-          <button @click="load">{{ $t('app.refresh') }}</button>
+          <ToolbarButton icon="refresh" @click="load">{{ $t('app.refresh') }}</ToolbarButton>
         </div>
       </div>
       <div style="padding:16px;">

@@ -4,10 +4,12 @@ import { createRouter, updateRouterMenu } from '/src/router/index.js';
 import { createPinia } from '/src/stores/pinia.js';
 import App from '/src/App.js';
 import { useAuthStore } from '/src/stores/auth.js';
+import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 
 async function bootstrap() {
   await loadLocales();
   const app = createApp(App);
+  app.component('ToolbarButton', ToolbarButton);
   app.use(createPinia());
 
   const auth = useAuthStore();

@@ -49,6 +49,42 @@
         "children": [],
         "route": "/monitor/conntrack",
         "component": "MonitorWidget"
+      },
+      {
+        "id": "ipsec-connections",
+        "label": "IPsec 连接",
+        "label_en": "IPsec Connections",
+        "icon": "",
+        "children": [],
+        "route": "/monitor/ipsec-connections",
+        "component": "IpsecConnectionsPage"
+      },
+      {
+        "id": "ipsec-sa",
+        "label": "IPsec 安全关联",
+        "label_en": "IPsec Security Associations",
+        "icon": "",
+        "children": [],
+        "route": "/monitor/ipsec-sa",
+        "component": "IpsecSaPage"
+      },
+      {
+        "id": "pptp-sessions",
+        "label": "PPTP 会话",
+        "label_en": "PPTP Sessions",
+        "icon": "",
+        "children": [],
+        "route": "/monitor/pptp-sessions",
+        "component": "PptpSessionsPage"
+      },
+      {
+        "id": "pptp-statistics",
+        "label": "PPTP 统计",
+        "label_en": "PPTP Statistics",
+        "icon": "",
+        "children": [],
+        "route": "/monitor/pptp-statistics",
+        "component": "PptpStatisticsPage"
       }
     ],
     "route": null,
@@ -450,7 +486,7 @@
         "icon": "",
         "children": [],
         "route": "/firewall/global-options",
-        "component": "ConfigPage"
+        "component": "FirewallGlobalOptionsPage"
       },
       {
         "id": "ipv4",
@@ -612,7 +648,7 @@
             "icon": "",
             "children": [],
             "route": "/firewall/group/address-group",
-            "component": "TablePage"
+            "component": "FirewallGroupPage"
           },
           {
             "id": "network-group",
@@ -621,7 +657,7 @@
             "icon": "",
             "children": [],
             "route": "/firewall/group/network-group",
-            "component": "TablePage"
+            "component": "FirewallGroupPage"
           },
           {
             "id": "port-group",
@@ -630,7 +666,7 @@
             "icon": "",
             "children": [],
             "route": "/firewall/group/port-group",
-            "component": "TablePage"
+            "component": "FirewallGroupPage"
           },
           {
             "id": "domain-group",
@@ -639,7 +675,7 @@
             "icon": "",
             "children": [],
             "route": "/firewall/group/domain-group",
-            "component": "TablePage"
+            "component": "FirewallGroupPage"
           },
           {
             "id": "interface-group",
@@ -648,7 +684,7 @@
             "icon": "",
             "children": [],
             "route": "/firewall/group/interface-group",
-            "component": "TablePage"
+            "component": "FirewallGroupPage"
           },
           {
             "id": "mac-group",
@@ -657,7 +693,7 @@
             "icon": "",
             "children": [],
             "route": "/firewall/group/mac-group",
-            "component": "TablePage"
+            "component": "FirewallGroupPage"
           },
           {
             "id": "ipv6-address-group",
@@ -666,7 +702,7 @@
             "icon": "",
             "children": [],
             "route": "/firewall/group/ipv6-address-group",
-            "component": "TablePage"
+            "component": "FirewallGroupPage"
           },
           {
             "id": "ipv6-network-group",
@@ -675,7 +711,7 @@
             "icon": "",
             "children": [],
             "route": "/firewall/group/ipv6-network-group",
-            "component": "TablePage"
+            "component": "FirewallGroupPage"
           },
           {
             "id": "dynamic-group",
@@ -684,7 +720,7 @@
             "icon": "",
             "children": [],
             "route": "/firewall/group/dynamic-group",
-            "component": "TablePage"
+            "component": "FirewallGroupPage"
           }
         ],
         "route": null,
@@ -1238,7 +1274,7 @@
         "icon": "",
         "children": [],
         "route": "/vpn/ipsec",
-        "component": "ConfigPage"
+        "component": "IpsecPage"
       },
       {
         "id": "openvpn",
@@ -1256,7 +1292,7 @@
         "icon": "",
         "children": [],
         "route": "/vpn/l2tp",
-        "component": "ConfigPage"
+        "component": "L2tpPage"
       },
       {
         "id": "pptp",
@@ -1265,7 +1301,7 @@
         "icon": "",
         "children": [],
         "route": "/vpn/pptp",
-        "component": "ConfigPage"
+        "component": "PptpPage"
       },
       {
         "id": "sstp",

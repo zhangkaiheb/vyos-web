@@ -444,7 +444,7 @@ export default defineComponent({
     };
   },
   template: `
-    <div>
+    <div class="page-container">
       <DataTable :columns="columns" :data="data" :loading="loading" :disabled="writeDisabled"
                  tableKey="ethernet_interfaces"
                  @create="create" @edit="edit" @delete="remove" @refresh="load"

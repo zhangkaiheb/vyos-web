@@ -37,7 +37,8 @@ function validIP(ip) {
 }
 
 function validIPOrSegment(ip) {
-  return validIPv4CIDR(ip) || validIPv4Range(ip) || validIP(ip);
+  const val = ip.startsWith('!') ? ip.slice(1) : ip;
+  return validIPv4CIDR(val) || validIPv4Range(val) || validIP(val);
 }
 
 function validPort(p) {
@@ -45,8 +46,41 @@ function validPort(p) {
   return n >= 1 && n <= 65535;
 }
 
+function validPortMulti(value) {
+  if (!value) return false;
+  const items = String(value).split(',').map(s => s.trim()).filter(Boolean);
+  if (!items.length) return false;
+  for (const item of items) {
+    if (item.includes('-')) {
+      const [start, end] = item.split('-').map(s => parseInt(s.trim()));
+      if (isNaN(start) || isNaN(end) || start < 1 || end > 65535 || start > end) return false;
+    } else if (!isNaN(parseInt(item))) {
+      if (!validPort(item)) return false;
+    }
+    // Named ports from /etc/services are also valid but not verified here
+  }
+  return true;
+}
+
 function validMAC(mac) {
   return MAC_RE.test(mac);
+}
+
+function _validateSingle(value, rule) {
+  const type = rule.validate || rule.type;
+  if (type === 'ip' && !validIP(value)) return '请输入有效的IP地址';
+  if (type === 'ip-segment' && !validIPOrSegment(value)) return '请输入有效的IP地址、CIDR 或 IP 范围';
+  if (type === 'ipv4' && !validIPv4(value)) return '请输入有效的IPv4地址';
+  if (type === 'ipv4-cidr' && !validIPv4CIDR(value)) return '请输入有效的IPv4网段';
+  if (type === 'ipv4-range' && !validIPv4Range(value)) return '请输入有效的IPv4范围，如 192.168.1.1-192.168.1.100';
+  if (type === 'ipv6' && !validIPv6(value)) return '请输入有效的IPv6地址';
+  if (type === 'mac' && !validMAC(value)) return '请输入有效的MAC地址';
+  if (type === 'port' && !validPortMulti(value)) return '请输入有效的端口、端口范围或逗号分隔列表';
+  if (type === 'port-single' && !validPort(value)) return '端口号范围为1-65535';
+  if (rule.min !== undefined && parseFloat(value) < rule.min) return `最小值为 ${rule.min}`;
+  if (rule.max !== undefined && parseFloat(value) > rule.max) return `最大值为 ${rule.max}`;
+  if (rule.pattern && !new RegExp(rule.pattern).test(String(value))) return rule.patternMessage || '格式不正确';
+  return '';
 }
 
 export function validateField(value, rule) {
@@ -54,18 +88,11 @@ export function validateField(value, rule) {
     return '此项为必填项';
   }
   if (value === '' || value === undefined || value === null) return '';
-  if (rule.type === 'ip' && !validIP(value)) return '请输入有效的IP地址';
-  if (rule.type === 'ip-segment' && !validIPOrSegment(value)) return '请输入有效的IP地址、CIDR 或 IP 范围';
-  if (rule.type === 'ipv4' && !validIPv4(value)) return '请输入有效的IPv4地址';
-  if (rule.type === 'ipv4-cidr' && !validIPv4CIDR(value)) return '请输入有效的IPv4网段';
-  if (rule.type === 'ipv4-range' && !validIPv4Range(value)) return '请输入有效的IPv4范围，如 192.168.1.1-192.168.1.100';
-  if (rule.type === 'ipv6' && !validIPv6(value)) return '请输入有效的IPv6地址';
-  if (rule.type === 'mac' && !validMAC(value)) return '请输入有效的MAC地址';
-  if (rule.type === 'port' && !validPort(value)) return '端口号范围为1-65535';
-  if (rule.min !== undefined && parseFloat(value) < rule.min) return `最小值为 ${rule.min}`;
-  if (rule.max !== undefined && parseFloat(value) > rule.max) return `最大值为 ${rule.max}`;
-  if (rule.pattern && !new RegExp(rule.pattern).test(String(value))) return rule.patternMessage || '格式不正确';
-  return '';
+  if (Array.isArray(value)) {
+    const errors = value.map(v => _validateSingle(String(v), rule)).filter(Boolean);
+    return errors.length ? errors.join('；') : '';
+  }
+  return _validateSingle(String(value), rule);
 }
 
 export { validIPv4, validIPv4CIDR, validIPv4Range, validIPv6, validIP, validIPOrSegment, validPort, validMAC };

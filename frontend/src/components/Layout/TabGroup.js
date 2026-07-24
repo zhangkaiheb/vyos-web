@@ -1,4 +1,4 @@
-import { defineComponent, ref } from '/src/utils/vue-import.js';
+import { defineComponent, ref, watch, computed } from '/src/utils/vue-import.js';
 
 export default defineComponent({
   name: 'TabGroup',
@@ -15,7 +15,13 @@ export default defineComponent({
       emit('update:modelValue', key);
     }
 
-    return { active, select };
+    watch(() => props.modelValue, (val) => {
+      if (val && val !== active.value) active.value = val;
+    });
+
+    const activeTab = computed(() => props.tabs.find(t => t.key === active.value) || props.tabs[0]);
+
+    return { active, select, activeTab };
   },
   template: `
     <div class="tab-group">
@@ -28,8 +34,8 @@ export default defineComponent({
         </div>
       </div>
       <div class="tab-panels">
-        <div v-for="tab in tabs" :key="tab.key" v-show="active === tab.key" class="tab-panel">
-          <slot :name="tab.key" :tab="tab"></slot>
+        <div class="tab-panel">
+          <slot :name="activeTab.key" :tab="activeTab"></slot>
         </div>
       </div>
     </div>

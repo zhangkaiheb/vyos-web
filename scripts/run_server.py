@@ -34,12 +34,23 @@ def static_app(environ, start_response):
             content_type = 'text/css'
         elif file_path.endswith('.json'):
             content_type = 'application/json'
-        start_response('200 OK', [('Content-Type', content_type)])
+        headers = [
+            ('Content-Type', content_type),
+            ('Cache-Control', 'no-store, no-cache, must-revalidate'),
+            ('Pragma', 'no-cache'),
+            ('Expires', '0'),
+        ]
+        start_response('200 OK', headers)
         with open(file_path, 'rb') as f:
             return [f.read()]
     # SPA fallback: serve index.html for unknown paths
     index_path = os.path.join(static_root, 'index.html')
-    start_response('200 OK', [('Content-Type', 'text/html')])
+    start_response('200 OK', [
+        ('Content-Type', 'text/html'),
+        ('Cache-Control', 'no-store, no-cache, must-revalidate'),
+        ('Pragma', 'no-cache'),
+        ('Expires', '0'),
+    ])
     with open(index_path, 'rb') as f:
         return [f.read()]
 

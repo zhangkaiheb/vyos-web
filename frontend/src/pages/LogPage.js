@@ -47,7 +47,7 @@ export default defineComponent({
     return { data, page, pageSize, total, totalPages, loading, load, logType, logTypes, filters, applyFilters };
   },
   template: `
-    <div>
+    <div class="page-container">
       <div class="toolbar">
         <div class="toolbar-left" style="gap:8px;flex-wrap:wrap;">
           <select v-model="logType" @change="$router.push('/logs/' + logType)">
@@ -63,28 +63,30 @@ export default defineComponent({
           </select>
           <input type="datetime-local" v-model="filters.start_time" />
           <input type="datetime-local" v-model="filters.end_time" />
-          <button class="primary" @click="applyFilters">{{ $t('app.search') }}</button>
-          <button @click="load">{{ $t('app.refresh') }}</button>
+          <ToolbarButton icon="search" primary @click="applyFilters">{{ $t('app.search') }}</ToolbarButton>
+          <ToolbarButton icon="refresh" @click="load">{{ $t('app.refresh') }}</ToolbarButton>
         </div>
         <div class="toolbar-right">
           每页 <input v-model.number="pageSize" style="width:50px;" @change="page=1;load()" /> 条
         </div>
       </div>
-      <table class="data-table">
-        <thead>
-          <tr><th>时间</th><th>用户/单元</th><th>级别</th><th>操作/消息</th><th>详情</th></tr>
-        </thead>
-        <tbody>
-          <tr v-for="row in data" :key="row.id || row.timestamp">
-            <td>{{ row.timestamp }}</td>
-            <td>{{ row.user_id || row.unit || '-' }}</td>
-            <td>{{ row.level || '-' }}</td>
-            <td>{{ row.action || row.message || '-' }}</td>
-            <td>{{ row.target || row.error_message || JSON.stringify(row.data || '') }}</td>
-          </tr>
-          <tr v-if="!data.length"><td colspan="5" class="text-center">暂无日志</td></tr>
-        </tbody>
-      </table>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr><th>时间</th><th>用户/单元</th><th>级别</th><th>操作/消息</th><th>详情</th></tr>
+          </thead>
+          <tbody>
+            <tr v-for="row in data" :key="row.id || row.timestamp">
+              <td>{{ row.timestamp }}</td>
+              <td>{{ row.user_id || row.unit || '-' }}</td>
+              <td>{{ row.level || '-' }}</td>
+              <td>{{ row.action || row.message || '-' }}</td>
+              <td>{{ row.target || row.error_message || JSON.stringify(row.data || '') }}</td>
+            </tr>
+            <tr v-if="!data.length"><td colspan="5" class="text-center">暂无日志</td></tr>
+          </tbody>
+        </table>
+      </div>
       <div class="pagination">
         <button @click="page=1;load()" :disabled="page===1">首页</button>
         <button @click="page--;load()" :disabled="page===1">上一页</button>

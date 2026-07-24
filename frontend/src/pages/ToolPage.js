@@ -64,7 +64,7 @@ export default defineComponent({
             <input v-model="terminal.pager" placeholder="pager" />
             <input v-model.number="terminal.width" placeholder="width" />
           </template>
-          <button class="primary" @click="run" :disabled="loading">{{ $t('app.confirm') }}</button>
+          <ToolbarButton icon="execute" primary @click="run" :disabled="loading">{{ $t('app.confirm') }}</ToolbarButton>
         </div>
       </div>
       <div class="page-section">

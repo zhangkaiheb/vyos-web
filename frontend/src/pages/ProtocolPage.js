@@ -45,12 +45,12 @@ export default defineComponent({
     };
   },
   template: `
-    <div>
+    <div class="page-container">
       <div class="toolbar">
         <div class="toolbar-left"><h3>系统协议</h3></div>
         <div class="toolbar-right">
           <input v-model="quickFilter" placeholder="搜索..." />
-          <button @click="load">{{ $t('app.refresh') }}</button>
+          <ToolbarButton icon="refresh" @click="load">{{ $t('app.refresh') }}</ToolbarButton>
         </div>
       </div>
       <DataTable :columns="columns" :data="filtered" :loading="loading" :selectable="false" :actions="[]">

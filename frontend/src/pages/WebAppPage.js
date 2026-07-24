@@ -86,9 +86,9 @@ export default defineComponent({
       <div class="form-row" v-else><label class="form-label">{{ $t('webapp.updateFile') }}</label><input type="file" @change="updateFile = $event.target.files[0]" /></div>
       <div class="form-row"><label class="form-label"></label>
         <div style="display:flex;gap:8px;">
-          <button @click="check">{{ $t('webapp.checkUpdate') }}</button>
-          <button class="primary" @click="update">{{ $t('webapp.update') }}</button>
-          <button @click="rollback">{{ $t('webapp.rollback') }}</button>
+          <ToolbarButton icon="checkUpdate" @click="check">{{ $t('webapp.checkUpdate') }}</ToolbarButton>
+          <ToolbarButton icon="update" primary @click="update">{{ $t('webapp.update') }}</ToolbarButton>
+          <ToolbarButton icon="rollback" @click="rollback">{{ $t('webapp.rollback') }}</ToolbarButton>
         </div>
       </div>
       <hr style="margin:20px 0;" />

@@ -1,6 +1,6 @@
 import { ref, computed } from '/src/utils/vue-import.js';
 import { defineStore } from '/src/stores/pinia.js';
-import { authApi, menuApi } from '/src/api/index.js';
+import { authApi, menuApi, systemApi } from '/src/api/index.js';
 import { locale } from '/src/i18n/index.js';
 
 export const useAuthStore = defineStore('auth', () => {
@@ -8,8 +8,18 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref(null);
   const menu = ref([]);
   const loading = ref(false);
+  const hostname = ref('');
 
   const isLoggedIn = computed(() => !!token.value && !!user.value);
+
+  async function loadHostname() {
+    try {
+      const res = await systemApi.info();
+      hostname.value = res.hostname || '';
+    } catch (e) {
+      hostname.value = '';
+    }
+  }
 
   async function login(username, password) {
     loading.value = true;
@@ -23,6 +33,7 @@ export const useAuthStore = defineStore('auth', () => {
         localStorage.setItem('locale', res.user.language);
       }
       await loadMenu();
+      await loadHostname();
       return res;
     } finally {
       loading.value = false;
@@ -34,6 +45,7 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = '';
     user.value = null;
     menu.value = [];
+    hostname.value = '';
     localStorage.removeItem('vyos_token');
   }
 
@@ -46,6 +58,7 @@ export const useAuthStore = defineStore('auth', () => {
         localStorage.setItem('locale', res.user.language);
       }
       await loadMenu();
+      await loadHostname();
     } catch (e) {
       logout();
     }
@@ -60,5 +73,5 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { token, user, menu, loading, isLoggedIn, login, logout, fetchUser, loadMenu };
+  return { token, user, menu, loading, hostname, isLoggedIn, login, logout, fetchUser, loadMenu };
 });

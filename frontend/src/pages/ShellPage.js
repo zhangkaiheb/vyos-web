@@ -51,7 +51,7 @@ export default defineComponent({
           <span>Web Shell</span>
         </div>
         <div class="toolbar-right">
-          <button @click="clear">Clear</button>
+          <ToolbarButton icon="clear" @click="clear">Clear</ToolbarButton>
         </div>
       </div>
       <div ref="outputEl" style="flex:1;background:#000;color:#0f0;font-family:monospace;padding:12px;overflow:auto;white-space:pre-wrap;">
@@ -62,7 +62,7 @@ export default defineComponent({
       <div style="display:flex;gap:8px;padding:8px;background:#f0f0f0;">
         <span style="font-family:monospace;">{{ prompt }}</span>
         <input v-model="command" @keydown.enter="execute" style="flex:1;font-family:monospace;" :disabled="loading" />
-        <button class="primary" @click="execute" :disabled="loading">Execute</button>
+        <ToolbarButton icon="execute" primary @click="execute" :disabled="loading">Execute</ToolbarButton>
       </div>
     </div>
   `,
