@@ -1,0 +1,31 @@
+[1mdiff --git a/frontend/src/pages/RuleTablePage.js b/frontend/src/pages/RuleTablePage.js[m
+[1mindex 1ca5ac5..39ab51d 100644[m
+[1m--- a/frontend/src/pages/RuleTablePage.js[m
+[1m+++ b/frontend/src/pages/RuleTablePage.js[m
+[36m@@ -432,8 +432,8 @@[m [mexport default defineComponent({[m
+       <div class="toolbar">[m
+         <div class="toolbar-left">[m
+           <ToolbarButton icon="create" @click="create" :disabled="writeDisabled">{{ $t('app.create') }}</ToolbarButton>[m
+[31m-          <ToolbarButton icon="edit" @click="edit" :disabled="writeDisabled">{{ $t('app.edit') }}</ToolbarButton>[m
+[31m-          <ToolbarButton icon="delete" @click="remove" :disabled="writeDisabled">{{ $t('app.delete') }}</ToolbarButton>[m
+[32m+[m[32m          <ToolbarButton icon="edit" @click="edit" :disabled="writeDisabled || !selected.length || selected.length > 1">{{ $t('app.edit') }}</ToolbarButton>[m
+[32m+[m[32m          <ToolbarButton icon="delete" @click="remove" :disabled="writeDisabled || !selected.length">{{ $t('app.delete') }}</ToolbarButton>[m
+           <ToolbarButton icon="move" @click="openMove" :disabled="writeDisabled">{{ $t('app.move') }}</ToolbarButton>[m
+           <ToolbarButton icon="copy" @click="copyRule" :disabled="writeDisabled">{{ $t('app.copy') }}</ToolbarButton>[m
+           <ToolbarButton icon="clearCounters" @click="clearStats">{{ $t('firewall.clearCounters') }}</ToolbarButton>[m
+[1mdiff --git a/frontend/src/pages/UserPage.js b/frontend/src/pages/UserPage.js[m
+[1mindex 5093141..83ac8e1 100644[m
+[1m--- a/frontend/src/pages/UserPage.js[m
+[1m+++ b/frontend/src/pages/UserPage.js[m
+[36m@@ -118,9 +118,9 @@[m [mexport default defineComponent({[m
+       <div class="toolbar">[m
+         <div class="toolbar-left">[m
+           <ToolbarButton icon="create" @click="create">{{ $t('app.create') }}</ToolbarButton>[m
+[31m-          <ToolbarButton icon="edit" @click="edit">{{ $t('app.edit') }}</ToolbarButton>[m
+[32m+[m[32m          <ToolbarButton icon="edit" @click="edit" :disabled="!selected.length || selected.length > 1">{{ $t('app.edit') }}</ToolbarButton>[m
+           <ToolbarButton icon="changePassword" @click="changePassword">{{ $t('user.changePassword') }}</ToolbarButton>[m
+[31m-          <ToolbarButton icon="delete" @click="remove">{{ $t('app.delete') }}</ToolbarButton>[m
+[32m+[m[32m          <ToolbarButton icon="delete" @click="remove" :disabled="!selected.length">{{ $t('app.delete') }}</ToolbarButton>[m
+           <ToolbarButton icon="refresh" @click="load">{{ $t('app.refresh') }}</ToolbarButton>[m
+         </div>[m
+       </div>[m

@@ -1,13 +1,19 @@
 import { defineComponent, ref, computed, h } from '/src/utils/vue-import.js';
+import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 
 export default defineComponent({
   name: 'DualListSelector',
+  components: { DraggableModal, ToolbarButton },
   props: {
     modelValue: { type: Array, default: () => [] },
     options: { type: Array, default: () => [] },
     disabled: { type: Boolean, default: false },
     titleLeft: { type: String, default: '可选' },
     titleRight: { type: String, default: '已选' },
+    allowCustom: { type: Boolean, default: false },
+    customPlaceholder: { type: String, default: '输入自定义值后按回车' },
+    customValidator: { type: Function, default: null },
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
@@ -15,6 +21,8 @@ export default defineComponent({
     const selectedRight = ref(new Set());
     const lastSelectedLeft = ref(null);
     const lastSelectedRight = ref(null);
+    const customValue = ref('');
+    const showCustomModal = ref(false);
 
     const availableItems = computed(() => {
       const selected = new Set(props.modelValue || []);
@@ -22,8 +30,7 @@ export default defineComponent({
     });
 
     const selectedItems = computed(() => {
-      const selected = new Set(props.modelValue || []);
-      return props.options.filter(opt => selected.has(opt));
+      return props.modelValue || [];
     });
 
     function emitValue(nextSelected) {
@@ -78,9 +85,40 @@ export default defineComponent({
       lastRef.value = index;
     }
 
+    function addCustom() {
+      const value = String(customValue.value || '').trim();
+      if (!value) {
+        showCustomModal.value = false;
+        return;
+      }
+      if (props.customValidator) {
+        const err = props.customValidator(value);
+        if (err) {
+          alert(err);
+          return;
+        }
+      }
+      const current = props.modelValue || [];
+      if (!current.includes(value)) {
+        emitValue([...current, value]);
+      }
+      customValue.value = '';
+      showCustomModal.value = false;
+    }
+
     function renderList(items, selected, lastRef, side) {
-      return h('div', { class: 'dual-list-box' }, [
-        h('div', { class: 'dual-list-title' }, side === 'left' ? props.titleLeft : props.titleRight),
+      const titleChildren = [h('span', {}, side === 'left' ? props.titleLeft : props.titleRight)];
+      if (side === 'left' && props.allowCustom) {
+        titleChildren.push(h('button', {
+          type: 'button',
+          class: 'dual-list-add-btn',
+          disabled: props.disabled,
+          title: '添加自定义项',
+          onClick: () => { customValue.value = ''; showCustomModal.value = true; },
+        }, '+'));
+      }
+      const children = [
+        h('div', { class: 'dual-list-title' }, titleChildren),
         h('div', { class: 'dual-list-items' }, items.map((item, index) => h('div', {
           key: item,
           class: ['dual-list-item', { selected: selected.has(index), disabled: props.disabled }],
@@ -90,7 +128,32 @@ export default defineComponent({
             index, e, items
           ),
         }, item))),
-      ]);
+      ];
+      return h('div', { class: 'dual-list-box' }, children);
+    }
+
+    function renderCustomModal() {
+      if (!props.allowCustom) return null;
+      return h(DraggableModal, {
+        title: '添加自定义项',
+        width: '360px',
+        visible: showCustomModal.value,
+        'onUpdate:visible': (v) => { showCustomModal.value = v; },
+        onConfirm: addCustom,
+        onClose: () => { customValue.value = ''; },
+      }, {
+        default: () => h('div', { class: 'dual-list-custom-input' }, [
+          h('input', {
+            type: 'text',
+            class: 'form-control',
+            placeholder: props.customPlaceholder,
+            value: customValue.value,
+            disabled: props.disabled,
+            onInput: (e) => { customValue.value = e.target.value; },
+            onKeydown: (e) => { if (e.key === 'Enter') { e.preventDefault(); addCustom(); } },
+          }),
+        ]),
+      });
     }
 
     function renderButtons() {
@@ -130,6 +193,7 @@ export default defineComponent({
       renderList(availableItems.value, selectedLeft.value, lastSelectedLeft, 'left'),
       renderButtons(),
       renderList(selectedItems.value, selectedRight.value, lastSelectedRight, 'right'),
+      renderCustomModal(),
     ]);
   },
 });

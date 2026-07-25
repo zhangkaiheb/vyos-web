@@ -3,7 +3,10 @@
 import sqlite3
 import os
 
-DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'vyos_web_config.db')
+DB_PATH = os.environ.get(
+    'VYOS_WEB_DB_PATH',
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'vyos_web_config.db')
+)
 
 
 def get_db_connection():
@@ -269,13 +272,30 @@ def _init_builtin_acl_items(cursor):
 
     walk(menu)
 
+    # For builtin ACLs, ensure every menu item has an entry so newly added
+    # menu items become visible automatically after deployment.
+    existing = set()
+    try:
+        cur = cursor.execute('''
+            SELECT access_control_table_id, level1, level2, level3
+            FROM access_control_items
+            WHERE access_control_table_id IN (1, 2, 3)
+        ''')
+        for row in cur.fetchall():
+            existing.add((row[0], row[1], row[2] or '', row[3] or ''))
+    except Exception:
+        pass
+
     for acl_id, perm in permissions.items():
         for l1, l2, l3 in items:
+            key = (acl_id, l1, l2 or '', l3 or '')
+            if key in existing:
+                continue
             cursor.execute('''
                 INSERT OR IGNORE INTO access_control_items
                 (access_control_table_id, level1, level2, level3, permission)
                 VALUES (?, ?, ?, ?, ?)
-            ''', (acl_id, l1, l2 or '', l3 or '', perm))
+            ''', key + (perm,))
 
 
 if __name__ == '__main__':

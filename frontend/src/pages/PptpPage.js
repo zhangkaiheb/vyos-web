@@ -528,16 +528,16 @@ export default defineComponent({
         <div style="font-weight:bold;margin-bottom:8px;">IPv4 客户端地址池</div>
         <div class="toolbar">
           <ToolbarButton icon="create" @click="createIpPool">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editIpPool">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeIpPool">删除</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editIpPool" :disabled="!selectedIpPool.length || selectedIpPool.length > 1">编辑</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeIpPool" :disabled="!selectedIpPool.length">删除</ToolbarButton>
         </div>
         <DataTable :columns="ipPoolColumns" :data="config.client_ip_pools" row-key="name" :externalToolbar="true" @selection-change="selectedIpPool = $event" :selectable="true" />
 
         <div style="font-weight:bold;margin:16px 0 8px;">IPv6 客户端地址池</div>
         <div class="toolbar">
           <ToolbarButton icon="create" @click="createIpv6Pool">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editIpv6Pool">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeIpv6Pool">删除</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editIpv6Pool" :disabled="!selectedIpv6Pool.length || selectedIpv6Pool.length > 1">编辑</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeIpv6Pool" :disabled="!selectedIpv6Pool.length">删除</ToolbarButton>
         </div>
         <DataTable :columns="ipv6PoolColumns" :data="config.client_ipv6_pools" row-key="name" :externalToolbar="true" @selection-change="selectedIpv6Pool = $event" :selectable="true" />
       </template>
@@ -558,8 +558,8 @@ export default defineComponent({
           <div style="font-weight:bold;margin:16px 0 8px;">本地用户</div>
           <div class="toolbar">
             <ToolbarButton icon="create" @click="createUser">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editUser">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeUser">删除</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editUser" :disabled="!selectedUser.length || selectedUser.length > 1">编辑</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeUser" :disabled="!selectedUser.length">删除</ToolbarButton>
           </div>
           <DataTable :columns="userColumns" :data="config.auth.local_users" row-key="username" :externalToolbar="true" @selection-change="selectedUser = $event" :selectable="true" />
         </div>
@@ -570,8 +570,8 @@ export default defineComponent({
           <div class="form-row"><label class="form-label">超时</label><input class="form-control" type="number" min="1" max="240" v-model="config.auth.radius.timeout" title="会话超时，默认 2" /></div>
           <div class="toolbar">
             <ToolbarButton icon="create" @click="createRadiusServer">添加</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editRadiusServer">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeRadiusServer">删除</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editRadiusServer" :disabled="!selectedRadiusServer.length || selectedRadiusServer.length > 1">编辑</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeRadiusServer" :disabled="!selectedRadiusServer.length">删除</ToolbarButton>
           </div>
           <DataTable :columns="radiusServerColumns" :data="config.auth.radius.servers" row-key="address" :externalToolbar="true" @selection-change="selectedRadiusServer = $event" :selectable="true" />
         </div>

@@ -1,6 +1,7 @@
 import { defineComponent, onMounted, ref, watch } from '/src/utils/vue-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { configApi } from '/src/api/index.js';
+import { showError } from '/src/components/Layout/ErrorDisplay.js';
 
 export default defineComponent({
   name: 'CommitBar',
@@ -45,6 +46,7 @@ export default defineComponent({
         showDiff.value = false;
       } catch (e) {
         message.value = e.message;
+        showError(e);
       }
     }
 
@@ -55,6 +57,7 @@ export default defineComponent({
         showDiff.value = false;
       } catch (e) {
         message.value = e.message;
+        showError(e);
       }
     }
 
@@ -64,6 +67,7 @@ export default defineComponent({
         message.value = '配置已保存';
       } catch (e) {
         message.value = e.message;
+        showError(e);
       }
     }
 

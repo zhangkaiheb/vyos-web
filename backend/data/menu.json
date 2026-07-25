@@ -15,24 +15,6 @@
         "component": "MonitorDashboard"
       },
       {
-        "id": "cpu",
-        "label": "CPU",
-        "label_en": "CPU",
-        "icon": "",
-        "children": [],
-        "route": "/monitor/cpu",
-        "component": "MonitorWidget"
-      },
-      {
-        "id": "memory",
-        "label": "内存",
-        "label_en": "Memory",
-        "icon": "",
-        "children": [],
-        "route": "/monitor/memory",
-        "component": "MonitorWidget"
-      },
-      {
         "id": "interface-traffic",
         "label": "接口流量",
         "label_en": "Interface Traffic",
@@ -85,6 +67,33 @@
         "children": [],
         "route": "/monitor/pptp-statistics",
         "component": "PptpStatisticsPage"
+      },
+      {
+        "id": "dhcp-leases",
+        "label": "DHCP 租约",
+        "label_en": "DHCP Leases",
+        "icon": "",
+        "children": [],
+        "route": "/monitor/dhcp-leases",
+        "component": "DhcpLeasesPage"
+      },
+      {
+        "id": "dhcp-static-mappings",
+        "label": "DHCP 静态映射",
+        "label_en": "DHCP Static Mappings",
+        "icon": "",
+        "children": [],
+        "route": "/monitor/dhcp-static-mappings",
+        "component": "DhcpStaticMappingsPage"
+      },
+      {
+        "id": "dhcp-statistics",
+        "label": "DHCP 统计",
+        "label_en": "DHCP Statistics",
+        "icon": "",
+        "children": [],
+        "route": "/monitor/dhcp-statistics",
+        "component": "DhcpStatisticsPage"
       }
     ],
     "route": null,
@@ -1147,7 +1156,7 @@
         "icon": "",
         "children": [],
         "route": "/service/dhcp-server",
-        "component": "ConfigPage"
+        "component": "DhcpServerPage"
       },
       {
         "id": "dhcp-relay",
@@ -1156,7 +1165,7 @@
         "icon": "",
         "children": [],
         "route": "/service/dhcp-relay",
-        "component": "ConfigPage"
+        "component": "DhcpRelayPage"
       },
       {
         "id": "dhcpv6-server",
@@ -1165,7 +1174,16 @@
         "icon": "",
         "children": [],
         "route": "/service/dhcpv6-server",
-        "component": "ConfigPage"
+        "component": "Dhcpv6ServerPage"
+      },
+      {
+        "id": "dhcpv6-relay",
+        "label": "DHCPv6中继",
+        "label_en": "DHCPv6 Relay",
+        "icon": "",
+        "children": [],
+        "route": "/service/dhcpv6-relay",
+        "component": "Dhcpv6RelayPage"
       },
       {
         "id": "dns",
@@ -1174,7 +1192,7 @@
         "icon": "",
         "children": [],
         "route": "/service/dns",
-        "component": "ConfigPage"
+        "component": "DnsPage"
       },
       {
         "id": "ntp",
@@ -1183,7 +1201,7 @@
         "icon": "",
         "children": [],
         "route": "/service/ntp",
-        "component": "ConfigPage"
+        "component": "NtpPage"
       },
       {
         "id": "ssh",
@@ -1192,7 +1210,7 @@
         "icon": "",
         "children": [],
         "route": "/service/ssh",
-        "component": "ConfigPage"
+        "component": "SshPage"
       },
       {
         "id": "https",
@@ -1201,7 +1219,7 @@
         "icon": "",
         "children": [],
         "route": "/service/https",
-        "component": "ConfigPage"
+        "component": "HttpsPage"
       },
       {
         "id": "snmp",
@@ -1210,7 +1228,7 @@
         "icon": "",
         "children": [],
         "route": "/service/snmp",
-        "component": "ConfigPage"
+        "component": "SnmpPage"
       },
       {
         "id": "lldp",
@@ -1219,7 +1237,16 @@
         "icon": "",
         "children": [],
         "route": "/service/lldp",
-        "component": "ConfigPage"
+        "component": "LldpPage"
+      },
+      {
+        "id": "ids-ddos-protection",
+        "label": "IDS DDoS防护",
+        "label_en": "IDS DDoS Protection",
+        "icon": "",
+        "children": [],
+        "route": "/service/ids-ddos-protection",
+        "component": "IdsDdosPage"
       },
       {
         "id": "webproxy",

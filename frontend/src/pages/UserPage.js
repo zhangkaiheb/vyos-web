@@ -118,9 +118,9 @@ export default defineComponent({
       <div class="toolbar">
         <div class="toolbar-left">
           <ToolbarButton icon="create" @click="create">{{ $t('app.create') }}</ToolbarButton>
-          <ToolbarButton icon="edit" @click="edit">{{ $t('app.edit') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="edit" :disabled="!selected.length || selected.length > 1">{{ $t('app.edit') }}</ToolbarButton>
           <ToolbarButton icon="changePassword" @click="changePassword">{{ $t('user.changePassword') }}</ToolbarButton>
-          <ToolbarButton icon="delete" @click="remove">{{ $t('app.delete') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="remove" :disabled="!selected.length">{{ $t('app.delete') }}</ToolbarButton>
           <ToolbarButton icon="refresh" @click="load">{{ $t('app.refresh') }}</ToolbarButton>
         </div>
       </div>

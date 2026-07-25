@@ -65,7 +65,7 @@ export default defineComponent({
     return { modalRef, close, confirm, onMouseDown, translate };
   },
   template: `
-    <div v-if="visible" class="modal-overlay" @click.self="close">
+    <div v-if="visible" class="modal-overlay">
       <div ref="modalRef" class="modal-container" :style="{ width, transform: 'translate(' + translate.x + 'px, ' + translate.y + 'px)' }" @mousedown="onMouseDown">
         <div class="modal-header">
           <span class="modal-title">{{ title }}</span>

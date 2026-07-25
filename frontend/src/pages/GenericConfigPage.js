@@ -16,8 +16,13 @@ export default defineComponent({
     const path = computed(() => route.path.replace(/^\//, '').replace(/\//g, ' '));
     const writeDisabled = computed(() => route.meta?.menuItem?.permission === 'read');
 
+    const isLeaf = ref(false);
+
     const schema = computed(() => {
       const meta = route.meta?.menuItem;
+      if (isLeaf.value) {
+        return [{ key: 'value', title: meta?.label || '值', type: 'text' }];
+      }
       if (meta?.schema) return meta.schema;
       return Object.keys(data.value).map(k => ({ key: k, title: k }));
     });
@@ -27,7 +32,14 @@ export default defineComponent({
       saved.value = false;
       try {
         const res = await configStore.getConfig(path.value, true);
-        data.value = res.data || {};
+        const raw = res.data;
+        if (raw !== null && typeof raw !== 'object') {
+          isLeaf.value = true;
+          data.value = { value: raw };
+        } else {
+          isLeaf.value = false;
+          data.value = raw || {};
+        }
       } catch (e) {
         showError(e);
       } finally {
@@ -37,7 +49,8 @@ export default defineComponent({
 
     async function save() {
       try {
-        await configStore.setConfig(path.value, data.value);
+        const payload = isLeaf.value ? data.value.value : data.value;
+        await configStore.setConfig(path.value, payload);
         saved.value = true;
         await configStore.checkSessionChanged();
       } catch (e) {

@@ -446,7 +446,7 @@ select {
 /* Toolbar */
 .toolbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   padding: 8px 12px;
   background: var(--color-bg-toolbar);
@@ -456,11 +456,19 @@ select {
   flex-wrap: wrap;
 }
 
+.toolbar-split {
+  justify-content: space-between;
+}
+
 .toolbar-left, .toolbar-right {
   display: flex;
   gap: 8px;
   align-items: center;
   flex-wrap: wrap;
+}
+
+.toolbar-right {
+  margin-left: auto;
 }
 
 .toolbar-btn {
@@ -805,6 +813,9 @@ select {
   font-size: 13px;
   color: #666;
   flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .dual-list-items {
@@ -864,6 +875,22 @@ select {
 .dual-list-btn:disabled {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+.dual-list-add-btn {
+  width: auto;
+  padding: 0 6px;
+  margin-left: 6px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.dual-list-custom-input {
+  padding: 8px 0;
+}
+
+.dual-list-custom-input .form-control {
+  width: 100%;
 }
 
 .advanced-section {

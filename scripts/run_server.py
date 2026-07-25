@@ -8,7 +8,9 @@ Production should use Apache + mod_wsgi.
 import os
 import sys
 import argparse
-from wsgiref.simple_server import make_server
+import threading
+from wsgiref.simple_server import make_server, WSGIServer, WSGIRequestHandler
+from socketserver import ThreadingMixIn
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BASE_DIR)
@@ -17,6 +19,13 @@ sys.path.insert(0, '/usr/libexec/vyos')
 sys.path.insert(0, '/usr/lib/python3/dist-packages')
 
 from backend.app import application
+
+
+class ThreadingWSGIServer(ThreadingMixIn, WSGIServer):
+    allow_reuse_address = True
+
+
+API_LOCK = threading.Lock()
 
 
 def static_app(environ, start_response):
@@ -58,6 +67,12 @@ def static_app(environ, start_response):
 def combined_app(environ, start_response):
     path = environ.get('PATH_INFO', '')
     if path.startswith('/api/'):
+        method = environ.get('REQUEST_METHOD', 'GET')
+        # The VyOS ConfigSession instance is shared within this process.
+        # Read operations can run concurrently, but write operations must be serialized.
+        if method in ('POST', 'PUT', 'DELETE'):
+            with API_LOCK:
+                return application(environ, start_response)
         return application(environ, start_response)
     return static_app(environ, start_response)
 
@@ -67,6 +82,6 @@ if __name__ == '__main__':
     parser.add_argument('--host', default='0.0.0.0')
     parser.add_argument('--port', type=int, default=8080)
     args = parser.parse_args()
-    httpd = make_server(args.host, args.port, combined_app)
+    httpd = make_server(args.host, args.port, combined_app, server_class=ThreadingWSGIServer, handler_class=WSGIRequestHandler)
     print(f'Serving on http://{args.host}:{args.port}')
     httpd.serve_forever()

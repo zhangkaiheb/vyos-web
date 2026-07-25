@@ -185,7 +185,9 @@ export default defineComponent({
 
     function actionDisabled(a) {
       if (props.disabled) return true;
-      if (NEEDS_SELECTION.includes(a)) return selectedKeys.value.size === 0;
+      if (!NEEDS_SELECTION.includes(a)) return false;
+      if (selectedKeys.value.size === 0) return true;
+      if (a === 'edit' && selectedKeys.value.size > 1) return true;
       return false;
     }
 
@@ -308,7 +310,7 @@ export default defineComponent({
   },
   template: `
     <div class="data-table-page">
-      <div class="toolbar" v-if="!externalToolbar">
+      <div class="toolbar toolbar-split" v-if="!externalToolbar">
         <div class="toolbar-left">
           <ToolbarButton v-for="a in actions" :key="a" :icon="a" @click="handleAction(a)" :disabled="actionDisabled(a)">
             {{ a === 'moveUp' ? $t('app.moveUp') : a === 'moveDown' ? $t('app.moveDown') : (ACTION_LABELS[a] || a) }}
@@ -342,7 +344,7 @@ export default defineComponent({
               </td>
               <td v-for="col in columns.filter(c => visibleColumns.includes(c.key))" :key="col.key">
                 <slot :name="col.key" :row="row" :value="row[col.key]">
-                  {{ row[col.key] }}
+                  {{ col.render ? col.render(row[col.key], row) : row[col.key] }}
                 </slot>
               </td>
             </tr>

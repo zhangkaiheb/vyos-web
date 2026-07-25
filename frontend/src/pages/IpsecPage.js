@@ -1261,8 +1261,8 @@ export default defineComponent({
           <div class="toolbar">
             <div class="toolbar-left">
               <ToolbarButton icon="create" @click="createIke" :disabled="writeDisabled">创建</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editIke" :disabled="writeDisabled">编辑</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removeIke" :disabled="writeDisabled">删除</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editIke" :disabled="writeDisabled || !selectedIke.length || selectedIke.length > 1">编辑</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removeIke" :disabled="writeDisabled || !selectedIke.length">删除</ToolbarButton>
             </div>
           </div>
           <DataTable :columns="ikeColumns" :data="ikeGroups" row-key="name" :externalToolbar="true" @selection-change="selectedIke = $event" :selectable="true">
@@ -1273,8 +1273,8 @@ export default defineComponent({
           <div class="toolbar">
             <div class="toolbar-left">
               <ToolbarButton icon="create" @click="createEsp" :disabled="writeDisabled">创建</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editEsp" :disabled="writeDisabled">编辑</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removeEsp" :disabled="writeDisabled">删除</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editEsp" :disabled="writeDisabled || !selectedEsp.length || selectedEsp.length > 1">编辑</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removeEsp" :disabled="writeDisabled || !selectedEsp.length">删除</ToolbarButton>
             </div>
           </div>
           <DataTable :columns="espColumns" :data="espGroups" row-key="name" :externalToolbar="true" @selection-change="selectedEsp = $event" :selectable="true">
@@ -1285,8 +1285,8 @@ export default defineComponent({
           <div class="toolbar">
             <div class="toolbar-left">
               <ToolbarButton icon="create" @click="createPsk" :disabled="writeDisabled">创建</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editPsk" :disabled="writeDisabled">编辑</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removePsk" :disabled="writeDisabled">删除</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editPsk" :disabled="writeDisabled || !selectedPsk.length || selectedPsk.length > 1">编辑</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removePsk" :disabled="writeDisabled || !selectedPsk.length">删除</ToolbarButton>
             </div>
           </div>
           <DataTable :columns="pskColumns" :data="psks" row-key="name" :externalToolbar="true" @selection-change="selectedPsk = $event" :selectable="true" />
@@ -1350,8 +1350,8 @@ export default defineComponent({
           <div class="toolbar">
             <div class="toolbar-left">
               <ToolbarButton icon="create" @click="createProfile" :disabled="writeDisabled">创建</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editProfile" :disabled="writeDisabled">编辑</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removeProfile" :disabled="writeDisabled">删除</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editProfile" :disabled="writeDisabled || !selectedProfile.length || selectedProfile.length > 1">编辑</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removeProfile" :disabled="writeDisabled || !selectedProfile.length">删除</ToolbarButton>
             </div>
           </div>
           <DataTable :columns="profileColumns" :data="profiles" row-key="name" :externalToolbar="true" @selection-change="selectedProfile = $event" :selectable="true" />
@@ -1360,8 +1360,8 @@ export default defineComponent({
           <div class="toolbar">
             <div class="toolbar-left">
               <ToolbarButton icon="create" @click="createS2s" :disabled="writeDisabled">创建</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editS2s" :disabled="writeDisabled">编辑</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removeS2s" :disabled="writeDisabled">删除</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editS2s" :disabled="writeDisabled || !selectedS2s.length || selectedS2s.length > 1">编辑</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removeS2s" :disabled="writeDisabled || !selectedS2s.length">删除</ToolbarButton>
             </div>
           </div>
           <DataTable :columns="s2sColumns" :data="siteToSitePeers" row-key="name" :externalToolbar="true" @selection-change="selectedS2s = $event" :selectable="true">
@@ -1374,8 +1374,8 @@ export default defineComponent({
               <div class="toolbar">
                 <div class="toolbar-left">
                   <ToolbarButton icon="create" @click="createRa" :disabled="writeDisabled">创建</ToolbarButton>
-                  <ToolbarButton icon="edit" @click="editRa" :disabled="writeDisabled">编辑</ToolbarButton>
-                  <ToolbarButton icon="delete" @click="removeRa" :disabled="writeDisabled">删除</ToolbarButton>
+                  <ToolbarButton icon="edit" @click="editRa" :disabled="writeDisabled || !selectedRa.length || selectedRa.length > 1">编辑</ToolbarButton>
+                  <ToolbarButton icon="delete" @click="removeRa" :disabled="writeDisabled || !selectedRa.length">删除</ToolbarButton>
                 </div>
               </div>
               <DataTable :columns="raColumns" :data="remoteAccessConns" row-key="name" :externalToolbar="true" @selection-change="selectedRa = $event" :selectable="true">
@@ -1386,8 +1386,8 @@ export default defineComponent({
               <div class="toolbar">
                 <div class="toolbar-left">
                   <ToolbarButton icon="create" @click="createRaPool" :disabled="writeDisabled">创建</ToolbarButton>
-                  <ToolbarButton icon="edit" @click="editRaPool" :disabled="writeDisabled">编辑</ToolbarButton>
-                  <ToolbarButton icon="delete" @click="removeRaPool" :disabled="writeDisabled">删除</ToolbarButton>
+                  <ToolbarButton icon="edit" @click="editRaPool" :disabled="writeDisabled || !selectedRaPool.length || selectedRaPool.length > 1">编辑</ToolbarButton>
+                  <ToolbarButton icon="delete" @click="removeRaPool" :disabled="writeDisabled || !selectedRaPool.length">删除</ToolbarButton>
                 </div>
               </div>
               <DataTable :columns="raPoolColumns" :data="remoteAccessPools" row-key="name" :externalToolbar="true" @selection-change="selectedRaPool = $event" :selectable="true">
@@ -1423,8 +1423,8 @@ export default defineComponent({
               <div class="toolbar">
                 <div class="toolbar-left">
                   <ToolbarButton icon="create" @click="createRaRadiusServer" :disabled="writeDisabled">添加服务器</ToolbarButton>
-                  <ToolbarButton icon="edit" @click="editRaRadiusServer" :disabled="writeDisabled">编辑</ToolbarButton>
-                  <ToolbarButton icon="delete" @click="removeRaRadiusServer" :disabled="writeDisabled">删除</ToolbarButton>
+                  <ToolbarButton icon="edit" @click="editRaRadiusServer" :disabled="writeDisabled || !selectedRaRadiusServer.length || selectedRaRadiusServer.length > 1">编辑</ToolbarButton>
+                  <ToolbarButton icon="delete" @click="removeRaRadiusServer" :disabled="writeDisabled || !selectedRaRadiusServer.length">删除</ToolbarButton>
                 </div>
               </div>
               <DataTable :columns="raRadiusServerColumns" :data="remoteAccessRadius.servers" row-key="ip" :externalToolbar="true" @selection-change="selectedRaRadiusServer = $event" :selectable="true" />

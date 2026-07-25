@@ -20,8 +20,22 @@ import IpsecConnectionsPage from '/src/pages/IpsecConnectionsPage.js';
 import IpsecSaPage from '/src/pages/IpsecSaPage.js';
 import L2tpPage from '/src/pages/L2tpPage.js';
 import PptpPage from '/src/pages/PptpPage.js';
+import DhcpServerPage from '/src/pages/DhcpServerPage.js';
+import DhcpRelayPage from '/src/pages/DhcpRelayPage.js';
 import PptpSessionsPage from '/src/pages/PptpSessionsPage.js';
 import PptpStatisticsPage from '/src/pages/PptpStatisticsPage.js';
+import DhcpLeasesPage from '/src/pages/DhcpLeasesPage.js';
+import DhcpStaticMappingsPage from '/src/pages/DhcpStaticMappingsPage.js';
+import DhcpStatisticsPage from '/src/pages/DhcpStatisticsPage.js';
+import Dhcpv6ServerPage from '/src/pages/Dhcpv6ServerPage.js';
+import Dhcpv6RelayPage from '/src/pages/Dhcpv6RelayPage.js';
+import DnsPage from '/src/pages/DnsPage.js';
+import NtpPage from '/src/pages/NtpPage.js';
+import SshPage from '/src/pages/SshPage.js';
+import HttpsPage from '/src/pages/HttpsPage.js';
+import LldpPage from '/src/pages/LldpPage.js';
+import IdsDdosPage from '/src/pages/IdsDdosPage.js';
+import SnmpPage from '/src/pages/SnmpPage.js';
 
 const componentMap = {
   TablePage: GenericTablePage,
@@ -45,8 +59,22 @@ const componentMap = {
   IpsecSaPage,
   L2tpPage,
   PptpPage,
+  DhcpServerPage,
+  DhcpRelayPage,
   PptpSessionsPage,
   PptpStatisticsPage,
+  DhcpLeasesPage,
+  DhcpStaticMappingsPage,
+  DhcpStatisticsPage,
+  Dhcpv6ServerPage,
+  Dhcpv6RelayPage,
+  DnsPage,
+  NtpPage,
+  SshPage,
+  HttpsPage,
+  LldpPage,
+  IdsDdosPage,
+  SnmpPage,
 };
 
 function buildRoutes(menu, parentPath = '') {

@@ -346,8 +346,8 @@ export default defineComponent({
       <div class="toolbar">
         <div class="toolbar-left">
           <ToolbarButton icon="create" @click="create" :disabled="writeDisabled">{{ $t('app.create') }}</ToolbarButton>
-          <ToolbarButton icon="edit" @click="edit" :disabled="writeDisabled">{{ $t('app.edit') }}</ToolbarButton>
-          <ToolbarButton icon="delete" @click="remove" :disabled="writeDisabled">{{ $t('app.delete') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="edit" :disabled="writeDisabled || !selected.length || selected.length > 1">{{ $t('app.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="remove" :disabled="writeDisabled || !selected.length">{{ $t('app.delete') }}</ToolbarButton>
         </div>
       </div>
       <template v-if="isDynamic">

@@ -169,7 +169,7 @@ def _handle_config_exception(func):
         except vyos.configsession.ConfigSessionError as e:
             return _structured_error(
                 'CONFIG_SESSION_ERROR', str(e), str(e),
-                suggestion='请检查配置路径、值及当前会话状态',
+                suggestion='请根据 VyOS 命令行返回的报错信息修正配置后重新提交',
                 trace=traceback.format_exc()
             )
         except ValueError as e:
@@ -201,15 +201,26 @@ class ConfigService:
 
     # ---------- read operations ----------
 
+    def _get_config_data(self, cfg, path_list, effective=True):
+        """Return config data at path. For leaf nodes return the scalar value."""
+        if not path_list:
+            return cfg.get_cached_root_dict(effective=effective)
+        try:
+            return cfg.get_config_dict(path_list, effective=effective, get_first_key=True)
+        except TypeError as e:
+            if 'not of type dict' in str(e):
+                try:
+                    return cfg.return_value(path_list)
+                except Exception:
+                    return None
+            raise
+
     def get_config(self, path):
         """Return config dict at path (effective/running config)."""
         try:
             cfg = vyos.config.Config()
             path_list = _path_to_list(path)
-            if not path_list:
-                data = cfg.get_cached_root_dict(effective=True)
-            else:
-                data = cfg.get_config_dict(path_list, effective=True, get_first_key=True)
+            data = self._get_config_data(cfg, path_list, effective=True)
             return {'success': True, 'path': path, 'data': data}
         except Exception as e:
             return _structured_error('CONFIG_GET_ERROR', str(e), traceback.format_exc(),
@@ -220,10 +231,7 @@ class ConfigService:
         try:
             cfg = vyos.config.Config()
             path_list = _path_to_list(path)
-            if not path_list:
-                data = cfg.get_cached_root_dict(effective=False)
-            else:
-                data = cfg.get_config_dict(path_list, effective=False, get_first_key=True)
+            data = self._get_config_data(cfg, path_list, effective=False)
             return {'success': True, 'path': path, 'data': data}
         except Exception as e:
             return _structured_error('CONFIG_GET_ERROR', str(e), traceback.format_exc(),

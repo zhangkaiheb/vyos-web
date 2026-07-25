@@ -334,7 +334,7 @@ class VyOSWebApp:
     def handle_monitor(self, environ, body):
         query = parse_qs(environ.get('QUERY_STRING', ''))
         widget_type = query.get('type', [''])[0]
-        interface = query.get('interface', [''])[0]
+        interface = self._normalize_interface(query.get('interface', [''])[0])
         duration = query.get('duration', ['24h'])[0]
         return self.monitor_service.get_data(widget_type, interface, duration)
 
@@ -395,12 +395,17 @@ class VyOSWebApp:
         path = query.get('path', [''])[0]
         return self.config_service.check_references_before_delete(path)
 
+    def _normalize_interface(self, interface):
+        if interface in (None, '', 'null', 'None'):
+            return None
+        return interface
+
     def handle_monitor_history(self, environ, body):
         query = parse_qs(environ.get('QUERY_STRING', ''))
         metric_type = query.get('type', [''])[0]
         metric = query.get('metric', [''])[0]
         duration = query.get('duration', ['24h'])[0]
-        interface = query.get('interface', [None])[0]
+        interface = self._normalize_interface(query.get('interface', [None])[0])
         return self.monitor_service.get_history(metric_type, metric, duration, interface)
 
     def handle_monitor_stream(self, environ, body):
@@ -408,7 +413,7 @@ class VyOSWebApp:
         import time
         query = parse_qs(environ.get('QUERY_STRING', ''))
         widget_type = query.get('type', ['cpu'])[0]
-        interface = query.get('interface', [''])[0]
+        interface = self._normalize_interface(query.get('interface', [''])[0])
         interval = int(query.get('interval', ['2'])[0])
 
         def event_generator():
