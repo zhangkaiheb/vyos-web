@@ -19,7 +19,17 @@
         "label": "接口流量",
         "label_en": "Interface Traffic",
         "icon": "",
-        "children": [],
+        "children": [
+          {
+            "id": "interface-stats",
+            "label": "接口统计",
+            "label_en": "Interface Stats",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/interface-traffic/interface-stats",
+            "component": "InterfaceStatsPage"
+          }
+        ],
         "route": "/monitor/interface-traffic",
         "component": "MonitorWidget"
       },
@@ -33,113 +43,236 @@
         "component": "MonitorWidget"
       },
       {
-        "id": "ipsec-connections",
-        "label": "IPsec 连接",
-        "label_en": "IPsec Connections",
-        "icon": "",
-        "children": [],
-        "route": "/monitor/ipsec-connections",
-        "component": "IpsecConnectionsPage"
+        "id": "network",
+        "label": "网络",
+        "label_en": "Network",
+        "icon": "GlobalOutlined",
+        "children": [
+          {
+            "id": "arp",
+            "label": "ARP",
+            "label_en": "ARP",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/network/arp",
+            "component": "ArpPage"
+          },
+          {
+            "id": "route",
+            "label": "路由",
+            "label_en": "Route",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/network/route",
+            "component": "RoutePage"
+          },
+          {
+            "id": "zebra",
+            "label": "Zebra",
+            "label_en": "Zebra",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/network/zebra",
+            "component": "ZebraPage"
+          },
+          {
+            "id": "active-connections",
+            "label": "活动连接",
+            "label_en": "Active Connections",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/network/active-connections",
+            "component": "ActiveConnectionsPage"
+          }
+        ],
+        "route": null,
+        "component": null
       },
       {
-        "id": "ipsec-sa",
-        "label": "IPsec 安全关联",
-        "label_en": "IPsec Security Associations",
-        "icon": "",
-        "children": [],
-        "route": "/monitor/ipsec-sa",
-        "component": "IpsecSaPage"
+        "id": "system-status",
+        "label": "系统状态",
+        "label_en": "System Status",
+        "icon": "DashboardOutlined",
+        "children": [
+          {
+            "id": "memory-cache",
+            "label": "内存缓存",
+            "label_en": "Memory Cache",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/system-status/memory-cache",
+            "component": "MemoryCachePage"
+          },
+          {
+            "id": "process-monitor",
+            "label": "进程监控",
+            "label_en": "Process Monitor",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/system-status/process-monitor",
+            "component": "ProcessMonitorPage"
+          }
+        ],
+        "route": null,
+        "component": null
       },
       {
-        "id": "pptp-sessions",
-        "label": "PPTP 会话",
-        "label_en": "PPTP Sessions",
+        "id": "ipsec",
+        "label": "IPsec",
+        "label_en": "IPsec",
         "icon": "",
-        "children": [],
-        "route": "/monitor/pptp-sessions",
-        "component": "PptpSessionsPage"
+        "children": [
+          {
+            "id": "connections",
+            "label": "IPsec 连接",
+            "label_en": "IPsec Connections",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/ipsec/connections",
+            "component": "IpsecConnectionsPage"
+          },
+          {
+            "id": "security-associations",
+            "label": "IPsec 安全关联",
+            "label_en": "IPsec Security Associations",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/ipsec/security-associations",
+            "component": "IpsecSaPage"
+          }
+        ],
+        "route": null,
+        "component": null
       },
       {
-        "id": "pptp-statistics",
-        "label": "PPTP 统计",
-        "label_en": "PPTP Statistics",
+        "id": "pptp",
+        "label": "PPTP",
+        "label_en": "PPTP",
         "icon": "",
-        "children": [],
-        "route": "/monitor/pptp-statistics",
-        "component": "PptpStatisticsPage"
+        "children": [
+          {
+            "id": "sessions",
+            "label": "PPTP 会话",
+            "label_en": "PPTP Sessions",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/pptp/sessions",
+            "component": "PptpSessionsPage"
+          },
+          {
+            "id": "statistics",
+            "label": "PPTP 统计",
+            "label_en": "PPTP Statistics",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/pptp/statistics",
+            "component": "PptpStatisticsPage"
+          }
+        ],
+        "route": null,
+        "component": null
       },
       {
-        "id": "dhcp-leases",
-        "label": "DHCP 租约",
-        "label_en": "DHCP Leases",
+        "id": "dhcp",
+        "label": "DHCP",
+        "label_en": "DHCP",
         "icon": "",
-        "children": [],
-        "route": "/monitor/dhcp-leases",
-        "component": "DhcpLeasesPage"
+        "children": [
+          {
+            "id": "leases",
+            "label": "DHCP 租约",
+            "label_en": "DHCP Leases",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/dhcp/leases",
+            "component": "DhcpLeasesPage"
+          },
+          {
+            "id": "static-mappings",
+            "label": "DHCP 静态映射",
+            "label_en": "DHCP Static Mappings",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/dhcp/static-mappings",
+            "component": "DhcpStaticMappingsPage"
+          },
+          {
+            "id": "statistics",
+            "label": "DHCP 统计",
+            "label_en": "DHCP Statistics",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/dhcp/statistics",
+            "component": "DhcpStatisticsPage"
+          },
+          {
+            "id": "dhcpv6-leases",
+            "label": "DHCPv6 租约",
+            "label_en": "DHCPv6 Leases",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/dhcp/dhcpv6-leases",
+            "component": "Dhcpv6LeasesPage"
+          },
+          {
+            "id": "dhcpv6-static-mappings",
+            "label": "DHCPv6 静态映射",
+            "label_en": "DHCPv6 Static Mappings",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/dhcp/dhcpv6-static-mappings",
+            "component": "Dhcpv6StaticMappingsPage"
+          }
+        ],
+        "route": null,
+        "component": null
       },
       {
-        "id": "dhcp-static-mappings",
-        "label": "DHCP 静态映射",
-        "label_en": "DHCP Static Mappings",
+        "id": "dns",
+        "label": "DNS",
+        "label_en": "DNS",
         "icon": "",
-        "children": [],
-        "route": "/monitor/dhcp-static-mappings",
-        "component": "DhcpStaticMappingsPage"
+        "children": [
+          {
+            "id": "dynamic-status",
+            "label": "Dynamic DNS 状态",
+            "label_en": "Dynamic DNS Status",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/dns/dynamic-status",
+            "component": "DnsDynamicStatusPage"
+          },
+          {
+            "id": "forwarding-statistics",
+            "label": "DNS 转发统计",
+            "label_en": "DNS Forwarding Statistics",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/dns/forwarding-statistics",
+            "component": "DnsForwardingStatisticsPage"
+          }
+        ],
+        "route": null,
+        "component": null
       },
       {
-        "id": "dhcp-statistics",
-        "label": "DHCP 统计",
-        "label_en": "DHCP Statistics",
+        "id": "ssh",
+        "label": "SSH",
+        "label_en": "SSH",
         "icon": "",
-        "children": [],
-        "route": "/monitor/dhcp-statistics",
-        "component": "DhcpStatisticsPage"
-      }
-    ],
-    "route": null,
-    "component": null
-  },
-  {
-    "id": "logs",
-    "label": "日志",
-    "label_en": "Logs",
-    "icon": "FileTextOutlined",
-    "children": [
-      {
-        "id": "audit",
-        "label": "操作日志",
-        "label_en": "Audit Log",
-        "icon": "",
-        "children": [],
-        "route": "/logs/audit",
-        "component": "LogPage"
-      },
-      {
-        "id": "system",
-        "label": "系统日志",
-        "label_en": "System Log",
-        "icon": "",
-        "children": [],
-        "route": "/logs/system",
-        "component": "LogPage"
-      },
-      {
-        "id": "firewall",
-        "label": "防火墙日志",
-        "label_en": "Firewall Log",
-        "icon": "",
-        "children": [],
-        "route": "/logs/firewall",
-        "component": "LogPage"
-      },
-      {
-        "id": "conntrack",
-        "label": "连接跟踪日志",
-        "label_en": "Conntrack Log",
-        "icon": "",
-        "children": [],
-        "route": "/logs/conntrack",
-        "component": "LogPage"
+        "children": [
+          {
+            "id": "fingerprints",
+            "label": "SSH 指纹",
+            "label_en": "SSH Fingerprints",
+            "icon": "",
+            "children": [],
+            "route": "/monitor/ssh/fingerprints",
+            "component": "SshFingerprintsPage"
+          }
+        ],
+        "route": null,
+        "component": null
       }
     ],
     "route": null,
@@ -151,6 +284,15 @@
     "label_en": "System Management",
     "icon": "SettingOutlined",
     "children": [
+      {
+        "id": "control-panel",
+        "label": "控制面板",
+        "label_en": "Control Panel",
+        "icon": "",
+        "children": [],
+        "route": "/system/control-panel",
+        "component": "ControlPanelPage"
+      },
       {
         "id": "interfaces",
         "label": "网络接口",
@@ -1150,40 +1292,50 @@
     "icon": "CloudServerOutlined",
     "children": [
       {
-        "id": "dhcp-server",
-        "label": "DHCP服务器",
-        "label_en": "DHCP Server",
+        "id": "dhcp",
+        "label": "DHCP服务",
+        "label_en": "DHCP Service",
         "icon": "",
-        "children": [],
-        "route": "/service/dhcp-server",
-        "component": "DhcpServerPage"
-      },
-      {
-        "id": "dhcp-relay",
-        "label": "DHCP中继",
-        "label_en": "DHCP Relay",
-        "icon": "",
-        "children": [],
-        "route": "/service/dhcp-relay",
-        "component": "DhcpRelayPage"
-      },
-      {
-        "id": "dhcpv6-server",
-        "label": "DHCPv6服务器",
-        "label_en": "DHCPv6 Server",
-        "icon": "",
-        "children": [],
-        "route": "/service/dhcpv6-server",
-        "component": "Dhcpv6ServerPage"
-      },
-      {
-        "id": "dhcpv6-relay",
-        "label": "DHCPv6中继",
-        "label_en": "DHCPv6 Relay",
-        "icon": "",
-        "children": [],
-        "route": "/service/dhcpv6-relay",
-        "component": "Dhcpv6RelayPage"
+        "children": [
+          {
+            "id": "dhcp-server",
+            "label": "DHCP服务器",
+            "label_en": "DHCP Server",
+            "icon": "",
+            "children": [],
+            "route": "/service/dhcp-server",
+            "component": "DhcpServerPage"
+          },
+          {
+            "id": "dhcp-relay",
+            "label": "DHCP中继",
+            "label_en": "DHCP Relay",
+            "icon": "",
+            "children": [],
+            "route": "/service/dhcp-relay",
+            "component": "DhcpRelayPage"
+          },
+          {
+            "id": "dhcpv6-server",
+            "label": "DHCPv6服务器",
+            "label_en": "DHCPv6 Server",
+            "icon": "",
+            "children": [],
+            "route": "/service/dhcpv6-server",
+            "component": "Dhcpv6ServerPage"
+          },
+          {
+            "id": "dhcpv6-relay",
+            "label": "DHCPv6中继",
+            "label_en": "DHCPv6 Relay",
+            "icon": "",
+            "children": [],
+            "route": "/service/dhcpv6-relay",
+            "component": "Dhcpv6RelayPage"
+          }
+        ],
+        "route": null,
+        "component": null
       },
       {
         "id": "dns",
@@ -1255,7 +1407,7 @@
         "icon": "",
         "children": [],
         "route": "/service/webproxy",
-        "component": "ConfigPage"
+        "component": "WebProxyPage"
       },
       {
         "id": "suricata",
@@ -1264,7 +1416,7 @@
         "icon": "",
         "children": [],
         "route": "/service/suricata",
-        "component": "ConfigPage"
+        "component": "SuricataPage"
       },
       {
         "id": "conntrack-sync",
@@ -1273,7 +1425,7 @@
         "icon": "",
         "children": [],
         "route": "/service/conntrack-sync",
-        "component": "ConfigPage"
+        "component": "ConntrackSyncPage"
       },
       {
         "id": "config-sync",
@@ -1282,7 +1434,7 @@
         "icon": "",
         "children": [],
         "route": "/service/config-sync",
-        "component": "ConfigPage"
+        "component": "ConfigSyncPage"
       }
     ],
     "route": null,
@@ -1356,6 +1508,52 @@
         "children": [],
         "route": "/vpn/vti",
         "component": "ConfigPage"
+      }
+    ],
+    "route": null,
+    "component": null
+  },
+  {
+    "id": "logs",
+    "label": "日志",
+    "label_en": "Logs",
+    "icon": "FileTextOutlined",
+    "children": [
+      {
+        "id": "audit",
+        "label": "操作日志",
+        "label_en": "Audit Log",
+        "icon": "",
+        "children": [],
+        "route": "/logs/audit",
+        "component": "LogPage"
+      },
+      {
+        "id": "system",
+        "label": "系统日志",
+        "label_en": "System Log",
+        "icon": "",
+        "children": [],
+        "route": "/logs/system",
+        "component": "LogPage"
+      },
+      {
+        "id": "firewall",
+        "label": "防火墙日志",
+        "label_en": "Firewall Log",
+        "icon": "",
+        "children": [],
+        "route": "/logs/firewall",
+        "component": "LogPage"
+      },
+      {
+        "id": "conntrack",
+        "label": "连接跟踪日志",
+        "label_en": "Conntrack Log",
+        "icon": "",
+        "children": [],
+        "route": "/logs/conntrack",
+        "component": "LogPage"
       }
     ],
     "route": null,

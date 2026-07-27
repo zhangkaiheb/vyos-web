@@ -105,12 +105,97 @@ function validateRange(value, min, max, name) {
   return '';
 }
 
+function validateIPv6Prefix96(value) {
+  if (!value) return '';
+  const parts = value.split('/');
+  if (parts.length !== 2) return 'DNS64 前缀格式应为 IPv6/96';
+  const err = validateIPv6(parts[0]);
+  if (err) return err;
+  const p = parseInt(parts[1], 10);
+  if (isNaN(p) || p !== 96) return 'DNS64 前缀长度必须为 96';
+  return '';
+}
+
+function validatePrefixExclusion(value) {
+  if (!value) return '';
+  const v = String(value).trim();
+  const target = v.startsWith('!') ? v.slice(1) : v;
+  if (!target) return '前缀不能为空';
+  return validateIPPrefix(target);
+}
+
+function validateNetmaskOrDomain(value) {
+  if (!value) return '';
+  if (value.includes('/')) return validateIPPrefix(value);
+  if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(value) || /^[0-9a-fA-F:]+$/.test(value)) return validateIP(value);
+  if (!/^[a-zA-Z0-9][-a-zA-Z0-9.]*[a-zA-Z0-9]$/.test(value)) return '请输入有效域名或网段';
+  return '';
+}
+
+function validateIPOrFQDN(value) {
+  if (!value) return '';
+  if (validateIP(value)) {
+    if (!/^[a-zA-Z0-9][-a-zA-Z0-9.]*[a-zA-Z0-9]$/.test(value)) return '请输入有效 IP 地址或 FQDN';
+  }
+  return '';
+}
+
+function validateConfigAuthPath(value) {
+  if (!value) return '';
+  if (!value.startsWith('/config/auth/')) return '密钥文件必须位于 /config/auth/ 目录下';
+  return '';
+}
+
+function validateHostname(value) {
+  if (!value) return '请输入主机名';
+  if (!/^[a-zA-Z0-9][-a-zA-Z0-9.]*[a-zA-Z0-9]$/.test(value)) return '主机名格式错误';
+  return '';
+}
+
+function nameServersToForm(nameServers = {}) {
+  return Object.entries(nameServers).map(([address, item]) => ({
+    _address: address,
+    address,
+    port: item?.port !== undefined ? String(item.port) : '',
+  }));
+}
+
+function nameServersToConfig(formNameServers) {
+  const result = {};
+  for (const ns of formNameServers || []) {
+    if (!ns.address) continue;
+    const item = {};
+    if (isPresent(ns.port)) item.port = String(ns.port);
+    result[ns.address] = item;
+  }
+  return result;
+}
+
 function domainsToForm(domains = {}) {
   return Object.entries(domains).map(([domain, item]) => ({
     _domain: domain,
     domain,
-    name_server: joinMembers(item['name-server']),
+    name_servers: nameServersToForm(item['name-server']),
   }));
+}
+
+function authoritativeDomainsToForm(domains = {}) {
+  return Object.entries(domains).map(([domain, item]) => ({
+    _domain: domain,
+    domain,
+    disable: item.disable !== undefined,
+  }));
+}
+
+function authoritativeDomainsToConfig(formDomains) {
+  const result = {};
+  for (const d of formDomains || []) {
+    if (!d.domain) continue;
+    const item = {};
+    if (d.disable) item.disable = '';
+    result[d.domain] = item;
+  }
+  return result;
 }
 
 function domainsToConfig(formDomains) {
@@ -118,8 +203,8 @@ function domainsToConfig(formDomains) {
   for (const d of formDomains) {
     if (!d.domain) continue;
     const item = {};
-    const servers = splitMembers(d.name_server);
-    if (servers.length) item['name-server'] = servers;
+    const nameServers = nameServersToConfig(d.name_servers || []);
+    if (Object.keys(nameServers).length) item['name-server'] = nameServers;
     result[d.domain] = item;
   }
   return result;
@@ -186,10 +271,11 @@ function dynamicNamesToConfig(formNames) {
 function dnsToForm(data = {}) {
   const forwarding = data.forwarding || {};
   const dynamic = data.dynamic || {};
+  const options = forwarding.options || {};
   return {
     forwarding: {
       listen_address: toArray(forwarding['listen-address']),
-      name_server: toArray(forwarding['name-server']),
+      name_servers: nameServersToForm(forwarding['name-server']),
       cache_size: forwarding['cache-size'] !== undefined ? String(forwarding['cache-size']) : '10000',
       allow_from: toArray(forwarding['allow-from']),
       dnssec: forwarding.dnssec || 'process-no-validate',
@@ -200,6 +286,16 @@ function dnsToForm(data = {}) {
       system: forwarding.system !== undefined,
       ignore_hosts_file: forwarding['ignore-hosts-file'] !== undefined,
       no_serve_rfc1918: forwarding['no-serve-rfc1918'] !== undefined,
+      authoritative_domain: authoritativeDomainsToForm(forwarding['authoritative-domain']),
+      dhcp: toArray(forwarding.dhcp),
+      dns64_prefix: forwarding['dns64-prefix'] || '',
+      exclude_throttle_address: toArray(forwarding['exclude-throttle-address']),
+      serve_stale_extension: forwarding['serve-stale-extension'] !== undefined ? String(forwarding['serve-stale-extension']) : '0',
+      options: {
+        ecs_add_for: toArray(options['ecs-add-for']),
+        ecs_ipv4_bits: options['ecs-ipv4-bits'] !== undefined ? String(options['ecs-ipv4-bits']) : '',
+        edns_subnet_allow_list: toArray(options['edns-subnet-allow-list']),
+      },
     },
     domains: domainsToForm(forwarding['domain']),
     dynamic: {
@@ -215,7 +311,8 @@ function dnsToConfig(form) {
   const forwarding = {};
   const f = form.forwarding || {};
   if (f.listen_address?.length) forwarding['listen-address'] = [...f.listen_address];
-  if (f.name_server?.length) forwarding['name-server'] = [...f.name_server];
+  const globalNameServers = nameServersToConfig(f.name_servers || []);
+  if (Object.keys(globalNameServers).length) forwarding['name-server'] = globalNameServers;
   if (isPresent(f.cache_size)) forwarding['cache-size'] = String(f.cache_size);
   if (f.allow_from?.length) forwarding['allow-from'] = [...f.allow_from];
   if (isPresent(f.dnssec)) forwarding.dnssec = String(f.dnssec);
@@ -226,6 +323,19 @@ function dnsToConfig(form) {
   if (f.system) forwarding.system = '';
   if (f.ignore_hosts_file) forwarding['ignore-hosts-file'] = '';
   if (f.no_serve_rfc1918) forwarding['no-serve-rfc1918'] = '';
+  if (f.dhcp?.length) forwarding.dhcp = [...f.dhcp];
+  if (isPresent(f.dns64_prefix)) forwarding['dns64-prefix'] = f.dns64_prefix;
+  if (f.exclude_throttle_address?.length) forwarding['exclude-throttle-address'] = [...f.exclude_throttle_address];
+  if (isPresent(f.serve_stale_extension)) forwarding['serve-stale-extension'] = String(f.serve_stale_extension);
+
+  const authDomains = authoritativeDomainsToConfig(f.authoritative_domain || []);
+  if (Object.keys(authDomains).length) forwarding['authoritative-domain'] = authDomains;
+
+  const options = {};
+  if (f.options?.ecs_add_for?.length) options['ecs-add-for'] = [...f.options.ecs_add_for];
+  if (isPresent(f.options?.ecs_ipv4_bits)) options['ecs-ipv4-bits'] = String(f.options.ecs_ipv4_bits);
+  if (f.options?.edns_subnet_allow_list?.length) options['edns-subnet-allow-list'] = [...f.options.edns_subnet_allow_list];
+  if (Object.keys(options).length) forwarding.options = options;
 
   const domains = domainsToConfig(form.domains || []);
   if (Object.keys(domains).length) forwarding.domain = domains;
@@ -266,6 +376,12 @@ export default defineComponent({
       return Array.from(addresses).filter(Boolean).sort();
     });
 
+    const interfaceNames = computed(() => {
+      return interfaces.value.map(i => i.name).sort();
+    });
+
+    const showAdvanced = ref(false);
+
     async function loadInterfaces() {
       try {
         const res = await interfaceApi.ethernet();
@@ -278,6 +394,7 @@ export default defineComponent({
     const commandPath = computed(() => {
       switch (activeTab.value) {
         case 'domain': return 'service dns forwarding domain';
+        case 'authoritative': return 'service dns forwarding authoritative-domain';
         case 'dynamic': return 'service dns dynamic';
         case 'forwarding':
         default: return 'service dns forwarding';
@@ -286,12 +403,25 @@ export default defineComponent({
 
     const domainColumns = [
       { key: 'domain', title: '域名' },
-      { key: 'name_server', title: 'DNS 服务器', render: (v) => splitMembers(v).join(', ') },
+      { key: 'name_servers', title: 'DNS 服务器', render: (v) => (v || []).map(ns => ns.port ? `${ns.address}:${ns.port}` : ns.address).join(', ') },
     ];
 
     const selectedDomain = ref([]);
     const showDomainModal = ref(false);
     const editingDomain = ref({});
+
+    const selectedDomainNameServer = ref([]);
+    const showDomainNameServerModal = ref(false);
+    const editingDomainNameServer = ref({});
+
+    const nameServerColumns = [
+      { key: 'address', title: '地址' },
+      { key: 'port', title: '端口', render: v => isPresent(v) ? v : '53（默认）' },
+    ];
+
+    const selectedNameServer = ref([]);
+    const showNameServerModal = ref(false);
+    const editingNameServer = ref({});
 
     const dynamicColumns = [
       { key: 'name', title: '名称' },
@@ -304,6 +434,15 @@ export default defineComponent({
     const selectedDynamic = ref([]);
     const showDynamicModal = ref(false);
     const editingDynamic = ref({});
+
+    const authoritativeColumns = [
+      { key: 'domain', title: '域名' },
+      { key: 'disable', title: '状态', render: v => v ? '禁用' : '启用' },
+    ];
+
+    const selectedAuthoritative = ref([]);
+    const showAuthoritativeModal = ref(false);
+    const editingAuthoritative = ref({});
 
     async function load() {
       loading.value = true;
@@ -323,20 +462,26 @@ export default defineComponent({
       const f = config.value.forwarding || {};
       let err = validateRange(f.port, 1, 65535, '端口');
       if (err) return alert(err + '，默认 53');
-      err = validateRange(f.timeout, 1, 65535, '超时时间');
+      err = validateRange(f.timeout, 10, 60000, '超时时间');
       if (err) return alert(err + ' 毫秒，默认 1500');
-      err = validateRange(f.cache_size, 0, 100000000, '缓存大小');
+      err = validateRange(f.cache_size, 0, 2147483647, '缓存大小');
       if (err) return alert(err + '，默认 10000');
-      err = validateRange(f.negative_ttl, 0, 86400, '负缓存 TTL');
+      err = validateRange(f.negative_ttl, 0, 7200, '负缓存 TTL');
       if (err) return alert(err + ' 秒，默认 3600');
 
       for (const ip of f.listen_address || []) {
         err = validateIP(ip);
         if (err) return alert(`监听地址 ${ip}：${err}`);
       }
-      for (const ip of f.name_server || []) {
-        err = validateIP(ip);
-        if (err) return alert(`上游 DNS 服务器 ${ip}：${err}`);
+      const nameServerAddresses = new Set();
+      for (const ns of f.name_servers || []) {
+        if (!ns.address) return alert('上游 DNS 服务器地址不能为空');
+        if (nameServerAddresses.has(ns.address)) return alert(`上游 DNS 服务器 ${ns.address} 重复`);
+        nameServerAddresses.add(ns.address);
+        err = validateIP(ns.address);
+        if (err) return alert(`上游 DNS 服务器 ${ns.address}：${err}`);
+        err = validateRange(ns.port, 1, 65535, '端口');
+        if (err) return alert(`上游 DNS 服务器 ${ns.address} 端口：${err}`);
       }
       for (const item of f.allow_from || []) {
         err = validateIPPrefix(item);
@@ -345,6 +490,33 @@ export default defineComponent({
       for (const ip of f.source_address || []) {
         err = validateIP(ip);
         if (err) return alert(`源地址 ${ip}：${err}`);
+      }
+      for (const ip of f.exclude_throttle_address || []) {
+        err = validateIPPrefix(ip);
+        if (err) return alert(`排除节流地址 ${ip}：${err}`);
+      }
+      err = validateIPv6Prefix96(f.dns64_prefix);
+      if (err) return alert(`DNS64 前缀：${err}`);
+      err = validateRange(f.serve_stale_extension, 0, 65535, '过期 TTL 扩展次数');
+      if (err) return alert(err + '，默认 0');
+
+      const opts = f.options || {};
+      for (const item of opts.ecs_add_for || []) {
+        err = validatePrefixExclusion(item);
+        if (err) return alert(`EDNS Client Subnet 匹配前缀 ${item}：${err}`);
+      }
+      err = validateRange(opts.ecs_ipv4_bits, 0, 32, 'ECS IPv4 位数');
+      if (err) return alert(err);
+      for (const item of opts.edns_subnet_allow_list || []) {
+        err = validateNetmaskOrDomain(item);
+        if (err) return alert(`EDNS Subnet 允许列表 ${item}：${err}`);
+      }
+
+      const authNames = new Set();
+      for (const a of f.authoritative_domain || []) {
+        if (!a.domain) return alert('权威域名称不能为空');
+        if (authNames.has(a.domain)) return alert(`权威域 ${a.domain} 重复`);
+        authNames.add(a.domain);
       }
 
       const d = config.value.dynamic || {};
@@ -356,15 +528,36 @@ export default defineComponent({
         if (!n.protocol) return alert(`Dynamic DNS ${n.name} 协议不能为空`);
         if (n.address_type === 'interface' && !n.address_interface) return alert(`Dynamic DNS ${n.name} 请选择接口`);
         if (n.address_type === 'web' && !n.web_url) return alert(`Dynamic DNS ${n.name} Web URL 不能为空`);
+        const hostNames = splitMembers(n.host_name);
+        if (!hostNames.length) return alert(`Dynamic DNS ${n.name} 请至少输入一个主机名`);
+        for (const h of hostNames) {
+          err = validateHostname(h);
+          if (err) return alert(`Dynamic DNS ${n.name} 主机名 ${h}：${err}`);
+        }
+        err = validateIPOrFQDN(n.server);
+        if (err) return alert(`Dynamic DNS ${n.name} 服务器：${err}`);
+        err = validateConfigAuthPath(n.key);
+        if (err) return alert(`Dynamic DNS ${n.name} 密钥文件：${err}`);
+        err = validateRange(n.expiry_time, 300, 2160000, '过期时间');
+        if (err) return alert(`Dynamic DNS ${n.name} ${err} 秒`);
+        err = validateRange(n.wait_time, 60, 86400, '等待时间');
+        if (err) return alert(`Dynamic DNS ${n.name} ${err} 秒`);
+        err = validateRange(n.ttl, 0, 2147483647, 'TTL');
+        if (err) return alert(`Dynamic DNS ${n.name} ${err} 秒`);
       }
 
       for (const dItem of config.value.domains || []) {
         if (!dItem.domain) return alert('域名转发条目中域名不能为空');
-        const servers = splitMembers(dItem.name_server);
-        if (!servers.length) return alert(`域名 ${dItem.domain} 至少需要填写一个 DNS 服务器`);
-        for (const ip of servers) {
-          err = validateIP(ip);
-          if (err) return alert(`域名 ${dItem.domain} 的 DNS 服务器 ${ip}：${err}`);
+        if (!dItem.name_servers?.length) return alert(`域名 ${dItem.domain} 至少需要填写一个 DNS 服务器`);
+        const domainNsAddresses = new Set();
+        for (const ns of dItem.name_servers) {
+          if (!ns.address) return alert(`域名 ${dItem.domain} 的 DNS 服务器地址不能为空`);
+          if (domainNsAddresses.has(ns.address)) return alert(`域名 ${dItem.domain} 的 DNS 服务器 ${ns.address} 重复`);
+          domainNsAddresses.add(ns.address);
+          err = validateIP(ns.address);
+          if (err) return alert(`域名 ${dItem.domain} 的 DNS 服务器 ${ns.address}：${err}`);
+          err = validateRange(ns.port, 1, 65535, '端口');
+          if (err) return alert(`域名 ${dItem.domain} 的 DNS 服务器 ${ns.address} 端口：${err}`);
         }
       }
 
@@ -381,7 +574,7 @@ export default defineComponent({
     }
 
     function createDomain() {
-      editingDomain.value = { domain: '', name_server: '' };
+      editingDomain.value = { domain: '', name_servers: [] };
       showDomainModal.value = true;
     }
 
@@ -401,11 +594,16 @@ export default defineComponent({
 
     function saveDomain() {
       if (!editingDomain.value.domain) return alert('请输入域名');
-      const servers = splitMembers(editingDomain.value.name_server);
-      if (!servers.length) return alert('请输入至少一个 DNS 服务器');
-      for (const ip of servers) {
-        const err = validateIP(ip);
-        if (err) return alert(`DNS 服务器 ${ip}：${err}`);
+      if (!editingDomain.value.name_servers?.length) return alert('请输入至少一个 DNS 服务器');
+      const domainNsAddresses = new Set();
+      for (const ns of editingDomain.value.name_servers) {
+        if (!ns.address) return alert('DNS 服务器地址不能为空');
+        if (domainNsAddresses.has(ns.address)) return alert(`DNS 服务器 ${ns.address} 重复`);
+        domainNsAddresses.add(ns.address);
+        let err = validateIP(ns.address);
+        if (err) return alert(`DNS 服务器 ${ns.address}：${err}`);
+        err = validateRange(ns.port, 1, 65535, '端口');
+        if (err) return alert(`DNS 服务器 ${ns.address} 端口：${err}`);
       }
       const row = { ...editingDomain.value };
       if (!row._domain) row._domain = row.domain;
@@ -417,6 +615,80 @@ export default defineComponent({
       config.value.domains = [...list];
       selectedDomain.value = [];
       showDomainModal.value = false;
+    }
+
+    function createDomainNameServer() {
+      editingDomainNameServer.value = { address: '', port: '' };
+      showDomainNameServerModal.value = true;
+    }
+
+    function editDomainNameServer() {
+      if (!selectedDomainNameServer.value.length) return alert('请选择要编辑的 DNS 服务器');
+      const row = (editingDomain.value.name_servers || []).find(ns => ns._address === selectedDomainNameServer.value[0]);
+      if (!row) return alert('未找到选中的 DNS 服务器');
+      editingDomainNameServer.value = { ...row };
+      showDomainNameServerModal.value = true;
+    }
+
+    function removeDomainNameServer() {
+      if (!selectedDomainNameServer.value.length) return alert('请选择要删除的 DNS 服务器');
+      editingDomain.value.name_servers = (editingDomain.value.name_servers || []).filter(ns => ns._address !== selectedDomainNameServer.value[0]);
+      selectedDomainNameServer.value = [];
+    }
+
+    function saveDomainNameServer() {
+      if (!editingDomainNameServer.value.address) return alert('请输入 DNS 服务器地址');
+      let err = validateIP(editingDomainNameServer.value.address);
+      if (err) return alert(`DNS 服务器地址：${err}`);
+      err = validateRange(editingDomainNameServer.value.port, 1, 65535, '端口');
+      if (err) return alert(`端口：${err}`);
+      const row = { ...editingDomainNameServer.value };
+      if (!row._address) row._address = row.address;
+      const list = editingDomain.value.name_servers || [];
+      const idx = list.findIndex(ns => ns._address === row._address);
+      if (idx >= 0 && !editingDomainNameServer.value._address) return alert('该 DNS 服务器已存在');
+      if (idx >= 0) list.splice(idx, 1, row);
+      else list.push(row);
+      editingDomain.value.name_servers = [...list];
+      selectedDomainNameServer.value = [];
+      showDomainNameServerModal.value = false;
+    }
+
+    function createNameServer() {
+      editingNameServer.value = { address: '', port: '' };
+      showNameServerModal.value = true;
+    }
+
+    function editNameServer() {
+      if (!selectedNameServer.value.length) return alert('请选择要编辑的上游 DNS 服务器');
+      const row = (config.value.forwarding.name_servers || []).find(ns => ns._address === selectedNameServer.value[0]);
+      if (!row) return alert('未找到选中的上游 DNS 服务器');
+      editingNameServer.value = { ...row };
+      showNameServerModal.value = true;
+    }
+
+    function removeNameServer() {
+      if (!selectedNameServer.value.length) return alert('请选择要删除的上游 DNS 服务器');
+      config.value.forwarding.name_servers = (config.value.forwarding.name_servers || []).filter(ns => ns._address !== selectedNameServer.value[0]);
+      selectedNameServer.value = [];
+    }
+
+    function saveNameServer() {
+      if (!editingNameServer.value.address) return alert('请输入 DNS 服务器地址');
+      let err = validateIP(editingNameServer.value.address);
+      if (err) return alert(`DNS 服务器地址：${err}`);
+      err = validateRange(editingNameServer.value.port, 1, 65535, '端口');
+      if (err) return alert(`端口：${err}`);
+      const row = { ...editingNameServer.value };
+      if (!row._address) row._address = row.address;
+      const list = config.value.forwarding.name_servers || [];
+      const idx = list.findIndex(ns => ns._address === row._address);
+      if (idx >= 0 && !editingNameServer.value._address) return alert('该 DNS 服务器已存在');
+      if (idx >= 0) list.splice(idx, 1, row);
+      else list.push(row);
+      config.value.forwarding.name_servers = [...list];
+      selectedNameServer.value = [];
+      showNameServerModal.value = false;
     }
 
     function createDynamic() {
@@ -444,6 +716,23 @@ export default defineComponent({
 
     function saveDynamic() {
       if (!editingDynamic.value.name) return alert('请输入 Dynamic DNS 名称');
+      const hostNames = splitMembers(editingDynamic.value.host_name);
+      if (!hostNames.length) return alert('请至少输入一个主机名');
+      for (const h of hostNames) {
+        const err = validateHostname(h);
+        if (err) return alert(`主机名 ${h}：${err}`);
+      }
+      let err = validateIPOrFQDN(editingDynamic.value.server);
+      if (err) return alert(`服务器：${err}`);
+      err = validateConfigAuthPath(editingDynamic.value.key);
+      if (err) return alert(`密钥文件：${err}`);
+      err = validateRange(editingDynamic.value.expiry_time, 300, 2160000, '过期时间');
+      if (err) return alert(err + ' 秒');
+      err = validateRange(editingDynamic.value.wait_time, 60, 86400, '等待时间');
+      if (err) return alert(err + ' 秒');
+      err = validateRange(editingDynamic.value.ttl, 0, 2147483647, 'TTL');
+      if (err) return alert(err + ' 秒');
+
       const row = { ...editingDynamic.value };
       if (!row._name) row._name = row.name;
       const list = config.value.dynamic.names || [];
@@ -456,15 +745,55 @@ export default defineComponent({
       showDynamicModal.value = false;
     }
 
+    function createAuthoritative() {
+      editingAuthoritative.value = { domain: '', disable: false };
+      showAuthoritativeModal.value = true;
+    }
+
+    function editAuthoritative() {
+      if (!selectedAuthoritative.value.length) return alert('请选择要编辑的权威域');
+      const row = (config.value.forwarding.authoritative_domain || []).find(a => a._domain === selectedAuthoritative.value[0]);
+      if (!row) return alert('未找到选中的权威域');
+      editingAuthoritative.value = { ...row };
+      showAuthoritativeModal.value = true;
+    }
+
+    function removeAuthoritative() {
+      if (!selectedAuthoritative.value.length) return alert('请选择要删除的权威域');
+      config.value.forwarding.authoritative_domain = (config.value.forwarding.authoritative_domain || []).filter(a => a._domain !== selectedAuthoritative.value[0]);
+      selectedAuthoritative.value = [];
+    }
+
+    function saveAuthoritative() {
+      if (!editingAuthoritative.value.domain) return alert('请输入权威域名称');
+      const row = { ...editingAuthoritative.value };
+      if (!row._domain) row._domain = row.domain;
+      const list = config.value.forwarding.authoritative_domain || [];
+      const idx = list.findIndex(a => a._domain === row._domain);
+      if (idx >= 0 && !editingAuthoritative.value._domain) return alert('该权威域已存在');
+      if (idx >= 0) list.splice(idx, 1, row);
+      else list.push(row);
+      config.value.forwarding.authoritative_domain = [...list];
+      selectedAuthoritative.value = [];
+      showAuthoritativeModal.value = false;
+    }
+
     onMounted(load);
 
     return {
-      loading, saving, saved, config, activeTab, writeDisabled, interfaces, localAddresses, commandPath,
+      loading, saving, saved, config, activeTab, writeDisabled, interfaces, localAddresses, interfaceNames, commandPath, showAdvanced,
       domainColumns, selectedDomain, showDomainModal, editingDomain,
+      selectedDomainNameServer, showDomainNameServerModal, editingDomainNameServer,
+      nameServerColumns, selectedNameServer, showNameServerModal, editingNameServer,
       dynamicColumns, selectedDynamic, showDynamicModal, editingDynamic,
+      authoritativeColumns, selectedAuthoritative, showAuthoritativeModal, editingAuthoritative,
       load, save, createDomain, editDomain, removeDomain, saveDomain,
+      createDomainNameServer, editDomainNameServer, removeDomainNameServer, saveDomainNameServer,
+      createNameServer, editNameServer, removeNameServer, saveNameServer,
       createDynamic, editDynamic, removeDynamic, saveDynamic,
+      createAuthoritative, editAuthoritative, removeAuthoritative, saveAuthoritative,
       DNSSEC_OPTIONS, IP_VERSION_OPTIONS, DYNAMIC_PROTOCOL_OPTIONS, ALLOW_FROM_OPTIONS,
+      validateIP, validateIPPrefix, validateIPv6Prefix96, validatePrefixExclusion, validateNetmaskOrDomain, validateIPOrFQDN, validateConfigAuthPath, validateHostname,
     };
   },
   components: { DataTable, DraggableModal, DualListSelector, TabGroup, ToolbarButton, CommandPreview },
@@ -474,6 +803,7 @@ export default defineComponent({
       <TabGroup v-model="activeTab" :tabs="[
         { key: 'forwarding', title: '转发' },
         { key: 'domain', title: '域名转发' },
+        { key: 'authoritative', title: '权威域' },
         { key: 'dynamic', title: 'Dynamic DNS' }
       ]">
 
@@ -481,25 +811,34 @@ export default defineComponent({
           <div class="form-row">
             <label class="form-label" title="DNS 转发监听地址">监听地址</label>
             <div style="flex:1;max-width:600px;">
-              <DualListSelector v-model="config.forwarding.listen_address" :options="localAddresses" title-left="可选" title-right="已选" />
+              <DualListSelector v-model="config.forwarding.listen_address" :options="localAddresses" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IP 地址后按回车" :custom-validator="validateIP" />
+              <div class="form-hint">点击可选列表右侧的 + 号添加自定义监听地址</div>
             </div>
           </div>
           <div class="form-row">
             <label class="form-label" title="上游 DNS 服务器地址">上游 DNS 服务器</label>
             <div style="flex:1;max-width:600px;">
-              <DualListSelector v-model="config.forwarding.name_server" :options="[]" title-left="可选" title-right="已选" />
+              <div class="toolbar" style="padding-left:0;">
+                <ToolbarButton icon="create" @click="createNameServer">创建</ToolbarButton>
+                <ToolbarButton icon="edit" @click="editNameServer" :disabled="!selectedNameServer.length || selectedNameServer.length > 1">编辑</ToolbarButton>
+                <ToolbarButton icon="delete" @click="removeNameServer" :disabled="!selectedNameServer.length">删除</ToolbarButton>
+              </div>
+              <DataTable :columns="nameServerColumns" :data="config.forwarding.name_servers" row-key="address" :externalToolbar="true" @selection-change="selectedNameServer = $event" :selectable="true" />
+              <div class="form-hint">每条记录可配置独立端口，默认 53</div>
             </div>
           </div>
           <div class="form-row">
             <label class="form-label" title="允许查询 DNS 的客户端网络">允许查询网络</label>
             <div style="flex:1;max-width:600px;">
-              <DualListSelector v-model="config.forwarding.allow_from" :options="ALLOW_FROM_OPTIONS" title-left="可选" title-right="已选" />
+              <DualListSelector v-model="config.forwarding.allow_from" :options="ALLOW_FROM_OPTIONS" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IP 或网段后按回车" :custom-validator="validateIPPrefix" />
+              <div class="form-hint">点击可选列表右侧的 + 号添加自定义允许查询网络</div>
             </div>
           </div>
           <div class="form-row">
             <label class="form-label" title="DNS 转发源地址，默认 0.0.0.0, ::">源地址</label>
             <div style="flex:1;max-width:600px;">
-              <DualListSelector v-model="config.forwarding.source_address" :options="localAddresses" title-left="可选" title-right="已选" />
+              <DualListSelector v-model="config.forwarding.source_address" :options="localAddresses" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IP 地址后按回车" :custom-validator="validateIP" />
+              <div class="form-hint">点击可选列表右侧的 + 号添加自定义源地址</div>
             </div>
           </div>
           <div class="form-row">
@@ -512,22 +851,22 @@ export default defineComponent({
           <div class="form-row">
             <label class="form-label" title="等待远程权威服务器响应的毫秒数，默认 1500">超时 (毫秒)</label>
             <div style="flex:1;">
-              <input type="number" min="1" max="65535" class="form-control" v-model="config.forwarding.timeout" placeholder="1-65535，默认 1500" />
-              <div class="form-hint">默认：1500，范围：1-65535 毫秒</div>
+              <input type="number" min="10" max="60000" class="form-control" v-model="config.forwarding.timeout" placeholder="10-60000，默认 1500" />
+              <div class="form-hint">默认：1500，范围：10-60000 毫秒</div>
             </div>
           </div>
           <div class="form-row">
             <label class="form-label" title="DNS 缓存条目数，默认 10000">缓存大小</label>
             <div style="flex:1;">
-              <input type="number" min="0" class="form-control" v-model="config.forwarding.cache_size" placeholder="默认 10000" />
-              <div class="form-hint">默认：10000</div>
+              <input type="number" min="0" max="2147483647" class="form-control" v-model="config.forwarding.cache_size" placeholder="0-2147483647，默认 10000" />
+              <div class="form-hint">默认：10000，范围：0-2147483647</div>
             </div>
           </div>
           <div class="form-row">
             <label class="form-label" title="负缓存最大时间，默认 3600 秒">负缓存 TTL (秒)</label>
             <div style="flex:1;">
-              <input type="number" min="0" max="86400" class="form-control" v-model="config.forwarding.negative_ttl" placeholder="0-86400，默认 3600" />
-              <div class="form-hint">默认：3600，范围：0-86400 秒</div>
+              <input type="number" min="0" max="7200" class="form-control" v-model="config.forwarding.negative_ttl" placeholder="0-7200，默认 3600" />
+              <div class="form-hint">默认：3600，范围：0-7200 秒</div>
             </div>
           </div>
           <div class="form-row">
@@ -539,6 +878,63 @@ export default defineComponent({
           <div class="form-row"><label class="form-label" title="使用系统名称服务器">使用系统名称服务器</label><input type="checkbox" v-model="config.forwarding.system" /></div>
           <div class="form-row"><label class="form-label" title="不在名称解析中使用本地 /etc/hosts">忽略 hosts 文件</label><input type="checkbox" v-model="config.forwarding.ignore_hosts_file" /></div>
           <div class="form-row"><label class="form-label" title="使服务器对 RFC1918 地址无权威响应">不服务 RFC1918</label><input type="checkbox" v-model="config.forwarding.no_serve_rfc1918" /></div>
+          <div class="form-row">
+            <label class="form-label" title="使用 DHCP 客户端名称服务器转发请求的接口">DHCP 接口</label>
+            <div style="flex:1;max-width:600px;">
+              <DualListSelector v-model="config.forwarding.dhcp" :options="interfaceNames" title-left="可选" title-right="已选" />
+              <div class="form-hint">从本地接口列表中选择</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label" title="IPv6-only 客户端与 IPv4-only 服务器通信的 DNS64 前缀">DNS64 前缀</label>
+            <div style="flex:1;">
+              <input class="form-control" v-model="config.forwarding.dns64_prefix" placeholder="例如 64:ff9b::/96" />
+              <div class="form-hint">格式：IPv6/96</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label" title="从节流排除的 IP 地址或子网">排除节流地址</label>
+            <div style="flex:1;max-width:600px;">
+              <DualListSelector v-model="config.forwarding.exclude_throttle_address" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IP 或网段后按回车" :custom-validator="validateIPPrefix" />
+              <div class="form-hint">点击可选列表右侧的 + 号添加</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label" title="过期记录 TTL 按 30 秒延长的次数，默认 0">过期 TTL 扩展次数</label>
+            <div style="flex:1;">
+              <input type="number" min="0" max="65535" class="form-control" v-model="config.forwarding.serve_stale_extension" placeholder="0-65535，默认 0" />
+              <div class="form-hint">默认：0，范围：0-65535</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label"></label>
+            <div style="flex:1;">
+              <button type="button" class="toolbar-btn" @click="showAdvanced = !showAdvanced">{{ showAdvanced ? '收起高级选项' : '展开高级选项' }}</button>
+            </div>
+          </div>
+          <div v-if="showAdvanced" style="border:1px solid var(--color-border);padding:12px;border-radius:2px;margin-bottom:12px;">
+            <div class="form-row">
+              <label class="form-label" title="启用 EDNS Client Subnet 的客户端网">ECS 添加前缀</label>
+              <div style="flex:1;max-width:600px;">
+                <DualListSelector v-model="config.forwarding.options.ecs_add_for" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入前缀，支持 ! 取反" :custom-validator="validatePrefixExclusion" />
+                <div class="form-hint">支持 IPv4/IPv6 前缀，可加 ! 取反</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="form-label" title="EDNS Client Subnet 传递的 IPv4 地址位数">ECS IPv4 位数</label>
+              <div style="flex:1;">
+                <input type="number" min="0" max="32" class="form-control" v-model="config.forwarding.options.ecs_ipv4_bits" placeholder="0-32" />
+                <div class="form-hint">范围：0-32</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="form-label" title="启用 EDNS Subnet 的域名或网段">EDNS Subnet 允许列表</label>
+              <div style="flex:1;max-width:600px;">
+                <DualListSelector v-model="config.forwarding.options.edns_subnet_allow_list" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入域名或网段后按回车" :custom-validator="validateNetmaskOrDomain" />
+                <div class="form-hint">点击可选列表右侧的 + 号添加域名或网段</div>
+              </div>
+            </div>
+          </div>
         </template>
 
         <template #domain>
@@ -548,6 +944,15 @@ export default defineComponent({
             <ToolbarButton icon="delete" @click="removeDomain" :disabled="!selectedDomain.length">删除</ToolbarButton>
           </div>
           <DataTable :columns="domainColumns" :data="config.domains" row-key="domain" :externalToolbar="true" @selection-change="selectedDomain = $event" :selectable="true" />
+        </template>
+
+        <template #authoritative>
+          <div class="toolbar">
+            <ToolbarButton icon="create" @click="createAuthoritative">创建</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editAuthoritative" :disabled="!selectedAuthoritative.length || selectedAuthoritative.length > 1">编辑</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeAuthoritative" :disabled="!selectedAuthoritative.length">删除</ToolbarButton>
+          </div>
+          <DataTable :columns="authoritativeColumns" :data="config.forwarding.authoritative_domain" row-key="domain" :externalToolbar="true" @selection-change="selectedAuthoritative = $event" :selectable="true" />
         </template>
 
         <template #dynamic>
@@ -573,9 +978,30 @@ export default defineComponent({
         <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
       </div>
 
-      <DraggableModal v-model:visible="showDomainModal" title="域名转发" @confirm="saveDomain" @close="showDomainModal = false">
+      <DraggableModal v-model:visible="showDomainModal" title="域名转发" width="560px" @confirm="saveDomain" @close="showDomainModal = false">
         <div class="form-row"><label class="form-label">域名</label><input class="form-control" v-model="editingDomain.domain" :disabled="!!editingDomain._domain" placeholder="example.com" /></div>
-        <div class="form-row"><label class="form-label">DNS 服务器</label><textarea class="form-control" v-model="editingDomain.name_server" rows="3" placeholder="每行一个 IPv4 / IPv6 地址" /></div>
+        <div class="form-row">
+          <label class="form-label">DNS 服务器</label>
+          <div style="flex:1;">
+            <div class="toolbar" style="padding-left:0;">
+              <ToolbarButton icon="create" @click="createDomainNameServer">创建</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editDomainNameServer" :disabled="!selectedDomainNameServer.length || selectedDomainNameServer.length > 1">编辑</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removeDomainNameServer" :disabled="!selectedDomainNameServer.length">删除</ToolbarButton>
+            </div>
+            <DataTable :columns="nameServerColumns" :data="editingDomain.name_servers" row-key="address" :externalToolbar="true" @selection-change="selectedDomainNameServer = $event" :selectable="true" />
+            <div class="form-hint">每条记录可配置独立端口，默认 53</div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="showDomainNameServerModal" title="DNS 服务器" @confirm="saveDomainNameServer" @close="showDomainNameServerModal = false">
+        <div class="form-row"><label class="form-label">地址</label><input class="form-control" v-model="editingDomainNameServer.address" :disabled="!!editingDomainNameServer._address" placeholder="IPv4 / IPv6 地址" /></div>
+        <div class="form-row"><label class="form-label">端口</label><input type="number" min="1" max="65535" class="form-control" v-model="editingDomainNameServer.port" placeholder="1-65535，默认 53" /><div class="form-hint">默认：53，范围：1-65535</div></div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="showNameServerModal" title="上游 DNS 服务器" @confirm="saveNameServer" @close="showNameServerModal = false">
+        <div class="form-row"><label class="form-label">地址</label><input class="form-control" v-model="editingNameServer.address" :disabled="!!editingNameServer._address" placeholder="IPv4 / IPv6 地址" /></div>
+        <div class="form-row"><label class="form-label">端口</label><input type="number" min="1" max="65535" class="form-control" v-model="editingNameServer.port" placeholder="1-65535，默认 53" /><div class="form-hint">默认：53，范围：1-65535</div></div>
       </DraggableModal>
 
       <DraggableModal v-model:visible="showDynamicModal" title="Dynamic DNS" width="560px" @confirm="saveDynamic" @close="showDynamicModal = false">
@@ -586,8 +1012,8 @@ export default defineComponent({
             <option v-for="p in DYNAMIC_PROTOCOL_OPTIONS" :key="p" :value="p">{{ p }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">服务器</label><input class="form-control" v-model="editingDynamic.server" placeholder="远程 Dynamic DNS 服务器" /></div>
-        <div class="form-row"><label class="form-label">主机名</label><textarea class="form-control" v-model="editingDynamic.host_name" rows="2" placeholder="每行一个主机名" /></div>
+        <div class="form-row"><label class="form-label">服务器</label><input class="form-control" v-model="editingDynamic.server" placeholder="IP 地址或 FQDN" /></div>
+        <div class="form-row"><label class="form-label">主机名</label><textarea class="form-control" v-model="editingDynamic.host_name" rows="2" placeholder="每行一个主机名（必填）" /></div>
         <div class="form-row"><label class="form-label">地址来源</label>
           <select class="form-control" v-model="editingDynamic.address_type">
             <option value="">未选择</option>
@@ -612,12 +1038,17 @@ export default defineComponent({
         </div>
         <div class="form-row"><label class="form-label">用户名</label><input class="form-control" v-model="editingDynamic.username" placeholder="认证用户名" /></div>
         <div class="form-row"><label class="form-label">密码</label><input type="password" class="form-control" v-model="editingDynamic.password" placeholder="认证密码" /></div>
-        <div class="form-row"><label class="form-label">密钥文件</label><input class="form-control" v-model="editingDynamic.key" placeholder="/config/auth/..." /></div>
+        <div class="form-row"><label class="form-label">密钥文件</label><input class="form-control" v-model="editingDynamic.key" placeholder="/config/auth/..." /><div class="form-hint">必须位于 /config/auth/ 目录</div></div>
         <div class="form-row"><label class="form-label">区域</label><input class="form-control" v-model="editingDynamic.zone" placeholder="DNS 区域" /></div>
-        <div class="form-row"><label class="form-label">TTL</label><input type="number" class="form-control" v-model="editingDynamic.ttl" placeholder="生存时间" /></div>
-        <div class="form-row"><label class="form-label">过期时间 (秒)</label><input type="number" class="form-control" v-model="editingDynamic.expiry_time" placeholder="缓存中标记为过期的时间" /></div>
-        <div class="form-row"><label class="form-label">等待时间 (秒)</label><input type="number" class="form-control" v-model="editingDynamic.wait_time" placeholder="更新尝试间隔" /></div>
+        <div class="form-row"><label class="form-label">TTL (秒)</label><input type="number" min="0" max="2147483647" class="form-control" v-model="editingDynamic.ttl" placeholder="0-2147483647" /><div class="form-hint">范围：0-2147483647</div></div>
+        <div class="form-row"><label class="form-label">过期时间 (秒)</label><input type="number" min="300" max="2160000" class="form-control" v-model="editingDynamic.expiry_time" placeholder="300-2160000" /><div class="form-hint">范围：300-2160000</div></div>
+        <div class="form-row"><label class="form-label">等待时间 (秒)</label><input type="number" min="60" max="86400" class="form-control" v-model="editingDynamic.wait_time" placeholder="60-86400" /><div class="form-hint">范围：60-86400</div></div>
         <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingDynamic.description" placeholder="描述" /></div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="showAuthoritativeModal" title="权威域" @confirm="saveAuthoritative" @close="showAuthoritativeModal = false">
+        <div class="form-row"><label class="form-label">域名</label><input class="form-control" v-model="editingAuthoritative.domain" :disabled="!!editingAuthoritative._domain" placeholder="example.com" /></div>
+        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingAuthoritative.disable" /></div>
       </DraggableModal>
     </div>
   `,

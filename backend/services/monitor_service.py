@@ -106,6 +106,19 @@ def _parse_conntrack_max():
         return 0
 
 
+def _parse_conntrack_count_ipv6():
+    try:
+        count = 0
+        with open('/proc/net/nf_conntrack', 'r') as f:
+            for line in f:
+                if line.startswith('ipv6 '):
+                    count += 1
+        return count
+    except Exception:
+        pass
+    return 0
+
+
 def _read_interface_counters():
     """Return dict of interface counters from /sys/class/net/<iface>/statistics."""
     counters = {}
@@ -159,6 +172,8 @@ class MonitorService:
     def __init__(self):
         self._last_interface_counters = {}
         self._last_interface_time = None
+        self._last_interface_collect_counters = {}
+        self._last_interface_collect_time = None
 
     def get_data(self, widget_type, interface, duration):
         try:
@@ -178,6 +193,10 @@ class MonitorService:
                 _record_history('conntrack', 'count', value, unit='')
                 return {'success': True, 'type': 'conntrack', 'value': value,
                         'max': max_val, 'unit': ''}
+            elif widget_type == 'conntrack-ipv6':
+                value = _parse_conntrack_count_ipv6()
+                _record_history('conntrack-ipv6', 'count', value, unit='')
+                return {'success': True, 'type': 'conntrack-ipv6', 'value': value, 'unit': ''}
             elif widget_type == 'interface-traffic':
                 rates = self._get_interface_rates(interface)
                 if interface:
@@ -295,10 +314,35 @@ class MonitorService:
         except Exception as e:
             return {'success': False, 'code': 'HISTORY_ERROR', 'message': str(e)}
 
+    def _collect_interface_metrics(self, interfaces=None):
+        """Record per-minute rx/tx packet, byte deltas and bit rates for given interfaces."""
+        now = time.time()
+        current = _read_interface_counters()
+        targets = interfaces or ['eth0', 'eth1']
+        if self._last_interface_collect_time is not None and self._last_interface_collect_counters:
+            delta = max(now - self._last_interface_collect_time, 0.001)
+            for iface in targets:
+                data = current.get(iface)
+                prev = self._last_interface_collect_counters.get(iface)
+                if not data or not prev:
+                    continue
+                for metric in ['rx_packets', 'tx_packets', 'rx_bytes', 'tx_bytes']:
+                    diff = max(data.get(metric, 0) - prev.get(metric, 0), 0)
+                    unit = 'packets' if 'packets' in metric else 'bytes'
+                    _record_history('interface-traffic', metric, diff, interface=iface, unit=unit)
+                # bit-rate for dashboard display (bps)
+                for direction in ['rx', 'tx']:
+                    bytes_diff = max(data.get(f'{direction}_bytes', 0) - prev.get(f'{direction}_bytes', 0), 0)
+                    bps = round(bytes_diff * 8 / delta, 2)
+                    _record_history('interface-traffic', direction, bps, interface=iface, unit='bps')
+        self._last_interface_collect_counters = current
+        self._last_interface_collect_time = now
+
     def collect_all(self):
         """Convenience method to collect and store current metrics."""
         _cleanup_history()
         self.get_data('cpu', '', '')
         self.get_data('memory', '', '')
         self.get_data('conntrack', '', '')
-        self._get_interface_rates()
+        self.get_data('conntrack-ipv6', '', '')
+        self._collect_interface_metrics(['eth0', 'eth1'])

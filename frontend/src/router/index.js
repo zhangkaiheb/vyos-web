@@ -29,13 +29,30 @@ import DhcpStaticMappingsPage from '/src/pages/DhcpStaticMappingsPage.js';
 import DhcpStatisticsPage from '/src/pages/DhcpStatisticsPage.js';
 import Dhcpv6ServerPage from '/src/pages/Dhcpv6ServerPage.js';
 import Dhcpv6RelayPage from '/src/pages/Dhcpv6RelayPage.js';
+import Dhcpv6LeasesPage from '/src/pages/Dhcpv6LeasesPage.js';
+import Dhcpv6StaticMappingsPage from '/src/pages/Dhcpv6StaticMappingsPage.js';
 import DnsPage from '/src/pages/DnsPage.js';
+import DnsDynamicStatusPage from '/src/pages/DnsDynamicStatusPage.js';
+import DnsForwardingStatisticsPage from '/src/pages/DnsForwardingStatisticsPage.js';
 import NtpPage from '/src/pages/NtpPage.js';
 import SshPage from '/src/pages/SshPage.js';
 import HttpsPage from '/src/pages/HttpsPage.js';
 import LldpPage from '/src/pages/LldpPage.js';
 import IdsDdosPage from '/src/pages/IdsDdosPage.js';
+import SuricataPage from '/src/pages/SuricataPage.js';
+import WebProxyPage from '/src/pages/WebProxyPage.js';
 import SnmpPage from '/src/pages/SnmpPage.js';
+import SshFingerprintsPage from '/src/pages/SshFingerprintsPage.js';
+import ArpPage from '/src/pages/ArpPage.js';
+import RoutePage from '/src/pages/RoutePage.js';
+import ZebraPage from '/src/pages/ZebraPage.js';
+import ActiveConnectionsPage from '/src/pages/ActiveConnectionsPage.js';
+import MemoryCachePage from '/src/pages/MemoryCachePage.js';
+import ProcessMonitorPage from '/src/pages/ProcessMonitorPage.js';
+import InterfaceStatsPage from '/src/pages/InterfaceStatsPage.js';
+import ControlPanelPage from '/src/pages/ControlPanelPage.js';
+import ConfigSyncPage from '/src/pages/ConfigSyncPage.js';
+import ConntrackSyncPage from '/src/pages/ConntrackSyncPage.js';
 
 const componentMap = {
   TablePage: GenericTablePage,
@@ -68,13 +85,30 @@ const componentMap = {
   DhcpStatisticsPage,
   Dhcpv6ServerPage,
   Dhcpv6RelayPage,
+  Dhcpv6LeasesPage,
+  Dhcpv6StaticMappingsPage,
   DnsPage,
+  DnsDynamicStatusPage,
+  DnsForwardingStatisticsPage,
   NtpPage,
   SshPage,
   HttpsPage,
   LldpPage,
   IdsDdosPage,
+  SuricataPage,
+  WebProxyPage,
   SnmpPage,
+  SshFingerprintsPage,
+  ArpPage,
+  RoutePage,
+  ZebraPage,
+  ActiveConnectionsPage,
+  MemoryCachePage,
+  ProcessMonitorPage,
+  InterfaceStatsPage,
+  ControlPanelPage,
+  ConfigSyncPage,
+  ConntrackSyncPage,
 };
 
 function buildRoutes(menu, parentPath = '') {

@@ -5,9 +5,11 @@ import { emitMenuRefresh } from '/src/utils/eventBus.js';
 
 const CLOSE_DELAY = 600;
 
-function renderSubmenu(items, state, keepParentOpen, clearParent, setOpen, clearOpen, toggleOpen, closeAll, router, route, level = 0) {
+function renderSubmenu(items, state, keepParentOpen, clearParent, setOpen, clearOpen, toggleOpen, closeAll, router, route, level = 0, fixedStyle = null) {
+  const style = fixedStyle || undefined;
   return h('div', {
     class: 'top-submenu',
+    style,
     onMouseenter: keepParentOpen,
     onMouseleave: clearParent,
   }, items.map(item => {
@@ -150,48 +152,60 @@ export default defineComponent({
       document.removeEventListener('click', onDocumentClick);
     });
 
-    return () => h('div', { class: 'top-menu-outer' }, [
-      h('nav', { class: 'top-menu' }, topItems.value.map(l1 => {
-        const hasChildren = l1.children?.length;
-        return h('div', {
-          class: ['top-menu-item', { active: activeL1.value === l1.id }],
-          onMouseenter: () => setL1(l1.id),
-          onMouseleave: clearL1,
-          onClick: (e) => { e.stopPropagation(); if (hasChildren) toggleL1(l1.id); }
-        }, [
-          h('span', { style: { display: 'flex', alignItems: 'center' } }, [
-            l1.label,
-            hasChildren ? h('span', { class: 'arrow' }, '▾') : null
-          ]),
-          (openL1.value === l1.id && hasChildren)
-            ? renderSubmenu(l1.children, openChild.value, () => setL1(l1.id), clearL1, setChild, clearChild, toggleChild, closeAll, router, route)
-            : null,
-        ]);
-      })),
-      h('div', { class: 'header-actions' }, [
-        h('div', { class: 'notification', title: '通知' }, [
-          h('span', null, '🔔'),
-          h('span', { class: 'notification-badge' }, '0')
-        ]),
-        h('div', { class: ['user-menu', { open: userMenuOpen.value }] }, [
-          h('button', {
-            class: 'user-menu-trigger',
-            type: 'button',
-            onClick: toggleUserMenu,
+    const itemRefs = {};
+
+    return () => {
+      const openItem = openL1.value ? topItems.value.find(i => i.id === openL1.value) : null;
+      const openItemEl = openL1.value ? itemRefs[openL1.value] : null;
+      const openLeft = openItemEl ? openItemEl.getBoundingClientRect().left : 0;
+      const fixedStyle = openItemEl
+        ? { position: 'fixed', left: `${openLeft}px`, top: 'var(--header-height)' }
+        : null;
+
+      return h('div', { class: 'top-menu-outer' }, [
+        h('nav', { class: 'top-menu' }, topItems.value.map(l1 => {
+          const hasChildren = l1.children?.length;
+          return h('div', {
+            class: ['top-menu-item', { active: activeL1.value === l1.id }],
+            ref: (el) => { if (el) itemRefs[l1.id] = el; },
+            onMouseenter: () => setL1(l1.id),
+            onMouseleave: clearL1,
+            onClick: (e) => { e.stopPropagation(); if (hasChildren) toggleL1(l1.id); }
           }, [
-            h('span', null, auth.user?.username || ''),
-            h('span', { class: 'user-menu-arrow' }, '▾'),
+            h('span', { style: { display: 'flex', alignItems: 'center', minWidth: 0 } }, [
+              h('span', { class: 'top-menu-label' }, l1.label),
+              hasChildren ? h('span', { class: 'arrow' }, '▾') : null
+            ]),
+          ]);
+        })),
+        (openItem && openItem.children?.length)
+          ? renderSubmenu(openItem.children, openChild.value, () => setL1(openL1.value), clearL1, setChild, clearChild, toggleChild, closeAll, router, route, 0, fixedStyle)
+          : null,
+        h('div', { class: 'header-actions' }, [
+          h('div', { class: 'notification', title: '通知' }, [
+            h('span', null, '🔔'),
+            h('span', { class: 'notification-badge' }, '0')
           ]),
-          userMenuOpen.value
-            ? h('div', { class: 'user-menu-dropdown' }, [
-                h('div', {
-                  class: 'user-menu-item',
-                  onClick: (e) => { e.stopPropagation(); logout(); closeUserMenu(); }
-                }, '注销')
-              ])
-            : null,
-        ]),
-      ])
-    ]);
+          h('div', { class: ['user-menu', { open: userMenuOpen.value }] }, [
+            h('button', {
+              class: 'user-menu-trigger',
+              type: 'button',
+              onClick: toggleUserMenu,
+            }, [
+              h('span', null, auth.user?.username || ''),
+              h('span', { class: 'user-menu-arrow' }, '▾'),
+            ]),
+            userMenuOpen.value
+              ? h('div', { class: 'user-menu-dropdown' }, [
+                  h('div', {
+                    class: 'user-menu-item',
+                    onClick: (e) => { e.stopPropagation(); logout(); closeUserMenu(); }
+                  }, '注销')
+                ])
+              : null,
+          ]),
+        ])
+      ]);
+    };
   }
 });

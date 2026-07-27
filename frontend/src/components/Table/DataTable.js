@@ -315,6 +315,7 @@ export default defineComponent({
           <ToolbarButton v-for="a in actions" :key="a" :icon="a" @click="handleAction(a)" :disabled="actionDisabled(a)">
             {{ a === 'moveUp' ? $t('app.moveUp') : a === 'moveDown' ? $t('app.moveDown') : (ACTION_LABELS[a] || a) }}
           </ToolbarButton>
+          <slot name="toolbar-left-extra"></slot>
         </div>
         <div class="toolbar-right">
           <input v-model="quickFilter" placeholder="搜索..." />

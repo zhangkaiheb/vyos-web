@@ -33,14 +33,14 @@ class BackgroundCollector:
             self._thread.join(timeout=2)
 
     def _run(self):
-        """Main loop: collect metrics every 10s, logs every 30s, cleanup hourly."""
+        """Main loop: collect metrics every 60s, logs every 30s, cleanup hourly."""
         last_metrics = 0
         last_logs = 0
         last_cleanup = 0
         while not self._stop_event.is_set():
             try:
                 now = time.time()
-                if now - last_metrics >= 10:
+                if now - last_metrics >= 60:
                     self._monitor.collect_all()
                     last_metrics = now
                 if now - last_logs >= 30:

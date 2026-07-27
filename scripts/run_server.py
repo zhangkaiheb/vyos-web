@@ -66,13 +66,12 @@ def static_app(environ, start_response):
 
 def combined_app(environ, start_response):
     path = environ.get('PATH_INFO', '')
+    if path.startswith('/api/config/') and not path.startswith('/api/config/session-changed'):
+        # The VyOS ConfigSession mutation calls are not thread-safe.
+        # Serialize config writes to avoid concurrency crashes.
+        with API_LOCK:
+            return application(environ, start_response)
     if path.startswith('/api/'):
-        method = environ.get('REQUEST_METHOD', 'GET')
-        # The VyOS ConfigSession instance is shared within this process.
-        # Read operations can run concurrently, but write operations must be serialized.
-        if method in ('POST', 'PUT', 'DELETE'):
-            with API_LOCK:
-                return application(environ, start_response)
         return application(environ, start_response)
     return static_app(environ, start_response)
 

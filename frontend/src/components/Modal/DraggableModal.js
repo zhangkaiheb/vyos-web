@@ -1,4 +1,5 @@
 import { defineComponent, ref, onMounted, onUnmounted, watch } from '/src/utils/vue-import.js';
+import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 
 export default defineComponent({
   name: 'DraggableModal',
@@ -64,6 +65,7 @@ export default defineComponent({
 
     return { modalRef, close, confirm, onMouseDown, translate };
   },
+  components: { ToolbarButton },
   template: `
     <div v-if="visible" class="modal-overlay">
       <div ref="modalRef" class="modal-container" :style="{ width, transform: 'translate(' + translate.x + 'px, ' + translate.y + 'px)' }" @mousedown="onMouseDown">
