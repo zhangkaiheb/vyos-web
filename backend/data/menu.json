@@ -294,34 +294,6 @@
         "component": "ControlPanelPage"
       },
       {
-        "id": "config-management",
-        "label": "配置管理",
-        "label_en": "Config Management",
-        "icon": "",
-        "children": [
-          {
-            "id": "config-management-versions",
-            "label": "版本管理",
-            "label_en": "Version Management",
-            "icon": "",
-            "children": [],
-            "route": "/system/config-management/versions",
-            "component": "ConfigManagementPage"
-          },
-          {
-            "id": "config-management-settings",
-            "label": "设置",
-            "label_en": "Settings",
-            "icon": "",
-            "children": [],
-            "route": "/system/config-management/settings",
-            "component": "ConfigManagementSettingsPage"
-          }
-        ],
-        "route": null,
-        "component": null
-      },
-      {
         "id": "interfaces",
         "label": "网络接口",
         "label_en": "Interfaces",
@@ -716,7 +688,7 @@
             "icon": "",
             "children": [],
             "route": "/policy/access-list6",
-            "component": "AccessListv6Page"
+            "component": "AccessListPage"
           },
           {
             "id": "as-path-list",
@@ -816,7 +788,7 @@
             "icon": "",
             "children": [],
             "route": "/policy/protocols/ospfv3",
-            "component": "ConfigPage"
+            "component": "OspfV3Page"
           },
           {
             "id": "static",
@@ -834,7 +806,7 @@
             "icon": "",
             "children": [],
             "route": "/policy/protocols/isis",
-            "component": "ConfigPage"
+            "component": "IsisPage"
           },
           {
             "id": "rip",
@@ -843,7 +815,7 @@
             "icon": "",
             "children": [],
             "route": "/policy/protocols/rip",
-            "component": "ConfigPage"
+            "component": "RipPage"
           },
           {
             "id": "ripng",
@@ -852,7 +824,7 @@
             "icon": "",
             "children": [],
             "route": "/policy/protocols/ripng",
-            "component": "ConfigPage"
+            "component": "RipNgPage"
           },
           {
             "id": "pim",
@@ -861,7 +833,16 @@
             "icon": "",
             "children": [],
             "route": "/policy/protocols/pim",
-            "component": "ConfigPage"
+            "component": "PimPage"
+          },
+          {
+            "id": "pim6",
+            "label": "PIM6",
+            "label_en": "PIM6",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/pim6",
+            "component": "Pim6Page"
           }
         ],
         "route": null,

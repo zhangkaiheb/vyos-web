@@ -62,6 +62,12 @@ import ConfigManagementPage from '/src/pages/ConfigManagementPage.js';
 import ConfigManagementSettingsPage from '/src/pages/ConfigManagementSettingsPage.js';
 import BgpPage from '/src/pages/BgpPage.js';
 import OspfPage from '/src/pages/OspfPage.js';
+import OspfV3Page from '/src/pages/OspfV3Page.js';
+import IsisPage from '/src/pages/IsisPage.js';
+import RipPage from '/src/pages/RipPage.js';
+import RipNgPage from '/src/pages/RipNgPage.js';
+import PimPage from '/src/pages/PimPage.js';
+import Pim6Page from '/src/pages/Pim6Page.js';
 
 const componentMap = {
   TablePage: GenericTablePage,
@@ -127,6 +133,12 @@ const componentMap = {
   ConfigManagementSettingsPage,
   BgpPage,
   OspfPage,
+  OspfV3Page,
+  IsisPage,
+  RipPage,
+  RipNgPage,
+  PimPage,
+  Pim6Page,
 };
 
 function buildRoutes(menu, parentPath = '') {

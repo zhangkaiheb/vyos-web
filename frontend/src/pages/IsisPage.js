@@ -366,34 +366,24 @@ export default defineComponent({
                   </select>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['dynamic-hostname']" />
-                    动态主机名
-                  </label>
+                  <label class="form-label">动态主机名</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['dynamic-hostname']" /></label>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['log-adjacency-changes']" />
-                    记录邻接关系变化
-                  </label>
+                  <label class="form-label">记录邻接关系变化</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['log-adjacency-changes']" /></label>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['purge-originator']" />
-                    清除发起者
-                  </label>
+                  <label class="form-label">清除发起者</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['purge-originator']" /></label>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['set-attached-bit']" />
-                    设置附加位
-                  </label>
+                  <label class="form-label">设置附加位</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['set-attached-bit']" /></label>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['set-overload-bit']" />
-                    设置过载位
-                  </label>
+                  <label class="form-label">设置过载位</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['set-overload-bit']" /></label>
                 </div>
                 <div class="form-row">
                   <label class="form-label">LSP 生成间隔</label>
@@ -436,10 +426,8 @@ export default defineComponent({
           <div style="padding:16px;">
             <h4>默认信息通告</h4>
             <div class="form-row">
-              <label class="form-label">
-                <input type="checkbox" v-model="config['default-information'].originate.always" />
-                始终通告默认路由
-              </label>
+              <label class="form-label">始终通告默认路由</label>
+              <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['default-information'].originate.always" /></label>
             </div>
             <div class="form-row">
               <label class="form-label">度量值</label>

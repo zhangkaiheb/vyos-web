@@ -503,10 +503,8 @@ export default defineComponent({
         <template #default-info>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">
-                <input type="checkbox" v-model="config['default-information'].originate" />
-                通告默认路由
-              </label>
+              <label class="form-label">通告默认路由</label>
+              <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['default-information'].originate" /></label>
             </div>
           </div>
         </template>

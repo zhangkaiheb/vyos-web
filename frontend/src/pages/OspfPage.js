@@ -1441,16 +1441,12 @@ export default defineComponent({
                   </select>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['parameters']['opaque-lsa']" />
-                    启用 Opaque-LSA 能力 (RFC2370)
-                  </label>
+                  <label class="form-label">启用 Opaque-LSA 能力 (RFC2370)</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['parameters']['opaque-lsa']" /></label>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['parameters']['rfc1583-compatibility']" />
-                    启用 RFC1583 兼容性
-                  </label>
+                  <label class="form-label">启用 RFC1583 兼容性</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['parameters']['rfc1583-compatibility']" /></label>
                 </div>
               </div>
             </div>
@@ -1477,10 +1473,8 @@ export default defineComponent({
                          title="auto-cost 参考带宽 (1-4000000 Kbit/s)" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['log-adjacency-changes']" />
-                    记录邻接关系变化
-                  </label>
+                  <label class="form-label">记录邻接关系变化</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['log-adjacency-changes']" /></label>
                 </div>
                 <div class="form-row">
                   <label class="form-label">被动接口</label>
@@ -1508,10 +1502,8 @@ export default defineComponent({
               <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">能力配置</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['capability'].opaque" />
-                    启用 Opaque LSA
-                  </label>
+                  <label class="form-label">启用 Opaque LSA</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['capability'].opaque" /></label>
                 </div>
               </div>
             </div>
@@ -1618,10 +1610,8 @@ export default defineComponent({
               <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">默认信息通告</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['default-information'].originate.always" />
-                    始终通告默认路由
-                  </label>
+                  <label class="form-label">始终通告默认路由</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['default-information'].originate.always" /></label>
                 </div>
                 <div class="form-row">
                   <label class="form-label">度量值</label>
@@ -1747,16 +1737,12 @@ export default defineComponent({
               <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">助手配置</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['graceful-restart']['helper']['enable']" />
-                    启用助手支持
-                  </label>
+                  <label class="form-label">启用助手支持</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['graceful-restart']['helper']['enable']" /></label>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['graceful-restart']['helper']['planned-only']" />
-                    仅支持计划内重启
-                  </label>
+                  <label class="form-label">仅支持计划内重启</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['graceful-restart']['helper']['planned-only']" /></label>
                 </div>
               </div>
             </div>
@@ -1770,10 +1756,8 @@ export default defineComponent({
               <div style="padding:16px;">
                 <p style="color:#666; font-size:12px; margin-top:0;">通告自己的 Router-LSA 为无限距离（stub 路由器）</p>
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['max-metric']['router-lsa']['administrative']" />
-                    管理应用（无限期）
-                  </label>
+                  <label class="form-label">管理应用（无限期）</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['max-metric']['router-lsa']['administrative']" /></label>
                 </div>
                 <div class="form-row">
                   <label class="form-label">关闭前通告</label>
@@ -1798,10 +1782,8 @@ export default defineComponent({
               <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">MPLS 流量工程</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['mpls-te']['enable']" />
-                    启用 MPLS-TE 功能
-                  </label>
+                  <label class="form-label">启用 MPLS-TE 功能</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['mpls-te']['enable']" /></label>
                 </div>
                 <div class="form-row">
                   <label class="form-label">路由器地址</label>
@@ -1898,10 +1880,8 @@ export default defineComponent({
                  title="汇总网络地址 (CIDR 格式)" :disabled="editingSummaryAddressIndex >= 0" />
         </div>
         <div class="form-row">
-          <label class="form-label">
-            <input type="checkbox" v-model="summaryAddressForm['no-advertise']" />
-            不通告此汇总路由
-          </label>
+          <label class="form-label">不通告此汇总路由</label>
+          <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="summaryAddressForm['no-advertise']" /></label>
         </div>
         <div class="form-row">
           <label class="form-label">标签</label>
@@ -1942,10 +1922,8 @@ export default defineComponent({
                  placeholder="访问列表名称" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">
-            <input type="checkbox" v-model="areaForm.shortcut" />
-            启用快捷模式
-          </label>
+          <label class="form-label">启用快捷模式</label>
+          <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="areaForm.shortcut" /></label>
         </div>
 
         <h4 style="margin-top:20px;">网络</h4>
@@ -2080,22 +2058,16 @@ export default defineComponent({
                  title="路由器优先级 (0-255，默认 1)" />
         </div>
         <div class="form-row">
-          <label class="form-label">
-            <input type="checkbox" v-model="interfaceForm.bfd" />
-            启用 BFD
-          </label>
+          <label class="form-label">启用 BFD</label>
+          <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="interfaceForm.bfd" /></label>
         </div>
         <div class="form-row">
-          <label class="form-label">
-            <input type="checkbox" v-model="interfaceForm.passive" />
-            被动模式
-          </label>
+          <label class="form-label">被动模式</label>
+          <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="interfaceForm.passive" /></label>
         </div>
         <div class="form-row">
-          <label class="form-label">
-            <input type="checkbox" v-model="interfaceForm['mtu-ignore']" />
-            忽略 MTU 不匹配
-          </label>
+          <label class="form-label">忽略 MTU 不匹配</label>
+          <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="interfaceForm['mtu-ignore']" /></label>
         </div>
       </DraggableModal>
 

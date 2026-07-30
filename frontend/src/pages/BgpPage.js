@@ -3777,17 +3777,27 @@ export default defineComponent({
 
             <template #ipv4-labeled-unicast>
               <div style="padding:16px;">
-                <h3 style="margin-bottom:16px;">网络</h3>
+                <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">网络</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv4LabeledUnicastNetworkColumns" :data="config['address-family']['ipv4-labeled-unicast'].networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
                            @create="createNetworkIpv4LabeledUnicast" @edit="editNetworkIpv4LabeledUnicast" @delete="deleteNetworksIpv4LabeledUnicast" />
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">聚合地址</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">聚合地址</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv4LabeledUnicastAggregateColumns" :data="config['address-family']['ipv4-labeled-unicast'].aggregates" :loading="loading" :disabled="writeDisabled"
                            rowKey="aggregate" :actions="['create', 'edit', 'delete']"
                            @create="createAggregateIpv4LabeledUnicast" @edit="editAggregateIpv4LabeledUnicast" @delete="deleteAggregatesIpv4LabeledUnicast" />
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">最大路径数</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">最大路径数</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">eBGP 最大路径数</label>
                   <input type="number" class="form-control" v-model="config['address-family']['ipv4-labeled-unicast'].maxPaths.ebgp"
@@ -3798,22 +3808,34 @@ export default defineComponent({
                   <input type="number" class="form-control" v-model="config['address-family']['ipv4-labeled-unicast'].maxPaths.ibgp"
                          min="1" max="256" placeholder="1-256" style="width:200px !important; flex:none !important;" />
                 </div>
+                  </div>
+                </div>
               </div>
             </template>
 
             <template #ipv4-multicast>
               <div style="padding:16px;">
-                <h3 style="margin-bottom:16px;">网络</h3>
+                <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">网络</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv4MulticastNetworkColumns" :data="config['address-family']['ipv4-multicast'].networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
                            @create="createNetworkIpv4Multicast" @edit="editNetworkIpv4Multicast" @delete="deleteNetworksIpv4Multicast" />
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">聚合地址</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">聚合地址</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv4MulticastAggregateColumns" :data="config['address-family']['ipv4-multicast'].aggregates" :loading="loading" :disabled="writeDisabled"
                            rowKey="aggregate" :actions="['create', 'edit', 'delete']"
                            @create="createAggregateIpv4Multicast" @edit="editAggregateIpv4Multicast" @delete="deleteAggregatesIpv4Multicast" />
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">管理距离</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">管理距离</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">eBGP 距离</label>
                   <input type="number" class="form-control" v-model="config['address-family']['ipv4-multicast'].distance.external"
@@ -3832,32 +3854,52 @@ export default defineComponent({
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
                          title="本地 BGP 路由管理距离 (1-255)" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">前缀管理距离</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">前缀管理距离</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv4MulticastDistancePrefixColumns" :data="config['address-family']['ipv4-multicast'].distancePrefixes" :loading="loading" :disabled="writeDisabled"
                            rowKey="prefix" :actions="['create', 'edit', 'delete']"
                            @create="createDistancePrefixIpv4Multicast" @edit="editDistancePrefixIpv4Multicast" @delete="deleteDistancePrefixesIpv4Multicast" />
+                  </div>
+                </div>
               </div>
             </template>
 
             <template #ipv4-unicast>
               <div style="padding:16px;">
-                <h3 style="margin-bottom:16px;">网络</h3>
+                <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">网络</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="networkColumns" :data="config.networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
                            @create="createNetwork" @edit="editNetwork" @delete="deleteNetworks" />
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">聚合地址</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">聚合地址</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="aggregateColumns" :data="config.aggregates" :loading="loading" :disabled="writeDisabled"
                            rowKey="aggregate" :actions="['create', 'edit', 'delete']"
                            @create="createAggregate" @edit="editAggregate" @delete="deleteAggregates" />
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">重分发</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">重分发</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="redistributeColumns" :data="config.redistributes" :loading="loading" :disabled="writeDisabled"
                            rowKey="protocol" :actions="['create', 'edit', 'delete']"
                            @create="createRedistribute" @edit="editRedistribute" @delete="deleteRedistributes" />
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">管理距离</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">管理距离</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">eBGP 距离</label>
                   <input type="number" class="form-control" v-model="config.distance.external"
@@ -3876,8 +3918,12 @@ export default defineComponent({
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
                          title="本地 BGP 路由管理距离 (1-255)" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">最大路径数</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">最大路径数</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">eBGP 最大路径</label>
                   <input type="number" class="form-control" v-model="config.maxPaths.ebgp"
@@ -3890,8 +3936,12 @@ export default defineComponent({
                          min="1" max="64" placeholder="1-64" style="width:200px !important; flex:none !important;"
                          title="iBGP 最大路径数 (1-64)" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">VPN 导出/导入</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">VPN 导出/导入</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label"></label>
                   <label><input type="checkbox" v-model="config.exportConfig.vpn" /> 导出到 VPN</label>
@@ -3900,8 +3950,12 @@ export default defineComponent({
                   <label class="form-label"></label>
                   <label><input type="checkbox" v-model="config.importConfig.vpn" /> 从 VPN 导入</label>
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">标签配置</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">标签配置</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">VPN 标签导出</label>
                   <input type="text" class="form-control" v-model="config.labelConfig.vpn.export"
@@ -3915,24 +3969,36 @@ export default defineComponent({
                     <option value="per-nexthop">per-nexthop</option>
                   </select>
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">下一跳配置</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">下一跳配置</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">VPN 下一跳导出</label>
                   <input type="text" class="form-control" v-model="config.nexthopConfig.vpn.export"
                          placeholder="下一跳地址" style="width:200px !important; flex:none !important;"
                          title="VPN 下一跳导出地址" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">路由区分器 (RD)</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">路由区分器 (RD)</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">VPN RD 导出</label>
                   <input type="text" class="form-control" v-model="config.rdConfig.vpn.export"
                          placeholder="路由区分器" style="width:200px !important; flex:none !important;"
                          title="VPN 路由区分器导出值" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">路由映射</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">路由映射</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">VPN 导出路由映射</label>
                   <input type="text" class="form-control" v-model="config.routeMapConfig.vpn.export"
@@ -3945,8 +4011,12 @@ export default defineComponent({
                          placeholder="路由映射名称" style="width:200px !important; flex:none !important;"
                          title="VPN 导入路由映射名称" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">路由目标</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">路由目标</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">VPN 双向路由目标</label>
                   <input type="text" class="form-control" v-model="config.routeTargetConfig.vpn.both"
@@ -3965,29 +4035,41 @@ export default defineComponent({
                          placeholder="路由目标" style="width:200px !important; flex:none !important;"
                          title="VPN 导入路由目标" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">SID 配置</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">SID 配置</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">VPN SID 导出</label>
                   <input type="text" class="form-control" v-model="config.sidConfig.vpn.export"
                          placeholder="SID 值" style="width:200px !important; flex:none !important;"
                          title="VPN SID 导出值" />
                 </div>
+                  </div>
+                </div>
               </div>
             </template>
 
             <template #ipv4-vpn>
               <div style="padding:16px;">
-                <h3 style="margin-bottom:16px;">网络</h3>
+                <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">网络</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv4VpnNetworkColumns" :data="config['address-family']['ipv4-vpn'].networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
                            @create="createNetworkIpv4Vpn" @edit="editNetworkIpv4Vpn" @delete="deleteNetworksIpv4Vpn" />
+                  </div>
+                </div>
               </div>
             </template>
 
             <template #ipv6-flowspec>
               <div style="padding:16px;">
-                <h3 style="margin-bottom:16px;">本地安装接口</h3>
+                <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">本地安装接口</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">接口</label>
                   <select class="form-control" v-model="config['address-family']['ipv6-flowspec']['local-install'].interface" style="width:200px !important; flex:none !important;">
@@ -3999,36 +4081,56 @@ export default defineComponent({
                     <option value="lo">lo</option>
                   </select>
                 </div>
+                  </div>
+                </div>
               </div>
             </template>
 
             <template #ipv6-labeled-unicast>
               <div style="padding:16px;">
-                <h3 style="margin-bottom:16px;">网络</h3>
+                <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">网络</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv6LabeledUnicastNetworkColumns" :data="config['address-family']['ipv6-labeled-unicast'].networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
                            @create="createNetworkIpv6LabeledUnicast" @edit="editNetworkIpv6LabeledUnicast" @delete="deleteNetworksIpv6LabeledUnicast" />
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">聚合地址</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">聚合地址</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv6LabeledUnicastAggregateColumns" :data="config['address-family']['ipv6-labeled-unicast'].aggregates" :loading="loading" :disabled="writeDisabled"
                            rowKey="aggregate" :actions="['create', 'edit', 'delete']"
                            @create="createAggregateIpv6LabeledUnicast" @edit="editAggregateIpv6LabeledUnicast" @delete="deleteAggregatesIpv6LabeledUnicast" />
+                  </div>
+                </div>
               </div>
             </template>
 
             <template #ipv6-multicast>
               <div style="padding:16px;">
-                <h3 style="margin-bottom:16px;">网络</h3>
+                <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">网络</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv6MulticastNetworkColumns" :data="config['address-family']['ipv6-multicast'].networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
                            @create="createNetworkIpv6Multicast" @edit="editNetworkIpv6Multicast" @delete="deleteNetworksIpv6Multicast" />
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">聚合地址</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">聚合地址</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv6MulticastAggregateColumns" :data="config['address-family']['ipv6-multicast'].aggregates" :loading="loading" :disabled="writeDisabled"
                            rowKey="aggregate" :actions="['create', 'edit', 'delete']"
                            @create="createAggregateIpv6Multicast" @edit="editAggregateIpv6Multicast" @delete="deleteAggregatesIpv6Multicast" />
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">管理距离</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">管理距离</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">eBGP 距离</label>
                   <input type="number" class="form-control" v-model="config['address-family']['ipv6-multicast'].distance.external"
@@ -4047,36 +4149,51 @@ export default defineComponent({
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
                          title="本地 BGP 路由管理距离 (1-255)" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">前缀管理距离</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">前缀管理距离</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv6MulticastDistancePrefixColumns" :data="config['address-family']['ipv6-multicast'].distancePrefixes" :loading="loading" :disabled="writeDisabled"
                            rowKey="prefix" :actions="['create', 'edit', 'delete']"
                            @create="createDistancePrefixIpv6Multicast" @edit="editDistancePrefixIpv6Multicast" @delete="deleteDistancePrefixesIpv6Multicast" />
-              </div>
-            </template>
-                <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden; margin-bottom:16px;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">网络</div>
-                  <div style="padding:16px;">
                   </div>
                 </div>
+              </div>
+            </template>
             <template #ipv6-unicast>
               <div style="padding:16px;">
-                <h3 style="margin-bottom:16px;">IPv6 网络</h3>
+                <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">IPv6 网络</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv6NetworkColumns" :data="config.ipv6Networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
                            @create="createIpv6Network" @edit="editIpv6Network" @delete="deleteIpv6Networks" />
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">IPv6 聚合地址</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">IPv6 聚合地址</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv6AggregateColumns" :data="config.ipv6Aggregates" :loading="loading" :disabled="writeDisabled"
                            rowKey="aggregate" :actions="['create', 'edit', 'delete']"
                            @create="createIpv6Aggregate" @edit="editIpv6Aggregate" @delete="deleteIpv6Aggregates" />
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">IPv6 重分发</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">IPv6 重分发</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv6RedistributeColumns" :data="config.ipv6Redistributes" :loading="loading" :disabled="writeDisabled"
                            rowKey="protocol" :actions="['create', 'edit', 'delete']"
                            @create="createIpv6Redistribute" @edit="editIpv6Redistribute" @delete="deleteIpv6Redistributes" />
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">管理距离</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">管理距离</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">eBGP 距离</label>
                   <input type="number" class="form-control" v-model="config.ipv6Distance.external"
@@ -4095,8 +4212,12 @@ export default defineComponent({
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
                          title="本地 BGP 路由管理距离 (1-255)" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">最大路径数</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">最大路径数</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">eBGP 最大路径</label>
                   <input type="number" class="form-control" v-model="config.ipv6MaxPaths.ebgp"
@@ -4109,13 +4230,21 @@ export default defineComponent({
                          min="1" max="256" placeholder="1-256" style="width:200px !important; flex:none !important;"
                          title="iBGP 最大路径数 (1-256)" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">前缀管理距离</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">前缀管理距离</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv6DistancePrefixColumns" :data="config.ipv6DistancePrefixes" :loading="loading" :disabled="writeDisabled"
                            rowKey="prefix" :actions="['create', 'edit', 'delete']"
                            @create="createDistancePrefixIpv6Unicast" @edit="editDistancePrefixIpv6Unicast" @delete="deleteDistancePrefixesIpv6Unicast" />
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">VPN 导出/导入</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">VPN 导出/导入</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label"></label>
                   <label><input type="checkbox" v-model="config.ipv6ExportConfig.vpn" /> 导出到 VPN</label>
@@ -4124,8 +4253,12 @@ export default defineComponent({
                   <label class="form-label"></label>
                   <label><input type="checkbox" v-model="config.ipv6ImportConfig.vpn" /> 从 VPN 导入</label>
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">标签配置</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">标签配置</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">VPN 标签导出</label>
                   <input type="text" class="form-control" v-model="config.ipv6LabelConfig.vpn.export"
@@ -4139,24 +4272,36 @@ export default defineComponent({
                     <option value="per-nexthop">per-nexthop</option>
                   </select>
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">下一跳配置</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">下一跳配置</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">VPN 下一跳导出</label>
                   <input type="text" class="form-control" v-model="config.ipv6NexthopConfig.vpn.export"
                          placeholder="下一跳地址" style="width:200px !important; flex:none !important;"
                          title="VPN 下一跳导出地址" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">路由区分器 (RD)</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">路由区分器 (RD)</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">VPN RD 导出</label>
                   <input type="text" class="form-control" v-model="config.ipv6RdConfig.vpn.export"
                          placeholder="路由区分器" style="width:200px !important; flex:none !important;"
                          title="VPN 路由区分器导出值" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">路由映射</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">路由映射</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">VPN 导出路由映射</label>
                   <input type="text" class="form-control" v-model="config.ipv6RouteMapConfig.vpn.export"
@@ -4169,8 +4314,12 @@ export default defineComponent({
                          placeholder="路由映射名称" style="width:200px !important; flex:none !important;"
                          title="VPN 导入路由映射名称" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">路由目标</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">路由目标</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">VPN 双向路由目标</label>
                   <input type="text" class="form-control" v-model="config.ipv6RouteTargetConfig.vpn.both"
@@ -4189,29 +4338,41 @@ export default defineComponent({
                          placeholder="路由目标" style="width:200px !important; flex:none !important;"
                          title="VPN 导入路由目标" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">SID 配置</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">SID 配置</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">VPN SID 导出</label>
                   <input type="text" class="form-control" v-model="config.ipv6SidConfig.vpn.export"
                          placeholder="SID 值" style="width:200px !important; flex:none !important;"
                          title="VPN SID 导出值" />
                 </div>
+                  </div>
+                </div>
               </div>
             </template>
 
             <template #ipv6-vpn>
               <div style="padding:16px;">
-                <h3 style="margin-bottom:16px;">网络</h3>
+                <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">网络</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="ipv6VpnNetworkColumns" :data="config['address-family']['ipv6-vpn'].networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
                            @create="createNetworkIpv6Vpn" @edit="editNetworkIpv6Vpn" @delete="deleteNetworksIpv6Vpn" />
+                  </div>
+                </div>
               </div>
             </template>
 
             <template #l2vpn-evpn>
               <div style="padding:16px;">
-                <h3 style="margin-bottom:16px;">基本设置</h3>
+                <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">基本设置</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label"></label>
                   <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn']['advertise-pip']" /> 通告 PIP (advertise-pip)</label>
@@ -4246,8 +4407,12 @@ export default defineComponent({
                   <input type="text" class="form-control" v-model="config['address-family']['l2vpn-evpn']['mac-vrf'].soo"
                          placeholder="例如: 1:1 或 1.1.1.1:100" style="width:300px;" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">EAD-ES 配置</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">EAD-ES 配置</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">EAD-ES Route Target Export</label>
                   <input type="text" class="form-control" v-model="config['address-family']['l2vpn-evpn']['ead-es-route-target'].export"
@@ -4258,8 +4423,12 @@ export default defineComponent({
                   <input type="number" class="form-control" v-model="config['address-family']['l2vpn-evpn']['ead-es-frag-evi-limit']"
                          min="1" max="65535" placeholder="1-65535" style="width:200px !important; flex:none !important;" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">Advertise 配置</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">Advertise 配置</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label"></label>
                   <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn'].advertise['ipv4-unicast'].enable" /> 通告 IPv4 Unicast</label>
@@ -4278,8 +4447,12 @@ export default defineComponent({
                   <input type="text" class="form-control" v-model="config['address-family']['l2vpn-evpn'].advertise['ipv6-unicast']['route-map']"
                          placeholder="Route-map 名称" style="width:300px;" />
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">Default Originate</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">Default Originate</div>
+                  <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label"></label>
                   <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn']['default-originate'].ipv4" /> IPv4 Default Originate</label>
@@ -4288,13 +4461,21 @@ export default defineComponent({
                   <label class="form-label"></label>
                   <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn']['default-originate'].ipv6" /> IPv6 Default Originate</label>
                 </div>
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">Route Target</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">Route Target</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="evpnRtColumns" :data="config['address-family']['l2vpn-evpn']['route-targets']" :loading="loading" :disabled="writeDisabled"
                            rowKey="key" :actions="['create', 'edit', 'delete']"
                            @create="createEvpnRt" @edit="editEvpnRt" @delete="deleteEvpnRts" />
+                  </div>
+                </div>
 
-                <h3 style="margin:24px 0 16px 0;">VNI</h3>
+                <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">VNI</div>
+                  <div style="padding:16px;">
                 <DataTable :columns="evpnVniColumns" :data="config['address-family']['l2vpn-evpn'].vnis" :loading="loading" :disabled="writeDisabled"
                            rowKey="vni" :actions="['create', 'edit', 'delete']"
                            @create="createEvpnVni" @edit="editEvpnVni" @delete="deleteEvpnVnis">
@@ -4303,6 +4484,8 @@ export default defineComponent({
                     <button class="btn btn-sm btn-link" @click.stop="openVniRtManager(row)" style="margin-left:8px;">管理</button>
                   </template>
                 </DataTable>
+                  </div>
+                </div>
               </div>
             </template>
           </TabGroup>

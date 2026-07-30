@@ -680,16 +680,12 @@ export default defineComponent({
                          title="auto-cost 参考带宽 (1-4000000 Kbit/s)" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['log-adjacency-changes']" />
-                    记录邻接关系变化
-                  </label>
+                  <label class="form-label">记录邻接关系变化</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['log-adjacency-changes']" /></label>
                 </div>
                 <div v-if="config['log-adjacency-changes']" class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['log-adjacency-changes-detail']" />
-                    记录详细邻接变化
-                  </label>
+                  <label class="form-label">记录详细邻接变化</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['log-adjacency-changes-detail']" /></label>
                 </div>
               </div>
             </div>
@@ -720,10 +716,8 @@ export default defineComponent({
               <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">默认信息通告</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['default-information'].originate.always" />
-                    始终通告默认路由
-                  </label>
+                  <label class="form-label">始终通告默认路由</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['default-information'].originate.always" /></label>
                 </div>
                 <div class="form-row">
                   <label class="form-label">度量值</label>
@@ -799,22 +793,16 @@ export default defineComponent({
               <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">Helper 设置</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['graceful-restart'].helper.enable" />
-                    启用 Helper 支持
-                  </label>
+                  <label class="form-label">启用 Helper 支持</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['graceful-restart'].helper.enable" /></label>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['graceful-restart'].helper['lsa-check-disable']" />
-                    禁用严格 LSA 检查
-                  </label>
+                  <label class="form-label">禁用严格 LSA 检查</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['graceful-restart'].helper['lsa-check-disable']" /></label>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['graceful-restart'].helper['planned-only']" />
-                    仅支持计划内重启
-                  </label>
+                  <label class="form-label">仅支持计划内重启</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['graceful-restart'].helper['planned-only']" /></label>
                 </div>
                 <div class="form-row">
                   <label class="form-label">支持的宽限时间</label>

@@ -501,16 +501,12 @@ export default defineComponent({
                   <input type="number" class="form-control" v-model="config['keep-alive-timer']" min="1" max="65535" placeholder="Keep-Alive 定时器" style="width:100%;" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config.ecmp.enable" />
-                    启用 PIM ECMP
-                  </label>
+                  <label class="form-label">启用 PIM ECMP</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config.ecmp.enable" /></label>
                 </div>
                 <div v-if="config.ecmp.enable" class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config.ecmp.rebalance" />
-                    启用 PIM ECMP Rebalance
-                  </label>
+                  <label class="form-label">启用 PIM ECMP Rebalance</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config.ecmp.rebalance" /></label>
                 </div>
                 <div class="form-row">
                   <label class="form-label">RP Keep-Alive 定时器</label>
@@ -557,10 +553,8 @@ export default defineComponent({
               <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">SPT 切换</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['spt-switchover']['infinity-and-beyond'].enable" />
-                    永不切换到 SPT (infinity-and-beyond)
-                  </label>
+                  <label class="form-label">永不切换到 SPT (infinity-and-beyond)</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['spt-switchover']['infinity-and-beyond'].enable" /></label>
                 </div>
                 <div v-if="config['spt-switchover']['infinity-and-beyond'].enable" class="form-row">
                   <label class="form-label">前缀列表</label>
@@ -577,10 +571,8 @@ export default defineComponent({
               <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">高级选项</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">
-                    <input type="checkbox" v-model="config['no-v6-secondary']" />
-                    禁用 IPv6 辅助地址 (no-v6-secondary)
-                  </label>
+                  <label class="form-label">禁用 IPv6 辅助地址 (no-v6-secondary)</label>
+                  <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['no-v6-secondary']" /></label>
                 </div>
                 <div class="form-row">
                   <label class="form-label">数据包处理数</label>
@@ -624,31 +616,23 @@ export default defineComponent({
           <input type="text" class="form-control" v-model="interfaceForm['source-address']" placeholder="IPv4 源地址" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">
-            <input type="checkbox" v-model="interfaceForm['no-bsm']" />
-            不处理 Bootstrap 消息 (no-bsm)
-          </label>
+          <label class="form-label">不处理 Bootstrap 消息 (no-bsm)</label>
+          <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="interfaceForm['no-bsm']" /></label>
         </div>
         <div class="form-row">
-          <label class="form-label">
-            <input type="checkbox" v-model="interfaceForm['no-unicast-bsm']" />
-            不处理单播 Bootstrap 消息 (no-unicast-bsm)
-          </label>
+          <label class="form-label">不处理单播 Bootstrap 消息 (no-unicast-bsm)</label>
+          <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="interfaceForm['no-unicast-bsm']" /></label>
         </div>
         <div class="form-row">
-          <label class="form-label">
-            <input type="checkbox" v-model="interfaceForm.passive" />
-            被动模式 (passive)
-          </label>
+          <label class="form-label">被动模式 (passive)</label>
+          <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="interfaceForm.passive" /></label>
         </div>
         <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
           <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">BFD</div>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">
-                <input type="checkbox" v-model="interfaceForm.bfd.enable" />
-                启用 BFD
-              </label>
+              <label class="form-label">启用 BFD</label>
+              <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="interfaceForm.bfd.enable" /></label>
             </div>
             <div v-if="interfaceForm.bfd.enable" class="form-row">
               <label class="form-label">BFD Profile</label>
@@ -660,10 +644,8 @@ export default defineComponent({
           <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">IGMP</div>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">
-                <input type="checkbox" v-model="interfaceForm.igmp.disable" />
-                禁用 IGMP
-              </label>
+              <label class="form-label">禁用 IGMP</label>
+              <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="interfaceForm.igmp.disable" /></label>
             </div>
             <div class="form-row">
               <label class="form-label">IGMP 版本</label>
