@@ -83,15 +83,12 @@ function drawTrafficChartBase(canvas, hoverIndex) {
   const chartWidth = cssWidth - margin.left - margin.right;
   const chartHeight = cssHeight - margin.top - margin.bottom;
 
-  // Title and interface label
-  ctx.fillStyle = '#333';
-  ctx.font = 'bold 14px sans-serif';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'top';
-  ctx.fillText(title, 12, 10);
+  // Interface label
+  ctx.fillStyle = '#666';
   ctx.font = '12px sans-serif';
   ctx.textAlign = 'right';
-  ctx.fillText(`接口: ${iface}`, cssWidth - 12, 12);
+  ctx.textBaseline = 'top';
+  ctx.fillText(`接口: ${iface}`, cssWidth - 12, 10);
 
   // Collect values
   const allValues = datasets.flatMap(d => d.data.map(p => parseFloat(p.value) || 0));
@@ -945,8 +942,8 @@ export default defineComponent({
                 </select>
                 <button v-if="w.type === 'cpu' || w.type === 'memory'" class="widget-action-text" @click="showHistory(w)">历史</button>
               </template>
-              <button class="widget-action-btn" title="刷新" @click="refreshWidget(w)">↻</button>
-              <button v-if="w.type === 'interface-traffic'" class="widget-action-btn" title="编辑" @click="openEditModal(w)">✎</button>
+              <button class="widget-action-btn widget-action-refresh" title="刷新" @click="refreshWidget(w)">↻</button>
+              <button v-if="w.type === 'interface-traffic'" class="widget-action-btn widget-action-edit" title="编辑" @click="openEditModal(w)">✎</button>
               <button class="widget-action-btn widget-action-close" title="关闭" @click="removeWidget(w)">✕</button>
             </div>
           </div>

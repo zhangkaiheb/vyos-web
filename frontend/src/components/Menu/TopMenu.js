@@ -1,6 +1,7 @@
 import { defineComponent, ref, computed, h, onMounted, onUnmounted } from '/src/utils/vue-import.js';
 import { useRoute, useRouter } from '/src/utils/vue-router-import.js';
 import { useAuthStore } from '/src/stores/auth.js';
+import { useNotificationStore } from '/src/stores/notifications.js';
 import { emitMenuRefresh } from '/src/utils/eventBus.js';
 
 const CLOSE_DELAY = 600;
@@ -57,6 +58,7 @@ export default defineComponent({
   name: 'TopMenu',
   setup() {
     const auth = useAuthStore();
+    const notifications = useNotificationStore();
     const route = useRoute();
     const router = useRouter();
     const topItems = computed(() => auth.menu);
@@ -134,6 +136,46 @@ export default defineComponent({
       userMenuOpen.value = false;
     }
 
+    const notificationOpen = ref(false);
+    function toggleNotification(e) {
+      e.stopPropagation();
+      notificationOpen.value = !notificationOpen.value;
+      if (notificationOpen.value) {
+        notifications.fetchNotifications();
+      }
+    }
+    function closeNotification() {
+      notificationOpen.value = false;
+    }
+    async function onNotificationClick(item, e) {
+      e.stopPropagation();
+      if (!item.read) {
+        await notifications.markRead(item.id);
+      }
+    }
+    async function onNotificationDelete(item, e) {
+      e.stopPropagation();
+      await notifications.deleteNotification(item.id);
+    }
+    async function onMarkAllRead(e) {
+      e.stopPropagation();
+      await notifications.markAllRead();
+    }
+
+    let notificationInterval = null;
+    function startNotificationPolling() {
+      notifications.fetchUnreadCount();
+      notificationInterval = setInterval(() => {
+        notifications.fetchUnreadCount();
+      }, 30000);
+    }
+    function stopNotificationPolling() {
+      if (notificationInterval) {
+        clearInterval(notificationInterval);
+        notificationInterval = null;
+      }
+    }
+
     function onDocumentClick(e) {
       const menuEl = document.querySelector('.top-menu-outer');
       if (menuEl && !menuEl.contains(e.target)) {
@@ -143,13 +185,19 @@ export default defineComponent({
       if (userMenuEl && !userMenuEl.contains(e.target)) {
         closeUserMenu();
       }
+      const notificationEl = document.querySelector('.notification');
+      if (notificationEl && !notificationEl.contains(e.target)) {
+        closeNotification();
+      }
     }
 
     onMounted(() => {
       document.addEventListener('click', onDocumentClick);
+      startNotificationPolling();
     });
     onUnmounted(() => {
       document.removeEventListener('click', onDocumentClick);
+      stopNotificationPolling();
     });
 
     const itemRefs = {};
@@ -182,9 +230,47 @@ export default defineComponent({
           ? renderSubmenu(openItem.children, openChild.value, () => setL1(openL1.value), clearL1, setChild, clearChild, toggleChild, closeAll, router, route, 0, fixedStyle)
           : null,
         h('div', { class: 'header-actions' }, [
-          h('div', { class: 'notification', title: '通知' }, [
-            h('span', null, '🔔'),
-            h('span', { class: 'notification-badge' }, '0')
+          h('div', {
+            class: ['notification', { open: notificationOpen.value }],
+            title: '通知',
+            onClick: toggleNotification,
+          }, [
+            h('span', { class: 'notification-icon' }, '🔔'),
+            notifications.unreadCount > 0
+              ? h('span', { class: 'notification-badge' }, notifications.unreadCount > 99 ? '99+' : notifications.unreadCount)
+              : null,
+            notificationOpen.value
+              ? h('div', { class: 'notification-dropdown', onClick: (e) => e.stopPropagation() }, [
+                  h('div', { class: 'notification-header' }, [
+                    h('span', { class: 'notification-title' }, '报警信息'),
+                    h('button', { class: 'notification-close', onClick: closeNotification }, '×'),
+                  ]),
+                  h('div', { class: 'notification-list' }, [
+                    notifications.sortedNotifications.length === 0
+                      ? h('div', { class: 'notification-empty' }, '暂无通知')
+                      : notifications.sortedNotifications.map(item => h('div', {
+                          key: item.id,
+                          class: ['notification-item', { unread: !item.read }],
+                          onClick: (e) => onNotificationClick(item, e),
+                        }, [
+                          h('span', { class: 'notification-dot' }, '⦿'),
+                          h('div', { class: 'notification-content' }, [
+                            h('div', { class: 'notification-time' }, notifications.formatTime(item.timestamp)),
+                            h('div', { class: 'notification-text' }, item.title + (item.message ? `, ${item.message}` : '')),
+                          ]),
+                          h('button', {
+                            class: 'notification-delete',
+                            onClick: (e) => onNotificationDelete(item, e),
+                          }, '×'),
+                        ])),
+                  ]),
+                  notifications.unreadCount > 0
+                    ? h('div', { class: 'notification-footer' }, [
+                        h('button', { class: 'notification-mark-read', onClick: onMarkAllRead }, '全部已读'),
+                      ])
+                    : null,
+                ])
+              : null,
           ]),
           h('div', { class: ['user-menu', { open: userMenuOpen.value }] }, [
             h('button', {

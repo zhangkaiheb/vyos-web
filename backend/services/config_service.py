@@ -12,6 +12,7 @@ import os
 import re
 import subprocess
 import tempfile
+import time
 import traceback
 from datetime import datetime
 from functools import wraps
@@ -22,6 +23,10 @@ from utils.database import get_db_connection
 
 CONFIG_SESSIONS = {}
 APP_NAME = "vyos-web-config"
+
+# Cache for session_changed to avoid expensive Config() creation on every poll
+_SESSION_CHANGED_CACHE = {'value': False, 'timestamp': 0}
+_SESSION_CHANGED_CACHE_TTL = 3  # seconds
 
 # Sensitive path patterns that may contain secrets
 SENSITIVE_PATHS = [
@@ -359,14 +364,33 @@ class ConfigService:
     def get_revisions(self):
         try:
             revisions = []
-            for rev in sorted(glob.glob('/opt/vyatta/config/tmp/*.tar'), reverse=True)[:20]:
-                name = os.path.basename(rev)
-                revisions.append({
-                    'name': name,
-                    'path': rev,
-                    'timestamp': os.path.getmtime(rev),
-                    'datetime': datetime.fromtimestamp(os.path.getmtime(rev)).isoformat()
-                })
+            commits_file = '/config/archive/commits'
+            if not os.path.exists(commits_file):
+                return {'success': True, 'revisions': revisions}
+
+            with open(commits_file, 'r') as f:
+                lines = f.readlines()
+
+            for idx, line in enumerate(lines):
+                line = line.strip()
+                if not line:
+                    continue
+                # Format: |timestamp|user|source|action|
+                parts = line.split('|')
+                if len(parts) >= 5:
+                    timestamp = int(parts[1])
+                    user = parts[2]
+                    source = parts[3]
+                    action = parts[4]
+
+                    revisions.append({
+                        'index': idx,
+                        'timestamp': datetime.fromtimestamp(timestamp).isoformat(),
+                        'user': user,
+                        'source': source,
+                        'action': action
+                    })
+
             return {'success': True, 'revisions': revisions}
         except Exception as e:
             return _structured_error('REVISION_ERROR', str(e), traceback.format_exc())
@@ -388,6 +412,10 @@ class ConfigService:
             if quota_error:
                 return quota_error
         if isinstance(value, dict):
+            try:
+                session.delete(path_list)
+            except vyos.configsession.ConfigSessionError:
+                pass
             self._set_config_dict(session, path_list, value)
         elif isinstance(value, list):
             try:
@@ -428,6 +456,47 @@ class ConfigService:
         return {'success': True, 'message': '配置提交成功', 'output': out}
 
     @_handle_config_exception
+    def commit_config_with_comment(self, user, comment):
+        username = user.get('username', 'unknown')
+        session = _get_config_session()
+        out = session.commit(comment=comment)
+        _log_action(username, 'commit', comment, {'output': out})
+        return {'success': True, 'message': '配置提交成功', 'output': out}
+
+    @_handle_config_exception
+    def commit_confirm(self, user, minutes=10, comment=''):
+        username = user.get('username', 'unknown')
+        cmd = ['/opt/vyatta/bin/vyatta-op-cmd-wrapper', 'commit-confirm']
+        if comment:
+            cmd.extend(['comment', comment])
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        _log_action(username, 'commit-confirm', str(minutes), {'output': result.stdout, 'comment': comment})
+        if result.returncode == 0:
+            return {'success': True, 'message': f'配置已提交，{minutes}分钟后自动回滚', 'output': result.stdout}
+        return _structured_error('COMMIT_CONFIRM_ERROR', result.stdout or result.stderr)
+
+    @_handle_config_exception
+    def confirm(self, user):
+        username = user.get('username', 'unknown')
+        cmd = ['/opt/vyatta/bin/vyatta-op-cmd-wrapper', 'confirm']
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        _log_action(username, 'confirm', '', {'output': result.stdout})
+        if result.returncode == 0:
+            return {'success': True, 'message': '确认成功，取消自动回滚', 'output': result.stdout}
+        return _structured_error('CONFIRM_ERROR', result.stdout or result.stderr)
+
+    @_handle_config_exception
+    def rollback_soft(self, user, revision):
+        username = user.get('username', 'unknown')
+        cmd = ['/opt/vyatta/bin/vyatta-op-cmd-wrapper', 'rollback-soft', str(revision)]
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        _log_action(username, 'rollback-soft', str(revision), {'output': result.stdout})
+        if result.returncode == 0:
+            return {'success': True, 'message': f'软回滚到版本 {revision} 成功，请比较差异后决定是否 commit', 'output': result.stdout}
+        return _structured_error('ROLLBACK_SOFT_ERROR', result.stdout or result.stderr,
+                                 suggestion='请检查版本号是否有效')
+
+    @_handle_config_exception
     def discard_config(self, user):
         username = user.get('username', 'unknown')
         session = _get_config_session()
@@ -443,6 +512,110 @@ class ConfigService:
         out = session.save_config(tmp_path)
         _log_action(username, 'save', '', {'output': out})
         return {'success': True, 'message': '配置已保存', 'output': out}
+
+    @_handle_config_exception
+    def save_config_to_file(self, user, target, target_type='system'):
+        username = user.get('username', 'unknown')
+        session = _get_config_session()
+
+        if target_type == 'system':
+            # 保存到系统默认配置文件
+            out = session.save_config()
+            _log_action(username, 'save', 'system', {'output': out})
+            return {'success': True, 'message': '配置已保存到系统文件', 'output': out}
+        else:
+            # 保存到指定文件或远程位置
+            # 对于远程协议，需要使用 vyos-op-cmd-wrapper
+            if target_type in ['scp', 'sftp', 'ftp', 'tftp', 'http', 'https']:
+                cmd = ['/opt/vyatta/bin/vyatta-op-cmd-wrapper', 'save', f'{target_type}://{target}']
+                result = subprocess.run(cmd, capture_output=True, text=True)
+                _log_action(username, 'save', target, {'output': result.stdout, 'type': target_type})
+                if result.returncode == 0:
+                    return {'success': True, 'message': f'配置已保存到 {target_type}://{target}', 'output': result.stdout}
+                return _structured_error('SAVE_FILE_ERROR', result.stdout or result.stderr)
+            else:
+                # 本地文件
+                out = session.save_config(target)
+                _log_action(username, 'save', target, {'output': out})
+                return {'success': True, 'message': f'配置已保存到 {target}', 'output': out}
+
+    @_handle_config_exception
+    def load_config_from_file(self, user, source, source_type='system'):
+        username = user.get('username', 'unknown')
+        session = _get_config_session()
+
+        if source_type == 'system':
+            # 从系统默认配置文件加载
+            out = session.migrate_and_load_config()
+            _log_action(username, 'load', 'system', {'output': out})
+            return {'success': True, 'message': '已从系统文件加载配置', 'output': out}
+        else:
+            # 从指定文件或远程位置加载
+            if source_type in ['scp', 'sftp', 'ftp', 'tftp', 'http', 'https']:
+                cmd = ['/opt/vyatta/bin/vyatta-op-cmd-wrapper', 'load', f'{source_type}://{source}']
+                result = subprocess.run(cmd, capture_output=True, text=True)
+                _log_action(username, 'load', source, {'output': result.stdout, 'type': source_type})
+                if result.returncode == 0:
+                    return {'success': True, 'message': f'已从 {source_type}://{source} 加载配置', 'output': result.stdout}
+                return _structured_error('LOAD_FILE_ERROR', result.stdout or result.stderr)
+            else:
+                # 本地文件
+                out = session.migrate_and_load_config(source)
+                _log_action(username, 'load', source, {'output': out})
+                return {'success': True, 'message': f'已从 {source} 加载配置', 'output': out}
+
+    @_handle_config_exception
+    def merge_config_from_file(self, user, source, source_type='local'):
+        username = user.get('username', 'unknown')
+
+        if source_type in ['scp', 'sftp', 'ftp', 'tftp', 'http', 'https']:
+            cmd = ['/opt/vyatta/bin/vyatta-op-cmd-wrapper', 'merge', f'{source_type}://{source}']
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            _log_action(username, 'merge', source, {'output': result.stdout, 'type': source_type})
+            if result.returncode == 0:
+                return {'success': True, 'message': f'已从 {source_type}://{source} 合并配置', 'output': result.stdout}
+            return _structured_error('MERGE_FILE_ERROR', result.stdout or result.stderr)
+        else:
+            # 本地文件 - 使用 load 命令实现合并
+            session = _get_config_session()
+            out = session.migrate_and_load_config(source)
+            _log_action(username, 'merge', source, {'output': out})
+            return {'success': True, 'message': f'已从 {source} 合并配置', 'output': out}
+
+    @_handle_config_exception
+    def add_comment(self, user, path, text):
+        username = user.get('username', 'unknown')
+        session = _get_config_session()
+
+        if path:
+            # 为特定配置路径添加注释
+            path_list = _path_to_list(path)
+            session.set(path_list + ['comment'], value=text)
+            _log_action(username, 'comment', path, {'text': text})
+            return {'success': True, 'message': f'已为 {path} 添加注释'}
+        else:
+            # 为整个配置添加注释（顶层）
+            # VyOS 不支持直接为根配置添加注释，需要指定具体路径
+            return _structured_error('COMMENT_ERROR', '请指定配置路径')
+
+    @_handle_config_exception
+    def rename_config(self, user, path, old_name, new_name):
+        username = user.get('username', 'unknown')
+        session = _get_config_session()
+
+        if not path:
+            return _structured_error('RENAME_ERROR', '请指定配置路径')
+        if not old_name:
+            return _structured_error('RENAME_ERROR', '请指定旧名称')
+        if not new_name:
+            return _structured_error('RENAME_ERROR', '请指定新名称')
+
+        # 构建 rename 命令路径
+        path_list = _path_to_list(path)
+        # 使用 ConfigSession 的 rename 方法
+        session.rename(path_list + [old_name], path_list + [new_name])
+        _log_action(username, 'rename', path, {'old': old_name, 'new': new_name})
+        return {'success': True, 'message': f'已将 {old_name} 重命名为 {new_name}'}
 
     @_handle_config_exception
     def load_config(self, user, source, password=''):
@@ -642,9 +815,17 @@ class ConfigService:
             return _structured_error('EXPORT_ERROR', str(e), traceback.format_exc())
 
     def session_changed(self):
+        """Check if config session has changed, with caching to avoid expensive Config() creation."""
+        now = time.time()
+        cache = _SESSION_CHANGED_CACHE
+        if now - cache['timestamp'] < _SESSION_CHANGED_CACHE_TTL:
+            return {'success': True, 'changed': cache['value']}
         try:
             cfg = vyos.config.Config()
-            return {'success': True, 'changed': cfg.session_changed()}
+            changed = cfg.session_changed()
+            cache['value'] = changed
+            cache['timestamp'] = now
+            return {'success': True, 'changed': changed}
         except Exception as e:
             return _structured_error('SESSION_CHANGED_ERROR', str(e), traceback.format_exc())
 

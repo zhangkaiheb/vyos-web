@@ -294,6 +294,34 @@
         "component": "ControlPanelPage"
       },
       {
+        "id": "config-management",
+        "label": "配置管理",
+        "label_en": "Config Management",
+        "icon": "",
+        "children": [
+          {
+            "id": "config-management-versions",
+            "label": "版本管理",
+            "label_en": "Version Management",
+            "icon": "",
+            "children": [],
+            "route": "/system/config-management/versions",
+            "component": "ConfigManagementPage"
+          },
+          {
+            "id": "config-management-settings",
+            "label": "设置",
+            "label_en": "Settings",
+            "icon": "",
+            "children": [],
+            "route": "/system/config-management/settings",
+            "component": "ConfigManagementSettingsPage"
+          }
+        ],
+        "route": null,
+        "component": null
+      },
+      {
         "id": "interfaces",
         "label": "网络接口",
         "label_en": "Interfaces",
@@ -619,6 +647,225 @@
         "children": [],
         "route": "/system/import-export",
         "component": "ImportExportPage"
+      }
+    ],
+    "route": null,
+    "component": null
+  },
+  {
+    "id": "policy",
+    "label": "路由",
+    "label_en": "Routing",
+    "icon": "NodeIndexOutlined",
+    "children": [
+      {
+        "id": "route",
+        "label": "策略路由",
+        "label_en": "Policy Route",
+        "icon": "",
+        "children": [],
+        "route": "/policy/route",
+        "component": "PolicyRoutePage"
+      },
+      {
+        "id": "route6",
+        "label": "IPv6策略路由",
+        "label_en": "Policy Route6",
+        "icon": "",
+        "children": [],
+        "route": "/policy/route6",
+        "component": "PolicyRoutePage"
+      },
+      {
+        "id": "local-route",
+        "label": "本地策略路由",
+        "label_en": "Local Route",
+        "icon": "",
+        "children": [],
+        "route": "/policy/local-route",
+        "component": "LocalRoutePage"
+      },
+      {
+        "id": "local-route6",
+        "label": "本地策略路由6",
+        "label_en": "Local Route6",
+        "icon": "",
+        "children": [],
+        "route": "/policy/local-route6",
+        "component": "LocalRoutePage"
+      },
+      {
+        "id": "routing-policy",
+        "label": "路由策略",
+        "label_en": "Routing Policy",
+        "icon": "",
+        "children": [
+          {
+            "id": "access-list",
+            "label": "访问列表",
+            "label_en": "Access List",
+            "icon": "",
+            "children": [],
+            "route": "/policy/access-list",
+            "component": "AccessListPage"
+          },
+          {
+            "id": "access-list6",
+            "label": "访问列表6",
+            "label_en": "Access List6",
+            "icon": "",
+            "children": [],
+            "route": "/policy/access-list6",
+            "component": "AccessListv6Page"
+          },
+          {
+            "id": "as-path-list",
+            "label": "AS路径列表",
+            "label_en": "AS Path List",
+            "icon": "",
+            "children": [],
+            "route": "/policy/as-path-list",
+            "component": "TablePage"
+          },
+          {
+            "id": "community-list",
+            "label": "团体列表",
+            "label_en": "Community List",
+            "icon": "",
+            "children": [],
+            "route": "/policy/community-list",
+            "component": "TablePage"
+          },
+          {
+            "id": "extcommunity-list",
+            "label": "扩展团体列表",
+            "label_en": "Extcommunity List",
+            "icon": "",
+            "children": [],
+            "route": "/policy/extcommunity-list",
+            "component": "TablePage"
+          },
+          {
+            "id": "large-community-list",
+            "label": "大型团体列表",
+            "label_en": "Large Community List",
+            "icon": "",
+            "children": [],
+            "route": "/policy/large-community-list",
+            "component": "TablePage"
+          },
+          {
+            "id": "prefix-list",
+            "label": "前缀列表",
+            "label_en": "Prefix List",
+            "icon": "",
+            "children": [],
+            "route": "/policy/prefix-list",
+            "component": "TablePage"
+          },
+          {
+            "id": "prefix-list6",
+            "label": "前缀列表6",
+            "label_en": "Prefix List6",
+            "icon": "",
+            "children": [],
+            "route": "/policy/prefix-list6",
+            "component": "TablePage"
+          },
+          {
+            "id": "route-map",
+            "label": "路由映射",
+            "label_en": "Route Map",
+            "icon": "",
+            "children": [],
+            "route": "/policy/route-map",
+            "component": "RuleTablePage"
+          }
+        ],
+        "route": null,
+        "component": null
+      },
+      {
+        "id": "protocols",
+        "label": "路由协议",
+        "label_en": "Protocols",
+        "icon": "",
+        "children": [
+          {
+            "id": "bgp",
+            "label": "BGP",
+            "label_en": "BGP",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/bgp",
+            "component": "BgpPage"
+          },
+          {
+            "id": "ospf",
+            "label": "OSPF",
+            "label_en": "OSPF",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/ospf",
+            "component": "OspfPage"
+          },
+          {
+            "id": "ospfv3",
+            "label": "OSPFv3",
+            "label_en": "OSPFv3",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/ospfv3",
+            "component": "ConfigPage"
+          },
+          {
+            "id": "static",
+            "label": "静态路由",
+            "label_en": "Static",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/static",
+            "component": "StaticRoutePage"
+          },
+          {
+            "id": "isis",
+            "label": "IS-IS",
+            "label_en": "IS-IS",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/isis",
+            "component": "ConfigPage"
+          },
+          {
+            "id": "rip",
+            "label": "RIP",
+            "label_en": "RIP",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/rip",
+            "component": "ConfigPage"
+          },
+          {
+            "id": "ripng",
+            "label": "RIPng",
+            "label_en": "RIPng",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/ripng",
+            "component": "ConfigPage"
+          },
+          {
+            "id": "pim",
+            "label": "PIM",
+            "label_en": "PIM",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/pim",
+            "component": "ConfigPage"
+          }
+        ],
+        "route": null,
+        "component": null
       }
     ],
     "route": null,
@@ -1057,225 +1304,6 @@
             "children": [],
             "route": "/nat66/destination",
             "component": "RuleTablePage"
-          }
-        ],
-        "route": null,
-        "component": null
-      }
-    ],
-    "route": null,
-    "component": null
-  },
-  {
-    "id": "policy",
-    "label": "路由",
-    "label_en": "Routing",
-    "icon": "NodeIndexOutlined",
-    "children": [
-      {
-        "id": "route",
-        "label": "策略路由",
-        "label_en": "Policy Route",
-        "icon": "",
-        "children": [],
-        "route": "/policy/route",
-        "component": "TablePage"
-      },
-      {
-        "id": "route6",
-        "label": "IPv6策略路由",
-        "label_en": "Policy Route6",
-        "icon": "",
-        "children": [],
-        "route": "/policy/route6",
-        "component": "TablePage"
-      },
-      {
-        "id": "local-route",
-        "label": "本地策略路由",
-        "label_en": "Local Route",
-        "icon": "",
-        "children": [],
-        "route": "/policy/local-route",
-        "component": "TablePage"
-      },
-      {
-        "id": "local-route6",
-        "label": "本地策略路由6",
-        "label_en": "Local Route6",
-        "icon": "",
-        "children": [],
-        "route": "/policy/local-route6",
-        "component": "TablePage"
-      },
-      {
-        "id": "routing-policy",
-        "label": "路由策略",
-        "label_en": "Routing Policy",
-        "icon": "",
-        "children": [
-          {
-            "id": "access-list",
-            "label": "访问列表",
-            "label_en": "Access List",
-            "icon": "",
-            "children": [],
-            "route": "/policy/access-list",
-            "component": "RuleTablePage"
-          },
-          {
-            "id": "access-list6",
-            "label": "访问列表6",
-            "label_en": "Access List6",
-            "icon": "",
-            "children": [],
-            "route": "/policy/access-list6",
-            "component": "RuleTablePage"
-          },
-          {
-            "id": "as-path-list",
-            "label": "AS路径列表",
-            "label_en": "AS Path List",
-            "icon": "",
-            "children": [],
-            "route": "/policy/as-path-list",
-            "component": "TablePage"
-          },
-          {
-            "id": "community-list",
-            "label": "团体列表",
-            "label_en": "Community List",
-            "icon": "",
-            "children": [],
-            "route": "/policy/community-list",
-            "component": "TablePage"
-          },
-          {
-            "id": "extcommunity-list",
-            "label": "扩展团体列表",
-            "label_en": "Extcommunity List",
-            "icon": "",
-            "children": [],
-            "route": "/policy/extcommunity-list",
-            "component": "TablePage"
-          },
-          {
-            "id": "large-community-list",
-            "label": "大型团体列表",
-            "label_en": "Large Community List",
-            "icon": "",
-            "children": [],
-            "route": "/policy/large-community-list",
-            "component": "TablePage"
-          },
-          {
-            "id": "prefix-list",
-            "label": "前缀列表",
-            "label_en": "Prefix List",
-            "icon": "",
-            "children": [],
-            "route": "/policy/prefix-list",
-            "component": "TablePage"
-          },
-          {
-            "id": "prefix-list6",
-            "label": "前缀列表6",
-            "label_en": "Prefix List6",
-            "icon": "",
-            "children": [],
-            "route": "/policy/prefix-list6",
-            "component": "TablePage"
-          },
-          {
-            "id": "route-map",
-            "label": "路由映射",
-            "label_en": "Route Map",
-            "icon": "",
-            "children": [],
-            "route": "/policy/route-map",
-            "component": "RuleTablePage"
-          }
-        ],
-        "route": null,
-        "component": null
-      },
-      {
-        "id": "protocols",
-        "label": "路由协议",
-        "label_en": "Protocols",
-        "icon": "",
-        "children": [
-          {
-            "id": "bgp",
-            "label": "BGP",
-            "label_en": "BGP",
-            "icon": "",
-            "children": [],
-            "route": "/policy/protocols/bgp",
-            "component": "ConfigPage"
-          },
-          {
-            "id": "ospf",
-            "label": "OSPF",
-            "label_en": "OSPF",
-            "icon": "",
-            "children": [],
-            "route": "/policy/protocols/ospf",
-            "component": "ConfigPage"
-          },
-          {
-            "id": "ospfv3",
-            "label": "OSPFv3",
-            "label_en": "OSPFv3",
-            "icon": "",
-            "children": [],
-            "route": "/policy/protocols/ospfv3",
-            "component": "ConfigPage"
-          },
-          {
-            "id": "static",
-            "label": "静态路由",
-            "label_en": "Static",
-            "icon": "",
-            "children": [],
-            "route": "/policy/protocols/static",
-            "component": "ConfigPage"
-          },
-          {
-            "id": "isis",
-            "label": "IS-IS",
-            "label_en": "IS-IS",
-            "icon": "",
-            "children": [],
-            "route": "/policy/protocols/isis",
-            "component": "ConfigPage"
-          },
-          {
-            "id": "rip",
-            "label": "RIP",
-            "label_en": "RIP",
-            "icon": "",
-            "children": [],
-            "route": "/policy/protocols/rip",
-            "component": "ConfigPage"
-          },
-          {
-            "id": "ripng",
-            "label": "RIPng",
-            "label_en": "RIPng",
-            "icon": "",
-            "children": [],
-            "route": "/policy/protocols/ripng",
-            "component": "ConfigPage"
-          },
-          {
-            "id": "pim",
-            "label": "PIM",
-            "label_en": "PIM",
-            "icon": "",
-            "children": [],
-            "route": "/policy/protocols/pim",
-            "component": "ConfigPage"
           }
         ],
         "route": null,

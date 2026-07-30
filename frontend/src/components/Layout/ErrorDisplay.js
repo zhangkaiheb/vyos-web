@@ -35,10 +35,10 @@ export default defineComponent({
       set(v) { if (!v) clearError(); }
     });
     const err = computed(() => errorState.value || {});
-    return { visible, err };
+    return { visible, err, clearError };
   },
   template: `
-    <DraggableModal v-model:visible="visible" title="错误提示">
+    <DraggableModal v-model:visible="visible" title="错误提示" modal-class="error-modal" @confirm="clearError">
       <div v-if="err.code" style="margin-bottom:8px;"><strong>错误码：</strong>{{ err.code }}</div>
       <div v-if="err.message" style="margin-bottom:8px;"><strong>错误信息：</strong>{{ err.message }}</div>
       <div v-if="err.detail" style="margin-bottom:8px;">

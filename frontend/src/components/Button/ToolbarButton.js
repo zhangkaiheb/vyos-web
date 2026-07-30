@@ -1,4 +1,4 @@
-import { defineComponent, h } from '/src/utils/vue-import.js';
+import { defineComponent } from '/src/utils/vue-import.js';
 
 const ICON_MAP = {
   create: '＋',
@@ -43,14 +43,23 @@ export default defineComponent({
     primary: { type: Boolean, default: false },
     danger: { type: Boolean, default: false },
   },
-  setup(props, { slots }) {
-    return () => h('button', {
-      class: ['toolbar-btn', { primary: props.primary, danger: props.danger }],
-      disabled: props.disabled,
-      type: 'button',
-    }, [
-      props.icon ? h('span', { class: 'toolbar-btn-icon' }, ICON_MAP[props.icon] || props.icon) : null,
-      h('span', { class: 'toolbar-btn-label' }, slots.default?.()),
-    ]);
+  emits: ['click'],
+  setup(props, { emit }) {
+    function handleClick(e) {
+      console.log('ToolbarButton click', props.icon, e);
+      emit('click', e);
+    }
+    return { handleClick, ICON_MAP };
   },
+  template: `
+    <button
+      type="button"
+      class="toolbar-btn"
+      :class="{ primary, danger }"
+      :disabled="disabled"
+      @click="handleClick">
+      <span v-if="icon" class="toolbar-btn-icon">{{ ICON_MAP[icon] || icon }}</span>
+      <span class="toolbar-btn-label"><slot /></span>
+    </button>
+  `,
 });

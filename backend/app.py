@@ -25,6 +25,7 @@ from services.log_service import LogService
 from services.users_service import UsersService
 from services.system_service import SystemService
 from services.interface_service import InterfaceService
+from services.notification_service import NotificationService
 from services.collector import start_collector
 from utils.response import json_response, sse_response, error_response
 from utils.auth_middleware import AuthMiddleware
@@ -43,6 +44,7 @@ class VyOSWebApp:
         self.users_service = UsersService()
         self.system_service = SystemService()
         self.interface_service = InterfaceService()
+        self.notification_service = NotificationService()
         self.auth_middleware = AuthMiddleware(self.auth_service)
         self.routes = self._register_routes()
 
@@ -52,7 +54,16 @@ class VyOSWebApp:
                 '/api/auth/login': self.handle_login,
                 '/api/auth/logout': self.handle_logout,
                 '/api/config/commit': self.handle_config_commit,
+                '/api/config/commit-with-comment': self.handle_config_commit_with_comment,
+                '/api/config/commit-confirm': self.handle_config_commit_confirm,
+                '/api/config/confirm': self.handle_config_confirm,
+                '/api/config/rollback-soft': self.handle_config_rollback_soft,
                 '/api/config/save': self.handle_config_save,
+                '/api/config/save-file': self.handle_config_save_file,
+                '/api/config/load-file': self.handle_config_load_file,
+                '/api/config/merge-file': self.handle_config_merge_file,
+                '/api/config/comment': self.handle_config_comment,
+                '/api/config/rename': self.handle_config_rename,
                 '/api/config/rollback': self.handle_config_rollback,
                 '/api/config/compare': self.handle_config_compare,
                 '/api/config/load': self.handle_config_load,
@@ -96,9 +107,13 @@ class VyOSWebApp:
                 '/api/op-mode/generate': self.handle_op_mode_generate,
                 '/api/webapp/update': self.handle_webapp_update,
                 '/api/webapp/rollback': self.handle_webapp_rollback,
+                '/api/notifications/:id/read': self.handle_notification_read,
+                '/api/notifications/mark-all-read': self.handle_notification_mark_all_read,
             },
             'GET': {
                 '/api/auth/user': self.handle_get_user,
+                '/api/notifications': self.handle_list_notifications,
+                '/api/notifications/unread-count': self.handle_notification_unread_count,
                 '/api/menu': self.handle_get_menu,
                 '/api/config': self.handle_get_config,
                 '/api/config/commands': self.handle_get_commands,
@@ -142,6 +157,8 @@ class VyOSWebApp:
                 '/api/users/:username': self.handle_delete_user,
                 '/api/access-control/:id': self.handle_delete_acl,
                 '/api/references': self.handle_remove_reference,
+                '/api/notifications/:id': self.handle_delete_notification,
+                '/api/notifications/read': self.handle_delete_read_notifications,
             },
         }
 
@@ -197,6 +214,11 @@ class VyOSWebApp:
 
         try:
             result = handler(environ, body)
+            # Allow handlers to return extra response headers as (data, headers) tuple
+            if isinstance(result, tuple) and len(result) == 2 and isinstance(result[1], list):
+                data, extra_headers = result
+                headers.extend(extra_headers)
+                result = data
             if hasattr(result, '__iter__') and not isinstance(result, (dict, list, bytes, str)):
                 return sse_response(start_response, result)
             return json_response(start_response, 200, result, headers)
@@ -250,7 +272,7 @@ class VyOSWebApp:
 
     def handle_get_menu(self, environ, body):
         user = environ.get('user', {})
-        return self.config_service.get_menu(user)
+        return self.config_service.get_menu(user), [('Cache-Control', 'no-cache, no-store, must-revalidate'), ('Pragma', 'no-cache'), ('Expires', '0')]
 
     def handle_get_config(self, environ, body):
         query = parse_qs(environ.get('QUERY_STRING', ''))
@@ -276,10 +298,61 @@ class VyOSWebApp:
         user = environ.get('user', {})
         return self.config_service.commit_config(user)
 
+    def handle_config_commit_with_comment(self, environ, body):
+        user = environ.get('user', {})
+        comment = body.get('comment', '')
+        return self.config_service.commit_config_with_comment(user, comment)
+
+    def handle_config_commit_confirm(self, environ, body):
+        user = environ.get('user', {})
+        minutes = body.get('minutes', 10)
+        comment = body.get('comment', '')
+        return self.config_service.commit_confirm(user, minutes, comment)
+
+    def handle_config_confirm(self, environ, body):
+        user = environ.get('user', {})
+        return self.config_service.confirm(user)
+
+    def handle_config_rollback_soft(self, environ, body):
+        user = environ.get('user', {})
+        revision = body.get('revision', 0)
+        return self.config_service.rollback_soft(user, revision)
+
     def handle_config_save(self, environ, body):
         user = environ.get('user', {})
         password = body.get('password', '')
         return self.config_service.save_config(user, password)
+
+    def handle_config_save_file(self, environ, body):
+        user = environ.get('user', {})
+        target = body.get('target', '')
+        target_type = body.get('type', 'system')
+        return self.config_service.save_config_to_file(user, target, target_type)
+
+    def handle_config_load_file(self, environ, body):
+        user = environ.get('user', {})
+        source = body.get('source', '')
+        source_type = body.get('type', 'system')
+        return self.config_service.load_config_from_file(user, source, source_type)
+
+    def handle_config_merge_file(self, environ, body):
+        user = environ.get('user', {})
+        source = body.get('source', '')
+        source_type = body.get('type', 'local')
+        return self.config_service.merge_config_from_file(user, source, source_type)
+
+    def handle_config_comment(self, environ, body):
+        user = environ.get('user', {})
+        path = body.get('path', '')
+        text = body.get('text', '')
+        return self.config_service.add_comment(user, path, text)
+
+    def handle_config_rename(self, environ, body):
+        user = environ.get('user', {})
+        path = body.get('path', '')
+        old_name = body.get('oldName', '')
+        new_name = body.get('newName', '')
+        return self.config_service.rename_config(user, path, old_name, new_name)
 
     def handle_config_rollback(self, environ, body):
         user = environ.get('user', {})
@@ -641,6 +714,34 @@ class VyOSWebApp:
 
     def handle_op_mode_generate(self, environ, body):
         return self.system_service.generate_command(body.get('command', ''), body.get('args', {}))
+
+    # ---------- notifications ----------
+
+    def handle_list_notifications(self, environ, body):
+        query = parse_qs(environ.get('QUERY_STRING', ''))
+        limit = int(query.get('limit', ['100'])[0])
+        return {'success': True, 'notifications': self.notification_service.list(limit)}
+
+    def handle_notification_unread_count(self, environ, body):
+        return {'success': True, 'count': self.notification_service.unread_count()}
+
+    def handle_notification_read(self, environ, body):
+        notification_id = body.get('_path_params', {}).get('id')
+        self.notification_service.mark_read(int(notification_id))
+        return {'success': True}
+
+    def handle_notification_mark_all_read(self, environ, body):
+        self.notification_service.mark_all_read()
+        return {'success': True}
+
+    def handle_delete_notification(self, environ, body):
+        notification_id = body.get('_path_params', {}).get('id')
+        self.notification_service.delete(int(notification_id))
+        return {'success': True}
+
+    def handle_delete_read_notifications(self, environ, body):
+        self.notification_service.delete_all_read()
+        return {'success': True}
 
 
 application = VyOSWebApp()

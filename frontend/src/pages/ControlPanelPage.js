@@ -296,8 +296,8 @@ const WidgetHeader = defineComponent({
       <span class="widget-title">{{ title }}</span>
       <div class="widget-actions">
         <span v-if="loading" class="widget-loading">加载中...</span>
-        <button class="widget-action-btn" title="刷新" @click.stop="$emit('refresh')">↻</button>
-        <button class="widget-action-btn" :title="collapsed ? '展开' : '折叠'" @click.stop="$emit('toggle')">{{ collapsed ? '▶' : '▼' }}</button>
+        <button class="widget-action-btn widget-action-refresh" title="刷新" @click.stop="$emit('refresh')">↻</button>
+        <button class="widget-action-btn widget-action-toggle" :title="collapsed ? '展开' : '折叠'" @click.stop="$emit('toggle')">{{ collapsed ? '▶' : '▼' }}</button>
         <button class="widget-action-btn widget-action-close" title="关闭" @click.stop="$emit('close')">✕</button>
       </div>
     </div>

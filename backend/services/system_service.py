@@ -11,6 +11,7 @@ import subprocess
 import time
 
 from utils.database import get_db_connection
+from services.notification_service import NotificationService
 
 
 BASE_DIR = '/opt/vyos-web-config'
@@ -113,6 +114,12 @@ class SystemService:
 
     def reboot(self):
         try:
+            NotificationService().add(
+                'reboot',
+                '系统重启',
+                '系统正在重启',
+                {}
+            )
             subprocess.Popen(['sudo', '/opt/vyatta/bin/vyatta-op-cmd-wrapper', 'reboot', 'now'])
             return {'success': True, 'message': '系统正在重启'}
         except Exception as e:

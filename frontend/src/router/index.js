@@ -53,6 +53,15 @@ import InterfaceStatsPage from '/src/pages/InterfaceStatsPage.js';
 import ControlPanelPage from '/src/pages/ControlPanelPage.js';
 import ConfigSyncPage from '/src/pages/ConfigSyncPage.js';
 import ConntrackSyncPage from '/src/pages/ConntrackSyncPage.js';
+import StaticRoutePage from '/src/pages/StaticRoutePage.js';
+import PolicyRoutePage from '/src/pages/PolicyRoutePage.js';
+import LocalRoutePage from '/src/pages/LocalRoutePage.js';
+import AccessListPage from '/src/pages/AccessListPage.js';
+import AccessListv6Page from '/src/pages/AccessListv6Page.js';
+import ConfigManagementPage from '/src/pages/ConfigManagementPage.js';
+import ConfigManagementSettingsPage from '/src/pages/ConfigManagementSettingsPage.js';
+import BgpPage from '/src/pages/BgpPage.js';
+import OspfPage from '/src/pages/OspfPage.js';
 
 const componentMap = {
   TablePage: GenericTablePage,
@@ -109,6 +118,15 @@ const componentMap = {
   ControlPanelPage,
   ConfigSyncPage,
   ConntrackSyncPage,
+  StaticRoutePage,
+  PolicyRoutePage,
+  LocalRoutePage,
+  AccessListPage,
+  AccessListv6Page,
+  ConfigManagementPage,
+  ConfigManagementSettingsPage,
+  BgpPage,
+  OspfPage,
 };
 
 function buildRoutes(menu, parentPath = '') {

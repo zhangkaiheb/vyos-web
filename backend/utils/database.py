@@ -215,6 +215,25 @@ def init_db():
             )
         ''')
 
+        # Notifications / alarms
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS notifications (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                type TEXT NOT NULL,
+                title TEXT NOT NULL,
+                message TEXT,
+                read INTEGER DEFAULT 0,
+                data TEXT DEFAULT '{}',
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        cursor.execute('''
+            CREATE INDEX IF NOT EXISTS idx_notifications_read ON notifications (read)
+        ''')
+        cursor.execute('''
+            CREATE INDEX IF NOT EXISTS idx_notifications_timestamp ON notifications (timestamp DESC)
+        ''')
+
         # Builtin ACLs
         cursor.execute('''
             INSERT OR IGNORE INTO access_control_tables (id, name, description, is_builtin)

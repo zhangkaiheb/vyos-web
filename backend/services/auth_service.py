@@ -12,12 +12,14 @@ except ImportError:
 
 from utils.database import get_db_connection, init_db
 from utils.auth_middleware import AuthMiddleware
+from services.notification_service import NotificationService
 
 
 class AuthService:
     def __init__(self):
         init_db()
         self.pam_auth = pam.pam() if pam else None
+        self.notification_service = NotificationService()
 
     def _pam_authenticate(self, username, password):
         if self.pam_auth:
@@ -36,6 +38,12 @@ class AuthService:
         # PAM authentication
         if not self._pam_authenticate(username, password):
             self._log_action(username, 'login', '', {}, ip_address, False, 'PAM authentication failed')
+            self.notification_service.add(
+                'login_failed',
+                '登录失败',
+                f'用户 {username} 从 {ip_address} 登录失败',
+                {'username': username, 'ip_address': ip_address}
+            )
             return {'success': False, 'message': '用户名或密码错误'}
         
         # Get user from database
@@ -74,7 +82,15 @@ class AuthService:
         
         # Log action
         self._log_action(username, 'login', 'auth', {}, ip_address, True, '')
-        
+
+        # Add notification
+        self.notification_service.add(
+            'login',
+            '用户登录',
+            f'用户 {username} 从 {ip_address} 登录',
+            {'username': username, 'ip_address': ip_address}
+        )
+
         return {
             'success': True,
             'token': token,
@@ -85,10 +101,21 @@ class AuthService:
         if token:
             conn = get_db_connection()
             try:
+                row = conn.execute(
+                    'SELECT user_id FROM user_sessions WHERE id = ?', (token,)
+                ).fetchone()
+                username = row['user_id'] if row else ''
                 conn.execute('DELETE FROM user_sessions WHERE id = ?', (token,))
                 conn.commit()
             finally:
                 conn.close()
+            if username:
+                self.notification_service.add(
+                    'logout',
+                    '用户退出',
+                    f'用户 {username} 已退出登录',
+                    {'username': username}
+                )
         return {'success': True}
 
     def get_user(self, username):

@@ -3,6 +3,9 @@ const IPv4_CIDR_RE = /^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/;
 const IPv4_RANGE_RE = /^(\d{1,3}\.){3}\d{1,3}-(\d{1,3}\.){3}\d{1,3}$/;
 const IPv6_RE = /^([0-9a-fA-F:]+)(\/\d{1,3})?$/;
 const MAC_RE = /^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/;
+const NUMBER_RANGE_RE = /^(\d+)(-(\d+))?$/;
+const NUMBER_EXCLUDE_RANGE_RE = /^!?(\d+)(-(\d+))?$/;
+const RATE_LIMIT_RE = /^\d+\/(second|minute|hour|day)$/;
 
 function validIPv4(ip) {
   if (!IPv4_RE.test(ip)) return false;
@@ -66,6 +69,31 @@ function validMAC(mac) {
   return MAC_RE.test(mac);
 }
 
+function validMACExclude(mac) {
+  const val = mac.startsWith('!') ? mac.slice(1) : mac;
+  return MAC_RE.test(val);
+}
+
+function validNumberRange(value, min, max) {
+  const m = String(value).match(NUMBER_RANGE_RE);
+  if (!m) return false;
+  const start = parseInt(m[1], 10);
+  const end = m[3] ? parseInt(m[3], 10) : start;
+  if (end < start) return false;
+  if (min !== undefined && start < min) return false;
+  if (max !== undefined && end > max) return false;
+  return true;
+}
+
+function validNumberExcludeRange(value, min, max) {
+  const val = String(value).startsWith('!') ? String(value).slice(1) : String(value);
+  return validNumberRange(val, min, max);
+}
+
+function validRateLimit(value) {
+  return RATE_LIMIT_RE.test(String(value));
+}
+
 function _validateSingle(value, rule) {
   const type = rule.validate || rule.type;
   if (type === 'ip' && !validIP(value)) return '请输入有效的IP地址';
@@ -75,8 +103,18 @@ function _validateSingle(value, rule) {
   if (type === 'ipv4-range' && !validIPv4Range(value)) return '请输入有效的IPv4范围，如 192.168.1.1-192.168.1.100';
   if (type === 'ipv6' && !validIPv6(value)) return '请输入有效的IPv6地址';
   if (type === 'mac' && !validMAC(value)) return '请输入有效的MAC地址';
+  if (type === 'mac-exclude' && !validMACExclude(value)) return '请输入有效的MAC地址，可前缀!表示排除';
   if (type === 'port' && !validPortMulti(value)) return '请输入有效的端口、端口范围或逗号分隔列表';
   if (type === 'port-single' && !validPort(value)) return '端口号范围为1-65535';
+  if (type === 'number-range' && !validNumberRange(value, rule.min, rule.max)) {
+    const rangeText = rule.min !== undefined && rule.max !== undefined ? `${rule.min}-${rule.max}` : '';
+    return `请输入有效的数值${rangeText ? `（${rangeText}）` : ''}或范围`;
+  }
+  if (type === 'number-exclude-range' && !validNumberExcludeRange(value, rule.min, rule.max)) {
+    const rangeText = rule.min !== undefined && rule.max !== undefined ? `${rule.min}-${rule.max}` : '';
+    return `请输入有效的数值${rangeText ? `（${rangeText}）` : ''}、范围，可前缀!表示排除`;
+  }
+  if (type === 'rate-limit' && !validRateLimit(value)) return '请输入有效的速率，如 5/minute';
   if (rule.min !== undefined && parseFloat(value) < rule.min) return `最小值为 ${rule.min}`;
   if (rule.max !== undefined && parseFloat(value) > rule.max) return `最大值为 ${rule.max}`;
   if (rule.pattern && !new RegExp(rule.pattern).test(String(value))) return rule.patternMessage || '格式不正确';
@@ -95,4 +133,4 @@ export function validateField(value, rule) {
   return _validateSingle(String(value), rule);
 }
 
-export { validIPv4, validIPv4CIDR, validIPv4Range, validIPv6, validIP, validIPOrSegment, validPort, validMAC };
+export { validIPv4, validIPv4CIDR, validIPv4Range, validIPv6, validIP, validIPOrSegment, validPort, validMAC, validMACExclude, validNumberRange, validNumberExcludeRange, validRateLimit };

@@ -34,9 +34,11 @@ export default defineComponent({
         </div>
       </div>
       <div class="tab-panels">
-        <div class="tab-panel">
-          <slot :name="activeTab.key" :tab="activeTab"></slot>
-        </div>
+        <template v-for="tab in tabs" :key="tab.key">
+          <div v-if="active === tab.key" class="tab-panel">
+            <slot :name="tab.key" :tab="tab"></slot>
+          </div>
+        </template>
       </div>
     </div>
   `,

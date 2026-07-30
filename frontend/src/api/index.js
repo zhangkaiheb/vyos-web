@@ -155,3 +155,12 @@ export const conntrackLogApi = {
   get: () => api.get('/conntrack-log-config'),
   set: (data) => api.post('/conntrack-log-config', data),
 };
+
+export const notificationApi = {
+  list: (limit = 100) => api.get('/notifications', { limit }),
+  unreadCount: () => api.get('/notifications/unread-count'),
+  markRead: (id) => api.post(`/notifications/${id}/read`, {}),
+  markAllRead: () => api.post('/notifications/mark-all-read', {}),
+  delete: (id) => api.delete(`/notifications/${id}`),
+  deleteRead: () => api.delete('/notifications/read'),
+};

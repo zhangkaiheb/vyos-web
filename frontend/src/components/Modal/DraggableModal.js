@@ -7,6 +7,7 @@ export default defineComponent({
     title: { type: String, default: '' },
     visible: { type: Boolean, default: false },
     width: { type: String, default: '600px' },
+    modalClass: { type: String, default: '' },
   },
   emits: ['update:visible', 'close', 'confirm'],
   setup(props, { emit }) {
@@ -67,7 +68,7 @@ export default defineComponent({
   },
   components: { ToolbarButton },
   template: `
-    <div v-if="visible" class="modal-overlay">
+    <div v-if="visible" class="modal-overlay" :class="modalClass">
       <div ref="modalRef" class="modal-container" :style="{ width, transform: 'translate(' + translate.x + 'px, ' + translate.y + 'px)' }" @mousedown="onMouseDown">
         <div class="modal-header">
           <span class="modal-title">{{ title }}</span>

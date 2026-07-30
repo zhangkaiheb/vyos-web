@@ -6,55 +6,48 @@ import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import HelpButton from '/src/components/Layout/HelpButton.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 
-function parseInterfaceNames(output) {
-  const lines = String(output || '').split('\n').map(s => s.replace(/\r$/, ''));
-  const names = [];
-  const re = /^\d+:\s+([^:@\s]+)(?:@[^:\s]+)?:/;
-  for (const line of lines) {
-    const m = line.match(re);
-    if (m && !names.includes(m[1])) names.push(m[1]);
+function parseIpStats(output) {
+  const interfaces = [];
+  const blocks = output.split(/\n(?=\d+:)/);
+  
+  for (const block of blocks) {
+    const headerMatch = block.match(/^\d+:\s+([^:@\s]+)(?:@[^:\s]+)?:/);
+    if (!headerMatch) continue;
+    const iface = headerMatch[1];
+    
+    const lines = block.split('\n');
+    const stats = { interface: iface };
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (line.startsWith('RX:')) {
+        const values = lines[i + 1]?.trim().split(/\s+/);
+        if (values && values.length >= 6) {
+          stats.rx_bytes = values[0];
+          stats.rx_packets = values[1];
+          stats.rx_errors = values[2];
+          stats.rx_dropped = values[3];
+          stats.rx_missed = values[4];
+          stats.multicast = values[5];
+        }
+      } else if (line.startsWith('TX:')) {
+        const values = lines[i + 1]?.trim().split(/\s+/);
+        if (values && values.length >= 6) {
+          stats.tx_bytes = values[0];
+          stats.tx_packets = values[1];
+          stats.tx_errors = values[2];
+          stats.tx_dropped = values[3];
+          stats.tx_carrier = values[4];
+          stats.collisions = values[5];
+        }
+      }
+    }
+    
+    interfaces.push(stats);
   }
-  return names;
+  
+  return interfaces;
 }
-
-function parseKeyValueStats(output) {
-  const map = {};
-  const lines = String(output || '').split('\n').map(s => s.replace(/\r$/, ''));
-  for (const line of lines) {
-    const idx = line.indexOf(':');
-    if (idx < 0) continue;
-    const key = line.slice(0, idx).trim();
-    const value = line.slice(idx + 1).trim();
-    if (key && value !== '') map[key] = value;
-  }
-  return map;
-}
-
-function parseIfconfig(output) {
-  const text = String(output || '');
-  const map = {};
-  const rx = text.match(/RX\s+packets\s+(\d+)\s+bytes\s+(\d+)\s+\(.*?\)\s*\n\s+RX\s+errors\s+(\d+)\s+dropped\s+(\d+)\s+overruns\s+(\d+)\s+frame\s+(\d+)/i);
-  const tx = text.match(/TX\s+packets\s+(\d+)\s+bytes\s+(\d+)\s+\(.*?\)\s*\n\s+TX\s+errors\s+(\d+)\s+dropped\s+(\d+)\s+overruns\s+(\d+)\s+carrier\s+(\d+)\s+collisions\s+(\d+)/i);
-  if (rx) {
-    map.rx_packets = rx[1];
-    map.rx_bytes = rx[2];
-    map.rx_errors = rx[3];
-    map.rx_dropped = rx[4];
-    map.rx_overruns = rx[5];
-  }
-  if (tx) {
-    map.tx_packets = tx[1];
-    map.tx_bytes = tx[2];
-    map.tx_errors = tx[3];
-    map.tx_dropped = tx[4];
-    map.tx_overruns = tx[5];
-    map.collisions = tx[7];
-  }
-  return map;
-}
-
-const PHYSICAL_KEYS = ['rx_packets', 'tx_packets', 'rx_bytes', 'tx_bytes', 'rx_errors', 'tx_errors', 'rx_dropped', 'tx_dropped', 'multicast', 'collisions'];
-const VIRTUAL_KEYS = ['rx_packets', 'rx_bytes', 'rx_errors', 'rx_dropped', 'rx_overruns', 'tx_packets', 'tx_bytes', 'tx_errors', 'tx_dropped', 'tx_overruns', 'collisions'];
 
 export default defineComponent({
   name: 'InterfaceStatsPage',
@@ -101,35 +94,31 @@ export default defineComponent({
     async function load() {
       loading.value = true;
       try {
-        const linkRes = await opModeApi.execute('ip link show');
-        const names = parseInterfaceNames(linkRes.output || '');
-
+        const res = await opModeApi.execute('ip -s link show');
+        if (!res.success) {
+          showError({ message: '获取接口统计失败: ' + (res.output || '') });
+          physicalRows.value = [];
+          virtualRows.value = [];
+          return;
+        }
+        const allStats = parseIpStats(res.output || '');
         const physical = [];
         const virtual = [];
-
-        await Promise.all(names.map(async (iface) => {
-          const isDot = iface.includes('.');
+        for (const s of allStats) {
+          if (s.interface === 'lo') continue;
+          const isDot = s.interface.includes('.');
           if (!isDot) {
-            try {
-              const ethRes = await opModeApi.execute(`ethtool -S ${iface}`);
-              if (ethRes.success) {
-                const map = parseKeyValueStats(ethRes.output || '');
-                const row = { interface: iface };
-                PHYSICAL_KEYS.forEach(k => { row[k] = map[k] || ''; });
-                physical.push(row);
-                return;
-              }
-            } catch (e) {}
-          }
-          try {
-            const ifcRes = await opModeApi.execute(`ifconfig ${iface}`);
-            const map = parseIfconfig(ifcRes.output || '');
-            const row = { interface: iface };
-            VIRTUAL_KEYS.forEach(k => { row[k] = map[k] || ''; });
+            const row = { interface: s.interface };
+            ['rx_packets','tx_packets','rx_bytes','tx_bytes','rx_errors','tx_errors','rx_dropped','tx_dropped','multicast','collisions'].forEach(k => { row[k] = s[k] || '0'; });
+            physical.push(row);
+          } else {
+            const row = { interface: s.interface };
+            ['rx_packets','rx_bytes','rx_errors','rx_dropped','tx_packets','tx_bytes','tx_errors','tx_dropped','collisions'].forEach(k => { row[k] = s[k] || '0'; });
+            row.rx_overruns = s.rx_missed || '0';
+            row.tx_overruns = s.tx_carrier || '0';
             virtual.push(row);
-          } catch (e) {}
-        }));
-
+          }
+        }
         physicalRows.value = physical.sort((a, b) => a.interface.localeCompare(b.interface));
         virtualRows.value = virtual.sort((a, b) => a.interface.localeCompare(b.interface));
       } catch (e) {

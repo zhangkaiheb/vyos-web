@@ -340,8 +340,8 @@ export default defineComponent({
           <tbody>
             <tr v-for="row in pagedData" :key="row[rowKey]" :class="{ selected: isSelected(row) }"
                 @click="$emit('row-click', row)">
-              <td v-if="selectable" @click.stop>
-                <input type="checkbox" :checked="isSelected(row)" @change="toggleSelect(row[rowKey])" />
+              <td v-if="selectable" @click="toggleSelect(row[rowKey])">
+                <input type="checkbox" :checked="isSelected(row)" @change="toggleSelect(row[rowKey])" @click.stop />
               </td>
               <td v-for="col in columns.filter(c => visibleColumns.includes(c.key))" :key="col.key">
                 <slot :name="col.key" :row="row" :value="row[col.key]">
