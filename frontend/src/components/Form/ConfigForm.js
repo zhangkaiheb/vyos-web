@@ -2,6 +2,7 @@ import { defineComponent, ref, watch, h, onMounted } from '/src/utils/vue-import
 import { validateField } from '/src/utils/validators.js';
 import { configApi } from '/src/api/index.js';
 import DualListSelector from '/src/components/Form/DualListSelector.js';
+import MatchTypeCards from '/src/components/Form/MatchTypeCards.js';
 
 function defaultValue(field) {
   if (field.default !== undefined) return JSON.parse(JSON.stringify(field.default));
@@ -24,11 +25,12 @@ export default defineComponent({
     showAdvanced: { type: Boolean, default: false },
   },
   emits: ['update:modelValue'],
-  setup(props, { emit, expose }) {
+  setup(props, { emit, expose, slots }) {
     const form = ref({});
     const advancedOpen = ref({ '': false });
     const fieldErrors = ref({});
     const suggestionsCache = ref({});
+    const activeTab = ref('');
 
     function suggestionKey(path, key) {
       return path.length ? `${path.join('.')}.${key}` : key;
@@ -55,7 +57,10 @@ export default defineComponent({
     onMounted(async () => {
       const collect = (schema, path, formObj) => {
         for (const field of schema) {
-          if (field.type === 'group') {
+          if (field.type === 'tab') {
+            // Tab children share the same flat form object
+            collect(field.children || [], path, formObj);
+          } else if (field.type === 'group') {
             collect(field.children || [], [...path, field.key], formObj?.[field.key] || {});
           } else if (field.dynamic) {
             loadSuggestions(path, field);
@@ -69,19 +74,24 @@ export default defineComponent({
       const walk = (schema, model) => {
         const result = {};
         for (const field of schema) {
-          const modelVal = model?.[field.key];
-          if (field.type === 'group') {
-            result[field.key] = walk(field.children || [], modelVal || {});
-          } else if (field.type === 'textarea' && field.multi) {
-            result[field.key] = Array.isArray(modelVal)
-              ? [...modelVal]
-              : (modelVal !== undefined ? String(modelVal).split('\n').filter(Boolean) : []);
-          } else if (field.type === 'checkbox' && field.valueless) {
-            // Treat node presence ({}, '', true) as checked; false/null/undefined as unchecked.
-            const val = modelVal !== undefined && modelVal !== false && modelVal !== null;
-            result[field.key] = val;
+          if (field.type === 'tab') {
+            // Flatten tab children into the same level; model stays at parent level
+            const childResult = walk(field.children || [], model || {});
+            Object.assign(result, childResult);
           } else {
-            result[field.key] = modelVal !== undefined ? JSON.parse(JSON.stringify(modelVal)) : defaultValue(field);
+            const modelVal = model?.[field.key];
+            if (field.type === 'group') {
+              result[field.key] = walk(field.children || [], modelVal || {});
+            } else if (field.type === 'textarea' && field.multi) {
+              result[field.key] = Array.isArray(modelVal)
+                ? [...modelVal]
+                : (modelVal !== undefined ? String(modelVal).split('\n').filter(Boolean) : []);
+            } else if (field.type === 'checkbox' && field.valueless) {
+              const val = modelVal !== undefined && modelVal !== false && modelVal !== null;
+              result[field.key] = val;
+            } else {
+              result[field.key] = modelVal !== undefined ? JSON.parse(JSON.stringify(modelVal)) : defaultValue(field);
+            }
           }
         }
         return result;
@@ -146,7 +156,10 @@ export default defineComponent({
 
     function validateFields(schema, formObj, path, errors) {
       for (const field of schema) {
-        if (field.type === 'group') {
+        if (field.type === 'tab') {
+          // Tab children share the same flat form object
+          validateFields(field.children || [], formObj, path, errors);
+        } else if (field.type === 'group') {
           validateFields(field.children || [], formObj[field.key] || {}, [...path, field.key], errors);
         } else {
           const msg = validateField(formObj[field.key], field);
@@ -266,16 +279,34 @@ export default defineComponent({
           titleLeft: field.titleLeft || '可选',
           titleRight: field.titleRight || '已选',
         }));
+      } else if (field.type === 'radio') {
+        children.push(h('div', { class: 'radio-cards' }, (field.options || []).map(opt => {
+          const optValue = typeof opt === 'object' ? opt.value : opt;
+          const optLabel = typeof opt === 'object' ? (opt.label || opt.value) : opt;
+          const isSelected = formObj[field.key] === optValue;
+          return h('div', {
+            key: optValue,
+            class: ['radio-card', isSelected ? 'radio-card-selected' : ''].filter(Boolean).join(' '),
+            onClick: () => { if (!disabled) formObj[field.key] = optValue; },
+          }, [
+            h('input', {
+              type: 'radio',
+              name: field.key,
+              value: optValue,
+              checked: isSelected,
+              disabled,
+              style: { display: 'none' },
+            }),
+            h('span', {}, optLabel),
+          ]);
+        })));
       } else if (field.type === 'checkbox') {
-        children.push(h('label', { class: 'checkbox-item' }, [
-          h('input', {
-            type: 'checkbox',
-            checked: !!formObj[field.key],
-            disabled,
-            onChange: (e) => { formObj[field.key] = e.target.checked; },
-          }),
-          h('span', {}, field.label || field.title),
-        ]));
+        children.push(h('input', {
+          type: 'checkbox',
+          checked: !!formObj[field.key],
+          disabled,
+          onChange: (e) => { formObj[field.key] = e.target.checked; },
+        }));
       } else if (field.type === 'textarea') {
         return renderTextarea(field, formObj, path);
       } else {
@@ -311,12 +342,56 @@ export default defineComponent({
     }
 
     function renderField(field, formObj, path, level = 0) {
+      if (field.type === 'tab') {
+        return null;
+      }
       if (field.type === 'group') {
         const groupClass = level > 0 ? 'form-group nested-group' : 'form-group';
         const groupModel = formObj[field.key] || {};
         return h('div', { class: groupClass }, [
           h('div', { class: 'form-group-title' }, field.title),
           h('div', { class: 'form-group-content' }, renderFields(field.children || [], groupModel, [...path, field.key], level + 1)),
+        ]);
+      }
+      if (field.type === 'checkbox') {
+        return h('div', { class: 'form-row' }, [
+          h('label', { class: 'form-label' }, field.title),
+          renderInput(field, formObj, path),
+        ]);
+      }
+      // dynamicValue: text input when dependsOn value is 'address', select dropdown otherwise
+      if (field.type === 'dynamicValue') {
+        const dependsKey = field.dependsOn;
+        const currentType = formObj[dependsKey] || 'address';
+        const isAddress = currentType === 'address';
+        const groupOptsMap = field.groupOptionsMap || {};
+        const selectOptions = isAddress ? [] : (groupOptsMap[currentType] || []).map(v => ({ value: v, label: v }));
+
+        const inputEl = isAddress
+          ? h('input', {
+              type: 'text',
+              class: 'form-input',
+              placeholder: field.placeholder || '',
+              value: formObj[field.key] || '',
+              disabled: props.disabled,
+              onInput: (e) => { formObj[field.key] = e.target.value; emitUpdate(); },
+            })
+          : h('select', {
+              class: 'form-input',
+              value: formObj[field.key] || '',
+              disabled: props.disabled,
+              onChange: (e) => { formObj[field.key] = e.target.value; emitUpdate(); },
+            }, [
+              h('option', { value: '' }, '请选择'),
+              ...selectOptions.map(opt => h('option', { value: opt.value }, opt.label)),
+            ]);
+
+        return h('div', { class: 'form-row' }, [
+          h('label', { class: 'form-label' }, field.title),
+          h('div', { class: 'form-control' }, [
+            inputEl,
+            field.help ? h('div', { class: 'form-hint' }, field.help) : null,
+          ]),
         ]);
       }
       return h('div', { class: 'form-row' }, [
@@ -329,9 +404,9 @@ export default defineComponent({
       const basic = schema.filter(f => !f.advanced);
       const advanced = schema.filter(f => f.advanced);
       if (props.showAdvanced) {
-        return schema.map(f => renderField(f, formObj, path, level));
+        return schema.map(f => renderField(f, formObj, path, level)).filter(Boolean);
       }
-      const nodes = basic.map(f => renderField(f, formObj, path, level));
+      const nodes = basic.map(f => renderField(f, formObj, path, level)).filter(Boolean);
       if (advanced.length) {
         const open = isAdvancedOpen(path);
         nodes.push(h('div', { class: 'advanced-section' }, [
@@ -345,6 +420,48 @@ export default defineComponent({
       return nodes;
     }
 
-    return () => h('div', { class: 'config-form' }, renderFields(props.schema, form.value, [], 0));
+    function renderTabs(schema, formObj, path, level) {
+      const tabs = schema.filter(f => f.type === 'tab');
+      const nonTabs = schema.filter(f => f.type !== 'tab');
+
+      if (!tabs.length) {
+        return renderFields(schema, formObj, path, level);
+      }
+
+      if (!activeTab.value && tabs.length) {
+        activeTab.value = tabs[0].key;
+      }
+
+      const tabNodes = [];
+
+      // Render non-tab fields first
+      if (nonTabs.length) {
+        tabNodes.push(...renderFields(nonTabs, formObj, path, level));
+      }
+
+      // Tab bar
+      tabNodes.push(h('div', { class: 'form-tabs' }, tabs.map(tab =>
+        h('div', {
+          key: tab.key,
+          class: ['form-tab', activeTab.value === tab.key ? 'form-tab-active' : ''].filter(Boolean).join(' '),
+          onClick: () => { activeTab.value = tab.key; },
+        }, tab.title)
+      )));
+
+      // Tab content - check for named slot first
+      const activeTabSchema = tabs.find(t => t.key === activeTab.value);
+      if (activeTabSchema) {
+        const slotContent = slots?.[activeTabSchema.key];
+        if (slotContent) {
+          tabNodes.push(h('div', { class: 'form-tab-content' }, slotContent(formObj)));
+        } else {
+          tabNodes.push(h('div', { class: 'form-tab-content' }, renderFields(activeTabSchema.children || [], formObj, path, level)));
+        }
+      }
+
+      return tabNodes;
+    }
+
+    return () => h('div', { class: 'config-form' }, renderTabs(props.schema, form.value, [], 0));
   },
 });

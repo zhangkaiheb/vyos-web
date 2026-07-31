@@ -1,5 +1,5 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
-import { configApi } from '/src/api/index.js';
+import { configApi, interfaceApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
@@ -1788,6 +1788,7 @@ export default defineComponent({
     const activeTab = ref('basic');
     const activeAfTab = ref('ipv4-unicast');
     const writeDisabled = ref(false);
+    const interfaces = ref([]);
 
     // Neighbor modal
     const neighborModalVisible = ref(false);
@@ -2294,6 +2295,16 @@ export default defineComponent({
         showError(e);
       } finally {
         loading.value = false;
+      }
+    }
+
+    async function loadInterfaces() {
+      try {
+        const res = await interfaceApi.ethernet();
+        const list = res.interfaces || [];
+        interfaces.value = list.map(i => i.name).sort();
+      } catch (e) {
+        console.error('Failed to load interface list', e);
       }
     }
 
@@ -3370,7 +3381,10 @@ export default defineComponent({
       evpnVniRtModalVisible.value = false;
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      loadInterfaces();
+    });
 
     // Parameters section
     const parametersForm = computed({
@@ -3415,6 +3429,7 @@ export default defineComponent({
 
     return {
       loading, saving, saved, config, activeTab, activeAfTab, writeDisabled,
+      interfaces,
       neighborColumns, peerGroupColumns, bmpColumns, listenColumns, networkColumns, aggregateColumns, interfaceColumns, redistributeColumns,
       ipv6NetworkColumns, ipv6AggregateColumns, ipv6RedistributeColumns, ipv6DistancePrefixColumns,
       ipv4FlowspecNetworkColumns, ipv4FlowspecAggregateColumns, ipv4FlowspecRedistributeColumns,
@@ -4969,12 +4984,20 @@ export default defineComponent({
       <DraggableModal v-model:visible="interfaceModalVisible" :title="editingInterfaceIndex >= 0 ? '编辑接口' : '添加接口'" width="500px" @confirm="saveInterface">
         <div class="form-row">
           <label class="form-label">接口名称 *</label>
-          <input type="text" class="form-control" v-model="interfaceForm.name"
-                 placeholder="例如: eth0" style="width:100%;" />
+          <template v-if="editingInterfaceIndex >= 0">
+            <input type="text" class="form-control" v-model="interfaceForm.name"
+                   style="width:100%;" disabled />
+          </template>
+          <template v-else>
+            <select class="form-control" v-model="interfaceForm.name" style="width:100%;">
+              <option value="">请选择接口</option>
+              <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
+            </select>
+          </template>
         </div>
         <div class="form-row">
-          <label class="form-label"></label>
-          <label><input type="checkbox" v-model="interfaceForm['mpls-forwarding']" /> 启用 MPLS 转发</label>
+          <label class="form-label">启用 MPLS 转发</label>
+          <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="interfaceForm['mpls-forwarding']" /></label>
         </div>
       </DraggableModal>
 

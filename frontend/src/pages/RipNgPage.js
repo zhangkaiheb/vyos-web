@@ -1,5 +1,5 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
-import { configApi } from '/src/api/index.js';
+import { configApi, interfaceApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
@@ -171,6 +171,7 @@ export default defineComponent({
     const newAggregate = ref('');
     const newRoute = ref('');
     const newPassiveInterface = ref('');
+    const interfaces = ref([]);
 
     const interfaceModalVisible = ref(false);
     const editingInterfaceIndex = ref(-1);
@@ -216,12 +217,22 @@ export default defineComponent({
     async function load() {
       loading.value = true;
       try {
-        const data = await configApi.get(['protocols', 'ripng']);
-        config.value = configToForm(data);
+        const res = await configApi.get(['protocols', 'ripng']);
+        config.value = configToForm(res.data || {});
       } catch (e) {
         showError(e);
       } finally {
         loading.value = false;
+      }
+    }
+
+    async function loadInterfaces() {
+      try {
+        const res = await interfaceApi.ethernet();
+        const list = res.interfaces || [];
+        interfaces.value = list.map(i => i.name).sort();
+      } catch (e) {
+        console.error('Failed to load interface list', e);
       }
     }
 
@@ -335,10 +346,14 @@ export default defineComponent({
       if (confirm('确定删除此重分发配置？')) config.value.redistributes.splice(index, 1);
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      loadInterfaces();
+    });
 
     return {
       loading, saving, saved, config, activeTab, writeDisabled,
+      interfaces,
       newNetwork, newAggregate, newRoute, newPassiveInterface,
       addNetwork, removeNetwork, addAggregate, removeAggregate, addRoute, removeRoute,
       addPassiveInterface, removePassiveInterface,
@@ -472,7 +487,10 @@ export default defineComponent({
             <div class="form-row">
               <label class="form-label">被动接口</label>
               <div style="display:flex; gap:10px; align-items:center;">
-                <input type="text" class="form-control" v-model="newPassiveInterface" placeholder="接口名称" style="width:100%;" />
+                <select class="form-control" v-model="newPassiveInterface" style="width:100%;">
+                  <option value="">请选择接口</option>
+                  <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
+                </select>
                 <ToolbarButton size="small" @click="addPassiveInterface">添加</ToolbarButton>
               </div>
             </div>
@@ -519,7 +537,16 @@ export default defineComponent({
       <DraggableModal v-model:visible="interfaceModalVisible" :title="editingInterfaceIndex >= 0 ? '编辑 RIPng 接口' : '添加 RIPng 接口'" width="600px" @confirm="saveInterface">
         <div class="form-row">
           <label class="form-label">接口名称 *</label>
-          <input type="text" class="form-control" v-model="interfaceForm.name" placeholder="例如: eth0" style="width:100%;" :disabled="editingInterfaceIndex >= 0" />
+          <template v-if="editingInterfaceIndex >= 0">
+            <input type="text" class="form-control" v-model="interfaceForm.name"
+                   style="width:100%;" disabled />
+          </template>
+          <template v-else>
+            <select class="form-control" v-model="interfaceForm.name" style="width:100%;">
+              <option value="">请选择接口</option>
+              <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
+            </select>
+          </template>
         </div>
         <div class="form-row">
           <label class="form-label">水平分割</label>

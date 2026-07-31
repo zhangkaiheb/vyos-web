@@ -35,6 +35,9 @@ import DnsPage from '/src/pages/DnsPage.js';
 import DnsDynamicStatusPage from '/src/pages/DnsDynamicStatusPage.js';
 import DnsForwardingStatisticsPage from '/src/pages/DnsForwardingStatisticsPage.js';
 import NtpPage from '/src/pages/NtpPage.js';
+import NetnsPage from '/src/pages/NetnsPage.js';
+import VrfPage from '/src/pages/VrfPage.js';
+import HighAvailabilityPage from '/src/pages/HighAvailabilityPage.js';
 import SshPage from '/src/pages/SshPage.js';
 import HttpsPage from '/src/pages/HttpsPage.js';
 import LldpPage from '/src/pages/LldpPage.js';
@@ -68,6 +71,31 @@ import RipPage from '/src/pages/RipPage.js';
 import RipNgPage from '/src/pages/RipNgPage.js';
 import PimPage from '/src/pages/PimPage.js';
 import Pim6Page from '/src/pages/Pim6Page.js';
+import BabelPage from '/src/pages/BabelPage.js';
+import BfdPage from '/src/pages/BfdPage.js';
+import FailoverPage from '/src/pages/FailoverPage.js';
+import IgmpProxyPage from '/src/pages/IgmpProxyPage.js';
+import MplsPage from '/src/pages/MplsPage.js';
+import NhrpPage from '/src/pages/NhrpPage.js';
+import RpkiPage from '/src/pages/RpkiPage.js';
+import SegmentRoutingPage from '/src/pages/SegmentRoutingPage.js';
+import AsPathListPage from '/src/pages/AsPathListPage.js';
+import CommunityListPage from '/src/pages/CommunityListPage.js';
+import ExtcommunityListPage from '/src/pages/ExtcommunityListPage.js';
+import LargeCommunityListPage from '/src/pages/LargeCommunityListPage.js';
+import PrefixListPage from '/src/pages/PrefixListPage.js';
+import PrefixList6Page from '/src/pages/PrefixList6Page.js';
+import RouteMapPage from '/src/pages/RouteMapPage.js';
+import PkiPage from '/src/pages/PkiPage.js';
+import ConntrackPage from '/src/pages/ConntrackPage.js';
+import SourceNatPage from '/src/pages/SourceNatPage.js';
+import DestinationNatPage from '/src/pages/DestinationNatPage.js';
+import StaticNatPage from '/src/pages/StaticNatPage.js';
+import CgnatPage from '/src/pages/CgnatPage.js';
+import Nat64SourcePage from '/src/pages/Nat64SourcePage.js';
+import Nat66DestinationPage from '/src/pages/Nat66DestinationPage.js';
+import Nat66SourcePage from '/src/pages/Nat66SourcePage.js';
+import FirewallIpv6Page from '/src/pages/FirewallIpv6Page.js';
 
 const componentMap = {
   TablePage: GenericTablePage,
@@ -106,6 +134,9 @@ const componentMap = {
   DnsDynamicStatusPage,
   DnsForwardingStatisticsPage,
   NtpPage,
+  NetnsPage,
+  VrfPage,
+  HighAvailabilityPage,
   SshPage,
   HttpsPage,
   LldpPage,
@@ -139,6 +170,31 @@ const componentMap = {
   RipNgPage,
   PimPage,
   Pim6Page,
+  BabelPage,
+  BfdPage,
+  FailoverPage,
+  IgmpProxyPage,
+  MplsPage,
+  NhrpPage,
+  RpkiPage,
+  SegmentRoutingPage,
+  AsPathListPage,
+  CommunityListPage,
+  ExtcommunityListPage,
+  LargeCommunityListPage,
+  PrefixListPage,
+  PrefixList6Page,
+  RouteMapPage,
+  PkiPage,
+  ConntrackPage,
+  SourceNatPage,
+  DestinationNatPage,
+  StaticNatPage,
+  CgnatPage,
+  Nat64SourcePage,
+  Nat66DestinationPage,
+  Nat66SourcePage,
+  FirewallIpv6Page,
 };
 
 function buildRoutes(menu, parentPath = '') {

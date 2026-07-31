@@ -1,5 +1,5 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
-import { configApi } from '/src/api/index.js';
+import { configApi, interfaceApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
@@ -179,8 +179,14 @@ function configToForm(data = {}) {
   for (const [areaId, attrs] of Object.entries(areaData)) {
     const networks = [];
     const networkData = attrs.network || {};
-    for (const [network] of Object.entries(networkData)) {
-      networks.push({ network });
+    if (Array.isArray(networkData)) {
+      for (const network of networkData) {
+        networks.push({ network });
+      }
+    } else {
+      for (const [network] of Object.entries(networkData)) {
+        networks.push({ network });
+      }
     }
     
     const ranges = [];
@@ -207,9 +213,19 @@ function configToForm(data = {}) {
       });
     }
     
+    // 解析 area-type: API 返回 { normal: {} } 或 { nssa: {} } 等对象
+    let areaType = '';
+    if (attrs['area-type']) {
+      if (typeof attrs['area-type'] === 'string') {
+        areaType = attrs['area-type'];
+      } else if (typeof attrs['area-type'] === 'object') {
+        areaType = Object.keys(attrs['area-type'])[0] || '';
+      }
+    }
+    
     areas.push({
       id: areaId,
-      'area-type': attrs['area-type'] || '',
+      'area-type': areaType,
       authentication: attrs.authentication || '',
       'export-list': attrs['export-list'] || '',
       'import-list': attrs['import-list'] || '',
@@ -294,6 +310,24 @@ function configToForm(data = {}) {
     });
   }
 
+  // 解析访问列表: API 返回 { "1": { export: ["kernel", "static"] } }
+  const accessLists = [];
+  const accessListData = data['access-list'] || {};
+  for (const [aclNum, attrs] of Object.entries(accessListData)) {
+    let exportProtos = [];
+    if (attrs?.export) {
+      if (Array.isArray(attrs.export)) {
+        exportProtos = attrs.export;
+      } else if (typeof attrs.export === 'object') {
+        exportProtos = Object.keys(attrs.export);
+      }
+    }
+    accessLists.push({
+      number: aclNum,
+      export: exportProtos,
+    });
+  }
+
   return {
     'router-id': data.parameters?.['router-id'] || '',
     'default-metric': data['default-metric'] || '',
@@ -303,7 +337,7 @@ function configToForm(data = {}) {
     'log-adjacency-changes-detail': !!data['log-adjacency-changes']?.detail,
     'passive-interface': toArray(data['passive-interface']),
     'passive-interface-default': !!data['passive-interface']?.default,
-    'access-list': toArray(data['access-list']),
+    'access-list': accessLists,
     'summary-address': summaryAddresses,
     'capability': {
       'opaque': !!data.capability?.opaque,
@@ -414,7 +448,18 @@ function configToConfig(form) {
 
   // Access list
   if (form['access-list']?.length) {
-    result['access-list'] = form['access-list'];
+    result['access-list'] = {};
+    for (const acl of form['access-list']) {
+      if (!acl.number) continue;
+      const attrs = {};
+      if (acl.export?.length) {
+        attrs.export = {};
+        for (const proto of acl.export) {
+          attrs.export[proto] = {};
+        }
+      }
+      result['access-list'][acl.number] = attrs;
+    }
   }
 
   // Summary address
@@ -672,6 +717,7 @@ export default defineComponent({
     const writeDisabled = ref(false);
     const newPassiveInterface = ref('');
     const newAccessList = ref('');
+    const interfaces = ref([]);
 
     // Summary address modal
     const summaryAddressModalVisible = ref(false);
@@ -755,6 +801,25 @@ export default defineComponent({
       { key: 'tag', title: '标签' },
     ];
 
+    const accessListColumns = [
+      { key: 'number', title: '编号' },
+      { key: 'export', title: '导出协议', render: (row) => row.export?.join(', ') || '' },
+    ];
+
+    const EXPORT_PROTOCOL_OPTIONS = [
+      { value: 'bgp', label: 'BGP' },
+      { value: 'connected', label: 'Connected' },
+      { value: 'isis', label: 'IS-IS' },
+      { value: 'kernel', label: 'Kernel' },
+      { value: 'rip', label: 'RIP' },
+      { value: 'static', label: 'Static' },
+    ];
+
+    // Access list modal
+    const accessListModalVisible = ref(false);
+    const editingAccessListIndex = ref(-1);
+    const accessListForm = ref({ number: '', export: [] });
+
     const commandPath = computed(() => {
       if (activeTab.value === 'areas') return 'protocols ospf area';
       if (activeTab.value === 'interfaces') return 'protocols ospf interface';
@@ -803,12 +868,26 @@ export default defineComponent({
     async function load() {
       loading.value = true;
       try {
-        const data = await configApi.get(['protocols', 'ospf']);
-        config.value = configToForm(data);
+        const res = await configApi.get(['protocols', 'ospf']);
+        console.log('OSPF API response:', res);
+        console.log('OSPF data:', res.data);
+        config.value = configToForm(res.data || {});
+        console.log('OSPF form:', config.value);
       } catch (e) {
+        console.error('OSPF load error:', e);
         showError(e);
       } finally {
         loading.value = false;
+      }
+    }
+
+    async function loadInterfaces() {
+      try {
+        const res = await interfaceApi.ethernet();
+        const list = res.interfaces || [];
+        interfaces.value = list.map(i => i.name).sort();
+      } catch (e) {
+        console.error('Failed to load interface list', e);
       }
     }
 
@@ -1109,15 +1188,30 @@ export default defineComponent({
       config.value['passive-interface'].splice(idx, 1);
     }
 
-    function addAccessList() {
-      if (newAccessList.value !== '' && !config.value['access-list'].includes(newAccessList.value)) {
-        config.value['access-list'].push(newAccessList.value);
-        newAccessList.value = '';
+    function openAccessListModal(index = -1) {
+      editingAccessListIndex.value = index;
+      if (index >= 0) {
+        accessListForm.value = JSON.parse(JSON.stringify(config.value['access-list'][index]));
+      } else {
+        accessListForm.value = { number: '', export: [] };
       }
+      accessListModalVisible.value = true;
     }
 
-    function removeAccessList(idx) {
-      config.value['access-list'].splice(idx, 1);
+    function saveAccessList() {
+      if (!accessListForm.value.number) return alert('请输入访问列表编号');
+      if (editingAccessListIndex.value >= 0) {
+        config.value['access-list'].splice(editingAccessListIndex.value, 1, JSON.parse(JSON.stringify(accessListForm.value)));
+      } else {
+        config.value['access-list'].push(JSON.parse(JSON.stringify(accessListForm.value)));
+      }
+      accessListModalVisible.value = false;
+    }
+
+    function deleteAccessList(index) {
+      if (confirm('确定删除此访问列表？')) {
+        config.value['access-list'].splice(index, 1);
+      }
     }
 
     function openSummaryAddressModal(index = -1) {
@@ -1374,12 +1468,18 @@ export default defineComponent({
       }
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      loadInterfaces();
+    });
 
     return {
       loading, saving, saved, config, activeTab, writeDisabled,
+      interfaces,
       newPassiveInterface, addPassiveInterface, removePassiveInterface,
-      newAccessList, addAccessList, removeAccessList,
+      accessListModalVisible, editingAccessListIndex, accessListForm,
+      accessListColumns, EXPORT_PROTOCOL_OPTIONS,
+      openAccessListModal, saveAccessList, deleteAccessList,
       summaryAddressModalVisible, editingSummaryAddressIndex, summaryAddressForm,
       openSummaryAddressModal, saveSummaryAddress, deleteSummaryAddress,
       areaModalVisible, editingAreaIndex, areaForm,
@@ -1479,9 +1579,10 @@ export default defineComponent({
                 <div class="form-row">
                   <label class="form-label">被动接口</label>
                   <div style="display:flex; gap:10px; align-items:center;">
-                    <input type="text" class="form-control" v-model="newPassiveInterface"
-                           placeholder="接口名称，如 eth0" style="width:100%;"
-                           title="被动接口名称" />
+                    <select class="form-control" v-model="newPassiveInterface" style="width:100%;" title="选择被动接口">
+                      <option value="">请选择接口</option>
+                      <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
+                    </select>
                     <ToolbarButton size="small" @click="addPassiveInterface">添加</ToolbarButton>
                   </div>
                 </div>
@@ -1643,25 +1744,9 @@ export default defineComponent({
               <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">访问列表</div>
               <div style="padding:16px;">
                 <p style="color:#666; font-size:12px; margin-top:0;">过滤路由更新中的网络</p>
-                <div class="form-row">
-                  <label class="form-label">访问列表编号</label>
-                  <div style="display:flex; gap:10px; align-items:center;">
-                    <input type="number" class="form-control" v-model.number="newAccessList"
-                           min="0" max="4294967295" placeholder="0-4294967295" style="width:100%;"
-                           title="访问列表编号" />
-                    <ToolbarButton size="small" @click="addAccessList">添加</ToolbarButton>
-                  </div>
-                </div>
-                <div v-if="config['access-list'].length > 0" class="form-row">
-                  <label class="form-label"></label>
-                  <div style="display:flex; flex-direction:column; gap:5px;">
-                    <div v-for="(acl, idx) in config['access-list']" :key="idx"
-                         style="display:flex; gap:10px; align-items:center;">
-                      <span>{{ acl }}</span>
-                      <ToolbarButton size="small" danger @click="removeAccessList(idx)">删除</ToolbarButton>
-                    </div>
-                  </div>
-                </div>
+                <DataTable :columns="accessListColumns" :data="config['access-list']" :loading="loading" :disabled="writeDisabled"
+                           rowKey="number" :actions="['create', 'edit', 'delete']"
+                           @create="openAccessListModal(-1)" @edit="openAccessListModal" @delete="deleteAccessList" />
               </div>
             </div>
           </div>
@@ -1891,6 +1976,26 @@ export default defineComponent({
         </div>
       </DraggableModal>
 
+      <!-- Access List Modal -->
+      <DraggableModal v-model:visible="accessListModalVisible" :title="editingAccessListIndex >= 0 ? '编辑访问列表' : '添加访问列表'" width="600px" @confirm="saveAccessList">
+        <div class="form-row">
+          <label class="form-label">访问列表编号 *</label>
+          <input type="number" class="form-control" v-model="accessListForm.number"
+                 min="0" max="4294967295" placeholder="0-4294967295" style="width:100%;"
+                 title="访问列表编号" :disabled="editingAccessListIndex >= 0" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">导出协议</label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+            <label v-for="opt in EXPORT_PROTOCOL_OPTIONS" :key="opt.value"
+                   style="display:flex; align-items:center; gap:8px;">
+              <input type="checkbox" :value="opt.value" v-model="accessListForm.export" />
+              {{ opt.label }}
+            </label>
+          </div>
+        </div>
+      </DraggableModal>
+
       <!-- Area Modal -->
       <DraggableModal v-model:visible="areaModalVisible" :title="editingAreaIndex >= 0 ? '编辑 OSPF 区域' : '添加 OSPF 区域'" width="600px" @confirm="saveArea">
         <div class="form-row">
@@ -1994,8 +2099,16 @@ export default defineComponent({
       <DraggableModal v-model:visible="interfaceModalVisible" :title="editingInterfaceIndex >= 0 ? '编辑 OSPF 接口' : '添加 OSPF 接口'" width="600px" @confirm="saveInterface">
         <div class="form-row">
           <label class="form-label">接口名称 *</label>
-          <input type="text" class="form-control" v-model="interfaceForm.name"
-                 placeholder="例如: eth0" style="width:100%;" :disabled="editingInterfaceIndex >= 0" />
+          <template v-if="editingInterfaceIndex >= 0">
+            <input type="text" class="form-control" v-model="interfaceForm.name"
+                   style="width:100%;" disabled />
+          </template>
+          <template v-else>
+            <select class="form-control" v-model="interfaceForm.name" style="width:100%;">
+              <option value="">请选择接口</option>
+              <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
+            </select>
+          </template>
         </div>
         <div class="form-row">
           <label class="form-label">区域</label>

@@ -421,15 +421,6 @@
         "component": "ConfigPage"
       },
       {
-        "id": "name-server",
-        "label": "DNS服务器",
-        "label_en": "Name Server",
-        "icon": "",
-        "children": [],
-        "route": "/system/name-server",
-        "component": "TablePage"
-      },
-      {
         "id": "ntp",
         "label": "NTP客户端",
         "label_en": "NTP Client",
@@ -448,22 +439,50 @@
         "component": "ConfigPage"
       },
       {
-        "id": "netns",
-        "label": "网络命名空间",
-        "label_en": "Network Namespace",
-        "icon": "",
-        "children": [],
-        "route": "/system/netns",
-        "component": "TablePage"
-      },
-      {
-        "id": "vrf",
-        "label": "VRF",
-        "label_en": "VRF",
-        "icon": "",
-        "children": [],
-        "route": "/system/vrf",
-        "component": "TablePage"
+        "id": "network",
+        "label": "网络管理",
+        "label_en": "Network Management",
+        "icon": "GlobalOutlined",
+        "children": [
+          {
+            "id": "netns",
+            "label": "网络命名空间",
+            "label_en": "Network Namespace",
+            "icon": "",
+            "children": [],
+            "route": "/system/netns",
+            "component": "NetnsPage"
+          },
+          {
+            "id": "vrf",
+            "label": "VRF",
+            "label_en": "VRF",
+            "icon": "",
+            "children": [],
+            "route": "/system/vrf",
+            "component": "VrfPage"
+          },
+          {
+            "id": "name-server",
+            "label": "DNS服务器",
+            "label_en": "Name Server",
+            "icon": "",
+            "children": [],
+            "route": "/system/name-server",
+            "component": "TablePage"
+          },
+          {
+            "id": "conntrack",
+            "label": "连接跟踪",
+            "label_en": "Conntrack",
+            "icon": "",
+            "children": [],
+            "route": "/system/conntrack",
+            "component": "ConntrackPage"
+          }
+        ],
+        "route": null,
+        "component": null
       },
       {
         "id": "container",
@@ -509,7 +528,7 @@
         "icon": "",
         "children": [],
         "route": "/system/pki",
-        "component": "ConfigPage"
+        "component": "PkiPage"
       },
       {
         "id": "high-availability",
@@ -518,16 +537,7 @@
         "icon": "",
         "children": [],
         "route": "/system/high-availability",
-        "component": "ConfigPage"
-      },
-      {
-        "id": "conntrack",
-        "label": "连接跟踪",
-        "label_en": "Conntrack",
-        "icon": "",
-        "children": [],
-        "route": "/system/conntrack",
-        "component": "ConfigPage"
+        "component": "HighAvailabilityPage"
       },
       {
         "id": "table-size",
@@ -631,47 +641,47 @@
     "icon": "NodeIndexOutlined",
     "children": [
       {
-        "id": "route",
-        "label": "策略路由",
-        "label_en": "Policy Route",
-        "icon": "",
-        "children": [],
-        "route": "/policy/route",
-        "component": "PolicyRoutePage"
-      },
-      {
-        "id": "route6",
-        "label": "IPv6策略路由",
-        "label_en": "Policy Route6",
-        "icon": "",
-        "children": [],
-        "route": "/policy/route6",
-        "component": "PolicyRoutePage"
-      },
-      {
-        "id": "local-route",
-        "label": "本地策略路由",
-        "label_en": "Local Route",
-        "icon": "",
-        "children": [],
-        "route": "/policy/local-route",
-        "component": "LocalRoutePage"
-      },
-      {
-        "id": "local-route6",
-        "label": "本地策略路由6",
-        "label_en": "Local Route6",
-        "icon": "",
-        "children": [],
-        "route": "/policy/local-route6",
-        "component": "LocalRoutePage"
-      },
-      {
         "id": "routing-policy",
         "label": "路由策略",
         "label_en": "Routing Policy",
         "icon": "",
         "children": [
+          {
+            "id": "route",
+            "label": "策略路由",
+            "label_en": "Policy Route",
+            "icon": "",
+            "children": [],
+            "route": "/policy/route",
+            "component": "PolicyRoutePage"
+          },
+          {
+            "id": "route6",
+            "label": "IPv6策略路由",
+            "label_en": "Policy Route6",
+            "icon": "",
+            "children": [],
+            "route": "/policy/route6",
+            "component": "PolicyRoutePage"
+          },
+          {
+            "id": "local-route",
+            "label": "本地策略路由",
+            "label_en": "Local Route",
+            "icon": "",
+            "children": [],
+            "route": "/policy/local-route",
+            "component": "LocalRoutePage"
+          },
+          {
+            "id": "local-route6",
+            "label": "本地策略路由6",
+            "label_en": "Local Route6",
+            "icon": "",
+            "children": [],
+            "route": "/policy/local-route6",
+            "component": "LocalRoutePage"
+          },
           {
             "id": "access-list",
             "label": "访问列表",
@@ -697,7 +707,7 @@
             "icon": "",
             "children": [],
             "route": "/policy/as-path-list",
-            "component": "TablePage"
+            "component": "AsPathListPage"
           },
           {
             "id": "community-list",
@@ -706,7 +716,7 @@
             "icon": "",
             "children": [],
             "route": "/policy/community-list",
-            "component": "TablePage"
+            "component": "CommunityListPage"
           },
           {
             "id": "extcommunity-list",
@@ -715,7 +725,7 @@
             "icon": "",
             "children": [],
             "route": "/policy/extcommunity-list",
-            "component": "TablePage"
+            "component": "ExtcommunityListPage"
           },
           {
             "id": "large-community-list",
@@ -724,7 +734,7 @@
             "icon": "",
             "children": [],
             "route": "/policy/large-community-list",
-            "component": "TablePage"
+            "component": "LargeCommunityListPage"
           },
           {
             "id": "prefix-list",
@@ -733,7 +743,7 @@
             "icon": "",
             "children": [],
             "route": "/policy/prefix-list",
-            "component": "TablePage"
+            "component": "PrefixListPage"
           },
           {
             "id": "prefix-list6",
@@ -742,7 +752,7 @@
             "icon": "",
             "children": [],
             "route": "/policy/prefix-list6",
-            "component": "TablePage"
+            "component": "PrefixList6Page"
           },
           {
             "id": "route-map",
@@ -751,7 +761,7 @@
             "icon": "",
             "children": [],
             "route": "/policy/route-map",
-            "component": "RuleTablePage"
+            "component": "RouteMapPage"
           }
         ],
         "route": null,
@@ -764,6 +774,24 @@
         "icon": "",
         "children": [
           {
+            "id": "babel",
+            "label": "Babel",
+            "label_en": "Babel",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/babel",
+            "component": "BabelPage"
+          },
+          {
+            "id": "bfd",
+            "label": "BFD",
+            "label_en": "BFD",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/bfd",
+            "component": "BfdPage"
+          },
+          {
             "id": "bgp",
             "label": "BGP",
             "label_en": "BGP",
@@ -771,6 +799,51 @@
             "children": [],
             "route": "/policy/protocols/bgp",
             "component": "BgpPage"
+          },
+          {
+            "id": "failover",
+            "label": "故障转移",
+            "label_en": "Failover",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/failover",
+            "component": "FailoverPage"
+          },
+          {
+            "id": "igmp-proxy",
+            "label": "IGMP 代理",
+            "label_en": "IGMP Proxy",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/igmp-proxy",
+            "component": "IgmpProxyPage"
+          },
+          {
+            "id": "isis",
+            "label": "IS-IS",
+            "label_en": "IS-IS",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/isis",
+            "component": "IsisPage"
+          },
+          {
+            "id": "mpls",
+            "label": "MPLS",
+            "label_en": "MPLS",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/mpls",
+            "component": "MplsPage"
+          },
+          {
+            "id": "nhrp",
+            "label": "NHRP",
+            "label_en": "NHRP",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/nhrp",
+            "component": "NhrpPage"
           },
           {
             "id": "ospf",
@@ -791,22 +864,22 @@
             "component": "OspfV3Page"
           },
           {
-            "id": "static",
-            "label": "静态路由",
-            "label_en": "Static",
+            "id": "pim",
+            "label": "PIM",
+            "label_en": "PIM",
             "icon": "",
             "children": [],
-            "route": "/policy/protocols/static",
-            "component": "StaticRoutePage"
+            "route": "/policy/protocols/pim",
+            "component": "PimPage"
           },
           {
-            "id": "isis",
-            "label": "IS-IS",
-            "label_en": "IS-IS",
+            "id": "pim6",
+            "label": "PIM6",
+            "label_en": "PIM6",
             "icon": "",
             "children": [],
-            "route": "/policy/protocols/isis",
-            "component": "IsisPage"
+            "route": "/policy/protocols/pim6",
+            "component": "Pim6Page"
           },
           {
             "id": "rip",
@@ -827,22 +900,31 @@
             "component": "RipNgPage"
           },
           {
-            "id": "pim",
-            "label": "PIM",
-            "label_en": "PIM",
+            "id": "rpki",
+            "label": "RPKI",
+            "label_en": "RPKI",
             "icon": "",
             "children": [],
-            "route": "/policy/protocols/pim",
-            "component": "PimPage"
+            "route": "/policy/protocols/rpki",
+            "component": "RpkiPage"
           },
           {
-            "id": "pim6",
-            "label": "PIM6",
-            "label_en": "PIM6",
+            "id": "segment-routing",
+            "label": "段路由",
+            "label_en": "Segment Routing",
             "icon": "",
             "children": [],
-            "route": "/policy/protocols/pim6",
-            "component": "Pim6Page"
+            "route": "/policy/protocols/segment-routing",
+            "component": "SegmentRoutingPage"
+          },
+          {
+            "id": "static",
+            "label": "静态路由",
+            "label_en": "Static",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/static",
+            "component": "StaticRoutePage"
           }
         ],
         "route": null,
@@ -935,7 +1017,7 @@
             "icon": "",
             "children": [],
             "route": "/firewall/ipv6/forward",
-            "component": "RuleTablePage"
+            "component": "FirewallIpv6Page"
           },
           {
             "id": "input",
@@ -944,7 +1026,7 @@
             "icon": "",
             "children": [],
             "route": "/firewall/ipv6/input",
-            "component": "RuleTablePage"
+            "component": "FirewallIpv6Page"
           },
           {
             "id": "output",
@@ -953,7 +1035,7 @@
             "icon": "",
             "children": [],
             "route": "/firewall/ipv6/output",
-            "component": "RuleTablePage"
+            "component": "FirewallIpv6Page"
           },
           {
             "id": "prerouting",
@@ -962,7 +1044,7 @@
             "icon": "",
             "children": [],
             "route": "/firewall/ipv6/prerouting",
-            "component": "RuleTablePage"
+            "component": "FirewallIpv6Page"
           },
           {
             "id": "name",
@@ -971,7 +1053,7 @@
             "icon": "",
             "children": [],
             "route": "/firewall/ipv6/name",
-            "component": "RuleTablePage"
+            "component": "FirewallIpv6Page"
           }
         ],
         "route": null,
@@ -1214,7 +1296,7 @@
         "icon": "",
         "children": [],
         "route": "/nat/source",
-        "component": "RuleTablePage"
+        "component": "SourceNatPage"
       },
       {
         "id": "destination",
@@ -1223,7 +1305,7 @@
         "icon": "",
         "children": [],
         "route": "/nat/destination",
-        "component": "RuleTablePage"
+        "component": "DestinationNatPage"
       },
       {
         "id": "static",
@@ -1232,7 +1314,7 @@
         "icon": "",
         "children": [],
         "route": "/nat/static",
-        "component": "RuleTablePage"
+        "component": "StaticNatPage"
       },
       {
         "id": "cgnat",
@@ -1241,7 +1323,7 @@
         "icon": "",
         "children": [],
         "route": "/nat/cgnat",
-        "component": "RuleTablePage"
+        "component": "CgnatPage"
       },
       {
         "id": "nat64",
@@ -1256,7 +1338,7 @@
             "icon": "",
             "children": [],
             "route": "/nat64/source",
-            "component": "RuleTablePage"
+            "component": "Nat64SourcePage"
           }
         ],
         "route": null,
@@ -1275,7 +1357,7 @@
             "icon": "",
             "children": [],
             "route": "/nat66/source",
-            "component": "RuleTablePage"
+            "component": "Nat66SourcePage"
           },
           {
             "id": "destination",
@@ -1284,7 +1366,7 @@
             "icon": "",
             "children": [],
             "route": "/nat66/destination",
-            "component": "RuleTablePage"
+            "component": "Nat66DestinationPage"
           }
         ],
         "route": null,

@@ -49,7 +49,9 @@ def _path_to_list(path):
         return [str(p) for p in path]
     if not path or path == '/':
         return []
-    return re.split(r'\s+', str(path).strip())
+    # Handle both space-separated and comma-separated paths
+    # URLSearchParams converts arrays to comma-separated strings
+    return re.split(r'[\s,]+', str(path).strip())
 
 
 def _list_to_path(path_list):
