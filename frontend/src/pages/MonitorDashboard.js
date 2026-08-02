@@ -310,7 +310,7 @@ function drawMetricChartBase(canvas, hoverIndex) {
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
   const cssWidth = canvas.clientWidth || 400;
-  const cssHeight = canvas.clientHeight || 180;
+  const cssHeight = canvas.clientHeight || 260;
   canvas.width = cssWidth * dpr;
   canvas.height = cssHeight * dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -318,26 +318,37 @@ function drawMetricChartBase(canvas, hoverIndex) {
 
   const options = canvas._metricOptions || {};
   const data = canvas._metricData || [];
-  const { title = '', valueLabel = '', color = '#5B9BD5' } = options;
+  const { title = '', valueLabel = '', color = '#5B9BD5', durationLabel = '' } = options;
 
   if (!data || !data.length) {
     ctx.fillStyle = '#999';
     ctx.font = '14px sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('No data', 12, cssHeight / 2);
+    ctx.textAlign = 'center';
+    ctx.fillText('No data', cssWidth / 2, cssHeight / 2);
     return;
   }
 
-  const margin = { top: 36, right: 16, bottom: 40, left: 60 };
+  const margin = { top: 36, right: 16, bottom: 56, left: 76 };
   const chartWidth = cssWidth - margin.left - margin.right;
   const chartHeight = cssHeight - margin.top - margin.bottom;
 
-  // Value label
-  ctx.fillStyle = '#666';
-  ctx.font = '14px sans-serif';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'top';
-  ctx.fillText(valueLabel || title, 12, 10);
+  // Duration label (top right)
+  if (durationLabel) {
+    ctx.fillStyle = '#666';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'top';
+    ctx.fillText(durationLabel, cssWidth - 12, 10);
+  }
+
+  // Value label (top left)
+  if (valueLabel) {
+    ctx.fillStyle = '#666';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(valueLabel, 12, 10);
+  }
 
   const values = data.map(d => parseFloat(d.value) || 0);
   let maxVal = Math.max(...values, 1);
@@ -369,9 +380,22 @@ function drawMetricChartBase(canvas, hoverIndex) {
     ctx.lineTo(margin.left + chartWidth, y);
     ctx.stroke();
     const val = (i / yTicks) * maxVal;
-    const labelText = maxVal < 10 ? val.toFixed(1) : formatNumber(Math.round(val));
-    ctx.fillText(labelText, margin.left - 6, y);
+    ctx.fillText(formatNumber(Math.round(val)), margin.left - 6, y);
   }
+
+  // Y-axis label (vertical characters)
+  ctx.save();
+  ctx.translate(10, margin.top + chartHeight / 2);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#666';
+  ctx.font = '12px sans-serif';
+  const yLabel = '数量';
+  const charHeight = 14;
+  yLabel.split('').forEach((char, i) => {
+    const y = (i - (yLabel.length - 1) / 2) * charHeight;
+    ctx.fillText(char, 0, y);
+  });
+  ctx.restore();
 
   // X-axis labels
   const len = data.length;
@@ -425,6 +449,28 @@ function drawMetricChartBase(canvas, hoverIndex) {
       ctx.stroke();
     }
   }
+
+  // Legend at bottom
+  ctx.font = '12px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  const legendLabel = title || '数量';
+  const legendText = `${legendLabel}数量`;
+  const legendLineLen = 16;
+  const legendGap = 6;
+  const textWidth = ctx.measureText(legendText).width;
+  const totalLegendWidth = legendLineLen + legendGap + textWidth;
+  const legendX = (cssWidth - totalLegendWidth) / 2;
+  const legendY = cssHeight - 24;
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(legendX, legendY);
+  ctx.lineTo(legendX + legendLineLen, legendY);
+  ctx.stroke();
+  ctx.fillStyle = '#333';
+  ctx.fillText(legendText, legendX + legendLineLen + legendGap, legendY);
 }
 
 function drawMetricChartTooltip(canvas, idx) {
@@ -486,7 +532,7 @@ function drawMetricChart(canvas, data, options = {}) {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const cssWidth = canvas.clientWidth || 400;
-    const margin = { top: 36, right: 16, bottom: 40, left: 60 };
+      const margin = { top: 36, right: 16, bottom: 56, left: 76 };
     const chartWidth = cssWidth - margin.left - margin.right;
     const len = canvas._metricData.length;
     if (x < margin.left || x > margin.left + chartWidth || len < 2) {
@@ -592,15 +638,15 @@ const STORAGE_KEY = 'monitorDashboardLayout';
 const DEFAULT_WIDGETS = [
   { id: 'cpu', title: 'CPU 使用率', type: 'cpu', metric: 'usage', duration: '24h', interface: '', data: [], value: 0 },
   { id: 'memory', title: '内存 使用率', type: 'memory', metric: 'usage', duration: '24h', interface: '', data: [], value: 0 },
-  { id: 'conntrack', title: 'Conntrack 数量', type: 'conntrack', metric: 'count', duration: '1d', interface: '', data: [], value: 0 },
-  { id: 'conntrack-ipv6', title: 'IPv6 Conntrack 数量', type: 'conntrack-ipv6', metric: 'count', duration: '1d', interface: '', data: [], value: 0 },
+  { id: 'conntrack', title: 'Conntrack 数量', type: 'conntrack', metric: 'count', duration: '24h', interface: '', data: [], value: 0 },
+  { id: 'conntrack-ipv6', title: 'IPv6 Conntrack 数量', type: 'conntrack-ipv6', metric: 'count', duration: '24h', interface: '', data: [], value: 0 },
 ];
 
 const AVAILABLE_WIDGETS = [
   { type: 'cpu', title: 'CPU 使用率', metric: 'usage', duration: '24h', multi: false },
   { type: 'memory', title: '内存 使用率', metric: 'usage', duration: '24h', multi: false },
-  { type: 'conntrack', title: 'Conntrack 数量', metric: 'count', duration: '1d', multi: false },
-  { type: 'conntrack-ipv6', title: 'IPv6 Conntrack 数量', metric: 'count', duration: '1d', multi: false },
+  { type: 'conntrack', title: 'Conntrack 数量', metric: 'count', duration: '24h', multi: false },
+  { type: 'conntrack-ipv6', title: 'IPv6 Conntrack 数量', metric: 'count', duration: '24h', multi: false },
   { type: 'interface-traffic', title: '接口流量', metric: 'bps', duration: '1h', multi: true },
 ];
 
@@ -649,6 +695,11 @@ export default defineComponent({
               metric = 'bps';
               if (!['1h', '24h', '30d'].includes(duration)) {
                 duration = '1h';
+              }
+            } else if (w.type === 'conntrack' || w.type === 'conntrack-ipv6') {
+              if (duration === '1d') duration = '24h';
+              if (!['1h', '24h', '30d'].includes(duration)) {
+                duration = '24h';
               }
             }
             return {
@@ -734,8 +785,8 @@ export default defineComponent({
       } else if (w.type === 'conntrack' || w.type === 'conntrack-ipv6') {
         drawMetricChart(c, w.data, {
           title: w.title,
-          valueLabel: `${w.title}: ${formatNumber(w.value)}`,
           color: '#5B9BD5',
+          valueLabel: `${w.title}: ${formatNumber(w.value)}`,
         });
       } else {
         let label = `${w.title}: ${w.value}`;
@@ -918,7 +969,7 @@ export default defineComponent({
           <ToolbarButton icon="addWidget" @click="modalVisible = true">控件</ToolbarButton>
         </div>
       </div>
-      <div class="widget-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px;padding:16px;">
+      <div class="widget-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:16px;">
         <div
           v-for="(w, index) in widgets"
           :key="w.id"
@@ -948,7 +999,7 @@ export default defineComponent({
             </div>
           </div>
           <div class="widget-body" :class="{ 'traffic-body': w.type === 'interface-traffic' }" style="padding:8px;">
-            <canvas :ref="el => { if(el) canvases[w.id] = el }" :style="{ width: '100%', height: (w.type === 'cpu' || w.type === 'memory') ? '260px' : (w.type === 'interface-traffic' ? '280px' : '180px'), background: '#fff' }"></canvas>
+            <canvas :ref="el => { if(el) canvases[w.id] = el }" :style="{ width: '100%', height: (w.type === 'cpu' || w.type === 'memory') ? '260px' : '280px', background: '#fff' }"></canvas>
             <div v-if="w.type === 'interface-traffic'" class="traffic-duration-bar" style="display:flex;justify-content:center;gap:16px;margin-top:8px;padding-top:4px;border-top:1px solid #eee;">
               <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;">
                 <input type="radio" v-model="w.duration" value="1h" @change="configureWidget(w)"> 过去60分钟

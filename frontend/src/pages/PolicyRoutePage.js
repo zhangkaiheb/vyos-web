@@ -284,16 +284,14 @@ function configRuleSetsToForm(raw) {
   const result = [];
   if (!raw || typeof raw !== 'object') return result;
   for (const [name, attrs] of Object.entries(raw)) {
-    const interfaces = [];
-    if (attrs.interface) {
-      if (Array.isArray(attrs.interface)) interfaces.push(...attrs.interface);
-      else interfaces.push(attrs.interface);
-    }
+    const iface = attrs.interface
+      ? (Array.isArray(attrs.interface) ? attrs.interface.join(', ') : String(attrs.interface))
+      : '';
     result.push({
       name,
       description: attrs.description || '',
       'default-log': !!attrs['default-log'],
-      interface: interfaces,
+      interface: iface,
       rules: configRulesToForm(attrs.rule),
     });
   }
@@ -306,7 +304,7 @@ function formRuleSetsToConfig(list) {
     const entry = {};
     if (item.description) entry.description = item.description;
     if (item['default-log']) entry['default-log'] = '';
-    if (item.interface?.length) entry.interface = item.interface;
+    if (item.interface) entry.interface = item.interface;
     const rules = {};
     for (const r of item.rules || []) {
       const cfg = formRuleToConfig(r);
@@ -381,11 +379,12 @@ export default defineComponent({
       { key: 'name', title: '规则集名称', type: 'text', required: true },
       { key: 'description', title: '描述', type: 'text' },
       { key: 'default-log', title: '默认动作日志', type: 'checkbox', valueless: true },
-      { key: 'interface', title: '接口', type: 'multi-select', options: [] },
+      { key: 'interface', title: '接口', type: 'select', options: [] },
     ];
 
     const ruleSetSchemaWithInterfaces = computed(() => {
-      return ruleSetSchema.map(f => f.key === 'interface' ? { ...f, options: interfaces.value } : f);
+      const opts = interfaces.value.map(n => ({ value: n, label: n }));
+      return ruleSetSchema.map(f => f.key === 'interface' ? { ...f, options: opts } : f);
     });
 
     const ruleTabs = [
@@ -531,7 +530,7 @@ export default defineComponent({
         ...r,
         'rule_count': r.rules?.length || 0,
         'default-log': r['default-log'] ? '是' : '',
-        interface: Array.isArray(r.interface) ? r.interface.join(', ') : (r.interface || ''),
+        interface: r.interface || '',
       }));
     });
 
@@ -563,7 +562,7 @@ export default defineComponent({
     watch(() => route.path, () => { load(); loadInterfaces(); });
 
     function createRuleSet() {
-      editingRuleSet.value = { name: '', description: '', 'default-log': false, interface: [], rules: [] };
+      editingRuleSet.value = { name: '', description: '', 'default-log': false, interface: '', rules: [] };
       editingRuleSetOriginalName.value = '';
       modalVisible.value = true;
     }

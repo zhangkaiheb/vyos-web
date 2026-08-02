@@ -106,7 +106,34 @@ class SystemService:
         unsafe = [';', '&&', '||', '`', '$(']
         if any(u in command for u in unsafe):
             return {'success': False, 'message': '命令包含不安全的字符或操作符'}
-        return _run_command(command.split(), timeout=30)
+        
+        cmd_parts = command.split()
+        # Security: only allow alphanumerics, hyphens, slashes, dots, colons, and question marks
+        for part in cmd_parts:
+            if not re.match(r'^[\w\.\-/:?]+$', part):
+                return {'success': False, 'message': '命令包含非法字符'}
+        
+        # Handle help command (?)
+        if command.strip() == '?':
+            return {
+                'success': True,
+                'output': '可用命令:\n  show <command>     - 显示系统信息\n  clear <command>    - 清除统计信息\n  restart <service>  - 重启服务\n  configure          - 进入配置模式\n  exit               - 退出\n  help               - 显示帮助\n  ?                  - 显示帮助',
+                'returncode': 0
+            }
+        
+        # Use vyatta-op-cmd-wrapper for VyOS commands
+        vyos_commands = ['show', 'clear', 'restart', 'update', 'execute', 'reset', 'add', 'delete', 'set', 'get', 'run', 'configure', 'exit', 'help']
+        if cmd_parts[0] in vyos_commands:
+            result = _run_command(['/opt/vyatta/bin/vyatta-op-cmd-wrapper'] + cmd_parts, timeout=30)
+            # For help commands (?), always return success since the wrapper doesn't support ? syntax
+            if '?' in command:
+                result['success'] = True
+                if not result.get('output'):
+                    result['output'] = '帮助信息不可用，请使用 --help 参数'
+            return result
+        
+        # For other commands, execute directly
+        return _run_command(cmd_parts, timeout=30)
 
     def reset_config(self):
         """Reset configuration to factory defaults."""

@@ -1,5 +1,5 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
-import { opModeApi } from '/src/api/index.js';
+import { defineComponent, ref, computed, onMounted, nextTick } from '/src/utils/vue-import.js';
+import { opModeApi, systemApi } from '/src/api/index.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 
@@ -258,12 +258,13 @@ const WIDGET_CATEGORIES = [
   { key: 'network', title: '网络' },
   { key: 'users', title: '用户' },
   { key: 'hardware', title: '硬件' },
+  { key: 'tools', title: '工具' },
 ];
 
 const WIDGET_ORDER = [
   'cpu', 'memory', 'disk', 'login', 'version', 'date',
   'table', 'users', 'storageScsi', 'storageNvme', 'storageSmart',
-  'usb', 'image', 'systemLoginUsers',
+  'usb', 'image', 'systemLoginUsers', 'webshell',
 ];
 
 const WIDGET_META = {
@@ -281,6 +282,7 @@ const WIDGET_META = {
   usb: { title: 'USB 设备', category: 'hardware', wide: false },
   image: { title: '系统镜像', category: 'system', wide: true },
   systemLoginUsers: { title: '系统登录用户', category: 'users', wide: true },
+  webshell: { title: 'Web Shell', category: 'tools', wide: true },
 };
 
 const WidgetHeader = defineComponent({
@@ -306,6 +308,7 @@ const WidgetHeader = defineComponent({
 
 function createDefaultData(key, wide) {
   if (key === 'usb' || key === 'date') return '';
+  if (key === 'webshell') return [];
   return wide ? [] : {};
 }
 
@@ -354,6 +357,52 @@ export default defineComponent({
     const modalVisible = ref(false);
     const searchKeyword = ref('');
     let dragIndex = null;
+
+    // Webshell state
+    const webshellOutput = ref([]);
+    const webshellLoading = ref(false);
+    const webshellOutputEl = ref(null);
+    const webshellPrompt = 'vyos@vyos:~$ ';
+    const webshellInput = ref('');
+    const webshellInputEl = ref(null);
+
+    async function webshellExecute() {
+      const cmd = webshellInput.value.trim();
+      if (!cmd) return;
+      // Add command line to output
+      webshellOutput.value.push({ type: 'cmd', text: webshellPrompt + cmd });
+      webshellLoading.value = true;
+      try {
+        const token = localStorage.getItem('vyos_token') || '';
+        const res = await fetch('/api/system/shell', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ command: cmd }),
+        });
+        const json = await res.json().catch(() => ({}));
+        const output = json.output || json.message || '';
+        if (output) {
+          const lines = output.split(/\r?\n/);
+          for (const line of lines) {
+            webshellOutput.value.push({ type: 'out', text: line });
+          }
+        }
+      } catch (e) {
+        webshellOutput.value.push({ type: 'err', text: e.message });
+      } finally {
+        webshellLoading.value = false;
+        webshellInput.value = '';
+        await nextTick();
+        if (webshellOutputEl.value) webshellOutputEl.value.scrollTop = webshellOutputEl.value.scrollHeight;
+        if (webshellInputEl.value) webshellInputEl.value.focus();
+      }
+    }
+
+    function webshellClear() {
+      webshellOutput.value = [];
+      webshellInput.value = '';
+      if (webshellInputEl.value) webshellInputEl.value.focus();
+    }
 
     function saveLayout() {
       try {
@@ -508,6 +557,14 @@ export default defineComponent({
       onDragStart,
       onDragOver,
       onDrop,
+      webshellOutput,
+      webshellLoading,
+      webshellOutputEl,
+      webshellPrompt,
+      webshellExecute,
+      webshellClear,
+      webshellInput,
+      webshellInputEl,
     };
   },
   components: { ToolbarButton, DraggableModal, WidgetHeader },
@@ -543,41 +600,51 @@ export default defineComponent({
 
             <template v-if="key === 'cpu'">
               <table class="widget-kv">
+                <tbody>
                 <tr><td class="widget-kv-key">型号</td><td class="widget-kv-value">{{ widgets.cpu.data.model || '-' }}</td></tr>
                 <tr><td class="widget-kv-key">插槽数</td><td class="widget-kv-value">{{ widgets.cpu.data.sockets || '-' }}</td></tr>
                 <tr><td class="widget-kv-key">核心总数</td><td class="widget-kv-value">{{ widgets.cpu.data.cores || '-' }}</td></tr>
                 <tr><td class="widget-kv-key">当前主频</td><td class="widget-kv-value">{{ widgets.cpu.data.current_mhz ? widgets.cpu.data.current_mhz + ' MHz' : '-' }}</td></tr>
+                </tbody>
               </table>
             </template>
 
             <template v-else-if="key === 'memory'">
               <table class="widget-kv">
+                <tbody>
                 <tr><td class="widget-kv-key">总量</td><td class="widget-kv-value">{{ widgets.memory.data.total || '-' }}</td></tr>
                 <tr><td class="widget-kv-key">已用</td><td class="widget-kv-value">{{ widgets.memory.data.used || '-' }}</td></tr>
                 <tr><td class="widget-kv-key">空闲</td><td class="widget-kv-value">{{ widgets.memory.data.free || '-' }}</td></tr>
+                </tbody>
               </table>
             </template>
 
             <template v-else-if="key === 'disk'">
               <table class="widget-kv">
+                <tbody>
                 <tr><td class="widget-kv-key">总容量</td><td class="widget-kv-value">{{ widgets.disk.data.size || '-' }}</td></tr>
                 <tr><td class="widget-kv-key">型号</td><td class="widget-kv-value">{{ widgets.disk.data.model || '-' }}</td></tr>
                 <tr><td class="widget-kv-key">分区数</td><td class="widget-kv-value">{{ (widgets.disk.data.partitions || []).length }}</td></tr>
+                </tbody>
               </table>
             </template>
 
             <template v-else-if="key === 'login'">
               <table class="widget-kv">
+                <tbody>
                 <tr v-for="(value, k) in widgets.login.data" :key="k"><td class="widget-kv-key">{{ k }}</td><td class="widget-kv-value">{{ value }}</td></tr>
+                </tbody>
               </table>
             </template>
 
             <template v-else-if="key === 'version'">
               <table class="widget-kv">
+                <tbody>
                 <tr><td class="widget-kv-key">Version</td><td class="widget-kv-value">{{ widgets.version.data.version || '-' }}</td></tr>
                 <tr><td class="widget-kv-key">Release train</td><td class="widget-kv-value">{{ widgets.version.data.release_train || '-' }}</td></tr>
                 <tr><td class="widget-kv-key">Architecture</td><td class="widget-kv-value">{{ widgets.version.data.architecture || '-' }}</td></tr>
                 <tr><td class="widget-kv-key">System type</td><td class="widget-kv-value">{{ widgets.version.data.system_type || '-' }}</td></tr>
+                </tbody>
               </table>
             </template>
 
@@ -616,10 +683,12 @@ export default defineComponent({
 
             <template v-else-if="key === 'storageSmart'">
               <table class="widget-kv">
+                <tbody>
                 <tr><td class="widget-kv-key">Vendor</td><td class="widget-kv-value">{{ widgets.storageSmart.data.vendor || '-' }}</td></tr>
                 <tr><td class="widget-kv-key">Product</td><td class="widget-kv-value">{{ widgets.storageSmart.data.product || '-' }}</td></tr>
                 <tr><td class="widget-kv-key">User Capacity</td><td class="widget-kv-value">{{ widgets.storageSmart.data.user_capacity || '-' }}</td></tr>
                 <tr><td class="widget-kv-key">Current Temperature</td><td class="widget-kv-value">{{ widgets.storageSmart.data.current_drive_temperature || '-' }}</td></tr>
+                </tbody>
               </table>
             </template>
 
@@ -639,6 +708,19 @@ export default defineComponent({
                 <thead><tr><th>用户名</th><th>类型</th><th>锁定</th><th>Tty</th><th>来源</th><th>最后登录</th></tr></thead>
                 <tbody><tr v-for="(row, idx) in widgets.systemLoginUsers.data" :key="idx"><td>{{ row.username }}</td><td>{{ row.type }}</td><td>{{ row.locked }}</td><td>{{ row.tty }}</td><td>{{ row.from }}</td><td>{{ row.last_login }}</td></tr></tbody>
               </table>
+            </template>
+
+            <template v-else-if="key === 'webshell'">
+              <div style="display:flex;flex-direction:column;height:360px;">
+                <div ref="webshellOutputEl" style="flex:1;background:#1e1e1e;color:#d4d4d4;font-family:'Cascadia Code','Fira Code','Consolas',monospace;font-size:13px;padding:8px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;border-radius:4px 4px 0 0;">
+                  <div v-for="(line, i) in webshellOutput" :key="i" :style="{ color: line.type === 'err' ? '#f14c4c' : line.type === 'cmd' ? '#dcdcaa' : '#d4d4d4' }">{{ line.text }}</div>
+                </div>
+                <div style="display:flex;align-items:center;background:#1e1e1e;padding:4px 8px;border-radius:0 0 4px 4px;cursor:text;" @click="$event.currentTarget.querySelector('input').focus()">
+                  <span style="color:#6a9955;font-family:monospace;font-size:13px;white-space:nowrap;">{{ webshellPrompt }}</span>
+                  <input v-model="webshellInput" @keyup.enter="webshellExecute" @wheel="webshellOutputEl && (webshellOutputEl.scrollTop += $event.deltaY)" style="flex:1;background:transparent;border:none;outline:none;color:#d4d4d4;font-family:monospace;font-size:13px;" :disabled="webshellLoading" />
+                  <span style="display:inline-block;width:7px;height:15px;background:#d4d4d4;vertical-align:text-bottom;animation:blink 1s step-end infinite;"></span>
+                </div>
+              </div>
             </template>
           </div>
         </div>
