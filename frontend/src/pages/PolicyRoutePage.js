@@ -1,7 +1,7 @@
 import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
-import { interfaceApi } from '/src/api/index.js';
+import { interfaceApi, configApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
@@ -25,18 +25,6 @@ const FRAGMENT_OPTIONS = [
 const IPSEC_OPTIONS = [
   { value: 'match-ipsec', label: '匹配 IPsec (match-ipsec)' },
   { value: 'match-none', label: '匹配非 IPsec (match-none)' },
-];
-
-const PROTOCOL_OPTIONS = [
-  { value: 'all', label: 'all (默认)' },
-  { value: 'tcp_udp', label: 'tcp_udp' },
-  { value: 'tcp', label: 'tcp' },
-  { value: 'udp', label: 'udp' },
-  { value: 'icmp', label: 'icmp' },
-  { value: 'gre', label: 'gre' },
-  { value: 'esp', label: 'esp' },
-  { value: 'ah', label: 'ah' },
-  { value: 'sctp', label: 'sctp' },
 ];
 
 const PACKET_TYPE_OPTIONS = ['broadcast', 'host', 'multicast', 'other'];
@@ -398,7 +386,7 @@ export default defineComponent({
       { key: 'rule', title: '规则编号', type: 'number', min: 1, max: 999999, required: true, help: '范围 1-999999' },
       { key: 'action', title: '动作', type: 'select', options: ACTION_OPTIONS, required: true },
       { key: 'description', title: '描述', type: 'text' },
-      { key: 'protocol', title: '协议', type: 'select', options: PROTOCOL_OPTIONS, default: 'all', help: '默认 all' },
+      { key: 'protocol', title: '协议', type: 'select', dynamic: true, default: 'all', help: '默认 all，从系统实时获取协议列表' },
       { key: 'disable', title: '禁用', type: 'checkbox', valueless: true },
     ];
 
@@ -524,6 +512,10 @@ export default defineComponent({
     }
 
     const tabSchemas = computed(() => buildTabSchemas());
+
+    const ruleSuggestionPath = computed(() => {
+      return `policy route ${editingRuleSet.value?.name || ''}`;
+    });
 
     const tableData = computed(() => {
       return ruleSets.value.map(r => ({
@@ -678,7 +670,7 @@ export default defineComponent({
     return {
       ruleSets, tableData, loading, selected, modalVisible, editingRuleSet,
       ruleModalVisible, editingRule, ruleSetActiveTab, ruleActiveTab, dataTableRef, ruleSetColumns, ruleColumns,
-      ruleSetSchemaWithInterfaces, tabSchemas, ruleTabs, ruleSelected, writeDisabled, commandText,
+      ruleSetSchemaWithInterfaces, tabSchemas, ruleTabs, ruleSelected, writeDisabled, commandText, ruleSuggestionPath,
       load, createRuleSet, editRuleSet, removeRuleSet, saveRuleSet,
       createRule, editRule, removeRule, saveRule,
       formatEndpoint,
@@ -726,7 +718,7 @@ export default defineComponent({
       <DraggableModal v-model:visible="ruleModalVisible" :title="editingRule?.rule ? '编辑规则' : '创建规则'" width="820px" @confirm="saveRule" modal-class="on-top">
         <TabGroup v-model="ruleActiveTab" :tabs="ruleTabs">
           <template #basic>
-            <ConfigForm v-model="editingRule" :schema="tabSchemas.basic" :disabled="writeDisabled" :showAdvanced="true" />
+            <ConfigForm v-model="editingRule" :schema="tabSchemas.basic" :disabled="writeDisabled" :showAdvanced="true" :suggestionPath="ruleSuggestionPath" />
           </template>
           <template #source>
             <ConfigForm v-model="editingRule" :schema="tabSchemas.source" :disabled="writeDisabled" :showAdvanced="true" />

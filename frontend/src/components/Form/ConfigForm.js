@@ -241,11 +241,17 @@ export default defineComponent({
       const children = [];
 
       if (field.type === 'select') {
+        // For dynamic select fields, get options from suggestionsCache
+        const key = errorKey(path, field.key);
+        const dynamicOpts = field.dynamic ? (suggestionsCache.value[key] || []) : [];
+        const options = dynamicOpts.length > 0 
+          ? dynamicOpts.map(o => ({ value: o, label: o }))
+          : (field.options || []);
         children.push(h('select', {
           value: formObj[field.key] || '',
           disabled,
           onChange: (e) => { formObj[field.key] = e.target.value; },
-        }, (field.options || []).map(opt => {
+        }, options.map(opt => {
           const optValue = typeof opt === 'object' ? opt.value : opt;
           const optLabel = typeof opt === 'object' ? (opt.label || opt.value) : opt;
           return h('option', { key: optValue, value: optValue }, optLabel);

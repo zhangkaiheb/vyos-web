@@ -1086,19 +1086,43 @@ class ConfigService:
         return sorted(set(chains))
 
     def _list_protocols(self):
-        protocols = ['all', 'tcp_udp', 'icmp', 'tcp', 'udp']
+        """Get protocol completions from VyOS CLI for policy route rules."""
+        protocols = []
         try:
-            with open('/etc/protocols', 'r', encoding='utf-8') as f:
-                for line in f:
+            # Use VyOS configd to get protocol completions
+            # This mimics the CLI tab-completion behavior
+            cmd = ['/opt/vyatta/bin/vyatta-cfg-cmd-wrapper', 'list',
+                   'policy route pr01 rule 1 protocol']
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            if result.returncode == 0 and result.stdout.strip():
+                for line in result.stdout.strip().splitlines():
                     line = line.strip()
-                    if not line or line.startswith('#'):
-                        continue
-                    parts = line.split()
-                    if parts and parts[0] not in protocols:
-                        protocols.append(parts[0])
+                    if line and not line.startswith('Possible'):
+                        # Extract protocol name (first word)
+                        parts = line.split()
+                        if parts:
+                            proto = parts[0]
+                            # Skip numeric protocols and special entries
+                            if proto not in protocols and not proto.startswith('!'):
+                                protocols.append(proto)
         except Exception:
             pass
-        return protocols
+
+        # Fallback to common protocols if CLI fails
+        if not protocols:
+            protocols = ['all', 'tcp_udp', 'tcp', 'udp', 'icmp', 'gre', 'esp', 'ah', 'sctp']
+            try:
+                with open('/etc/protocols', 'r', encoding='utf-8') as f:
+                    for line in f:
+                        line = line.strip()
+                        if not line or line.startswith('#'):
+                            continue
+                        parts = line.split()
+                        if parts and parts[0] not in protocols:
+                            protocols.append(parts[0])
+            except Exception:
+                pass
+        return sorted(protocols)
 
     # ---------- help documentation ----------
 

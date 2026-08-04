@@ -96,6 +96,9 @@ import Nat64SourcePage from '/src/pages/Nat64SourcePage.js';
 import Nat66DestinationPage from '/src/pages/Nat66DestinationPage.js';
 import Nat66SourcePage from '/src/pages/Nat66SourcePage.js';
 import FirewallIpv6Page from '/src/pages/FirewallIpv6Page.js';
+import QosInterfacePage from '/src/pages/QosInterfacePage.js';
+import QosPolicyPage from '/src/pages/QosPolicyPage.js';
+import QosTrafficMatchGroupPage from '/src/pages/QosTrafficMatchGroupPage.js';
 
 const componentMap = {
   TablePage: GenericTablePage,
@@ -195,6 +198,9 @@ const componentMap = {
   Nat66DestinationPage,
   Nat66SourcePage,
   FirewallIpv6Page,
+  QosInterfacePage,
+  QosPolicyPage,
+  QosTrafficMatchGroupPage,
 };
 
 function buildRoutes(menu, parentPath = '') {

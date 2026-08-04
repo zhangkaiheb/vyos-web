@@ -1227,7 +1227,7 @@
             "icon": "",
             "children": [],
             "route": "/qos/interface",
-            "component": "TablePage"
+            "component": "QosInterfacePage"
           },
           {
             "id": "policy",
@@ -1236,7 +1236,7 @@
             "icon": "",
             "children": [],
             "route": "/qos/policy",
-            "component": "TablePage"
+            "component": "QosPolicyPage"
           },
           {
             "id": "traffic-match-group",
@@ -1245,7 +1245,7 @@
             "icon": "",
             "children": [],
             "route": "/qos/traffic-match-group",
-            "component": "TablePage"
+            "component": "QosTrafficMatchGroupPage"
           }
         ],
         "route": null,
