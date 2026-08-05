@@ -70,7 +70,7 @@ def main():
                 menu_item('openvpn', 'OpenVPN', 'OpenVPN', route='/system/interfaces/openvpn', component='TablePage'),
                 menu_item('vxlan', 'VXLAN', 'VXLAN', route='/system/interfaces/vxlan', component='TablePage'),
                 menu_item('pppoe', 'PPPoE', 'PPPoE', route='/system/interfaces/pppoe', component='TablePage'),
-                menu_item('tunnel', '隧道', 'Tunnel', route='/system/interfaces/tunnel', component='TablePage'),
+                menu_item('tunnel', '隧道', 'Tunnel', route='/system/interfaces/tunnel', component='TunnelPage'),
                 menu_item('dummy', 'Dummy', 'Dummy', route='/system/interfaces/dummy', component='TablePage'),
                 menu_item('loopback', 'Loopback', 'Loopback', route='/system/interfaces/loopback', component='TablePage'),
                 menu_item('input', 'Input', 'Input', route='/system/interfaces/input', component='ConfigPage'),

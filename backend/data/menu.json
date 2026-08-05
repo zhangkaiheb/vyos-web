@@ -315,7 +315,7 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/bonding",
-            "component": "TablePage"
+            "component": "BondingPage"
           },
           {
             "id": "bridge",
@@ -324,7 +324,7 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/bridge",
-            "component": "TablePage"
+            "component": "BridgePage"
           },
           {
             "id": "wireguard",
@@ -333,7 +333,7 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/wireguard",
-            "component": "TablePage"
+            "component": "WireGuardPage"
           },
           {
             "id": "openvpn",
@@ -342,7 +342,7 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/openvpn",
-            "component": "TablePage"
+            "component": "OpenVpnPage"
           },
           {
             "id": "vxlan",
@@ -351,7 +351,63 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/vxlan",
-            "component": "TablePage"
+            "component": "VxlanPage"
+          },
+          {
+            "id": "geneve",
+            "label": "Geneve",
+            "label_en": "Geneve",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/geneve",
+            "component": "GenevePage",
+            "hidden": true
+          },
+          {
+            "id": "l2tpv3",
+            "label": "L2TPv3",
+            "label_en": "L2TPv3",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/l2tpv3",
+            "component": "L2tpv3Page"
+          },
+          {
+            "id": "virtual-ethernet",
+            "label": "虚拟以太网",
+            "label_en": "Virtual Ethernet",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/virtual-ethernet",
+            "component": "VirtualEthernetPage"
+          },
+          {
+            "id": "vti",
+            "label": "VTI",
+            "label_en": "VTI",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/vti",
+            "component": "VtiPage"
+          },
+          {
+            "id": "macsec",
+            "label": "MACSec",
+            "label_en": "MACSec",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/macsec",
+            "component": "MacSecPage"
+          },
+          {
+            "id": "pseudo-ethernet",
+            "label": "Pseudo Ethernet",
+            "label_en": "Pseudo Ethernet",
+            "icon": "",
+            "children": [],
+            "route": "/system/interfaces/pseudo-ethernet",
+            "component": "PseudoEthernetPage",
+            "hidden": true
           },
           {
             "id": "pppoe",
@@ -360,7 +416,7 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/pppoe",
-            "component": "TablePage"
+            "component": "PPPoEPage"
           },
           {
             "id": "tunnel",
@@ -369,7 +425,7 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/tunnel",
-            "component": "TablePage"
+            "component": "TunnelPage"
           },
           {
             "id": "dummy",
@@ -378,7 +434,8 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/dummy",
-            "component": "TablePage"
+            "component": "TablePage",
+            "hidden": true
           },
           {
             "id": "loopback",
@@ -387,7 +444,7 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/loopback",
-            "component": "TablePage"
+            "component": "LoopbackPage"
           },
           {
             "id": "input",
@@ -396,7 +453,8 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/input",
-            "component": "ConfigPage"
+            "component": "InputPage",
+            "hidden": true
           }
         ],
         "route": null,
@@ -971,7 +1029,8 @@
             "icon": "",
             "children": [],
             "route": "/firewall/ipv4/input",
-            "component": "RuleTablePage"
+            "component": "RuleTablePage",
+            "hidden": true
           },
           {
             "id": "output",
@@ -1553,7 +1612,8 @@
         "icon": "",
         "children": [],
         "route": "/vpn/openvpn",
-        "component": "ConfigPage"
+        "component": "ConfigPage",
+        "hidden": true
       },
       {
         "id": "l2tp",
@@ -1589,7 +1649,8 @@
         "icon": "",
         "children": [],
         "route": "/vpn/wireguard",
-        "component": "ConfigPage"
+        "component": "ConfigPage",
+        "hidden": true
       },
       {
         "id": "vti",
@@ -1598,7 +1659,8 @@
         "icon": "",
         "children": [],
         "route": "/vpn/vti",
-        "component": "ConfigPage"
+        "component": "ConfigPage",
+        "hidden": true
       }
     ],
     "route": null,

@@ -13,7 +13,7 @@ function renderSubmenu(items, state, keepParentOpen, clearParent, setOpen, clear
     style,
     onMouseenter: keepParentOpen,
     onMouseleave: clearParent,
-  }, items.map(item => {
+  }, items.filter(item => !item.hidden).map(item => {
     const hasChildren = item.children?.length;
     const isActive = item.route && (route.path === item.route || route.path.startsWith(item.route + '/'));
     const isOpen = state.openId === item.id && hasChildren;

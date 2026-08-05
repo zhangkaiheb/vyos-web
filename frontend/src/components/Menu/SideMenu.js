@@ -27,7 +27,7 @@ export default defineComponent({
 
     const items = computed(() => {
       if (!l1Item.value) return [];
-      return (l1Item.value.children || []).map(item => ({ ...item, level: 2 }));
+      return (l1Item.value.children || []).filter(item => !item.hidden).map(item => ({ ...item, level: 2 }));
     });
 
     return { items, isActive, router, onLeafClick };

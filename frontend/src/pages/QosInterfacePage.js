@@ -1,6 +1,6 @@
 import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue-import.js';
 import { useConfigStore } from '/src/stores/config.js';
-import { interfaceApi, configApi } from '/src/api/index.js';
+import { configApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
@@ -29,55 +29,55 @@ export default defineComponent({
 
     const columns = [
       { key: 'interface', title: '接口', dataIndex: 'interface', width: 150 },
-      { key: 'direction', title: '方向', dataIndex: 'direction', width: 100 },
-      { key: 'policy', title: '策略', dataIndex: 'policy', width: 200 },
+      { key: 'egress', title: '出站策略 (egress)', dataIndex: 'egress', width: 200 },
+      { key: 'ingress', title: '入站策略 (ingress)', dataIndex: 'ingress', width: 200 },
       { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const tableData = computed(() => {
-      const result = [];
-      for (const iface of interfaces.value) {
-        if (iface.egress) {
-          result.push({
-            key: `${iface.name}-egress`,
-            interface: iface.name,
-            direction: 'egress',
-            policy: iface.egress,
-          });
-        }
-        if (iface.ingress) {
-          result.push({
-            key: `${iface.name}-ingress`,
-            interface: iface.name,
-            direction: 'ingress',
-            policy: iface.ingress,
-          });
-        }
-      }
-      return result;
+      return interfaces.value.map(iface => ({
+        key: iface.name,
+        interface: iface.name,
+        egress: iface.egress || '',
+        ingress: iface.ingress || '',
+        ...iface,
+      }));
     });
 
     const schema = computed(() => [
       { key: 'interface', title: '接口', type: 'select', options: interfaces.value.map(i => ({ value: i.name, label: i.name })), required: true },
-      { key: 'direction', title: '方向', type: 'select', options: DIRECTION_OPTIONS, required: true },
-      { key: 'policy', title: '策略', type: 'select', options: policies.value.map(p => ({ value: p, label: p })), required: true, dynamic: true },
+      { key: 'egress', title: '出站策略 (egress)', type: 'select', options: policies.value.map(p => ({ value: p, label: p })), dynamic: true },
+      { key: 'ingress', title: '入站策略 (ingress)', type: 'select', options: policies.value.map(p => ({ value: p, label: p })), dynamic: true },
     ]);
 
     const commandText = computed(() => {
       if (!editingItem.value) return '';
-      const { interface: iface, direction, policy } = editingItem.value;
-      return `set qos interface ${iface} ${direction} ${policy}`;
+      const { interface: iface, egress, ingress } = editingItem.value;
+      const cmds = [];
+      if (egress) cmds.push(`set qos interface ${iface} egress ${egress}`);
+      if (ingress) cmds.push(`set qos interface ${iface} ingress ${ingress}`);
+      return cmds.join('\n');
     });
 
     async function load() {
       loading.value = true;
       try {
-        const [ifaceRes, policyRes] = await Promise.all([
-          interfaceApi.ethernet(),
+        const [qosRes, policyRes] = await Promise.all([
+          configApi.get('qos interface'),
           configApi.get('qos policy'),
         ]);
 
-        interfaces.value = ifaceRes.interfaces || [];
+        // Build interface list from qos interface config
+        const qosData = qosRes.data || {};
+        const ifaceList = [];
+        for (const [name, config] of Object.entries(qosData)) {
+          ifaceList.push({
+            name,
+            egress: config.egress || '',
+            ingress: config.ingress || '',
+          });
+        }
+        interfaces.value = ifaceList;
 
         // Extract all policy names from different policy types
         const policyData = policyRes.data || {};
@@ -96,20 +96,29 @@ export default defineComponent({
     }
 
     function create() {
-      editingItem.value = { interface: '', direction: 'egress', policy: '' };
+      editingItem.value = { interface: '', egress: '', ingress: '' };
       modalVisible.value = true;
     }
 
     function edit(record) {
-      editingItem.value = { ...record };
+      editingItem.value = {
+        interface: record.interface,
+        egress: record.egress || '',
+        ingress: record.ingress || '',
+      };
       modalVisible.value = true;
     }
 
     async function save() {
       if (!editingItem.value) return;
-      const { interface: iface, direction, policy } = editingItem.value;
+      const { interface: iface, egress, ingress } = editingItem.value;
       try {
-        await configApi.set(`qos interface ${iface} ${direction}`, policy);
+        if (egress) {
+          await configApi.set(`qos interface ${iface} egress`, egress);
+        }
+        if (ingress) {
+          await configApi.set(`qos interface ${iface} ingress`, ingress);
+        }
         await configStore.commit();
         modalVisible.value = false;
         await load();
@@ -119,9 +128,14 @@ export default defineComponent({
     }
 
     async function remove(record) {
-      if (!confirm(`确定删除 ${record.interface} 的 ${record.direction} 策略？`)) return;
+      if (!confirm(`确定删除接口 ${record.interface} 的 QoS 配置？`)) return;
       try {
-        await configApi.delete(`qos interface ${record.interface} ${record.direction}`);
+        if (record.egress) {
+          await configApi.delete(`qos interface ${record.interface} egress`);
+        }
+        if (record.ingress) {
+          await configApi.delete(`qos interface ${record.interface} ingress`);
+        }
         await configStore.commit();
         await load();
       } catch (e) {
@@ -163,7 +177,7 @@ export default defineComponent({
       </DataTable>
       <DraggableModal
         v-model:visible="modalVisible"
-        :title="editingItem && tableData.find(d => d.key === editingItem.key) ? '编辑接口QoS' : '新建接口QoS'"
+        :title="editingItem && tableData.find(d => d.interface === editingItem.interface) ? '编辑接口QoS' : '新建接口QoS'"
         @confirm="save"
         @close="modalVisible = false"
       >

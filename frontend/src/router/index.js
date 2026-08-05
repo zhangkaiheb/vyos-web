@@ -99,6 +99,21 @@ import FirewallIpv6Page from '/src/pages/FirewallIpv6Page.js';
 import QosInterfacePage from '/src/pages/QosInterfacePage.js';
 import QosPolicyPage from '/src/pages/QosPolicyPage.js';
 import QosTrafficMatchGroupPage from '/src/pages/QosTrafficMatchGroupPage.js';
+import TunnelPage from '/src/pages/TunnelPage.js';
+import OpenVpnPage from '/src/pages/OpenVpnPage.js';
+import BondingPage from '/src/pages/BondingPage.js';
+import BridgePage from '/src/pages/BridgePage.js';
+import PPPoEPage from '/src/pages/PPPoEPage.js';
+import WireGuardPage from '/src/pages/WireGuardPage.js';
+import VxlanPage from '/src/pages/VxlanPage.js';
+import LoopbackPage from '/src/pages/LoopbackPage.js';
+import GenevePage from '/src/pages/GenevePage.js';
+import L2tpv3Page from '/src/pages/L2tpv3Page.js';
+import VirtualEthernetPage from '/src/pages/VirtualEthernetPage.js';
+import VtiPage from '/src/pages/VtiPage.js';
+import MacSecPage from '/src/pages/MacSecPage.js';
+import PseudoEthernetPage from '/src/pages/PseudoEthernetPage.js';
+import InputPage from '/src/pages/InputPage.js';
 
 const componentMap = {
   TablePage: GenericTablePage,
@@ -201,6 +216,21 @@ const componentMap = {
   QosInterfacePage,
   QosPolicyPage,
   QosTrafficMatchGroupPage,
+  TunnelPage,
+  OpenVpnPage,
+  BondingPage,
+  BridgePage,
+  PPPoEPage,
+  WireGuardPage,
+  VxlanPage,
+  LoopbackPage,
+  GenevePage,
+  L2tpv3Page,
+  VirtualEthernetPage,
+  VtiPage,
+  MacSecPage,
+  PseudoEthernetPage,
+  InputPage,
 };
 
 function buildRoutes(menu, parentPath = '') {

@@ -24,13 +24,26 @@ export default defineComponent({
     const customValue = ref('');
     const showCustomModal = ref(false);
 
+    // Extract the actual value from an option (supports both string and {value,label} formats)
+    function optValue(opt) {
+      return typeof opt === 'object' ? opt.value : opt;
+    }
+
+    function optLabel(opt) {
+      return typeof opt === 'object' ? (opt.label || opt.value) : opt;
+    }
+
     const availableItems = computed(() => {
       const selected = new Set(props.modelValue || []);
-      return props.options.filter(opt => !selected.has(opt));
+      return props.options.filter(opt => !selected.has(optValue(opt)));
     });
 
     const selectedItems = computed(() => {
-      return props.modelValue || [];
+      const selected = props.modelValue || [];
+      // Map selected values back to their full option objects for display
+      const optMap = {};
+      props.options.forEach(opt => { optMap[optValue(opt)] = opt; });
+      return selected.map(v => optMap[v] !== undefined ? optMap[v] : v);
     });
 
     function emitValue(nextSelected) {
@@ -38,7 +51,7 @@ export default defineComponent({
     }
 
     function moveToRight() {
-      const toAdd = availableItems.value.filter((_, i) => selectedLeft.value.has(i));
+      const toAdd = availableItems.value.filter((_, i) => selectedLeft.value.has(i)).map(optValue);
       if (!toAdd.length) return;
       emitValue([...(props.modelValue || []), ...toAdd]);
       selectedLeft.value = new Set();
@@ -46,7 +59,7 @@ export default defineComponent({
     }
 
     function moveToLeft() {
-      const toRemove = new Set(selectedItems.value.filter((_, i) => selectedRight.value.has(i)));
+      const toRemove = new Set(selectedItems.value.filter((_, i) => selectedRight.value.has(i)).map(optValue));
       if (!toRemove.size) return;
       emitValue((props.modelValue || []).filter(v => !toRemove.has(v)));
       selectedRight.value = new Set();
@@ -55,7 +68,7 @@ export default defineComponent({
 
     function moveAllToRight() {
       if (!availableItems.value.length) return;
-      emitValue([...(props.modelValue || []), ...availableItems.value]);
+      emitValue([...(props.modelValue || []), ...availableItems.value.map(optValue)]);
       selectedLeft.value = new Set();
       lastSelectedLeft.value = null;
     }
@@ -117,17 +130,18 @@ export default defineComponent({
           onClick: () => { customValue.value = ''; showCustomModal.value = true; },
         }, '+'));
       }
+      const itemElements = items.map((item, index) => h('div', {
+        key: optValue(item),
+        class: ['dual-list-item', { selected: selected.has(index), disabled: props.disabled }],
+        onClick: (e) => toggleSelection(
+          side === 'left' ? selectedLeft : selectedRight,
+          side === 'left' ? lastSelectedLeft : lastSelectedRight,
+          index, e, items
+        ),
+      }, optLabel(item)));
       const children = [
         h('div', { class: 'dual-list-title' }, titleChildren),
-        h('div', { class: 'dual-list-items' }, items.map((item, index) => h('div', {
-          key: item,
-          class: ['dual-list-item', { selected: selected.has(index), disabled: props.disabled }],
-          onClick: (e) => toggleSelection(
-            side === 'left' ? selectedLeft : selectedRight,
-            side === 'left' ? lastSelectedLeft : lastSelectedRight,
-            index, e, items
-          ),
-        }, item))),
+        h('div', { class: 'dual-list-items' }, itemElements),
       ];
       return h('div', { class: 'dual-list-box' }, children);
     }
