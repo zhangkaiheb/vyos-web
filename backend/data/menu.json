@@ -832,6 +832,15 @@
         "icon": "",
         "children": [
           {
+            "id": "static",
+            "label": "静态路由",
+            "label_en": "Static",
+            "icon": "",
+            "children": [],
+            "route": "/policy/protocols/static",
+            "component": "StaticRoutePage"
+          },
+          {
             "id": "babel",
             "label": "Babel",
             "label_en": "Babel",
@@ -974,15 +983,6 @@
             "children": [],
             "route": "/policy/protocols/segment-routing",
             "component": "SegmentRoutingPage"
-          },
-          {
-            "id": "static",
-            "label": "静态路由",
-            "label_en": "Static",
-            "icon": "",
-            "children": [],
-            "route": "/policy/protocols/static",
-            "component": "StaticRoutePage"
           }
         ],
         "route": null,
