@@ -160,7 +160,7 @@ select {
   white-space: nowrap;
   user-select: none;
   font-weight: bold;
-  font-size: 13px;
+  font-size: 14px;
   flex-shrink: 0;
 }
 
@@ -513,7 +513,7 @@ select {
   justify-content: space-between;
   padding: 0 16px;
   color: var(--color-text-muted);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .breadcrumb-path {
