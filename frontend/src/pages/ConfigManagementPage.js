@@ -5,7 +5,6 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 const COLUMNS = [
   { key: 'index', label: '序号', width: 80 },
@@ -139,7 +138,7 @@ const RENAME_PATHS = [
 
 export default defineComponent({
   name: 'ConfigManagementPage',
-  components: { DataTable, DraggableModal, ToolbarButton, TabGroup, CommandPreview },
+  components: { DataTable, DraggableModal, ToolbarButton, TabGroup },
   setup() {
     const revisions = ref([]);
     const loading = ref(false);
@@ -549,7 +548,6 @@ export default defineComponent({
       </div>
 
       <div class="section">
-        <CommandPreview :command="currentCommand" />
       </div>
 
       <!-- Commit Modal -->

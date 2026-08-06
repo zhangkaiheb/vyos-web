@@ -2,7 +2,6 @@ import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import
 import { useConfigStore } from '/src/stores/config.js';
 import { configApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
@@ -23,7 +22,7 @@ const LEVELS = ['emerg', 'alert', 'crit', 'err', 'warning', 'notice', 'info', 'd
 
 export default defineComponent({
   name: 'SyslogPage',
-  components: { CommandPreview, ToolbarButton, TabGroup },
+  components: { ToolbarButton, TabGroup },
   setup() {
     const configStore = useConfigStore();
     const loading = ref(false);
@@ -273,7 +272,6 @@ export default defineComponent({
           </div>
         </template>
       </TabGroup>
-      <CommandPreview :path="commandPath" />
       <div class="page-actions-bottom">
         <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
       </div>

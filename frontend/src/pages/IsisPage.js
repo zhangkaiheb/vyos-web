@@ -3,7 +3,6 @@ import { configApi, interfaceApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 
@@ -344,7 +343,7 @@ export default defineComponent({
       save, configToConfig,
     };
   },
-  components: { TabGroup, ToolbarButton, CommandPreview, DataTable, DraggableModal },
+  components: { TabGroup, ToolbarButton, DataTable, DraggableModal },
   template: `
     <div class="page-container">
       <div v-if="saved" class="alert alert-success">已保存</div>
@@ -481,7 +480,6 @@ export default defineComponent({
         </template>
       </TabGroup>
 
-      <CommandPreview :path="commandPath" />
       <div class="page-actions-bottom">
         <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
       </div>

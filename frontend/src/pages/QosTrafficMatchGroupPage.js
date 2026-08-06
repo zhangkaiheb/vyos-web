@@ -7,7 +7,6 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 import { onMenuRefresh, offMenuRefresh } from '/src/utils/eventBus.js';
 
 const DSCP_OPTIONS = [
@@ -109,7 +108,7 @@ const IP_PROTOCOL_OPTIONS = [
 
 export default defineComponent({
   name: 'QosTrafficMatchGroupPage',
-  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
     const configStore = useConfigStore();
     const loading = ref(false);
@@ -1027,7 +1026,6 @@ export default defineComponent({
         width="900px"
       >
         <ConfigForm v-if="editingGroup" v-model="editingGroup" :schema="groupSchema" />
-        <CommandPreview v-if="commandText" :command="commandText" />
 
         <div v-if="editingGroup" style="margin-top:20px;border-top:1px solid #e8e8e8;padding-top:16px;">
           <h4 style="margin:0 0 12px 0;">匹配规则</h4>
@@ -1072,7 +1070,6 @@ export default defineComponent({
             <ConfigForm v-if="editingMatch" v-model="editingMatch" :schema="getMatchTabSchema('advanced')" />
           </template>
         </TabGroup>
-        <CommandPreview v-if="matchCommandText" :command="matchCommandText" />
       </DraggableModal>
     </div>
   `,

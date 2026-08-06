@@ -7,7 +7,6 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 import { onMenuRefresh, offMenuRefresh } from '/src/utils/eventBus.js';
 
 const POLICY_TYPES = [
@@ -427,7 +426,7 @@ function hasClasses(type) {
 
 export default defineComponent({
   name: 'QosPolicyPage',
-  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
     const configStore = useConfigStore();
     const loading = ref(false);
@@ -1352,7 +1351,6 @@ export default defineComponent({
         width="900"
       >
         <ConfigForm v-if="editingPolicy" v-model="editingPolicy" :schema="currentSchema" />
-        <CommandPreview v-if="commandText" :command="commandText" />
 
         <!-- Class management section (for policies with classes) -->
         <div v-if="editingPolicy && hasClasses(editingPolicy.type)" style="margin-top: 20px; border-top: 1px solid #e8e8e8; padding-top: 16px;">
@@ -1393,7 +1391,6 @@ export default defineComponent({
             </TabGroup>
           </div>
           <ConfigForm v-else v-model="classModalEditing" :schema="classSchema" />
-          <CommandPreview v-if="classCommandText" :command="classCommandText" />
 
           <!-- Rule management section (not for random-detect) -->
           <div v-if="editingPolicy.type !== 'random-detect'" style="margin-top: 20px; border-top: 1px solid #e8e8e8; padding-top: 16px;">

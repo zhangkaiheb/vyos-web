@@ -8,7 +8,6 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 import { FIREWALL_RULE_SCHEMA_IPV6 } from '/src/data/firewallRuleSchemaIpv6.js';
 import { onMenuRefresh, offMenuRefresh } from '/src/utils/eventBus.js';
 
@@ -453,7 +452,6 @@ export default defineComponent({
           {{ row.disable !== undefined ? '是' : '' }}
         </template>
       </DataTable>
-      <CommandPreview :path="configBase" />
       <DraggableModal v-model:visible="modalVisible" :title="editingItem?.id ? '编辑 IPv6 规则' : '创建 IPv6 规则'" width="820px" @confirm="save">
         <TabGroup v-model="activeTab" :tabs="tabs">
           <template v-for="tab in tabs" :key="tab.key" #[tab.key]>
@@ -503,5 +501,5 @@ export default defineComponent({
       </DraggableModal>
     </div>
   `,
-  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
 });

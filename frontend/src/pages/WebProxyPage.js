@@ -5,7 +5,6 @@ import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import DataTable from '/src/components/Table/DataTable.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 const AUTH_METHOD_OPTIONS = ['', 'ldap'];
 const CACHE_PEER_TYPE_OPTIONS = ['parent', 'sibling', 'multicast'];
@@ -864,7 +863,7 @@ export default defineComponent({
       AUTH_METHOD_OPTIONS, CACHE_PEER_TYPE_OPTIONS, DEFAULT_ACTION_OPTIONS,
     };
   },
-  components: { TabGroup, ToolbarButton, DraggableModal, DataTable, CommandPreview },
+  components: { TabGroup, ToolbarButton, DraggableModal, DataTable },
   template: `
     <div class="page-container">
       <div v-if="saved" class="alert alert-success">已保存</div>
@@ -1079,7 +1078,6 @@ export default defineComponent({
         </div>
       </DraggableModal>
 
-      <CommandPreview :path="commandPath" />
       <div class="page-actions-bottom">
         <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
       </div>

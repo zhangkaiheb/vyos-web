@@ -6,7 +6,6 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import DualListSelector from '/src/components/Form/DualListSelector.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -837,7 +836,7 @@ export default defineComponent({
       validateIPv6, validateIPv6OrFQDN,
     };
   },
-  components: { DataTable, DraggableModal, DualListSelector, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, DualListSelector, TabGroup, ToolbarButton },
   template: `
     <div class="page-container">
       <div v-if="saved" class="alert alert-success">已保存</div>
@@ -885,7 +884,6 @@ export default defineComponent({
         </template>
       </TabGroup>
 
-      <CommandPreview :path="commandPath" />
       <div class="page-actions-bottom">
         <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
       </div>

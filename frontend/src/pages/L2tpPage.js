@@ -5,7 +5,6 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 const AUTH_MODE_OPTIONS = ['', 'local', 'radius', 'noauth'];
 const AUTH_PROTOCOL_OPTIONS = ['pap', 'chap', 'mschap', 'mschap-v2'];
@@ -560,7 +559,7 @@ export default defineComponent({
       createRadiusServer, editRadiusServer, removeRadiusServer, saveRadiusServer,
     };
   },
-  components: { DataTable, DraggableModal, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, TabGroup, ToolbarButton },
   template: `
     <div class="page-container">
       <div v-if="saved" class="alert alert-success">已保存</div>
@@ -696,7 +695,6 @@ export default defineComponent({
       </template>
       </TabGroup>
 
-      <CommandPreview :path="commandPath" />
       <div class="page-actions-bottom">
         <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
       </div>

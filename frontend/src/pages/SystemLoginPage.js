@@ -5,7 +5,6 @@ import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
@@ -247,7 +246,7 @@ function formToLogin(form) {
 
 export default defineComponent({
   name: 'SystemLoginPage',
-  components: { ConfigForm, DataTable, DraggableModal, CommandPreview, ToolbarButton, TabGroup },
+  components: { ConfigForm, DataTable, DraggableModal, ToolbarButton, TabGroup },
   setup() {
     const configStore = useConfigStore();
     const loading = ref(false);
@@ -699,7 +698,6 @@ export default defineComponent({
 
       </TabGroup>
 
-      <CommandPreview :path="commandPath" />
 
       <!-- User edit modal -->
       <DraggableModal v-model:visible="showUserModal" :title="editingUser && editingUser._key ? '编辑用户' : '添加用户'" @confirm="saveUser" @close="showUserModal = false" width="800px">

@@ -6,7 +6,6 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 
 export default defineComponent({
@@ -358,7 +357,7 @@ export default defineComponent({
       toggleLogAllocation, load,
     };
   },
-  components: { DataTable, DraggableModal, ConfigForm, ToolbarButton, CommandPreview, TabGroup },
+  components: { DataTable, DraggableModal, ConfigForm, ToolbarButton, TabGroup },
   template: `
     <div class="page-container">
       <TabGroup :tabs="tabs" v-model="activeTab">
@@ -391,7 +390,6 @@ export default defineComponent({
       </TabGroup>
       <div style="height:32px;"></div>
 
-      <CommandPreview :path="path" />
       <div class="page-actions-bottom">
         <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
       </div>

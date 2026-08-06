@@ -8,7 +8,6 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 export default defineComponent({
   name: 'StaticNatPage',
@@ -170,14 +169,13 @@ export default defineComponent({
 
     return { path, writeDisabled, rules, loading, modalVisible, editingRule, editingOriginalId, tabs, activeTab, tabSchemas, columns, openModal, saveRule, deleteRule };
   },
-  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   template: `
     <div class="page-container">
       <DataTable :columns="columns" :data="rules" :loading="loading" :disabled="writeDisabled"
                  rowKey="id" :actions="['create', 'edit', 'delete']"
                  @create="openModal(-1)" @edit="openModal(rules.findIndex(r => r.id === $event.id))" @delete="deleteRule" />
       <div style="height:32px;"></div>
-      <CommandPreview :path="path" />
       <div class="page-actions-bottom">
         <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
       </div>

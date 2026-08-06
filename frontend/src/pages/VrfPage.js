@@ -7,7 +7,6 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 const PROTOCOL_OPTIONS = [
   { value: 'any', label: 'any' },
@@ -296,7 +295,6 @@ export default defineComponent({
         </DataTable>
       </div>
       <div class="section">
-        <CommandPreview :path="path" />
       </div>
       <DraggableModal v-model:visible="modalVisible" :title="editingOriginalName ? '编辑' : '创建'" width="800px" @confirm="save">
         <TabGroup v-model="activeTab" :tabs="TABS">
@@ -351,5 +349,5 @@ export default defineComponent({
       </DraggableModal>
     </div>
   `,
-  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
 });

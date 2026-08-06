@@ -6,7 +6,6 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 export default defineComponent({
   name: 'NetnsPage',
@@ -148,12 +147,11 @@ export default defineComponent({
         </DataTable>
       </div>
       <div class="section">
-        <CommandPreview :path="path" />
       </div>
       <DraggableModal v-model:visible="modalVisible" :title="editingOriginalName ? '编辑' : '创建'" width="500px" @confirm="save">
         <ConfigForm v-model="editingNetns" :schema="schema" :disabled="writeDisabled" :showAdvanced="true" />
       </DraggableModal>
     </div>
   `,
-  components: { DataTable, DraggableModal, ConfigForm, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, ToolbarButton },
 });

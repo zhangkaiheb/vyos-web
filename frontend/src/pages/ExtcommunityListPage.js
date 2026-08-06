@@ -7,7 +7,6 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 const ACTION_OPTIONS = [
   { value: 'permit', label: 'permit' },
@@ -282,7 +281,6 @@ export default defineComponent({
         </DataTable>
       </div>
       <div class="section">
-        <CommandPreview :path="path" />
       </div>
       <DraggableModal v-model:visible="listModalVisible" :title="editingListOriginalName ? '编辑' : '创建'" width="780px" @confirm="saveList">
         <div>
@@ -311,5 +309,5 @@ export default defineComponent({
       </DraggableModal>
     </div>
   `,
-  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
 });

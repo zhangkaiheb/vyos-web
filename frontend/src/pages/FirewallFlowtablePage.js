@@ -6,7 +6,6 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
 
 function toArray(val) {
@@ -26,7 +25,7 @@ function isPresent(value) {
 
 export default defineComponent({
   name: 'FirewallFlowtablePage',
-  components: { DataTable, DraggableModal, ConfigForm, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, ToolbarButton },
   setup() {
     const configStore = useConfigStore();
     const loading = ref(false);
@@ -181,7 +180,6 @@ export default defineComponent({
         </template>
       </DataTable>
 
-      <CommandPreview :path="commandPath" />
       <div class="page-actions-bottom">
         <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
       </div>

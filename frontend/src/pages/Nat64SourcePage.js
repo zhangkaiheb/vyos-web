@@ -6,7 +6,6 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 const PROTOCOL_OPTIONS = [
   { value: 'icmp', label: 'ICMP' },
@@ -232,13 +231,12 @@ export default defineComponent({
       openPoolModal, savePool, deletePool,
     };
   },
-  components: { DataTable, DraggableModal, ConfigForm, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, ToolbarButton },
   template: `
     <div class="page-container">
       <DataTable :columns="ruleColumns" :data="rules" :loading="loading" :disabled="writeDisabled"
                  rowKey="id" :actions="['create', 'edit', 'delete']"
                  @create="openModal(-1)" @edit="openModal" @delete="deleteRule" />
-      <CommandPreview :path="path" />
       <div class="page-actions-bottom">
         <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
       </div>

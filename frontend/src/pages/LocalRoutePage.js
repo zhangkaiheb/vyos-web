@@ -8,7 +8,6 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 const BASE_PROTOCOL_OPTIONS = [
   { value: 'all', label: 'all (默认)' },
@@ -303,7 +302,6 @@ export default defineComponent({
       <DataTable ref="dataTableRef" :columns="columns" :data="tableData" :loading="loading" :disabled="writeDisabled"
                  @selection-change="selected = $event" :selectable="true" :externalToolbar="true" row-key="rule">
       </DataTable>
-      <CommandPreview :command="commandText" />
       <DraggableModal v-model:visible="modalVisible" :title="editingRule?.rule ? '编辑本地策略路由规则' : '创建本地策略路由规则'" width="780px" @confirm="saveRule">
         <TabGroup v-model="activeTab" :tabs="RULE_TABS">
           <template #basic>
@@ -319,5 +317,5 @@ export default defineComponent({
       </DraggableModal>
     </div>
   `,
-  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
 });

@@ -6,7 +6,6 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 import { onMenuRefresh, offMenuRefresh } from '/src/utils/eventBus.js';
 
 const DIRECTION_OPTIONS = [
@@ -16,7 +15,7 @@ const DIRECTION_OPTIONS = [
 
 export default defineComponent({
   name: 'QosInterfacePage',
-  components: { DataTable, DraggableModal, ConfigForm, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, ToolbarButton },
   setup() {
     const configStore = useConfigStore();
     const loading = ref(false);
@@ -182,7 +181,6 @@ export default defineComponent({
         @close="modalVisible = false"
       >
         <ConfigForm v-if="editingItem" v-model="editingItem" :schema="schema" />
-        <CommandPreview v-if="commandText" :command="commandText" />
       </DraggableModal>
     </div>
   `,

@@ -5,13 +5,12 @@ import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
 
 export default defineComponent({
   name: 'TaskSchedulerPage',
-  components: { DataTable, DraggableModal, ConfigForm, CommandPreview, ToolbarButton },
+  components: { DataTable, DraggableModal, ConfigForm, ToolbarButton },
   setup() {
     const configStore = useConfigStore();
     const loading = ref(false);
@@ -163,7 +162,6 @@ export default defineComponent({
           <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
         </template>
       </DataTable>
-      <CommandPreview :path="commandPath" />
       <div class="page-actions-bottom">
         <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
       </div>

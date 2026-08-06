@@ -5,7 +5,6 @@ import { useConfigStore } from '/src/stores/config.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 const ENABLE_OPTIONS = ['', 'enable', 'disable'];
 const VALIDATION_OPTIONS = ['', 'strict', 'loose', 'disable'];
@@ -318,12 +317,11 @@ export default defineComponent({
             <ConfigForm v-model="form" :schema="t.schema" :disabled="writeDisabled" :formKey="'fw_global_' + t.key" />
           </template>
         </TabGroup>
-        <CommandPreview path="firewall global-options" />
         <div class="page-actions-bottom">
           <ToolbarButton icon="save" primary @click="save" :disabled="writeDisabled || saving">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
         </div>
       </div>
     </div>
   `,
-  components: { ConfigForm, TabGroup, CommandPreview },
+  components: { ConfigForm, TabGroup },
 });

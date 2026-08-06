@@ -3,7 +3,6 @@ import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 export default defineComponent({
   name: 'GenericConfigPage',
@@ -68,12 +67,11 @@ export default defineComponent({
       <div class="page-section">
         <div v-if="saved" class="alert alert-success">{{ $t('msg.saved') }}</div>
         <ConfigForm v-model="data" :schema="schema" :disabled="writeDisabled" />
-        <CommandPreview :path="path" />
         <div class="page-actions-bottom">
           <ToolbarButton icon="save" primary @click="save" :disabled="writeDisabled">{{ $t('app.save') }}</ToolbarButton>
         </div>
       </div>
     </div>
   `,
-  components: { ConfigForm, CommandPreview },
+  components: { ConfigForm },
 });

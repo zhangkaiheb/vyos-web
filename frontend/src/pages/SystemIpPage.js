@@ -3,7 +3,6 @@ import { useConfigStore } from '/src/stores/config.js';
 import { configApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
 
@@ -21,7 +20,7 @@ const ARP_SIZES = ['1024', '2048', '4096', '8192', '16384', '32768'];
 
 export default defineComponent({
   name: 'SystemIpPage',
-  components: { TabGroup, CommandPreview, ToolbarButton },
+  components: { TabGroup, ToolbarButton },
   setup() {
     const configStore = useConfigStore();
     const loading = ref(false);
@@ -225,7 +224,6 @@ export default defineComponent({
           </tbody>
         </table>
       </div>
-      <CommandPreview :path="commandPath" />
       <div class="page-actions-bottom">
         <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
       </div>

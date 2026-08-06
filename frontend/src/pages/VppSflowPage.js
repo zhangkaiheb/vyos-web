@@ -7,7 +7,6 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
 
 function toArray(val) {
@@ -30,7 +29,7 @@ function splitLines(text) { return String(text || '').split('\n').map(s => s.tri
 
 export default defineComponent({
   name: 'VppSflowPage',
-  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
     const configStore = useConfigStore();
     const loading = ref(false);
@@ -117,7 +116,6 @@ export default defineComponent({
       </div>
       <div class="form-row"><label class="form-label">接口</label><textarea class="form-control" v-model="config.interfaces" rows="5" placeholder="每行一个接口名称" title="启用sFlow的接口列表" /></div>
 
-      <CommandPreview :path="commandPath" />
       <div class="page-actions-bottom">
         <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
       </div>

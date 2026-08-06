@@ -7,7 +7,6 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 const TABS = [
   { key: 'ca', title: '证书颁发机构 (CA)' },
@@ -924,7 +923,6 @@ export default defineComponent({
         </TabGroup>
       </div>
       <div class="section">
-        <CommandPreview :path="path" />
       </div>
 
       <!-- CA Modal -->
@@ -958,5 +956,5 @@ export default defineComponent({
       </DraggableModal>
     </div>
   `,
-  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
 });

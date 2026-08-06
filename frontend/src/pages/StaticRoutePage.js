@@ -6,7 +6,6 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 const ROUTE_TYPES = [
   { value: 'next-hop', label: '下一跳' },
@@ -881,7 +880,7 @@ export default defineComponent({
       save, load,
     };
   },
-  components: { DataTable, DraggableModal, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, TabGroup, ToolbarButton },
   template: `
     <div class="page-section">
       <div v-if="saved" class="alert alert-success">{{ $t('msg.saved') }}</div>
@@ -966,7 +965,6 @@ export default defineComponent({
         <ToolbarButton icon="save" primary @click="save" :disabled="writeDisabled || saving">{{ saving ? '保存中...' : $t('app.save') }}</ToolbarButton>
       </div>
 
-      <CommandPreview path="protocols static" />
 
 
       <!-- Table Modal -->

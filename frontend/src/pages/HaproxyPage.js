@@ -4,12 +4,11 @@ import { useConfigStore } from '/src/stores/config.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 
 export default defineComponent({
   name: 'HaproxyPage',
-  components: { TabGroup, DataTable, DraggableModal, CommandPreview, ToolbarButton },
+  components: { TabGroup, DataTable, DraggableModal, ToolbarButton },
   template: `
     <div>
       <TabGroup v-model="activeTab" :tabs="[
@@ -157,7 +156,6 @@ export default defineComponent({
 
       </TabGroup>
 
-      <CommandPreview :path="commandPath" />
 
       <!-- 后端服务器弹窗 -->
       <DraggableModal v-model:visible="showBackendModal" title="后端服务器" width="700px" @ok="saveBackend">

@@ -8,7 +8,6 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 const TEST_TYPE_OPTIONS = [
   { value: 'ping', label: 'ping (ICMP echo)' },
@@ -222,7 +221,7 @@ function globalToCommands(g) {
 
 export default defineComponent({
   name: 'WanPage',
-  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
     const route = useRoute();
     const configStore = useConfigStore();
@@ -624,7 +623,6 @@ export default defineComponent({
 
       </TabGroup>
 
-      <CommandPreview :path="commandPath" />
 
       <!-- 健康检查弹窗 -->
       <DraggableModal v-model:visible="showHealthModal" title="接口健康检查" width="600px" @ok="saveHealth">

@@ -8,7 +8,6 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 const ACTION_OPTIONS = [
   { value: 'accept', label: '接受 (accept)' },
@@ -689,7 +688,6 @@ export default defineComponent({
       <DataTable ref="dataTableRef" :columns="ruleSetColumns" :data="tableData" :loading="loading" :disabled="writeDisabled"
                  @selection-change="selected = $event" :selectable="true" :externalToolbar="true" row-key="name">
       </DataTable>
-      <CommandPreview :command="commandText" />
       <DraggableModal v-model:visible="modalVisible" :title="editingRuleSet?.name ? '编辑规则集' : '创建规则集'" width="780px" @confirm="saveRuleSet">
         <TabGroup v-model="ruleSetActiveTab" :tabs="[{key:'basic',title:'基本'},{key:'rules',title:'规则'}]">
           <template #basic>
@@ -733,5 +731,5 @@ export default defineComponent({
       </DraggableModal>
     </div>
   `,
-  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
 });

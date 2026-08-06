@@ -8,7 +8,6 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 const KEY_EXCHANGE_OPTIONS = ['', 'ikev1', 'ikev2'];
 const IKE_MODE_OPTIONS = ['', 'main', 'aggressive'];
@@ -1436,7 +1435,6 @@ export default defineComponent({
         </template>
       </TabGroup>
 
-      <CommandPreview :path="commandPath" />
 
       <DraggableModal v-model:visible="ikeModalVisible" title="IKE 组" width="920px" @confirm="saveIke">
         <div class="form-row"><label class="form-label" title="IKE 组名称，只能包含字母、数字、下划线和连字符">名称</label><input class="form-control" v-model="editingIke.name" :disabled="editingIke._name" title="IKE 组名称" /></div>
@@ -1616,5 +1614,5 @@ export default defineComponent({
       </DraggableModal>
     </div>
   `,
-  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
 });

@@ -4,7 +4,6 @@ import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import DataTable from '/src/components/Table/DataTable.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 
 const MODE_OPTIONS = ['load', 'set'];
@@ -273,7 +272,7 @@ export default defineComponent({
       load, save, openCreate, openEdit, saveSection, deleteSections,
     };
   },
-  components: { ToolbarButton, DraggableModal, DataTable, CommandPreview, TabGroup },
+  components: { ToolbarButton, DraggableModal, DataTable, TabGroup },
   template: `
     <div class="page-container">
       <div v-if="saved" class="alert alert-success">已保存</div>
@@ -312,7 +311,6 @@ export default defineComponent({
         </template>
       </DraggableModal>
 
-      <CommandPreview :path="commandPath"></CommandPreview>
       <div class="page-actions-bottom">
         <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
       </div>

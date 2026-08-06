@@ -6,7 +6,6 @@ import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import DualListSelector from '/src/components/Form/DualListSelector.js';
 import DataTable from '/src/components/Table/DataTable.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 const EVE_FILETYPE_OPTIONS = ['regular', 'syslog'];
 const EVE_TYPE_OPTIONS = [
@@ -387,7 +386,7 @@ export default defineComponent({
       EVE_FILETYPE_OPTIONS, EVE_TYPE_OPTIONS,
     };
   },
-  components: { TabGroup, ToolbarButton, DraggableModal, DualListSelector, DataTable, CommandPreview },
+  components: { TabGroup, ToolbarButton, DraggableModal, DualListSelector, DataTable },
   template: `
     <div class="page-container">
       <div v-if="saved" class="alert alert-success">已保存</div>
@@ -470,7 +469,6 @@ export default defineComponent({
         </div>
       </DraggableModal>
 
-      <CommandPreview :path="commandPath" />
       <div class="page-actions-bottom">
         <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
       </div>

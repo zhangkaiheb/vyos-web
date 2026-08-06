@@ -7,7 +7,6 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-import CommandPreview from '/src/components/Layout/CommandPreview.js';
 
 const TABS = [
   { key: 'basic', title: '基本设置' },
@@ -669,7 +668,7 @@ export default defineComponent({
       ignoreRuleSchema, customRuleSchema,
     };
   },
-  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton, CommandPreview },
+  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   template: `
     <div class="page-container">
       <TabGroup v-model="activeTab" :tabs="TABS">
@@ -782,7 +781,6 @@ export default defineComponent({
 
       </TabGroup>
 
-      <CommandPreview :path="path" />
       <div class="page-actions-bottom">
         <ToolbarButton v-if="activeTab === 'basic'" icon="save" primary @click="saveBasic" :disabled="writeDisabled">保存</ToolbarButton>
         <ToolbarButton v-if="activeTab === 'tcp'" icon="save" primary @click="saveTcp" :disabled="writeDisabled">保存</ToolbarButton>
