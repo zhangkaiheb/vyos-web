@@ -510,6 +510,15 @@
             "children": [],
             "route": "/system/settings/syslog",
             "component": "SyslogPage"
+          },
+          {
+            "id": "task-scheduler",
+            "label": "定时任务",
+            "label_en": "Task Scheduler",
+            "icon": "",
+            "children": [],
+            "route": "/system/settings/task-scheduler",
+            "component": "TaskSchedulerPage"
           }
         ],
         "route": null,
@@ -556,6 +565,24 @@
             "children": [],
             "route": "/system/conntrack",
             "component": "ConntrackPage"
+          },
+          {
+            "id": "ip",
+            "label": "IPv4设置",
+            "label_en": "IPv4 Settings",
+            "icon": "",
+            "children": [],
+            "route": "/system/ip",
+            "component": "SystemIpPage"
+          },
+          {
+            "id": "ipv6",
+            "label": "IPv6设置",
+            "label_en": "IPv6 Settings",
+            "icon": "",
+            "children": [],
+            "route": "/system/ipv6",
+            "component": "SystemIpv6Page"
           }
         ],
         "route": null,

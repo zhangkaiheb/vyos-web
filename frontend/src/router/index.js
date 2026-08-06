@@ -134,6 +134,9 @@ import ContainerRegistryPage from '/src/pages/ContainerRegistryPage.js';
 import SystemLoginPage from '/src/pages/SystemLoginPage.js';
 import HostNamePage from '/src/pages/HostNamePage.js';
 import SyslogPage from '/src/pages/SyslogPage.js';
+import TaskSchedulerPage from '/src/pages/TaskSchedulerPage.js';
+import SystemIpPage from '/src/pages/SystemIpPage.js';
+import SystemIpv6Page from '/src/pages/SystemIpv6Page.js';
 
 const componentMap = {
   TablePage: GenericTablePage,
@@ -271,6 +274,9 @@ const componentMap = {
   SystemLoginPage,
   HostNamePage,
   SyslogPage,
+  TaskSchedulerPage,
+  SystemIpPage,
+  SystemIpv6Page,
 };
 
 function buildRoutes(menu, parentPath = '') {
