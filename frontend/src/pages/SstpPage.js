@@ -1,0 +1,837 @@
+import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { configApi } from '/src/api/index.js';
+import { showError } from '/src/components/Layout/ErrorDisplay.js';
+import DataTable from '/src/components/Table/DataTable.js';
+import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import ConfigForm from '/src/components/Form/ConfigForm.js';
+import TabGroup from '/src/components/Layout/TabGroup.js';
+import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import CommandPreview from '/src/components/Layout/CommandPreview.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+
+function toArray(val) {
+  if (val === undefined || val === null) return [];
+  if (Array.isArray(val)) return val;
+  return [val];
+}
+
+function isPresent(value) {
+  if (value === undefined || value === null || value === '') return false;
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return true;
+  if (Array.isArray(value) && value.length === 0) return false;
+  if (typeof value === 'object' && Object.keys(value).length === 0) return false;
+  return true;
+}
+
+function joinLines(val) { return toArray(val).join('\n'); }
+function splitLines(text) { return String(text || '').split('\n').map(s => s.trim()).filter(Boolean); }
+
+export default defineComponent({
+  name: 'SstpPage',
+  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton, CommandPreview },
+  setup() {
+    const configStore = useConfigStore();
+    const loading = ref(false);
+    const saving = ref(false);
+    const saved = ref(false);
+    const activeTab = ref('basic');
+
+    const config = ref({
+      description: '',
+      port: '443',
+      mtu: '1500',
+      gateway_address: '',
+      host_name: '',
+      thread_count: 'all',
+      max_concurrent_sessions: '',
+      authentication: {
+        mode: 'local',
+        protocols: ['pap', 'chap', 'mschap', 'mschap-v2'],
+        local_users: [],
+        radius: {
+          accounting_interim_interval: '',
+          acct_interim_jitter: '',
+          acct_timeout: '3',
+          dynamic_author: { key: '', port: '1700', server: '' },
+          max_try: '3',
+          nas_identifier: '',
+          nas_ip_address: '',
+          preallocate_vif: false,
+          rate_limit: { attribute: 'Filter-Id', enable: false, multiplier: '1', vendor: '' },
+          source_address: '',
+          servers: [],
+        },
+      },
+      client_ip_pools: [],
+      client_ipv6_pools: [],
+      default_pool: '',
+      default_ipv6_pool: '',
+      ppp_options: {
+        disable_ccp: false,
+        interface_cache: '',
+        ipv4: 'prefer',
+        ipv6: 'deny',
+        ipv6_accept_peer_interface_id: false,
+        ipv6_interface_id: '',
+        ipv6_peer_interface_id: '',
+        lcp_echo_failure: '3',
+        lcp_echo_interval: '30',
+        lcp_echo_timeout: '0',
+        min_mtu: '',
+        mppe: 'prefer',
+        mru: '',
+      },
+      ssl: {
+        ca_certificate: '',
+        certificate: '',
+      },
+      name_servers: '',
+      wins_servers: '',
+      shaper: { fwmark: '' },
+      limits: { burst: '', connection_limit: '', timeout: '' },
+      log: { level: '3' },
+      snmp: { master_agent: false },
+      extended_scripts: { on_change: '', on_down: '', on_pre_up: '', on_up: '' },
+    });
+
+    const userColumns = [
+      { key: 'username', title: '用户名', dataIndex: 'username', width: 150 },
+      { key: 'password', title: '密码', dataIndex: 'password', width: 150 },
+      { key: 'static_ip', title: '静态 IP', dataIndex: 'static_ip', width: 120 },
+      { key: 'disable', title: '禁用', dataIndex: 'disable', width: 60 },
+      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+    ];
+
+    const radiusServerColumns = [
+      { key: 'address', title: '地址', dataIndex: 'address', width: 150 },
+      { key: 'key', title: '密钥', dataIndex: 'key', width: 150 },
+      { key: 'port', title: '端口', dataIndex: 'port', width: 80 },
+      { key: 'disable', title: '禁用', dataIndex: 'disable', width: 60 },
+      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+    ];
+
+    const ipPoolColumns = [
+      { key: 'name', title: '名称', dataIndex: 'name', width: 150 },
+      { key: 'next_pool', title: '下一个池', dataIndex: 'next_pool', width: 120 },
+      { key: 'range', title: '范围', dataIndex: 'range', width: 200 },
+      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+    ];
+
+    const ipv6PoolColumns = [
+      { key: 'name', title: '名称', dataIndex: 'name', width: 150 },
+      { key: 'delegate', title: '委派前缀', dataIndex: 'delegate', width: 200 },
+      { key: 'prefix', title: '客户端前缀', dataIndex: 'prefix', width: 200 },
+      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+    ];
+
+    const selectedUsers = ref([]);
+    const selectedRadiusServers = ref([]);
+    const selectedIpPools = ref([]);
+    const selectedIpv6Pools = ref([]);
+
+    const showUserModal = ref(false);
+    const editingUser = ref(null);
+    const showRadiusModal = ref(false);
+    const editingRadiusServer = ref(null);
+    const showIpPoolModal = ref(false);
+    const editingIpPool = ref(null);
+    const showIpv6PoolModal = ref(false);
+    const editingIpv6Pool = ref(null);
+
+    const commandPath = computed(() => {
+      switch (activeTab.value) {
+        case 'auth': return 'vpn sstp authentication';
+        case 'pool': return 'vpn sstp client-ip-pool';
+        case 'ppp': return 'vpn sstp ppp-options';
+        case 'ssl': return 'vpn sstp ssl';
+        case 'network': return 'vpn sstp name-server';
+        default: return 'vpn sstp';
+      }
+    });
+
+    function sstpToForm(data = {}) {
+      const auth = data.authentication || {};
+      const localUsers = auth['local-users'] || {};
+      const radiusServers = auth.radius?.server || {};
+      const ipPools = data['client-ip-pool'] || {};
+      const ipv6Pools = data['client-ipv6-pool'] || {};
+      const ppp = data['ppp-options'] || {};
+      const ssl = data.ssl || {};
+      const shaper = data.shaper || {};
+      const limits = data.limits || {};
+      const log = data.log || {};
+      const snmp = data.snmp || {};
+      const scripts = data['extended-scripts'] || {};
+
+      return {
+        description: data.description || '',
+        port: data.port || '443',
+        mtu: data.mtu || '1500',
+        gateway_address: data['gateway-address'] || '',
+        host_name: data['host-name'] || '',
+        thread_count: data['thread-count'] || 'all',
+        max_concurrent_sessions: data['max-concurrent-sessions'] || '',
+        authentication: {
+          mode: auth.mode || 'local',
+          protocols: auth.protocols ? toArray(auth.protocols) : ['pap', 'chap', 'mschap', 'mschap-v2'],
+          local_users: Object.entries(localUsers).map(([username, u]) => ({
+            _username: username,
+            username,
+            password: u.password || '',
+            disable: u.disable !== undefined,
+            static_ip: u['static-ip'] || '',
+            rate_limit: {
+              download: u['rate-limit']?.download || '',
+              upload: u['rate-limit']?.upload || '',
+            },
+          })),
+          radius: {
+            accounting_interim_interval: auth.radius?.['accounting-interim-interval'] || '',
+            acct_interim_jitter: auth.radius?.['acct-interim-jitter'] || '',
+            acct_timeout: auth.radius?.['acct-timeout'] || '3',
+            dynamic_author: {
+              key: auth.radius?.['dynamic-author']?.key || '',
+              port: auth.radius?.['dynamic-author']?.port || '1700',
+              server: auth.radius?.['dynamic-author']?.server || '',
+            },
+            max_try: auth.radius?.['max-try'] || '3',
+            nas_identifier: auth.radius?.['nas-identifier'] || '',
+            nas_ip_address: auth.radius?.['nas-ip-address'] || '',
+            preallocate_vif: auth.radius?.['preallocate-vif'] !== undefined,
+            rate_limit: {
+              attribute: auth.radius?.['rate-limit']?.attribute || 'Filter-Id',
+              enable: auth.radius?.['rate-limit']?.enable !== undefined,
+              multiplier: auth.radius?.['rate-limit']?.multiplier || '1',
+              vendor: auth.radius?.['rate-limit']?.vendor || '',
+            },
+            source_address: auth.radius?.['source-address'] || '',
+            servers: Object.entries(radiusServers).map(([address, s]) => ({
+              _address: address,
+              address,
+              key: s.key || '',
+              port: s.port || '1812',
+              acct_port: s['acct-port'] || '1813',
+              backup: s.backup !== undefined,
+              disable: s.disable !== undefined,
+              disable_accounting: s['disable-accounting'] !== undefined,
+              fail_time: s['fail-time'] || '0',
+              priority: s.priority || '',
+              source_address: s['source-address'] || '',
+              timeout: s.timeout || '2',
+            })),
+          },
+        },
+        client_ip_pools: Object.entries(ipPools).map(([name, pool]) => ({
+          _name: name,
+          name,
+          next_pool: pool['next-pool'] || '',
+          range: pool.range || '',
+        })),
+        client_ipv6_pools: Object.entries(ipv6Pools).map(([name, pool]) => ({
+          _name: name,
+          name,
+          delegate: pool.delegate ? Object.entries(pool.delegate).map(([d, v]) => ({
+            prefix: d,
+            delegation_prefix: v?.['delegation-prefix'] || '',
+          })) : [],
+          prefix: pool.prefix ? Object.entries(pool.prefix).map(([p, v]) => ({
+            prefix: p,
+            mask: v?.mask || '',
+          })) : [],
+        })),
+        default_pool: data['default-pool'] || '',
+        default_ipv6_pool: data['default-ipv6-pool'] || '',
+        ppp_options: {
+          disable_ccp: ppp['disable-ccp'] !== undefined,
+          interface_cache: ppp['interface-cache'] || '',
+          ipv4: ppp.ipv4 || 'prefer',
+          ipv6: ppp.ipv6 || 'deny',
+          ipv6_accept_peer_interface_id: ppp['ipv6-accept-peer-interface-id'] !== undefined,
+          ipv6_interface_id: ppp['ipv6-interface-id'] || '',
+          ipv6_peer_interface_id: ppp['ipv6-peer-interface-id'] || '',
+          lcp_echo_failure: ppp['lcp-echo-failure'] || '3',
+          lcp_echo_interval: ppp['lcp-echo-interval'] || '30',
+          lcp_echo_timeout: ppp['lcp-echo-timeout'] || '0',
+          min_mtu: ppp['min-mtu'] || '',
+          mppe: ppp.mppe || 'prefer',
+          mru: ppp.mru || '',
+        },
+        ssl: {
+          ca_certificate: ssl['ca-certificate'] || '',
+          certificate: ssl.certificate || '',
+        },
+        name_servers: joinLines(data['name-server']),
+        wins_servers: joinLines(data['wins-server']),
+        shaper: { fwmark: shaper.fwmark || '' },
+        limits: {
+          burst: limits.burst || '',
+          connection_limit: limits['connection-limit'] || '',
+          timeout: limits.timeout || '',
+        },
+        log: { level: log.level || '3' },
+        snmp: { master_agent: snmp['master-agent'] !== undefined },
+        extended_scripts: {
+          on_change: scripts['on-change'] || '',
+          on_down: scripts['on-down'] || '',
+          on_pre_up: scripts['on-pre-up'] || '',
+          on_up: scripts['on-up'] || '',
+        },
+      };
+    }
+
+    function formToSstp(form) {
+      const result = {};
+
+      if (isPresent(form.description)) result.description = String(form.description);
+      if (isPresent(form.port) && form.port !== '443') result.port = String(form.port);
+      if (isPresent(form.mtu) && form.mtu !== '1500') result.mtu = String(form.mtu);
+      if (isPresent(form.gateway_address)) result['gateway-address'] = String(form.gateway_address);
+      if (isPresent(form.host_name)) result['host-name'] = String(form.host_name);
+      if (form.thread_count && form.thread_count !== 'all') result['thread-count'] = String(form.thread_count);
+      if (isPresent(form.max_concurrent_sessions)) result['max-concurrent-sessions'] = String(form.max_concurrent_sessions);
+
+      const auth = {};
+      if (form.authentication.mode && form.authentication.mode !== 'local') auth.mode = String(form.authentication.mode);
+      if (form.authentication.protocols && form.authentication.protocols.length > 0) {
+        const defaults = ['pap', 'chap', 'mschap', 'mschap-v2'];
+        if (JSON.stringify(form.authentication.protocols.sort()) !== JSON.stringify(defaults.sort())) {
+          auth.protocols = form.authentication.protocols;
+        }
+      }
+
+      const users = {};
+      for (const u of form.authentication.local_users || []) {
+        if (!u.username) continue;
+        const user = {};
+        if (u.disable) user.disable = '';
+        if (isPresent(u.password)) user.password = String(u.password);
+        if (isPresent(u.static_ip)) user['static-ip'] = String(u.static_ip);
+        if (isPresent(u.rate_limit?.download) || isPresent(u.rate_limit?.upload)) {
+          user['rate-limit'] = {};
+          if (isPresent(u.rate_limit.download)) user['rate-limit'].download = String(u.rate_limit.download);
+          if (isPresent(u.rate_limit.upload)) user['rate-limit'].upload = String(u.rate_limit.upload);
+        }
+        users[u.username] = user;
+      }
+      if (Object.keys(users).length) auth['local-users'] = users;
+
+      const radius = {};
+      const servers = {};
+      for (const s of form.authentication.radius?.servers || []) {
+        if (!s.address) continue;
+        const srv = {};
+        if (s.disable) srv.disable = '';
+        if (isPresent(s.key)) srv.key = String(s.key);
+        if (isPresent(s.port) && s.port !== '1812') srv.port = String(s.port);
+        if (isPresent(s.acct_port) && s.acct_port !== '1813') srv['acct-port'] = String(s.acct_port);
+        if (s.backup) srv.backup = '';
+        if (s.disable_accounting) srv['disable-accounting'] = '';
+        if (isPresent(s.fail_time) && s.fail_time !== '0') srv['fail-time'] = String(s.fail_time);
+        if (isPresent(s.priority)) srv.priority = String(s.priority);
+        if (isPresent(s.source_address)) srv['source-address'] = String(s.source_address);
+        if (isPresent(s.timeout) && s.timeout !== '2') srv.timeout = String(s.timeout);
+        servers[s.address] = srv;
+      }
+      if (Object.keys(servers).length) radius.server = servers;
+      if (isPresent(form.authentication.radius?.source_address)) radius['source-address'] = String(form.authentication.radius.source_address);
+      if (isPresent(form.authentication.radius?.accounting_interim_interval)) radius['accounting-interim-interval'] = String(form.authentication.radius.accounting_interim_interval);
+      if (isPresent(form.authentication.radius?.acct_interim_jitter)) radius['acct-interim-jitter'] = String(form.authentication.radius.acct_interim_jitter);
+      if (isPresent(form.authentication.radius?.acct_timeout) && form.authentication.radius.acct_timeout !== '3') radius['acct-timeout'] = String(form.authentication.radius.acct_timeout);
+      if (isPresent(form.authentication.radius?.max_try) && form.authentication.radius.max_try !== '3') radius['max-try'] = String(form.authentication.radius.max_try);
+      if (isPresent(form.authentication.radius?.nas_identifier)) radius['nas-identifier'] = String(form.authentication.radius.nas_identifier);
+      if (isPresent(form.authentication.radius?.nas_ip_address)) radius['nas-ip-address'] = String(form.authentication.radius.nas_ip_address);
+      if (form.authentication.radius?.preallocate_vif) radius['preallocate-vif'] = '';
+      const rl = form.authentication.radius?.rate_limit;
+      if (rl) {
+        if (rl.enable) radius['rate-limit'] = radius['rate-limit'] || {};
+        if (isPresent(rl.attribute) && rl.attribute !== 'Filter-Id') { radius['rate-limit'] = radius['rate-limit'] || {}; radius['rate-limit'].attribute = String(rl.attribute); }
+        if (rl.enable) { radius['rate-limit'] = radius['rate-limit'] || {}; radius['rate-limit'].enable = ''; }
+        if (isPresent(rl.multiplier) && rl.multiplier !== '1') { radius['rate-limit'] = radius['rate-limit'] || {}; radius['rate-limit'].multiplier = String(rl.multiplier); }
+        if (isPresent(rl.vendor)) { radius['rate-limit'] = radius['rate-limit'] || {}; radius['rate-limit'].vendor = String(rl.vendor); }
+      }
+      const da = form.authentication.radius?.dynamic_author;
+      if (da && (isPresent(da.key) || isPresent(da.server) || (da.port && da.port !== '1700'))) {
+        radius['dynamic-author'] = {};
+        if (isPresent(da.key)) radius['dynamic-author'].key = String(da.key);
+        if (isPresent(da.port) && da.port !== '1700') radius['dynamic-author'].port = String(da.port);
+        if (isPresent(da.server)) radius['dynamic-author'].server = String(da.server);
+      }
+      if (Object.keys(radius).length) auth.radius = radius;
+
+      if (Object.keys(auth).length) result.authentication = auth;
+
+      const ipPools = {};
+      for (const pool of form.client_ip_pools || []) {
+        if (!pool.name) continue;
+        const p = {};
+        if (isPresent(pool.next_pool)) p['next-pool'] = String(pool.next_pool);
+        if (isPresent(pool.range)) p.range = String(pool.range);
+        ipPools[pool.name] = p;
+      }
+      if (Object.keys(ipPools).length) result['client-ip-pool'] = ipPools;
+
+      const ipv6Pools = {};
+      for (const pool of form.client_ipv6_pools || []) {
+        if (!pool.name) continue;
+        const p = {};
+        if (pool.delegate && pool.delegate.length) {
+          p.delegate = {};
+          for (const d of pool.delegate) {
+            if (isPresent(d.prefix)) {
+              p.delegate[d.prefix] = {};
+              if (isPresent(d.delegation_prefix)) p.delegate[d.prefix]['delegation-prefix'] = String(d.delegation_prefix);
+            }
+          }
+        }
+        if (pool.prefix && pool.prefix.length) {
+          p.prefix = {};
+          for (const pr of pool.prefix) {
+            if (isPresent(pr.prefix)) {
+              p.prefix[pr.prefix] = {};
+              if (isPresent(pr.mask)) p.prefix[pr.prefix].mask = String(pr.mask);
+            }
+          }
+        }
+        ipv6Pools[pool.name] = p;
+      }
+      if (Object.keys(ipv6Pools).length) result['client-ipv6-pool'] = ipv6Pools;
+
+      if (isPresent(form.default_pool)) result['default-pool'] = String(form.default_pool);
+      if (isPresent(form.default_ipv6_pool)) result['default-ipv6-pool'] = String(form.default_ipv6_pool);
+
+      const ppp = {};
+      if (form.ppp_options.disable_ccp) ppp['disable-ccp'] = '';
+      if (isPresent(form.ppp_options.interface_cache)) ppp['interface-cache'] = String(form.ppp_options.interface_cache);
+      if (form.ppp_options.ipv4 && form.ppp_options.ipv4 !== 'prefer') ppp.ipv4 = String(form.ppp_options.ipv4);
+      if (form.ppp_options.ipv6 && form.ppp_options.ipv6 !== 'deny') ppp.ipv6 = String(form.ppp_options.ipv6);
+      if (form.ppp_options.ipv6_accept_peer_interface_id) ppp['ipv6-accept-peer-interface-id'] = '';
+      if (isPresent(form.ppp_options.ipv6_interface_id)) ppp['ipv6-interface-id'] = String(form.ppp_options.ipv6_interface_id);
+      if (isPresent(form.ppp_options.ipv6_peer_interface_id)) ppp['ipv6-peer-interface-id'] = String(form.ppp_options.ipv6_peer_interface_id);
+      if (isPresent(form.ppp_options.lcp_echo_failure) && form.ppp_options.lcp_echo_failure !== '3') ppp['lcp-echo-failure'] = String(form.ppp_options.lcp_echo_failure);
+      if (isPresent(form.ppp_options.lcp_echo_interval) && form.ppp_options.lcp_echo_interval !== '30') ppp['lcp-echo-interval'] = String(form.ppp_options.lcp_echo_interval);
+      if (isPresent(form.ppp_options.lcp_echo_timeout) && form.ppp_options.lcp_echo_timeout !== '0') ppp['lcp-echo-timeout'] = String(form.ppp_options.lcp_echo_timeout);
+      if (isPresent(form.ppp_options.min_mtu)) ppp['min-mtu'] = String(form.ppp_options.min_mtu);
+      if (form.ppp_options.mppe && form.ppp_options.mppe !== 'prefer') ppp.mppe = String(form.ppp_options.mppe);
+      if (isPresent(form.ppp_options.mru)) ppp.mru = String(form.ppp_options.mru);
+      if (Object.keys(ppp).length) result['ppp-options'] = ppp;
+
+      const ssl = {};
+      if (isPresent(form.ssl.ca_certificate)) ssl['ca-certificate'] = String(form.ssl.ca_certificate);
+      if (isPresent(form.ssl.certificate)) ssl.certificate = String(form.ssl.certificate);
+      if (Object.keys(ssl).length) result.ssl = ssl;
+
+      const nameServers = splitLines(form.name_servers);
+      if (nameServers.length) result['name-server'] = nameServers;
+      const winsServers = splitLines(form.wins_servers);
+      if (winsServers.length) result['wins-server'] = winsServers;
+
+      if (isPresent(form.shaper?.fwmark)) result.shaper = { fwmark: String(form.shaper.fwmark) };
+
+      const limits = {};
+      if (isPresent(form.limits?.burst)) limits.burst = String(form.limits.burst);
+      if (isPresent(form.limits?.connection_limit)) limits['connection-limit'] = String(form.limits.connection_limit);
+      if (isPresent(form.limits?.timeout)) limits.timeout = String(form.limits.timeout);
+      if (Object.keys(limits).length) result.limits = limits;
+
+      if (form.log?.level && form.log.level !== '3') result.log = { level: String(form.log.level) };
+
+      if (form.snmp?.master_agent) result.snmp = { 'master-agent': '' };
+
+      const scripts = {};
+      if (isPresent(form.extended_scripts?.on_change)) scripts['on-change'] = String(form.extended_scripts.on_change);
+      if (isPresent(form.extended_scripts?.on_down)) scripts['on-down'] = String(form.extended_scripts.on_down);
+      if (isPresent(form.extended_scripts?.on_pre_up)) scripts['on-pre-up'] = String(form.extended_scripts.on_pre_up);
+      if (isPresent(form.extended_scripts?.on_up)) scripts['on-up'] = String(form.extended_scripts.on_up);
+      if (Object.keys(scripts).length) result['extended-scripts'] = scripts;
+
+      return result;
+    }
+
+    async function load() {
+      loading.value = true;
+      saved.value = false;
+      try {
+        const res = await configApi.get('vpn sstp', true);
+        config.value = sstpToForm(res.data || {});
+      } catch (e) {
+        showError(e.message || '加载失败');
+      } finally {
+        loading.value = false;
+      }
+    }
+
+    async function save() {
+      saving.value = true;
+      try {
+        const payload = formToSstp(config.value);
+        await configApi.set('vpn sstp', payload);
+        await configStore.commit();
+        saved.value = true;
+        await load();
+      } catch (e) {
+        showError(e.message || '保存失败');
+      } finally {
+        saving.value = false;
+      }
+    }
+
+    function createUser() {
+      editingUser.value = { username: '', password: '', disable: false, static_ip: '', rate_limit: { download: '', upload: '' } };
+      showUserModal.value = true;
+    }
+
+    function editUser() {
+      if (!selectedUsers.value.length) return alert('请选择要编辑的用户');
+      const row = config.value.authentication.local_users.find(u => u.username === selectedUsers.value[0]);
+      if (!row) return alert('未找到选中的用户');
+      editingUser.value = JSON.parse(JSON.stringify(row));
+      showUserModal.value = true;
+    }
+
+    function removeUser() {
+      if (!selectedUsers.value.length) return alert('请选择要删除的用户');
+      config.value.authentication.local_users = config.value.authentication.local_users.filter(u => u.username !== selectedUsers.value[0]);
+      selectedUsers.value = [];
+    }
+
+    function saveUser() {
+      if (!editingUser.value.username) return alert('请输入用户名');
+      const list = config.value.authentication.local_users;
+      const idx = list.findIndex(u => u._username === editingUser.value._username);
+      if (idx >= 0) list.splice(idx, 1, { ...editingUser.value });
+      else list.push({ ...editingUser.value });
+      config.value.authentication.local_users = list;
+      showUserModal.value = false;
+    }
+
+    function createRadiusServer() {
+      editingRadiusServer.value = { address: '', key: '', port: '1812', acct_port: '1813', backup: false, disable: false, disable_accounting: false, fail_time: '0', priority: '', source_address: '', timeout: '2' };
+      showRadiusModal.value = true;
+    }
+
+    function editRadiusServer() {
+      if (!selectedRadiusServers.value.length) return alert('请选择要编辑的服务器');
+      const row = config.value.authentication.radius.servers.find(s => s.address === selectedRadiusServers.value[0]);
+      if (!row) return alert('未找到选中的服务器');
+      editingRadiusServer.value = JSON.parse(JSON.stringify(row));
+      showRadiusModal.value = true;
+    }
+
+    function removeRadiusServer() {
+      if (!selectedRadiusServers.value.length) return alert('请选择要删除的服务器');
+      config.value.authentication.radius.servers = config.value.authentication.radius.servers.filter(s => s.address !== selectedRadiusServers.value[0]);
+      selectedRadiusServers.value = [];
+    }
+
+    function saveRadiusServer() {
+      if (!editingRadiusServer.value.address) return alert('请输入服务器地址');
+      const list = config.value.authentication.radius.servers;
+      const idx = list.findIndex(s => s._address === editingRadiusServer.value._address);
+      if (idx >= 0) list.splice(idx, 1, { ...editingRadiusServer.value });
+      else list.push({ ...editingRadiusServer.value });
+      config.value.authentication.radius.servers = list;
+      showRadiusModal.value = false;
+    }
+
+    function createIpPool() {
+      editingIpPool.value = { name: '', next_pool: '', range: '' };
+      showIpPoolModal.value = true;
+    }
+
+    function editIpPool() {
+      if (!selectedIpPools.value.length) return alert('请选择要编辑的 IP 池');
+      const row = config.value.client_ip_pools.find(p => p.name === selectedIpPools.value[0]);
+      if (!row) return alert('未找到选中的 IP 池');
+      editingIpPool.value = JSON.parse(JSON.stringify(row));
+      showIpPoolModal.value = true;
+    }
+
+    function removeIpPool() {
+      if (!selectedIpPools.value.length) return alert('请选择要删除的 IP 池');
+      config.value.client_ip_pools = config.value.client_ip_pools.filter(p => p.name !== selectedIpPools.value[0]);
+      selectedIpPools.value = [];
+    }
+
+    function saveIpPool() {
+      if (!editingIpPool.value.name) return alert('请输入 IP 池名称');
+      const list = config.value.client_ip_pools;
+      const idx = list.findIndex(p => p._name === editingIpPool.value._name);
+      if (idx >= 0) list.splice(idx, 1, { ...editingIpPool.value });
+      else list.push({ ...editingIpPool.value });
+      config.value.client_ip_pools = list;
+      showIpPoolModal.value = false;
+    }
+
+    function createIpv6Pool() {
+      editingIpv6Pool.value = { name: '', delegate: [], prefix: [] };
+      showIpv6PoolModal.value = true;
+    }
+
+    function editIpv6Pool() {
+      if (!selectedIpv6Pools.value.length) return alert('请选择要编辑的 IPv6 池');
+      const row = config.value.client_ipv6_pools.find(p => p.name === selectedIpv6Pools.value[0]);
+      if (!row) return alert('未找到选中的 IPv6 池');
+      editingIpv6Pool.value = JSON.parse(JSON.stringify(row));
+      showIpv6PoolModal.value = true;
+    }
+
+    function removeIpv6Pool() {
+      if (!selectedIpv6Pools.value.length) return alert('请选择要删除的 IPv6 池');
+      config.value.client_ipv6_pools = config.value.client_ipv6_pools.filter(p => p.name !== selectedIpv6Pools.value[0]);
+      selectedIpv6Pools.value = [];
+    }
+
+    function saveIpv6Pool() {
+      if (!editingIpv6Pool.value.name) return alert('请输入 IPv6 池名称');
+      const list = config.value.client_ipv6_pools;
+      const idx = list.findIndex(p => p._name === editingIpv6Pool.value._name);
+      if (idx >= 0) list.splice(idx, 1, { ...editingIpv6Pool.value });
+      else list.push({ ...editingIpv6Pool.value });
+      config.value.client_ipv6_pools = list;
+      showIpv6PoolModal.value = false;
+    }
+
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
+
+    return {
+      loading, saving, saved, config, activeTab, commandPath,
+      userColumns, radiusServerColumns, ipPoolColumns, ipv6PoolColumns,
+      selectedUsers, selectedRadiusServers, selectedIpPools, selectedIpv6Pools,
+      showUserModal, editingUser, showRadiusModal, editingRadiusServer,
+      showIpPoolModal, editingIpPool, showIpv6PoolModal, editingIpv6Pool,
+      load, save,
+      createUser, editUser, removeUser, saveUser,
+      createRadiusServer, editRadiusServer, removeRadiusServer, saveRadiusServer,
+      createIpPool, editIpPool, removeIpPool, saveIpPool,
+      createIpv6Pool, editIpv6Pool, removeIpv6Pool, saveIpv6Pool,
+    };
+  },
+  template: `
+    <div class="page-container">
+      <div v-if="saved" class="alert alert-success">已保存</div>
+      <TabGroup v-model="activeTab" :tabs="[
+        { key: 'basic', title: '基本' },
+        { key: 'auth', title: '认证' },
+        { key: 'pool', title: 'IP 池' },
+        { key: 'ppp', title: 'PPP 选项' },
+        { key: 'ssl', title: 'SSL' },
+        { key: 'network', title: '网络' }
+      ]">
+
+      <template #basic>
+        <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="config.description" title="SSTP 服务器描述" /></div>
+        <div class="form-row"><label class="form-label">端口</label><input class="form-control" type="number" min="1" max="65535" v-model="config.port" title="SSTP 连接端口，默认 443" /></div>
+        <div class="form-row"><label class="form-label">MTU</label><input class="form-control" type="number" min="68" max="1500" v-model="config.mtu" title="最大传输单元，默认 1500" /></div>
+        <div class="form-row"><label class="form-label">网关地址</label><input class="form-control" v-model="config.gateway_address" placeholder="x.x.x.x" title="发送给客户端的默认网关" /></div>
+        <div class="form-row"><label class="form-label">主机名</label><input class="form-control" v-model="config.host_name" title="仅允许连接到具有相同 TLS SNI 的指定主机" /></div>
+        <div class="form-row"><label class="form-label">线程数</label>
+          <select class="form-control" v-model="config.thread_count" title="工作线程数，默认 all">
+            <option value="all">所有 CPU 核心 (默认)</option>
+            <option value="half">一半 CPU 核心</option>
+          </select>
+        </div>
+        <div class="form-row"><label class="form-label">最大并发会话</label><input class="form-control" type="number" min="0" max="65535" v-model="config.max_concurrent_sessions" title="最大并发会话启动尝试数" /></div>
+      </template>
+
+      <template #auth>
+        <div class="form-row"><label class="form-label">认证模式</label>
+          <select class="form-control" v-model="config.authentication.mode" title="认证模式">
+            <option value="local">本地认证 (默认)</option>
+            <option value="radius">RADIUS 认证</option>
+            <option value="noauth">禁用认证</option>
+          </select>
+        </div>
+        <div class="form-row"><label class="form-label">认证协议</label>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;">
+            <label><input type="checkbox" value="pap" v-model="config.authentication.protocols" /> PAP</label>
+            <label><input type="checkbox" value="chap" v-model="config.authentication.protocols" /> CHAP</label>
+            <label><input type="checkbox" value="mschap" v-model="config.authentication.protocols" /> MS-CHAP</label>
+            <label><input type="checkbox" value="mschap-v2" v-model="config.authentication.protocols" /> MS-CHAP-v2</label>
+          </div>
+        </div>
+
+        <div v-if="config.authentication.mode === 'local'">
+          <div style="font-weight:bold;margin:16px 0 8px;">本地用户</div>
+          <div class="toolbar">
+            <ToolbarButton icon="create" @click="createUser">创建</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editUser" :disabled="!selectedUsers.length || selectedUsers.length > 1">编辑</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeUser" :disabled="!selectedUsers.length">删除</ToolbarButton>
+          </div>
+          <DataTable :columns="userColumns" :data="config.authentication.local_users" rowKey="username" :externalToolbar="true" @selection-change="selectedUsers = $event" :selectable="true" />
+        </div>
+
+        <div v-if="config.authentication.mode === 'radius'">
+          <div class="form-row"><label class="form-label">源地址</label><input class="form-control" v-model="config.authentication.radius.source_address" placeholder="x.x.x.x" title="发起连接的 IPv4 源地址" /></div>
+
+          <div style="font-weight:bold;margin:16px 0 8px;">RADIUS 全局设置</div>
+          <div class="form-row"><label class="form-label">计费间隔</label><input class="form-control" type="number" min="1" max="3600" v-model="config.authentication.radius.accounting_interim_interval" title="发送计费信息间隔（秒）" /></div>
+          <div class="form-row"><label class="form-label">计费抖动</label><input class="form-control" type="number" min="1" max="60" v-model="config.authentication.radius.acct_interim_jitter" title="计费信息最大抖动值（秒）" /></div>
+          <div class="form-row"><label class="form-label">计费超时</label><input class="form-control" type="number" min="0" max="60" v-model="config.authentication.radius.acct_timeout" title="中间更新包超时，0 保持活跃（默认 3）" /></div>
+          <div class="form-row"><label class="form-label">最大重试</label><input class="form-control" type="number" min="1" max="20" v-model="config.authentication.radius.max_try" title="发送 Access-Request/Accounting-Request 查询的最大次数（默认 3）" /></div>
+          <div class="form-row"><label class="form-label">NAS 标识符</label><input class="form-control" v-model="config.authentication.radius.nas_identifier" title="发送到 RADIUS 的 NAS-Identifier 属性" /></div>
+          <div class="form-row"><label class="form-label">NAS IP 地址</label><input class="form-control" v-model="config.authentication.radius.nas_ip_address" placeholder="x.x.x.x" title="发送到 RADIUS 的 NAS-IP-Address 属性" /></div>
+          <div class="form-row"><label class="form-label">预分配 VIF</label><input type="checkbox" v-model="config.authentication.radius.preallocate_vif" title="在 Access-Request 中启用 NAS-Port-Id 属性" /></div>
+          <div class="form-row"><label class="form-label">限速属性</label><input class="form-control" v-model="config.authentication.radius.rate_limit.attribute" title="包含速率信息的 RADIUS 属性（默认 Filter-Id）" /></div>
+          <div class="form-row"><label class="form-label">启用限速</label><input type="checkbox" v-model="config.authentication.radius.rate_limit.enable" title="通过 RADIUS 启用带宽整形" /></div>
+          <div class="form-row"><label class="form-label">限速乘数</label><input class="form-control" v-model="config.authentication.radius.rate_limit.multiplier" title="整形乘数（默认 1）" /></div>
+          <div class="form-row"><label class="form-label">限速厂商</label><input class="form-control" v-model="config.authentication.radius.rate_limit.vendor" title="厂商字典" /></div>
+          <div style="font-weight:bold;margin:16px 0 8px;">动态授权 (CoA)</div>
+          <div class="form-row"><label class="form-label">CoA 密钥</label><input class="form-control" v-model="config.authentication.radius.dynamic_author.key" title="动态授权扩展服务器共享密钥" /></div>
+          <div class="form-row"><label class="form-label">CoA 端口</label><input class="form-control" type="number" min="1" max="65535" v-model="config.authentication.radius.dynamic_author.port" title="连接端口（默认 1700）" /></div>
+          <div class="form-row"><label class="form-label">CoA 服务器</label><input class="form-control" v-model="config.authentication.radius.dynamic_author.server" placeholder="x.x.x.x" title="动态授权服务器 IPv4 地址" /></div>
+          <div style="font-weight:bold;margin:16px 0 8px;">RADIUS 服务器</div>
+          <div class="toolbar">
+            <ToolbarButton icon="create" @click="createRadiusServer">添加</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editRadiusServer" :disabled="!selectedRadiusServers.length || selectedRadiusServers.length > 1">编辑</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeRadiusServer" :disabled="!selectedRadiusServers.length">删除</ToolbarButton>
+          </div>
+          <DataTable :columns="radiusServerColumns" :data="config.authentication.radius.servers" rowKey="address" :externalToolbar="true" @selection-change="selectedRadiusServers = $event" :selectable="true" />
+        </div>
+      </template>
+
+      <template #pool>
+        <div class="form-row"><label class="form-label">默认 IP 池</label><input class="form-control" v-model="config.default_pool" title="默认客户端 IP 池名称" /></div>
+        <div class="form-row"><label class="form-label">默认 IPv6 池</label><input class="form-control" v-model="config.default_ipv6_pool" title="默认客户端 IPv6 池名称" /></div>
+
+        <div style="font-weight:bold;margin:16px 0 8px;">客户端 IP 池</div>
+        <div class="toolbar">
+          <ToolbarButton icon="create" @click="createIpPool">创建</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editIpPool" :disabled="!selectedIpPools.length || selectedIpPools.length > 1">编辑</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeIpPool" :disabled="!selectedIpPools.length">删除</ToolbarButton>
+        </div>
+        <DataTable :columns="ipPoolColumns" :data="config.client_ip_pools" rowKey="name" :externalToolbar="true" @selection-change="selectedIpPools = $event" :selectable="true" />
+
+        <div style="font-weight:bold;margin:16px 0 8px;">客户端 IPv6 池</div>
+        <div class="toolbar">
+          <ToolbarButton icon="create" @click="createIpv6Pool">创建</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editIpv6Pool" :disabled="!selectedIpv6Pools.length || selectedIpv6Pools.length > 1">编辑</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeIpv6Pool" :disabled="!selectedIpv6Pools.length">删除</ToolbarButton>
+        </div>
+        <DataTable :columns="ipv6PoolColumns" :data="config.client_ipv6_pools" rowKey="name" :externalToolbar="true" @selection-change="selectedIpv6Pools = $event" :selectable="true" />
+      </template>
+
+      <template #ppp>
+        <div class="form-row"><label class="form-label">禁用 CCP</label><input type="checkbox" v-model="config.ppp_options.disable_ccp" title="禁用压缩控制协议 (CCP)" /></div>
+        <div class="form-row"><label class="form-label">接口缓存</label><input class="form-control" type="number" min="1" max="256000" v-model="config.ppp_options.interface_cache" title="缓存的接口数量" /></div>
+        <div class="form-row"><label class="form-label">IPv4 协商</label>
+          <select class="form-control" v-model="config.ppp_options.ipv4" title="IPv4 (IPCP) 协商算法">
+            <option value="deny">拒绝</option>
+            <option value="allow">允许（仅客户端请求时）</option>
+            <option value="prefer">优先（默认）</option>
+            <option value="require">必须</option>
+          </select>
+        </div>
+        <div class="form-row"><label class="form-label">IPv6 协商</label>
+          <select class="form-control" v-model="config.ppp_options.ipv6" title="IPv6 (IPCP6) 协商算法，默认拒绝">
+            <option value="deny">拒绝 (默认)</option>
+            <option value="allow">允许（仅客户端请求时）</option>
+            <option value="prefer">优先</option>
+            <option value="require">必须</option>
+          </select>
+        </div>
+        <div class="form-row"><label class="form-label">接受对端接口 ID</label><input type="checkbox" v-model="config.ppp_options.ipv6_accept_peer_interface_id" title="接受对端接口标识符" /></div>
+        <div class="form-row"><label class="form-label">IPv6 接口 ID</label><input class="form-control" v-model="config.ppp_options.ipv6_interface_id" placeholder="random 或 x:x:x:x" title="IPv6 接口标识符" /></div>
+        <div class="form-row"><label class="form-label">IPv6 对端接口 ID</label><input class="form-control" v-model="config.ppp_options.ipv6_peer_interface_id" placeholder="random/ipv4-addr/calling-sid/x:x:x:x" title="对端 IPv6 接口标识符" /></div>
+        <div class="form-row"><label class="form-label">LCP 回显失败</label><input class="form-control" type="number" v-model="config.ppp_options.lcp_echo_failure" title="最大无响应回显请求数，默认 3" /></div>
+        <div class="form-row"><label class="form-label">LCP 回显间隔</label><input class="form-control" type="number" v-model="config.ppp_options.lcp_echo_interval" title="LCP 回显请求/秒，默认 30" /></div>
+        <div class="form-row"><label class="form-label">LCP 回显超时</label><input class="form-control" type="number" v-model="config.ppp_options.lcp_echo_timeout" title="等待对端活动的超时时间（秒），默认 0" /></div>
+        <div class="form-row"><label class="form-label">最小 MTU</label><input class="form-control" type="number" min="68" max="65535" v-model="config.ppp_options.min_mtu" title="最小可接受 MTU" /></div>
+        <div class="form-row"><label class="form-label">MPPE</label>
+          <select class="form-control" v-model="config.ppp_options.mppe" title="MPPE 协商偏好">
+            <option value="require">必须</option>
+            <option value="prefer">优先 (默认)</option>
+            <option value="deny">拒绝</option>
+          </select>
+        </div>
+        <div class="form-row"><label class="form-label">MRU</label><input class="form-control" type="number" min="68" max="65535" v-model="config.ppp_options.mru" title="首选 MRU" /></div>
+      </template>
+
+      <template #ssl>
+        <div class="form-row"><label class="form-label">CA 证书</label><input class="form-control" v-model="config.ssl.ca_certificate" title="PKI 配置中的 CA 证书链" /></div>
+        <div class="form-row"><label class="form-label">证书</label><input class="form-control" v-model="config.ssl.certificate" title="PKI 配置中的证书名称" /></div>
+      </template>
+
+      <template #network>
+        <div class="form-row"><label class="form-label">DNS 服务器</label><textarea class="form-control" v-model="config.name_servers" rows="3" placeholder="每行一个 DNS 地址" title="域名服务器地址" /></div>
+        <div class="form-row"><label class="form-label">WINS 服务器</label><textarea class="form-control" v-model="config.wins_servers" rows="3" placeholder="每行一个 WINS 地址" title="WINS 服务器地址" /></div>
+        <div class="form-row"><label class="form-label">防火墙标记</label><input class="form-control" type="number" min="1" max="2147483647" v-model="config.shaper.fwmark" title="排除整形的防火墙标记值" /></div>
+        <div class="form-row"><label class="form-label">突发计数</label><input class="form-control" v-model="config.limits.burst" title="突发计数" /></div>
+        <div class="form-row"><label class="form-label">连接限制</label><input class="form-control" v-model="config.limits.connection_limit" placeholder="如 1/min, 60/sec" title="可接受的连接速率" /></div>
+        <div class="form-row"><label class="form-label">超时</label><input class="form-control" v-model="config.limits.timeout" title="超时时间（秒）" /></div>
+        <div class="form-row"><label class="form-label">日志级别</label>
+          <select class="form-control" v-model="config.log.level" title="日志级别，默认 3">
+            <option value="0">关闭日志</option>
+            <option value="1">仅错误</option>
+            <option value="2">错误和警告</option>
+            <option value="3">错误、警告和基本信息 (默认)</option>
+            <option value="4">错误、警告和完整信息</option>
+            <option value="5">所有消息（含调试）</option>
+          </select>
+        </div>
+        <div class="form-row"><label class="form-label">SNMP 主代理</label><input type="checkbox" v-model="config.snmp.master_agent" title="启用 SNMP 主代理模式" /></div>
+        <div class="form-row"><label class="form-label">变更脚本</label><input class="form-control" v-model="config.extended_scripts.on_change" title="RADIUS CoA 处理时运行的脚本" /></div>
+        <div class="form-row"><label class="form-label">断开脚本</label><input class="form-control" v-model="config.extended_scripts.on_down" title="会话接口终止时运行的脚本" /></div>
+        <div class="form-row"><label class="form-label">预启动脚本</label><input class="form-control" v-model="config.extended_scripts.on_pre_up" title="会话接口启动前运行的脚本" /></div>
+        <div class="form-row"><label class="form-label">启动脚本</label><input class="form-control" v-model="config.extended_scripts.on_up" title="会话接口完全配置并启动后运行的脚本" /></div>
+      </template>
+      </TabGroup>
+
+      <CommandPreview :path="commandPath" />
+      <div class="page-actions-bottom">
+        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
+      </div>
+
+      <DraggableModal v-model:visible="showUserModal" :title="editingUser && editingUser._username ? '编辑本地用户' : '新建本地用户'" @confirm="saveUser" @close="showUserModal = false" width="600px">
+        <div class="form-row"><label class="form-label">用户名</label><input class="form-control" v-model="editingUser.username" :disabled="editingUser._username" title="认证用户名" /></div>
+        <div class="form-row"><label class="form-label">密码</label><input class="form-control" type="password" v-model="editingUser.password" title="认证密码" /></div>
+        <div class="form-row"><label class="form-label">静态 IP</label><input class="form-control" v-model="editingUser.static_ip" placeholder="x.x.x.x" title="静态客户端 IP 地址" /></div>
+        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingUser.disable" title="禁用该用户" /></div>
+        <div class="form-row"><label class="form-label">下载限速</label><input class="form-control" v-model="editingUser.rate_limit.download" title="下载带宽限制 (kbits/sec)" /></div>
+        <div class="form-row"><label class="form-label">上传限速</label><input class="form-control" v-model="editingUser.rate_limit.upload" title="上传带宽限制 (kbits/sec)" /></div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="showRadiusModal" :title="editingRadiusServer && editingRadiusServer._address ? '编辑 RADIUS 服务器' : '添加 RADIUS 服务器'" @confirm="saveRadiusServer" @close="showRadiusModal = false">
+        <div class="form-row"><label class="form-label">地址</label><input class="form-control" v-model="editingRadiusServer.address" :disabled="editingRadiusServer._address" placeholder="x.x.x.x" title="RADIUS 服务器 IPv4 地址" /></div>
+        <div class="form-row"><label class="form-label">共享密钥</label><input class="form-control" v-model="editingRadiusServer.key" title="共享密钥" /></div>
+        <div class="form-row"><label class="form-label">端口</label><input class="form-control" type="number" min="1" max="65535" v-model="editingRadiusServer.port" title="端口，默认 1812" /></div>
+        <div class="form-row"><label class="form-label">源地址</label><input class="form-control" v-model="editingRadiusServer.source_address" placeholder="x.x.x.x" title="发起连接的源地址" /></div>
+        <div class="form-row"><label class="form-label">计费端口</label><input class="form-control" type="number" min="1" max="65535" v-model="editingRadiusServer.acct_port" title="计费端口，默认 1813" /></div>
+        <div class="form-row"><label class="form-label">备份</label><input type="checkbox" v-model="editingRadiusServer.backup" title="其他服务器不可用时使用备份服务器" /></div>
+        <div class="form-row"><label class="form-label">禁用计费</label><input type="checkbox" v-model="editingRadiusServer.disable_accounting" title="禁用计费" /></div>
+        <div class="form-row"><label class="form-label">故障时间</label><input class="form-control" type="number" min="0" v-model="editingRadiusServer.fail_time" title="故障后标记服务器不可用的秒数（默认 0）" /></div>
+        <div class="form-row"><label class="form-label">优先级</label><input class="form-control" v-model="editingRadiusServer.priority" title="服务器优先级" /></div>
+        <div class="form-row"><label class="form-label">超时</label><input class="form-control" type="number" min="1" max="240" v-model="editingRadiusServer.timeout" title="会话超时，默认 2" /></div>
+        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingRadiusServer.disable" title="禁用该服务器" /></div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="showIpPoolModal" :title="editingIpPool && editingIpPool._name ? '编辑 IP 池' : '新建 IP 池'" @confirm="saveIpPool" @close="showIpPoolModal = false" width="600px">
+        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingIpPool.name" :disabled="editingIpPool._name" title="IP 池名称" /></div>
+        <div class="form-row"><label class="form-label">下一个池</label><input class="form-control" v-model="editingIpPool.next_pool" title="下一个 IP 池名称" /></div>
+        <div class="form-row"><label class="form-label">范围</label><input class="form-control" v-model="editingIpPool.range" placeholder="如 192.168.1.100-192.168.1.200" title="IP 地址范围" /></div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="showIpv6PoolModal" :title="editingIpv6Pool && editingIpv6Pool._name ? '编辑 IPv6 池' : '新建 IPv6 池'" @confirm="saveIpv6Pool" @close="showIpv6PoolModal = false" width="700px">
+        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingIpv6Pool.name" :disabled="editingIpv6Pool._name" title="IPv6 池名称" /></div>
+        <div style="font-weight:bold;margin:12px 0 8px;">委派前缀 (DHCPv6-PD)</div>
+        <div v-for="(d, i) in editingIpv6Pool.delegate" :key="'d'+i" style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
+          <input class="form-control" v-model="d.prefix" placeholder="h:h:h:h:h:h:h:h/x" title="IPv6 委派前缀" style="flex:2;" />
+          <input class="form-control" type="number" min="32" max="64" v-model="d.delegation_prefix" placeholder="32-64" title="委派前缀长度" style="flex:1;" />
+          <button @click="editingIpv6Pool.delegate.splice(i, 1)" style="padding:4px 8px;">删除</button>
+        </div>
+        <button @click="editingIpv6Pool.delegate.push({prefix:'',delegation_prefix:''})" style="margin-bottom:12px;">+ 添加委派前缀</button>
+        <div style="font-weight:bold;margin:12px 0 8px;">客户端前缀池</div>
+        <div v-for="(p, i) in editingIpv6Pool.prefix" :key="'p'+i" style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
+          <input class="form-control" v-model="p.prefix" placeholder="h:h:h:h:h:h:h:h/x" title="IPv6 前缀" style="flex:2;" />
+          <input class="form-control" type="number" min="48" max="128" v-model="p.mask" placeholder="48-128" title="客户端前缀长度" style="flex:1;" />
+          <button @click="editingIpv6Pool.prefix.splice(i, 1)" style="padding:4px 8px;">删除</button>
+        </div>
+        <button @click="editingIpv6Pool.prefix.push({prefix:'',mask:''})">+ 添加客户端前缀</button>
+      </DraggableModal>
+    </div>
+  `,
+});

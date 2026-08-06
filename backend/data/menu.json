@@ -464,37 +464,56 @@
         "id": "settings",
         "label": "系统设置",
         "label_en": "Settings",
-        "icon": "",
-        "children": [],
-        "route": "/system/settings",
-        "component": "SettingsPage"
-      },
-      {
-        "id": "host-name",
-        "label": "主机名",
-        "label_en": "Host Name",
-        "icon": "",
-        "children": [],
-        "route": "/system/host-name",
-        "component": "ConfigPage"
-      },
-      {
-        "id": "ntp",
-        "label": "NTP客户端",
-        "label_en": "NTP Client",
-        "icon": "",
-        "children": [],
-        "route": "/system/ntp",
-        "component": "ConfigPage"
-      },
-      {
-        "id": "login",
-        "label": "登录设置",
-        "label_en": "Login",
-        "icon": "",
-        "children": [],
-        "route": "/system/login",
-        "component": "ConfigPage"
+        "icon": "SettingOutlined",
+        "children": [
+          {
+            "id": "host-name",
+            "label": "主机名",
+            "label_en": "Host Name",
+            "icon": "",
+            "children": [],
+            "route": "/system/settings/host-name",
+            "component": "HostNamePage"
+          },
+          {
+            "id": "ntp",
+            "label": "NTP客户端",
+            "label_en": "NTP Client",
+            "icon": "",
+            "children": [],
+            "route": "/system/settings/ntp",
+            "component": "ConfigPage"
+          },
+          {
+            "id": "login",
+            "label": "登录设置",
+            "label_en": "Login",
+            "icon": "",
+            "children": [],
+            "route": "/system/settings/login",
+            "component": "SystemLoginPage"
+          },
+          {
+            "id": "high-availability",
+            "label": "高可用性",
+            "label_en": "High Availability",
+            "icon": "",
+            "children": [],
+            "route": "/system/settings/high-availability",
+            "component": "HighAvailabilityPage"
+          },
+          {
+            "id": "syslog",
+            "label": "Syslog",
+            "label_en": "Syslog",
+            "icon": "",
+            "children": [],
+            "route": "/system/settings/syslog",
+            "component": "SyslogPage"
+          }
+        ],
+        "route": null,
+        "component": null
       },
       {
         "id": "network",
@@ -555,7 +574,7 @@
             "icon": "",
             "children": [],
             "route": "/system/container/name",
-            "component": "TablePage"
+            "component": "ContainerNamePage"
           },
           {
             "id": "network",
@@ -564,7 +583,7 @@
             "icon": "",
             "children": [],
             "route": "/system/container/network",
-            "component": "TablePage"
+            "component": "ContainerNetworkPage"
           },
           {
             "id": "registry",
@@ -573,7 +592,7 @@
             "icon": "",
             "children": [],
             "route": "/system/container/registry",
-            "component": "TablePage"
+            "component": "ContainerRegistryPage"
           }
         ],
         "route": null,
@@ -587,15 +606,6 @@
         "children": [],
         "route": "/system/pki",
         "component": "PkiPage"
-      },
-      {
-        "id": "high-availability",
-        "label": "高可用性",
-        "label_en": "High Availability",
-        "icon": "",
-        "children": [],
-        "route": "/system/high-availability",
-        "component": "HighAvailabilityPage"
       },
       {
         "id": "table-size",
@@ -1253,7 +1263,7 @@
         "icon": "",
         "children": [],
         "route": "/firewall/zone",
-        "component": "TablePage"
+        "component": "FirewallZonePage"
       },
       {
         "id": "flowtable",
@@ -1262,7 +1272,7 @@
         "icon": "",
         "children": [],
         "route": "/firewall/flowtable",
-        "component": "TablePage"
+        "component": "FirewallFlowtablePage"
       },
       {
         "id": "protocol",
@@ -1272,71 +1282,6 @@
         "children": [],
         "route": "/firewall/protocol",
         "component": "ProtocolPage"
-      },
-      {
-        "id": "qos",
-        "label": "服务质量",
-        "label_en": "QoS",
-        "icon": "ControlOutlined",
-        "children": [
-          {
-            "id": "interface",
-            "label": "接口QoS",
-            "label_en": "Interface QoS",
-            "icon": "",
-            "children": [],
-            "route": "/qos/interface",
-            "component": "QosInterfacePage"
-          },
-          {
-            "id": "policy",
-            "label": "QoS策略",
-            "label_en": "QoS Policy",
-            "icon": "",
-            "children": [],
-            "route": "/qos/policy",
-            "component": "QosPolicyPage"
-          },
-          {
-            "id": "traffic-match-group",
-            "label": "流量匹配组",
-            "label_en": "Traffic Match Group",
-            "icon": "",
-            "children": [],
-            "route": "/qos/traffic-match-group",
-            "component": "QosTrafficMatchGroupPage"
-          }
-        ],
-        "route": null,
-        "component": null
-      },
-      {
-        "id": "load-balancing",
-        "label": "负载均衡",
-        "label_en": "Load Balancing",
-        "icon": "ApartmentOutlined",
-        "children": [
-          {
-            "id": "wan",
-            "label": "WAN负载均衡",
-            "label_en": "WAN LB",
-            "icon": "",
-            "children": [],
-            "route": "/load-balancing/wan",
-            "component": "ConfigPage"
-          },
-          {
-            "id": "reverse-proxy",
-            "label": "反向代理",
-            "label_en": "Reverse Proxy",
-            "icon": "",
-            "children": [],
-            "route": "/load-balancing/reverse-proxy",
-            "component": "ConfigPage"
-          }
-        ],
-        "route": null,
-        "component": null
       }
     ],
     "route": null,
@@ -1344,7 +1289,7 @@
   },
   {
     "id": "nat",
-    "label": "网络地址转换",
+    "label": "NAT",
     "label_en": "NAT",
     "icon": "SwapOutlined",
     "children": [
@@ -1591,6 +1536,71 @@
     "component": null
   },
   {
+    "id": "qos",
+    "label": "服务质量",
+    "label_en": "QoS",
+    "icon": "ControlOutlined",
+    "children": [
+      {
+        "id": "interface",
+        "label": "接口QoS",
+        "label_en": "Interface QoS",
+        "icon": "",
+        "children": [],
+        "route": "/qos/interface",
+        "component": "QosInterfacePage"
+      },
+      {
+        "id": "policy",
+        "label": "QoS策略",
+        "label_en": "QoS Policy",
+        "icon": "",
+        "children": [],
+        "route": "/qos/policy",
+        "component": "QosPolicyPage"
+      },
+      {
+        "id": "traffic-match-group",
+        "label": "流量匹配组",
+        "label_en": "Traffic Match Group",
+        "icon": "",
+        "children": [],
+        "route": "/qos/traffic-match-group",
+        "component": "QosTrafficMatchGroupPage"
+      }
+    ],
+    "route": null,
+    "component": null
+  },
+  {
+    "id": "load-balancing",
+    "label": "负载均衡",
+    "label_en": "Load Balancing",
+    "icon": "ApartmentOutlined",
+    "children": [
+      {
+        "id": "wan",
+        "label": "WAN负载均衡",
+        "label_en": "WAN LB",
+        "icon": "",
+        "children": [],
+        "route": "/load-balancing/wan",
+        "component": "WanPage"
+      },
+      {
+        "id": "haproxy",
+        "label": "HAProxy",
+        "label_en": "HAProxy",
+        "icon": "",
+        "children": [],
+        "route": "/load-balancing/haproxy",
+        "component": "HaproxyPage"
+      }
+    ],
+    "route": null,
+    "component": null
+  },
+  {
     "id": "vpn",
     "label": "虚拟专用网络",
     "label_en": "VPN",
@@ -1634,13 +1644,22 @@
         "component": "PptpPage"
       },
       {
+        "id": "openconnect",
+        "label": "OpenConnect",
+        "label_en": "OpenConnect",
+        "icon": "",
+        "children": [],
+        "route": "/vpn/openconnect",
+        "component": "OpenConnectPage"
+      },
+      {
         "id": "sstp",
         "label": "SSTP",
         "label_en": "SSTP",
         "icon": "",
         "children": [],
         "route": "/vpn/sstp",
-        "component": "ConfigPage"
+        "component": "SstpPage"
       },
       {
         "id": "wireguard",
@@ -1662,6 +1681,24 @@
         "component": "ConfigPage",
         "hidden": true
       }
+    ],
+    "route": null,
+    "component": null
+  },
+  {
+    "id": "vpp",
+    "label": "VPP",
+    "label_en": "VPP",
+    "icon": "ThunderboltOutlined",
+    "children": [
+      { "id": "acl", "label": "ACL", "label_en": "ACL", "icon": "", "children": [], "route": "/vpp/acl", "component": "VppAclPage" },
+      { "id": "interfaces", "label": "接口", "label_en": "Interfaces", "icon": "", "children": [], "route": "/vpp/interfaces", "component": "VppInterfacesPage" },
+      { "id": "ipfix", "label": "IPFIX", "label_en": "IPFIX", "icon": "", "children": [], "route": "/vpp/ipfix", "component": "VppIpfixPage" },
+      { "id": "kernel-interfaces", "label": "内核接口", "label_en": "Kernel Interfaces", "icon": "", "children": [], "route": "/vpp/kernel-interfaces", "component": "VppKernelInterfacesPage" },
+      { "id": "nat", "label": "NAT", "label_en": "NAT", "icon": "", "children": [], "route": "/vpp/nat", "component": "VppNatPage" },
+      { "id": "nat44", "label": "NAT44", "label_en": "NAT44", "icon": "", "children": [], "route": "/vpp/nat44", "component": "VppNat44Page" },
+      { "id": "settings", "label": "设置", "label_en": "Settings", "icon": "", "children": [], "route": "/vpp/settings", "component": "VppSettingsPage" },
+      { "id": "sflow", "label": "sFlow", "label_en": "sFlow", "icon": "", "children": [], "route": "/vpp/sflow", "component": "VppSflowPage" }
     ],
     "route": null,
     "component": null

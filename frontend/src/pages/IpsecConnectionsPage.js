@@ -95,7 +95,7 @@ export default defineComponent({
 
     onMounted(load);
 
-    return { loading, connections, columns, load };
+    return { loading, connections, columns, load, rawOutput };
   },
   components: { DataTable, ToolbarButton },
   template: `

@@ -255,7 +255,6 @@ const STORAGE_KEY = 'controlPanelLayout';
 
 const WIDGET_CATEGORIES = [
   { key: 'system', title: '系统信息' },
-  { key: 'network', title: '网络' },
   { key: 'users', title: '用户' },
   { key: 'hardware', title: '硬件' },
   { key: 'tools', title: '工具' },
@@ -263,7 +262,7 @@ const WIDGET_CATEGORIES = [
 
 const WIDGET_ORDER = [
   'cpu', 'memory', 'disk', 'login', 'version', 'date',
-  'table', 'users', 'storageScsi', 'storageNvme', 'storageSmart',
+  'users', 'storageScsi', 'storageNvme', 'storageSmart',
   'usb', 'image', 'systemLoginUsers', 'webshell',
 ];
 
@@ -274,15 +273,14 @@ const WIDGET_META = {
   login: { title: '当前登录', category: 'system', wide: false },
   version: { title: '系统版本', category: 'system', wide: false },
   date: { title: '系统时间', category: 'system', wide: false },
-  table: { title: '路由表', category: 'network', wide: true },
-  users: { title: '当前用户', category: 'users', wide: true },
+  users: { title: '当前用户', category: 'users', wide: false },
   storageScsi: { title: 'SCSI 存储设备', category: 'hardware', wide: false },
   storageNvme: { title: 'NVMe 存储设备', category: 'hardware', wide: false },
   storageSmart: { title: 'SMART 信息', category: 'hardware', wide: false },
   usb: { title: 'USB 设备', category: 'hardware', wide: false },
-  image: { title: '系统镜像', category: 'system', wide: true },
+  image: { title: '系统镜像', category: 'system', wide: false },
   systemLoginUsers: { title: '系统登录用户', category: 'users', wide: true },
-  webshell: { title: 'Web Shell', category: 'tools', wide: true },
+  webshell: { title: 'Web Shell', category: 'tools', wide: false },
 };
 
 const WidgetHeader = defineComponent({
@@ -342,7 +340,6 @@ export default defineComponent({
       { key: 'memory', command: 'system memory', parser: parseMemory },
       { key: 'disk', command: 'disk sda format', parser: parseDisk },
       { key: 'login', command: 'login', parser: parseKeyValue },
-      { key: 'table', command: 'table', parser: parseFixedTable },
       { key: 'version', command: 'version', parser: parseKeyValue },
       { key: 'users', command: 'users', parser: parseFixedTable },
       { key: 'date', command: 'date', parser: (raw) => raw.trim() },
@@ -650,13 +647,6 @@ export default defineComponent({
 
             <template v-else-if="key === 'date'">
               <div class="widget-value">{{ widgets.date.data || '-' }}</div>
-            </template>
-
-            <template v-else-if="key === 'table'">
-              <table class="widget-table">
-                <thead><tr><th>VRF</th><th>NS ID</th><th>VRF ID</th><th>AFI</th><th>SAFI</th><th>Table</th><th>Count</th></tr></thead>
-                <tbody><tr v-for="(row, idx) in widgets.table.data" :key="idx"><td>{{ row.vrf }}</td><td>{{ row.ns_id }}</td><td>{{ row.vrf_id }}</td><td>{{ row.afi }}</td><td>{{ row.safi }}</td><td>{{ row.table }}</td><td>{{ row.count }}</td></tr></tbody>
-              </table>
             </template>
 
             <template v-else-if="key === 'users'">

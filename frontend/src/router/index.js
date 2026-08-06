@@ -10,6 +10,8 @@ import UserPage from '/src/pages/UserPage.js';
 import ProtocolPage from '/src/pages/ProtocolPage.js';
 import FirewallGlobalOptionsPage from '/src/pages/FirewallGlobalOptionsPage.js';
 import FirewallGroupPage from '/src/pages/FirewallGroupPage.js';
+import FirewallZonePage from '/src/pages/FirewallZonePage.js';
+import FirewallFlowtablePage from '/src/pages/FirewallFlowtablePage.js';
 import SettingsPage from '/src/pages/SettingsPage.js';
 import ToolPage from '/src/pages/ToolPage.js';
 import ImportExportPage from '/src/pages/ImportExportPage.js';
@@ -20,6 +22,7 @@ import IpsecConnectionsPage from '/src/pages/IpsecConnectionsPage.js';
 import IpsecSaPage from '/src/pages/IpsecSaPage.js';
 import L2tpPage from '/src/pages/L2tpPage.js';
 import PptpPage from '/src/pages/PptpPage.js';
+import SstpPage from '/src/pages/SstpPage.js';
 import DhcpServerPage from '/src/pages/DhcpServerPage.js';
 import DhcpRelayPage from '/src/pages/DhcpRelayPage.js';
 import PptpSessionsPage from '/src/pages/PptpSessionsPage.js';
@@ -114,6 +117,23 @@ import VtiPage from '/src/pages/VtiPage.js';
 import MacSecPage from '/src/pages/MacSecPage.js';
 import PseudoEthernetPage from '/src/pages/PseudoEthernetPage.js';
 import InputPage from '/src/pages/InputPage.js';
+import WanPage from '/src/pages/WanPage.js';
+import HaproxyPage from '/src/pages/HaproxyPage.js';
+import OpenConnectPage from '/src/pages/OpenConnectPage.js';
+import VppAclPage from '/src/pages/VppAclPage.js';
+import VppInterfacesPage from '/src/pages/VppInterfacesPage.js';
+import VppIpfixPage from '/src/pages/VppIpfixPage.js';
+import VppKernelInterfacesPage from '/src/pages/VppKernelInterfacesPage.js';
+import VppNatPage from '/src/pages/VppNatPage.js';
+import VppNat44Page from '/src/pages/VppNat44Page.js';
+import VppSettingsPage from '/src/pages/VppSettingsPage.js';
+import VppSflowPage from '/src/pages/VppSflowPage.js';
+import ContainerNamePage from '/src/pages/ContainerNamePage.js';
+import ContainerNetworkPage from '/src/pages/ContainerNetworkPage.js';
+import ContainerRegistryPage from '/src/pages/ContainerRegistryPage.js';
+import SystemLoginPage from '/src/pages/SystemLoginPage.js';
+import HostNamePage from '/src/pages/HostNamePage.js';
+import SyslogPage from '/src/pages/SyslogPage.js';
 
 const componentMap = {
   TablePage: GenericTablePage,
@@ -127,6 +147,9 @@ const componentMap = {
   ProtocolPage,
   FirewallGlobalOptionsPage,
   FirewallGroupPage,
+  FirewallZonePage,
+  FirewallFlowtablePage,
+  SstpPage,
   SettingsPage,
   ToolPage,
   ImportExportPage,
@@ -231,6 +254,23 @@ const componentMap = {
   MacSecPage,
   PseudoEthernetPage,
   InputPage,
+  WanPage,
+  HaproxyPage,
+  OpenConnectPage,
+  VppAclPage,
+  VppInterfacesPage,
+  VppIpfixPage,
+  VppKernelInterfacesPage,
+  VppNatPage,
+  VppNat44Page,
+  VppSettingsPage,
+  VppSflowPage,
+  ContainerNamePage,
+  ContainerNetworkPage,
+  ContainerRegistryPage,
+  SystemLoginPage,
+  HostNamePage,
+  SyslogPage,
 };
 
 function buildRoutes(menu, parentPath = '') {
