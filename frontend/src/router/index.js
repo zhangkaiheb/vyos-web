@@ -137,6 +137,7 @@ import SyslogPage from '/src/pages/SyslogPage.js';
 import TaskSchedulerPage from '/src/pages/TaskSchedulerPage.js';
 import SystemIpPage from '/src/pages/SystemIpPage.js';
 import SystemIpv6Page from '/src/pages/SystemIpv6Page.js';
+import DnsServerPage from '/src/pages/DnsServerPage.js';
 
 const componentMap = {
   TablePage: GenericTablePage,
@@ -277,6 +278,7 @@ const componentMap = {
   TaskSchedulerPage,
   SystemIpPage,
   SystemIpv6Page,
+  DnsServerPage,
 };
 
 function buildRoutes(menu, parentPath = '') {

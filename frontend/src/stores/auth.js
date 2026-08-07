@@ -1,4 +1,4 @@
-import { ref, computed } from '/src/utils/vue-import.js';
+import { ref, computed, onMounted, onUnmounted } from '/src/utils/vue-import.js';
 import { defineStore } from '/src/stores/pinia.js';
 import { authApi, menuApi, systemApi } from '/src/api/index.js';
 import { locale } from '/src/i18n/index.js';
@@ -11,6 +11,17 @@ export const useAuthStore = defineStore('auth', () => {
   const hostname = ref('');
 
   const isLoggedIn = computed(() => !!token.value && !!user.value);
+
+  function handleAuthExpired() {
+    token.value = '';
+    user.value = null;
+    menu.value = [];
+    hostname.value = '';
+  }
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('auth:expired', handleAuthExpired);
+  }
 
   async function loadHostname() {
     try {

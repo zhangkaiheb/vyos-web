@@ -1,10 +1,12 @@
 import { defineComponent, ref } from '/src/utils/vue-import.js';
+import { useRouter } from '/src/utils/vue-router-import.js';
 import { useAuthStore } from '/src/stores/auth.js';
 
 export default defineComponent({
   name: 'LoginPage',
   setup() {
     const auth = useAuthStore();
+    const router = useRouter();
     const username = ref('vyos');
     const password = ref('');
     const error = ref('');
@@ -13,6 +15,7 @@ export default defineComponent({
       error.value = '';
       try {
         await auth.login(username.value, password.value);
+        router.replace('/');
       } catch (e) {
         error.value = e.message;
       }

@@ -12,21 +12,21 @@ const ACTION_OPTIONS = ['', 'accept', 'drop', 'reject'];
 const LOG_LEVEL_OPTIONS = ['', 'emerg', 'alert', 'crit', 'err', 'warn', 'notice', 'info', 'debug'];
 
 const GENERAL_SCHEMA = [
-  { key: 'all_ping', title: '所有 ICMP 请求 (all-ping)', type: 'select', options: ENABLE_OPTIONS, help: '处理所有 IPv4 ICMP echo 请求' },
-  { key: 'broadcast_ping', title: '广播 ICMP 请求 (broadcast-ping)', type: 'select', options: ENABLE_OPTIONS, help: '处理广播 IPv4 ICMP echo/timestamp 请求' },
-  { key: 'directed_broadcast', title: '定向广播转发 (directed-broadcast)', type: 'select', options: ENABLE_OPTIONS, help: '所有接口 IPv4 定向广播转发' },
-  { key: 'ip_src_route', title: 'IPv4 源路由选项 (ip-src-route)', type: 'select', options: ENABLE_OPTIONS, help: '处理带源路由选项的 IPv4 数据包' },
-  { key: 'ipv6_receive_redirects', title: 'IPv6 接收重定向 (ipv6-receive-redirects)', type: 'select', options: ENABLE_OPTIONS, help: '处理接收到的 ICMPv6 重定向消息' },
+  { key: 'all_ping', title: '所有 ICMP 请求 (all-ping)', type: 'checkbox', help: '处理所有 IPv4 ICMP echo 请求' },
+  { key: 'broadcast_ping', title: '广播 ICMP 请求 (broadcast-ping)', type: 'checkbox', help: '处理广播 IPv4 ICMP echo/timestamp 请求' },
+  { key: 'directed_broadcast', title: '定向广播转发 (directed-broadcast)', type: 'checkbox', help: '所有接口 IPv4 定向广播转发' },
+  { key: 'ip_src_route', title: 'IPv4 源路由选项 (ip-src-route)', type: 'checkbox', help: '处理带源路由选项的 IPv4 数据包' },
+  { key: 'ipv6_receive_redirects', title: 'IPv6 接收重定向 (ipv6-receive-redirects)', type: 'checkbox', help: '处理接收到的 ICMPv6 重定向消息' },
   { key: 'ipv6_source_validation', title: 'IPv6 源验证 (ipv6-source-validation)', type: 'select', options: VALIDATION_OPTIONS, help: 'RFC3704 IPv6 反向路径源验证' },
-  { key: 'ipv6_src_route', title: 'IPv6 源路由扩展头 (ipv6-src-route)', type: 'select', options: ENABLE_OPTIONS, help: '处理带路由扩展头的 IPv6 数据包' },
-  { key: 'log_martians', title: '无效地址日志 (log-martians)', type: 'select', options: ENABLE_OPTIONS, help: '记录无效地址的 IPv4 数据包' },
-  { key: 'receive_redirects', title: 'IPv4 接收重定向 (receive-redirects)', type: 'select', options: ENABLE_OPTIONS, help: '处理接收到的 IPv4 ICMP 重定向消息' },
+  { key: 'ipv6_src_route', title: 'IPv6 源路由扩展头 (ipv6-src-route)', type: 'checkbox', help: '处理带路由扩展头的 IPv6 数据包' },
+  { key: 'log_martians', title: '无效地址日志 (log-martians)', type: 'checkbox', help: '记录无效地址的 IPv4 数据包' },
+  { key: 'receive_redirects', title: 'IPv4 接收重定向 (receive-redirects)', type: 'checkbox', help: '处理接收到的 IPv4 ICMP 重定向消息' },
   { key: 'resolver_cache', title: '域名解析缓存 (resolver-cache)', type: 'checkbox', help: '解析失败时保留上次成功值' },
   { key: 'resolver_interval', title: '解析更新间隔 (resolver-interval)', type: 'number', placeholder: '300', help: '域名解析更新间隔，单位秒', min: 10, max: 3600 },
-  { key: 'send_redirects', title: 'IPv4 发送重定向 (send-redirects)', type: 'select', options: ENABLE_OPTIONS, help: '发送 IPv4 ICMP 重定向消息' },
+  { key: 'send_redirects', title: 'IPv4 发送重定向 (send-redirects)', type: 'checkbox', help: '发送 IPv4 ICMP 重定向消息' },
   { key: 'source_validation', title: 'IPv4 源验证 (source-validation)', type: 'select', options: VALIDATION_OPTIONS, help: 'RFC3704 IPv4 反向路径源验证' },
-  { key: 'syn_cookies', title: 'TCP SYN Cookies (syn-cookies)', type: 'select', options: ENABLE_OPTIONS, help: 'IPv4 TCP SYN Cookie 保护' },
-  { key: 'twa_hazards_protection', title: 'TIME-WAIT 保护 (twa-hazards-protection)', type: 'select', options: ENABLE_OPTIONS, help: 'RFC1337 TCP TIME-WAIT 暗杀风险保护' },
+  { key: 'syn_cookies', title: 'TCP SYN Cookies (syn-cookies)', type: 'checkbox', help: 'IPv4 TCP SYN Cookie 保护' },
+  { key: 'twa_hazards_protection', title: 'TIME-WAIT 保护 (twa-hazards-protection)', type: 'checkbox', help: 'RFC1337 TCP TIME-WAIT 暗杀风险保护' },
 ];
 
 function statePolicySchema(state) {
@@ -66,21 +66,21 @@ const TAB_DEFS = [
 ];
 
 const DEFAULTS = {
-  all_ping: 'enable',
-  broadcast_ping: 'disable',
-  directed_broadcast: 'enable',
-  ip_src_route: 'disable',
-  ipv6_receive_redirects: 'disable',
+  all_ping: true,
+  broadcast_ping: false,
+  directed_broadcast: true,
+  ip_src_route: false,
+  ipv6_receive_redirects: false,
   ipv6_source_validation: 'disable',
-  ipv6_src_route: 'disable',
-  log_martians: 'enable',
-  receive_redirects: 'disable',
+  ipv6_src_route: false,
+  log_martians: true,
+  receive_redirects: false,
   resolver_cache: false,
   resolver_interval: 300,
-  send_redirects: 'enable',
+  send_redirects: true,
   source_validation: 'disable',
-  syn_cookies: 'enable',
-  twa_hazards_protection: 'disable',
+  syn_cookies: true,
+  twa_hazards_protection: false,
 
   state_policy_established_action: '',
   state_policy_established_log: false,
@@ -145,7 +145,17 @@ function configToForm(cfg) {
     twa_hazards_protection: 'twa-hazards-protection',
   };
   for (const [formKey, cfgKey] of Object.entries(mapGeneral)) {
-    if (cfg[cfgKey] !== undefined) form[formKey] = cfg[cfgKey];
+    if (cfg[cfgKey] !== undefined) {
+      // Checkbox fields: convert 'enable'/'disable' to boolean
+      if (['all_ping', 'broadcast_ping', 'directed_broadcast', 'ip_src_route',
+           'ipv6_receive_redirects', 'ipv6_src_route', 'log_martians',
+           'receive_redirects', 'send_redirects', 'syn_cookies',
+           'twa_hazards_protection'].includes(formKey)) {
+        form[formKey] = cfg[cfgKey] === 'enable';
+      } else {
+        form[formKey] = cfg[cfgKey];
+      }
+    }
   }
   // resolver-cache is a boolean node (set without value)
   form.resolver_cache = cfg['resolver-cache'] !== undefined;
@@ -188,6 +198,12 @@ function isPresent(value) {
 function formToConfig(form) {
   const value = {};
 
+  const checkboxFields = [
+    'all-ping', 'broadcast-ping', 'directed-broadcast', 'ip-src-route',
+    'ipv6-receive-redirects', 'ipv6-src-route', 'log-martians',
+    'receive-redirects', 'send-redirects', 'syn-cookies', 'twa-hazards-protection'
+  ];
+
   const mapGeneral = {
     'all-ping': form.all_ping,
     'broadcast-ping': form.broadcast_ping,
@@ -205,7 +221,12 @@ function formToConfig(form) {
     'twa-hazards-protection': form.twa_hazards_protection,
   };
   for (const [cfgKey, val] of Object.entries(mapGeneral)) {
-    if (isPresent(val)) value[cfgKey] = String(val);
+    if (checkboxFields.includes(cfgKey)) {
+      // Checkbox fields always send 'enable' or 'disable'
+      value[cfgKey] = val ? 'enable' : 'disable';
+    } else if (isPresent(val)) {
+      value[cfgKey] = String(val);
+    }
   }
   // resolver-cache is a boolean node and is set separately
 

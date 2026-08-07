@@ -22,6 +22,11 @@ async function request(method, url, data = null, query = null) {
 
   const res = await fetch(fullUrl, options);
   const json = await res.json().catch(() => ({}));
+  if (res.status === 401) {
+    localStorage.removeItem('vyos_token');
+    window.dispatchEvent(new CustomEvent('auth:expired'));
+    throw new Error('Token expired');
+  }
   if (!res.ok || !json.success) {
     const err = new Error(json.message || `HTTP ${res.status}`);
     err.code = json.code || res.status;

@@ -555,7 +555,7 @@
             "icon": "",
             "children": [],
             "route": "/system/name-server",
-            "component": "TablePage"
+            "component": "DnsServerPage"
           },
           {
             "id": "conntrack",

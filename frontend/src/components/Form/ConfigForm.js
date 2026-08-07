@@ -250,6 +250,7 @@ export default defineComponent({
         children.push(h('select', {
           value: formObj[field.key] || '',
           disabled,
+          style: { maxWidth: '200px' },
           onChange: (e) => { formObj[field.key] = e.target.value; },
         }, options.map(opt => {
           const optValue = typeof opt === 'object' ? opt.value : opt;
