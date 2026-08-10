@@ -1,9 +1,7 @@
 import { defineComponent, computed, watch } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useAuthStore } from '/src/stores/auth.js';
-import { useConfigStore } from '/src/stores/config.js';
 import TopMenu from '/src/components/Menu/TopMenu.js';
-import CommitBar from '/src/components/Layout/CommitBar.js';
 import ErrorDisplay from '/src/components/Layout/ErrorDisplay.js';
 import HelpButton from '/src/components/Layout/HelpButton.js';
 import { emitMenuRefresh } from '/src/utils/eventBus.js';
@@ -12,7 +10,6 @@ export default defineComponent({
   name: 'MainLayout',
   setup() {
     const auth = useAuthStore();
-    const config = useConfigStore();
     const route = useRoute();
 
     const breadcrumbs = computed(() => {
@@ -39,7 +36,7 @@ export default defineComponent({
     const pageTitle = computed(() => auth.hostname || 'VyOS');
     watch(pageTitle, (val) => { document.title = val; }, { immediate: true });
 
-    return { auth, config, breadcrumbs, refreshCurrentPage, pageTitle, route };
+    return { auth, breadcrumbs, refreshCurrentPage, pageTitle, route };
   },
   template: `
     <div class="main-layout">
@@ -49,7 +46,6 @@ export default defineComponent({
           <TopMenu />
         </div>
       </header>
-      <CommitBar />
       <div class="breadcrumb">
         <div class="breadcrumb-path">
           <span v-for="(b, i) in breadcrumbs" :key="i" class="breadcrumb-item">
@@ -68,5 +64,5 @@ export default defineComponent({
       <ErrorDisplay />
     </div>
   `,
-  components: { TopMenu, CommitBar, ErrorDisplay, HelpButton },
+  components: { TopMenu, ErrorDisplay, HelpButton },
 });

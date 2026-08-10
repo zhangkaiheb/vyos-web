@@ -4,6 +4,7 @@ import { configApi } from '/src/api/index.js';
 
 export const useConfigStore = defineStore('config', () => {
   const sessionChanged = ref(false);
+  const pendingChanges = ref(false);
   const commands = ref([]);
 
   async function getConfig(path, session = false) {
@@ -18,15 +19,29 @@ export const useConfigStore = defineStore('config', () => {
     return configApi.delete(path);
   }
 
+  function markPending() {
+    pendingChanges.value = true;
+  }
+
+  function clearPending() {
+    pendingChanges.value = false;
+  }
+
   async function commit() {
     const res = await configApi.commit();
-    await checkSessionChanged();
+    pendingChanges.value = false;
     return res;
   }
 
   async function discard() {
     const res = await configApi.discard();
-    await checkSessionChanged();
+    pendingChanges.value = false;
+    return res;
+  }
+
+  async function save() {
+    const res = await configApi.save();
+    pendingChanges.value = false;
     return res;
   }
 
@@ -49,8 +64,9 @@ export const useConfigStore = defineStore('config', () => {
   }
 
   return {
-    sessionChanged, commands,
+    sessionChanged, pendingChanges, commands,
     getConfig, setConfig, deleteConfig,
-    commit, discard, checkSessionChanged, loadCommands,
+    markPending, clearPending,
+    commit, discard, save, checkSessionChanged, loadCommands,
   };
 });

@@ -263,6 +263,32 @@ select {
   z-index: 1;
 }
 
+.pending-changes-icon {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.pending-changes-icon:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.pending-icon {
+  font-size: 18px;
+  display: inline-block;
+  -webkit-text-stroke: 0.5px white;
+}
+
+.pending-icon.flashing {
+  animation: pending-flash 1s ease-in-out infinite;
+}
+
+@keyframes pending-flash {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.9); }
+}
+
 .user-menu {
   position: relative;
 }
@@ -1537,6 +1563,41 @@ select {
 
 .diff-del {
   color: var(--color-error);
+}
+
+.commit-diff-modal {
+  max-height: 400px;
+  overflow: auto;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@keyframes dotPulse {
+  0%, 20% {
+    color: #999;
+  }
+  40% {
+    color: #666;
+  }
+  60%, 100% {
+    color: #999;
+  }
+}
+
+.dot1 {
+  animation: dotPulse 1.4s infinite;
+  animation-delay: 0s;
+}
+
+.dot2 {
+  animation: dotPulse 1.4s infinite;
+  animation-delay: 0.2s;
+}
+
+.dot3 {
+  animation: dotPulse 1.4s infinite;
+  animation-delay: 0.4s;
 }
 
 /* Alerts */

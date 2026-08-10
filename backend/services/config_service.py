@@ -44,6 +44,22 @@ def _get_config_session(session_id=None):
     return CONFIG_SESSIONS[session_id]
 
 
+def _get_fresh_config_session(session_id=None):
+    """Get a fresh ConfigSession, always recreating to avoid stale session issues."""
+    if session_id is None:
+        session_id = str(os.getpid())
+    # Always recreate to avoid stale session issues
+    if session_id in CONFIG_SESSIONS:
+        try:
+            old = CONFIG_SESSIONS[session_id]
+            old.close()
+        except Exception:
+            pass
+        del CONFIG_SESSIONS[session_id]
+    CONFIG_SESSIONS[session_id] = vyos.configsession.ConfigSession(session_id, app=APP_NAME)
+    return CONFIG_SESSIONS[session_id]
+
+
 def _path_to_list(path):
     if isinstance(path, list):
         return [str(p) for p in path]
@@ -444,7 +460,7 @@ class ConfigService:
                 detail={'references': refs},
                 suggestion='请先移除引用该配置项的规则或启用强制删除'
             )
-        session = _get_config_session()
+        session = _get_fresh_config_session()
         session.delete(path_list)
         _log_action(username, 'delete', _list_to_path(path_list), {})
         return {'success': True, 'message': '配置已删除'}
@@ -652,13 +668,60 @@ class ConfigService:
                                  suggestion='请检查版本号是否有效')
 
     def compare_config(self, left, right):
+        """Compare two configurations."""
         try:
             cfg = vyos.config.Config()
-            running = cfg.get_cached_root_dict(effective=True)
-            session = cfg.get_cached_root_dict(effective=False)
-            return {'success': True, 'left': running, 'right': session}
+            left_config = cfg.get_config_dict([], effective=True, get_first_key=True)
+            right_config = cfg.get_config_dict([], effective=False, get_first_key=True)
+            if not isinstance(left_config, dict):
+                left_config = {}
+            if not isinstance(right_config, dict):
+                right_config = {}
+            diff_lines = self._compute_diff(left_config, right_config)
+            return {'success': True, 'diff': diff_lines}
         except Exception as e:
             return _structured_error('COMPARE_ERROR', str(e), traceback.format_exc())
+
+    def _compute_diff(self, old_dict, new_dict, prefix=''):
+        """Compute VyOS CLI-style diff lines between two config dicts."""
+        diff_lines = []
+        all_keys = set(list(old_dict.keys()) + list(new_dict.keys()))
+        for key in sorted(all_keys):
+            path = f'{prefix} {key}' if prefix else key
+            if key not in old_dict:
+                self._add_diff_lines(new_dict[key], path, '+', diff_lines)
+            elif key not in new_dict:
+                self._add_diff_lines(old_dict[key], path, '-', diff_lines)
+            else:
+                old_val = old_dict[key]
+                new_val = new_dict[key]
+                if isinstance(old_val, dict) and isinstance(new_val, dict):
+                    diff_lines.extend(self._compute_diff(old_val, new_val, path))
+                elif isinstance(old_val, list) and isinstance(new_val, list):
+                    old_set = set(old_val)
+                    new_set = set(new_val)
+                    for v in sorted(old_set - new_set):
+                        diff_lines.append(f'-{path} {v}')
+                    for v in sorted(new_set - old_set):
+                        diff_lines.append(f'+{path} {v}')
+                elif old_val != new_val:
+                    self._add_diff_lines(old_val, path, '-', diff_lines)
+                    self._add_diff_lines(new_val, path, '+', diff_lines)
+        return diff_lines
+
+    def _add_diff_lines(self, value, path, prefix, diff_lines):
+        """Add diff lines for a value with prefix (+/-)."""
+        if isinstance(value, dict):
+            for k, v in value.items():
+                self._add_diff_lines(v, f'{path} {k}', prefix, diff_lines)
+        elif isinstance(value, list):
+            for v in value:
+                diff_lines.append(f'{prefix}{path} {v}')
+        else:
+            if value == '' or value is None:
+                diff_lines.append(f'{prefix}{path}')
+            else:
+                diff_lines.append(f'{prefix}{path} {value}')
 
     def import_config(self, user, config_type, data, password='', path=''):
         try:
@@ -823,8 +886,20 @@ class ConfigService:
         if now - cache['timestamp'] < _SESSION_CHANGED_CACHE_TTL:
             return {'success': True, 'changed': cache['value']}
         try:
-            cfg = vyos.config.Config()
-            changed = cfg.session_changed()
+            session = _get_config_session()
+            if not session:
+                cache['value'] = False
+                cache['timestamp'] = now
+                return {'success': True, 'changed': False}
+            # Get session config
+            session_text = session.show_config([], format='raw') or ''
+            # Get running config from config.boot
+            try:
+                with open('/config/config.boot', 'r') as f:
+                    running_text = f.read()
+            except Exception:
+                running_text = ''
+            changed = running_text != session_text
             cache['value'] = changed
             cache['timestamp'] = now
             return {'success': True, 'changed': changed}

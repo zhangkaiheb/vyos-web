@@ -2,7 +2,9 @@ import { defineComponent, ref, computed, h, onMounted, onUnmounted } from '/src/
 import { useRoute, useRouter } from '/src/utils/vue-router-import.js';
 import { useAuthStore } from '/src/stores/auth.js';
 import { useNotificationStore } from '/src/stores/notifications.js';
+import { useConfigStore } from '/src/stores/config.js';
 import { emitMenuRefresh } from '/src/utils/eventBus.js';
+import PendingChanges from '/src/components/Layout/PendingChanges.js';
 
 const CLOSE_DELAY = 600;
 
@@ -56,8 +58,10 @@ function renderSubmenu(items, state, keepParentOpen, clearParent, setOpen, clear
 
 export default defineComponent({
   name: 'TopMenu',
+  components: { PendingChanges },
   setup() {
     const auth = useAuthStore();
+    const config = useConfigStore();
     const notifications = useNotificationStore();
     const route = useRoute();
     const router = useRouter();
@@ -230,6 +234,7 @@ export default defineComponent({
           ? renderSubmenu(openItem.children, openChild.value, () => setL1(openL1.value), clearL1, setChild, clearChild, toggleChild, closeAll, router, route, 0, fixedStyle)
           : null,
         h('div', { class: 'header-actions' }, [
+          h(PendingChanges),
           h('div', {
             class: ['notification', { open: notificationOpen.value }],
             title: '通知',
