@@ -1,35 +1,39 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
+import { useConfigStore } from '/src/stores/config.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import { api, interfaceApi } from '/src/api/index.js';
-
-const COLUMNS = [
-  { key: 'name', title: '接口名称', width: 120 },
-  { key: 'description', title: '描述', width: 160 },
-  { key: 'mtu', title: 'MTU', width: 80 },
-  { key: 'vrf', title: 'VRF', width: 100 },
-  { key: 'disable', title: '禁用', width: 80 },
-  { key: 'actions', title: '操作', width: 100 },
-];
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { showError } from '/src/components/Layout/ErrorDisplay.js';
 
 const SOURCE_VALIDATION_OPTIONS = [
-  { value: 'strict', label: 'strict (严格)' },
-  { value: 'loose', label: 'loose (宽松)' },
-  { value: 'disable', label: 'disable (禁用)' },
+  { value: 'strict', label: 'strict' },
+  { value: 'loose', label: 'loose' },
+  { value: 'disable', label: 'disable' },
 ];
 
 const ACCEPT_DAD_OPTIONS = [
-  { value: '0', label: '0 (禁用 DAD)' },
-  { value: '1', label: '1 (启用 DAD - 默认)' },
-  { value: '2', label: '2 (启用 DAD - MAC 重复时禁用 IPv6)' },
+  { value: '0', label: '0' },
+  { value: '1', label: '1' },
+  { value: '2', label: '2' },
 ];
 
 export default defineComponent({
   name: 'VtiPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
+    const { t } = inject('i18n');
+    const configStore = useConfigStore();
+    const COLUMNS = computed(() => [
+      { key: 'name', title: t('interface.vti.name'), width: 120 },
+      { key: 'description', title: t('interface.vti.description'), width: 160 },
+      { key: 'mtu', title: t('interface.vti.mtu'), width: 80 },
+      { key: 'vrf', title: t('interface.vti.vrf'), width: 100 },
+      { key: 'disable', title: t('interface.vti.disable'), width: 80 },
+      { key: 'actions', title: t('interface.vti.actions'), width: 100 },
+    ]);
     const loading = ref(false);
     const vtis = ref([]);
     const modalVisible = ref(false);
@@ -37,49 +41,51 @@ export default defineComponent({
     const interfaceOptions = ref([]);
     const activeTab = ref('basic');
     const selectedVti = ref([]);
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
 
     const basicSchema = computed(() => [
-      { key: 'name', title: '接口名称', type: 'text', required: true, placeholder: '如 vti0, vti1', help: '格式: vtiN' },
-      { key: 'description', title: '描述', type: 'text', placeholder: '接口描述' },
-      { key: 'address', title: 'IP 地址', type: 'textarea', placeholder: '每行一个 IPv4/IPv6 地址或 CIDR', help: '接口 IP 地址 (支持多行)' },
-      { key: 'mtu', title: 'MTU', type: 'number', min: 68, max: 16000, placeholder: '68-16000', help: '最大传输单元 (默认: 1500)' },
-      { key: 'disable', title: '禁用接口', type: 'checkbox', help: '管理性禁用接口' },
+      { key: 'name', title: t('interface.vti.name'), type: 'text', required: true, placeholder: t('interface.vti.name_placeholder'), help: t('interface.vti.name_help') },
+      { key: 'description', title: t('interface.vti.description'), type: 'text', placeholder: t('interface.vti.description_placeholder') },
+      { key: 'address', title: t('interface.vti.ip_address'), type: 'textarea', placeholder: t('interface.vti.address_placeholder'), help: t('interface.vti.address_help') },
+      { key: 'mtu', title: t('interface.vti.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('interface.vti.mtu_placeholder'), help: t('interface.vti.mtu_help') },
+      { key: 'disable', title: t('interface.vti.disable'), type: 'checkbox', help: t('interface.vti.disable_help') },
     ]);
 
     const ipSchema = computed(() => [
-      { key: 'ip_adjust_mss', title: '调整 MSS', type: 'text', placeholder: 'clamp-mss-to-pmtu 或 536-65535', help: 'TCP MSS 值' },
-      { key: 'ip_arp_cache_timeout', title: 'ARP 缓存超时', type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: 'ARP 缓存条目超时 (秒, 默认: 30)' },
-      { key: 'ip_disable_arp_filter', title: '禁用 ARP 过滤', type: 'checkbox', help: '禁用 ARP 过滤' },
-      { key: 'ip_disable_forwarding', title: '禁用转发', type: 'checkbox', help: '禁用 IP 转发' },
-      { key: 'ip_enable_arp_accept', title: '启用 ARP 接受', type: 'checkbox', help: '启用 ARP 接受' },
-      { key: 'ip_enable_arp_announce', title: '启用 ARP 通告', type: 'checkbox', help: '启用 ARP 通告' },
-      { key: 'ip_enable_arp_ignore', title: '启用 ARP 忽略', type: 'checkbox', help: '启用 ARP 忽略' },
-      { key: 'ip_enable_directed_broadcast', title: '启用定向广播', type: 'checkbox', help: '启用定向广播转发' },
-      { key: 'ip_enable_proxy_arp', title: '启用代理 ARP', type: 'checkbox', help: '启用代理 ARP' },
-      { key: 'ip_proxy_arp_pvlan', title: '私有 VLAN 代理 ARP', type: 'checkbox', help: '启用私有 VLAN 代理 ARP' },
-      { key: 'ip_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
+      { key: 'ip_adjust_mss', title: t('interface.vti.ip.adjust_mss'), type: 'text', placeholder: t('interface.vti.ip.adjust_mss_placeholder'), help: t('interface.vti.ip.adjust_mss_help') },
+      { key: 'ip_arp_cache_timeout', title: t('interface.vti.ip.arp_cache_timeout'), type: 'number', min: 1, max: 86400, placeholder: t('interface.vti.ip.arp_cache_timeout_placeholder'), help: t('interface.vti.ip.arp_cache_timeout_help') },
+      { key: 'ip_disable_arp_filter', title: t('interface.vti.ip.disable_arp_filter'), type: 'checkbox', help: t('interface.vti.ip.disable_arp_filter_help') },
+      { key: 'ip_disable_forwarding', title: t('interface.vti.ip.disable_forwarding'), type: 'checkbox', help: t('interface.vti.ip.disable_forwarding_help') },
+      { key: 'ip_enable_arp_accept', title: t('interface.vti.ip.enable_arp_accept'), type: 'checkbox', help: t('interface.vti.ip.enable_arp_accept_help') },
+      { key: 'ip_enable_arp_announce', title: t('interface.vti.ip.enable_arp_announce'), type: 'checkbox', help: t('interface.vti.ip.enable_arp_announce_help') },
+      { key: 'ip_enable_arp_ignore', title: t('interface.vti.ip.enable_arp_ignore'), type: 'checkbox', help: t('interface.vti.ip.enable_arp_ignore_help') },
+      { key: 'ip_enable_directed_broadcast', title: t('interface.vti.ip.enable_directed_broadcast'), type: 'checkbox', help: t('interface.vti.ip.enable_directed_broadcast_help') },
+      { key: 'ip_enable_proxy_arp', title: t('interface.vti.ip.enable_proxy_arp'), type: 'checkbox', help: t('interface.vti.ip.enable_proxy_arp_help') },
+      { key: 'ip_proxy_arp_pvlan', title: t('interface.vti.ip.proxy_arp_pvlan'), type: 'checkbox', help: t('interface.vti.ip.proxy_arp_pvlan_help') },
+      { key: 'ip_source_validation', title: t('interface.vti.ip.source_validation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: t('interface.vti.ip.source_validation_placeholder'), help: t('interface.vti.ip.source_validation_help') },
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: '接受 DAD', type: 'select', options: ACCEPT_DAD_OPTIONS, help: '重复地址检测 (默认: 1)' },
-      { key: 'ipv6_autoconf', title: '自动配置', type: 'checkbox', help: '使用 SLAAC 获取 IPv6 地址' },
-      { key: 'ipv6_eui64', title: 'EUI-64 前缀', type: 'text', placeholder: 'IPv6 前缀', help: '基于 MAC 的 EUI-64 地址前缀' },
-      { key: 'ipv6_no_default_link_local', title: '无默认链路本地地址', type: 'checkbox', help: '移除默认链路本地地址' },
-      { key: 'ipv6_adjust_mss', title: '调整 MSS', type: 'text', placeholder: 'clamp-mss-to-pmtu 或 536-65535', help: 'TCP MSS 值' },
-      { key: 'ipv6_base_reachable_time', title: '基础可达时间', type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: '基础可达时间 (秒, 默认: 30)' },
-      { key: 'ipv6_disable_forwarding', title: '禁用转发', type: 'checkbox', help: '禁用 IPv6 转发' },
-      { key: 'ipv6_dup_addr_detect_transmits', title: 'DAD 传输次数', type: 'number', min: 0, max: 100, placeholder: '0-100', help: 'DAD 期间发送的 NS 消息数 (默认: 1, 0=禁用)' },
-      { key: 'ipv6_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
+      { key: 'ipv6_accept_dad', title: t('interface.vti.ipv6.accept_dad'), type: 'select', options: ACCEPT_DAD_OPTIONS, help: t('interface.vti.ipv6.accept_dad_help') },
+      { key: 'ipv6_autoconf', title: t('interface.vti.ipv6.address_autoconf'), type: 'checkbox', help: t('interface.vti.ipv6.address_autoconf_help') },
+      { key: 'ipv6_eui64', title: t('interface.vti.ipv6.address_eui64'), type: 'text', placeholder: t('interface.vti.ipv6.address_eui64_placeholder'), help: t('interface.vti.ipv6.eui64_help') },
+      { key: 'ipv6_no_default_link_local', title: t('interface.vti.ipv6.no_default_link_local'), type: 'checkbox', help: t('interface.vti.ipv6.no_default_link_local_help') },
+      { key: 'ipv6_adjust_mss', title: t('interface.vti.ipv6.adjust_mss'), type: 'text', placeholder: t('interface.vti.ipv6.adjust_mss_placeholder'), help: t('interface.vti.ipv6.adjust_mss_help') },
+      { key: 'ipv6_base_reachable_time', title: t('interface.vti.ipv6.base_reachable_time'), type: 'number', min: 1, max: 86400, placeholder: t('interface.vti.ipv6.base_reachable_time_placeholder'), help: t('interface.vti.ipv6.base_reachable_time_help') },
+      { key: 'ipv6_disable_forwarding', title: t('interface.vti.ipv6.disable_forwarding'), type: 'checkbox', help: t('interface.vti.ipv6.disable_forwarding_help') },
+      { key: 'ipv6_dup_addr_detect_transmits', title: t('interface.vti.ipv6.dup_addr_detect_transmits'), type: 'number', min: 0, max: 100, placeholder: t('interface.vti.ipv6.dup_addr_detect_transmits_placeholder'), help: t('interface.vti.ipv6.dup_addr_detect_transmits_help') },
+      { key: 'ipv6_source_validation', title: t('interface.vti.ipv6.source_validation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: t('interface.vti.ipv6.source_validation_placeholder'), help: t('interface.vti.ipv6.source_validation_help') },
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: '镜像出方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像出方向流量到目标接口' },
-      { key: 'mirror_ingress', title: '镜像入方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像入方向流量到目标接口' },
+      { key: 'mirror_egress', title: t('interface.vti.mirror.egress'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.vti.mirror.placeholder'), help: t('interface.vti.mirror.egress_help') },
+      { key: 'mirror_ingress', title: t('interface.vti.mirror.ingress'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.vti.mirror.placeholder'), help: t('interface.vti.mirror.ingress_help') },
     ]);
 
     const otherSchema = computed(() => [
-      { key: 'redirect', title: '重定向目标', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '重定向入站数据包到目标接口' },
-      { key: 'vrf', title: 'VRF 实例', type: 'text', placeholder: 'VRF 实例名称', help: 'VRF 实例名称' },
+      { key: 'redirect', title: t('interface.vti.other.redirect'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.vti.other.redirect_placeholder'), help: t('interface.vti.other.redirect_help') },
+      { key: 'vrf', title: t('interface.vti.other.vrf'), type: 'text', placeholder: t('interface.vti.other.vrf_placeholder'), help: t('interface.vti.other.vrf_help') },
     ]);
 
     const commandText = computed(() => {
@@ -125,16 +131,15 @@ export default defineComponent({
       if (v.redirect) lines.push(`set interfaces vti ${name} redirect ${v.redirect}`);
       if (v.vrf) lines.push(`set interfaces vti ${name} vrf ${v.vrf}`);
 
-      return lines.length ? lines.join('\n') : '# 未配置任何参数';
+      return lines.length ? lines.join('\n') : t('interface.vti.noConfig');
     });
 
     const modalTabs = computed(() => [
-      { key: 'basic', title: '基本配置' },
-      { key: 'ip', title: 'IPv4 参数' },
-      { key: 'ipv6', title: 'IPv6 参数' },
-      { key: 'mirror', title: '流量镜像' },
-      { key: 'other', title: '其他' },
-      { key: 'command', title: '命令预览' },
+      { key: 'basic', title: t('interface.vti.tab.basic') },
+      { key: 'ip', title: t('interface.vti.tab.ip') },
+      { key: 'ipv6', title: t('interface.vti.tab.ipv6') },
+      { key: 'mirror', title: t('interface.vti.tab.mirror') },
+      { key: 'other', title: t('interface.vti.tab.other') },
     ]);
 
     function getDefaultForm() {
@@ -261,10 +266,6 @@ export default defineComponent({
       }
     }
 
-    function showError(err) {
-      alert(`错误码: ${err.code || 'ERROR'}\n错误信息: ${err.message || err}`);
-    }
-
     function openModal(index = -1) {
       if (index >= 0) {
         editingVti.value = vtiToForm(vtis.value[index]);
@@ -278,10 +279,11 @@ export default defineComponent({
     async function save() {
       try {
         const form = editingVti.value;
-        if (!form.name) { alert('请输入接口名称'); return; }
+        if (!form.name) { showError({ message: t('interface.vti.nameRequired') }); return; }
         const config = formToVti(form);
-        console.log('[VTI] 保存配置:', JSON.stringify(config, null, 2));
-        await api.put('/config', { path: `interfaces vti ${form.name}`, value: config });
+        console.log('[VTI] Save config:', JSON.stringify(config, null, 2));
+        await configStore.setConfig(`interfaces vti ${form.name}`, config);
+        configStore.markPending();
         modalVisible.value = false;
         await load();
       } catch (err) {
@@ -289,28 +291,35 @@ export default defineComponent({
       }
     }
 
-    async function remove() {
-      if (!selectedVti.value.length) { alert('请先选择要删除的 VTI 接口'); return; }
-      if (!confirm(`确定删除选中的 ${selectedVti.value.length} 个 VTI 接口?`)) return;
+    function remove() {
+      if (!selectedVti.value.length) { showError({ message: t('interface.vti.selectFirst') }); return; }
+      pendingDeleteNames.value = selectedVti.value.map(v => v.name);
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemove() {
       try {
-        for (const v of selectedVti.value) {
-          await api.delete('/config', { path: `interfaces vti ${v.name}` });
+        for (const name of pendingDeleteNames.value) {
+          await configStore.deleteConfig(`interfaces vti ${name}`);
+          configStore.markPending();
         }
         selectedVti.value = [];
+        pendingDeleteNames.value = [];
         await load();
       } catch (err) {
         showError(err);
       }
     }
 
-    onMounted(() => { load(); });
+    onMounted(() => { load(); onMenuRefresh(load); });
 
     return {
       loading, vtis, selected: selectedVti, modalVisible, editingVti, interfaceOptions, activeTab,
+      deleteModalVisible, pendingDeleteNames,
       COLUMNS,
       basicSchema, ipSchema, ipv6Schema, mirrorSchema, otherSchema,
       commandText, modalTabs,
-      openModal, save, remove, load,
+      openModal, save, remove, confirmRemove, load, t,
     };
   },
   template: `
@@ -327,7 +336,7 @@ export default defineComponent({
         @refresh="load"
         @selection-change="selected = $event"
       />
-      <DraggableModal v-model:visible="modalVisible" :title="editingVti?.name ? '编辑 VTI 接口' : '创建 VTI 接口'" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingVti?.name ? t('interface.vti.modal.edit') : t('interface.vti.modal.create')" width="900px">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic><ConfigForm :schema="basicSchema" :model="editingVti" /></template>
@@ -335,13 +344,18 @@ export default defineComponent({
             <template #ipv6><ConfigForm :schema="ipv6Schema" :model="editingVti" /></template>
             <template #mirror><ConfigForm :schema="mirrorSchema" :model="editingVti" /></template>
             <template #other><ConfigForm :schema="otherSchema" :model="editingVti" /></template>
-            <template #command><pre style="background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;font-size:13px;">{{ commandText }}</pre></template>
           </TabGroup>
         </template>
         <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">取消</button>
-          <button type="button" class="btn btn-primary" @click="save">确定</button>
+          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('common.cancel') }}</button>
+          <button type="button" class="btn btn-primary" @click="save">{{ t('common.confirm') }}</button>
         </template>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('common.confirm_delete')" width="400px" @confirm="confirmRemove">
+        <div>{{ t('interface.vti.delete_confirm') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

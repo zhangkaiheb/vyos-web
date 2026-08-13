@@ -1,0 +1,128 @@
+{
+  "zh-CN": {
+    "hostname": {
+      "buttons": {
+        "confirm": "确定",
+        "saving": "saving"
+      },
+      "errors": {
+        "hostnameRequired": "host名称 为必填项",
+        "loadFailed": "load 失败",
+        "saveFailed": "保存 失败"
+      },
+      "labels": {
+        "name": "名称",
+        "placeholder": "placeholder",
+        "titleTip": "titleTip"
+      }
+    }
+  },
+  "en": {
+    "hostname": {
+      "buttons": {
+        "confirm": "Confirm",
+        "saving": "Saving"
+      },
+      "errors": {
+        "hostnameRequired": "Hostname Required",
+        "loadFailed": "Load Failed",
+        "saveFailed": "Save Failed"
+      },
+      "labels": {
+        "name": "Name",
+        "placeholder": "Placeholder",
+        "titleTip": "Title Tip"
+      }
+    }
+  },
+  "zh-TW": {
+    "hostname": {
+      "buttons": {
+        "confirm": "Confirm",
+        "saving": "Saving"
+      },
+      "errors": {
+        "hostnameRequired": "Hostname Required",
+        "loadFailed": "Load Failed",
+        "saveFailed": "Save Failed"
+      },
+      "labels": {
+        "name": "Name",
+        "placeholder": "Placeholder",
+        "titleTip": "Title Tip"
+      }
+    }
+  },
+  "ru": {
+    "hostname": {
+      "buttons": {
+        "confirm": "Confirm",
+        "saving": "Saving"
+      },
+      "errors": {
+        "hostnameRequired": "Hostname Required",
+        "loadFailed": "Load Failed",
+        "saveFailed": "Save Failed"
+      },
+      "labels": {
+        "name": "Name",
+        "placeholder": "Placeholder",
+        "titleTip": "Title Tip"
+      }
+    }
+  },
+  "de": {
+    "hostname": {
+      "buttons": {
+        "confirm": "Confirm",
+        "saving": "Saving"
+      },
+      "errors": {
+        "hostnameRequired": "Hostname Required",
+        "loadFailed": "Load Failed",
+        "saveFailed": "Save Failed"
+      },
+      "labels": {
+        "name": "Name",
+        "placeholder": "Placeholder",
+        "titleTip": "Title Tip"
+      }
+    }
+  },
+  "fr": {
+    "hostname": {
+      "buttons": {
+        "confirm": "Confirm",
+        "saving": "Saving"
+      },
+      "errors": {
+        "hostnameRequired": "Hostname Required",
+        "loadFailed": "Load Failed",
+        "saveFailed": "Save Failed"
+      },
+      "labels": {
+        "name": "Name",
+        "placeholder": "Placeholder",
+        "titleTip": "Title Tip"
+      }
+    }
+  },
+  "ko": {
+    "hostname": {
+      "buttons": {
+        "confirm": "Confirm",
+        "saving": "Saving"
+      },
+      "errors": {
+        "hostnameRequired": "Hostname Required",
+        "loadFailed": "Load Failed",
+        "saveFailed": "Save Failed"
+      },
+      "labels": {
+        "name": "Name",
+        "placeholder": "Placeholder",
+        "titleTip": "Title Tip"
+      }
+    }
+  }
+}

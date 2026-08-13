@@ -5,45 +5,48 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const DEVICE_TYPE_OPTIONS = [
-  { value: 'tun', label: 'tun (三层隧道 - 默认)' },
-  { value: 'tap', label: 'tap (二层隧道)' },
+  { value: 'tun', label: 'openvpn.deviceType.tun' },
+  { value: 'tap', label: 'openvpn.deviceType.tap' },
 ];
 
 const IP_VERSION_OPTIONS = [
-  { value: 'auto', label: 'auto (自动 - 默认)' },
-  { value: 'ipv4', label: 'ipv4 (仅 IPv4)' },
-  { value: 'ipv6', label: 'ipv6 (仅 IPv6)' },
-  { value: 'dual-stack', label: 'dual-stack (双栈)' },
+  { value: 'auto', label: 'openvpn.ipVersion.auto' },
+  { value: 'ipv4', label: 'openvpn.ipVersion.ipv4' },
+  { value: 'ipv6', label: 'openvpn.ipVersion.ipv6' },
+  { value: 'dual-stack', label: 'openvpn.ipVersion.dualStack' },
 ];
 
 const MODE_OPTIONS = [
-  { value: 'site-to-site', label: 'site-to-site (站点到站点)' },
-  { value: 'client', label: 'client (客户端)' },
-  { value: 'server', label: 'server (服务端)' },
+  { value: 'site-to-site', label: 'openvpn.mode.siteToSite' },
+  { value: 'client', label: 'openvpn.mode.client' },
+  { value: 'server', label: 'openvpn.mode.server' },
 ];
 
 const PROTOCOL_OPTIONS = [
-  { value: 'udp', label: 'udp (UDP - 默认)' },
-  { value: 'tcp-passive', label: 'tcp-passive (TCP 被动/监听)' },
-  { value: 'tcp-active', label: 'tcp-active (TCP 主动/连接)' },
+  { value: 'udp', label: 'openvpn.protocol.udp' },
+  { value: 'tcp-passive', label: 'openvpn.protocol.tcpPassive' },
+  { value: 'tcp-active', label: 'openvpn.protocol.tcpActive' },
 ];
 
 const CIPHER_OPTIONS = [
-  { value: '', label: '(未设置)' },
-  { value: 'none', label: 'none (无加密)' },
-  { value: '3des', label: '3des (Triple DES)' },
-  { value: 'aes128', label: 'aes128 (AES-128-CBC)' },
-  { value: 'aes128gcm', label: 'aes128gcm (AES-128-GCM)' },
-  { value: 'aes192', label: 'aes192 (AES-192-CBC)' },
-  { value: 'aes192gcm', label: 'aes192gcm (AES-192-GCM)' },
-  { value: 'aes256', label: 'aes256 (AES-256-CBC)' },
-  { value: 'aes256gcm', label: 'aes256gcm (AES-256-GCM)' },
+  { value: '', label: 'openvpn.cipher.notSet' },
+  { value: 'none', label: 'openvpn.cipher.none' },
+  { value: '3des', label: 'openvpn.cipher.3des' },
+  { value: 'aes128', label: 'openvpn.cipher.aes128' },
+  { value: 'aes128gcm', label: 'openvpn.cipher.aes128gcm' },
+  { value: 'aes192', label: 'openvpn.cipher.aes192' },
+  { value: 'aes192gcm', label: 'openvpn.cipher.aes192gcm' },
+  { value: 'aes256', label: 'openvpn.cipher.aes256' },
+  { value: 'aes256gcm', label: 'openvpn.cipher.aes256gcm' },
 ];
 
 const HASH_OPTIONS = [
-  { value: '', label: '(未设置)' },
+  { value: '', label: 'openvpn.hash.notSet' },
   { value: 'md5', label: 'md5' },
   { value: 'sha1', label: 'sha1' },
   { value: 'sha256', label: 'sha256' },
@@ -52,15 +55,15 @@ const HASH_OPTIONS = [
 ];
 
 const SOURCE_VALIDATION_OPTIONS = [
-  { value: 'strict', label: 'strict (严格反向路径转发 RFC3704)' },
-  { value: 'loose', label: 'loose (宽松反向路径转发 RFC3704)' },
-  { value: 'disable', label: 'disable (无源验证)' },
+  { value: 'strict', label: 'openvpn.sourceValidation.strict' },
+  { value: 'loose', label: 'openvpn.sourceValidation.loose' },
+  { value: 'disable', label: 'openvpn.sourceValidation.disable' },
 ];
 
 const ACCEPT_DAD_OPTIONS = [
-  { value: '0', label: '0 (禁用 DAD)' },
-  { value: '1', label: '1 (启用 DAD - 默认)' },
-  { value: '2', label: '2 (启用 DAD - 发现 MAC 重复时禁用 IPv6)' },
+  { value: '0', label: 'openvpn.acceptDad.0' },
+  { value: '1', label: 'openvpn.acceptDad.1' },
+  { value: '2', label: 'openvpn.acceptDad.2' },
 ];
 
 const TLS_VERSION_OPTIONS = [
@@ -71,32 +74,32 @@ const TLS_VERSION_OPTIONS = [
 ];
 
 const TLS_ROLE_OPTIONS = [
-  { value: 'active', label: 'active (主动)' },
-  { value: 'passive', label: 'passive (被动)' },
+  { value: 'active', label: 'openvpn.tlsRole.active' },
+  { value: 'passive', label: 'openvpn.tlsRole.passive' },
 ];
 
 const TOPOLOGY_OPTIONS = [
-  { value: 'subnet', label: 'subnet (子网 - 默认)' },
-  { value: 'point-to-point', label: 'point-to-point (点对点)' },
-  { value: 'net30', label: 'net30 (Net30)' },
+  { value: 'subnet', label: 'openvpn.topology.subnet' },
+  { value: 'point-to-point', label: 'openvpn.topology.pointToPoint' },
+  { value: 'net30', label: 'openvpn.topology.net30' },
 ];
 
 const MFA_CHALLENGE_OPTIONS = [
-  { value: 'enable', label: 'enable (启用 - 默认)' },
-  { value: 'disable', label: 'disable (禁用)' },
+  { value: 'enable', label: 'openvpn.mfaChallenge.enable' },
+  { value: 'disable', label: 'openvpn.mfaChallenge.disable' },
 ];
 
 const COLUMNS = [
-  { key: 'name', title: '接口名称', width: 120 },
-  { key: 'description', title: '描述', width: 150 },
-  { key: 'mode', title: '模式', width: 120 },
-  { key: 'protocol', title: '协议', width: 100 },
-  { key: 'device_type', title: '设备类型', width: 100 },
-  { key: 'local_port', title: '本地端口', width: 90 },
-  { key: 'remote_host', title: '远端主机', width: 140 },
-  { key: 'remote_port', title: '远端端口', width: 90 },
-  { key: 'disable', title: '禁用', width: 80 },
-  { key: 'actions', title: '操作', width: 120, fixed: 'right' },
+  { key: 'name', title: 'openvpn.columns.name', width: 120 },
+  { key: 'description', title: 'openvpn.columns.description', width: 150 },
+  { key: 'mode', title: 'openvpn.columns.mode', width: 120 },
+  { key: 'protocol', title: 'openvpn.columns.protocol', width: 100 },
+  { key: 'device_type', title: 'openvpn.columns.deviceType', width: 100 },
+  { key: 'local_port', title: 'openvpn.columns.localPort', width: 90 },
+  { key: 'remote_host', title: 'openvpn.columns.remoteHost', width: 140 },
+  { key: 'remote_port', title: 'openvpn.columns.remotePort', width: 90 },
+  { key: 'disable', title: 'openvpn.columns.disable', width: 80 },
+  { key: 'actions', title: 'app.actions', width: 120, fixed: 'right' },
 ];
 
 function toArray(val) {
@@ -109,6 +112,8 @@ export default defineComponent({
   name: 'OpenVpnPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
+    const configStore = useConfigStore();
+    const { t } = useI18n();
     const loading = ref(false);
     const openvpnList = ref([]);
     const selected = ref([]);
@@ -118,108 +123,108 @@ export default defineComponent({
     const activeTab = ref('basic');
 
     const basicSchema = computed(() => [
-      { key: 'name', title: '接口名称', type: 'text', required: true, placeholder: '如 vtun0, vtun1', disabled: !!editingItem.value?.name },
-      { key: 'description', title: '描述', type: 'text', placeholder: '接口描述' },
-      { key: 'device_type', title: '设备类型', type: 'select', options: DEVICE_TYPE_OPTIONS, required: true },
-      { key: 'disable', title: '禁用接口', type: 'checkbox' },
-      { key: 'ip_version', title: 'IP 版本', type: 'select', options: IP_VERSION_OPTIONS },
-      { key: 'mode', title: '模式', type: 'select', options: MODE_OPTIONS, required: true },
-      { key: 'protocol', title: '协议', type: 'select', options: PROTOCOL_OPTIONS },
-      { key: 'persistent_tunnel', title: '持久隧道', type: 'checkbox', help: '隧道断开后不关闭接口' },
-      { key: 'shared_secret_key', title: '共享密钥', type: 'password', placeholder: '共享密钥文件路径' },
-      { key: 'use_lzo_compression', title: 'LZO 压缩', type: 'checkbox', help: '启用 LZO 压缩' },
-      { key: 'vrf', title: 'VRF 实例', type: 'text', placeholder: 'VRF 名称' },
-      { key: 'openvpn_option', title: '额外 OpenVPN 选项', type: 'textarea', placeholder: '每行一个额外的 OpenVPN 配置选项' },
-      { key: 'local_host', title: '本地地址', type: 'text', placeholder: '本地监听 IP 地址' },
-      { key: 'local_port', title: '本地端口', type: 'number', min: 1, max: 65535, placeholder: '默认: 1194' },
-      { key: 'remote_host', title: '远端主机', type: 'text', placeholder: '远端 IP 地址' },
-      { key: 'remote_port', title: '远端端口', type: 'number', min: 1, max: 65535, placeholder: '默认: 1194' },
-      { key: 'redirect', title: '重定向目标', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口' },
-      { key: 'local_address', title: '本地地址 (隧道)', type: 'text', placeholder: '隧道本地 IP 地址' },
-      { key: 'local_subnet_mask', title: '本地子网掩码', type: 'text', placeholder: '如 255.255.255.0' },
-      { key: 'remote_address', title: '远端地址 (隧道)', type: 'text', placeholder: '隧道远端 IP 地址' },
+      { key: 'name', title: 'openvpn.schema.name', type: 'text', required: true, placeholder: 'openvpn.schema.namePlaceholder', disabled: !!editingItem.value?.name },
+      { key: 'description', title: 'openvpn.schema.description', type: 'text', placeholder: 'openvpn.schema.descriptionPlaceholder' },
+      { key: 'device_type', title: 'openvpn.schema.deviceType', type: 'select', options: DEVICE_TYPE_OPTIONS, required: true },
+      { key: 'disable', title: 'openvpn.schema.disable', type: 'checkbox' },
+      { key: 'ip_version', title: 'openvpn.schema.ipVersion', type: 'select', options: IP_VERSION_OPTIONS },
+      { key: 'mode', title: 'openvpn.schema.mode', type: 'select', options: MODE_OPTIONS, required: true },
+      { key: 'protocol', title: 'openvpn.schema.protocol', type: 'select', options: PROTOCOL_OPTIONS },
+      { key: 'persistent_tunnel', title: 'openvpn.schema.persistentTunnel', type: 'checkbox', help: 'openvpn.schema.persistentTunnelHelp' },
+      { key: 'shared_secret_key', title: 'openvpn.schema.sharedSecretKey', type: 'password', placeholder: 'openvpn.schema.sharedSecretKeyPlaceholder' },
+      { key: 'use_lzo_compression', title: 'openvpn.schema.useLzoCompression', type: 'checkbox', help: 'openvpn.schema.useLzoCompressionHelp' },
+      { key: 'vrf', title: 'openvpn.schema.vrf', type: 'text', placeholder: 'openvpn.schema.vrfPlaceholder' },
+      { key: 'openvpn_option', title: 'openvpn.schema.openvpnOption', type: 'textarea', placeholder: 'openvpn.schema.openvpnOptionPlaceholder' },
+      { key: 'local_host', title: 'openvpn.schema.localHost', type: 'text', placeholder: 'openvpn.schema.localHostPlaceholder' },
+      { key: 'local_port', title: 'openvpn.schema.localPort', type: 'number', min: 1, max: 65535, placeholder: 'openvpn.schema.localPortPlaceholder' },
+      { key: 'remote_host', title: 'openvpn.schema.remoteHost', type: 'text', placeholder: 'openvpn.schema.remoteHostPlaceholder' },
+      { key: 'remote_port', title: 'openvpn.schema.remotePort', type: 'number', min: 1, max: 65535, placeholder: 'openvpn.schema.remotePortPlaceholder' },
+      { key: 'redirect', title: 'openvpn.schema.redirect', type: 'select', options: interfaceOptions.value, placeholder: 'openvpn.schema.redirectPlaceholder' },
+      { key: 'local_address', title: 'openvpn.schema.localAddress', type: 'text', placeholder: 'openvpn.schema.localAddressPlaceholder' },
+      { key: 'local_subnet_mask', title: 'openvpn.schema.localSubnetMask', type: 'text', placeholder: 'openvpn.schema.localSubnetMaskPlaceholder' },
+      { key: 'remote_address', title: 'openvpn.schema.remoteAddress', type: 'text', placeholder: 'openvpn.schema.remoteAddressPlaceholder' },
     ]);
 
     const authSchema = computed(() => [
-      { key: 'auth_username', title: '用户名', type: 'text', placeholder: '认证用户名' },
-      { key: 'auth_password', title: '密码', type: 'password', placeholder: '认证密码' },
+      { key: 'auth_username', title: 'openvpn.schema.authUsername', type: 'text', placeholder: 'openvpn.schema.authUsernamePlaceholder' },
+      { key: 'auth_password', title: 'openvpn.schema.authPassword', type: 'password', placeholder: 'openvpn.schema.authPasswordPlaceholder' },
     ]);
 
     const encryptionSchema = computed(() => [
-      { key: 'encryption_cipher', title: '加密算法', type: 'select', options: CIPHER_OPTIONS },
-      { key: 'encryption_data_ciphers', title: '数据加密算法列表', type: 'text', placeholder: '如 AES-256-GCM:AES-128-GCM', help: '加密协商算法列表，冒号分隔' },
-      { key: 'encryption_data_ciphers_fallback', title: '回退加密算法', type: 'select', options: CIPHER_OPTIONS },
-      { key: 'hash', title: '哈希算法', type: 'select', options: HASH_OPTIONS },
+      { key: 'encryption_cipher', title: 'openvpn.schema.encryptionCipher', type: 'select', options: CIPHER_OPTIONS },
+      { key: 'encryption_data_ciphers', title: 'openvpn.schema.encryptionDataCiphers', type: 'text', placeholder: 'openvpn.schema.encryptionDataCiphersPlaceholder', help: 'openvpn.schema.encryptionDataCiphersHelp' },
+      { key: 'encryption_data_ciphers_fallback', title: 'openvpn.schema.encryptionDataCiphersFallback', type: 'select', options: CIPHER_OPTIONS },
+      { key: 'hash', title: 'openvpn.schema.hash', type: 'select', options: HASH_OPTIONS },
     ]);
 
     const keepAliveSchema = computed(() => [
-      { key: 'keepalive_failure_count', title: '失败次数', type: 'number', min: 0, max: 1000, placeholder: '默认: 60' },
-      { key: 'keepalive_interval', title: '间隔 (秒)', type: 'number', min: 0, max: 600, placeholder: '默认: 10' },
+      { key: 'keepalive_failure_count', title: 'openvpn.schema.keepaliveFailureCount', type: 'number', min: 0, max: 1000, placeholder: 'openvpn.schema.keepaliveFailureCountPlaceholder' },
+      { key: 'keepalive_interval', title: 'openvpn.schema.keepaliveInterval', type: 'number', min: 0, max: 600, placeholder: 'openvpn.schema.keepaliveIntervalPlaceholder' },
     ]);
 
     const offloadSchema = computed(() => [
-      { key: 'offload_dco', title: 'DCO 数据面卸载', type: 'checkbox', help: '启用 OpenVPN DCO (Data Channel Offload) 内核加速' },
+      { key: 'offload_dco', title: 'openvpn.schema.offloadDco', type: 'checkbox', help: 'openvpn.schema.offloadDcoHelp' },
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: '镜像出方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '将出方向流量镜像到指定接口' },
-      { key: 'mirror_ingress', title: '镜像入方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '将入方向流量镜像到指定接口' },
+      { key: 'mirror_egress', title: 'openvpn.schema.mirrorEgress', type: 'select', options: interfaceOptions.value, placeholder: 'openvpn.schema.mirrorPlaceholder', help: 'openvpn.schema.mirrorEgressHelp' },
+      { key: 'mirror_ingress', title: 'openvpn.schema.mirrorIngress', type: 'select', options: interfaceOptions.value, placeholder: 'openvpn.schema.mirrorPlaceholder', help: 'openvpn.schema.mirrorIngressHelp' },
     ]);
 
     const ipSchema = computed(() => [
-      { key: 'ip_adjust_mss', title: '调整 TCP MSS', type: 'text', placeholder: '536-65535 或 clamp-mss-to-pmtu', help: '自动设置为 PMTU 值或指定字节数' },
-      { key: 'ip_arp_cache_timeout', title: 'ARP 缓存超时', type: 'number', min: 1, max: 86400, placeholder: '默认: 30', help: 'ARP 缓存条目超时时间 (秒)' },
-      { key: 'ip_disable_arp_filter', title: '禁用 ARP 过滤', type: 'checkbox' },
-      { key: 'ip_disable_forwarding', title: '禁用 IP 转发', type: 'checkbox' },
-      { key: 'ip_enable_arp_accept', title: '启用 ARP accept', type: 'checkbox' },
-      { key: 'ip_enable_arp_announce', title: '启用 ARP announce', type: 'checkbox' },
-      { key: 'ip_enable_arp_ignore', title: '启用 ARP ignore', type: 'checkbox' },
-      { key: 'ip_enable_directed_broadcast', title: '启用定向广播转发', type: 'checkbox' },
-      { key: 'ip_enable_proxy_arp', title: '启用 Proxy ARP', type: 'checkbox' },
-      { key: 'ip_proxy_arp_pvlan', title: '启用私有 VLAN Proxy ARP', type: 'checkbox' },
-      { key: 'ip_source_validation', title: '源验证 (uRPF)', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择验证模式' },
+      { key: 'ip_adjust_mss', title: 'openvpn.schema.ipAdjustMss', type: 'text', placeholder: 'openvpn.schema.ipAdjustMssPlaceholder', help: 'openvpn.schema.ipAdjustMssHelp' },
+      { key: 'ip_arp_cache_timeout', title: 'openvpn.schema.ipArpCacheTimeout', type: 'number', min: 1, max: 86400, placeholder: 'openvpn.schema.ipArpCacheTimeoutPlaceholder', help: 'openvpn.schema.ipArpCacheTimeoutHelp' },
+      { key: 'ip_disable_arp_filter', title: 'openvpn.schema.ipDisableArpFilter', type: 'checkbox' },
+      { key: 'ip_disable_forwarding', title: 'openvpn.schema.ipDisableForwarding', type: 'checkbox' },
+      { key: 'ip_enable_arp_accept', title: 'openvpn.schema.ipEnableArpAccept', type: 'checkbox' },
+      { key: 'ip_enable_arp_announce', title: 'openvpn.schema.ipEnableArpAnnounce', type: 'checkbox' },
+      { key: 'ip_enable_arp_ignore', title: 'openvpn.schema.ipEnableArpIgnore', type: 'checkbox' },
+      { key: 'ip_enable_directed_broadcast', title: 'openvpn.schema.ipEnableDirectedBroadcast', type: 'checkbox' },
+      { key: 'ip_enable_proxy_arp', title: 'openvpn.schema.ipEnableProxyArp', type: 'checkbox' },
+      { key: 'ip_proxy_arp_pvlan', title: 'openvpn.schema.ipProxyArpPvlan', type: 'checkbox' },
+      { key: 'ip_source_validation', title: 'openvpn.schema.ipSourceValidation', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: 'openvpn.schema.ipSourceValidationPlaceholder' },
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: '接受 DAD', type: 'select', options: ACCEPT_DAD_OPTIONS, help: '重复地址检测 (默认: 1)' },
-      { key: 'ipv6_address_autoconf', title: '自动配置 (SLAAC)', type: 'checkbox', help: '使用无状态自动配置获取 IPv6 地址' },
-      { key: 'ipv6_address_eui64', title: 'EUI-64 前缀', type: 'text', placeholder: 'IPv6 /64 网络，如 2001:db8::/64' },
-      { key: 'ipv6_address_iface_id', title: '接口标识符', type: 'text', placeholder: '::h:h:h:h' },
-      { key: 'ipv6_no_default_link_local', title: '移除默认链路本地地址', type: 'checkbox' },
-      { key: 'ipv6_adjust_mss', title: '调整 TCP MSS', type: 'text', placeholder: '536-65535 或 clamp-mss-to-pmtu' },
-      { key: 'ipv6_base_reachable_time', title: '基础可达时间', type: 'number', min: 1, max: 86400, placeholder: '默认: 30', help: '基础可达时间 (秒)' },
-      { key: 'ipv6_disable_forwarding', title: '禁用 IPv6 转发', type: 'checkbox' },
-      { key: 'ipv6_dup_addr_detect_transmits', title: 'DAD 探测次数', type: 'number', min: 0, placeholder: '默认: 1', help: '执行 DAD 时发送的 NS 消息数量 (0=禁用)' },
-      { key: 'ipv6_source_validation', title: '源验证 (uRPF)', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择验证模式' },
+      { key: 'ipv6_accept_dad', title: 'openvpn.schema.ipv6AcceptDad', type: 'select', options: ACCEPT_DAD_OPTIONS, help: 'openvpn.schema.ipv6AcceptDadHelp' },
+      { key: 'ipv6_address_autoconf', title: 'openvpn.schema.ipv6AddressAutoconf', type: 'checkbox', help: 'openvpn.schema.ipv6AddressAutoconfHelp' },
+      { key: 'ipv6_address_eui64', title: 'openvpn.schema.ipv6AddressEui64', type: 'text', placeholder: 'openvpn.schema.ipv6AddressEui64Placeholder' },
+      { key: 'ipv6_address_iface_id', title: 'openvpn.schema.ipv6AddressIfaceId', type: 'text', placeholder: 'openvpn.schema.ipv6AddressIfaceIdPlaceholder' },
+      { key: 'ipv6_no_default_link_local', title: 'openvpn.schema.ipv6NoDefaultLinkLocal', type: 'checkbox' },
+      { key: 'ipv6_adjust_mss', title: 'openvpn.schema.ipv6AdjustMss', type: 'text', placeholder: 'openvpn.schema.ipv6AdjustMssPlaceholder' },
+      { key: 'ipv6_base_reachable_time', title: 'openvpn.schema.ipv6BaseReachableTime', type: 'number', min: 1, max: 86400, placeholder: 'openvpn.schema.ipv6BaseReachableTimePlaceholder', help: 'openvpn.schema.ipv6BaseReachableTimeHelp' },
+      { key: 'ipv6_disable_forwarding', title: 'openvpn.schema.ipv6DisableForwarding', type: 'checkbox' },
+      { key: 'ipv6_dup_addr_detect_transmits', title: 'openvpn.schema.ipv6DupAddrDetectTransmits', type: 'number', min: 0, placeholder: 'openvpn.schema.ipv6DupAddrDetectTransmitsPlaceholder', help: 'openvpn.schema.ipv6DupAddrDetectTransmitsHelp' },
+      { key: 'ipv6_source_validation', title: 'openvpn.schema.ipv6SourceValidation', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: 'openvpn.schema.ipv6SourceValidationPlaceholder' },
     ]);
 
     const serverSchema = computed(() => [
-      { key: 'server_bridge_disable', title: '禁用桥接', type: 'checkbox' },
-      { key: 'server_bridge_gateway', title: '桥接网关', type: 'text', placeholder: 'IPv4 网关地址' },
-      { key: 'server_bridge_start', title: '桥接起始地址', type: 'text', placeholder: 'IPv4 起始地址' },
-      { key: 'server_bridge_stop', title: '桥接结束地址', type: 'text', placeholder: 'IPv4 结束地址' },
-      { key: 'server_bridge_subnet_mask', title: '桥接子网掩码', type: 'text', placeholder: '如 255.255.255.0' },
-      { key: 'server_client_pool_disable', title: '禁用客户端地址池', type: 'checkbox' },
-      { key: 'server_client_pool_start', title: '客户端池起始', type: 'text', placeholder: 'IPv4 起始地址' },
-      { key: 'server_client_pool_stop', title: '客户端池结束', type: 'text', placeholder: 'IPv4 结束地址' },
-      { key: 'server_client_pool_subnet_mask', title: '客户端池子网掩码', type: 'text', placeholder: '如 255.255.255.0' },
-      { key: 'server_client_ipv6_pool_base', title: '客户端 IPv6 池前缀', type: 'text', placeholder: 'IPv6 前缀' },
-      { key: 'server_client_ipv6_pool_disable', title: '禁用客户端 IPv6 池', type: 'checkbox' },
-      { key: 'server_domain_name', title: '域名', type: 'text', placeholder: '推送给客户端的域名' },
-      { key: 'server_max_connections', title: '最大连接数', type: 'number', min: 1, max: 4096, placeholder: '1-4096' },
-      { key: 'server_name_server', title: 'DNS 服务器', type: 'textarea', placeholder: '每行一个 DNS 地址', help: '推送给客户端的 DNS 服务器地址' },
-      { key: 'server_push_route', title: '推送路由', type: 'textarea', placeholder: '每行一条路由，如 10.0.0.0/24 metric 100', help: '推送给客户端的路由 (IPv4/IPv6 网络 + 可选 metric)' },
-      { key: 'server_reject_unconfigured', title: '拒绝未配置客户端', type: 'checkbox' },
-      { key: 'server_subnet', title: '服务器子网', type: 'text', placeholder: '服务器模式子网，如 10.0.0.0/24' },
-      { key: 'server_topology', title: '拓扑', type: 'select', options: TOPOLOGY_OPTIONS },
+      { key: 'server_bridge_disable', title: 'openvpn.schema.serverBridgeDisable', type: 'checkbox' },
+      { key: 'server_bridge_gateway', title: 'openvpn.schema.serverBridgeGateway', type: 'text', placeholder: 'openvpn.schema.serverBridgeGatewayPlaceholder' },
+      { key: 'server_bridge_start', title: 'openvpn.schema.serverBridgeStart', type: 'text', placeholder: 'openvpn.schema.serverBridgeStartPlaceholder' },
+      { key: 'server_bridge_stop', title: 'openvpn.schema.serverBridgeStop', type: 'text', placeholder: 'openvpn.schema.serverBridgeStopPlaceholder' },
+      { key: 'server_bridge_subnet_mask', title: 'openvpn.schema.serverBridgeSubnetMask', type: 'text', placeholder: 'openvpn.schema.serverBridgeSubnetMaskPlaceholder' },
+      { key: 'server_client_pool_disable', title: 'openvpn.schema.serverClientPoolDisable', type: 'checkbox' },
+      { key: 'server_client_pool_start', title: 'openvpn.schema.serverClientPoolStart', type: 'text', placeholder: 'openvpn.schema.serverClientPoolStartPlaceholder' },
+      { key: 'server_client_pool_stop', title: 'openvpn.schema.serverClientPoolStop', type: 'text', placeholder: 'openvpn.schema.serverClientPoolStopPlaceholder' },
+      { key: 'server_client_pool_subnet_mask', title: 'openvpn.schema.serverClientPoolSubnetMask', type: 'text', placeholder: 'openvpn.schema.serverClientPoolSubnetMaskPlaceholder' },
+      { key: 'server_client_ipv6_pool_base', title: 'openvpn.schema.serverClientIpv6PoolBase', type: 'text', placeholder: 'openvpn.schema.serverClientIpv6PoolBasePlaceholder' },
+      { key: 'server_client_ipv6_pool_disable', title: 'openvpn.schema.serverClientIpv6PoolDisable', type: 'checkbox' },
+      { key: 'server_domain_name', title: 'openvpn.schema.serverDomainName', type: 'text', placeholder: 'openvpn.schema.serverDomainNamePlaceholder' },
+      { key: 'server_max_connections', title: 'openvpn.schema.serverMaxConnections', type: 'number', min: 1, max: 4096, placeholder: 'openvpn.schema.serverMaxConnectionsPlaceholder' },
+      { key: 'server_name_server', title: 'openvpn.schema.serverNameServer', type: 'textarea', placeholder: 'openvpn.schema.serverNameServerPlaceholder', help: 'openvpn.schema.serverNameServerHelp' },
+      { key: 'server_push_route', title: 'openvpn.schema.serverPushRoute', type: 'textarea', placeholder: 'openvpn.schema.serverPushRoutePlaceholder', help: 'openvpn.schema.serverPushRouteHelp' },
+      { key: 'server_reject_unconfigured', title: 'openvpn.schema.serverRejectUnconfigured', type: 'checkbox' },
+      { key: 'server_subnet', title: 'openvpn.schema.serverSubnet', type: 'text', placeholder: 'openvpn.schema.serverSubnetPlaceholder' },
+      { key: 'server_topology', title: 'openvpn.schema.serverTopology', type: 'select', options: TOPOLOGY_OPTIONS },
     ]);
 
     const serverMfaSchema = computed(() => [
-      { key: 'server_mfa_totp_challenge', title: '挑战模式', type: 'select', options: MFA_CHALLENGE_OPTIONS },
-      { key: 'server_mfa_totp_digits', title: '位数', type: 'number', min: 1, max: 65535, placeholder: '默认: 6' },
-      { key: 'server_mfa_totp_drift', title: '漂移', type: 'number', min: 1, max: 65535, placeholder: '默认: 0' },
-      { key: 'server_mfa_totp_slop', title: '容差窗口 (秒)', type: 'number', min: 1, max: 65535, placeholder: '默认: 180' },
-      { key: 'server_mfa_totp_step', title: '步长 (秒)', type: 'number', min: 1, max: 65535, placeholder: '默认: 30' },
+      { key: 'server_mfa_totp_challenge', title: 'openvpn.schema.serverMfaTotpChallenge', type: 'select', options: MFA_CHALLENGE_OPTIONS },
+      { key: 'server_mfa_totp_digits', title: 'openvpn.schema.serverMfaTotpDigits', type: 'number', min: 1, max: 65535, placeholder: 'openvpn.schema.serverMfaTotpDigitsPlaceholder' },
+      { key: 'server_mfa_totp_drift', title: 'openvpn.schema.serverMfaTotpDrift', type: 'number', min: 1, max: 65535, placeholder: 'openvpn.schema.serverMfaTotpDriftPlaceholder' },
+      { key: 'server_mfa_totp_slop', title: 'openvpn.schema.serverMfaTotpSlop', type: 'number', min: 1, max: 65535, placeholder: 'openvpn.schema.serverMfaTotpSlopPlaceholder' },
+      { key: 'server_mfa_totp_step', title: 'openvpn.schema.serverMfaTotpStep', type: 'number', min: 1, max: 65535, placeholder: 'openvpn.schema.serverMfaTotpStepPlaceholder' },
     ]);
 
     // Server client management
@@ -228,14 +233,18 @@ export default defineComponent({
     const editingClientIndex = ref(-1);
     const clientModalVisible = ref(false);
     const clientForm = ref({ name: '', disable: false, ip: '', push_route: '', subnet: '' });
+    const deleteSingleClientModalVisible = ref(false);
+    const pendingDeleteClientName = ref('');
+    const deleteSelectedClientsModalVisible = ref(false);
+    const pendingDeleteClientNames = ref([]);
 
     const clientColumns = [
-      { key: 'name', title: '客户端名称', width: 150 },
-      { key: 'disable', title: '禁用', width: 80 },
-      { key: 'ip', title: 'IP 地址', width: 140 },
-      { key: 'push_route', title: '推送路由', width: 200 },
-      { key: 'subnet', title: '子网', width: 140 },
-      { key: 'actions', title: '操作', width: 120 },
+      { key: 'name', title: 'openvpn.clientColumns.name', width: 150 },
+      { key: 'disable', title: 'openvpn.clientColumns.disable', width: 80 },
+      { key: 'ip', title: 'openvpn.clientColumns.ip', width: 140 },
+      { key: 'push_route', title: 'openvpn.clientColumns.pushRoute', width: 200 },
+      { key: 'subnet', title: 'openvpn.clientColumns.subnet', width: 140 },
+      { key: 'actions', title: 'app.actions', width: 120 },
     ];
 
     function addClient() {
@@ -252,19 +261,19 @@ export default defineComponent({
 
     function saveClient() {
       if (!clientForm.value.name) {
-        showError('请输入客户端名称');
+        showError(t('openvpn.clientNameRequired'));
         return;
       }
       const clientData = JSON.parse(JSON.stringify(clientForm.value));
-      console.log('[OpenVPN] 保存客户端:', JSON.stringify(clientData, null, 2));
+      console.log('[OpenVPN] Save client:', JSON.stringify(clientData, null, 2));
       if (editingClientIndex.value >= 0) {
-        console.log('[OpenVPN] 更新客户端索引:', editingClientIndex.value, '原数据:', JSON.stringify(serverClients.value[editingClientIndex.value]));
+        console.log('[OpenVPN] Update client index:', editingClientIndex.value, 'original:', JSON.stringify(serverClients.value[editingClientIndex.value]));
         serverClients.value[editingClientIndex.value] = clientData;
-        console.log('[OpenVPN] 更新后客户端列表:', JSON.stringify(serverClients.value, null, 2));
+        console.log('[OpenVPN] Updated client list:', JSON.stringify(serverClients.value, null, 2));
       } else {
-        console.log('[OpenVPN] 新增客户端');
+        console.log('[OpenVPN] Add new client');
         serverClients.value.push(clientData);
-        console.log('[OpenVPN] 新增后客户端列表:', JSON.stringify(serverClients.value, null, 2));
+        console.log('[OpenVPN] Client list after add:', JSON.stringify(serverClients.value, null, 2));
       }
       clientModalVisible.value = false;
     }
@@ -272,37 +281,50 @@ export default defineComponent({
     function deleteClient(index) {
       if (index >= 0) {
         const clientToDelete = serverClients.value[index];
-        console.log('[OpenVPN] 删除客户端索引:', index, '客户端数据:', JSON.stringify(clientToDelete));
-        if (confirm('确定删除此客户端配置？')) {
-          serverClients.value.splice(index, 1);
-          console.log('[OpenVPN] 删除后客户端列表:', JSON.stringify(serverClients.value, null, 2));
-        }
+        console.log('[OpenVPN] Delete client index:', index, 'client:', JSON.stringify(clientToDelete));
+        pendingDeleteClientName.value = clientToDelete.name;
+        deleteSingleClientModalVisible.value = true;
       } else if (selectedClients.value.length > 0) {
         const namesToDelete = selectedClients.value.map(c => c.name);
-        console.log('[OpenVPN] 批量删除客户端:', namesToDelete);
-        if (confirm('确定删除选中的客户端配置？')) {
-          serverClients.value = serverClients.value.filter(c => !namesToDelete.includes(c.name));
-          selectedClients.value = [];
-          console.log('[OpenVPN] 批量删除后客户端列表:', JSON.stringify(serverClients.value, null, 2));
-        }
+        console.log('[OpenVPN] Batch delete clients:', namesToDelete);
+        pendingDeleteClientNames.value = namesToDelete;
+        deleteSelectedClientsModalVisible.value = true;
       } else {
-        showError('请选择要删除的客户端');
+        showError(t('openvpn.selectClientFirst'));
       }
     }
 
+    function confirmDeleteSingleClient() {
+      const index = serverClients.value.findIndex(c => c.name === pendingDeleteClientName.value);
+      if (index >= 0) {
+        serverClients.value.splice(index, 1);
+        console.log('[OpenVPN] Client list after delete:', JSON.stringify(serverClients.value, null, 2));
+      }
+      deleteSingleClientModalVisible.value = false;
+      pendingDeleteClientName.value = '';
+    }
+
+    function confirmDeleteSelectedClients() {
+      serverClients.value = serverClients.value.filter(c => !pendingDeleteClientNames.value.includes(c.name));
+      selectedClients.value = [];
+      console.log('[OpenVPN] Client list after batch delete:', JSON.stringify(serverClients.value, null, 2));
+      deleteSelectedClientsModalVisible.value = false;
+      pendingDeleteClientNames.value = [];
+    }
+
     const tlsSchema = computed(() => [
-      { key: 'tls_auth_key', title: '认证密钥', type: 'text', placeholder: 'TLS 认证密钥文件' },
-      { key: 'tls_ca_certificate', title: 'CA 证书', type: 'text', placeholder: 'PKI 配置中的 CA 证书名称' },
-      { key: 'tls_certificate', title: '证书', type: 'text', placeholder: 'PKI 配置中的证书名称' },
-      { key: 'tls_crypt_key', title: '加密密钥', type: 'text', placeholder: 'TLS 加密密钥文件' },
-      { key: 'tls_dh_params', title: 'DH 参数', type: 'text', placeholder: 'Diffie-Hellman 参数 (仅服务端)', help: '仅服务端模式需要' },
-      { key: 'tls_peer_fingerprint', title: '对端指纹', type: 'text', placeholder: 'SHA256 指纹' },
-      { key: 'tls_role', title: 'TLS 角色', type: 'select', options: TLS_ROLE_OPTIONS, placeholder: '选择 TLS 角色' },
-      { key: 'tls_version_min', title: '最低 TLS 版本', type: 'select', options: [{ value: '', label: '(未设置)' }, ...TLS_VERSION_OPTIONS] },
+      { key: 'tls_auth_key', title: 'openvpn.schema.tlsAuthKey', type: 'text', placeholder: 'openvpn.schema.tlsAuthKeyPlaceholder' },
+      { key: 'tls_ca_certificate', title: 'openvpn.schema.tlsCaCertificate', type: 'text', placeholder: 'openvpn.schema.tlsCaCertificatePlaceholder' },
+      { key: 'tls_certificate', title: 'openvpn.schema.tlsCertificate', type: 'text', placeholder: 'openvpn.schema.tlsCertificatePlaceholder' },
+      { key: 'tls_crypt_key', title: 'openvpn.schema.tlsCryptKey', type: 'text', placeholder: 'openvpn.schema.tlsCryptKeyPlaceholder' },
+      { key: 'tls_dh_params', title: 'openvpn.schema.tlsDhParams', type: 'text', placeholder: 'openvpn.schema.tlsDhParamsPlaceholder', help: 'openvpn.schema.tlsDhParamsHelp' },
+      { key: 'tls_peer_fingerprint', title: 'openvpn.schema.tlsPeerFingerprint', type: 'text', placeholder: 'openvpn.schema.tlsPeerFingerprintPlaceholder' },
+      { key: 'tls_role', title: 'openvpn.schema.tlsRole', type: 'select', options: TLS_ROLE_OPTIONS, placeholder: 'openvpn.schema.tlsRolePlaceholder' },
+      { key: 'tls_version_min', title: 'openvpn.schema.tlsVersionMin', type: 'select', options: [{ value: '', label: 'openvpn.schema.notSet' }, ...TLS_VERSION_OPTIONS] },
     ]);
 
     const replaceRouteSchema = computed(() => [
-      { key: 'replace_default_route_local', title: '本地地址', type: 'text', placeholder: '替换默认路由的本地地址' },
+      { key: 'replace_default_route_local', title: 'openvpn.schema.replaceDefaultRouteLocal', type: 'text', placeholder: 'openvpn.schema.replaceDefaultRouteLocalPlaceholder' },
     ]);
 
     const commandText = computed(() => {
@@ -843,7 +865,7 @@ export default defineComponent({
           label: iface.name || iface,
         }));
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('openvpn.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -860,63 +882,72 @@ export default defineComponent({
     }
 
     async function save() {
-      console.log('[OpenVPN] 开始保存接口配置');
-      console.log('[OpenVPN] 接口名称:', editingItem.value.name);
-      console.log('[OpenVPN] 模式:', editingItem.value.mode);
-      console.log('[OpenVPN] 表单数据:', JSON.stringify(editingItem.value, null, 2));
+      console.log('[OpenVPN] Start saving interface config');
+      console.log('[OpenVPN] Interface name:', editingItem.value.name);
+      console.log('[OpenVPN] Mode:', editingItem.value.mode);
+      console.log('[OpenVPN] Form data:', JSON.stringify(editingItem.value, null, 2));
 
       if (!editingItem.value.name) {
-        showError('请输入接口名称');
+        showError(t('openvpn.interfaceNameRequired'));
         return;
       }
       if (!editingItem.value.mode) {
-        showError('请选择模式');
+        showError(t('openvpn.modeRequired'));
         return;
       }
 
       const config = formToConfig(editingItem.value);
-      console.log('[OpenVPN] 转换后的配置:', JSON.stringify(config, null, 2));
-      console.log('[OpenVPN] 客户端数量:', config.server?.client?.length || 0);
+      console.log('[OpenVPN] Converted config:', JSON.stringify(config, null, 2));
+      console.log('[OpenVPN] Client count:', config.server?.client?.length || 0);
 
       try {
-        console.log('[OpenVPN] 调用 API: set interfaces openvpn', editingItem.value.name);
+        console.log('[OpenVPN] Calling API: set interfaces openvpn', editingItem.value.name);
         await configApi.set(`interfaces openvpn ${editingItem.value.name}`, config);
-        console.log('[OpenVPN] API 调用成功');
+        configStore.markPending();
+        console.log('[OpenVPN] API call success');
         modalVisible.value = false;
         await load();
-        console.log('[OpenVPN] 配置保存完成，已重新加载列表');
+        console.log('[OpenVPN] Config saved, list reloaded');
       } catch (e) {
-        console.error('[OpenVPN] 保存失败:', e);
-        showError(e.message || '保存失败');
+        console.error('[OpenVPN] Save failed:', e);
+        showError(e.message || t('openvpn.saveFailed'));
       }
     }
 
     async function remove() {
       if (selected.value.length === 0) {
-        showError('请选择要删除的 OpenVPN 接口');
+        showError(t('openvpn.selectInterfaceFirst'));
         return;
       }
       const names = selected.value.map(s => s.name);
       try {
         await Promise.all(names.map(name => configApi.delete(`interfaces openvpn ${name}`)));
+        configStore.markPending();
         selected.value = [];
         await load();
       } catch (e) {
-        showError(e.message || '删除失败');
+        showError(e.message || t('openvpn.deleteFailed'));
       }
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
-    return {
+    return {t,
+      
       loading, openvpnList, selected, modalVisible, editingItem, interfaceOptions, activeTab,
       serverClients, selectedClients, editingClientIndex, clientModalVisible, clientForm, clientColumns,
+      deleteSingleClientModalVisible, pendingDeleteClientName,
+      deleteSelectedClientsModalVisible, pendingDeleteClientNames,
       COLUMNS,
       basicSchema, authSchema, encryptionSchema, keepAliveSchema, offloadSchema,
       mirrorSchema, ipSchema, ipv6Schema, serverSchema, serverMfaSchema,
       tlsSchema, replaceRouteSchema, commandText,
       openModal, save, remove, load,
       addClient, editClient, saveClient, deleteClient,
+      confirmDeleteSingleClient, confirmDeleteSelectedClients,
     };
   },
   template: `
@@ -940,36 +971,35 @@ export default defineComponent({
           </template>
           <template v-if="column.key === 'disable'">
             <span :class="record.disable ? 'badge badge-danger' : 'badge badge-success'">
-              {{ record.disable ? '是' : '否' }}
+              {{ record.disable ? t('openvpn.status.yes') : t('openvpn.status.no') }}
             </span>
           </template>
           <template v-if="column.key === 'actions'">
-            <a @click="openModal(openvpnList.indexOf(record))">编辑</a>
-            <a @click="selected = [record]; remove()" style="color: #ff4d4f; margin-left: 8px;">删除</a>
+            <a @click="openModal(openvpnList.indexOf(record))">{{ t('app.edit') }}</a>
+            <a @click="selected = [record]; remove()" style="color: #ff4d4f; margin-left: 8px;">{{ t('app.delete') }}</a>
           </template>
         </template>
       </DataTable>
 
       <DraggableModal
         v-model:visible="modalVisible"
-        :title="editingItem?.name ? '编辑 OpenVPN 接口' : '创建 OpenVPN 接口'"
+        :title="editingItem?.name ? t('openvpn.modal.editInterface') : t('openvpn.modal.createInterface')"
         width="900px"
         @confirm="save"
       >
         <div v-if="editingItem">
           <TabGroup v-model="activeTab" :tabs="[
-            { key: 'basic', title: '基本配置' },
-            { key: 'auth', title: '认证' },
-            { key: 'encryption', title: '加密' },
-            { key: 'tls', title: 'TLS' },
-            { key: 'server', title: '服务端' },
-            { key: 'keepalive', title: 'Keep-Alive' },
-            { key: 'ip', title: 'IPv4 参数' },
-            { key: 'ipv6', title: 'IPv6 参数' },
-            { key: 'offload', title: '卸载' },
-            { key: 'mirror', title: '流量镜像' },
-            { key: 'replaceRoute', title: '替换路由' },
-            { key: 'preview', title: '命令预览' },
+            { key: 'basic', title: t('openvpn.tabs.basic') },
+            { key: 'auth', title: t('openvpn.tabs.auth') },
+            { key: 'encryption', title: t('openvpn.tabs.encryption') },
+            { key: 'tls', title: t('openvpn.tabs.tls') },
+            { key: 'server', title: t('openvpn.tabs.server') },
+            { key: 'keepalive', title: t('openvpn.tabs.keepalive') },
+            { key: 'ip', title: t('openvpn.tabs.ip') },
+            { key: 'ipv6', title: t('openvpn.tabs.ipv6') },
+            { key: 'offload', title: t('openvpn.tabs.offload') },
+            { key: 'mirror', title: t('openvpn.tabs.mirror') },
+            { key: 'replaceRoute', title: t('openvpn.tabs.replaceRoute') },
           ]">
             <template #basic>
               <ConfigForm v-model="editingItem" :schema="basicSchema" />
@@ -985,14 +1015,14 @@ export default defineComponent({
             </template>
             <template #server>
               <div v-if="editingItem.mode !== 'server'" style="color: #999; padding: 20px; text-align: center;">
-                仅当模式为 "server" 时可配置服务端选项
+                {{ t('openvpn.serverModeOnly') }}
               </div>
               <template v-else>
-                <h3 style="margin-top: 0;">服务端配置</h3>
+                <h3 style="margin-top: 0;">{{ t('openvpn.serverConfig') }}</h3>
                 <ConfigForm v-model="editingItem" :schema="serverSchema" />
                 <h3>MFA TOTP</h3>
                 <ConfigForm v-model="editingItem" :schema="serverMfaSchema" />
-                <h3 style="margin-top: 20px;">客户端管理</h3>
+                <h3 style="margin-top: 20px;">{{ t('openvpn.clientManagement') }}</h3>
                 <DataTable
                   :columns="clientColumns"
                   :data="serverClients"
@@ -1007,12 +1037,12 @@ export default defineComponent({
                   <template #bodyCell="{ column, record }">
                     <template v-if="column.key === 'disable'">
                       <span :class="record.disable ? 'badge badge-danger' : 'badge badge-success'">
-                        {{ record.disable ? '是' : '否' }}
+                        {{ record.disable ? t('openvpn.status.yes') : t('openvpn.status.no') }}
                       </span>
                     </template>
                     <template v-if="column.key === 'actions'">
-                      <a @click="editClient(serverClients.indexOf(record))">编辑</a>
-                      <a @click="deleteClient(serverClients.indexOf(record))" style="color: #ff4d4f; margin-left: 8px;">删除</a>
+                      <a @click="editClient(serverClients.indexOf(record))">{{ t('app.edit') }}</a>
+                      <a @click="deleteClient(serverClients.indexOf(record))" style="color: #ff4d4f; margin-left: 8px;">{{ t('app.delete') }}</a>
                     </template>
                   </template>
                 </DataTable>
@@ -1036,16 +1066,13 @@ export default defineComponent({
             <template #replaceRoute>
               <ConfigForm v-model="editingItem" :schema="replaceRouteSchema" />
             </template>
-            <template #preview>
-              <pre style="background: #f5f5f5; padding: 12px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap;">{{ commandText }}</pre>
-            </template>
           </TabGroup>
         </div>
       </DraggableModal>
 
       <DraggableModal
         v-model:visible="clientModalVisible"
-        :title="editingClientIndex >= 0 ? '编辑客户端' : '创建客户端'"
+        :title="editingClientIndex >= 0 ? t('openvpn.modal.editClient') : t('openvpn.modal.createClient')"
         width="600px"
         @confirm="saveClient"
       >
@@ -1053,13 +1080,37 @@ export default defineComponent({
           <ConfigForm
             v-model="clientForm"
             :schema="[
-              { key: 'name', title: '客户端名称', type: 'text', required: true, placeholder: '证书 Common Name', disabled: editingClientIndex >= 0 },
-              { key: 'disable', title: '禁用', type: 'checkbox' },
-              { key: 'ip', title: 'IP 地址', type: 'text', placeholder: '客户端 IP 地址' },
-              { key: 'push_route', title: '推送路由', type: 'textarea', placeholder: '每行一条路由，如 10.0.0.0/24 metric 100' },
-              { key: 'subnet', title: '子网', type: 'text', placeholder: '客户端子网' },
+              { key: 'name', title: 'openvpn.clientSchema.name', type: 'text', required: true, placeholder: 'openvpn.clientSchema.namePlaceholder', disabled: editingClientIndex >= 0 },
+              { key: 'disable', title: 'openvpn.clientSchema.disable', type: 'checkbox' },
+              { key: 'ip', title: 'openvpn.clientSchema.ip', type: 'text', placeholder: 'openvpn.clientSchema.ipPlaceholder' },
+              { key: 'push_route', title: 'openvpn.clientSchema.pushRoute', type: 'textarea', placeholder: 'openvpn.clientSchema.pushRoutePlaceholder' },
+              { key: 'subnet', title: 'openvpn.clientSchema.subnet', type: 'text', placeholder: 'openvpn.clientSchema.subnetPlaceholder' },
             ]"
           />
+        </div>
+      </DraggableModal>
+
+      <DraggableModal
+        v-model:visible="deleteSingleClientModalVisible"
+        :title="t('app.confirmDelete')"
+        width="400px"
+        @confirm="confirmDeleteSingleClient"
+      >
+        <div>{{ t('openvpn.confirmDeleteClient') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div style="padding:2px 0;">{{ pendingDeleteClientName }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal
+        v-model:visible="deleteSelectedClientsModalVisible"
+        :title="t('app.confirmDelete')"
+        width="400px"
+        @confirm="confirmDeleteSelectedClients"
+      >
+        <div>{{ t('openvpn.confirmDeleteClient') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteClientNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
     </div>

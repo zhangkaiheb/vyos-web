@@ -8,6 +8,7 @@ import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -31,10 +32,10 @@ export default defineComponent({
   name: 'VppSettingsPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
+    const { t } = useI18n();
     const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
     const activeTab = ref('buffers');
 
     const config = ref({
@@ -54,14 +55,14 @@ export default defineComponent({
     });
 
     const interfaceColumns = [
-      { key: 'interface', title: '接口', dataIndex: 'interface', width: 150 },
-      { key: 'rx_mode', title: 'RX模式', dataIndex: 'rx_mode', width: 100 },
-      { key: 'dpdk_num_rx_desc', title: 'RX描述符', dataIndex: 'dpdk_num_rx_desc', width: 100 },
-      { key: 'dpdk_num_rx_queues', title: 'RX队列', dataIndex: 'dpdk_num_rx_queues', width: 80 },
-      { key: 'dpdk_num_tx_desc', title: 'TX描述符', dataIndex: 'dpdk_num_tx_desc', width: 100 },
-      { key: 'dpdk_num_tx_queues', title: 'TX队列', dataIndex: 'dpdk_num_tx_queues', width: 80 },
-      { key: 'dpdk_promisc', title: '混杂', dataIndex: 'dpdk_promisc', width: 60 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'interface', title: t('vpp.columns.interface'), dataIndex: 'interface', width: 150 },
+      { key: 'rx_mode', title: t('vpp.columns.rxMode'), dataIndex: 'rx_mode', width: 100 },
+      { key: 'dpdk_num_rx_desc', title: t('vpp.columns.rxDesc'), dataIndex: 'dpdk_num_rx_desc', width: 100 },
+      { key: 'dpdk_num_rx_queues', title: t('vpp.columns.rxQueue'), dataIndex: 'dpdk_num_rx_queues', width: 80 },
+      { key: 'dpdk_num_tx_desc', title: t('vpp.columns.txDesc'), dataIndex: 'dpdk_num_tx_desc', width: 100 },
+      { key: 'dpdk_num_tx_queues', title: t('vpp.columns.txQueue'), dataIndex: 'dpdk_num_tx_queues', width: 80 },
+      { key: 'dpdk_promisc', title: t('vpp.columns.promisc'), dataIndex: 'dpdk_promisc', width: 60 },
+      { key: 'actions', title: t('vpp.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const selectedInterfaces = ref([]);
@@ -251,12 +252,11 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('vpp settings', true);
         config.value = settingsToForm(res.data || {});
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('vpp.error.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -270,11 +270,10 @@ export default defineComponent({
         if (Object.keys(payload).length) {
           await configApi.set('vpp settings', payload);
         }
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('vpp.error.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -286,21 +285,21 @@ export default defineComponent({
     }
 
     function editInterface() {
-      if (!selectedInterfaces.value.length) return alert('请选择要编辑的接口');
+      if (!selectedInterfaces.value.length) return showError({ message: t('vpp.error.selectInterfaceToEdit') });
       const row = config.value.interface_list.find(i => i.interface === selectedInterfaces.value[0]);
-      if (!row) return alert('未找到选中的接口');
+      if (!row) return showError({ message: t('vpp.error.interfaceNotFound') });
       editingInterface.value = JSON.parse(JSON.stringify(row));
       showInterfaceModal.value = true;
     }
 
     function removeInterface() {
-      if (!selectedInterfaces.value.length) return alert('请选择要删除的接口');
+      if (!selectedInterfaces.value.length) return showError({ message: t('vpp.error.selectInterfaceToDelete') });
       config.value.interface_list = config.value.interface_list.filter(i => i.interface !== selectedInterfaces.value[0]);
       selectedInterfaces.value = [];
     }
 
     function saveInterface() {
-      if (!editingInterface.value.interface) return alert('请输入接口名称');
+      if (!editingInterface.value.interface) return showError({ message: t('vpp.error.enterInterfaceName') });
       const list = config.value.interface_list;
       const idx = list.findIndex(i => i._interface === editingInterface.value._interface);
       if (idx >= 0) list.splice(idx, 1, { ...editingInterface.value });
@@ -315,7 +314,8 @@ export default defineComponent({
     });
 
     return {
-      loading, saving, saved, config, activeTab, commandPath,
+      t,
+      loading, saving, config, activeTab, commandPath,
       interfaceColumns, selectedInterfaces, showInterfaceModal, editingInterface,
       load, save,
       createInterface, editInterface, removeInterface, saveInterface,
@@ -323,83 +323,82 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'buffers', title: 'Buffers' },
-        { key: 'cpu', title: 'CPU' },
-        { key: 'interface', title: 'Interface' },
-        { key: 'ipsec', title: 'IPsec' },
-        { key: 'ipv6', title: 'IPv6' },
-        { key: 'l2learn', title: 'L2Learn' },
-        { key: 'lcp', title: 'LCP' },
-        { key: 'logging', title: 'Logging' },
-        { key: 'memory', title: 'Memory' },
-        { key: 'nat44', title: 'NAT44' },
-        { key: 'physmem', title: 'Physmem' },
-        { key: 'statseg', title: 'Statseg' },
-        { key: 'unix', title: 'Unix' }
+        { key: 'buffers', title: t('vpp.tabs.buffers') },
+        { key: 'cpu', title: t('vpp.tabs.cpu') },
+        { key: 'interface', title: t('vpp.tabs.interface') },
+        { key: 'ipsec', title: t('vpp.tabs.ipsec') },
+        { key: 'ipv6', title: t('vpp.tabs.ipv6') },
+        { key: 'l2learn', title: t('vpp.tabs.l2learn') },
+        { key: 'lcp', title: t('vpp.tabs.lcp') },
+        { key: 'logging', title: t('vpp.tabs.logging') },
+        { key: 'memory', title: t('vpp.tabs.memory') },
+        { key: 'nat44', title: t('vpp.tabs.nat44') },
+        { key: 'physmem', title: t('vpp.tabs.physmem') },
+        { key: 'statseg', title: t('vpp.tabs.statseg') },
+        { key: 'unix', title: t('vpp.tabs.unix') }
       ]">
 
       <template #buffers>
-        <div class="form-row"><label class="form-label">Buffers per NUMA</label><input class="form-control" v-model="config.buffers.buffers_per_numa" placeholder="auto 或 16384-4294967295" title="每个NUMA节点的缓冲区数量" /></div>
-        <div class="form-row"><label class="form-label">数据大小</label><input class="form-control" type="number" min="0" max="4294967295" v-model="config.buffers.data_size" title="数据大小，默认2048" /></div>
-        <div class="form-row"><label class="form-label">页面大小</label>
-          <select class="form-control" v-model="config.buffers.page_size" title="页面大小">
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.buffersPerNuma') }}</label><input class="form-control" v-model="config.buffers.buffers_per_numa" :placeholder="t('vpp.placeholders.buffersPerNuma')" :title="t('vpp.titles.buffersPerNuma')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.dataSize') }}</label><input class="form-control" type="number" min="0" max="4294967295" v-model="config.buffers.data_size" :title="t('vpp.titles.dataSize')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.pageSize') }}</label>
+          <select class="form-control" v-model="config.buffers.page_size" :title="t('vpp.titles.pageSize')">
             <option value="4K">4K</option>
-            <option value="2M">2M (默认)</option>
+            <option value="2M">2M ({{ t('vpp.default') }})</option>
             <option value="1G">1G</option>
           </select>
         </div>
       </template>
 
       <template #cpu>
-        <div class="form-row"><label class="form-label">Corelist Workers</label><textarea class="form-control" v-model="config.cpu.corelist_workers" rows="3" placeholder="每行一个核心编号(0-512)" title="Worker核心列表" /></div>
-        <div class="form-row"><label class="form-label">主核心</label><input class="form-control" type="number" min="0" max="512" v-model="config.cpu.main_core" title="主核心编号" /></div>
-        <div class="form-row"><label class="form-label">跳过核心数</label><input class="form-control" type="number" min="1" max="512" v-model="config.cpu.skip_cores" title="跳过的核心数" /></div>
-        <div class="form-row"><label class="form-label">Workers数</label><input class="form-control" type="number" min="0" max="512" v-model="config.cpu.workers" title="Worker线程数" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.corelistWorkers') }}</label><textarea class="form-control" v-model="config.cpu.corelist_workers" rows="3" :placeholder="t('vpp.placeholders.corelistWorkers')" :title="t('vpp.titles.corelistWorkers')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.mainCore') }}</label><input class="form-control" type="number" min="0" max="512" v-model="config.cpu.main_core" :title="t('vpp.titles.mainCore')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.skipCores') }}</label><input class="form-control" type="number" min="1" max="512" v-model="config.cpu.skip_cores" :title="t('vpp.titles.skipCores')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.workersCount') }}</label><input class="form-control" type="number" min="0" max="512" v-model="config.cpu.workers" :title="t('vpp.titles.workersCount')" /></div>
       </template>
 
       <template #interface>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createInterface">添加</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editInterface" :disabled="!selectedInterfaces.length || selectedInterfaces.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeInterface" :disabled="!selectedInterfaces.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createInterface">{{ t('vpp.buttons.add') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editInterface" :disabled="!selectedInterfaces.length || selectedInterfaces.length > 1">{{ t('vpp.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeInterface" :disabled="!selectedInterfaces.length">{{ t('vpp.buttons.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="interfaceColumns" :data="config.interface_list" rowKey="interface" :externalToolbar="true" @selection-change="selectedInterfaces = $event" :selectable="true" />
       </template>
 
       <template #ipsec>
-        <div class="form-row"><label class="form-label">接口类型</label>
-          <select class="form-control" v-model="config.ipsec.interface_type" title="IPsec接口类型">
-            <option value="ipsec">IPsec (默认)</option>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.interfaceType') }}</label>
+          <select class="form-control" v-model="config.ipsec.interface_type" :title="t('vpp.titles.interfaceType')">
+            <option value="ipsec">IPsec ({{ t('vpp.default') }})</option>
             <option value="ipip">IPIP</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">Netlink批延迟(ms)</label><input class="form-control" type="number" min="0" max="4294967295" v-model="config.ipsec.netlink_batch_delay_ms" title="Netlink批处理延迟（毫秒）" /></div>
-        <div class="form-row"><label class="form-label">Netlink批大小</label><input class="form-control" type="number" min="0" max="4294967295" v-model="config.ipsec.netlink_batch_size" title="Netlink批处理大小" /></div>
-        <div class="form-row"><label class="form-label">Netlink RX缓冲大小</label><input class="form-control" type="number" min="0" max="4294967295" v-model="config.ipsec.netlink_rx_buffer_size" title="Netlink接收缓冲区大小" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.netlinkBatchDelay') }}</label><input class="form-control" type="number" min="0" max="4294967295" v-model="config.ipsec.netlink_batch_delay_ms" :title="t('vpp.titles.netlinkBatchDelay')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.netlinkBatchSize') }}</label><input class="form-control" type="number" min="0" max="4294967295" v-model="config.ipsec.netlink_batch_size" :title="t('vpp.titles.netlinkBatchSize')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.netlinkRxBufferSize') }}</label><input class="form-control" type="number" min="0" max="4294967295" v-model="config.ipsec.netlink_rx_buffer_size" :title="t('vpp.titles.netlinkRxBufferSize')" /></div>
       </template>
 
       <template #ipv6>
-        <div class="form-row"><label class="form-label">哈希桶数</label><input class="form-control" type="number" min="1" max="4294967295" v-model="config.ipv6.hash_buckets" title="哈希桶数量，默认65536" /></div>
-        <div class="form-row"><label class="form-label">堆大小</label><input class="form-control" v-model="config.ipv6.heap_size" placeholder="如 32M" title="堆大小，默认32M" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.hashBuckets') }}</label><input class="form-control" type="number" min="1" max="4294967295" v-model="config.ipv6.hash_buckets" :title="t('vpp.titles.hashBuckets')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.heapSize') }}</label><input class="form-control" v-model="config.ipv6.heap_size" :placeholder="t('vpp.placeholders.heapSize')" :title="t('vpp.titles.heapSize')" /></div>
       </template>
 
       <template #l2learn>
-        <div class="form-row"><label class="form-label">限制</label><input class="form-control" type="number" min="1" max="4294967295" v-model="config.l2learn.limit" title="L2学习限制，默认4194304" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.l2learnLimit') }}</label><input class="form-control" type="number" min="1" max="4294967295" v-model="config.l2learn.limit" :title="t('vpp.titles.l2learnLimit')" /></div>
       </template>
 
       <template #lcp>
-        <div class="form-row"><label class="form-label">忽略内核路由</label><input type="checkbox" v-model="config.lcp.ignore_kernel_routes" title="忽略内核路由" /></div>
-        <div class="form-row"><label class="form-label">Netlink批延迟(ms)</label><input class="form-control" type="number" min="0" max="4294967295" v-model="config.lcp.netlink_batch_delay_ms" title="Netlink批处理延迟（毫秒）" /></div>
-        <div class="form-row"><label class="form-label">Netlink批大小</label><input class="form-control" type="number" min="0" max="4294967295" v-model="config.lcp.netlink_batch_size" title="Netlink批处理大小" /></div>
-        <div class="form-row"><label class="form-label">Netlink RX缓冲大小</label><input class="form-control" type="number" min="0" max="4294967295" v-model="config.lcp.netlink_rx_buffer_size" title="Netlink接收缓冲区大小" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.ignoreKernelRoutes') }}</label><input type="checkbox" v-model="config.lcp.ignore_kernel_routes" :title="t('vpp.titles.ignoreKernelRoutes')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.netlinkBatchDelay') }}</label><input class="form-control" type="number" min="0" max="4294967295" v-model="config.lcp.netlink_batch_delay_ms" :title="t('vpp.titles.netlinkBatchDelay')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.netlinkBatchSize') }}</label><input class="form-control" type="number" min="0" max="4294967295" v-model="config.lcp.netlink_batch_size" :title="t('vpp.titles.netlinkBatchSize')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.netlinkRxBufferSize') }}</label><input class="form-control" type="number" min="0" max="4294967295" v-model="config.lcp.netlink_rx_buffer_size" :title="t('vpp.titles.netlinkRxBufferSize')" /></div>
       </template>
 
       <template #logging>
-        <div class="form-row"><label class="form-label">默认日志级别</label>
-          <select class="form-control" v-model="config.logging.default_log_level" title="默认日志级别">
-            <option value="">未设置</option>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.defaultLogLevel') }}</label>
+          <select class="form-control" v-model="config.logging.default_log_level" :title="t('vpp.titles.defaultLogLevel')">
+            <option value="">{{ t('vpp.notSet') }}</option>
             <option value="alert">Alert</option>
             <option value="crit">Crit</option>
             <option value="debug">Debug</option>
@@ -414,65 +413,61 @@ export default defineComponent({
       </template>
 
       <template #memory>
-        <div class="form-row"><label class="form-label">主堆页面大小</label>
-          <select class="form-control" v-model="config.memory.main_heap_page_size" title="主堆页面大小">
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.mainHeapPageSize') }}</label>
+          <select class="form-control" v-model="config.memory.main_heap_page_size" :title="t('vpp.titles.mainHeapPageSize')">
             <option value="4K">4K</option>
-            <option value="2M">2M (默认)</option>
+            <option value="2M">2M ({{ t('vpp.default') }})</option>
             <option value="1G">1G</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">主堆大小</label><input class="form-control" v-model="config.memory.main_heap_size" placeholder="如 3G" title="主堆大小，默认3G" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.mainHeapSize') }}</label><input class="form-control" v-model="config.memory.main_heap_size" :placeholder="t('vpp.placeholders.mainHeapSize')" :title="t('vpp.titles.mainHeapSize')" /></div>
       </template>
 
       <template #nat44>
-        <div class="form-row"><label class="form-label">会话限制</label><input class="form-control" type="number" min="1" max="4294967295" v-model="config.nat44.session_limit" title="NAT44会话限制，默认64512" /></div>
-        <div class="form-row"><label class="form-label">Workers</label><textarea class="form-control" v-model="config.nat44.workers" rows="2" placeholder="每行一个Worker编号(0-512)" title="NAT44 Worker线程" /></div>
-        <div style="font-weight:bold;margin:16px 0 8px;">超时设置</div>
-        <div class="form-row"><label class="form-label">ICMP</label><input class="form-control" type="number" v-model="config.nat44.timeouts.icmp" title="ICMP超时（秒），默认60" /></div>
-        <div class="form-row"><label class="form-label">TCP已建立</label><input class="form-control" type="number" v-model="config.nat44.timeouts.tcp_established" title="TCP已建立连接超时（秒），默认7440" /></div>
-        <div class="form-row"><label class="form-label">TCP临时</label><input class="form-control" type="number" v-model="config.nat44.timeouts.tcp_transitory" title="TCP临时连接超时（秒），默认240" /></div>
-        <div class="form-row"><label class="form-label">UDP</label><input class="form-control" type="number" v-model="config.nat44.timeouts.udp" title="UDP超时（秒），默认300" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.sessionLimit') }}</label><input class="form-control" type="number" min="1" max="4294967295" v-model="config.nat44.session_limit" :title="t('vpp.titles.sessionLimit')" /></div>
+        <div class="form-row"><label class="form-label">Workers</label><textarea class="form-control" v-model="config.nat44.workers" rows="2" :placeholder="t('vpp.placeholders.nat44Workers')" :title="t('vpp.titles.nat44Workers')" /></div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('vpp.labels.timeoutSettings') }}</div>
+        <div class="form-row"><label class="form-label">ICMP</label><input class="form-control" type="number" v-model="config.nat44.timeouts.icmp" :title="t('vpp.titles.icmpTimeout')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.tcpEstablished') }}</label><input class="form-control" type="number" v-model="config.nat44.timeouts.tcp_established" :title="t('vpp.titles.tcpEstablished')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.tcpTransitory') }}</label><input class="form-control" type="number" v-model="config.nat44.timeouts.tcp_transitory" :title="t('vpp.titles.tcpTransitory')" /></div>
+        <div class="form-row"><label class="form-label">UDP</label><input class="form-control" type="number" v-model="config.nat44.timeouts.udp" :title="t('vpp.titles.udpTimeout')" /></div>
       </template>
 
       <template #physmem>
-        <div class="form-row"><label class="form-label">最大大小</label><input class="form-control" v-model="config.physmem.max_size" placeholder="如 1G" title="物理内存最大大小" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.maxSize') }}</label><input class="form-control" v-model="config.physmem.max_size" :placeholder="t('vpp.placeholders.maxSize')" :title="t('vpp.titles.maxSize')" /></div>
       </template>
 
       <template #statseg>
-        <div class="form-row"><label class="form-label">页面大小</label>
-          <select class="form-control" v-model="config.statseg.page_size" title="统计段页面大小">
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.pageSize') }}</label>
+          <select class="form-control" v-model="config.statseg.page_size" :title="t('vpp.titles.statsegPageSize')">
             <option value="4K">4K</option>
-            <option value="2M">2M (默认)</option>
+            <option value="2M">2M ({{ t('vpp.default') }})</option>
             <option value="1G">1G</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">大小</label><input class="form-control" v-model="config.statseg.size" placeholder="如 128M" title="统计段大小，默认128M" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.size') }}</label><input class="form-control" v-model="config.statseg.size" :placeholder="t('vpp.placeholders.statsegSize')" :title="t('vpp.titles.statsegSize')" /></div>
       </template>
 
       <template #unix>
-        <div class="form-row"><label class="form-label">Poll Sleep(usec)</label><input class="form-control" type="number" min="0" max="500000" v-model="config.unix.poll_sleep_usec" title="Poll睡眠微秒数，默认0" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.pollSleep') }}</label><input class="form-control" type="number" min="0" max="500000" v-model="config.unix.poll_sleep_usec" :title="t('vpp.titles.pollSleep')" /></div>
       </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="showInterfaceModal" :title="editingInterface && editingInterface._interface ? '编辑接口设置' : '添加接口设置'" @confirm="saveInterface" @close="showInterfaceModal = false" width="700px">
-        <div class="form-row"><label class="form-label">接口</label><input class="form-control" v-model="editingInterface.interface" :disabled="editingInterface._interface" placeholder="ethernet" title="接口名称" /></div>
-        <div class="form-row"><label class="form-label">RX模式</label>
-          <select class="form-control" v-model="editingInterface.rx_mode" title="接收模式">
-            <option value="">未设置</option>
+      <DraggableModal v-model:visible="showInterfaceModal" :title="editingInterface && editingInterface._interface ? t('vpp.modal.editInterface') : t('vpp.modal.addInterface')" @confirm="saveInterface" @close="showInterfaceModal = false" width="700px">
+        <div class="form-row"><label class="form-label">{{ t('vpp.columns.interface') }}</label><input class="form-control" v-model="editingInterface.interface" :disabled="editingInterface._interface" :placeholder="t('vpp.placeholders.interfaceName')" :title="t('vpp.titles.interfaceName')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.rxMode') }}</label>
+          <select class="form-control" v-model="editingInterface.rx_mode" :title="t('vpp.titles.rxMode')">
+            <option value="">{{ t('vpp.notSet') }}</option>
             <option value="polling">Polling</option>
             <option value="interrupt">Interrupt</option>
             <option value="adaptive">Adaptive</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">DPDK RX描述符数</label><input class="form-control" type="number" min="256" max="16384" v-model="editingInterface.dpdk_num_rx_desc" title="DPDK RX描述符数量，默认1024" /></div>
-        <div class="form-row"><label class="form-label">DPDK RX队列数</label><input class="form-control" type="number" min="1" max="8192" v-model="editingInterface.dpdk_num_rx_queues" title="DPDK RX队列数量" /></div>
-        <div class="form-row"><label class="form-label">DPDK TX描述符数</label><input class="form-control" type="number" min="256" max="8192" v-model="editingInterface.dpdk_num_tx_desc" title="DPDK TX描述符数量，默认1024" /></div>
-        <div class="form-row"><label class="form-label">DPDK TX队列数</label><input class="form-control" type="number" min="1" max="8192" v-model="editingInterface.dpdk_num_tx_queues" title="DPDK TX队列数量" /></div>
-        <div class="form-row"><label class="form-label">DPDK混杂模式</label><input type="checkbox" v-model="editingInterface.dpdk_promisc" title="启用DPDK混杂模式" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.dpdkRxDesc') }}</label><input class="form-control" type="number" min="256" max="16384" v-model="editingInterface.dpdk_num_rx_desc" :title="t('vpp.titles.dpdkRxDesc')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.dpdkRxQueues') }}</label><input class="form-control" type="number" min="1" max="8192" v-model="editingInterface.dpdk_num_rx_queues" :title="t('vpp.titles.dpdkRxQueues')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.dpdkTxDesc') }}</label><input class="form-control" type="number" min="256" max="8192" v-model="editingInterface.dpdk_num_tx_desc" :title="t('vpp.titles.dpdkTxDesc')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.dpdkTxQueues') }}</label><input class="form-control" type="number" min="1" max="8192" v-model="editingInterface.dpdk_num_tx_queues" :title="t('vpp.titles.dpdkTxQueues')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vpp.labels.dpdkPromisc') }}</label><input type="checkbox" v-model="editingInterface.dpdk_promisc" :title="t('vpp.titles.dpdkPromisc')" /></div>
       </DraggableModal>
     </div>
   `,

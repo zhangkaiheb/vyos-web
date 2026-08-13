@@ -7,6 +7,8 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const ALGORITHM_OPTIONS = [
   { value: 'round-robin', label: 'Round Robin' },
@@ -39,16 +41,12 @@ const VRRP_VERSION_OPTIONS = [
   { value: '3', label: 'VRRPv3' },
 ];
 
-const TABS = [
-  { key: 'virtual-server', title: '虚拟服务器' },
-  { key: 'vrrp-group', title: 'VRRP 组' },
-  { key: 'vrrp-sync', title: 'VRRP 同步组' },
-  { key: 'vrrp-global', title: 'VRRP 全局参数' },
-];
+// TABS will be computed in setup() using t()
 
 export default defineComponent({
   name: 'HighAvailabilityPage',
   setup() {
+    const { t } = useI18n();
     const route = useRoute();
     const configStore = useConfigStore();
     const virtualServers = ref([]);
@@ -81,102 +79,119 @@ export default defineComponent({
     const editingOriginalRS = ref('');
     const selectedRS = ref([]);
 
+    // Delete confirmation modals
+    const vsDeleteModalVisible = ref(false);
+    const pendingDeleteVSNames = ref([]);
+    const rsDeleteModalVisible = ref(false);
+    const pendingDeleteRSNames = ref([]);
+    const vrrpDeleteModalVisible = ref(false);
+    const pendingDeleteVRRPNames = ref([]);
+    const syncDeleteModalVisible = ref(false);
+    const pendingDeleteSyncNames = ref([]);
+
     const path = computed(() => 'high-availability');
     const writeDisabled = computed(() => route.meta?.menuItem?.permission === 'read');
     const activeTab = ref('virtual-server');
 
-    const vsColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'address', title: '虚拟地址' },
-      { key: 'port', title: '端口' },
-      { key: 'protocol', title: '协议' },
-      { key: 'algorithm', title: '算法' },
-      { key: 'realServerCount', title: '真实服务器数' },
-    ];
+    const TABS = computed(() => [
+      { key: 'virtual-server', title: t('highAvailability.tabs.virtualServer') },
+      { key: 'vrrp-group', title: t('highAvailability.tabs.vrrpGroup') },
+      { key: 'vrrp-sync', title: t('highAvailability.tabs.vrrpSync') },
+      { key: 'vrrp-global', title: t('highAvailability.tabs.vrrpGlobal') },
+    ]);
 
-    const vrrpGroupColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'vrid', title: 'VRID' },
-      { key: 'interface', title: '接口' },
-      { key: 'priority', title: '优先级' },
-      { key: 'addressCount', title: '虚拟地址数' },
-    ];
+    const vsColumns = computed(() => [
+      { key: 'name', title: t('highAvailability.columns.name') },
+      { key: 'address', title: t('highAvailability.columns.address') },
+      { key: 'port', title: t('highAvailability.columns.port') },
+      { key: 'protocol', title: t('highAvailability.columns.protocol') },
+      { key: 'algorithm', title: t('highAvailability.columns.algorithm') },
+      { key: 'realServerCount', title: t('highAvailability.columns.realServerCount') },
+    ]);
 
-    const syncGroupColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'memberCount', title: '成员数' },
-    ];
+    const vrrpGroupColumns = computed(() => [
+      { key: 'name', title: t('highAvailability.columns.name') },
+      { key: 'vrid', title: t('highAvailability.columns.vrid') },
+      { key: 'interface', title: t('highAvailability.columns.interface') },
+      { key: 'priority', title: t('highAvailability.columns.priority') },
+      { key: 'addressCount', title: t('highAvailability.columns.addressCount') },
+    ]);
+
+    const syncGroupColumns = computed(() => [
+      { key: 'name', title: t('highAvailability.columns.name') },
+      { key: 'memberCount', title: t('highAvailability.columns.memberCount') },
+    ]);
 
     const vsSchema = computed(() => [
-      { key: 'name', title: '名称', type: 'text', required: true, placeholder: '例如: vs01' },
-      { key: 'address', title: '虚拟地址', type: 'text', required: true, placeholder: '1.1.1.1 或 h:h:h:h:h:h:h:h' },
-      { key: 'port', title: '端口', type: 'number', min: 0, max: 65535, placeholder: '0-65535' },
-      { key: 'protocol', title: '协议', type: 'select', options: PROTOCOL_OPTIONS, defaultValue: 'tcp' },
-      { key: 'algorithm', title: '调度算法', type: 'select', options: ALGORITHM_OPTIONS, defaultValue: 'least-connection', help: '默认: least-connection' },
-      { key: 'forwardMethod', title: '转发方法', type: 'select', options: FORWARD_METHOD_OPTIONS, defaultValue: 'nat', help: '默认: nat' },
-      { key: 'delayLoop', title: '健康检查间隔', type: 'number', min: 1, max: 600, placeholder: '1-600 秒', defaultValue: 10, help: '默认: 10 秒' },
-      { key: 'persistenceTimeout', title: '持久连接超时', type: 'number', min: 1, max: 86400, placeholder: '1-86400 秒', defaultValue: 300, help: '默认: 300 秒' },
-      { key: 'fwmark', title: '防火墙标记', type: 'number', min: 1, max: 2147483647, placeholder: '1-2147483647' },
+      { key: 'name', title: t('highAvailability.vsSchema.name.title'), type: 'text', required: true, placeholder: t('highAvailability.vsSchema.name.placeholder') },
+      { key: 'address', title: t('highAvailability.vsSchema.address.title'), type: 'text', required: true, placeholder: t('highAvailability.vsSchema.address.placeholder') },
+      { key: 'port', title: t('highAvailability.vsSchema.port.title'), type: 'number', min: 0, max: 65535, placeholder: t('highAvailability.vsSchema.port.placeholder') },
+      { key: 'protocol', title: t('highAvailability.vsSchema.protocol.title'), type: 'select', options: PROTOCOL_OPTIONS, defaultValue: 'tcp' },
+      { key: 'algorithm', title: t('highAvailability.vsSchema.algorithm.title'), type: 'select', options: ALGORITHM_OPTIONS, defaultValue: 'least-connection', help: t('highAvailability.vsSchema.algorithm.help') },
+      { key: 'forwardMethod', title: t('highAvailability.vsSchema.forwardMethod.title'), type: 'select', options: FORWARD_METHOD_OPTIONS, defaultValue: 'nat', help: t('highAvailability.vsSchema.forwardMethod.help') },
+      { key: 'delayLoop', title: t('highAvailability.vsSchema.delayLoop.title'), type: 'number', min: 1, max: 600, placeholder: t('highAvailability.vsSchema.delayLoop.placeholder'), defaultValue: 10, help: t('highAvailability.vsSchema.delayLoop.help') },
+      { key: 'persistenceTimeout', title: t('highAvailability.vsSchema.persistenceTimeout.title'), type: 'number', min: 1, max: 86400, placeholder: t('highAvailability.vsSchema.persistenceTimeout.placeholder'), defaultValue: 300, help: t('highAvailability.vsSchema.persistenceTimeout.help') },
+      { key: 'fwmark', title: t('highAvailability.vsSchema.fwmark.title'), type: 'number', min: 1, max: 2147483647, placeholder: t('highAvailability.vsSchema.fwmark.placeholder') },
     ]);
 
     const vrrpGroupSchema = computed(() => [
-      { key: 'name', title: '名称', type: 'text', required: true, placeholder: '例如: vg01' },
-      { key: 'vrid', title: 'VRID', type: 'number', min: 1, max: 255, required: true, placeholder: '1-255' },
-      { key: 'interface', title: '接口', type: 'text', required: true, placeholder: '例如: eth0' },
-      { key: 'priority', title: '优先级', type: 'number', min: 1, max: 255, defaultValue: 100, help: '默认: 100, 范围 1-255' },
-      { key: 'advertiseInterval', title: '通告间隔', type: 'number', min: 1, max: 255, defaultValue: 1, help: '默认: 1 秒' },
-      { key: 'preemptDelay', title: '抢占延迟', type: 'number', min: 0, max: 1000, defaultValue: 0, help: '默认: 0 秒, 范围 0-1000' },
-      { key: 'helloSourceAddress', title: 'Hello 源地址', type: 'text', placeholder: 'IPv4/IPv6 地址' },
-      { key: 'peerAddress', title: '单播 Peer 地址', type: 'text', placeholder: 'IPv4/IPv6 地址' },
-      { key: 'description', title: '描述', type: 'text' },
-      { key: 'disable', title: '禁用', type: 'checkbox' },
-      { key: 'noPreempt', title: '禁用抢占', type: 'checkbox' },
-      { key: 'rfc3768Compatibility', title: 'RFC3768 兼容', type: 'checkbox', help: '使用 VRRP 虚拟 MAC 地址' },
-      { key: 'authType', title: '认证类型', type: 'select', options: AUTH_TYPE_OPTIONS, help: 'plaintext-password 或 ah' },
-      { key: 'authPassword', title: '认证密码', type: 'text', placeholder: '最多 8 个字符' },
-      { key: 'garpInterval', title: 'GARP 间隔', type: 'number', min: 0, max: 1000, defaultValue: 0, help: '默认: 0 秒, 范围 0-1000 (微秒精度)' },
-      { key: 'garpMasterDelay', title: 'GARP Master 延迟', type: 'number', min: 1, max: 1000, defaultValue: 5, help: '默认: 5 秒, 范围 1-1000' },
-      { key: 'garpMasterRefresh', title: 'GARP Master 刷新', type: 'number', min: 0, max: 255, defaultValue: 5, help: '默认: 5 秒, 0=不刷新, 范围 0 或 1-255' },
-      { key: 'garpMasterRefreshRepeat', title: 'GARP Master 刷新重复', type: 'number', min: 1, max: 255, defaultValue: 1, help: '默认: 1, 范围 1-255' },
-      { key: 'garpMasterRepeat', title: 'GARP Master 重复', type: 'number', min: 1, max: 255, defaultValue: 5, help: '默认: 5, 范围 1-255' },
-      { key: 'healthCheckFailureCount', title: '健康检查失败次数', type: 'text', defaultValue: '3', help: '默认: 3' },
-      { key: 'healthCheckInterval', title: '健康检查间隔', type: 'text', defaultValue: '60', help: '默认: 60 秒' },
-      { key: 'healthCheckPing', title: '健康检查 Ping 目标', type: 'text', placeholder: 'IPv4/IPv6 地址' },
-      { key: 'healthCheckScript', title: '健康检查脚本', type: 'text', placeholder: '脚本文件路径' },
-      { key: 'trackExcludeInterface', title: '排除接口跟踪', type: 'checkbox', help: '禁用主接口状态跟踪' },
-      { key: 'transitionScriptBackup', title: 'Backup 转换脚本', type: 'text', placeholder: '脚本路径' },
-      { key: 'transitionScriptFault', title: 'Fault 转换脚本', type: 'text', placeholder: '脚本路径' },
-      { key: 'transitionScriptMaster', title: 'Master 转换脚本', type: 'text', placeholder: '脚本路径' },
-      { key: 'transitionScriptStop', title: 'Stop 转换脚本', type: 'text', placeholder: '脚本路径' },
+      { key: 'name', title: t('highAvailability.vrrpGroupSchema.name.title'), type: 'text', required: true, placeholder: t('highAvailability.vrrpGroupSchema.name.placeholder') },
+      { key: 'vrid', title: t('highAvailability.vrrpGroupSchema.vrid.title'), type: 'number', min: 1, max: 255, required: true, placeholder: t('highAvailability.vrrpGroupSchema.vrid.placeholder') },
+      { key: 'interface', title: t('highAvailability.vrrpGroupSchema.interface.title'), type: 'text', required: true, placeholder: t('highAvailability.vrrpGroupSchema.interface.placeholder') },
+      { key: 'priority', title: t('highAvailability.vrrpGroupSchema.priority.title'), type: 'number', min: 1, max: 255, defaultValue: 100, help: t('highAvailability.vrrpGroupSchema.priority.help') },
+      { key: 'advertiseInterval', title: t('highAvailability.vrrpGroupSchema.advertiseInterval.title'), type: 'number', min: 1, max: 255, defaultValue: 1, help: t('highAvailability.vrrpGroupSchema.advertiseInterval.help') },
+      { key: 'preemptDelay', title: t('highAvailability.vrrpGroupSchema.preemptDelay.title'), type: 'number', min: 0, max: 1000, defaultValue: 0, help: t('highAvailability.vrrpGroupSchema.preemptDelay.help') },
+      { key: 'helloSourceAddress', title: t('highAvailability.vrrpGroupSchema.helloSourceAddress.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.helloSourceAddress.placeholder') },
+      { key: 'peerAddress', title: t('highAvailability.vrrpGroupSchema.peerAddress.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.peerAddress.placeholder') },
+      { key: 'description', title: t('highAvailability.vrrpGroupSchema.description.title'), type: 'text' },
+      { key: 'disable', title: t('highAvailability.vrrpGroupSchema.disable.title'), type: 'checkbox' },
+      { key: 'noPreempt', title: t('highAvailability.vrrpGroupSchema.noPreempt.title'), type: 'checkbox' },
+      { key: 'rfc3768Compatibility', title: t('highAvailability.vrrpGroupSchema.rfc3768Compatibility.title'), type: 'checkbox', help: t('highAvailability.vrrpGroupSchema.rfc3768Compatibility.help') },
+      { key: 'authType', title: t('highAvailability.vrrpGroupSchema.authType.title'), type: 'select', options: AUTH_TYPE_OPTIONS, help: t('highAvailability.vrrpGroupSchema.authType.help') },
+      { key: 'authPassword', title: t('highAvailability.vrrpGroupSchema.authPassword.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.authPassword.placeholder') },
+      { key: 'garpInterval', title: t('highAvailability.vrrpGroupSchema.garpInterval.title'), type: 'number', min: 0, max: 1000, defaultValue: 0, help: t('highAvailability.vrrpGroupSchema.garpInterval.help') },
+      { key: 'garpMasterDelay', title: t('highAvailability.vrrpGroupSchema.garpMasterDelay.title'), type: 'number', min: 1, max: 1000, defaultValue: 5, help: t('highAvailability.vrrpGroupSchema.garpMasterDelay.help') },
+      { key: 'garpMasterRefresh', title: t('highAvailability.vrrpGroupSchema.garpMasterRefresh.title'), type: 'number', min: 0, max: 255, defaultValue: 5, help: t('highAvailability.vrrpGroupSchema.garpMasterRefresh.help') },
+      { key: 'garpMasterRefreshRepeat', title: t('highAvailability.vrrpGroupSchema.garpMasterRefreshRepeat.title'), type: 'number', min: 1, max: 255, defaultValue: 1, help: t('highAvailability.vrrpGroupSchema.garpMasterRefreshRepeat.help') },
+      { key: 'garpMasterRepeat', title: t('highAvailability.vrrpGroupSchema.garpMasterRepeat.title'), type: 'number', min: 1, max: 255, defaultValue: 5, help: t('highAvailability.vrrpGroupSchema.garpMasterRepeat.help') },
+      { key: 'healthCheckFailureCount', title: t('highAvailability.vrrpGroupSchema.healthCheckFailureCount.title'), type: 'text', defaultValue: '3', help: t('highAvailability.vrrpGroupSchema.healthCheckFailureCount.help') },
+      { key: 'healthCheckInterval', title: t('highAvailability.vrrpGroupSchema.healthCheckInterval.title'), type: 'text', defaultValue: '60', help: t('highAvailability.vrrpGroupSchema.healthCheckInterval.help') },
+      { key: 'healthCheckPing', title: t('highAvailability.vrrpGroupSchema.healthCheckPing.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.healthCheckPing.placeholder') },
+      { key: 'healthCheckScript', title: t('highAvailability.vrrpGroupSchema.healthCheckScript.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.healthCheckScript.placeholder') },
+      { key: 'trackExcludeInterface', title: t('highAvailability.vrrpGroupSchema.trackExcludeInterface.title'), type: 'checkbox', help: t('highAvailability.vrrpGroupSchema.trackExcludeInterface.help') },
+      { key: 'transitionScriptBackup', title: t('highAvailability.vrrpGroupSchema.transitionScriptBackup.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.transitionScriptBackup.placeholder') },
+      { key: 'transitionScriptFault', title: t('highAvailability.vrrpGroupSchema.transitionScriptFault.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.transitionScriptFault.placeholder') },
+      { key: 'transitionScriptMaster', title: t('highAvailability.vrrpGroupSchema.transitionScriptMaster.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.transitionScriptMaster.placeholder') },
+      { key: 'transitionScriptStop', title: t('highAvailability.vrrpGroupSchema.transitionScriptStop.title'), type: 'text', placeholder: t('highAvailability.vrrpGroupSchema.transitionScriptStop.placeholder') },
     ]);
 
     const syncGroupSchema = computed(() => [
-      { key: 'name', title: '名称', type: 'text', required: true, placeholder: '例如: sg01' },
-      { key: 'members', title: '成员 (逗号分隔)', type: 'text', required: true, placeholder: 'vg01,vg02' },
+      { key: 'name', title: t('highAvailability.syncGroupSchema.name.title'), type: 'text', required: true, placeholder: t('highAvailability.syncGroupSchema.name.placeholder') },
+      { key: 'members', title: t('highAvailability.syncGroupSchema.members.title'), type: 'text', required: true, placeholder: t('highAvailability.syncGroupSchema.members.placeholder') },
     ]);
 
     const vrrpGlobalSchema = computed(() => [
-      { key: 'startupDelay', title: '启动延迟', type: 'number', min: 1, max: 600, placeholder: '1-600 秒', help: '范围 1-600 秒' },
-      { key: 'version', title: 'VRRP 版本', type: 'select', options: VRRP_VERSION_OPTIONS, defaultValue: '2', help: 'IPv6 始终使用 VRRPv3' },
-      { key: 'garpInterval', title: 'GARP 间隔', type: 'number', min: 0, max: 1000, defaultValue: 0, help: '默认: 0, 范围 0-1000 秒 (微秒精度)' },
-      { key: 'garpMasterDelay', title: 'GARP Master 延迟', type: 'number', min: 1, max: 1000, defaultValue: 5, help: '默认: 5, 范围 1-1000 秒' },
-      { key: 'garpMasterRefresh', title: 'GARP Master 刷新', type: 'number', min: 0, max: 255, defaultValue: 5, help: '默认: 5, 0=不刷新, 范围 0 或 1-255' },
-      { key: 'garpMasterRefreshRepeat', title: 'GARP Master 刷新重复', type: 'number', min: 1, max: 255, defaultValue: 1, help: '默认: 1, 范围 1-255' },
-      { key: 'garpMasterRepeat', title: 'GARP Master 重复', type: 'number', min: 1, max: 255, defaultValue: 5, help: '默认: 5, 范围 1-255' },
+      { key: 'startupDelay', title: t('highAvailability.vrrpGlobalSchema.startupDelay.title'), type: 'number', min: 1, max: 600, placeholder: t('highAvailability.vrrpGlobalSchema.startupDelay.placeholder'), help: t('highAvailability.vrrpGlobalSchema.startupDelay.help') },
+      { key: 'version', title: t('highAvailability.vrrpGlobalSchema.version.title'), type: 'select', options: VRRP_VERSION_OPTIONS, defaultValue: '2', help: t('highAvailability.vrrpGlobalSchema.version.help') },
+      { key: 'garpInterval', title: t('highAvailability.vrrpGlobalSchema.garpInterval.title'), type: 'number', min: 0, max: 1000, defaultValue: 0, help: t('highAvailability.vrrpGlobalSchema.garpInterval.help') },
+      { key: 'garpMasterDelay', title: t('highAvailability.vrrpGlobalSchema.garpMasterDelay.title'), type: 'number', min: 1, max: 1000, defaultValue: 5, help: t('highAvailability.vrrpGlobalSchema.garpMasterDelay.help') },
+      { key: 'garpMasterRefresh', title: t('highAvailability.vrrpGlobalSchema.garpMasterRefresh.title'), type: 'number', min: 0, max: 255, defaultValue: 5, help: t('highAvailability.vrrpGlobalSchema.garpMasterRefresh.help') },
+      { key: 'garpMasterRefreshRepeat', title: t('highAvailability.vrrpGlobalSchema.garpMasterRefreshRepeat.title'), type: 'number', min: 1, max: 255, defaultValue: 1, help: t('highAvailability.vrrpGlobalSchema.garpMasterRefreshRepeat.help') },
+      { key: 'garpMasterRepeat', title: t('highAvailability.vrrpGlobalSchema.garpMasterRepeat.title'), type: 'number', min: 1, max: 255, defaultValue: 5, help: t('highAvailability.vrrpGlobalSchema.garpMasterRepeat.help') },
     ]);
 
-    const rsColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'port', title: '端口' },
-      { key: 'connectionTimeout', title: '连接超时' },
-      { key: 'healthCheckScript', title: '健康检查脚本' },
-    ];
+    const rsColumns = computed(() => [
+      { key: 'name', title: t('highAvailability.columns.name') },
+      { key: 'port', title: t('highAvailability.columns.port') },
+      { key: 'connectionTimeout', title: t('highAvailability.columns.connectionTimeout') },
+      { key: 'healthCheckScript', title: t('highAvailability.columns.healthCheckScript') },
+    ]);
 
     const rsSchema = computed(() => [
-      { key: 'name', title: '名称', type: 'text', required: true, placeholder: '例如: rs01' },
-      { key: 'port', title: '端口', type: 'number', min: 0, max: 65535, placeholder: '0-65535' },
-      { key: 'connectionTimeout', title: '连接超时', type: 'number', min: 1, max: 86400, placeholder: '1-86400 秒', help: '默认: 300 秒' },
-      { key: 'healthCheckScript', title: '健康检查脚本', type: 'text', placeholder: '脚本文件路径' },
+      { key: 'name', title: t('highAvailability.rsSchema.name.title'), type: 'text', required: true, placeholder: t('highAvailability.rsSchema.name.placeholder') },
+      { key: 'port', title: t('highAvailability.rsSchema.port.title'), type: 'number', min: 0, max: 65535, placeholder: t('highAvailability.rsSchema.port.placeholder') },
+      { key: 'connectionTimeout', title: t('highAvailability.rsSchema.connectionTimeout.title'), type: 'number', min: 1, max: 86400, placeholder: t('highAvailability.rsSchema.connectionTimeout.placeholder'), help: t('highAvailability.rsSchema.connectionTimeout.help') },
+      { key: 'healthCheckScript', title: t('highAvailability.rsSchema.healthCheckScript.title'), type: 'text', placeholder: t('highAvailability.rsSchema.healthCheckScript.placeholder') },
     ]);
 
     async function load() {
@@ -280,7 +295,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(load);
+    onMounted(() => { load(); onMenuRefresh(load); });
     watch(() => route.path, () => {
       selectedVS.value = [];
       selectedVRRPGroup.value = [];
@@ -359,8 +374,8 @@ export default defineComponent({
     }
 
     function editVS() {
-      if (!selectedVS.value.length) return showError({ message: '请选择一个虚拟服务器' });
-      if (selectedVS.value.length > 1) return showError({ message: '请选择一个虚拟服务器' });
+      if (!selectedVS.value.length) return showError({ message: t('highAvailability.messages.selectVS') });
+      if (selectedVS.value.length > 1) return showError({ message: t('highAvailability.messages.selectVS') });
       const vs = virtualServers.value.find(n => n.name === selectedVS.value[0]);
       if (!vs) return;
       editingVS.value = flattenVSData(vs.name, vs._raw || {});
@@ -368,31 +383,41 @@ export default defineComponent({
       vsModalVisible.value = true;
     }
 
-    async function removeVS() {
-      if (!selectedVS.value.length) return showError({ message: '请选择一个虚拟服务器' });
-      if (!confirm('确认删除选中的虚拟服务器？')) return;
-      for (const name of selectedVS.value) {
+    function removeVS() {
+      if (!selectedVS.value.length) return showError({ message: t('highAvailability.messages.selectVS') });
+      pendingDeleteVSNames.value = [...selectedVS.value];
+      vsDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveVS() {
+      vsDeleteModalVisible.value = false;
+      for (const name of pendingDeleteVSNames.value) {
         await configStore.deleteConfig(`${path.value} virtual-server ${name}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selectedVS.value = [];
+      pendingDeleteVSNames.value = [];
       await load();
     }
 
     async function saveVS() {
-      if (!editingVS.value.name) return showError({ message: '请输入名称' });
-      if (!editingVS.value.address) return showError({ message: '请输入虚拟地址' });
+      if (!editingVS.value.name) return showError({ message: t('highAvailability.messages.enterName') });
+      if (!editingVS.value.address) return showError({ message: t('highAvailability.messages.enterAddress') });
       const original = editingOriginalVS.value;
       if (!original && virtualServers.value.some(n => n.name === editingVS.value.name)) {
-        return showError({ message: '名称已存在' });
+        return showError({ message: t('highAvailability.messages.nameExists') });
       }
       const value = unflattenVSData(editingVS.value);
       try {
         if (original && original !== editingVS.value.name) {
           await configStore.deleteConfig(`${path.value} virtual-server ${original}`);
+          configStore.markPending();
           await configStore.setConfig(`${path.value} virtual-server ${editingVS.value.name}`, value);
+          configStore.markPending();
         } else {
           await configStore.setConfig(`${path.value} virtual-server ${editingVS.value.name}`, value);
+          configStore.markPending();
         }
         vsModalVisible.value = false;
         await configStore.checkSessionChanged();
@@ -411,8 +436,8 @@ export default defineComponent({
     }
 
     function editRealServer() {
-      if (!selectedRS.value.length) return showError({ message: '请选择一个真实服务器' });
-      if (selectedRS.value.length > 1) return showError({ message: '请选择一个真实服务器' });
+      if (!selectedRS.value.length) return showError({ message: t('highAvailability.messages.selectRS') });
+      if (selectedRS.value.length > 1) return showError({ message: t('highAvailability.messages.selectRS') });
       const rs = editingVS.value.realServers.find(r => r.name === selectedRS.value[0]);
       if (!rs) return;
       editingRS.value = { ...rs };
@@ -421,17 +446,23 @@ export default defineComponent({
     }
 
     function removeRealServer() {
-      if (!selectedRS.value.length) return showError({ message: '请选择一个真实服务器' });
-      if (!confirm('确认删除选中的真实服务器？')) return;
-      editingVS.value.realServers = editingVS.value.realServers.filter(r => !selectedRS.value.includes(r.name));
+      if (!selectedRS.value.length) return showError({ message: t('highAvailability.messages.selectRS') });
+      pendingDeleteRSNames.value = [...selectedRS.value];
+      rsDeleteModalVisible.value = true;
+    }
+
+    function confirmRemoveRS() {
+      rsDeleteModalVisible.value = false;
+      editingVS.value.realServers = editingVS.value.realServers.filter(r => !pendingDeleteRSNames.value.includes(r.name));
       selectedRS.value = [];
+      pendingDeleteRSNames.value = [];
     }
 
     function saveRS() {
-      if (!editingRS.value.name) return showError({ message: '请输入名称' });
+      if (!editingRS.value.name) return showError({ message: t('highAvailability.messages.enterName') });
       const original = editingOriginalRS.value;
       if (!original && editingVS.value.realServers.some(r => r.name === editingRS.value.name)) {
-        return showError({ message: '名称已存在' });
+        return showError({ message: t('highAvailability.messages.nameExists') });
       }
       if (original && original !== editingRS.value.name) {
         const idx = editingVS.value.realServers.findIndex(r => r.name === original);
@@ -575,8 +606,8 @@ export default defineComponent({
     }
 
     function editVRRPGroup() {
-      if (!selectedVRRPGroup.value.length) return showError({ message: '请选择一个 VRRP 组' });
-      if (selectedVRRPGroup.value.length > 1) return showError({ message: '请选择一个 VRRP 组' });
+      if (!selectedVRRPGroup.value.length) return showError({ message: t('highAvailability.messages.selectVRRPGroup') });
+      if (selectedVRRPGroup.value.length > 1) return showError({ message: t('highAvailability.messages.selectVRRPGroup') });
       const group = vrrpGroups.value.find(n => n.name === selectedVRRPGroup.value[0]);
       if (!group) return;
       editingVRRP.value = flattenVRRPGroupData(group.name, group._raw || {});
@@ -584,32 +615,42 @@ export default defineComponent({
       vrrpModalVisible.value = true;
     }
 
-    async function removeVRRPGroup() {
-      if (!selectedVRRPGroup.value.length) return showError({ message: '请选择一个 VRRP 组' });
-      if (!confirm('确认删除选中的 VRRP 组？')) return;
-      for (const name of selectedVRRPGroup.value) {
+    function removeVRRPGroup() {
+      if (!selectedVRRPGroup.value.length) return showError({ message: t('highAvailability.messages.selectVRRPGroup') });
+      pendingDeleteVRRPNames.value = [...selectedVRRPGroup.value];
+      vrrpDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveVRRPGroup() {
+      vrrpDeleteModalVisible.value = false;
+      for (const name of pendingDeleteVRRPNames.value) {
         await configStore.deleteConfig(`${path.value} vrrp group ${name}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selectedVRRPGroup.value = [];
+      pendingDeleteVRRPNames.value = [];
       await load();
     }
 
     async function saveVRRPGroup() {
-      if (!editingVRRP.value.name) return showError({ message: '请输入名称' });
-      if (!editingVRRP.value.vrid) return showError({ message: '请输入 VRID' });
-      if (!editingVRRP.value.interface) return showError({ message: '请输入接口' });
+      if (!editingVRRP.value.name) return showError({ message: t('highAvailability.messages.enterName') });
+      if (!editingVRRP.value.vrid) return showError({ message: t('highAvailability.messages.enterVRID') });
+      if (!editingVRRP.value.interface) return showError({ message: t('highAvailability.messages.enterInterface') });
       const original = editingOriginalVRRP.value;
       if (!original && vrrpGroups.value.some(n => n.name === editingVRRP.value.name)) {
-        return showError({ message: '名称已存在' });
+        return showError({ message: t('highAvailability.messages.nameExists') });
       }
       const value = unflattenVRRPGroupData(editingVRRP.value);
       try {
         if (original && original !== editingVRRP.value.name) {
           await configStore.deleteConfig(`${path.value} vrrp group ${original}`);
+          configStore.markPending();
           await configStore.setConfig(`${path.value} vrrp group ${editingVRRP.value.name}`, value);
+          configStore.markPending();
         } else {
           await configStore.setConfig(`${path.value} vrrp group ${editingVRRP.value.name}`, value);
+          configStore.markPending();
         }
         vrrpModalVisible.value = false;
         await configStore.checkSessionChanged();
@@ -650,8 +691,8 @@ export default defineComponent({
     }
 
     function editSyncGroup() {
-      if (!selectedSyncGroup.value.length) return showError({ message: '请选择一个同步组' });
-      if (selectedSyncGroup.value.length > 1) return showError({ message: '请选择一个同步组' });
+      if (!selectedSyncGroup.value.length) return showError({ message: t('highAvailability.messages.selectSyncGroup') });
+      if (selectedSyncGroup.value.length > 1) return showError({ message: t('highAvailability.messages.selectSyncGroup') });
       const group = vrrpSyncGroups.value.find(n => n.name === selectedSyncGroup.value[0]);
       if (!group) return;
       editingSync.value = flattenSyncGroupData(group.name, group._raw || {});
@@ -659,31 +700,41 @@ export default defineComponent({
       syncModalVisible.value = true;
     }
 
-    async function removeSyncGroup() {
-      if (!selectedSyncGroup.value.length) return showError({ message: '请选择一个同步组' });
-      if (!confirm('确认删除选中的同步组？')) return;
-      for (const name of selectedSyncGroup.value) {
+    function removeSyncGroup() {
+      if (!selectedSyncGroup.value.length) return showError({ message: t('highAvailability.messages.selectSyncGroup') });
+      pendingDeleteSyncNames.value = [...selectedSyncGroup.value];
+      syncDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveSyncGroup() {
+      syncDeleteModalVisible.value = false;
+      for (const name of pendingDeleteSyncNames.value) {
         await configStore.deleteConfig(`${path.value} vrrp sync-group ${name}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selectedSyncGroup.value = [];
+      pendingDeleteSyncNames.value = [];
       await load();
     }
 
     async function saveSyncGroup() {
-      if (!editingSync.value.name) return showError({ message: '请输入名称' });
-      if (!editingSync.value.members) return showError({ message: '请输入成员' });
+      if (!editingSync.value.name) return showError({ message: t('highAvailability.messages.enterName') });
+      if (!editingSync.value.members) return showError({ message: t('highAvailability.messages.enterMembers') });
       const original = editingOriginalSync.value;
       if (!original && vrrpSyncGroups.value.some(n => n.name === editingSync.value.name)) {
-        return showError({ message: '名称已存在' });
+        return showError({ message: t('highAvailability.messages.nameExists') });
       }
       const value = unflattenSyncGroupData(editingSync.value);
       try {
         if (original && original !== editingSync.value.name) {
           await configStore.deleteConfig(`${path.value} vrrp sync-group ${original}`);
+          configStore.markPending();
           await configStore.setConfig(`${path.value} vrrp sync-group ${editingSync.value.name}`, value);
+          configStore.markPending();
         } else {
           await configStore.setConfig(`${path.value} vrrp sync-group ${editingSync.value.name}`, value);
+          configStore.markPending();
         }
         syncModalVisible.value = false;
         await configStore.checkSessionChanged();
@@ -710,6 +761,7 @@ export default defineComponent({
 
       try {
         await configStore.setConfig(`${path.value} vrrp global-parameters`, value);
+        configStore.markPending();
         await configStore.checkSessionChanged();
         await load();
       } catch (e) {
@@ -718,21 +770,26 @@ export default defineComponent({
     }
 
     return {
+      t,
       virtualServers, vrrpGroups, vrrpSyncGroups, vrrpGlobal, loading,
       selectedVS, selectedVRRPGroup, selectedSyncGroup,
       vsModalVisible, editingVS, editingOriginalVS,
       vrrpModalVisible, editingVRRP, editingOriginalVRRP,
       syncModalVisible, editingSync, editingOriginalSync,
       rsModalVisible, editingRS, editingOriginalRS, selectedRS,
+      vsDeleteModalVisible, pendingDeleteVSNames,
+      rsDeleteModalVisible, pendingDeleteRSNames,
+      vrrpDeleteModalVisible, pendingDeleteVRRPNames,
+      syncDeleteModalVisible, pendingDeleteSyncNames,
       vsColumns, vrrpGroupColumns, syncGroupColumns, rsColumns,
       vsSchema, vrrpGroupSchema, syncGroupSchema, vrrpGlobalSchema, rsSchema,
       path, writeDisabled, activeTab, TABS,
       ALGORITHM_OPTIONS, FORWARD_METHOD_OPTIONS, PROTOCOL_OPTIONS, AUTH_TYPE_OPTIONS, VRRP_VERSION_OPTIONS,
       load,
-      createVS, editVS, removeVS, saveVS,
-      addRealServer, editRealServer, removeRealServer, saveRS,
-      createVRRPGroup, editVRRPGroup, removeVRRPGroup, saveVRRPGroup,
-      createSyncGroup, editSyncGroup, removeSyncGroup, saveSyncGroup,
+      createVS, editVS, removeVS, confirmRemoveVS, saveVS,
+      addRealServer, editRealServer, removeRealServer, confirmRemoveRS, saveRS,
+      createVRRPGroup, editVRRPGroup, removeVRRPGroup, confirmRemoveVRRPGroup, saveVRRPGroup,
+      createSyncGroup, editSyncGroup, removeSyncGroup, confirmRemoveSyncGroup, saveSyncGroup,
       saveVRRPGlobal,
     };
   },
@@ -743,10 +800,10 @@ export default defineComponent({
           <template #virtual-server>
             <div class="toolbar">
               <div class="toolbar-left">
-                <ToolbarButton icon="create" @click="createVS" :disabled="writeDisabled">创建</ToolbarButton>
-                <ToolbarButton icon="edit" @click="editVS" :disabled="writeDisabled || !selectedVS.length || selectedVS.length > 1">编辑</ToolbarButton>
-                <ToolbarButton icon="delete" @click="removeVS" :disabled="writeDisabled || !selectedVS.length">删除</ToolbarButton>
-                <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+                <ToolbarButton icon="create" @click="createVS" :disabled="writeDisabled">{{ t('highAvailability.buttons.create') }}</ToolbarButton>
+                <ToolbarButton icon="edit" @click="editVS" :disabled="writeDisabled || !selectedVS.length || selectedVS.length > 1">{{ t('highAvailability.buttons.edit') }}</ToolbarButton>
+                <ToolbarButton icon="delete" @click="removeVS" :disabled="writeDisabled || !selectedVS.length">{{ t('highAvailability.buttons.delete') }}</ToolbarButton>
+                <ToolbarButton icon="refresh" @click="load">{{ t('highAvailability.buttons.refresh') }}</ToolbarButton>
               </div>
             </div>
             <DataTable :columns="vsColumns" :data="virtualServers" :loading="loading" :disabled="writeDisabled"
@@ -756,10 +813,10 @@ export default defineComponent({
           <template #vrrp-group>
             <div class="toolbar">
               <div class="toolbar-left">
-                <ToolbarButton icon="create" @click="createVRRPGroup" :disabled="writeDisabled">创建</ToolbarButton>
-                <ToolbarButton icon="edit" @click="editVRRPGroup" :disabled="writeDisabled || !selectedVRRPGroup.length || selectedVRRPGroup.length > 1">编辑</ToolbarButton>
-                <ToolbarButton icon="delete" @click="removeVRRPGroup" :disabled="writeDisabled || !selectedVRRPGroup.length">删除</ToolbarButton>
-                <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+                <ToolbarButton icon="create" @click="createVRRPGroup" :disabled="writeDisabled">{{ t('highAvailability.buttons.create') }}</ToolbarButton>
+                <ToolbarButton icon="edit" @click="editVRRPGroup" :disabled="writeDisabled || !selectedVRRPGroup.length || selectedVRRPGroup.length > 1">{{ t('highAvailability.buttons.edit') }}</ToolbarButton>
+                <ToolbarButton icon="delete" @click="removeVRRPGroup" :disabled="writeDisabled || !selectedVRRPGroup.length">{{ t('highAvailability.buttons.delete') }}</ToolbarButton>
+                <ToolbarButton icon="refresh" @click="load">{{ t('highAvailability.buttons.refresh') }}</ToolbarButton>
               </div>
             </div>
             <DataTable :columns="vrrpGroupColumns" :data="vrrpGroups" :loading="loading" :disabled="writeDisabled"
@@ -769,10 +826,10 @@ export default defineComponent({
           <template #vrrp-sync>
             <div class="toolbar">
               <div class="toolbar-left">
-                <ToolbarButton icon="create" @click="createSyncGroup" :disabled="writeDisabled">创建</ToolbarButton>
-                <ToolbarButton icon="edit" @click="editSyncGroup" :disabled="writeDisabled || !selectedSyncGroup.length || selectedSyncGroup.length > 1">编辑</ToolbarButton>
-                <ToolbarButton icon="delete" @click="removeSyncGroup" :disabled="writeDisabled || !selectedSyncGroup.length">删除</ToolbarButton>
-                <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+                <ToolbarButton icon="create" @click="createSyncGroup" :disabled="writeDisabled">{{ t('highAvailability.buttons.create') }}</ToolbarButton>
+                <ToolbarButton icon="edit" @click="editSyncGroup" :disabled="writeDisabled || !selectedSyncGroup.length || selectedSyncGroup.length > 1">{{ t('highAvailability.buttons.edit') }}</ToolbarButton>
+                <ToolbarButton icon="delete" @click="removeSyncGroup" :disabled="writeDisabled || !selectedSyncGroup.length">{{ t('highAvailability.buttons.delete') }}</ToolbarButton>
+                <ToolbarButton icon="refresh" @click="load">{{ t('highAvailability.buttons.refresh') }}</ToolbarButton>
               </div>
             </div>
             <DataTable :columns="syncGroupColumns" :data="vrrpSyncGroups" :loading="loading" :disabled="writeDisabled"
@@ -781,25 +838,20 @@ export default defineComponent({
           </template>
           <template #vrrp-global>
             <ConfigForm v-model="vrrpGlobal" :schema="vrrpGlobalSchema" :disabled="writeDisabled" :showAdvanced="true" />
-            <div style="margin-top:20px;">
-              <ToolbarButton icon="save" @click="saveVRRPGlobal" :disabled="writeDisabled">保存</ToolbarButton>
-            </div>
           </template>
         </TabGroup>
       </div>
-      <div class="section">
-      </div>
-      
+
       <!-- Virtual Server Modal -->
-      <DraggableModal v-model:visible="vsModalVisible" title="虚拟服务器" width="800px" @confirm="saveVS">
+      <DraggableModal v-model:visible="vsModalVisible" :title="t('highAvailability.modals.virtualServer')" width="800px" @confirm="saveVS">
         <ConfigForm v-model="editingVS" :schema="vsSchema" :disabled="writeDisabled" :showAdvanced="true" />
         <div style="margin-top:20px;">
-          <div class="form-section-title">真实服务器</div>
+          <div class="form-section-title">{{ t('highAvailability.modals.realServer') }}</div>
           <div class="toolbar">
             <div class="toolbar-left">
-              <ToolbarButton icon="create" @click="addRealServer" :disabled="writeDisabled">创建</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editRealServer" :disabled="writeDisabled || !selectedRS.length || selectedRS.length > 1">编辑</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removeRealServer" :disabled="writeDisabled || !selectedRS.length">删除</ToolbarButton>
+              <ToolbarButton icon="create" @click="addRealServer" :disabled="writeDisabled">{{ t('highAvailability.buttons.create') }}</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editRealServer" :disabled="writeDisabled || !selectedRS.length || selectedRS.length > 1">{{ t('highAvailability.buttons.edit') }}</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removeRealServer" :disabled="writeDisabled || !selectedRS.length">{{ t('highAvailability.buttons.delete') }}</ToolbarButton>
             </div>
           </div>
           <DataTable :columns="rsColumns" :data="editingVS?.realServers || []" :loading="false" :disabled="writeDisabled"
@@ -809,18 +861,50 @@ export default defineComponent({
       </DraggableModal>
       
       <!-- Real Server Modal -->
-      <DraggableModal v-model:visible="rsModalVisible" :title="editingOriginalRS ? '编辑' : '创建'" width="500px" @confirm="saveRS">
+      <DraggableModal v-model:visible="rsModalVisible" :title="editingOriginalRS ? t('highAvailability.modals.edit') : t('highAvailability.modals.create')" width="500px" @confirm="saveRS">
         <ConfigForm v-model="editingRS" :schema="rsSchema" :disabled="writeDisabled" :showAdvanced="true" />
       </DraggableModal>
       
       <!-- VRRP Group Modal -->
-      <DraggableModal v-model:visible="vrrpModalVisible" :title="editingOriginalVRRP ? '编辑' : '创建'" width="600px" @confirm="saveVRRPGroup">
+      <DraggableModal v-model:visible="vrrpModalVisible" :title="editingOriginalVRRP ? t('highAvailability.modals.edit') : t('highAvailability.modals.create')" width="600px" @confirm="saveVRRPGroup">
         <ConfigForm v-model="editingVRRP" :schema="vrrpGroupSchema" :disabled="writeDisabled" :showAdvanced="true" />
       </DraggableModal>
       
       <!-- Sync Group Modal -->
-      <DraggableModal v-model:visible="syncModalVisible" :title="editingOriginalSync ? '编辑' : '创建'" width="500px" @confirm="saveSyncGroup">
+      <DraggableModal v-model:visible="syncModalVisible" :title="editingOriginalSync ? t('highAvailability.modals.edit') : t('highAvailability.modals.create')" width="500px" @confirm="saveSyncGroup">
         <ConfigForm v-model="editingSync" :schema="syncGroupSchema" :disabled="writeDisabled" :showAdvanced="true" />
+      </DraggableModal>
+
+      <!-- Virtual Server Delete Confirmation Modal -->
+      <DraggableModal v-model:visible="vsDeleteModalVisible" :title="t('highAvailability.modals.confirmDelete')" width="400px" @confirm="confirmRemoveVS">
+        <div>{{ t('highAvailability.messages.confirmDeleteVS') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteVSNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <!-- Real Server Delete Confirmation Modal -->
+      <DraggableModal v-model:visible="rsDeleteModalVisible" :title="t('highAvailability.modals.confirmDelete')" width="400px" @confirm="confirmRemoveRS">
+        <div>{{ t('highAvailability.messages.confirmDeleteRS') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteRSNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <!-- VRRP Group Delete Confirmation Modal -->
+      <DraggableModal v-model:visible="vrrpDeleteModalVisible" :title="t('highAvailability.modals.confirmDelete')" width="400px" @confirm="confirmRemoveVRRPGroup">
+        <div>{{ t('highAvailability.messages.confirmDeleteVRRP') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteVRRPNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <!-- Sync Group Delete Confirmation Modal -->
+      <DraggableModal v-model:visible="syncDeleteModalVisible" :title="t('highAvailability.modals.confirmDelete')" width="400px" @confirm="confirmRemoveSyncGroup">
+        <div>{{ t('highAvailability.messages.confirmDeleteSync') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteSyncNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

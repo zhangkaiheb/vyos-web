@@ -6,6 +6,9 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import DualListSelector from '/src/components/Form/DualListSelector.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -20,13 +23,6 @@ function isPresent(value) {
   if (Array.isArray(value) && value.length === 0) return false;
   if (typeof value === 'object' && Object.keys(value).length === 0) return false;
   return true;
-}
-
-function validateIPv6(value) {
-  if (!value) return '';
-  const re = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}$|^(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}$|^(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}$|^:(?::[0-9a-fA-F]{1,4}){1,7}$|^::$/;
-  if (!re.test(value)) return 'IPv6 地址格式错误';
-  return '';
 }
 
 function listenInterfacesToForm(items = {}) {
@@ -95,6 +91,8 @@ function dhcpv6RelayToConfig(form) {
 export default defineComponent({
   name: 'Dhcpv6RelayPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -102,6 +100,13 @@ export default defineComponent({
     const activeTab = ref('basic');
     const writeDisabled = ref(false);
     const interfaces = ref([]);
+
+    function validateIPv6(value) {
+      if (!value) return '';
+      const re = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}$|^(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}$|^(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}$|^:(?::[0-9a-fA-F]{1,4}){1,7}$|^::$/;
+      if (!re.test(value)) return t('dhcpv6relay.errors.invalidIPv6');
+      return '';
+    }
 
     async function loadInterfaces() {
       try {
@@ -115,8 +120,8 @@ export default defineComponent({
     const commandPath = computed(() => 'service dhcpv6-relay');
 
     const listenColumns = [
-      { key: 'name', title: '接口' },
-      { key: 'address', title: '监听地址' },
+      { key: 'name', title: t('dhcpv6relay.columns.interface') },
+      { key: 'address', title: t('dhcpv6relay.columns.listenAddress') },
     ];
 
     const selectedListen = ref([]);
@@ -124,8 +129,8 @@ export default defineComponent({
     const editingListen = ref({});
 
     const upstreamColumns = [
-      { key: 'name', title: '接口' },
-      { key: 'addresses', title: '上游服务器地址', render: v => toArray(v).join(', ') },
+      { key: 'name', title: t('dhcpv6relay.columns.interface') },
+      { key: 'addresses', title: t('dhcpv6relay.columns.upstreamServerAddress'), render: v => toArray(v).join(', ') },
     ];
 
     const selectedUpstream = ref([]);
@@ -148,35 +153,36 @@ export default defineComponent({
 
     async function save() {
       const hop = parseInt(config.value.max_hop_count, 10);
-      if (isNaN(hop) || hop < 1 || hop > 255) return alert('最大跳数范围为 1-255');
+      if (isNaN(hop) || hop < 1 || hop > 255) return showError({ message: t('dhcpv6relay.errors.hopCountRange') });
 
       const listenNames = new Set();
       for (const item of config.value.listen_interfaces || []) {
-        if (!item.name) return alert('监听接口名称不能为空');
-        if (listenNames.has(item.name)) return alert(`监听接口 ${item.name} 重复`);
+        if (!item.name) return showError({ message: t('dhcpv6relay.errors.listenNameRequired') });
+        if (listenNames.has(item.name)) return showError({ message: t('dhcpv6relay.errors.listenDuplicate', { name: item.name }) });
         listenNames.add(item.name);
         if (isPresent(item.address)) {
           const err = validateIPv6(item.address);
-          if (err) return alert(`监听接口 ${item.name} ${err}`);
+          if (err) return showError({ message: t('dhcpv6relay.errors.listenInvalidAddress', { name: item.name, error: err }) });
         }
       }
 
       const upstreamNames = new Set();
       for (const item of config.value.upstream_interfaces || []) {
-        if (!item.name) return alert('上游接口名称不能为空');
-        if (upstreamNames.has(item.name)) return alert(`上游接口 ${item.name} 重复`);
+        if (!item.name) return showError({ message: t('dhcpv6relay.errors.upstreamNameRequired') });
+        if (upstreamNames.has(item.name)) return showError({ message: t('dhcpv6relay.errors.upstreamDuplicate', { name: item.name }) });
         upstreamNames.add(item.name);
         const addrs = toArray(item.addresses || []).filter(Boolean);
-        if (!addrs.length) return alert(`上游接口 ${item.name} 至少需要配置一个服务器地址`);
+        if (!addrs.length) return showError({ message: t('dhcpv6relay.errors.upstreamAddressRequired', { name: item.name }) });
         for (const addr of addrs) {
           const err = validateIPv6(addr);
-          if (err) return alert(`上游接口 ${item.name} 地址 ${addr}：${err}`);
+          if (err) return showError({ message: t('dhcpv6relay.errors.upstreamInvalidAddress', { name: item.name, address: addr, error: err }) });
         }
       }
 
       saving.value = true;
       try {
-        await configApi.set('service dhcpv6-relay', dhcpv6RelayToConfig(config.value));
+        await configStore.setConfig('service dhcpv6-relay', dhcpv6RelayToConfig(config.value));
+        configStore.markPending();
         saved.value = true;
         await load();
       } catch (e) {
@@ -192,27 +198,27 @@ export default defineComponent({
     }
 
     function editListen() {
-      if (!selectedListen.value.length) return alert('请选择要编辑的监听接口');
+      if (!selectedListen.value.length) return showError({ message: t('dhcpv6relay.errors.selectListenToEdit') });
       const row = (config.value.listen_interfaces || []).find(i => i._name === selectedListen.value[0]);
-      if (!row) return alert('未找到选中的监听接口');
+      if (!row) return showError({ message: t('dhcpv6relay.errors.selectedListenNotFound') });
       editingListen.value = JSON.parse(JSON.stringify(row));
       showListenModal.value = true;
     }
 
     function removeListen() {
-      if (!selectedListen.value.length) return alert('请选择要删除的监听接口');
+      if (!selectedListen.value.length) return showError({ message: t('dhcpv6relay.errors.selectListenToDelete') });
       config.value.listen_interfaces = (config.value.listen_interfaces || []).filter(i => i._name !== selectedListen.value[0]);
       selectedListen.value = [];
     }
 
     function saveListen() {
-      if (!editingListen.value.name) return alert('请选择接口');
+      if (!editingListen.value.name) return showError({ message: t('dhcpv6relay.errors.selectInterface') });
       const list = config.value.listen_interfaces || [];
       const idx = list.findIndex(i => i._name === editingListen.value._name);
       if (idx >= 0) {
         list.splice(idx, 1, JSON.parse(JSON.stringify(editingListen.value)));
       } else {
-        if (list.some(i => i.name === editingListen.value.name)) return alert('该监听接口已存在');
+        if (list.some(i => i.name === editingListen.value.name)) return showError({ message: t('dhcpv6relay.errors.listenAlreadyExists') });
         list.push(JSON.parse(JSON.stringify(editingListen.value)));
       }
       config.value.listen_interfaces = [...list];
@@ -226,33 +232,33 @@ export default defineComponent({
     }
 
     function editUpstream() {
-      if (!selectedUpstream.value.length) return alert('请选择要编辑的上游接口');
+      if (!selectedUpstream.value.length) return showError({ message: t('dhcpv6relay.errors.selectUpstreamToEdit') });
       const row = (config.value.upstream_interfaces || []).find(i => i._name === selectedUpstream.value[0]);
-      if (!row) return alert('未找到选中的上游接口');
+      if (!row) return showError({ message: t('dhcpv6relay.errors.selectedUpstreamNotFound') });
       editingUpstream.value = JSON.parse(JSON.stringify(row));
       showUpstreamModal.value = true;
     }
 
     function removeUpstream() {
-      if (!selectedUpstream.value.length) return alert('请选择要删除的上游接口');
+      if (!selectedUpstream.value.length) return showError({ message: t('dhcpv6relay.errors.selectUpstreamToDelete') });
       config.value.upstream_interfaces = (config.value.upstream_interfaces || []).filter(i => i._name !== selectedUpstream.value[0]);
       selectedUpstream.value = [];
     }
 
     function saveUpstream() {
-      if (!editingUpstream.value.name) return alert('请选择接口');
+      if (!editingUpstream.value.name) return showError({ message: t('dhcpv6relay.errors.selectInterface') });
       const addrs = toArray(editingUpstream.value.addresses || []).filter(Boolean);
-      if (!addrs.length) return alert('上游接口至少需要配置一个服务器地址');
+      if (!addrs.length) return showError({ message: t('dhcpv6relay.errors.upstreamAddressRequiredGeneral') });
       for (const addr of addrs) {
         const err = validateIPv6(addr);
-        if (err) return alert(`地址 ${addr}：${err}`);
+        if (err) return showError({ message: t('dhcpv6relay.errors.invalidAddress', { address: addr, error: err }) });
       }
       const list = config.value.upstream_interfaces || [];
       const idx = list.findIndex(i => i._name === editingUpstream.value._name);
       if (idx >= 0) {
         list.splice(idx, 1, JSON.parse(JSON.stringify(editingUpstream.value)));
       } else {
-        if (list.some(i => i.name === editingUpstream.value.name)) return alert('该上游接口已存在');
+        if (list.some(i => i.name === editingUpstream.value.name)) return showError({ message: t('dhcpv6relay.errors.upstreamAlreadyExists') });
         list.push(JSON.parse(JSON.stringify(editingUpstream.value)));
       }
       config.value.upstream_interfaces = [...list];
@@ -260,9 +266,13 @@ export default defineComponent({
       showUpstreamModal.value = false;
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
     return {
+      t,
       loading, saving, saved, config, activeTab, writeDisabled, interfaces, commandPath,
       listenColumns, selectedListen, showListenModal, editingListen,
       upstreamColumns, selectedUpstream, showUpstreamModal, editingUpstream,
@@ -275,32 +285,32 @@ export default defineComponent({
   components: { DataTable, DraggableModal, DualListSelector, TabGroup, ToolbarButton },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('dhcpv6relay.messages.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本' },
-        { key: 'relay-options', title: '中继选项' }
+        { key: 'basic', title: t('dhcpv6relay.tabs.basic') },
+        { key: 'relay-options', title: t('dhcpv6relay.tabs.relayOptions') }
       ]">
 
         <template #basic>
           <div class="form-row">
-            <label class="form-label" title="禁用 DHCPv6 中继实例">禁用</label>
-            <input type="checkbox" v-model="config.disable" title="禁用 DHCPv6 中继实例" />
+            <label class="form-label" :title="t('dhcpv6relay.tooltips.disableInstance')">{{ t('dhcpv6relay.labels.disable') }}</label>
+            <input type="checkbox" v-model="config.disable" :title="t('dhcpv6relay.tooltips.disableInstance')" />
           </div>
 
           <div style="margin-top:16px;">
             <div class="toolbar">
-              <ToolbarButton icon="create" @click="createListen">创建监听接口</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editListen" :disabled="!selectedListen.length || selectedListen.length > 1">编辑监听接口</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removeListen" :disabled="!selectedListen.length">删除监听接口</ToolbarButton>
+              <ToolbarButton icon="create" @click="createListen">{{ t('dhcpv6relay.buttons.createListen') }}</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editListen" :disabled="!selectedListen.length || selectedListen.length > 1">{{ t('dhcpv6relay.buttons.editListen') }}</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removeListen" :disabled="!selectedListen.length">{{ t('dhcpv6relay.buttons.deleteListen') }}</ToolbarButton>
             </div>
             <DataTable :columns="listenColumns" :data="config.listen_interfaces" row-key="name" :externalToolbar="true" :selectable="true" @selection-change="selectedListen = $event" />
           </div>
 
           <div style="margin-top:16px;">
             <div class="toolbar">
-              <ToolbarButton icon="create" @click="createUpstream">创建上游接口</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editUpstream" :disabled="!selectedUpstream.length || selectedUpstream.length > 1">编辑上游接口</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removeUpstream" :disabled="!selectedUpstream.length">删除上游接口</ToolbarButton>
+              <ToolbarButton icon="create" @click="createUpstream">{{ t('dhcpv6relay.buttons.createUpstream') }}</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editUpstream" :disabled="!selectedUpstream.length || selectedUpstream.length > 1">{{ t('dhcpv6relay.buttons.editUpstream') }}</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removeUpstream" :disabled="!selectedUpstream.length">{{ t('dhcpv6relay.buttons.deleteUpstream') }}</ToolbarButton>
             </div>
             <DataTable :columns="upstreamColumns" :data="config.upstream_interfaces" row-key="name" :externalToolbar="true" :selectable="true" @selection-change="selectedUpstream = $event" />
           </div>
@@ -308,50 +318,46 @@ export default defineComponent({
 
         <template #relay-options>
           <div class="form-row">
-            <label class="form-label" title="报文最大跳数，范围 1-255，默认 10">最大跳数</label>
+            <label class="form-label" :title="t('dhcpv6relay.tooltips.maxHopCount')">{{ t('dhcpv6relay.labels.maxHopCount') }}</label>
             <div style="flex:1;">
-              <input type="number" min="1" max="255" class="form-control" v-model="config.max_hop_count" placeholder="1-255，默认 10" title="最大跳数" />
-              <div class="form-hint">范围：1-255，默认 10</div>
+              <input type="number" min="1" max="255" class="form-control" v-model="config.max_hop_count" :placeholder="t('dhcpv6relay.placeholders.maxHopCount')" :title="t('dhcpv6relay.labels.maxHopCount')" />
+              <div class="form-hint">{{ t('dhcpv6relay.hints.maxHopCountRange') }}</div>
             </div>
           </div>
           <div class="form-row">
-            <label class="form-label" title="设置 DHCPv6 interface-ID 选项">使用接口 ID 选项</label>
-            <input type="checkbox" v-model="config.use_interface_id_option" title="使用接口 ID 选项" />
+            <label class="form-label" :title="t('dhcpv6relay.tooltips.useInterfaceIdOption')">{{ t('dhcpv6relay.labels.useInterfaceIdOption') }}</label>
+            <input type="checkbox" v-model="config.use_interface_id_option" :title="t('dhcpv6relay.tooltips.useInterfaceIdOption')" />
           </div>
         </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="showListenModal" title="监听接口" width="420px" @confirm="saveListen" @close="showListenModal = false">
+      <DraggableModal v-model:visible="showListenModal" :title="t('dhcpv6relay.modals.listenInterface')" width="420px" @confirm="saveListen" @close="showListenModal = false">
         <div class="form-row">
-          <label class="form-label">接口</label>
+          <label class="form-label">{{ t('dhcpv6relay.labels.interface') }}</label>
           <select class="form-control" v-model="editingListen.name" :disabled="!!editingListen._name">
-            <option value="">请选择接口</option>
+            <option value="">{{ t('dhcpv6relay.placeholders.selectInterface') }}</option>
             <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">监听地址</label>
-          <input type="text" class="form-control" v-model="editingListen.address" placeholder="可选，留空表示监听接口上所有地址" />
+          <label class="form-label">{{ t('dhcpv6relay.labels.listenAddress') }}</label>
+          <input type="text" class="form-control" v-model="editingListen.address" :placeholder="t('dhcpv6relay.placeholders.listenAddressOptional')" />
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showUpstreamModal" title="上游接口" width="520px" @confirm="saveUpstream" @close="showUpstreamModal = false">
+      <DraggableModal v-model:visible="showUpstreamModal" :title="t('dhcpv6relay.modals.upstreamInterface')" width="520px" @confirm="saveUpstream" @close="showUpstreamModal = false">
         <div class="form-row">
-          <label class="form-label">接口</label>
+          <label class="form-label">{{ t('dhcpv6relay.labels.interface') }}</label>
           <select class="form-control" v-model="editingUpstream.name" :disabled="!!editingUpstream._name">
-            <option value="">请选择接口</option>
+            <option value="">{{ t('dhcpv6relay.placeholders.selectInterface') }}</option>
             <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">上游服务器地址</label>
+          <label class="form-label">{{ t('dhcpv6relay.labels.upstreamServerAddress') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingUpstream.addresses" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址后按回车" :custom-validator="validateIPv6" />
-            <div class="form-hint">点击 + 号添加 IPv6 地址，至少填写一个</div>
+            <DualListSelector v-model="editingUpstream.addresses" :options="[]" :title-left="t('dhcpv6relay.dualList.available')" :title-right="t('dhcpv6relay.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6relay.dualList.enterIPv6')" :custom-validator="validateIPv6" />
+            <div class="form-hint">{{ t('dhcpv6relay.hints.addIPv6Address') }}</div>
           </div>
         </div>
       </DraggableModal>

@@ -8,6 +8,7 @@ import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -31,33 +32,33 @@ export default defineComponent({
   name: 'VppKernelInterfacesPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
+    const { t } = useI18n();
     const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
 
     const config = ref({
       interfaces: [],
     });
 
     const interfaceColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 150 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-      { key: 'address', title: '地址', dataIndex: 'address', width: 150 },
+      { key: 'name', title: t('vppKernel.columns.name'), dataIndex: 'name', width: 150 },
+      { key: 'description', title: t('vppKernel.columns.description'), dataIndex: 'description', width: 200 },
+      { key: 'address', title: t('vppKernel.columns.address'), dataIndex: 'address', width: 150 },
       { key: 'mtu', title: 'MTU', dataIndex: 'mtu', width: 80 },
-      { key: 'rx_mode', title: 'RX模式', dataIndex: 'rx_mode', width: 100 },
-      { key: 'disable', title: '禁用', dataIndex: 'disable', width: 60 },
-      { key: 'vif_count', title: 'VIF数', dataIndex: 'vif_count', width: 80 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'rx_mode', title: t('vppKernel.columns.rxMode'), dataIndex: 'rx_mode', width: 100 },
+      { key: 'disable', title: t('vppKernel.columns.disable'), dataIndex: 'disable', width: 60 },
+      { key: 'vif_count', title: t('vppKernel.columns.vifCount'), dataIndex: 'vif_count', width: 80 },
+      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const vifColumns = [
       { key: 'vlan_id', title: 'VLAN ID', dataIndex: 'vlan_id', width: 80 },
-      { key: 'address', title: '地址', dataIndex: 'address', width: 150 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 150 },
+      { key: 'address', title: t('vppKernel.columns.address'), dataIndex: 'address', width: 150 },
+      { key: 'description', title: t('vppKernel.columns.description'), dataIndex: 'description', width: 150 },
       { key: 'mtu', title: 'MTU', dataIndex: 'mtu', width: 80 },
-      { key: 'disable', title: '禁用', dataIndex: 'disable', width: 60 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'disable', title: t('vppKernel.columns.disable'), dataIndex: 'disable', width: 60 },
+      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const selectedInterfaces = ref([]);
@@ -122,12 +123,11 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('vpp kernel-interfaces', true);
         config.value = kernelInterfacesToForm(res.data || {});
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('app.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -141,11 +141,10 @@ export default defineComponent({
         if (Object.keys(payload).length) {
           await configApi.set('vpp kernel-interfaces', payload);
         }
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('app.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -157,21 +156,21 @@ export default defineComponent({
     }
 
     function editInterface() {
-      if (!selectedInterfaces.value.length) return alert('请选择要编辑的接口');
+      if (!selectedInterfaces.value.length) return showError({ message: t('vppKernel.selectInterfaceFirst') });
       const row = config.value.interfaces.find(i => i.name === selectedInterfaces.value[0]);
-      if (!row) return alert('未找到选中的接口');
+      if (!row) return showError({ message: t('vppKernel.interfaceNotFound') });
       editingInterface.value = JSON.parse(JSON.stringify(row));
       showInterfaceModal.value = true;
     }
 
     function removeInterface() {
-      if (!selectedInterfaces.value.length) return alert('请选择要删除的接口');
+      if (!selectedInterfaces.value.length) return showError({ message: t('vppKernel.selectInterfaceFirst') });
       config.value.interfaces = config.value.interfaces.filter(i => i.name !== selectedInterfaces.value[0]);
       selectedInterfaces.value = [];
     }
 
     function saveInterface() {
-      if (!editingInterface.value.name) return alert('请输入接口名称');
+      if (!editingInterface.value.name) return showError({ message: t('vppKernel.nameRequired') });
       const list = config.value.interfaces;
       const idx = list.findIndex(i => i._name === editingInterface.value._name);
       if (idx >= 0) list.splice(idx, 1, { ...editingInterface.value });
@@ -186,21 +185,21 @@ export default defineComponent({
     }
 
     function editVif() {
-      if (!selectedVifs.value.length) return alert('请选择要编辑的VIF');
+      if (!selectedVifs.value.length) return showError({ message: t('vppKernel.selectVifFirst') });
       const row = editingInterface.value.vifs.find(v => v.vlan_id === selectedVifs.value[0]);
-      if (!row) return alert('未找到选中的VIF');
+      if (!row) return showError({ message: t('vppKernel.vifNotFound') });
       editingVif.value = JSON.parse(JSON.stringify(row));
       showVifModal.value = true;
     }
 
     function removeVif() {
-      if (!selectedVifs.value.length) return alert('请选择要删除的VIF');
+      if (!selectedVifs.value.length) return showError({ message: t('vppKernel.selectVifFirst') });
       editingInterface.value.vifs = editingInterface.value.vifs.filter(v => v.vlan_id !== selectedVifs.value[0]);
       selectedVifs.value = [];
     }
 
     function saveVif() {
-      if (editingVif.value.vlan_id === '' || editingVif.value.vlan_id === null) return alert('请输入VLAN ID');
+      if (editingVif.value.vlan_id === '' || editingVif.value.vlan_id === null) return showError({ message: t('vppKernel.vlanIdRequired') });
       const list = editingInterface.value.vifs;
       const idx = list.findIndex(v => v._vlan_id === editingVif.value._vlan_id);
       if (idx >= 0) list.splice(idx, 1, { ...editingVif.value });
@@ -214,8 +213,9 @@ export default defineComponent({
       onMenuRefresh(load);
     });
 
-    return {
-      loading, saving, saved, config, commandPath,
+    return {t,
+      
+      loading, saving, config, commandPath,
       interfaceColumns, vifColumns,
       selectedInterfaces, selectedVifs,
       showInterfaceModal, editingInterface, showVifModal, editingVif,
@@ -226,12 +226,10 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
-
       <div class="toolbar">
-        <ToolbarButton icon="create" @click="createInterface">创建</ToolbarButton>
-        <ToolbarButton icon="edit" @click="editInterface" :disabled="!selectedInterfaces.length || selectedInterfaces.length > 1">编辑</ToolbarButton>
-        <ToolbarButton icon="delete" @click="removeInterface" :disabled="!selectedInterfaces.length">删除</ToolbarButton>
+        <ToolbarButton icon="create" @click="createInterface">{{ t('app.create') }}</ToolbarButton>
+        <ToolbarButton icon="edit" @click="editInterface" :disabled="!selectedInterfaces.length || selectedInterfaces.length > 1">{{ t('app.edit') }}</ToolbarButton>
+        <ToolbarButton icon="delete" @click="removeInterface" :disabled="!selectedInterfaces.length">{{ t('app.delete') }}</ToolbarButton>
       </div>
       <DataTable :columns="interfaceColumns" :data="config.interfaces" rowKey="name" :externalToolbar="true" @selection-change="selectedInterfaces = $event" :selectable="true">
         <template #bodyCell="{ column, record }">
@@ -241,40 +239,36 @@ export default defineComponent({
         </template>
       </DataTable>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="showInterfaceModal" :title="editingInterface && editingInterface._name ? '编辑内核接口' : '新建内核接口'" @confirm="saveInterface" @close="showInterfaceModal = false" width="800px">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingInterface.name" :disabled="editingInterface._name" placeholder="vpp(tun|tap)N" title="内核接口名称" /></div>
-        <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingInterface.description" title="接口描述" /></div>
-        <div class="form-row"><label class="form-label">地址</label><textarea class="form-control" v-model="editingInterface.address" rows="3" placeholder="每行一个IP/dhcp/dhcpv6" title="IP地址" /></div>
-        <div class="form-row"><label class="form-label">MTU</label><input class="form-control" type="number" min="68" max="16000" v-model="editingInterface.mtu" title="最大传输单元" /></div>
-        <div class="form-row"><label class="form-label">RX模式</label>
-          <select class="form-control" v-model="editingInterface.rx_mode" title="接收模式">
-            <option value="">未设置</option>
+      <DraggableModal v-model:visible="showInterfaceModal" :title="editingInterface && editingInterface._name ? t('vppKernel.modal.editInterface') : t('vppKernel.modal.createInterface')" @confirm="saveInterface" @close="showInterfaceModal = false" width="800px">
+        <div class="form-row"><label class="form-label">{{ t('vppKernel.form.name') }}</label><input class="form-control" v-model="editingInterface.name" :disabled="editingInterface._name" placeholder="vpp(tun|tap)N" :title="t('vppKernel.form.name')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppKernel.form.description') }}</label><input class="form-control" v-model="editingInterface.description" :title="t('vppKernel.form.description')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppKernel.form.address') }}</label><textarea class="form-control" v-model="editingInterface.address" rows="3" :placeholder="t('vppKernel.placeholder.addressPerLine')" :title="t('vppKernel.form.address')" /></div>
+        <div class="form-row"><label class="form-label">MTU</label><input class="form-control" type="number" min="68" max="16000" v-model="editingInterface.mtu" :title="t('vppKernel.form.mtu')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppKernel.form.rxMode') }}</label>
+          <select class="form-control" v-model="editingInterface.rx_mode" :title="t('vppKernel.form.rxMode')">
+            <option value="">{{ t('vppKernel.rxMode.notSet') }}</option>
             <option value="polling">Polling</option>
             <option value="interrupt">Interrupt</option>
             <option value="adaptive">Adaptive</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingInterface.disable" title="禁用接口" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppKernel.form.disable') }}</label><input type="checkbox" v-model="editingInterface.disable" :title="t('vppKernel.form.disable')" /></div>
 
-        <div style="font-weight:bold;margin:16px 0 8px;">VIF管理</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('vppKernel.sections.vifManagement') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createVif">添加VIF</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editVif" :disabled="!selectedVifs.length || selectedVifs.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeVif" :disabled="!selectedVifs.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createVif">{{ t('vppKernel.buttons.addVif') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editVif" :disabled="!selectedVifs.length || selectedVifs.length > 1">{{ t('app.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeVif" :disabled="!selectedVifs.length">{{ t('app.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="vifColumns" :data="editingInterface.vifs" rowKey="vlan_id" :externalToolbar="true" @selection-change="selectedVifs = $event" :selectable="true" />
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showVifModal" :title="editingVif && editingVif._vlan_id !== undefined ? '编辑VIF' : '添加VIF'" @confirm="saveVif" @close="showVifModal = false">
+      <DraggableModal v-model:visible="showVifModal" :title="editingVif && editingVif._vlan_id !== undefined ? t('vppKernel.modal.editVif') : t('vppKernel.modal.addVif')" @confirm="saveVif" @close="showVifModal = false">
         <div class="form-row"><label class="form-label">VLAN ID</label><input class="form-control" type="number" min="0" max="4094" v-model="editingVif.vlan_id" :disabled="editingVif._vlan_id !== undefined" title="VLAN ID" /></div>
-        <div class="form-row"><label class="form-label">地址</label><textarea class="form-control" v-model="editingVif.address" rows="3" placeholder="每行一个IP/dhcp/dhcpv6" title="IP地址" /></div>
-        <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingVif.description" title="VIF描述" /></div>
-        <div class="form-row"><label class="form-label">MTU</label><input class="form-control" type="number" min="68" max="16000" v-model="editingVif.mtu" title="最大传输单元" /></div>
-        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingVif.disable" title="禁用VIF" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppKernel.form.address') }}</label><textarea class="form-control" v-model="editingVif.address" rows="3" :placeholder="t('vppKernel.placeholder.addressPerLine')" :title="t('vppKernel.form.address')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppKernel.form.description') }}</label><input class="form-control" v-model="editingVif.description" :title="t('vppKernel.form.description')" /></div>
+        <div class="form-row"><label class="form-label">MTU</label><input class="form-control" type="number" min="68" max="16000" v-model="editingVif.mtu" :title="t('vppKernel.form.mtu')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppKernel.form.disable') }}</label><input type="checkbox" v-model="editingVif.disable" :title="t('vppKernel.form.disable')" /></div>
       </DraggableModal>
     </div>
   `,

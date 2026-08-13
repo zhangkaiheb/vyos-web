@@ -1,0 +1,1936 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="bgp">
+<h1>BGP</h1>
+<p><abbr title="Граница шлюза протокол">BGP</abbr> является одним из внешних шлюзовых протоколов
+и де-факто стандартным междоменным маршрутизационным протоколом. Последняя версия BGP
+— это 4. BGP-4 описан в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1771.html"><strong>RFC 1771</strong></a> и обновлено <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4271.html"><strong>RFC 4271</strong></a>. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2858.html"><strong>RFC 2858</strong></a>
+добавляет многоадресную поддержку к BGP.</p>
+<p>VyOS использует <abbr title="Free Range Routing">FRR</abbr> и хотим поблагодарить
+их за их усилия!</p>
+<section id="basic-concepts">
+<h2>Основные понятия</h2>
+<section id="autonomous-systems">
+<h3>Автономные системы</h3>
+<p>Согласно <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1930.html"><strong>RFC 1930</strong></a>:</p>
+<blockquote>
+<div><p>AS — это связанный набор одного или более IP префиксов, управляемых одним или несколькими
+сетевыми операторами, которые имеют ЕДИНЫЙ и ЧЕТКО ОПРЕДЕЛЕННЫЙ маршрутный политика.</p>
+</div></blockquote>
+<p>Каждая <abbr title="Автономная система">AS</abbr> имеет идентифицирующее число, связанное с ней
+называется <abbr title="Номер автономной системы">ASN</abbr>. Это двухбайтовое значение
+в диапазоне от 1 до 65535. Номера AS 64512 через 65535 определены
+как частные номера AS. Частные номера AS не должны быть объявлены на глобальной
+Интернет. Двухбайтовый диапазон номеров AS исчерпан. 4-байтовые номера AS указаны
+в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6793.html"><strong>RFC 6793</strong></a>, и предоставляют набор из 4294967296 номеров AS.</p>
+<p><abbr title="Номер автономной системы">ASN</abbr> является одним из основных элементов
+BGP. BGP — это протокол расстояния-вектора, и фреймворк AS-Path
+предоставляет метрику расстояния-вектора и обнаружение циклов для BGP.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp system-as &lt;asn&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-system-as-asn" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите локальный <abbr title="Номер автономной системы">ASN</abbr>, который представляет этот роутер.
+Это обязательный параметр!</p>
+</div>
+</div>
+</section>
+<section id="address-families">
+<h3>Семейства адресов</h3>
+<p>Многоадресные расширения позволяют BGP передавать информацию о маршрутизации для нескольких
+сетевых протоколов уровней. BGP поддерживает идентификатор семейства адресов (AFI) для
+IPv4 и IPv6.</p>
+</section>
+<section id="route-selection">
+<h3>Выбор маршрута</h3>
+<p>Процесс выбора маршрута, используемый реализацией FRR BGP, использует следующие
+критерии принятия решений, начиная с верхней части списка и двигаясь вниз, пока один из факторов не будет использован.</p>
+<ol class="arabic">
+<li><p><strong>Проверка веса</strong></p>
+<p>Предпочитать маршруты с более высоким локальным весом, чем с более низким.</p>
+</li>
+<li><p><strong>Проверка локальной предпочтительности</strong></p>
+<p>Предпочитать маршруты с более высокой локальной предпочтительностью, чем с более низкой.</p>
+</li>
+<li><p><strong>Проверка локального маршрута</strong></p>
+<p>Предпочитать локальные маршруты (статические, агрегаты, перераспределенные) по сравнению с полученными маршрутами.</p>
+</li>
+<li><p><strong>Проверка длины AS-пути</strong></p>
+<p>Предпочитать кратчайший путь AS-пути.</p>
+</li>
+<li><p><strong>Проверка источника</strong></p>
+<p>Предпочитать маршрут с самым низким типом источника. То есть, предпочитать маршруты IGP по сравнению с EGP, и неопределенными маршрутами.</p>
+</li>
+<li><p><strong>Проверка MED</strong></p>
+<p>Где маршруты с MED были получены от одного и того же AS, предпочитать маршрут с самым низким MED.</p>
+</li>
+<li><p><strong>Проверка внешнего</strong></p>
+<p>Предпочитать маршрут, полученный от внешнего, eBGP-пира, по сравнению с маршрутами, полученными от других типов пиров.</p>
+</li>
+<li><p><strong>Проверка стоимости IGP</strong></p>
+<p>Предпочитать маршрут с более низкой стоимостью IGP.</p>
+</li>
+<li><p><strong>Проверка многопутевого</strong></p>
+<p>Если многопутевая настройка включена, то проверьте, могут ли маршруты, еще не различаемые по предпочтению, считаться равными. Если
+<code class="docutils literal notranslate">bgp bestpath as-path multipath-relax</code> установлен, все такие маршруты считаются равными, в противном случае маршруты, полученные через iBGP с одинаковыми AS_PATH, или маршруты, полученные от eBGP-соседей в том же AS, считаются равными.</p>
+</li>
+<li><p><strong>Проверка уже выбранного внешнего</strong></p>
+<p>Если оба маршрута были получены от eBGP-пиров, то предпочитать маршрут, который уже был выбран. Обратите внимание, что эта проверка не применяется, если
+<code class="docutils literal notranslate">bgp bestpath compare-routerid</code> настроен. Эта проверка может
+предотвратить некоторые случаи колебаний.</p>
+</li>
+<li><p><strong>Проверка идентификатора маршрутизатора</strong></p>
+<p>Предпочитать маршрут с самым низким идентификатором маршрутизатора. Если у маршрута есть
+атрибут ORIGINATOR_ID, через iBGP-отражение, тогда используется этот идентификатор маршрутизатора, в противном случае используется идентификатор маршрутизатора соседа, от которого был получен маршрут.</p>
+</li>
+<li><p><strong>Проверка длины списка кластеров</strong></p>
+<p>Используется маршрут с самой короткой длиной списка кластеров. Список кластеров
+отражает путь iBGP-отражения, который маршрут прошел.</p>
+</li>
+<li><p><strong>Адрес пир</strong></p>
+<p>Предпочитать маршрут, полученный от пира с более высоким транспортным слоем
+адресом, как последний критерий для разрешения спора.</p>
+</li>
+</ol>
+</section>
+<section id="capability-negotiation">
+<h3>Согласование возможностей</h3>
+<p>При добавлении функции обмена информацией о маршрутизации IPv6 в BGP. Были некоторые
+предложения. <abbr title="Инженерная группа интернета">IETF</abbr>
+<abbr title="Межсетевой маршрутизации">IDR</abbr> приняла предложение, называемое Многоадресным
+расширением для BGP. Спецификация описана в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2283.html"><strong>RFC 2283</strong></a>. Протокол
+не определяет новых протоколов. Он определяет новые атрибуты для существующего BGP. Когда
+он используется для обмена информацией о маршрутизации IPv6, он называется BGP-4+. Когда он используется
+для обмена информацией о multicast-маршрутизации, он называется MBGP.</p>
+<p><em>bgpd</em> поддерживает Многоадресное расширение для BGP. Таким образом, если удаленный пир поддерживает
+протокол, <em>bgpd</em> может обмениваться информацией о маршрутизации IPv6 и/или multicast.</p>
+<p>Традиционный BGP не имел функции для обнаружения возможностей удаленного пира,
+например, может ли он обрабатывать типы префиксов, отличные от маршрутов IPv4 unicast.
+Это было большой проблемой при использовании Многоадресного расширения для BGP в
+операционной сети. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2842.html"><strong>RFC 2842</strong></a> приняло функцию, называемую Согласование возможностей.
+<em>bgpd</em> использует это Согласование возможностей для обнаружения возможностей удаленного пира.
+Если пир настроен только как пир IPv4 unicast, <em>bgpd</em> не отправляет эти пакеты согласования возможностей (по крайней мере, не если другие
+необязательные возможности BGP требуют согласования возможностей).</p>
+<p>По умолчанию FRR запускает соединение с минимальными общими возможностями для
+обеих сторон. Например, если локальный роутер имеет возможность unicast и multicast
+и удаленный роутер имеет только unicast, локальный роутер установит соединение с unicast только.
+Когда нет общих возможностей, FRR отправляет ошибку Unsupported Capability и затем сбрасывает соединение.</p>
+</section>
+</section>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<section id="bgp-router-configuration">
+<h3>Конфигурация роутера BGP</h3>
+<p>Во-первых, вы должны настроить роутер BGP с помощью <abbr title="Номер автономной системы">ASN</abbr>. Номер AS является идентификатором автономной системы.
+Протокол BGP использует номер AS для определения, является ли соединение BGP внутренним или внешним. VyOS не имеет специальной команды для запуска процесса BGP.
+Процесс BGP начинается, когда первый сосед конфигурируется.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp system-as &lt;asn&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-system-as-asn" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите локальный номер автономной системы, который представляет этот роутер. Это
+обязательный параметр!</p>
+</div>
+</div>
+<section id="peers-configuration">
+<h4>Конфигурация пиров</h4>
+<section id="defining-peers">
+<h5>Определение пиров</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; remote-as &lt;asn&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-remote-as-asn" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Эта команда создает нового соседа, чей remote-as — &lt;asn&gt;. Адрес соседа может быть
+IPv4-адресом, IPv6-адресом или интерфейсом для использования
+для соединения. Эта команда применима для пира и группы пиров.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; remote-as internal
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-remote-as-internal" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Создайте пир так, как вы бы сделали, указав ASN, за исключением того, что если
+пир ASN отличается от моего, как указано в команде <code class="docutils literal notranslate">protocols bgp &lt;asn&gt;</code>, соединение будет отклонено.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; remote-as external
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-remote-as-external" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Создайте пир так, как вы бы сделали, указав ASN, за исключением того, что если
+пир ASN такой же, как мой, как указано в команде <code class="docutils literal notranslate">protocols bgp &lt;asn&gt;</code>, соединение будет отклонено.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; remote-as auto
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-remote-as-auto" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Создайте пир так, как вы бы сделали, указав ASN, за исключением того, что пир
+удаленный ASN определяется автоматически из сообщения OPEN.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; local-role &lt;role&gt; [strict]
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-local-role-role-strict" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Роли BGP определены в RFC <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> и обеспечивают простой способ
+добавления предотвращения, обнаружения и смягчения маршрутизации. Значение локальной роли
+согласуется с новой возможностью BGP Role, которая имеет
+встроенную проверку соответствующего значения. В случае несоответствия
+новое сообщение о несоответствии ролей BGP &lt;2, 11&gt; будет отправлено.
+Правильные пары ролей:</p>
+<p>Провайдер - Клиент</p>
+<p>Пир - Пир</p>
+<p>RS-Server - RS-Client</p>
+<p>Если задано <code class="docutils literal notranslate">strict</code>, сеанс BGP не будет установлен
+до тех пор, пока BGP-пир не установит локальную роль на своей стороне. Этот
+параметр конфигурации определен в RFC <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> и используется для
+обязательного выполнения соответствующей конфигурации на стороне ваших контрагентов.</p>
+<p>Маршруты, отправляемые провайдером, rs-server или пиром локальной роли
+(или если получены клиентом, rs-client или пиром локальной роли), будут
+отмечены новым атрибутом Only to Customer (OTC).</p>
+<p>Маршруты с этим атрибутом могут быть отправлены только вашему соседу, если ваша
+локальная роль — провайдер или rs-server. Маршруты с этим атрибутом могут
+быть получены только если ваша локальная роль — клиент или rs-client.</p>
+<p>В случае пир-пир отношения маршруты могут быть получены только если OTC
+значение равно вашему номеру AS соседа.</p>
+<p>Все эти правила с OTC помогут обнаружить и смягчить утечки маршрутов
+и будут происходить автоматически, если локальная роль установлена.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; shutdown
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-shutdown" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Эта команда отключает пир или группу пиров. Чтобы снова включить пир, используйте
+команду delete этого.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-description-text" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите описание пира или группы пиров.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; update-source &lt;address|interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-update-source-address-interface" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Укажите IPv4-адрес источника для сеанса BGP с этим соседом,
+может быть указан как прямой IPv4-адрес, так и имя интерфейса.</p>
+</div>
+</div>
+</section>
+<section id="bgp-capability-negotiation-1">
+<h5>Согласование возможностей</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; capability dynamic
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-capability-dynamic" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Эта команда позволит динамическое обновление возможностей во время
+установленного сеанса BGP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; capability extended-nexthop
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-capability-extended-nexthop" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Позвольте BGP согласовать возможность extended-nexthop с его пиром.
+Если вы соединяетесь через IPv6 Link-Local адрес, эта возможность
+включается автоматически. Если вы соединяетесь через IPv6 Global Address
+то включение этой команды позволит BGP устанавливать маршруты IPv4 с
+IPv6 next-hop, если у вас не настроены IPv4 на интерфейсах.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; disable-capability-negotiation
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-disable-capability-negotiation" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Подавить отправку Согласования возможностей как необязательный параметр OPEN сообщения
+для пира. Эта команда влияет только на пир, который
+настроен иначе, чем IPv4 unicast конфигурация.</p>
+<p>Когда удаленный пир не имеет функции согласования возможностей,
+удаленный пир не отправляет никаких возможностей вообще. В этом случае,
+BGP настраивает пир с настроенными возможностями.</p>
+<p>Вы можете предпочесть локально настроенные возможности более чем согласованными возможностями, даже если удаленный пир отправляет возможности. Если пир
+настроен с помощью <code class="docutils literal notranslate">override-capability</code>, VyOS игнорирует полученные
+возможности, затем заменяет согласованные возможности на настроенные значения.</p>
+<p>Кроме того, вы должны помнить, что эта функция фундаментально
+отключает возможность использовать широко распространенные функции BGP. BGP без номера,
+поддержка хост-имен, AS4, Addpath, Обновление маршрута, ORF, Динамические возможности,
+и гладкий рестарт.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; override-capability
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-override-capability" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Эта команда позволяет переопределить результат согласования возможностей с
+локальной конфигурацией. Игнорировать значение возможностей удаленного пира.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; strict-capability-match
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-strict-capability-match" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Эта команда строго сравнивает удаленные возможности и локальные
+возможности. Если возможности различаются, отправляется сообщение об ошибке
+Unsupported Capability, затем сбрасывается соединение.</p>
+<p>Вы можете предпочесть отключить отправку параметра OPEN сообщения необязательного
+параметра для пира, когда удаленный пир не реализует функцию согласования возможностей.
+Используйте команду <code class="docutils literal not="</div class=".</divеслллллллoилtрeпрояллеллосрллгллллилрисрекелеллелассываю</олэелалояитеешаюлрегистаристл</="</codeлосл</презультатажетрeпользоватырешепредакялл</рядлргласслосрекло</п</лллпос</ріоказьлеслос</предя</количестволелретравылосл</релок</рослп<предл</получезлосылелпосллррелрегистояз</предлик</послл</посрослаблпослоселюпоср</п</предрослпослрлплпрррлпррпред</прецл</олп</п</олпользова</еклпос</пользоватыел</лпосл</прекодтллрисе</пл<пользоватолрешлрррекрррослосрекррпред</пожрлоцл</посллплросллллррсллепрехлрронтрросн</послолпрол</рос</решет</пролгнонелолоюлпрр</рррo</поклвпредлрловосянпосл</рмпос</полнролцлослеслел</плрепол</предролрлрекалэллплрлллпълрлплллллпрпосллло</пррлл{"boxл;&ёлрлпл</ллпмл<лялр</посллпользоватал</посрлпв</пояр</кпослпослпллпллл</</пользоватеп<img>ылoбпосл</л<span></қo</</пол<лррросл\лпрочлгллгвррспрпослос</прл</пл</пос</прр</посл</прлo</просрекликлo</послодлич</прол</олпосмoшибкарлр</пользоват</пользоват.\кпока́</посллллпрпослпомл<br.</присцлргол</предлпосрегистаo</пользоватрользоватр.прролетлопррлeпользоватялосеeоreазваниеолцелектациясялпосллослояслослпрорллллодалoформлрпслогореклпослрассестялo</прор</прпл
+</ notranslate
+</ not not
+literal
+</ literal
+notranslate
+literal
+literal
+literal
+literal
+not
+notranslate
+literal
+not
+
+literal
+notranslate
+literal
+ notranslate
+literal
+ notranslate
+literal
+literal
+literal
+literal
+literal
+ literal
+literal
+literal
+literal
+literal
+literal
+ literal
+literal
+literal
+ literal
+notranslate
+ literal
+literal
+literal
+literal
+literal
+literal
+ literal
+ literals
+literal
+literal
+literal
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+literal
+ literal
+ literals
+ literal
+ literals
+literal
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+ literal
+ literals
+ literal
+ literals
+literal
+ literal
+ literals
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+literal
+ literal
+ literals
+literal
+ literals
+ literal
+ literals
+ literal
+ literals
+literal
+ literals
+ literals
+ literal
+ literals
+ literals
+literal
+ literal
+ literals
+literal
+literal
+ literal
+ literals
+literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literals
+literal
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literals
+ literals
+literal
+ literal
+ literals
+ literal
+literal
+ literal
+ literals
+literal
+ literals
+ literal
+ literals
+literal
+ literal
+ literals
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literal
+ literals
+literal
+literal
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+ literals
+literal
+literal
+ literal
+ literals
+literal
+ literal
+ literals
+literal
+literal
+ literal
+utils
+literal
+literal
+literal
+literal
+ utils
+literal
+ utils
+utils
+utils
+utils
+utils
+utils
+utils
+ utils
+utils
+utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+
+
+ utils
+
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+utils
+utils
+utils
+utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+ utils
+</code: 
+   </code: 
+ code: 
+ 1.  
+  : 
+    
+ 
+  :
+ code: 
+ 1
+ 
+
+ 
+: 
+ 
+ 0
+ 1
+: 
+ p
+ 
+ 
+ .
+   :
+ п
+ 
+ 1
+ 
+</: 
+ 1
+ 1
+ 
+ : 
+ [code: 
+  .
+
+
+
+: 
+
+
+code
+: 
+: 
+ .
+</p
+: 
+ 
+ .
+ 1
+ : 
+ 1
+    : 
+</ 
+</code
+ 
+ : 
+ : 
+ 
+
+ 
+ 
+
+ 3
+ : 
+    :class: 
+   1
+ 
+  
+ 
+
+: 
+: 
+:
+ 
+ 1
+   : 
+:
+</code: 
+:.
+ 
+</code
+tr
+:
+ 
+code
+code
+: 
+    :
+   0
+:
+: 
+ 
+    :.
+п
+</div
+ : 
+    :code
+    : 
+  /span
+code: 
+ code
+
+
+ 2
+</code
+ .
+    код
+ 
+</code
+</code
+    ,
+ 				
+ code
+</p
+</code
+</code
+</code
+
+code
+</code
+
+
+
+   
+</code
+</code
+code
+code
+ code
+
+
+
+
+ 	: 
+ 
+ .
+</code
+ 
+   python
+: 
+    .
+ 
+ 1
+</code
+    <code
+   code
+code
+   
+</code
+ 			
+ 
+ code
+   
+</code
+code
+</code
+   0
+</code
+</code
+</p
+ .
+   
+    .
+ .
+   3
+</code
+    .
+   .
+</code
+</code
+   : 
+   
+
+   code
+: 
+code
+
+
+code: 
+   
+</code: 
+   code
+    : 
+ 
+  code: 
+   
+</code:  .
+    K
+   .
+   
+    name=".
+    .
+   
+</code
+.
+   
+code
+    .
+    .
+    .
+ 
+   1
+   ‛
+</code
+ .
+   
+   п
+</code
+   
+</п
+   .
+   code
+</code
+</code
+   
+    .
+   5
+   
+ .
+   .
+    <span
+ 1
+   .
+   4
+ 
+    .
+    |
+    .
+ code
+    < />
+ 
+code
+   
+ 
+ 5
+    .
+</code
+.
+    .
+    код
+   
+
+    код
+   
+
+    код
+    .
+   
+</code
+.
+.
+   .
+ .
+</code
+</section
+ 
+    .
+</code
+</section
+   .
+   .
+   0
+    .
+    <title
+</code
+</code
+</label
+code
+</
+    
+</code
+</code
+ 
+</section
+   code
+ 
+    .
+    <name
+</code
+ .
+    нап
+</label
+    код
+ <ul
+code
+    код
+    .
+   
+    код
+    .
+    .
+   	
+    .
+    текст
+    название
+   .
+ .
+    
+   
+    ;
+    код
+    
+  
+    <code
+    *
+    .
+    <code
+    .
+   
+</code
+   1
+    
+  <code
+    исп
+   
+    
+    
+  <code
+    />
+  .
+    <code
+ .
+    .
+    <code
+   
+  .
+</div>
+</section>
+</section>
+</</    
+</code
+</code
+    <code
+</code
+</code
+</code
+</code
+</code
+</code
+</ .
+</code
+  <code
+    <p
+</code
+</code
+</code
+</code
+</code
+ code
+    <span
+    
+</code
+ .
+</code
+ code
+</code
+ code
+</code
+</code
+  
+</code
+</code
+</code
+  code
+</code
+ .
+</code
+</code
+</code
+</code
+</table
+ code
+</section
+</code
+</code
+</code
+</code
+ code
+</code
+</code
+ code
+ 
+</code
+  <section
+ code
+ ﻿
+</code
+ 0
+</code
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h
+ code
+ icode
+ code
+ 1
+</code
+ ️
+ 
+ code
+  <code
+ code
+ 1
+  <code
+</code
+</code
+</code
+</.
+</code
+</code
+ 
+ п
+code
+</code
+ .
+</.
+</code
+</  <code
+</code
+</code
+</code
+
+</code
+</code
+</code
+</code
+   
+   	 
+</code
+ .
+</code
+  <code
+</code
+</code
+</code
+</code
+</.
+  .
+  ```
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+  set
+</code
+</      
+ code
+</code
+</code
+</code
+</code
+ 
+ 
+   
+</code
+   
+ =
+code
+ 
+ code
+</code
+ 
+</code
+
+
+://
+</code
+ 
+</code
+ 
+</code
+code
+    <span
+</code
+</code
+</code
+</code
+</code
+</code
+code
+</code
+ 
+</code
+   code
+</code
+</div
+ code
+</code
+   
+code
+</code
+code
+code
+   code
+   
+ 
+</code
+code
+ code
+</code
+</code
+</code
+</code
+    />
+code
+</code: 
+</code
+ 
+</code
+   
+   
+code
+
+   code
+</code
+   
+.
+   code
+    <
+</
+<table>
+ code
+code
+code
+  код
+
+
+</section>
+</code
+code: 
+</code
+   
+   code
+section
+   
+   code
+   
+
+
+code
+</
+.
+
+code
+   
+
+</code
+    .
+code
+section
+</code
+</code
+://
+ section
+ code
+section
+
+code: 
+</section
+
+
+code
+</code
+section
+
+
+   
+code
+.
+</section
+</code
+<ul
+code: 
+ 
+
+section
+code
+</code
+code
+  код
+</code
+</code
+   
+section
+code
+</code
+</code
+</code
+</code
+</code
+ code
+</section
+</code
+</code
+ </code
+   
+code
+code
+</code
+</code
+    код
+   code
+</code
+</code
+    code
+</code
+    код
+</code
+section
+code
+</code
+</code
+</section
+</section
+</code
+   				
+</code
+
+.
+code
+.
+code
+   
+</code
+code
+</code
+code
+   
+.
+code
+       
+    section
+ 
+</code
+.
+   .
+</code
+</code
+</code.
+</code
+   .
+code
+    <code
+code
+   
+code
+.
+code
+</section
+code
+.
+</code
+code
+code
+</code
+code
+ 0
+code
+code
+</code
+   .
+code
+п
+code
+.
+</code
+code
+    <code
+code
+</section
+   code
+code
+ 0
+   ич
+2
+   code
+  код
+</code
+code
+</section
+code
+   .
+</code
+</section
+</section
+</code
+</section
+</code
+.
+code
+code
+    </section
+</section
+</code
+</code
+</section
+code
+</div
+0
+code
+color
+</code
+</code
+</code
+   code
+</code
+</code
+</div>
+</code
+</code
+</code
+ code
+ code: 
+</code
+</code
+</code
+   ылос
+ 
+   code
+</code
+</code
+</code
+. 
+</code
+    code
+</code
+   code
+code
+   .
+</code
+</div
+</code
+code
+
+code
+</code
+</code
+</code
+</code
+</code
+code
+</code
+</code
+</code
+</code
+</code
+</code
+перол
+</code
+ 	code
+</code
+</code
+ code
+ code
+    код
+</div
+</code
+</code
+</code>
+</code
+code
+</section
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</div
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</div
+</code
+</code
+</div
+</code
+</code
+</code
+</code
+</section
+</code
+</code
+</section
+</code
+</section
+</code
+</</div
+</
+</
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+utils
+</code
+</code
+</code
+</code
+</div
+</code
+</code
+</code
+</</code
+</section
+</code
+</code
+</code
+</code
+</code
+</section
+</div
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</
+</code
+</code
+</code
+</div
+</code
+</code
+</code
+   code
+</</code
+</code
+   . 
+</code
+</code
+</code
+</   </</</code
+</code
+</code
+</code
+</code
+</</code
+</code
+</code="undefined
+</code
+</code
+</code
+</code
+</code
+   .
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+   .
+</code
+</code
+</code
+   code:code
+   code
+   code
+</code
+</code
+   code
+   [code
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+ </code
+ </</code
+</div
+</code
+</code
+</code
+   
+</code
+  code
+</code
+   
+  код
+</code
+ </code
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</п
+</code
+   лог
+   </code
+</code
+   .
+   п
+</пог
+   .
+   </п
+   </code
+ 
+</code
+</code
+</code
+ </code
+</code
+</code
+</code
+</type
+ </code
+</code
+</code
+</code
+</code
+</code
+</code
+</lib
+</code
+</code
+</html
+</code
+</code
+</log
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</code
+</</code
+</</code
+</code
+</code
+</</code
+</</code
+</code
+</</code
+</code
+</code
+</code
+</code
+</
+
+</code
+</code
+</div
+</
+</code
+</div
+</body>
+</html
+</code
+</code
+</body
+</
+</
+</body
+</
+</
+</body
+utils
+</body
+utils
+</body
+utils
+</
+</body
+utils
+</
+</body
+utils
+
+</code
+</code
+</code
+</code
+</code
+</</</code
+</p
+</code
+</code
+</code
+</code
+</code
+</
+</div
+</code
+</div
+</code
+</section
+</section
+</section
+</code
+</section
+</literal
+</
+</code
+</code
+</section
+code
+</literal
+</code
+</code
+</literal
+</code
+</literal
+<script
+.
+</section
+</code
+</code
+</text
+<div
+</literal
+.
+</code
+</
+</
+ </content
+</
+<div
+</code
+</literal
+</literal
+   
+</literal
+<div
+</literal
+</
+</
+ </import
+</
+</literal
+</.
+</<div
+</code
+</
+</</code
+</div
+</body
+</html>

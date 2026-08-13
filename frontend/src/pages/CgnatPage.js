@@ -2,26 +2,29 @@ import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
+import { useI18n } from '/src/i18n/index.js';
 
 export default defineComponent({
   name: 'CgnatPage',
   setup() {
+    const { t } = useI18n();
     const route = useRoute();
     const configStore = useConfigStore();
     const path = 'nat cgnat';
     const writeDisabled = computed(() => route.meta?.menuItem?.permission === 'read');
 
     const activeTab = ref('rules');
-    const tabs = [
-      { key: 'rules', title: '规则' },
-      { key: 'external', title: '外部池' },
-      { key: 'internal', title: '内部池' },
-    ];
+    const tabs = computed(() => [
+      { key: 'rules', title: t('cgnat.tabs.rules') },
+      { key: 'external', title: t('cgnat.tabs.external') },
+      { key: 'internal', title: t('cgnat.tabs.internal') },
+    ]);
 
     const rules = ref([]);
     const loading = ref(false);
@@ -46,46 +49,54 @@ export default defineComponent({
     const editingRange = ref(null);
     const editingRangeIndex = ref(-1);
 
+    // Delete confirmation modals
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
+    const extPoolDeleteModalVisible = ref(false);
+    const pendingDeleteExtPoolNames = ref([]);
+    const intPoolDeleteModalVisible = ref(false);
+    const pendingDeleteIntPoolNames = ref([]);
+
     const ruleSchema = computed(() => [
-      { key: 'id', title: '规则编号', type: 'number', min: 1, max: 999999, required: true, help: '范围: 1-999999' },
-      { key: 'sourcePool', title: '源内部池', type: 'select', required: true, help: '选择已配置的内部池',
+      { key: 'id', title: t('cgnat.schema.ruleId'), type: 'number', min: 1, max: 999999, required: true, help: t('cgnat.schema.ruleIdHelp') },
+      { key: 'sourcePool', title: t('cgnat.schema.sourcePool'), type: 'select', required: true, help: t('cgnat.schema.sourcePoolHelp'),
         options: intPools.value.map(p => ({ value: p.name, label: p.name })) },
-      { key: 'translationPool', title: '翻译外部池', type: 'select', required: true, help: '选择已配置的外部池',
+      { key: 'translationPool', title: t('cgnat.schema.translationPool'), type: 'select', required: true, help: t('cgnat.schema.translationPoolHelp'),
         options: extPools.value.map(p => ({ value: p.name, label: p.name })) },
     ]);
 
-    const extPoolSchema = [
-      { key: 'name', title: '池名称', type: 'text', required: true, help: '外部池的唯一标识名称' },
-      { key: 'externalPortRange', title: '外部端口范围', type: 'text', placeholder: '1024-65535', help: '端口范围，默认: 1024-65535' },
-      { key: 'perUserLimitPort', title: '每用户端口数', type: 'number', min: 1, max: 65535, placeholder: '2000', help: '每用户端口数，默认: 2000，范围: 1-65535' },
-    ];
+    const extPoolSchema = computed(() => [
+      { key: 'name', title: t('cgnat.schema.poolName'), type: 'text', required: true, help: t('cgnat.schema.extPoolNameHelp') },
+      { key: 'externalPortRange', title: t('cgnat.schema.externalPortRange'), type: 'text', placeholder: '1024-65535', help: t('cgnat.schema.externalPortRangeHelp') },
+      { key: 'perUserLimitPort', title: t('cgnat.schema.perUserLimitPort'), type: 'number', min: 1, max: 65535, placeholder: '2000', help: t('cgnat.schema.perUserLimitPortHelp') },
+    ]);
 
-    const intPoolSchema = [
-      { key: 'name', title: '池名称', type: 'text', required: true, help: '内部池的唯一标识名称' },
-    ];
+    const intPoolSchema = computed(() => [
+      { key: 'name', title: t('cgnat.schema.poolName'), type: 'text', required: true, help: t('cgnat.schema.intPoolNameHelp') },
+    ]);
 
-    const ruleColumns = [
-      { key: 'id', title: '规则编号' },
-      { key: 'sourcePool', title: '源内部池' },
-      { key: 'translationPool', title: '翻译外部池' },
-    ];
+    const ruleColumns = computed(() => [
+      { key: 'id', title: t('cgnat.columns.ruleId') },
+      { key: 'sourcePool', title: t('cgnat.columns.sourcePool') },
+      { key: 'translationPool', title: t('cgnat.columns.translationPool') },
+    ]);
 
-    const rangeColumns = [
-      { key: 'range', title: 'IP地址范围' },
-      { key: 'seq', title: '序号' },
-    ];
+    const rangeColumns = computed(() => [
+      { key: 'range', title: t('cgnat.columns.ipRange') },
+      { key: 'seq', title: t('cgnat.columns.seq') },
+    ]);
 
-    const poolColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'ranges', title: '地址范围' },
-      { key: 'portRange', title: '端口范围' },
-      { key: 'perUserLimit', title: '每用户端口数' },
-    ];
+    const poolColumns = computed(() => [
+      { key: 'name', title: t('cgnat.columns.name') },
+      { key: 'ranges', title: t('cgnat.columns.ranges') },
+      { key: 'portRange', title: t('cgnat.columns.portRange') },
+      { key: 'perUserLimit', title: t('cgnat.columns.perUserLimit') },
+    ]);
 
-    const intPoolColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'ranges', title: '地址范围' },
-    ];
+    const intPoolColumns = computed(() => [
+      { key: 'name', title: t('cgnat.columns.name') },
+      { key: 'ranges', title: t('cgnat.columns.ranges') },
+    ]);
 
     function formatRangeLines(ranges) {
       if (!ranges || !ranges.length) return '';
@@ -152,7 +163,7 @@ export default defineComponent({
           });
         }
       } catch (e) {
-        showError('加载 CGNAT 配置失败', e);
+        showError(t('cgnat.loadFailed'), e);
       } finally {
         loading.value = false;
       }
@@ -174,9 +185,9 @@ export default defineComponent({
     async function saveRule() {
       try {
         const rule = editingRule.value;
-        if (!rule.id) return showError({ message: '请输入规则编号' });
-        if (!rule.sourcePool) return showError({ message: '请输入源内部池' });
-        if (!rule.translationPool) return showError({ message: '请输入翻译外部池' });
+        if (!rule.id) return showError({ message: t('cgnat.errors.ruleIdRequired') });
+        if (!rule.sourcePool) return showError({ message: t('cgnat.errors.sourcePoolRequired') });
+        if (!rule.translationPool) return showError({ message: t('cgnat.errors.translationPoolRequired') });
 
         const value = {
           source: { pool: rule.sourcePool },
@@ -187,23 +198,33 @@ export default defineComponent({
           await configStore.deleteConfig(`${path} rule ${editingOriginalId.value}`);
         }
         await configStore.setConfig(`${path} rule ${rule.id}`, value);
+        configStore.markPending();
         modalVisible.value = false;
         await load();
       } catch (e) {
-        showError('保存 CGNAT 规则失败', e);
+        showError(t('cgnat.saveRuleFailed'), e);
       }
     }
 
-    async function deleteRule(index) {
+    function deleteRule(index) {
       const row = rules.value[index];
       if (!row) return;
-      if (!confirm('确认删除此 CGNAT 规则？')) return;
-      try {
-        await configStore.deleteConfig(`${path} rule ${row.id}`);
-        await load();
-      } catch (e) {
-        showError('删除 CGNAT 规则失败', e);
+      pendingDeleteNames.value = [row.id];
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveRule() {
+      deleteModalVisible.value = false;
+      for (const id of pendingDeleteNames.value) {
+        try {
+          await configStore.deleteConfig(`${path} rule ${id}`);
+          configStore.markPending();
+        } catch (e) {
+          showError(t('cgnat.deleteRuleFailed'), e);
+        }
       }
+      pendingDeleteNames.value = [];
+      await load();
     }
 
     async function openPoolModal(type, row) {
@@ -247,7 +268,7 @@ export default defineComponent({
 
     function saveRange() {
       const r = editingRange.value;
-      if (!r.range) return showError({ message: '请输入IP地址范围' });
+      if (!r.range) return showError({ message: t('cgnat.errors.ipRangeRequired') });
       const row = { range: r.range, seq: r.seq ? parseInt(r.seq) : null };
       if (editingRangeIndex.value >= 0) {
         rangeRows.value[editingRangeIndex.value] = row;
@@ -264,7 +285,7 @@ export default defineComponent({
     async function savePool() {
       try {
         const pool = editingPool.value;
-        if (!pool.name) return showError({ message: '请输入池名称' });
+        if (!pool.name) return showError({ message: t('cgnat.errors.poolNameRequired') });
 
         const poolType = editingPoolType.value;
         const value = {};
@@ -290,36 +311,51 @@ export default defineComponent({
           await configStore.deleteConfig(`${path} pool ${poolType} ${editingPoolOriginalName.value}`);
         }
         await configStore.setConfig(`${path} pool ${poolType} ${pool.name}`, value);
+        configStore.markPending();
         poolModalVisible.value = false;
         await load();
       } catch (e) {
-        showError('保存 CGNAT 池失败', e);
+        showError(t('cgnat.savePoolFailed'), e);
       }
     }
 
-    async function deleteExtPool(keys) {
+    function deleteExtPool(keys) {
       if (!keys || !keys.length) return;
-      if (!confirm('确认删除选中的外部池？')) return;
+      pendingDeleteExtPoolNames.value = keys;
+      extPoolDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveExtPool() {
+      extPoolDeleteModalVisible.value = false;
       try {
-        for (const name of keys) {
+        for (const name of pendingDeleteExtPoolNames.value) {
           await configStore.deleteConfig(`${path} pool external ${name}`);
+          configStore.markPending();
         }
+        pendingDeleteExtPoolNames.value = [];
         await load();
       } catch (e) {
-        showError('删除外部池失败', e);
+        showError(t('cgnat.deleteExternalPoolFailed'), e);
       }
     }
 
-    async function deleteIntPool(keys) {
+    function deleteIntPool(keys) {
       if (!keys || !keys.length) return;
-      if (!confirm('确认删除选中的内部池？')) return;
+      pendingDeleteIntPoolNames.value = keys;
+      intPoolDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveIntPool() {
+      intPoolDeleteModalVisible.value = false;
       try {
-        for (const name of keys) {
+        for (const name of pendingDeleteIntPoolNames.value) {
           await configStore.deleteConfig(`${path} pool internal ${name}`);
+          configStore.markPending();
         }
+        pendingDeleteIntPoolNames.value = [];
         await load();
       } catch (e) {
-        showError('删除内部池失败', e);
+        showError(t('cgnat.deleteInternalPoolFailed'), e);
       }
     }
 
@@ -331,26 +367,33 @@ export default defineComponent({
           await configStore.deleteConfig(`${path} log-allocation`);
         }
       } catch (e) {
-        showError('设置日志分配失败', e);
+        showError(t('cgnat.setLoggingFailed'), e);
         logAllocation.value = !logAllocation.value;
       }
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
     watch(() => route.path, load);
 
     return {
+      t,
       path, writeDisabled,
       activeTab, tabs,
       logAllocation,
       rules, loading,
       modalVisible, editingRule, editingOriginalId, ruleModalKey,
       ruleSchema, ruleColumns,
-      openModal, saveRule, deleteRule,
+      openModal, saveRule, deleteRule, confirmRemoveRule,
+      deleteModalVisible, pendingDeleteNames,
       extPools, intPools,
       poolModalVisible, poolModalKey, editingPool, editingPoolType, editingPoolOriginalName,
       extPoolSchema, intPoolSchema, poolColumns, intPoolColumns,
-      openPoolModal, savePool, deleteExtPool, deleteIntPool,
+      openPoolModal, savePool, deleteExtPool, deleteIntPool, confirmRemoveExtPool, confirmRemoveIntPool,
+      extPoolDeleteModalVisible, pendingDeleteExtPoolNames,
+      intPoolDeleteModalVisible, pendingDeleteIntPoolNames,
       rangeRows, rangeColumns,
       rangeModalVisible, rangeModalKey, editingRange, editingRangeIndex,
       openRangeModal, saveRange, deleteRange,
@@ -368,7 +411,7 @@ export default defineComponent({
             <template #toolbar-left-extra>
               <label style="display:inline-flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
                 <input type="checkbox" v-model="logAllocation" :disabled="writeDisabled" @change="toggleLogAllocation" />
-                记录地址端口分配日志
+                {{ t('cgnat.labels.logAllocation') }}
               </label>
             </template>
           </DataTable>
@@ -388,24 +431,19 @@ export default defineComponent({
                      @delete="deleteIntPool" />
         </template>
       </TabGroup>
-      <div style="height:32px;"></div>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="modalVisible" :title="editingOriginalId ? '编辑 CGNAT 规则' : '创建 CGNAT 规则'" width="600px" :key="ruleModalKey">
+      <DraggableModal v-model:visible="modalVisible" :title="editingOriginalId ? t('cgnat.modals.editRule') : t('cgnat.modals.createRule')" width="600px" :key="ruleModalKey">
         <ConfigForm v-model="editingRule" :schema="ruleSchema" :showAdvanced="true" />
         <template #footer>
-          <button @click="modalVisible = false">取消</button>
-          <button class="btn-primary" @click="saveRule">确定</button>
+          <button @click="modalVisible = false">{{ t('common.buttons.cancel') }}</button>
+          <button class="btn-primary" @click="saveRule">{{ t('common.buttons.confirm') }}</button>
         </template>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="poolModalVisible" :title="editingPoolOriginalName ? '编辑 CGNAT 池' : '创建 CGNAT 池'" width="700px" :key="poolModalKey">
+      <DraggableModal v-model:visible="poolModalVisible" :title="editingPoolOriginalName ? t('cgnat.modals.editPool') : t('cgnat.modals.createPool')" width="700px" :key="poolModalKey">
         <ConfigForm v-model="editingPool" :schema="editingPoolType === 'external' ? extPoolSchema : intPoolSchema" :showAdvanced="true" />
         <div style="margin-top:16px;">
-          <div style="font-weight:600;margin-bottom:8px;">IP地址范围</div>
+          <div style="font-weight:600;margin-bottom:8px;">{{ t('cgnat.labels.ipRange') }}</div>
           <DataTable :columns="rangeColumns" :data="rangeRows" rowKey="range"
                      :actions="['create', 'edit', 'delete']"
                      @create="openRangeModal(-1)"
@@ -413,20 +451,42 @@ export default defineComponent({
                      @delete="deleteRange" />
         </div>
         <template #footer>
-          <button @click="poolModalVisible = false">取消</button>
-          <button class="btn-primary" @click="savePool">确定</button>
+          <button @click="poolModalVisible = false">{{ t('common.buttons.cancel') }}</button>
+          <button class="btn-primary" @click="savePool">{{ t('common.buttons.confirm') }}</button>
         </template>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="rangeModalVisible" :title="editingRangeIndex >= 0 ? '编辑 IP地址范围' : '添加 IP地址范围'" width="500px" :key="rangeModalKey">
+      <DraggableModal v-model:visible="rangeModalVisible" :title="editingRangeIndex >= 0 ? t('cgnat.modals.editRange') : t('cgnat.modals.addRange')" width="500px" :key="rangeModalKey">
         <ConfigForm v-model="editingRange" :schema="[
-          { key: 'range', title: 'IP地址范围', type: 'text', required: true, placeholder: '如: 3.3.1.2-3.3.1.50 或 1.1.0.0/16' },
-          { key: 'seq', title: '序号', type: 'number', min: 1, max: 999999, placeholder: editingPoolType === 'external' ? '必填' : '可选', help: editingPoolType === 'external' ? '范围: 1-999999' : '外部池必填，内部池可选' }
+          { key: 'range', title: t('cgnat.schema.ipRange'), type: 'text', required: true, placeholder: t('cgnat.schema.ipRangePlaceholder') },
+          { key: 'seq', title: t('cgnat.schema.seq'), type: 'number', min: 1, max: 999999, placeholder: editingPoolType === 'external' ? t('cgnat.schema.seqRequired') : t('cgnat.schema.seqOptional'), help: editingPoolType === 'external' ? t('cgnat.schema.seqHelp') : t('cgnat.schema.seqHelpOptional') }
         ]" />
         <template #footer>
-          <button @click="rangeModalVisible = false">取消</button>
-          <button class="btn-primary" @click="saveRange">确定</button>
+          <button @click="rangeModalVisible = false">{{ t('common.buttons.cancel') }}</button>
+          <button class="btn-primary" @click="saveRange">{{ t('common.buttons.confirm') }}</button>
         </template>
+      </DraggableModal>
+
+      <!-- Delete Confirmation Modals -->
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('cgnat.modals.confirmDelete')" width="400px" @confirm="confirmRemoveRule">
+        <div>{{ t('cgnat.messages.confirmDeleteRule') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="id in pendingDeleteNames" :key="id" style="padding:2px 0;">{{ id }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="extPoolDeleteModalVisible" :title="t('cgnat.modals.confirmDelete')" width="400px" @confirm="confirmRemoveExtPool">
+        <div>{{ t('cgnat.messages.confirmDeleteExtPool') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteExtPoolNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="intPoolDeleteModalVisible" :title="t('cgnat.modals.confirmDelete')" width="400px" @confirm="confirmRemoveIntPool">
+        <div>{{ t('cgnat.messages.confirmDeleteIntPool') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteIntPoolNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

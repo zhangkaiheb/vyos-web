@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="container">
+<h1>Контейнер</h1>
+<p>Реализация контейнера в VyOS основана на <a class="reference external" href="https://podman.io/">Podman</a> как движок без сервера.</p>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; image
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-image" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Устанавливает имя образа в реестре</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container name mysql-server image mysql:8.0
+</pre></div>
+</div>
+<p>Если реестр не указан, будет использоваться Docker.io, если только альтернативный реестр не указан с помощью
+<code class="docutils literal notranslate">set container registry &lt;name&gt;</code> или реестр включен в имя образа</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container name mysql-server image quay.io/mysql:8.0
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; entrypoint &lt;entrypoint&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-entrypoint-entrypoint" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Заменяет стандартный точку входа из образа для контейнера.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; command &lt;command&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-command-command" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Заменяет стандартную команду из образа для контейнера.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; arguments &lt;arguments&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-arguments-arguments" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Устанавливает аргументы команды для контейнера.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; host-name &lt;hostname&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-host-name-hostname" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Устанавливает имя хоста для контейнера.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; allow-host-pid
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-allow-host-pid" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Контейнер и хост используют один и тот же пространство имен процессов.
+Это означает, что процессы, запущенные на хосте, видны внутри контейнера, и процессы внутри контейнера видны на хосте.</p>
+<p>Команда переводится в “–pid host” при создании контейнера.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; allow-host-networks
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-allow-host-networks" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Позволяет использовать сетевой стек хоста в контейнере. Сетевой стек контейнера не изолирован от хоста и будет использовать IP хоста.</p>
+<p>Команда переводится в “–net host” при создании контейнера.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p><strong>allow-host-networks</strong> не может быть использовано с <strong>network</strong></p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; network &lt;networkname&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-network-networkname" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Присоединяет пользовательскую сеть к контейнеру.
+Должно быть указано только одно сетевое имя и оно должно уже существовать.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; network &lt;networkname&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-network-networkname-address-address" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Опционально установите конкретный статический IPv4 или IPv6 адрес для контейнера.
+Этот адрес должен находиться в префиксе указанной сети.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Первый IP в контейнерной сети зарезервирован двигателем и не может быть использован</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-name-server-address" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Опционально установите пользовательский сервер имен.
+Если используется контейнерная сеть с включенным DNS,
+эта настройка не будет иметь никакого эффекта.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-description-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить описание контейнера</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; environment &lt;key&gt; value &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-environment-key-value-value" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Добавьте пользовательские переменные окружения.
+Разрешено несколько переменных окружения.
+Следующие команды переводятся в “-e key=value” при создании контейнера.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container name mysql-server environment MYSQL_DATABASE value &#39;zabbix&#39;
+set container name mysql-server environment MYSQL_USER value &#39;zabbix&#39;
+set container name mysql-server environment MYSQL_PASSWORD value &#39;zabbix_pwd&#39;
+set container name mysql-server environment MYSQL_ROOT_PASSWORD value &#39;root_pwd&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; port &lt;portname&gt; source &lt;portnumber&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-port-portname-source-portnumber" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; port &lt;portname&gt; destination &lt;portnumber&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-port-portname-destination-portnumber" title="Перемещение к этой команде"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; port &lt;portname&gt; protocol &lt;tcp | udp&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-port-portname-protocol-tcp-udp" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Публикует порт для контейнера.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container name zabbix-web-nginx-mysql port http source 80
+set container name zabbix-web-nginx-mysql port http destination 8080
+set container name zabbix-web-nginx-mysql port http protocol tcp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Публикация портов не может быть использована с <strong>network</strong>. Для этого цели доступен обходной путь
+с использованием NAT и статического назначения IP для контейнера.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; volume &lt;volumename&gt; source &lt;path&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-volume-volumename-source-path" title="Перемещение к этой команде"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; volume &lt;volumename&gt; destination &lt;path&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-volume-volumename-destination-path" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Монтирует объем в контейнер</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container name coredns volume &#39;corefile&#39; source /config/coredns/Corefile
+set container name coredns volume &#39;corefile&#39; destination /etc/Corefile
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; volume &lt;volumename&gt; mode &lt;ro | rw&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-volume-volumename-mode-ro-rw" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Объем монтируется как rw (чтение/запись - по умолчанию) или ro (только чтение)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; tmpfs &lt;tmpfsname&gt; destination &lt;path&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-tmpfs-tmpfsname-destination-path" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Монтирует файловую систему tmpfs <em>(оперативное хранилище)</em> по указанному пути внутри контейнера.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; tmpfs &lt;tmpfsname&gt; size &lt;MB&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-tmpfs-tmpfsname-size-mb" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Размер файла tmpfs в МБ, максимальный размер 64 ГБ или 50% от общего объема доступной памяти системы.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; uid &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-uid-number" title="Перемещение к этой команде"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; gid &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-gid-number" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установите идентификатор пользователя или группы контейнера</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; restart [no | on-failure | always]
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-restart-no-on-failure-always" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установите поведение перезагрузки контейнера.</p>
+<ul class="simple">
+<li><p><strong>no</strong>: Не перезапускать контейнеры при выходе</p></li>
+<li><p><strong>on-failure</strong>: Перезапускать контейнеры при выходе с ненулевым кодом
+выхода, повторяя бесконечно (по умолчанию)</p></li>
+<li><p><strong>always</strong>: Перезапускать контейнеры при выходе, независимо от статуса,
+повторяя бесконечно</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; cpu-quota &lt;num&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-cpu-quota-num" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Это указывает количество ресурсов ЦП, которые может использовать контейнер.</p>
+<p>По умолчанию 0 для неограниченного.
+Например, 1.25 ограничивает контейнер до использования до 1.25 ядер
+времени ЦП.
+Это может быть десятичное число с тремя десятичными знаками.</p>
+<p>Команда переводится в “–cpus=&lt;num&gt;” при создании контейнера.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; memory &lt;MB&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-memory-mb" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Ограничивает память, доступную для контейнера.</p>
+<p>По умолчанию 512 МБ. Используйте 0 МБ для неограниченной памяти.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; device &lt;devicename&gt; source &lt;path&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-device-devicename-source-path" title="Перемещение к этой команде"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; device &lt;devicename&gt; destination &lt;path&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-device-devicename-destination-path" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Добавляет устройство хоста в контейнер.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; capability &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-capability-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установите возможности или разрешения контейнера.</p>
+<ul class="simple">
+<li><p><strong>net-admin</strong>: Операции сети (интерфейс, брандмауэр, таблицы маршрутизации)</p></li>
+<li><p><strong>net-bind-service</strong>: Привязка сокета к привилегированным портам
+(числа портов меньше 1024)</p></li>
+<li><p><strong>net-raw</strong>: Разрешение создания сырых сетевых сокетов</p></li>
+<li><p><strong>setpcap</strong>: Наборы возможностей (из ограниченного или унаследованного набора)</p></li>
+<li><p><strong>sys-admin</strong>: Операции администрирования (quotactl, mount, sethostname,
+setdomainame)</p></li>
+<li><p><strong>sys-time</strong>: Разрешение на установку системного времени</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; sysctl parameter &lt;parameter&gt; value &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-sysctl-parameter-parameter-value-value" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установите значения sysctl для контейнера.</p>
+<p>Подмножество возможных параметров:</p>
+<ul class="simple">
+<li><p>Параметры ядра: kernel.msgmax, kernel.msgmnb, kernel.msgmni, kernel.sem,
+kernel.shmall, kernel.shmmax, kernel.shmmni, kernel.shm_rmid_forced</p></li>
+<li><p>Параметры, начинающиеся с fs.mqueue.*</p></li>
+<li><p>Параметры, начинающиеся с net.* (только если используется пользовательская сеть)</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; label &lt;label&gt; value &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-label-label-value-value" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Добавьте метаданные для этого контейнера.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-disable" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Отключить контейнер.</p>
+</div>
+</div>
+<section id="container-health-checks">
+<h3>Проверки состояния контейнера</h3>
+<p>По умолчанию, проверки состояния не выполняются, даже если они определены образом.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; health-check
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-health-check" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>По умолчанию выполняется проверка состояния контейнера, если она определена образом.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; health-check command &lt;command&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-health-check-command-command" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Заменяет стандартную команду проверки состояния из образа для контейнера.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; health-check interval &lt;interval&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-health-check-interval-interval" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Заменяет стандартный интервал проверки состояния. Например: <code class="docutils literal notranslate">60</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; health-check timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-health-check-timeout-timeout" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Заменяет стандартный таймаут проверки состояния. Например: <code class="docutils literal notranslate">10</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; health-check retries &lt;retries&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-health-check-retries-retries" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Число попыток проверки состояния перед тем, как контейнер считается неправильным. Например: <code class="docutils literal notranslate">1</code></p>
+</div>
+</div>
+</section>
+<section id="container-networks">
+<h3>Контейнерные сети</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container network &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-network-name" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Создает именованную контейнерную сеть</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container network &lt;name&gt; description
+<a class="cmdlink" href="#cfgcmd-set-container-network-name-description" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Краткое описание того, что это за сеть.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container network &lt;name&gt; prefix &lt;ipv4|ipv6&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-network-name-prefix-ipv4-ipv6" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Определите префикс IPv4 и/или IPv6 для заданного имени сети.
+IPv4 и IPv6 могут использоваться параллельно.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container network &lt;name&gt; mtu &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-network-name-mtu-number" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Настройте <abbr title="Maximum Transmission Unit">MTU</abbr> для заданной сети. Это
+размер (в байтах) самого большого фрейма Ethernet, отправляемого на этом соединении.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container network &lt;name&gt; no-name-server
+<a class="cmdlink" href="#cfgcmd-set-container-network-name-no-name-server" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Отключает плагин Domain Name System (DNS) для этой сети.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container network &lt;name&gt; vrf &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-network-name-vrf-name" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Привязывает контейнерную сеть к заданному экземпляру VRF.</p>
+</div>
+</div>
+</section>
+<section id="container-registry">
+<h3>Реестр контейнеров</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Добавляет реестр в список unqualified-search-registries. По умолчанию, для любого
+образа, который не включает реестр в имя образа, VyOS будет использовать
+docker.io и quay.io как контейнерный реестр.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-disable" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Отключить заданный контейнерный реестр</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; authentication username
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-authentication-username" title="Перемещение к этой команде"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; authentication password
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-authentication-password" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Некоторые контейнерные реестры требуют учетных данных для использования.</p>
+<p>Учетные данные можно определить здесь и будут использоваться только при добавлении
+образа контейнера в систему.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; insecure
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-insecure" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Разрешает доступ к реестру через незашифрованный HTTP или TLS-соединения с
+ненадежными сертификатами.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; mirror address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-mirror-address-address" title="Перемещение к этой команде"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; mirror host-name &lt;host-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-mirror-host-name-host-name" title="Перемещение к этой команде"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; mirror port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-mirror-port-port" title="Перемещение к этой команде"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; mirror path &lt;path&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-mirror-path-path" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Зеркало реестра, используйте <code class="docutils literal notranslate">(host-name|address)[:port][/path]</code>.</p>
+<p>Если у вас есть зеркало http://192.168.1.1:8080 для docker.io, вы можете использовать <code class="docutils literal notranslate">docker.io/some/repo</code> или запустить <code class="docutils literal notranslate">podman pull docker.io/some/repo</code></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container registry docker.io mirror address 192.168.1.1
+set container registry docker.io mirror port 8080
+set container registry docker.io insecure
+</pre></div>
+</div>
+<p>Если http://192.168.1.1:8080 является вашим собственным реестром, вы можете использовать <code class="docutils literal notranslate">192.168.1.1:8080/some/repo</code> или запустить <code class="docutils literal notranslate">podman pull 192.168.1.1:8080/some/repo</code></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container registry 192.168.1.1:8080 insecure
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="log-configuration">
+<h3>Конфигурация журнала</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; log-driver [k8s-file | journald | none]
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-log-driver-k8s-file-journald-none" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установите драйвер журнала по умолчанию для контейнеров.</p>
+<ul class="simple">
+<li><p><strong>k8s-file</strong>: Запись в текстовый файл в стиле Kubernetes.</p></li>
+<li><p><strong>journald</strong>: Запись в системный журнал</p></li>
+<li><p><strong>none</strong>: Отключение журналирования для контейнера</p></li>
+</ul>
+<p>Текущее значение по умолчанию — journald.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="operation-commands">
+<h2>Команды операций</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+add container image &lt;containername&gt;
+<a class="cmdlink" href="#opcmd-add-container-image-containername" title="Перемещение к этой команде"></a></div><div class="opcmd-body">
+<p>Загрузить новый образ для контейнера</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show container
+<a class="cmdlink" href="#opcmd-show-container" title="Перемещение к этой команде"></a></div><div class="opcmd-body">
+<p>Показать список всех активных контейнеров.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show container image
+<a class="cmdlink" href="#opcmd-show-container-image" title="Перемещение к этой команде"></a></div><div class="opcmd-body">
+<p>Показать локальные образы контейнеров.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show container log &lt;containername&gt;
+<a class="cmdlink" href="#opcmd-show-container-log-containername" title="Перемещение к этой команде"></a></div><div class="opcmd-body">
+<p>Показать журналы из заданного контейнера</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show container network
+<a class="cmdlink" href="#opcmd-show-container-network" title="Перемещение к этой команде"></a></div><div class="opcmd-body">
+<p>Показать список доступных контейнерных сетей</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+restart container &lt;containername&gt;
+<a class="cmdlink" href="#opcmd-restart-container-containername" title="Перемещение к этой команде"></a></div><div class="opcmd-body">
+<p>Перезапустить заданный контейнер</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+update container image &lt;containername&gt;
+<a class="cmdlink" href="#opcmd-update-container-image-containername" title="Перемещение к этой команде"></a></div><div class="opcmd-body">
+<p>Обновить образ контейнера</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+delete container image &lt;image id|all&gt; [force]
+<a class="cmdlink" href="#opcmd-delete-container-image-image-id-all-force" title="Перемещение к этой команде"></a></div><div class="opcmd-body">
+<p>Удалить определенный образ контейнера на основе его идентификатора образа.
+Вы также можете удалить все образы контейнеров одновременно.</p>
+<p>Вы не можете удалить образ контейнера, если у него более одного тега,
+присвоенного, поэтому есть опция <code class="docutils literal notranslate">force</code>, чтобы передать ее
+образу контейнера, чтобы также удалить эти изображения.</p>
+</div>
+</div>
+</section>
+<section id="example-configuration">
+<h2>Пример конфигурации</h2>
+<p>В целях демонстрации, <a class="reference external" href="https://www.zabbix.com/documentation/current/manual/installation/containers">пример #1 в официальной документации</a>
+к декларативному синтаксису CLI VyOS.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container network zabbix prefix 172.20.0.0/16
+set container network zabbix description &#39;Network for Zabbix component containers&#39;
+
+set container name mysql-server image mysql:8.0
+set container name mysql-server network zabbix
+
+set container name mysql-server environment &#39;MYSQL_DATABASE&#39; value &#39;zabbix&#39;
+set container name mysql-server environment &#39;MYSQL_USER&#39; value &#39;zabbix&#39;
+set container name mysql-server environment &#39;MYSQL_PASSWORD&#39; value &#39;zabbix_pwd&#39;
+set container name mysql-server environment &#39;MYSQL_ROOT_PASSWORD&#39; value &#39;root_pwd&#39;
+
+set container name zabbix-java-gateway image zabbix/zabbix-java-gateway:alpine-5.2-latest
+set container name zabbix-java-gateway network zabbix
+
+set container name zabbix-server-mysql image zabbix/zabbix-server-mysql:alpine-5.2-latest
+set container name zabbix-server-mysql network zabbix
+
+set container name zabbix-server-mysql environment &#39;DB_SERVER_HOST&#39; value &#39;mysql-server&#39;
+set container name zabbix-server-mysql environment &#39;MYSQL_DATABASE&#39; value &#39;zabbix&#39;
+set container name zabbix-server-mysql environment &#39;MYSQL_USER&#39; value &#39;zabbix&#39;
+set container name zabbix-server-mysql environment &#39;MYSQL_PASSWORD&#39; value &#39;zabbix_pwd&#39;
+set container name zabbix-server-mysql environment &#39;MYSQL_ROOT_PASSWORD&#39; value &#39;root_pwd&#39;
+set container name zabbix-server-mysql environment &#39;ZBX_JAVAGATEWAY&#39; value &#39;zabbix-java-gateway&#39;
+
+set container name zabbix-server-mysql port zabbix source 10051
+set container name zabbix-server-mysql port zabbix destination 10051
+
+set container name zabbix-web-nginx-mysql image zabbix/zabbix-web-nginx-mysql:alpine-5.2-latest
+set container name zabbix-web-nginx-mysql network zabbix
+
+set container name zabbix-web-nginx-mysql environment &#39;MYSQL_DATABASE&#39; value &#39;zabbix&#39;
+set container name zabbix-web-nginx-mysql environment &#39;ZBX_SERVER_HOST&#39; value &#39;zabbix-server-mysql&#39;
+set container name zabbix-web-nginx-mysql environment &#39;DB_SERVER_HOST&#39; value &#39;mysql-server&#39;
+set container name zabbix-web-nginx-mysql environment &#39;MYSQL_USER&#39; value &#39;zabbix&#39;
+set container name zabbix-web-nginx-mysql environment &#39;MYSQL_PASSWORD&#39; value &#39;zabbix_pwd&#39;
+set container name zabbix-web-nginx-mysql environment &#39;MYSQL_ROOT_PASSWORD&#39; value &#39;root_pwd&#39;
+
+set container name zabbix-web-nginx-mysql port http source 80
+set container name zabbix-web-nginx-mysql port http destination 8080
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

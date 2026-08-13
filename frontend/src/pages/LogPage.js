@@ -1,10 +1,12 @@
 import { defineComponent, ref, computed, watch, onMounted } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { logApi } from '/src/api/index.js';
+import { useI18n } from '/src/i18n/index.js';
 
 export default defineComponent({
   name: 'LogPage',
   setup() {
+    const { t } = useI18n();
     const route = useRoute();
     const data = ref([]);
     const page = ref(1);
@@ -44,16 +46,16 @@ export default defineComponent({
     onMounted(load);
     watch(() => route.path, () => { page.value = 1; filters.value = { keyword: '', level: '', start_time: '', end_time: '' }; load(); });
 
-    return { data, page, pageSize, total, totalPages, loading, load, logType, logTypes, filters, applyFilters };
+    return { data, page, pageSize, total, totalPages, loading, load, logType, logTypes, filters, applyFilters, t };
   },
   template: `
     <div class="page-container">
       <div class="toolbar">
         <div class="toolbar-left" style="gap:8px;flex-wrap:wrap;">
           <select v-model="logType" @change="$router.push('/logs/' + logType)">
-            <option v-for="t in logTypes" :key="t" :value="t">{{ $t('logs.' + t) || t }}</option>
+            <option v-for="lt in logTypes" :key="lt" :value="lt">{{ $t('logs.' + lt) || lt }}</option>
           </select>
-          <input v-model="filters.keyword" placeholder="关键字" @keydown.enter="applyFilters" />
+          <input v-model="filters.keyword" :placeholder="t('log.filters.keyword')" @keydown.enter="applyFilters" />
           <select v-model="filters.level" @change="applyFilters">
             <option value="">{{ $t('logs.level') }}</option>
             <option value="debug">DEBUG</option>
@@ -67,13 +69,13 @@ export default defineComponent({
           <ToolbarButton icon="refresh" @click="load">{{ $t('app.refresh') }}</ToolbarButton>
         </div>
         <div class="toolbar-right">
-          每页 <input v-model.number="pageSize" style="width:50px;" @change="page=1;load()" /> 条
+          {{ t('log.pagination.perPage') }} <input v-model.number="pageSize" style="width:50px;" @change="page=1;load()" /> {{ t('log.pagination.items') }}
         </div>
       </div>
       <div class="data-table-wrapper">
         <table class="data-table">
           <thead>
-            <tr><th>时间</th><th>用户/单元</th><th>级别</th><th>操作/消息</th><th>详情</th></tr>
+            <tr><th>{{ t('log.columns.timestamp') }}</th><th>{{ t('log.columns.userUnit') }}</th><th>{{ t('log.columns.level') }}</th><th>{{ t('log.columns.actionMessage') }}</th><th>{{ t('log.columns.details') }}</th></tr>
           </thead>
           <tbody>
             <tr v-for="row in data" :key="row.id || row.timestamp">
@@ -83,17 +85,17 @@ export default defineComponent({
               <td>{{ row.action || row.message || '-' }}</td>
               <td>{{ row.target || row.error_message || JSON.stringify(row.data || '') }}</td>
             </tr>
-            <tr v-if="!data.length"><td colspan="5" class="text-center">暂无日志</td></tr>
+            <tr v-if="!data.length"><td colspan="5" class="text-center">{{ t('log.messages.noLogs') }}</td></tr>
           </tbody>
         </table>
       </div>
       <div class="pagination">
-        <button @click="page=1;load()" :disabled="page===1">首页</button>
-        <button @click="page--;load()" :disabled="page===1">上一页</button>
+        <button @click="page=1;load()" :disabled="page===1">{{ t('log.pagination.first') }}</button>
+        <button @click="page--;load()" :disabled="page===1">{{ t('log.pagination.previous') }}</button>
         <span>{{ page }} / {{ totalPages }}</span>
-        <button @click="page++;load()" :disabled="page===totalPages">下一页</button>
-        <button @click="page=totalPages;load()" :disabled="page===totalPages">末页</button>
-        <span style="margin-left:12px;">共 {{ total }} 条</span>
+        <button @click="page++;load()" :disabled="page===totalPages">{{ t('log.pagination.next') }}</button>
+        <button @click="page=totalPages;load()" :disabled="page===totalPages">{{ t('log.pagination.last') }}</button>
+        <span style="margin-left:12px;">{{ t('log.pagination.total', { total }) }}</span>
       </div>
     </div>
   `,

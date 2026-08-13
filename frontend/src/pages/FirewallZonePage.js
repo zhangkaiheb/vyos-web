@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { configApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
@@ -29,28 +29,28 @@ export default defineComponent({
   components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
     const configStore = useConfigStore();
+    const { t } = inject('i18n');
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
 
-    const zoneColumns = [
-      { key: 'name', title: '区域名称', dataIndex: 'name', width: 120 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-      { key: 'default_action', title: '默认动作', dataIndex: 'default_action', width: 100 },
-      { key: 'default_firewall', title: '默认防火墙', dataIndex: 'default_firewall', width: 150 },
-      { key: 'default_log', title: '默认日志', dataIndex: 'default_log', width: 80 },
-      { key: 'local_zone', title: '本地区域', dataIndex: 'local_zone', width: 80 },
-      { key: 'member_interfaces', title: '成员接口', dataIndex: 'member_interfaces', width: 200 },
-      { key: 'member_vrfs', title: '成员 VRF', dataIndex: 'member_vrfs', width: 120 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const zoneColumns = computed(() => [
+      { key: 'name', title: t('firewall.zone.zoneName'), dataIndex: 'name', width: 120 },
+      { key: 'description', title: t('rule.description'), dataIndex: 'description', width: 200 },
+      { key: 'default_action', title: t('firewall.zone.defaultAction'), dataIndex: 'default_action', width: 100 },
+      { key: 'default_firewall', title: t('firewall.zone.defaultFirewall'), dataIndex: 'default_firewall', width: 150 },
+      { key: 'default_log', title: t('firewall.zone.defaultLog'), dataIndex: 'default_log', width: 80 },
+      { key: 'local_zone', title: t('firewall.zone.localZone'), dataIndex: 'local_zone', width: 80 },
+      { key: 'member_interfaces', title: t('firewall.zone.memberInterfaces'), dataIndex: 'member_interfaces', width: 200 },
+      { key: 'member_vrfs', title: t('firewall.zone.memberVrfs'), dataIndex: 'member_vrfs', width: 120 },
+      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
-    const fromColumns = [
-      { key: 'zone', title: '来源区域', dataIndex: 'zone', width: 120 },
-      { key: 'firewall_name', title: 'IPv4 规则集', dataIndex: 'firewall_name', width: 150 },
-      { key: 'firewall_ipv6_name', title: 'IPv6 规则集', dataIndex: 'firewall_ipv6_name', width: 150 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const fromColumns = computed(() => [
+      { key: 'zone', title: t('firewall.zone.sourceZone'), dataIndex: 'zone', width: 120 },
+      { key: 'firewall_name', title: t('firewall.zone.ipv4Ruleset'), dataIndex: 'firewall_name', width: 150 },
+      { key: 'firewall_ipv6_name', title: t('firewall.zone.ipv6Ruleset'), dataIndex: 'firewall_ipv6_name', width: 150 },
+      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
     const zones = ref([]);
     const selected = ref([]);
@@ -59,33 +59,33 @@ export default defineComponent({
     const showFromModal = ref(false);
     const editingFrom = ref(null);
 
-    const zoneSchema = [
-      { key: 'name', title: '区域名称', type: 'text', required: true, help: '区域名称' },
-      { key: 'description', title: '描述', type: 'text', help: '区域描述' },
-      { key: 'default_action', title: '默认动作', type: 'select', options: [
-        { value: 'drop', label: '丢弃 (默认)' },
-        { value: 'reject', label: '拒绝并通知源' },
-      ], help: '进入此区域的流量的默认操作' },
-      { key: 'default_firewall_name', title: '默认 IPv4 规则集', type: 'text', help: '进入此区域的默认 IPv4 防火墙规则集' },
-      { key: 'default_firewall_ipv6_name', title: '默认 IPv6 规则集', type: 'text', help: '进入此区域的默认 IPv6 防火墙规则集' },
-      { key: 'default_log', title: '默认日志', type: 'checkbox', help: '记录命中默认操作的数据包' },
-      { key: 'local_zone', title: '本地区域', type: 'checkbox', help: '将此区域设为本地区域' },
-    ];
+    const zoneSchema = computed(() => [
+      { key: 'name', title: t('firewall.zone.zoneName'), type: 'text', required: true, help: t('firewall.zone.zoneNameHelp') },
+      { key: 'description', title: t('rule.description'), type: 'text', help: t('firewall.zone.descriptionHelp') },
+      { key: 'default_action', title: t('firewall.zone.defaultAction'), type: 'select', options: [
+        { value: 'drop', label: t('firewall.zone.dropDefault') },
+        { value: 'reject', label: t('firewall.zone.rejectNotify') },
+      ], help: t('firewall.zone.defaultActionHelp') },
+      { key: 'default_firewall_name', title: t('firewall.zone.defaultIpv4Ruleset'), type: 'text', help: t('firewall.zone.defaultIpv4RulesetHelp') },
+      { key: 'default_firewall_ipv6_name', title: t('firewall.zone.defaultIpv6Ruleset'), type: 'text', help: t('firewall.zone.defaultIpv6RulesetHelp') },
+      { key: 'default_log', title: t('firewall.zone.defaultLog'), type: 'checkbox', help: t('firewall.zone.defaultLogHelp') },
+      { key: 'local_zone', title: t('firewall.zone.localZone'), type: 'checkbox', help: t('firewall.zone.localZoneHelp') },
+    ]);
 
-    const fromSchema = [
-      { key: 'zone', title: '来源区域', type: 'text', required: true, help: '来源区域名称' },
-      { key: 'firewall_name', title: 'IPv4 规则集', type: 'text', help: 'IPv4 防火墙规则集名称' },
-      { key: 'firewall_ipv6_name', title: 'IPv6 规则集', type: 'text', help: 'IPv6 防火墙规则集名称' },
-    ];
+    const fromSchema = computed(() => [
+      { key: 'zone', title: t('firewall.zone.sourceZone'), type: 'text', required: true, help: t('firewall.zone.sourceZoneHelp') },
+      { key: 'firewall_name', title: t('firewall.zone.ipv4Ruleset'), type: 'text', help: t('firewall.zone.ipv4RulesetHelp') },
+      { key: 'firewall_ipv6_name', title: t('firewall.zone.ipv6Ruleset'), type: 'text', help: t('firewall.zone.ipv6RulesetHelp') },
+    ]);
 
-    const intraSchema = [
-      { key: 'action', title: '动作', type: 'select', options: [
-        { value: 'accept', label: '接受' },
-        { value: 'drop', label: '丢弃' },
-      ], help: '区域内流量的操作' },
-      { key: 'firewall_name', title: 'IPv4 规则集', type: 'text', help: 'IPv4 防火墙规则集名称' },
-      { key: 'firewall_ipv6_name', title: 'IPv6 规则集', type: 'text', help: 'IPv6 防火墙规则集名称' },
-    ];
+    const intraSchema = computed(() => [
+      { key: 'action', title: t('rule.action'), type: 'select', options: [
+        { value: 'accept', label: t('rule.actionAccept') },
+        { value: 'drop', label: t('rule.actionDrop') },
+      ], help: t('firewall.zone.intraZoneActionHelp') },
+      { key: 'firewall_name', title: t('firewall.zone.ipv4Ruleset'), type: 'text', help: t('firewall.zone.ipv4RulesetHelp') },
+      { key: 'firewall_ipv6_name', title: t('firewall.zone.ipv6Ruleset'), type: 'text', help: t('firewall.zone.ipv6RulesetHelp') },
+    ]);
 
     const commandPath = computed(() => 'firewall zone');
 
@@ -168,12 +168,11 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('firewall zone', true);
         zones.value = zoneToForm(res.data || {});
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('firewall.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -184,11 +183,10 @@ export default defineComponent({
       try {
         const payload = formToZone(zones.value);
         await configApi.set('firewall zone', payload);
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('firewall.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -206,21 +204,21 @@ export default defineComponent({
     }
 
     function editZone() {
-      if (!selected.value.length) return alert('请选择要编辑的区域');
+      if (!selected.value.length) return showError({ message: t('firewall.zone.selectZoneToEdit') });
       const row = zones.value.find(z => z.name === selected.value[0]);
-      if (!row) return alert('未找到选中的区域');
+      if (!row) return showError({ message: t('firewall.zone.zoneNotFound') });
       editingZone.value = JSON.parse(JSON.stringify(row));
       showZoneModal.value = true;
     }
 
     function removeZone() {
-      if (!selected.value.length) return alert('请选择要删除的区域');
+      if (!selected.value.length) return showError({ message: t('firewall.zone.selectZoneToDelete') });
       zones.value = zones.value.filter(z => z.name !== selected.value[0]);
       selected.value = [];
     }
 
     function saveZone() {
-      if (!editingZone.value.name) return alert('请输入区域名称');
+      if (!editingZone.value.name) return showError({ message: t('firewall.zone.enterZoneName') });
       const list = zones.value;
       const idx = list.findIndex(z => z._name === editingZone.value._name);
       if (idx >= 0) list.splice(idx, 1, { ...editingZone.value });
@@ -235,14 +233,14 @@ export default defineComponent({
     }
 
     function editFrom() {
-      if (!editingZone.value.from_zones.length) return alert('请先添加来源区域');
+      if (!editingZone.value.from_zones.length) return showError({ message: t('firewall.zone.addSourceZoneFirst') });
       const first = editingZone.value.from_zones[0];
       editingFrom.value = JSON.parse(JSON.stringify(first));
       showFromModal.value = true;
     }
 
     function saveFrom() {
-      if (!editingFrom.value.zone) return alert('请输入来源区域名称');
+      if (!editingFrom.value.zone) return showError({ message: t('firewall.zone.enterSourceZoneName') });
       const list = editingZone.value.from_zones;
       const idx = list.findIndex(f => f._zone === editingFrom.value._zone);
       if (idx >= 0) list.splice(idx, 1, { ...editingFrom.value });
@@ -274,8 +272,9 @@ export default defineComponent({
       onMenuRefresh(load);
     });
 
-    return {
-      loading, saving, saved, zones, selected,
+    return {t,
+      
+      loading, saving, zones, selected,
       showZoneModal, editingZone, showFromModal, editingFrom,
       zoneColumns, fromColumns, zoneSchema, fromSchema, intraSchema,
       commandPath,
@@ -287,66 +286,60 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
-
       <div class="toolbar">
-        <ToolbarButton icon="create" @click="createZone">创建</ToolbarButton>
-        <ToolbarButton icon="edit" @click="editZone" :disabled="!selected.length || selected.length > 1">编辑</ToolbarButton>
-        <ToolbarButton icon="delete" @click="removeZone" :disabled="!selected.length">删除</ToolbarButton>
+        <ToolbarButton icon="create" @click="createZone">{{ $t('app.create') }}</ToolbarButton>
+        <ToolbarButton icon="edit" @click="editZone" :disabled="!selected.length || selected.length > 1">{{ $t('app.edit') }}</ToolbarButton>
+        <ToolbarButton icon="delete" @click="removeZone" :disabled="!selected.length">{{ $t('app.delete') }}</ToolbarButton>
       </div>
 
       <DataTable :columns="zoneColumns" :data="zones" rowKey="name" :externalToolbar="true" @selection-change="selected = $event" :selectable="true" :loading="loading">
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'default_log'">
-            <span>{{ record.default_log ? '是' : '否' }}</span>
+            <span>{{ record.default_log ? $t('app.yes') : $t('app.no') }}</span>
           </template>
           <template v-if="column.key === 'local_zone'">
-            <span>{{ record.local_zone ? '是' : '否' }}</span>
+            <span>{{ record.local_zone ? $t('app.yes') : $t('app.no') }}</span>
           </template>
           <template v-if="column.key === 'actions'">
-            <a @click="editZoneByRecord(record)">编辑</a>
-            <a @click="removeZoneByRecord(record)" style="color:#ff4d4f;margin-left:8px">删除</a>
+            <a @click="editZoneByRecord(record)">{{ $t('app.edit') }}</a>
+            <a @click="removeZoneByRecord(record)" style="color:#ff4d4f;margin-left:8px">{{ $t('app.delete') }}</a>
           </template>
         </template>
       </DataTable>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="showZoneModal" :title="editingZone && editingZone._name ? '编辑区域' : '新建区域'" @confirm="saveZone" @close="showZoneModal = false" width="700px">
+      <DraggableModal v-model:visible="showZoneModal" :title="editingZone && editingZone._name ? $t('firewall.zone.editZone') : $t('firewall.zone.createZone')" @confirm="saveZone" @close="showZoneModal = false" width="700px">
         <ConfigForm :schema="zoneSchema" v-model="editingZone" />
 
-        <div style="font-weight:bold;margin:16px 0 8px;">成员接口</div>
-        <div class="form-row"><label class="form-label">接口</label><input class="form-control" v-model="editingZone.member_interfaces" placeholder="逗号分隔，如 eth0, eth1" title="与区域关联的接口" /></div>
-        <div class="form-row"><label class="form-label">VRF</label><input class="form-control" v-model="editingZone.member_vrfs" placeholder="逗号分隔" title="与区域关联的 VRF" /></div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ $t('firewall.zone.memberInterfaces') }}</div>
+        <div class="form-row"><label class="form-label">{{ $t('firewall.zone.interface') }}</label><input class="form-control" v-model="editingZone.member_interfaces" :placeholder="$t('firewall.zone.interfacePlaceholder')" :title="$t('firewall.zone.interfaceTitle')" /></div>
+        <div class="form-row"><label class="form-label">VRF</label><input class="form-control" v-model="editingZone.member_vrfs" :placeholder="$t('firewall.zone.vrfPlaceholder')" :title="$t('firewall.zone.vrfTitle')" /></div>
 
-        <div style="font-weight:bold;margin:16px 0 8px;">区域内过滤</div>
-        <div class="form-row"><label class="form-label">动作</label>
-          <select class="form-control" v-model="editingZone.intra_action" title="区域内流量的操作">
-            <option value="">未设置</option>
-            <option value="accept">接受</option>
-            <option value="drop">丢弃</option>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ $t('firewall.zone.intraZoneFiltering') }}</div>
+        <div class="form-row"><label class="form-label">{{ $t('rule.action') }}</label>
+          <select class="form-control" v-model="editingZone.intra_action" :title="$t('firewall.zone.intraZoneActionTitle')">
+            <option value="">{{ $t('firewall.zone.notSet') }}</option>
+            <option value="accept">{{ $t('rule.actionAccept') }}</option>
+            <option value="drop">{{ $t('rule.actionDrop') }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">IPv4 规则集</label><input class="form-control" v-model="editingZone.intra_firewall_name" title="区域内 IPv4 防火墙规则集" /></div>
-        <div class="form-row"><label class="form-label">IPv6 规则集</label><input class="form-control" v-model="editingZone.intra_firewall_ipv6_name" title="区域内 IPv6 防火墙规则集" /></div>
+        <div class="form-row"><label class="form-label">{{ $t('firewall.zone.ipv4Ruleset') }}</label><input class="form-control" v-model="editingZone.intra_firewall_name" :title="$t('firewall.zone.intraIpv4RulesetTitle')" /></div>
+        <div class="form-row"><label class="form-label">{{ $t('firewall.zone.ipv6Ruleset') }}</label><input class="form-control" v-model="editingZone.intra_firewall_ipv6_name" :title="$t('firewall.zone.intraIpv6RulesetTitle')" /></div>
 
-        <div style="font-weight:bold;margin:16px 0 8px;">来源区域防火墙</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ $t('firewall.zone.sourceZoneFirewall') }}</div>
         <div class="toolbar" style="margin-bottom:8px;">
-          <ToolbarButton icon="create" @click="createFrom">添加</ToolbarButton>
+          <ToolbarButton icon="create" @click="createFrom">{{ $t('app.add') }}</ToolbarButton>
         </div>
         <DataTable :columns="fromColumns" :data="editingZone.from_zones" rowKey="zone" :externalToolbar="true" :selectable="false">
           <template #bodyCell="{ column, record, index }">
             <template v-if="column.key === 'actions'">
-              <a @click="editFromByRecord(record)" style="margin-right:8px">编辑</a>
-              <a @click="removeFrom(index)" style="color:#ff4d4f">删除</a>
+              <a @click="editFromByRecord(record)" style="margin-right:8px">{{ $t('app.edit') }}</a>
+              <a @click="removeFrom(index)" style="color:#ff4d4f">{{ $t('app.delete') }}</a>
             </template>
           </template>
         </DataTable>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showFromModal" :title="editingFrom && editingFrom._zone ? '编辑来源区域' : '添加来源区域'" @confirm="saveFrom" @close="showFromModal = false">
+      <DraggableModal v-model:visible="showFromModal" :title="editingFrom && editingFrom._zone ? $t('firewall.zone.editSourceZone') : $t('firewall.zone.addSourceZone')" @confirm="saveFrom" @close="showFromModal = false">
         <ConfigForm :schema="fromSchema" v-model="editingFrom" />
       </DraggableModal>
     </div>

@@ -666,7 +666,8 @@ class VyOSWebApp:
     def handle_help(self, environ, body):
         query = parse_qs(environ.get('QUERY_STRING', ''))
         path = query.get('path', [''])[0]
-        return self.config_service.get_help(path)
+        lang = query.get('lang', ['en'])[0]
+        return self.config_service.get_help(path, lang)
 
     def handle_set_conntrack_log_config(self, environ, body):
         user = environ.get('user', {})

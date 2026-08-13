@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, watch, inject } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
@@ -7,20 +7,22 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-
-const TABS = [
-  { key: 'ca', title: '证书颁发机构 (CA)' },
-  { key: 'certificate', title: '证书' },
-  { key: 'dh', title: 'DH 参数' },
-  { key: 'key-pair', title: '密钥对' },
-  { key: 'openssh', title: 'OpenSSH 密钥' },
-  { key: 'openvpn', title: 'OpenVPN 密钥' },
-  { key: 'x509', title: 'X509 默认值' },
-];
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 
 export default defineComponent({
   name: 'PkiPage',
   setup() {
+    const { t } = inject('i18n');
+
+    const TABS = computed(() => [
+      { key: 'ca', title: t('pki.tabs.ca') },
+      { key: 'certificate', title: t('pki.tabs.certificate') },
+      { key: 'dh', title: t('pki.tabs.dh') },
+      { key: 'key-pair', title: t('pki.tabs.keyPair') },
+      { key: 'openssh', title: t('pki.tabs.openssh') },
+      { key: 'openvpn', title: t('pki.tabs.openvpn') },
+      { key: 'x509', title: t('pki.tabs.x509') },
+    ]);
     const route = useRoute();
     const configStore = useConfigStore();
     const activeTab = ref('ca');
@@ -71,109 +73,123 @@ export default defineComponent({
     // X509 data
     const x509Data = ref({});
 
+    // Delete modal refs
+    const caDeleteModalVisible = ref(false);
+    const pendingDeleteCaNames = ref([]);
+    const certDeleteModalVisible = ref(false);
+    const pendingDeleteCertNames = ref([]);
+    const dhDeleteModalVisible = ref(false);
+    const pendingDeleteDhNames = ref([]);
+    const keypairDeleteModalVisible = ref(false);
+    const pendingDeleteKeypairNames = ref([]);
+    const opensshDeleteModalVisible = ref(false);
+    const pendingDeleteOpensshNames = ref([]);
+    const openvpnDeleteModalVisible = ref(false);
+    const pendingDeleteOpenvpnNames = ref([]);
+
     const path = computed(() => 'pki');
     const writeDisabled = computed(() => route.meta?.menuItem?.permission === 'read');
 
     // CA columns and schema
-    const caColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'description', title: '描述' },
-      { key: 'hasCertificate', title: '证书' },
-      { key: 'hasCrl', title: 'CRL' },
-      { key: 'hasPrivateKey', title: '私钥' },
-    ];
+    const caColumns = computed(() => [
+      { key: 'name', title: t('pki.columns.name') },
+      { key: 'description', title: t('pki.columns.description') },
+      { key: 'hasCertificate', title: t('pki.columns.certificate') },
+      { key: 'hasCrl', title: t('pki.columns.crl') },
+      { key: 'hasPrivateKey', title: t('pki.columns.privateKey') },
+    ]);
 
     const caSchema = computed(() => [
-      { key: 'name', title: '名称', type: 'text', required: true, placeholder: '例如: ca01' },
-      { key: 'description', title: '描述', type: 'text' },
-      { key: 'certificate', title: '证书 (PEM 格式)', type: 'textarea', placeholder: '-----BEGIN CERTIFICATE-----...' },
-      { key: 'crl', title: '证书吊销列表 (PEM 格式)', type: 'textarea', placeholder: '-----BEGIN X509 CRL-----...' },
-      { key: 'privateKey', title: '私钥 (PEM 格式)', type: 'textarea', placeholder: '-----BEGIN PRIVATE KEY-----...' },
-      { key: 'passwordProtected', title: '私钥受密码保护', type: 'checkbox' },
+      { key: 'name', title: t('pki.columns.name'), type: 'text', required: true, placeholder: t('pki.placeholders.caName') },
+      { key: 'description', title: t('pki.columns.description'), type: 'text' },
+      { key: 'certificate', title: t('pki.labels.certificatePem'), type: 'textarea', placeholder: '-----BEGIN CERTIFICATE-----...' },
+      { key: 'crl', title: t('pki.labels.crlPem'), type: 'textarea', placeholder: '-----BEGIN X509 CRL-----...' },
+      { key: 'privateKey', title: t('pki.labels.privateKeyPem'), type: 'textarea', placeholder: '-----BEGIN PRIVATE KEY-----...' },
+      { key: 'passwordProtected', title: t('pki.labels.passwordProtected'), type: 'checkbox' },
     ]);
 
     // Certificate columns and schema
-    const certColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'description', title: '描述' },
-      { key: 'hasCertificate', title: '证书' },
-      { key: 'hasPrivateKey', title: '私钥' },
-      { key: 'acmeDomains', title: 'ACME 域名' },
-    ];
+    const certColumns = computed(() => [
+      { key: 'name', title: t('pki.columns.name') },
+      { key: 'description', title: t('pki.columns.description') },
+      { key: 'hasCertificate', title: t('pki.columns.certificate') },
+      { key: 'hasPrivateKey', title: t('pki.columns.privateKey') },
+      { key: 'acmeDomains', title: t('pki.columns.acmeDomains') },
+    ]);
 
     const certSchema = computed(() => [
-      { key: 'name', title: '名称', type: 'text', required: true, placeholder: '例如: cert01' },
-      { key: 'description', title: '描述', type: 'text' },
-      { key: 'certificate', title: '证书 (PEM 格式)', type: 'textarea', placeholder: '-----BEGIN CERTIFICATE-----...' },
-      { key: 'privateKey', title: '私钥 (PEM 格式)', type: 'textarea', placeholder: '-----BEGIN PRIVATE KEY-----...' },
-      { key: 'passwordProtected', title: '私钥受密码保护', type: 'checkbox' },
-      { key: 'acmeEmail', title: 'ACME 邮箱', type: 'text', placeholder: 'admin@example.com' },
-      { key: 'acmeListenAddress', title: 'ACME 监听地址', type: 'text', placeholder: 'IPv4 地址' },
-      { key: 'acmeRsaKeySize', title: 'ACME RSA 密钥大小', type: 'number', min: 1024, max: 8192, defaultValue: 2048, help: '默认: 2048' },
-      { key: 'acmeUrl', title: 'ACME URL', type: 'text', defaultValue: 'https://acme-v02.api.letsencrypt.org/directory', help: '默认: Let\'s Encrypt' },
-      { key: 'acmeDomainNames', title: 'ACME 域名 (逗号分隔)', type: 'text', placeholder: 'example.com,www.example.com' },
+      { key: 'name', title: t('pki.columns.name'), type: 'text', required: true, placeholder: t('pki.placeholders.certName') },
+      { key: 'description', title: t('pki.columns.description'), type: 'text' },
+      { key: 'certificate', title: t('pki.labels.certificatePem'), type: 'textarea', placeholder: '-----BEGIN CERTIFICATE-----...' },
+      { key: 'privateKey', title: t('pki.labels.privateKeyPem'), type: 'textarea', placeholder: '-----BEGIN PRIVATE KEY-----...' },
+      { key: 'passwordProtected', title: t('pki.labels.passwordProtected'), type: 'checkbox' },
+      { key: 'acmeEmail', title: t('pki.labels.acmeEmail'), type: 'text', placeholder: 'admin@example.com' },
+      { key: 'acmeListenAddress', title: t('pki.labels.acmeListenAddress'), type: 'text', placeholder: t('pki.placeholders.ipv4Address') },
+      { key: 'acmeRsaKeySize', title: t('pki.labels.acmeRsaKeySize'), type: 'number', min: 1024, max: 8192, defaultValue: 2048, help: t('pki.help.default2048') },
+      { key: 'acmeUrl', title: t('pki.labels.acmeUrl'), type: 'text', defaultValue: 'https://acme-v02.api.letsencrypt.org/directory', help: t('pki.help.defaultLetsEncrypt') },
+      { key: 'acmeDomainNames', title: t('pki.labels.acmeDomainNames'), type: 'text', placeholder: 'example.com,www.example.com' },
     ]);
 
     // DH columns and schema
-    const dhColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'hasParameters', title: '参数' },
-    ];
+    const dhColumns = computed(() => [
+      { key: 'name', title: t('pki.columns.name') },
+      { key: 'hasParameters', title: t('pki.columns.parameters') },
+    ]);
 
     const dhSchema = computed(() => [
-      { key: 'name', title: '名称', type: 'text', required: true, placeholder: '例如: dh01' },
-      { key: 'parameters', title: 'DH 参数 (PEM 格式)', type: 'textarea', placeholder: '-----BEGIN DH PARAMETERS-----...' },
+      { key: 'name', title: t('pki.columns.name'), type: 'text', required: true, placeholder: t('pki.placeholders.dhName') },
+      { key: 'parameters', title: t('pki.labels.dhParametersPem'), type: 'textarea', placeholder: '-----BEGIN DH PARAMETERS-----...' },
     ]);
 
     // Key-pair columns and schema
-    const keyPairColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'hasPrivateKey', title: '私钥' },
-      { key: 'hasPublicKey', title: '公钥' },
-      { key: 'passwordProtected', title: '受密码保护' },
-    ];
+    const keyPairColumns = computed(() => [
+      { key: 'name', title: t('pki.columns.name') },
+      { key: 'hasPrivateKey', title: t('pki.columns.privateKey') },
+      { key: 'hasPublicKey', title: t('pki.columns.publicKey') },
+      { key: 'passwordProtected', title: t('pki.columns.passwordProtected') },
+    ]);
 
     const keyPairSchema = computed(() => [
-      { key: 'name', title: '名称', type: 'text', required: true, placeholder: '例如: key01' },
-      { key: 'privateKey', title: '私钥 (PEM 格式)', type: 'textarea', placeholder: '-----BEGIN PRIVATE KEY-----...' },
-      { key: 'publicKey', title: '公钥 (PEM 格式)', type: 'textarea', placeholder: '-----BEGIN PUBLIC KEY-----...' },
-      { key: 'passwordProtected', title: '私钥受密码保护', type: 'checkbox' },
+      { key: 'name', title: t('pki.columns.name'), type: 'text', required: true, placeholder: t('pki.placeholders.keyName') },
+      { key: 'privateKey', title: t('pki.labels.privateKeyPem'), type: 'textarea', placeholder: '-----BEGIN PRIVATE KEY-----...' },
+      { key: 'publicKey', title: t('pki.labels.publicKeyPem'), type: 'textarea', placeholder: '-----BEGIN PUBLIC KEY-----...' },
+      { key: 'passwordProtected', title: t('pki.labels.passwordProtected'), type: 'checkbox' },
     ]);
 
     // OpenSSH columns and schema
-    const opensshColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'hasPrivateKey', title: '私钥' },
-      { key: 'hasPublicKey', title: '公钥' },
-      { key: 'passwordProtected', title: '受密码保护' },
-    ];
+    const opensshColumns = computed(() => [
+      { key: 'name', title: t('pki.columns.name') },
+      { key: 'hasPrivateKey', title: t('pki.columns.privateKey') },
+      { key: 'hasPublicKey', title: t('pki.columns.publicKey') },
+      { key: 'passwordProtected', title: t('pki.columns.passwordProtected') },
+    ]);
 
     const opensshSchema = computed(() => [
-      { key: 'name', title: '名称', type: 'text', required: true, placeholder: '例如: ssh01' },
-      { key: 'privateKey', title: '私钥 (PEM 格式)', type: 'textarea', placeholder: '-----BEGIN OPENSSH PRIVATE KEY-----...' },
-      { key: 'publicKey', title: '公钥', type: 'textarea', placeholder: 'ssh-rsa AAAA...' },
-      { key: 'passwordProtected', title: '私钥受密码保护', type: 'checkbox' },
+      { key: 'name', title: t('pki.columns.name'), type: 'text', required: true, placeholder: t('pki.placeholders.sshName') },
+      { key: 'privateKey', title: t('pki.labels.privateKeyPem'), type: 'textarea', placeholder: '-----BEGIN OPENSSH PRIVATE KEY-----...' },
+      { key: 'publicKey', title: t('pki.columns.publicKey'), type: 'textarea', placeholder: 'ssh-rsa AAAA...' },
+      { key: 'passwordProtected', title: t('pki.labels.passwordProtected'), type: 'checkbox' },
     ]);
 
     // OpenVPN columns and schema
-    const openvpnColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'hasKey', title: '密钥' },
-      { key: 'version', title: '版本' },
-    ];
+    const openvpnColumns = computed(() => [
+      { key: 'name', title: t('pki.columns.name') },
+      { key: 'hasKey', title: t('pki.columns.key') },
+      { key: 'version', title: t('pki.columns.version') },
+    ]);
 
     const openvpnSchema = computed(() => [
-      { key: 'name', title: '名称', type: 'text', required: true, placeholder: '例如: vpn01' },
-      { key: 'key', title: '共享密钥数据', type: 'textarea', placeholder: 'OpenVPN 共享密钥数据' },
-      { key: 'version', title: '版本', type: 'text', placeholder: '例如: 1' },
+      { key: 'name', title: t('pki.columns.name'), type: 'text', required: true, placeholder: t('pki.placeholders.vpnName') },
+      { key: 'key', title: t('pki.labels.sharedKeyData'), type: 'textarea', placeholder: t('pki.placeholders.openvpnKeyData') },
+      { key: 'version', title: t('pki.columns.version'), type: 'text', placeholder: t('pki.placeholders.versionNumber') },
     ]);
 
     // X509 schema
     const x509Schema = computed(() => [
-      { key: 'country', title: '国家', type: 'text', defaultValue: 'GB', placeholder: '例如: CN, US, GB' },
-      { key: 'locality', title: '地区', type: 'text', defaultValue: 'Some-City', placeholder: '例如: Beijing, Shanghai' },
-      { key: 'organization', title: '组织', type: 'text', defaultValue: 'VyOS', placeholder: '例如: My Organization' },
-      { key: 'state', title: '省份', type: 'text', defaultValue: 'Some-State', placeholder: '例如: Beijing, Guangdong' },
+      { key: 'country', title: t('pki.labels.country'), type: 'text', defaultValue: 'GB', placeholder: t('pki.placeholders.countryCode') },
+      { key: 'locality', title: t('pki.labels.locality'), type: 'text', defaultValue: 'Some-City', placeholder: t('pki.placeholders.localityExample') },
+      { key: 'organization', title: t('pki.labels.organization'), type: 'text', defaultValue: 'VyOS', placeholder: t('pki.placeholders.organizationExample') },
+      { key: 'state', title: t('pki.labels.state'), type: 'text', defaultValue: 'Some-State', placeholder: t('pki.placeholders.stateExample') },
     ]);
 
     async function load() {
@@ -318,7 +334,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(load);
+    onMounted(() => { load(); onMenuRefresh(load); });
     watch(() => route.path, () => {
       selectedCA.value = [];
       selectedCert.value = [];
@@ -365,8 +381,8 @@ export default defineComponent({
     }
 
     function editCA() {
-      if (!selectedCA.value.length) return showError({ message: '请选择一个 CA' });
-      if (selectedCA.value.length > 1) return showError({ message: '请选择一个 CA' });
+      if (!selectedCA.value.length) return showError({ message: t('pki.errors.selectOneCA') });
+      if (selectedCA.value.length > 1) return showError({ message: t('pki.errors.selectOneCA') });
       const ca = caList.value.find(n => n.name === selectedCA.value[0]);
       if (!ca) return;
       editingCA.value = flattenCAData(ca.name, ca._raw || {});
@@ -375,29 +391,39 @@ export default defineComponent({
     }
 
     async function removeCA() {
-      if (!selectedCA.value.length) return showError({ message: '请选择一个 CA' });
-      if (!confirm('确认删除选中的 CA？')) return;
-      for (const name of selectedCA.value) {
+      if (!selectedCA.value.length) return showError({ message: t('pki.errors.selectOneCA') });
+      pendingDeleteCaNames.value = [...selectedCA.value];
+      caDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveCA() {
+      caDeleteModalVisible.value = false;
+      for (const name of pendingDeleteCaNames.value) {
         await configStore.deleteConfig(`${path.value} ca ${name}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selectedCA.value = [];
+      pendingDeleteCaNames.value = [];
       await load();
     }
 
     async function saveCA() {
-      if (!editingCA.value.name) return showError({ message: '请输入名称' });
+      if (!editingCA.value.name) return showError({ message: t('pki.errors.enterName') });
       const original = editingOriginalCA.value;
       if (!original && caList.value.some(n => n.name === editingCA.value.name)) {
-        return showError({ message: '名称已存在' });
+        return showError({ message: t('pki.errors.nameExists') });
       }
       const value = unflattenCAData(editingCA.value);
       try {
         if (original && original !== editingCA.value.name) {
           await configStore.deleteConfig(`${path.value} ca ${original}`);
+          configStore.markPending();
           await configStore.setConfig(`${path.value} ca ${editingCA.value.name}`, value);
+          configStore.markPending();
         } else {
           await configStore.setConfig(`${path.value} ca ${editingCA.value.name}`, value);
+          configStore.markPending();
         }
         caModalVisible.value = false;
         await configStore.checkSessionChanged();
@@ -464,8 +490,8 @@ export default defineComponent({
     }
 
     function editCert() {
-      if (!selectedCert.value.length) return showError({ message: '请选择一个证书' });
-      if (selectedCert.value.length > 1) return showError({ message: '请选择一个证书' });
+      if (!selectedCert.value.length) return showError({ message: t('pki.errors.selectOneCert') });
+      if (selectedCert.value.length > 1) return showError({ message: t('pki.errors.selectOneCert') });
       const cert = certList.value.find(n => n.name === selectedCert.value[0]);
       if (!cert) return;
       editingCert.value = flattenCertData(cert.name, cert._raw || {});
@@ -474,29 +500,39 @@ export default defineComponent({
     }
 
     async function removeCert() {
-      if (!selectedCert.value.length) return showError({ message: '请选择一个证书' });
-      if (!confirm('确认删除选中的证书？')) return;
-      for (const name of selectedCert.value) {
+      if (!selectedCert.value.length) return showError({ message: t('pki.errors.selectOneCert') });
+      pendingDeleteCertNames.value = [...selectedCert.value];
+      certDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveCert() {
+      certDeleteModalVisible.value = false;
+      for (const name of pendingDeleteCertNames.value) {
         await configStore.deleteConfig(`${path.value} certificate ${name}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selectedCert.value = [];
+      pendingDeleteCertNames.value = [];
       await load();
     }
 
     async function saveCert() {
-      if (!editingCert.value.name) return showError({ message: '请输入名称' });
+      if (!editingCert.value.name) return showError({ message: t('pki.errors.enterName') });
       const original = editingOriginalCert.value;
       if (!original && certList.value.some(n => n.name === editingCert.value.name)) {
-        return showError({ message: '名称已存在' });
+        return showError({ message: t('pki.errors.nameExists') });
       }
       const value = unflattenCertData(editingCert.value);
       try {
         if (original && original !== editingCert.value.name) {
           await configStore.deleteConfig(`${path.value} certificate ${original}`);
+          configStore.markPending();
           await configStore.setConfig(`${path.value} certificate ${editingCert.value.name}`, value);
+          configStore.markPending();
         } else {
           await configStore.setConfig(`${path.value} certificate ${editingCert.value.name}`, value);
+          configStore.markPending();
         }
         certModalVisible.value = false;
         await configStore.checkSessionChanged();
@@ -531,8 +567,8 @@ export default defineComponent({
     }
 
     function editDH() {
-      if (!selectedDH.value.length) return showError({ message: '请选择一个 DH 参数' });
-      if (selectedDH.value.length > 1) return showError({ message: '请选择一个 DH 参数' });
+      if (!selectedDH.value.length) return showError({ message: t('pki.errors.selectOneDH') });
+      if (selectedDH.value.length > 1) return showError({ message: t('pki.errors.selectOneDH') });
       const dh = dhList.value.find(n => n.name === selectedDH.value[0]);
       if (!dh) return;
       editingDH.value = flattenDHData(dh.name, dh._raw || {});
@@ -541,29 +577,39 @@ export default defineComponent({
     }
 
     async function removeDH() {
-      if (!selectedDH.value.length) return showError({ message: '请选择一个 DH 参数' });
-      if (!confirm('确认删除选中的 DH 参数？')) return;
-      for (const name of selectedDH.value) {
+      if (!selectedDH.value.length) return showError({ message: t('pki.errors.selectOneDH') });
+      pendingDeleteDhNames.value = [...selectedDH.value];
+      dhDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveDH() {
+      dhDeleteModalVisible.value = false;
+      for (const name of pendingDeleteDhNames.value) {
         await configStore.deleteConfig(`${path.value} dh ${name}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selectedDH.value = [];
+      pendingDeleteDhNames.value = [];
       await load();
     }
 
     async function saveDH() {
-      if (!editingDH.value.name) return showError({ message: '请输入名称' });
+      if (!editingDH.value.name) return showError({ message: t('pki.errors.enterName') });
       const original = editingOriginalDH.value;
       if (!original && dhList.value.some(n => n.name === editingDH.value.name)) {
-        return showError({ message: '名称已存在' });
+        return showError({ message: t('pki.errors.nameExists') });
       }
       const value = unflattenDHData(editingDH.value);
       try {
         if (original && original !== editingDH.value.name) {
           await configStore.deleteConfig(`${path.value} dh ${original}`);
+          configStore.markPending();
           await configStore.setConfig(`${path.value} dh ${editingDH.value.name}`, value);
+          configStore.markPending();
         } else {
           await configStore.setConfig(`${path.value} dh ${editingDH.value.name}`, value);
+          configStore.markPending();
         }
         dhModalVisible.value = false;
         await configStore.checkSessionChanged();
@@ -608,8 +654,8 @@ export default defineComponent({
     }
 
     function editKeyPair() {
-      if (!selectedKeyPair.value.length) return showError({ message: '请选择一个密钥对' });
-      if (selectedKeyPair.value.length > 1) return showError({ message: '请选择一个密钥对' });
+      if (!selectedKeyPair.value.length) return showError({ message: t('pki.errors.selectOneKeyPair') });
+      if (selectedKeyPair.value.length > 1) return showError({ message: t('pki.errors.selectOneKeyPair') });
       const kp = keyPairList.value.find(n => n.name === selectedKeyPair.value[0]);
       if (!kp) return;
       editingKeyPair.value = flattenKeyPairData(kp.name, kp._raw || {});
@@ -618,29 +664,39 @@ export default defineComponent({
     }
 
     async function removeKeyPair() {
-      if (!selectedKeyPair.value.length) return showError({ message: '请选择一个密钥对' });
-      if (!confirm('确认删除选中的密钥对？')) return;
-      for (const name of selectedKeyPair.value) {
+      if (!selectedKeyPair.value.length) return showError({ message: t('pki.errors.selectOneKeyPair') });
+      pendingDeleteKeypairNames.value = [...selectedKeyPair.value];
+      keypairDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveKeyPair() {
+      keypairDeleteModalVisible.value = false;
+      for (const name of pendingDeleteKeypairNames.value) {
         await configStore.deleteConfig(`${path.value} key-pair ${name}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selectedKeyPair.value = [];
+      pendingDeleteKeypairNames.value = [];
       await load();
     }
 
     async function saveKeyPair() {
-      if (!editingKeyPair.value.name) return showError({ message: '请输入名称' });
+      if (!editingKeyPair.value.name) return showError({ message: t('pki.errors.enterName') });
       const original = editingOriginalKeyPair.value;
       if (!original && keyPairList.value.some(n => n.name === editingKeyPair.value.name)) {
-        return showError({ message: '名称已存在' });
+        return showError({ message: t('pki.errors.nameExists') });
       }
       const value = unflattenKeyPairData(editingKeyPair.value);
       try {
         if (original && original !== editingKeyPair.value.name) {
           await configStore.deleteConfig(`${path.value} key-pair ${original}`);
+          configStore.markPending();
           await configStore.setConfig(`${path.value} key-pair ${editingKeyPair.value.name}`, value);
+          configStore.markPending();
         } else {
           await configStore.setConfig(`${path.value} key-pair ${editingKeyPair.value.name}`, value);
+          configStore.markPending();
         }
         keyPairModalVisible.value = false;
         await configStore.checkSessionChanged();
@@ -685,8 +741,8 @@ export default defineComponent({
     }
 
     function editOpenSSH() {
-      if (!selectedOpenSSH.value.length) return showError({ message: '请选择一个 OpenSSH 密钥' });
-      if (selectedOpenSSH.value.length > 1) return showError({ message: '请选择一个 OpenSSH 密钥' });
+      if (!selectedOpenSSH.value.length) return showError({ message: t('pki.errors.selectOneOpenSSH') });
+      if (selectedOpenSSH.value.length > 1) return showError({ message: t('pki.errors.selectOneOpenSSH') });
       const ssh = opensshList.value.find(n => n.name === selectedOpenSSH.value[0]);
       if (!ssh) return;
       editingOpenSSH.value = flattenOpenSSHData(ssh.name, ssh._raw || {});
@@ -695,29 +751,39 @@ export default defineComponent({
     }
 
     async function removeOpenSSH() {
-      if (!selectedOpenSSH.value.length) return showError({ message: '请选择一个 OpenSSH 密钥' });
-      if (!confirm('确认删除选中的 OpenSSH 密钥？')) return;
-      for (const name of selectedOpenSSH.value) {
+      if (!selectedOpenSSH.value.length) return showError({ message: t('pki.errors.selectOneOpenSSH') });
+      pendingDeleteOpensshNames.value = [...selectedOpenSSH.value];
+      opensshDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveOpenSSH() {
+      opensshDeleteModalVisible.value = false;
+      for (const name of pendingDeleteOpensshNames.value) {
         await configStore.deleteConfig(`${path.value} openssh ${name}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selectedOpenSSH.value = [];
+      pendingDeleteOpensshNames.value = [];
       await load();
     }
 
     async function saveOpenSSH() {
-      if (!editingOpenSSH.value.name) return showError({ message: '请输入名称' });
+      if (!editingOpenSSH.value.name) return showError({ message: t('pki.errors.enterName') });
       const original = editingOriginalOpenSSH.value;
       if (!original && opensshList.value.some(n => n.name === editingOpenSSH.value.name)) {
-        return showError({ message: '名称已存在' });
+        return showError({ message: t('pki.errors.nameExists') });
       }
       const value = unflattenOpenSSHData(editingOpenSSH.value);
       try {
         if (original && original !== editingOpenSSH.value.name) {
           await configStore.deleteConfig(`${path.value} openssh ${original}`);
+          configStore.markPending();
           await configStore.setConfig(`${path.value} openssh ${editingOpenSSH.value.name}`, value);
+          configStore.markPending();
         } else {
           await configStore.setConfig(`${path.value} openssh ${editingOpenSSH.value.name}`, value);
+          configStore.markPending();
         }
         opensshModalVisible.value = false;
         await configStore.checkSessionChanged();
@@ -754,8 +820,8 @@ export default defineComponent({
     }
 
     function editOpenVPN() {
-      if (!selectedOpenVPN.value.length) return showError({ message: '请选择一个 OpenVPN 密钥' });
-      if (selectedOpenVPN.value.length > 1) return showError({ message: '请选择一个 OpenVPN 密钥' });
+      if (!selectedOpenVPN.value.length) return showError({ message: t('pki.errors.selectOneOpenVPN') });
+      if (selectedOpenVPN.value.length > 1) return showError({ message: t('pki.errors.selectOneOpenVPN') });
       const vpn = openvpnList.value.find(n => n.name === selectedOpenVPN.value[0]);
       if (!vpn) return;
       editingOpenVPN.value = flattenOpenVPNData(vpn.name, vpn._raw || {});
@@ -764,29 +830,39 @@ export default defineComponent({
     }
 
     async function removeOpenVPN() {
-      if (!selectedOpenVPN.value.length) return showError({ message: '请选择一个 OpenVPN 密钥' });
-      if (!confirm('确认删除选中的 OpenVPN 密钥？')) return;
-      for (const name of selectedOpenVPN.value) {
+      if (!selectedOpenVPN.value.length) return showError({ message: t('pki.errors.selectOneOpenVPN') });
+      pendingDeleteOpenvpnNames.value = [...selectedOpenVPN.value];
+      openvpnDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveOpenVPN() {
+      openvpnDeleteModalVisible.value = false;
+      for (const name of pendingDeleteOpenvpnNames.value) {
         await configStore.deleteConfig(`${path.value} openvpn shared-secret ${name}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selectedOpenVPN.value = [];
+      pendingDeleteOpenvpnNames.value = [];
       await load();
     }
 
     async function saveOpenVPN() {
-      if (!editingOpenVPN.value.name) return showError({ message: '请输入名称' });
+      if (!editingOpenVPN.value.name) return showError({ message: t('pki.errors.enterName') });
       const original = editingOriginalOpenVPN.value;
       if (!original && openvpnList.value.some(n => n.name === editingOpenVPN.value.name)) {
-        return showError({ message: '名称已存在' });
+        return showError({ message: t('pki.errors.nameExists') });
       }
       const value = unflattenOpenVPNData(editingOpenVPN.value);
       try {
         if (original && original !== editingOpenVPN.value.name) {
           await configStore.deleteConfig(`${path.value} openvpn shared-secret ${original}`);
+          configStore.markPending();
           await configStore.setConfig(`${path.value} openvpn shared-secret ${editingOpenVPN.value.name}`, value);
+          configStore.markPending();
         } else {
           await configStore.setConfig(`${path.value} openvpn shared-secret ${editingOpenVPN.value.name}`, value);
+          configStore.markPending();
         }
         openvpnModalVisible.value = false;
         await configStore.checkSessionChanged();
@@ -806,6 +882,7 @@ export default defineComponent({
 
       try {
         await configStore.setConfig(`${path.value} x509 default`, value);
+        configStore.markPending();
         await configStore.checkSessionChanged();
         await load();
       } catch (e) {
@@ -813,7 +890,8 @@ export default defineComponent({
       }
     }
 
-    return {
+    return {t,
+      
       activeTab, loading, writeDisabled, path, TABS,
       caList, selectedCA, caColumns, caSchema, caModalVisible, editingCA, editingOriginalCA,
       certList, selectedCert, certColumns, certSchema, certModalVisible, editingCert, editingOriginalCert,
@@ -822,13 +900,19 @@ export default defineComponent({
       opensshList, selectedOpenSSH, opensshColumns, opensshSchema, opensshModalVisible, editingOpenSSH, editingOriginalOpenSSH,
       openvpnList, selectedOpenVPN, openvpnColumns, openvpnSchema, openvpnModalVisible, editingOpenVPN, editingOriginalOpenVPN,
       x509Data, x509Schema,
+      caDeleteModalVisible, pendingDeleteCaNames,
+      certDeleteModalVisible, pendingDeleteCertNames,
+      dhDeleteModalVisible, pendingDeleteDhNames,
+      keypairDeleteModalVisible, pendingDeleteKeypairNames,
+      opensshDeleteModalVisible, pendingDeleteOpensshNames,
+      openvpnDeleteModalVisible, pendingDeleteOpenvpnNames,
       load,
-      createCA, editCA, removeCA, saveCA,
-      createCert, editCert, removeCert, saveCert,
-      createDH, editDH, removeDH, saveDH,
-      createKeyPair, editKeyPair, removeKeyPair, saveKeyPair,
-      createOpenSSH, editOpenSSH, removeOpenSSH, saveOpenSSH,
-      createOpenVPN, editOpenVPN, removeOpenVPN, saveOpenVPN,
+      createCA, editCA, removeCA, confirmRemoveCA, saveCA,
+      createCert, editCert, removeCert, confirmRemoveCert, saveCert,
+      createDH, editDH, removeDH, confirmRemoveDH, saveDH,
+      createKeyPair, editKeyPair, removeKeyPair, confirmRemoveKeyPair, saveKeyPair,
+      createOpenSSH, editOpenSSH, removeOpenSSH, confirmRemoveOpenSSH, saveOpenSSH,
+      createOpenVPN, editOpenVPN, removeOpenVPN, confirmRemoveOpenVPN, saveOpenVPN,
       saveX509,
     };
   },
@@ -839,10 +923,10 @@ export default defineComponent({
           <template #ca>
             <div class="toolbar">
               <div class="toolbar-left">
-                <ToolbarButton icon="create" @click="createCA" :disabled="writeDisabled">创建</ToolbarButton>
-                <ToolbarButton icon="edit" @click="editCA" :disabled="writeDisabled || !selectedCA.length || selectedCA.length > 1">编辑</ToolbarButton>
-                <ToolbarButton icon="delete" @click="removeCA" :disabled="writeDisabled || !selectedCA.length">删除</ToolbarButton>
-                <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+                <ToolbarButton icon="create" @click="createCA" :disabled="writeDisabled">{{ $t('app.create') }}</ToolbarButton>
+                <ToolbarButton icon="edit" @click="editCA" :disabled="writeDisabled || !selectedCA.length || selectedCA.length > 1">{{ $t('app.edit') }}</ToolbarButton>
+                <ToolbarButton icon="delete" @click="removeCA" :disabled="writeDisabled || !selectedCA.length">{{ $t('app.delete') }}</ToolbarButton>
+                <ToolbarButton icon="refresh" @click="load">{{ $t('app.refresh') }}</ToolbarButton>
               </div>
             </div>
             <DataTable :columns="caColumns" :data="caList" :loading="loading" :disabled="writeDisabled"
@@ -852,10 +936,10 @@ export default defineComponent({
           <template #certificate>
             <div class="toolbar">
               <div class="toolbar-left">
-                <ToolbarButton icon="create" @click="createCert" :disabled="writeDisabled">创建</ToolbarButton>
-                <ToolbarButton icon="edit" @click="editCert" :disabled="writeDisabled || !selectedCert.length || selectedCert.length > 1">编辑</ToolbarButton>
-                <ToolbarButton icon="delete" @click="removeCert" :disabled="writeDisabled || !selectedCert.length">删除</ToolbarButton>
-                <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+                <ToolbarButton icon="create" @click="createCert" :disabled="writeDisabled">{{ $t('app.create') }}</ToolbarButton>
+                <ToolbarButton icon="edit" @click="editCert" :disabled="writeDisabled || !selectedCert.length || selectedCert.length > 1">{{ $t('app.edit') }}</ToolbarButton>
+                <ToolbarButton icon="delete" @click="removeCert" :disabled="writeDisabled || !selectedCert.length">{{ $t('app.delete') }}</ToolbarButton>
+                <ToolbarButton icon="refresh" @click="load">{{ $t('app.refresh') }}</ToolbarButton>
               </div>
             </div>
             <DataTable :columns="certColumns" :data="certList" :loading="loading" :disabled="writeDisabled"
@@ -865,10 +949,10 @@ export default defineComponent({
           <template #dh>
             <div class="toolbar">
               <div class="toolbar-left">
-                <ToolbarButton icon="create" @click="createDH" :disabled="writeDisabled">创建</ToolbarButton>
-                <ToolbarButton icon="edit" @click="editDH" :disabled="writeDisabled || !selectedDH.length || selectedDH.length > 1">编辑</ToolbarButton>
-                <ToolbarButton icon="delete" @click="removeDH" :disabled="writeDisabled || !selectedDH.length">删除</ToolbarButton>
-                <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+                <ToolbarButton icon="create" @click="createDH" :disabled="writeDisabled">{{ $t('app.create') }}</ToolbarButton>
+                <ToolbarButton icon="edit" @click="editDH" :disabled="writeDisabled || !selectedDH.length || selectedDH.length > 1">{{ $t('app.edit') }}</ToolbarButton>
+                <ToolbarButton icon="delete" @click="removeDH" :disabled="writeDisabled || !selectedDH.length">{{ $t('app.delete') }}</ToolbarButton>
+                <ToolbarButton icon="refresh" @click="load">{{ $t('app.refresh') }}</ToolbarButton>
               </div>
             </div>
             <DataTable :columns="dhColumns" :data="dhList" :loading="loading" :disabled="writeDisabled"
@@ -878,10 +962,10 @@ export default defineComponent({
           <template #key-pair>
             <div class="toolbar">
               <div class="toolbar-left">
-                <ToolbarButton icon="create" @click="createKeyPair" :disabled="writeDisabled">创建</ToolbarButton>
-                <ToolbarButton icon="edit" @click="editKeyPair" :disabled="writeDisabled || !selectedKeyPair.length || selectedKeyPair.length > 1">编辑</ToolbarButton>
-                <ToolbarButton icon="delete" @click="removeKeyPair" :disabled="writeDisabled || !selectedKeyPair.length">删除</ToolbarButton>
-                <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+                <ToolbarButton icon="create" @click="createKeyPair" :disabled="writeDisabled">{{ $t('app.create') }}</ToolbarButton>
+                <ToolbarButton icon="edit" @click="editKeyPair" :disabled="writeDisabled || !selectedKeyPair.length || selectedKeyPair.length > 1">{{ $t('app.edit') }}</ToolbarButton>
+                <ToolbarButton icon="delete" @click="removeKeyPair" :disabled="writeDisabled || !selectedKeyPair.length">{{ $t('app.delete') }}</ToolbarButton>
+                <ToolbarButton icon="refresh" @click="load">{{ $t('app.refresh') }}</ToolbarButton>
               </div>
             </div>
             <DataTable :columns="keyPairColumns" :data="keyPairList" :loading="loading" :disabled="writeDisabled"
@@ -891,10 +975,10 @@ export default defineComponent({
           <template #openssh>
             <div class="toolbar">
               <div class="toolbar-left">
-                <ToolbarButton icon="create" @click="createOpenSSH" :disabled="writeDisabled">创建</ToolbarButton>
-                <ToolbarButton icon="edit" @click="editOpenSSH" :disabled="writeDisabled || !selectedOpenSSH.length || selectedOpenSSH.length > 1">编辑</ToolbarButton>
-                <ToolbarButton icon="delete" @click="removeOpenSSH" :disabled="writeDisabled || !selectedOpenSSH.length">删除</ToolbarButton>
-                <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+                <ToolbarButton icon="create" @click="createOpenSSH" :disabled="writeDisabled">{{ $t('app.create') }}</ToolbarButton>
+                <ToolbarButton icon="edit" @click="editOpenSSH" :disabled="writeDisabled || !selectedOpenSSH.length || selectedOpenSSH.length > 1">{{ $t('app.edit') }}</ToolbarButton>
+                <ToolbarButton icon="delete" @click="removeOpenSSH" :disabled="writeDisabled || !selectedOpenSSH.length">{{ $t('app.delete') }}</ToolbarButton>
+                <ToolbarButton icon="refresh" @click="load">{{ $t('app.refresh') }}</ToolbarButton>
               </div>
             </div>
             <DataTable :columns="opensshColumns" :data="opensshList" :loading="loading" :disabled="writeDisabled"
@@ -904,10 +988,10 @@ export default defineComponent({
           <template #openvpn>
             <div class="toolbar">
               <div class="toolbar-left">
-                <ToolbarButton icon="create" @click="createOpenVPN" :disabled="writeDisabled">创建</ToolbarButton>
-                <ToolbarButton icon="edit" @click="editOpenVPN" :disabled="writeDisabled || !selectedOpenVPN.length || selectedOpenVPN.length > 1">编辑</ToolbarButton>
-                <ToolbarButton icon="delete" @click="removeOpenVPN" :disabled="writeDisabled || !selectedOpenVPN.length">删除</ToolbarButton>
-                <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+                <ToolbarButton icon="create" @click="createOpenVPN" :disabled="writeDisabled">{{ $t('app.create') }}</ToolbarButton>
+                <ToolbarButton icon="edit" @click="editOpenVPN" :disabled="writeDisabled || !selectedOpenVPN.length || selectedOpenVPN.length > 1">{{ $t('app.edit') }}</ToolbarButton>
+                <ToolbarButton icon="delete" @click="removeOpenVPN" :disabled="writeDisabled || !selectedOpenVPN.length">{{ $t('app.delete') }}</ToolbarButton>
+                <ToolbarButton icon="refresh" @click="load">{{ $t('app.refresh') }}</ToolbarButton>
               </div>
             </div>
             <DataTable :columns="openvpnColumns" :data="openvpnList" :loading="loading" :disabled="writeDisabled"
@@ -916,9 +1000,6 @@ export default defineComponent({
           </template>
           <template #x509>
             <ConfigForm v-model="x509Data" :schema="x509Schema" :disabled="writeDisabled" :showAdvanced="true" />
-            <div style="margin-top:20px;">
-              <ToolbarButton icon="save" @click="saveX509" :disabled="writeDisabled">保存</ToolbarButton>
-            </div>
           </template>
         </TabGroup>
       </div>
@@ -926,33 +1007,81 @@ export default defineComponent({
       </div>
 
       <!-- CA Modal -->
-      <DraggableModal v-model:visible="caModalVisible" :title="editingOriginalCA ? '编辑' : '创建'" width="700px" @confirm="saveCA">
+      <DraggableModal v-model:visible="caModalVisible" :title="editingOriginalCA ? $t('app.edit') : $t('app.create')" width="700px" @confirm="saveCA">
         <ConfigForm v-model="editingCA" :schema="caSchema" :disabled="writeDisabled" :showAdvanced="true" />
       </DraggableModal>
 
       <!-- Certificate Modal -->
-      <DraggableModal v-model:visible="certModalVisible" :title="editingOriginalCert ? '编辑' : '创建'" width="700px" @confirm="saveCert">
+      <DraggableModal v-model:visible="certModalVisible" :title="editingOriginalCert ? $t('app.edit') : $t('app.create')" width="700px" @confirm="saveCert">
         <ConfigForm v-model="editingCert" :schema="certSchema" :disabled="writeDisabled" :showAdvanced="true" />
       </DraggableModal>
 
       <!-- DH Modal -->
-      <DraggableModal v-model:visible="dhModalVisible" :title="editingOriginalDH ? '编辑' : '创建'" width="600px" @confirm="saveDH">
+      <DraggableModal v-model:visible="dhModalVisible" :title="editingOriginalDH ? $t('app.edit') : $t('app.create')" width="600px" @confirm="saveDH">
         <ConfigForm v-model="editingDH" :schema="dhSchema" :disabled="writeDisabled" :showAdvanced="true" />
       </DraggableModal>
 
       <!-- Key-pair Modal -->
-      <DraggableModal v-model:visible="keyPairModalVisible" :title="editingOriginalKeyPair ? '编辑' : '创建'" width="700px" @confirm="saveKeyPair">
+      <DraggableModal v-model:visible="keyPairModalVisible" :title="editingOriginalKeyPair ? $t('app.edit') : $t('app.create')" width="700px" @confirm="saveKeyPair">
         <ConfigForm v-model="editingKeyPair" :schema="keyPairSchema" :disabled="writeDisabled" :showAdvanced="true" />
       </DraggableModal>
 
       <!-- OpenSSH Modal -->
-      <DraggableModal v-model:visible="opensshModalVisible" :title="editingOriginalOpenSSH ? '编辑' : '创建'" width="700px" @confirm="saveOpenSSH">
+      <DraggableModal v-model:visible="opensshModalVisible" :title="editingOriginalOpenSSH ? $t('app.edit') : $t('app.create')" width="700px" @confirm="saveOpenSSH">
         <ConfigForm v-model="editingOpenSSH" :schema="opensshSchema" :disabled="writeDisabled" :showAdvanced="true" />
       </DraggableModal>
 
       <!-- OpenVPN Modal -->
-      <DraggableModal v-model:visible="openvpnModalVisible" :title="editingOriginalOpenVPN ? '编辑' : '创建'" width="600px" @confirm="saveOpenVPN">
+      <DraggableModal v-model:visible="openvpnModalVisible" :title="editingOriginalOpenVPN ? $t('app.edit') : $t('app.create')" width="600px" @confirm="saveOpenVPN">
         <ConfigForm v-model="editingOpenVPN" :schema="openvpnSchema" :disabled="writeDisabled" :showAdvanced="true" />
+      </DraggableModal>
+
+      <!-- CA Delete Confirmation Modal -->
+      <DraggableModal v-model:visible="caDeleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemoveCA">
+        <div>{{ $t('pki.confirmDeleteCA') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteCaNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <!-- Certificate Delete Confirmation Modal -->
+      <DraggableModal v-model:visible="certDeleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemoveCert">
+        <div>{{ $t('pki.confirmDeleteCert') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteCertNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <!-- DH Delete Confirmation Modal -->
+      <DraggableModal v-model:visible="dhDeleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemoveDH">
+        <div>{{ $t('pki.confirmDeleteDH') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteDhNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <!-- Key-pair Delete Confirmation Modal -->
+      <DraggableModal v-model:visible="keypairDeleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemoveKeyPair">
+        <div>{{ $t('pki.confirmDeleteKeyPair') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteKeypairNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <!-- OpenSSH Delete Confirmation Modal -->
+      <DraggableModal v-model:visible="opensshDeleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemoveOpenSSH">
+        <div>{{ $t('pki.confirmDeleteOpenSSH') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteOpensshNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <!-- OpenVPN Delete Confirmation Modal -->
+      <DraggableModal v-model:visible="openvpnDeleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemoveOpenVPN">
+        <div>{{ $t('pki.confirmDeleteOpenVPN') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteOpenvpnNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

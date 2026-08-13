@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="traffic-policy">
+<h1>Verkehrsrichtlinie</h1>
+<section id="id1">
+<h2>QoS</h2>
+<p>Der allgemeine Name für Quality of Service oder Traffic Control beinhaltet Dinge wie das Formen des Verkehrs, die Planung oder das Löschen von Paketen, was die Art von Dingen ist, mit denen Sie spielen können, wenn Sie beispielsweise eine Bandbreitenengstelle auf einer Verbindung haben und möchten, dass einige Arten von Verkehr über andere priorisiert werden.</p>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Tc_(Linux)">tc</a> ist ein leistungsstarkes Werkzeug für Traffic Control, das im Linux-Kernel gefunden wird. Seine Konfiguration wird jedoch oft als mühsam betrachtet. Glücklicherweise erleichtert VyOS diese Aufgabe durch seine CLI, während es <code class="docutils literal notranslate">tc</code> als Backend verwendet.</p>
+<section id="how-to-make-it-work">
+<h3>Wie funktioniert es?</h3>
+<p>Um VyOS Traffic Control funktionieren zu lassen, müssen Sie zwei Schritte befolgen:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><strong>Eine Verkehrsrichtlinie erstellen</strong>.</p></li>
+<li><p><strong>Die Verkehrsrichtlinie auf eine Schnittstelle eingang oder ausgehend anwenden</strong>.</p></li>
+</ol>
+</div></blockquote>
+<p>Bevor Sie lernen, Ihre Richtlinie zu konfigurieren, warnen wir Sie über die verschiedenen Einheiten, die Sie verwenden können, und zeigen Ihnen auch, was <em>Klassen</em> sind und wie sie funktionieren, da einige Richtlinien möglicherweise erforderlich sind, um sie zu konfigurieren.</p>
+</section>
+<section id="units">
+<h3>Einheiten</h3>
+<p>Bei der Konfiguration Ihrer Verkehrsrichtlinie müssen Sie Datenratenwerte festlegen, achten Sie auf die Einheiten, die Sie verwalten, es ist leicht, sich mit den verschiedenen Präfixen und Suffixen zu verwirren, die Sie verwenden können. VyOS zeigt Ihnen immer die verschiedenen Einheiten an, die Sie verwenden können.</p>
+<section id="prefixes">
+<h4>Präfixe</h4>
+<p>Sie können <strong>dezimale</strong> Präfixe verwenden.</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kbit  (10^3)    Kilobit pro Sekunde
+mbit  (10^6)    Megabit pro Sekunde
+gbit  (10^9)    Gigabit pro Sekunde
+tbit  (10^12)   Terabit pro Sekunde
+
+kbps  (8*10^3)  Kilobyte pro Sekunde
+mbps  (8*10^6)  Megabyte pro Sekunde
+gbps  (8*10^9)  Gigabyte pro Sekunde
+tbps  (8*10^12) Terabyte pro Sekunde
+</pre></div>
+</div>
+</div></blockquote>
+<p>Oder <strong>binäre</strong> Präfixe.</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kibit (2^10 = 1024)    Kibibit pro Sekunde
+mibit (2^20 = 1024^2)  Mebibit pro Sekunde
+gibit (2^30 = 1024^3)  Gibibit pro Sekunde
+tbit  (2^40 = 1024^4)  Tebibit pro Sekunde
+
+kibps (1024*8)         Kibibyte (KiB) pro Sekunde
+mibps (1024^2*8)       Mebibyte (MiB) pro Sekunde
+gibps (1024^3*8)       Gibibyte (GiB) pro Sekunde
+tibps (1024^4*8)       Tebibyte (TiB) pro Sekunde
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="suffixes">
+<h4>Suffixe</h4>
+<p>Ein <em>Bit</em> wird als <strong>bit</strong> geschrieben,</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kbit (Kilobits pro Sekunde)
+mbit (Megabits pro Sekunde)
+gbit (Gigabits pro Sekunde)
+tbit (Terabits pro Sekunde)
+</pre></div>
+</div>
+</div></blockquote>
+<p>während ein <em>Byte</em> als einzelner <strong>b</strong> geschrieben wird.</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kbps (Kilobytes pro Sekunde)
+mbps (Megabytes pro Sekunde)
+gbps (Gigabytes pro Sekunde)
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+</section>
+<section id="classes">
+<h3>Klassen</h3>
+<p>In dem <a class="reference internal" href="#creating-a-traffic-policy">Abschnitt zur Erstellung einer Verkehrsrichtlinie</a> werden Sie sehen, dass einige der Richtlinien <em>Klassen</em> verwenden. Diese Richtlinien ermöglichen es Ihnen, den Verkehr entsprechend verschiedenen Parametern zu verteilen, die Sie wählen können. Eine Klasse ist also einfach eine spezifische Art von Verkehr, den Sie auswählen.</p>
+<p>Das endgültige Ziel der Klassifizierung des Verkehrs ist es, jeder Klasse eine unterschiedliche Behandlung zu geben.</p>
+<section id="matching-traffic">
+<h4>Verkehr abgleichen</h4>
+<p>Um zu definieren, welcher Verkehr in welche Klasse geht, definieren Sie Filter (das heißt, die Übereinstimmungskriterien). Pakete durchlaufen diese Übereinstimmungsregeln (wie die Regeln eines Feuerwalls) und, wenn ein Paket den Filter trifft, wird es dieser Klasse zugeordnet.</p>
+<p>In VyOS wird eine Klasse durch eine Nummer identifiziert, die Sie bei der Konfiguration wählen können.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Die Bedeutung der Klassen-ID ist nicht für jede Art von Richtlinie gleich. Normalerweise benötigen Richtlinien nur eine sinnlose Zahl, um eine Klasse (Klassen-ID) zu identifizieren, aber dies gilt nicht für jede Richtlinie.
+Die Nummer einer Klasse in einer Prioritätswarteschlange identifiziert sie nicht nur, sondern definiert auch ihre Priorität.</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy &lt;policy&gt; &lt;policy-name&gt; class &lt;class-ID&gt; match &lt;class-matching-rule-name&gt;
+</pre></div>
+</div>
+<p>Im obigen Befehl legen wir den Typ der Richtlinie fest, mit der wir arbeiten, und den Namen, den wir dafür wählen; eine Klasse (damit wir bestimmten Verkehr unterscheiden können) und eine identifizierbare Nummer für diese Klasse;
+dann konfigurieren wir eine Übereinstimmungsregel (oder einen Filter) und einen Namen dafür.</p>
+<p>Eine Klasse kann mehrere Übereinstimmungsfilter haben:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper MY-SHAPER class 30 match HTTP
+set qos policy shaper MY-SHAPER class 30 match HTTPs
+</pre></div>
+</div>
+<p>Eine Übereinstimmungsregel kann mehrere Kriterien enthalten und passt zum Verkehr, wenn alle diese Kriterien wahr sind.</p>
+<p>Zum Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper MY-SHAPER class 30 match HTTP ip protocol tcp
+set qos policy shaper MY-SHAPER class 30 match HTTP ip source port 80
+</pre></div>
+</div>
+<p>Dieser Befehl passt TCP-Verkehr mit Quellport 80.</p>
+<p>Es gibt viele Parameter, die Sie verwenden können, um den Verkehr zu matchen, den Sie für eine Klasse wollen:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Ethernet (Protokoll, Zieladresse oder Quelladresse)</strong></p></li>
+<li><p><strong>Schnittstellenname</strong></p></li>
+<li><p><strong>IPv4 (DSCP-Wert, maximale Paketlänge, Protokoll, Quelladresse,</strong>
+<strong>Zieladresse, Quellport, Zielport oder TCP-Flags)</strong></p></li>
+<li><p><strong>IPv6 (DSCP-Wert, maximale Nutzlastlänge, Protokoll, Quelladresse,</strong>
+<strong>Zieladresse, Quellport, Zielport oder TCP-Flags)</strong></p></li>
+<li><p><strong>Firewall-Markierung</strong></p></li>
+<li><p><strong>VLAN-ID</strong></p></li>
+</ul>
+</div></blockquote>
+<p>Beim Konfigurieren Ihres Filters können Sie die <code class="docutils literal notranslate">Tab</code>-Taste verwenden, um die vielen verschiedenen Parameter anzuzeigen, die Sie konfigurieren können.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# set qos policy shaper MY-SHAPER class 30 match MY-FIRST-FILTER 
+Possible completions:
+   description  Description
+ &gt; ether        Ethernet header match
+   interface    Interface to use
+ &gt; ip           Match IP protocol header
+ &gt; ipv6         Match IPV6 protocol header
+   mark         Match on mark applied by firewall
+   vif          Virtual Local Area Network (VLAN) ID for this match
+</pre></div>
+</div>
+<p>Wie in dem Beispiel oben gezeigt, ist eines der Möglichkeiten, Pakete zu matchen, basierend auf Markierungen, die vom Firewall durchgeführt werden,
+<a class="reference external" href="https://blog.vyos.io/using-the-policy-route-and-packet-marking-for-custom-qos-matches">was Ihnen eine große Flexibilität bieten kann</a>.</p>
+<p>Sie können auch eine Beschreibung für einen Filter schreiben:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper MY-SHAPER class 30 match MY-FIRST-FILTER description &quot;My filter description&quot;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Eine IPv4 TCP-Filter wird nur Pakete mit einer IPv4-Header-Länge von 20 Bytes (was die meisten IPv4-Pakete ist) matchen.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>IPv6 TCP-Filter passen nur IPv6-Pakete ohne Header-Erweiterung an, siehe <a class="reference external" href="https://en.wikipedia.org/wiki/IPv6_packet#Extension_headers">https://en.wikipedia.org/wiki/IPv6_packet#Extension_headers</a></p>
+</div>
+</section>
+<section id="traffic-match-group">
+<h4>Verkehrs-Match-Gruppe</h4>
+<p>In einigen Fällen, in denen wir eine Organisation unserer Auswahl von Matches benötigen, um flexibler zu sein und unsere Filterdefinition zu organisieren, können wir Verkehrs-Match-Gruppen anwenden, um uns zu ermöglichen, verschiedene Filtergruppen innerhalb unserer Richtlinie zu erstellen und für jede Gruppe verschiedene Parameter zu definieren:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos traffic-match-group &lt;group_name&gt; match &lt;match_name&gt;
+Possible completions:
+   description          Description
+ &gt; ip                   Match IP protocol header
+ &gt; ipv6                 Match IPv6 protocol header
+   mark                 Match on mark applied by firewall
+   vif                  Virtual Local Area Network (VLAN) ID for this match
+</pre></div>
+</div>
+<p>Erben Sie Matches aus einer anderen Gruppe</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos traffic-match-group &lt;group_name&gt; match-group &lt;match_group_name&gt;
+</pre></div>
+</div>
+<p>Eine Match-Gruppe kann mehrere Kriterien enthalten und diese in derselben Richtlinie erben.</p>
+<p>Zum Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos traffic-match-group Mission-Critical match AF31 ip dscp &#39;AF31&#39;
+set qos traffic-match-group Mission-Critical match AF32 ip dscp &#39;AF42&#39;
+set qos traffic-match-group Mission-Critical match CS3 ip dscp &#39;CS3&#39;
+set qos traffic-match-group Streaming-Video match AF11 ip dscp &#39;AF11&#39;
+set qos traffic-match-group Streaming-Video match AF41 ip dscp &#39;AF41&#39;
+set qos traffic-match-group Streaming-Video match AF43 ip dscp &#39;AF43&#39;
+set qos policy shaper VyOS-HTB class 10 bandwidth &#39;30%&#39;
+set qos policy shaper VyOS-HTB class 10 description &#39;Multimedia&#39;
+set qos policy shaper VyOS-HTB class 10 match CS4 ip dscp &#39;CS4&#39;
+set qos policy shaper VyOS-HTB class 10 match-group &#39;Streaming-Video&#39;
+set qos policy shaper VyOS-HTB class 10 priority &#39;1&#39;
+set qos policy shaper VyOS-HTB class 10 queue-type &#39;fair-queue&#39;
+set qos policy shaper VyOS-HTB class 20 description &#39;MC&#39;
+set qos policy shaper VyOS-HTB class 20 match-group &#39;Mission-Critical&#39;
+set qos policy shaper VyOS-HTB class 20 priority &#39;2&#39;
+set qos policy shaper VyOS-HTB class 20 queue-type &#39;fair-queue&#39;
+set qos policy shaper VyOS-HTB default bandwidth &#39;20%&#39;
+set qos policy shaper VyOS-HTB default queue-type &#39;fq-codel&#39;
+</pre></div>
+</div>
+<p>In diesem Beispiel können wir beobachten, dass verschiedene DSCP-Kriterien basierend auf unserer QoS-Konfiguration innerhalb der gleichen Richtliniengruppe definiert werden.</p>
+</section>
+<section id="default">
+<h4>Standard</h4>
+<p>Wenn Sie oft auch Ihre <em>Standard</em>-Verkehrsrichtlinie konfigurieren müssen, so wie Sie es mit einer Klasse tun. <em>Standard</em> kann als Klasse betrachtet werden, da es sich so verhält. Es enthält jeden Verkehr, der keine der definierten Klassen getroffen hat, also ist es wie eine offene Klasse, eine Klasse ohne Matching-Filter.</p>
+</section>
+<section id="class-treatment">
+<h4>Klassen-Behandlung</h4>
+<p>Wenn eine Klasse eine Filter-Konfiguration hat, müssen Sie auch definieren, was Sie mit dem Verkehr dieser Klasse tun möchten, welche spezifische Traffic-Control-Behandlung Sie ihr geben möchten. Sie haben je nach Traffic-Policy, die Sie konfigurieren, unterschiedliche Möglichkeiten.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# set qos policy shaper MY-SHAPER class 30
+Possible completions:
+   bandwidth    Available bandwidth for this policy (default: auto)
+   burst        Burst size for this class (default: 15k)
+   ceiling      Bandwidth limit for this class
+   codel-quantum
+                Deficit in the fair queuing algorithm (default 1514)
+   description  Description
+   flows        Number of flows into which the incoming packets are classified(default 1024)
+   interval     Interval used to measure the delay (default 100)
++&gt; match        Class matching rule name
+   priority     Priority for rule evaluation
+   queue-limit  Maximum queue size
+   queue-type   Queue type for default traffic (default: fq-codel)
+   set-dscp     Change the Differentiated Services (DiffServ) field in the IP header
+   target       Acceptable minimum standing/persistent queue delay (default: 5)
+</pre></div>
+</div>
+<p>Zum Beispiel, mit <code class="code docutils literal notranslate">set qos policy shaper MY-SHAPER class 30 set-dscp EF</code> würden Sie den DSCP-Feldwert der Pakete in dieser Klasse auf Expedite Forwarding ändern.</p>
+<blockquote>
+<div><p>DSCP-Werte gemäß <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2474.html"><strong>RFC 2474</strong></a> und <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4595.html"><strong>RFC 4595</strong></a>:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Binärer Wert</p></th>
+<th class="head"><p>Konfiguriertes Wert</p></th>
+<th class="head"><p>Drop-Rate</p></th>
+<th class="head"><p>Beschreibung</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>101110</p></td>
+<td><p>46</p></td>
+<td><p>-</p></td>
+<td><p>Expedited forwarding (EF)</p></td>
+</tr>
+<tr class="row-odd"><td><p>000000</p></td>
+<td><p>0</p></td>
+<td><p>-</p></td>
+<td><p>Best effort traffic, default</p></td>
+</tr>
+<tr class="row-even"><td><p>001010</p></td>
+<td><p>10</p></td>
+<td><p>Niedrig</p></td>
+<td><p>Assured Forwarding(AF) 11</p></td>
+</tr>
+<tr class="row-odd"><td><p>001100</p></td>
+<td><p>12</p></td>
+<td><p>Mittel</p></td>
+<td><p>Assured Forwarding(AF) 12</p></td>
+</tr>
+<tr class="row-even"><td><p>001110</p></td>
+<td><p>14</p></td>
+<td><p>Hoch</p></td>
+<td><p>Assured Forwarding(AF) 13</p></td>
+</tr>
+<tr class="row-odd"><td><p>010010</p></td>
+<td><p>18</p></td>
+<td><p>Niedrig</p></td>
+<td><p>Assured Forwarding(AF) 21</p></td>
+</tr>
+<tr class="row-even"><td><p>010100</p></td>
+<td><p>20</p></td>
+<td><p>Mittel</p></td>
+<td><p>Assured Forwarding(AF) 22</p></td>
+</tr>
+<tr class="row-odd"><td><p>010110</p></td>
+<td><p>22</p></td>
+<td><p>Hoch</p></td>
+<td><p>Assured Forwarding(AF) 23</p></td>
+</tr>
+<tr class="row-even"><td><p>011010</p></td>
+<td><p>26</p></td>
+<td><p>Niedrig</p></td>
+<td><p>Assured Forwarding(AF) 31</p></td>
+</tr>
+<tr class="row-odd"><td><p>011100</p></td>
+<td><p>28</p></td>
+<td><p>Mittel</p></td>
+<td><p>Assured Forwarding(AF) 32</p></td>
+</tr>
+<tr class="row-even"><td><p>011110</p></td>
+<td><p>30</p></td>
+<td><p>Hoch</p></td>
+<td><p>Assured Forwarding(AF) 33</p></td>
+</tr>
+<tr class="row-odd"><td><p>100010</p></td>
+<td><p>34</p></td>
+<td><p>Niedrig</p></td>
+<td><p>Assured Forwarding(AF) 41</p></td>
+</tr>
+<tr class="row-even"><td><p>100100</p></td>
+<td><p>36</p></td>
+<td><p>Mittel</p></td>
+<td><p>Assured Forwarding(AF) 42</p></td>
+</tr>
+<tr class="row-odd"><td><p>100110</p></td>
+<td><p>38</p></td>
+<td><p>Hoch</p></td>
+<td><p>Assured Forwarding(AF) 43</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</section>
+<section id="embedding-one-policy-into-another-one">
+<h4>Einrichtung einer Richtlinie in eine andere Richtlinie</h4>
+<p>Oft brauchen wir es, eine Richtlinie in eine andere Richtlinie einzubauen. Es ist möglich, dies auf klassenbasierten Richtlinien zu tun, indem man eine neue Richtlinie in eine Klasse anhängt. Zum Beispiel könnten Sie verschiedene Richtlinien auf die verschiedenen Klassen einer Round-Robin-Richtlinie anwenden, die Sie konfiguriert haben.</p>
+<p>Eine häufige Anwendung ist der Fall, bei dem einige Richtlinien, um effektiv zu sein, auf eine Schnittstelle angewandt werden müssen, die direkt verbunden ist, wo die Engstelle ist. Wenn Ihr Router nicht direkt an die Engstelle angeschlossen ist, sondern ein Hop vorher, können Sie die Engstelle simulieren, indem Sie Ihre nicht-formende Richtlinie in eine klassenbasierte formende Richtlinie einbetten, damit sie wirkt.</p>
+<p>Sie können eine Richtlinie in eine Klasse durch die <code class="docutils literal notranslate">queue-type</code>-Einstellung konfigurieren.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper FQ-SHAPER bandwidth 4gbit
+set qos policy shaper FQ-SHAPER default bandwidth 100%
+set qos policy shaper FQ-SHAPER default queue-type fq-codel
+</pre></div>
+</div>
+<p>Wie in dem letzten Befehl des Beispiels oben gezeigt, ermöglicht die <code class="docutils literal notranslate">queue-type</code>-Einstellung diese Kombinationen. Sie können sie in vielen Richtlinien verwenden.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Einige Richtlinien beinhalten bereits andere eingebettete Richtlinien. Das ist der Fall bei Shaper: Jede seiner Klassen verwendet fair-queue, es sei denn, Sie ändern es.</p>
+</div>
+</section>
+</section>
+<section id="creating-a-traffic-policy">
+<h3>Erstellung einer Verkehrsrichtlinie</h3>
+<p>VyOS ermöglicht es Ihnen, den Verkehr auf viele verschiedene Weisen zu kontrollieren, hier werden wir jede Möglichkeit behandeln. Sie können so viele Richtlinien konfigurieren, wie Sie wollen, aber Sie können nur eine Richtlinie pro Schnittstelle und Richtung (eingehend oder ausgehend) anwenden.</p>
+<p>Einige Richtlinien können kombiniert werden, Sie können eine andere Richtlinie konfigurieren, die auf eine Klasse der Hauptrichtlinie angewandt wird.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hinweis</p>
+<p><strong>Wenn Sie nach einer Richtlinie für Ihren ausgehenden Verkehr suchen</strong>
+aber Sie wissen nicht, welche Sie benötigen und möchten nicht durch jede mögliche Richtlinie gehen, die hier gezeigt wird, <strong>unsere Wette ist, dass Sie wahrscheinlich eine</strong> Shaper <strong>Richtlinie suchen und Sie</strong> <a class="reference internal" href="#embed">Ihre Warteschlangen einstellen</a> <strong>möchten als FQ-CoDel</strong>.</p>
+</div>
+<section id="drop-tail">
+<h4>Drop Tail</h4>
+<div class="line-block">
+<div class="line"><strong>Warteschlange Disziplin:</strong> PFIFO (Packet First In First Out).</div>
+<div class="line"><strong>Wird angewandt auf:</strong> Ausgehender Verkehr.</div>
+</div>
+<p>Dies ist die einfachste Warteschlange, die Sie auf Ihren Verkehr anwenden können. Der Verkehr muss eine endliche Warteschlange durchlaufen, bevor er tatsächlich gesendet wird. Sie müssen definieren, wie viele Pakete diese Warteschlange enthalten kann.</p>
+<p>Wenn ein Paket gesendet werden muss, muss es durch diese Warteschlange gehen, also wird das Paket an das Ende gestellt. Wenn das Paket vollständig durch diese Warteschlange gegangen ist, wird es aus der Warteschlange entfernt und wird schließlich an die NIC weitergegeben, um tatsächlich gesendet zu werden.</p>
+<p>Trotzdem, dass die Drop-Tail-Richtlinie keine Pakete verlangsamt, können viele Pakete abgewiesen werden, wenn sie versuchen, am Ende der Warteschlange eingeordnet zu werden. Dies kann passieren, wenn die Warteschlange noch nicht genug Pakete aus ihrem Kopf freigegeben hat.</p>
+<p>Diese Richtlinie benötigt die geringsten Ressourcen für denselben Verkehr. Aber <strong>sehr wahrscheinlich benötigen Sie es nicht, da Sie nicht viel davon bekommen können. Manchmal wird es nur verwendet, um Logging zu ermöglichen.</strong></p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy drop-tail &lt;policy-name&gt; queue-limit &lt;number-of-packets&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-drop-tail-policy-name-queue-limit-number-of-packets" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um eine Drop-Tail-Richtlinie (PFIFO) zu konfigurieren. Wählen Sie einen eindeutigen Namen für diese Richtlinie und die Größe der Warteschlange, indem Sie die Anzahl der Pakete festlegen, die sie enthalten kann (maximal 4294967295).</p>
+</div>
+</div>
+</section>
+<section id="fair-queue">
+<h4>Fair Queue</h4>
+<div class="line-block">
+<div class="line"><strong>Warteschlange Disziplin:</strong> SFQ (Stochastic Fairness Queuing).</div>
+<div class="line"><strong>Wird angewandt auf:</strong> Ausgehender Verkehr.</div>
+</div>
+<p>Fair Queue ist ein work-conserving Scheduler, der die Übertragung von Paketen auf Basis von Flows plant, das heißt, es balanciert den Verkehr, indem es ihn über verschiedene Unterklassen verteilt, um Gerechtigkeit sicherzustellen, sodass jeder Flow in der Lage ist, Daten nacheinander zu senden, und verhindert, dass ein einzelner Flow den Rest übertönt.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fair-queue &lt;policy-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fair-queue-policy-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um eine Fair-Queue-Richtlinie zu erstellen und ihr einen Namen zu geben. Sie basiert auf dem Stochastic Fairness Queueing und kann auf ausgehenden Verkehr angewandt werden.</p>
+</div>
+</div>
+<p>Um den Verkehr zu trennen, verwendet Fair Queue einen Classifier, der auf Quelladresse, Zieladresse und Quellport basiert. Das Algorithmus fügt Pakete basierend auf diesen drei Parametern in Hash-Buckets ein. Jeder dieser Buckets sollte einen eindeutigen Flow darstellen. Da mehrere Flows möglicherweise in denselben Bucket hashen, wird das Hashingalgorithmus zu konfigurierbaren Intervallen gestört, sodass die Unfairness nur für kurze Zeit besteht. Die Störung kann jedoch zu unabsichtlicher Paketumordnung führen. Ein empfehlenswerter Wert könnte 10 Sekunden sein.</p>
+<p>Eine der Verwendungen von Fair Queue könnte die Minderung von Denial-of-Service-Angriffen sein.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fair-queue &lt;policy-name&gt; hash-interval &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fair-queue-policy-name-hash-interval-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um eine Fair-Queue-Richtlinie zu definieren, basierend auf dem Stochastic Fairness Queueing, und setzen Sie die Anzahl der Sekunden, zu denen ein neues Warteschlange-Algorithmen-Störung stattfinden wird (maximal 4294967295).</p>
+</div>
+</div>
+<p>Beim Entfernen aus der Warteschlange wird jede Hash-Bucket mit Daten in einem Round-Robin-Verfahren abgefragt. Sie können die Länge der Warteschlange konfigurieren.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fair-queue &lt;policy-name&gt; queue-limit &lt;limit&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fair-queue-policy-name-queue-limit-limit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um eine Fair-Queue-Richtlinie zu definieren, basierend auf dem Stochastic Fairness Queueing, und setzen Sie die maximale Anzahl der Pakete, die in der Warteschlange warten dürfen. Jedes weitere Paket wird abgewiesen.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Fair Queue ist eine nicht-formende (work-conserving) Richtlinie, also wird sie nur dann nützlich sein, wenn Ihr ausgehender Schnittstelle wirklich voll ist. Wenn nicht, wird VyOS die Warteschlange nicht besitzen und Fair Queue wird keine Wirkung haben. Wenn es Bandbreite auf dem physischen Link gibt, können Sie Fair-Queue in eine klassenbasierte formende Richtlinie einbetten, um sicherzustellen, dass sie die Warteschlange besitzt.</p>
+</div>
+</section>
+<section id="fq-codel">
+<h4>FQ-CoDel</h4>
+<div class="line-block">
+<div class="line"><strong>Warteschlange Disziplin:</strong> Fair/Flow Queue CoDel.</div>
+<div class="line"><strong>Wird angewandt auf:</strong> Ausgehender Verkehr.</div>
+</div>
+<p>Die FQ-CoDel-Richtlinie verteilt den Verkehr in 1024 FIFO-Warteschlangen und versucht, gute Dienste zwischen allen von ihnen zu gewährleisten. Sie versucht auch, die Länge aller Warteschlangen kurz zu halten.</p>
+<p>FQ-CoDel kämpft gegen Bufferbloat und reduziert die Latenz, ohne komplexe Konfigurationen zu benötigen. Es ist zur neuen Standard-Warteschlange Disciplin für die Schnittstellen einiger GNU/Linux-Distributionen geworden.</p>
+<p>Es verwendet ein stochastisches Modell, um ankommende Pakete in verschiedene Flows zu klassifizieren und bietet allen Flows, die die Warteschlange nutzen, einen fairen Anteil an der Bandbreite. Jeder Flow wird von der CoDel-Warteschlange verwaltet. Paketumordnung innerhalb eines Flows wird vermieden, da Codel intern eine FIFO-Warteschlange verwendet.</p>
+<p>FQ-CoDel basiert auf einem modifizierten Deficit Round Robin (DRR)-Warteschlange-Scheduler mit dem CoDel Active Queue Management (AQM)-Algorithmus, der auf jeder Warteschlange operiert.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>FQ-Codel ist eine nicht-formende (work-conserving) Richtlinie, also wird sie nur dann nützlich sein, wenn Ihr ausgehender Schnittstelle wirklich voll ist. Wenn nicht, wird VyOS die Warteschlange nicht besitzen und FQ-Codel wird keine Wirkung haben. Wenn es Bandbreite auf dem physischen Link gibt, können Sie FQ-Codel in eine klassenbasierte formende Richtlinie einbetten, um sicherzustellen, dass sie die Warteschlange besitzt. Wenn Sie sich nicht sicher sind, ob Sie Ihre FQ-CoDel-Richtlinie in einen Shaper einbetten müssen, tun Sie es.</p>
+</div>
+<p>FQ-CoDel ist für 10Gbit-Geschwindigkeiten mit seinen Standardparametern gut geeignet. Es könnte auch bei anderen Geschwindigkeiten ohne Konfiguration gut funktionieren, aber hier erklären wir einige Fälle, in denen Sie seine Parameter anpassen möchten.</p>
+<p>Wenn Sie es bei 1Gbit und niedrigerer Geschwindigkeit laufen lassen, möchten Sie vielleicht die <code class="docutils literal notranslate">queue-limit</code> auf 1000 Pakete oder weniger reduzieren. Bei Geschwindigkeiten wie 10Mbit möchten Sie sie auf 600 Pakete setzen.</p>
+<p>Wenn Sie FQ-CoDel in Shaper einbetten und hohe Geschwindigkeiten (100Mbit und höher) haben, können Sie den <code class="docutils literal notranslate">quantum</code> auf 8000 oder höher erhöhen, damit der Scheduler CPU spart.</p>
+<p>Auf niedrigen Geschwindigkeiten (unter 40Mbit) möchten Sie den <code class="docutils literal notranslate">quantum</code> auf etwas wie 300 Byte heruntersetzen.</p>
+<p>Bei sehr niedrigen Geschwindigkeiten (unter 3Mbit) möchten Sie neben der Anpassung des <code class="docutils literal notranslate">quantum</code> (300 bleibt gut) auch den <code class="docutils literal notranslate">target</code> auf etwas wie 15ms erhöhen und den <code class="docutils literal notranslate">interval</code> auf etwa 150 ms erhöhen.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fq-codel &lt;policy name&gt; codel-quantum &lt;bytes&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-codel-quantum-bytes" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um eine fq-codel-Richtlinie zu konfigurieren, ihren Namen festzulegen und die maximale Anzahl von Bytes (Standard: 1514) festzulegen, die aus einer Warteschlange gleichzeitig dekodiert werden.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fq-codel &lt;policy name&gt; flows &lt;number-of-flows&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-flows-number-of-flows" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um eine fq-codel-Richtlinie zu konfigurieren, ihren Namen festzulegen und die Anzahl der Unter-Warteschlangen (Standard: 1024), in die Pakete klassifiziert werden.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fq-codel &lt;policy name&gt; interval &lt;milliseconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-interval-milliseconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um eine fq-codel-Richtlinie zu konfigurieren, ihren Namen festzulegen und die Zeitspanne, die vom CoDel-Steuerungsloop verwendet wird, um zu erkennen, wann eine persistente Warteschlange entwickelt wird, sicherzustellen, dass die gemessene minimale Verzögerung nicht zu alt wird (Standard: 100ms).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fq-codel &lt;policy-name&gt; queue-limit &lt;number-of-packets&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-queue-limit-number-of-packets" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um eine fq-codel-Richtlinie zu konfigurieren, ihren Namen festzulegen und eine feste Grenze für die tatsächliche Warteschlange festzulegen. Wenn diese Grenze erreicht wird, werden neue Pakete abgewiesen (Standard: 10240 Pakete).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fq-codel &lt;policy-name&gt; target &lt;milliseconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-target-milliseconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um eine fq-codel-Richtlinie zu konfigurieren, ihren Namen festzulegen und die akzeptable minimale stehende/persistente Warteschlange Verzögerung festzulegen. Diese minimale Verzögerung wird identifiziert, indem der lokale Mindestverzögerungswert erfasst wird, den Pakete erfahren (Standard: 5ms).</p>
+</div>
+</div>
+<section id="example">
+<h5>Beispiel</h5>
+<p>Ein einfaches Beispiel für eine FQ-CoDel-Richtlinie, die innerhalb einer Shaper-Richtlinie funktioniert.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper FQ-CODEL-SHAPER bandwidth 2gbit
+set qos policy shaper FQ-CODEL-SHAPER default bandwidth 100%
+set qos policy shaper FQ-CODEL-SHAPER default queue-type fq-codel
+</pre></div>
+</div>
+</section>
+</section>
+<section id="limiter">
+<h4>Limiter</h4>
+<div class="line-block">
+<div class="line"><strong>Warteschlange Disziplin:</strong> Eingangspolicer.</div>
+<div class="line"><strong>Wird angewandt auf:</strong> Eingehender Verkehr.</div>
+</div>
+<p>Limiter ist eine solche Richtlinie, die Klassen verwendet (Eingang qdisc ist eigentlich eine klassenlose Richtlinie, aber Filter funktionieren darin).</p>
+<p>Der Limiter führt grundlegende Eingangspolicing von Verkehrsflüssen durch. Mehrere Klassen von Verkehr können definiert werden und Verkehrsbeschränkungen können auf jede Klasse angewandt werden. Obwohl der Policer ein Token-Bucket-Mechanismus intern verwendet, hat er nicht die Fähigkeit, ein Paket zu verzögern, wie es ein Formungsmechanismus tut. Verkehr, der die definierten Bandbreitenbegrenzungen überschreitet, wird direkt abgewiesen. Auch eine maximale erlaubte Burst kann konfiguriert werden.</p>
+<p>Sie können Klassen (bis zu 4090) mit unterschiedlichen Einstellungen und eine Standardrichtlinie konfigurieren, die auf jeden Verkehr angewandt wird, der keine der konfigurierten Klassen trifft.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Wenn Sie eine <strong>Formung</strong> für Ihren <strong>eingehenden</strong> Verkehr anwenden möchten, prüfen Sie den Abschnitt zu Eingangsschaltung.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy limiter &lt;policy-name&gt; class &lt;class ID&gt; match &lt;match-name&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-limiter-policy-name-class-class-id-match-match-name-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um einen Eingangspolicer zu konfigurieren, seinen Namen festzulegen, eine Klassen-ID (1-4090), einen Klassen-Überprüfungsnamen und seine Beschreibung.</p>
+</div>
+</div>
+<p>Wenn die Übereinstimmungsregeln für eine Klasse festgelegt sind, können Sie beginnen, wie Sie das übereinstimmende Verkehrsverhalten konfigurieren möchten.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy limiter &lt;policy-name&gt; class &lt;class-ID&gt; bandwidth &lt;rate&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-limiter-policy-name-class-class-id-bandwidth-rate" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um einen Eingangspolicer zu konfigurieren, seinen Namen festzulegen, eine Klassen-ID (1-4090) und die maximale erlaubte Bandbreite für diese Klasse.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy limiter &lt;policy-name&gt; class &lt;class-ID&gt; burst &lt;burst-size&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-limiter-policy-name-class-class-id-burst-burst-size" title="Permalink to this Command"></a></div><div class="
+
+="Zwei:p></p>span> </p> <span:body">
+<p>0, value=" /p></p></p> <p>;</p> <p> <codeel \text="label>
+code:p>p>reset="l</p>p>p>l</p><codeularv</p></p</p<code>0p<p>abel>p></p</p>p</p>ue</p</p> <p</p> <p</p</p>p</p</p</p</p</p<p> <p>p<p></p</p</p</p</p</p>p</p>p</p</p</</p</p</p<p<p><p><code></p<p</p</p<p</code></p<p</div>
+</div>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="rpki">
+<h1>RPKI</h1>
+<p><abbr title="Ресурсная система открытых ключей">RPKI</abbr> — это архитектура, предназначенная для обеспечения безопасности инфраструктуры маршрутизации интернета. Она криптографически связывает префиксы IP-адресов с правильными исходящими
+<abbr title="Номера автономных систем">ASNs</abbr>. Маршрутизаторы BGP могут использовать эту информацию для проверки источника каждого маршрута против соответствующего
+<abbr title="Авторизация маршрута">ROA</abbr> на соответствие требованиям. RPKI описана в
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6480">RFC 6480</a>.</p>
+<p>Маршрутизаторы BGP могут получать информацию ROA из программного обеспечения RPKI Relying Party, также известного как сервер RPKI или валидатор, с использованием протокола RTR. Открытое программное обеспечение включает
+<a class="reference external" href="https://www.nlnetlabs.nl/projects/routing/routinator/">Routinator</a> (Rust) от NLnet Labs, 
+<a class="reference external" href="https://www.rpki-client.org/">rpki-client</a> (C) от OpenBSD и 
+<a class="reference external" href="https://github.com/bgp/stayrtr">StayRTR</a> (Go). Протокол RTR описан в
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc8210">RFC 8210</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Совет</p>
+<p>Если вы новичок в области безопасности маршрутизации, документация по RPKI, поддерживаемая NLnet Labs,
+быстро поможет вам освоиться. Она охватывает все, от основных понятий до развертывания в производственной среде.</p>
+</div>
+<section id="getting-started">
+<h2>Начало работы</h2>
+<p>Сначала вам нужно развернуть валидатор RPKI для ваших маршрутизаторов. Документация по RPKI, поддерживаемая NLnet Labs,
+предоставляет подробный список открытого программного обеспечения, которое вы можете сравнить и выбрать. После запуска выбранного сервера, ваши маршрутизаторы смогут начать проверку объявлений.</p>
+<p>После проверки импортированные маршруты могут иметь один из следующих состояний:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">valid</code>: Префикс и исходящий ASN совпадают с подписанным ROA. Эти объявления маршрутов считаются надежными.</p></li>
+<li><p><code class="docutils literal notranslate">invalid</code>: Префикс, длина префикса или исходящий ASN не совпадают ни с одним существующим ROA. Это может указывать на захват префикса или неправильную конфигурацию
+и должно рассматриваться как недоверенное.</p></li>
+<li><p><code class="docutils literal notranslate">notfound</code>: Нет ROA, покрывающего префикс. На начало 2024 года это относится примерно к 40%–50% префиксов, объявленных в
+<abbr title="Зона без умолчания">DFZ</abbr>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если вы управляете глобальными IP-адресами для вашей сети, убедитесь, что их префиксы имеют связанные ROA, чтобы предотвратить их отметку как <code class="docutils literal notranslate">notfound</code> в RPKI.</p>
+</div>
+<p>Для большинства сетевых операторов это включает публикацию ROA через соответствующие
+<abbr title="Региональные регистры интернет-ресурсов">RIR</abbr>, такие как ARIN, RIPE NCC, APNIC, LACNIC или AFRINIC. Очень рекомендуется создавать ROA для любых IP-префиксов, которые вы планируете объявлять в DFZ.</p>
+<p>Особенно крупные сети могут выбрать запуск собственного центра сертификации RPKI и сервера публикации вместо публикации ROA через свой RIR.
+Эта тема выходит за рамки документации VyOS. Для получения дополнительной информации рассмотрите ресурсы о
+<a class="reference external" href="https://www.nlnetlabs.nl/projects/routing/krill/">Krill</a>.</p>
+</section>
+<section id="current-implementation">
+<h2>Текущая реализация</h2>
+<p>Текущая реализация включает следующие функции:</p>
+<ul class="simple">
+<li><p>Маршрутизатор BGP подключается к одному или нескольким серверам кэша RPKI для получения проверенных сопоставлений префикса с источником AS. Для реализации продвинутой отказоустойчивости можно настроить несколько серверов кэша с разными значениями приоритета.</p></li>
+<li><p>Если соединение с сервером кэша RPKI не установлено после заданного времени ожидания, маршрутизатор обрабатывает маршруты без проверки источника префикса. Он будет продолжать попытки подключения к серверу кэша RPKI в фоновом режиме.</p></li>
+<li><p>По умолчанию включение RPKI не влияет на выбор лучшего пути. Неверные префиксы все еще рассматриваются при выборе лучшего пути, но вы можете настроить маршрутизатор так, чтобы он игнорировал их.</p></li>
+<li><p>Вы можете настроить карты маршрутов для соответствия определенному состоянию проверки RPKI.
+Это позволяет создавать локальные политики, которые обрабатывают маршруты BGP на основе результатов проверки источника префикса.</p></li>
+<li><p>Обновления от серверов кэша RPKI применяются напрямую, и выбор пути обновляется соответственно. Примечание: необходимо включить мягкую переконфигурацию BGP для этой функции.</p></li>
+</ul>
+</section>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rpki polling-period &lt;1-86400&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rpki-polling-period-1-86400" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интервал, в секундах, через который маршрутизатор опрашивает сервер кэша RPKI на наличие обновлений.</strong></p>
+<p>Значение по умолчанию составляет 300 секунд.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki polling-period 600
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rpki expire-interval &lt;600-172800&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rpki-expire-interval-600-172800" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интервал, в секундах, через который маршрутизатор истекает срок действия своего кэшированного RPKI-данных.</strong></p>
+<p>Значение по умолчанию составляет 7200 секунд.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki expire-interval 14400
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rpki retry-interval &lt;1-7200&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rpki-retry-interval-1-7200" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интервал, в секундах, перед повторной попыткой подключения к серверу кэша RPKI после неудачного подключения.</strong></p>
+<p>Значение по умолчанию составляет 600 секунд.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki retry-interval 60
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rpki cache &lt;address&gt; port &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rpki-cache-address-port-1-65535" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте адрес и порт сервера кэша RPKI.</strong></p>
+<p>Адрес можно указать как IPv4 или IPv6-адрес, или как
+<abbr title="Полное имя домена">FQDN</abbr>.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Вам нужно настроить оба параметра <code class="docutils literal notranslate">port</code> и <code class="docutils literal notranslate">preference</code> для каждого IP-адреса сервера кэша.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki cache 192.0.2.1 port 3323
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rpki cache &lt;address&gt; preference &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rpki-cache-address-preference-1-255" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте значение приоритета для сервера кэша RPKI.</strong></p>
+<p>При настройке нескольких серверов кэша маршрутизатор приоритетно подключается к серверу с наименьшим значением приоритета.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Вам нужно настроить оба параметра <code class="docutils literal notranslate">port</code> и <code class="docutils literal notranslate">preference</code> для каждого IP-адреса сервера кэша.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Значения <code class="docutils literal notranslate">preference</code> должны быть уникальны среди серверов кэша.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki cache 192.0.2.1 preference 1
+</pre></div>
+</div>
+<section id="ssh">
+<h3>SSH</h3>
+<p>Вы можете подключиться к серверу кэша RPKI с помощью протокола RTR через обычный TCP или через SSH. SSH обеспечивает целостность и конфиденциальность транспорта. Используйте SSH, если ваша программа проверки поддерживает этот вариант.</p>
+<p>Чтобы использовать аутентификацию SSH, выполните следующие шаги:</p>
+<p><strong>Шаг 1.</strong> Создайте пару ключей SSH клиента:</p>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+generate ssh client-key /config/auth/id_rsa_rpki
+<a class="cmdlink" href="#opcmd-generate-ssh-client-key-config-auth-id-rsa-rpki" title="Перемещение к этой команде"></a></div></div>
+<p><strong>Шаг 2.</strong> Извлеките часть base64 из обоих ключей, а также идентификатор алгоритма публичного ключа:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre>   grep -v &quot;PRIVATE KEY&quot; /config/auth/id_rsa_rpki | tr -d &#39;\n&#39;
+   awk &#39;{print $2}&#39; /config/auth/id_rsa_rpki.pub
+   awk &#39;{print $1}&#39; /config/auth/id_rsa_rpki.pub
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Подсистема PKI принимает только часть base64 каждого ключа, без PEM/OpenSSH заголовков, подвалов или разрывов строк. Если вы вставите содержимое файла напрямую, коммит не удастся.</p>
+</div>
+<p><strong>Шаг 3.</strong> Импортируйте пару ключей в подсистему PKI:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>   set pki openssh &lt;name&gt; private key &lt;base64-encoded-private-key&gt;
+   set pki openssh &lt;name&gt; public key &lt;base64-encoded-public-key&gt;
+   set pki openssh &lt;name&gt; public type &lt;type&gt;
+</pre></div>
+</div>
+<p>После импорта пары ключей настройте соединение SSH, используя приведенные ниже команды.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rpki cache &lt;address&gt; ssh username &lt;user&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rpki-cache-address-ssh-username-user" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте имя пользователя SSH для аутентификации на сервере кэша RPKI.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki cache 192.0.2.1 ssh username rpki-user
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rpki cache &lt;address&gt; ssh key &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rpki-cache-address-ssh-key-name" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте имя пары ключей OpenSSH, используемой для аутентификации на сервере кэша RPKI.</strong></p>
+<p>Параметр <code class="docutils literal notranslate">&lt;name&gt;</code> должен совпадать с именем пары ключей, ранее определенным в командах
+<code class="docutils literal notranslate">set pki openssh</code>.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki cache 192.0.2.1 ssh key rpki
+</pre></div>
+</div>
+</section>
+</section>
+<section id="example">
+<h2>Пример</h2>
+<p>Следующий пример демонстрирует, как подключиться к серверу кэша RPKI
+(например, Routinator) и создать маршрут импорта для фильтрации префиксов на основе их состояния проверки.</p>
+<p>Сначала настройте подключение к серверу кэша RPKI по адресу <code class="docutils literal notranslate">192.0.2.1</code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki cache 192.0.2.1 port &#39;3323&#39;
+set protocols rpki cache 192.0.2.1 preference &#39;1&#39;
+</pre></div>
+</div>
+<p>Далее создайте карту маршрутов для применения к вашим входящим обновлениям BGP. Эта политика определяет следующее поведение:</p>
+<ul class="simple">
+<li><p>Разрешает <code class="docutils literal notranslate">valid</code> префиксы и назначает высокий локальный приоритет (300).</p></li>
+<li><p>Разрешает <code class="docutils literal notranslate">notfound</code> префиксы, но назначает более низкий локальный приоритет (125).</p></li>
+<li><p>Отклоняет префиксы со статусом <code class="docutils literal notranslate">invalid</code>.</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set policy route-map ROUTES-IN rule 10 action &#39;permit&#39;
+set policy route-map ROUTES-IN rule 10 match rpki &#39;valid&#39;
+set policy route-map ROUTES-IN rule 10 set local-preference &#39;300&#39;
+
+set policy route-map ROUTES-IN rule 20 action &#39;permit&#39;
+set policy route-map ROUTES-IN rule 20 match rpki &#39;notfound&#39;
+set policy route-map ROUTES-IN rule 20 set local-preference &#39;125&#39;
+
+set policy route-map ROUTES-IN rule 30 action &#39;deny&#39;
+set policy route-map ROUTES-IN rule 30 match rpki &#39;invalid&#39;
+</pre></div>
+</div>
+<p>После настройки ваших маршрутизаторов на отклонение RPKI-недопустимых префиксов, проверьте настройку, используя <a class="reference external" href="https://isbgpsafe.com/">веб-сайт Cloudflare</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Убедитесь, что нет маршрутов по умолчанию или других путей, которые направляли бы трафик к RPKI-недопустимым пунктам назначения. В противном случае тест может сообщить, что маршрутизатор является небезопасным.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

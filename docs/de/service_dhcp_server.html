@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="dhcp-server">
+<h1>DHCP-Server</h1>
+<p>VyOS verwendet den Kea DHCP-Server für die Zuweisung von IPv4- und IPv6-Adressen.</p>
+<section id="ipv4-server">
+<h2>IPv4-Server</h2>
+<p>Die Netzwerktopologie wird durch shared-network-name und Subnetzdeklarationen definiert. Der DHCP-Dienst kann mehrere gemeinsame Netzwerke bedienen, wobei jedes gemeinsame Netzwerk 1 oder mehrere Subnetze haben kann. Jedes Subnetz muss auf einem Interface vorhanden sein. Ein Bereich kann innerhalb eines Subnetzes deklariert werden, um einen Pool dynamischer Adressen zu definieren. Mehrere Bereiche können definiert werden und können Löcher enthalten. Statische Zuordnungen können eingerichtet werden, um „statische“ Adressen an Clients basierend auf deren MAC-Adresse zuzuweisen.</p>
+<section id="configuration">
+<h3>Konfiguration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server hostfile-update
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-hostfile-update" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Erstellen Sie einen DNS-Eintrag pro Client-Lease, indem Sie Clients zur Datei /etc/hosts hinzufügen.
+Der Eintrag hat das Format: <code class="docutils literal notranslate">&lt;shared-network-name&gt;_&lt;hostname&gt;.&lt;domain-name&gt;</code></p>
+</div>
+</div>
+<section id="shared-network-options">
+<h4>Gemeinsame Netzwerkoptionen</h4>
+<p>Die folgenden DHCP-Optionen gelten für ein ganzes gemeinsames Netzwerk. Alle Subnetze erben diese Werte, es sei denn, die gleiche Option ist lokal festgelegt.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option bootfile-name &lt;filename&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-bootfile-name-filename" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Bootdateiname (DHCP Option 67).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option bootfile-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-bootfile-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Server, von dem die initiale Bootdatei geladen werden soll (DHCP siaddr-Feld).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option bootfile-size &lt;size&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-bootfile-size-size" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Bootdateigröße in 512-Byte-Blöcken (DHCP Option 13).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option captive-portal &lt;url&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-captive-portal-url" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Captive Portal API-Endpunkt (DHCP Option 114).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option capwap-controller &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-capwap-controller-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IP-Adresse des CAPWAP-Zugriffscontrollers (DHCP Option 138).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option client-prefix-length &lt;prefix-length&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-client-prefix-length-prefix-length" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt das Client-Subnetzmaske gemäß RFC 950 an. Wenn nicht gesetzt, wird die Subnetzdeklaration verwendet (DHCP Option 1).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option default-router &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-default-router-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IP-Adresse des Standardrouters (DHCP Option 3).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option domain-name &lt;domain-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-domain-name-domain-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Der domain-name-Parameter sollte der Domänenname sein, der dem Hostnamen des Clients angehängt wird, um einen vollständigen Domänennamen (FQDN) zu bilden (DHCP Option 15).</p>
+<p>Dies ist der Konfigurationsparameter für die gesamte gemeinsame Netzwerkkonfiguration. Alle Subnetze erben diesen Konfigurationswert, sofern nicht lokal festgelegt.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option domain-search &lt;domain-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-domain-search-domain-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Der domain-name-Parameter sollte der Domänenname sein, der bei der Vervollständigung von DNS-Anfragen verwendet wird, wenn kein vollständiger FQDN übergeben wird. Diese Option kann mehrmals angegeben werden, falls mehrere Suchdomänen erforderlich sind (DHCP Option 119).</p>
+<p>Dies ist der Konfigurationsparameter für die gesamte gemeinsame Netzwerkkonfiguration. Alle Subnetze erben diesen Konfigurationswert, sofern nicht lokal festgelegt.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option interface-mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Client-Interface-MTU (DHCP Option 26).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option ip-forwarding
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-ip-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IP-Weiterleitung auf dem Client aktivieren (DHCP Option 19).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option ipv6-only-preferred &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-ipv6-only-preferred-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Deaktiviert IPv4 auf IPv6-only-Geräten für die angegebene Anzahl von Sekunden (RFC 8925, DHCP Option 108).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; 
+...</div-cfg">
+<div class="cfgcmd-body">
+<p>Bootstrap date</div>
+<div class="cfgcmd-body">
+<p>Größe</div>
+<div class="cfgcmd-body">
+<p>
+<p>Option</div>
+<div class="cmd">
+<div class="cmd">
+<p>
+<p>Option</div>
+<p>
+<p>
+<div class>
+<div class="cfgcmd-body">
+<p>Größe</div>
+<p>
+<p>
+<div class="cmd-body">
+<p>
+<p>
+</div>
+<p>
+</div>
+</div>
+<div class="cmd-body-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option bootfile-name &lt;name>&lt</div class="cmd-link" href="#cfgcmd-set-service-dhcp-server-name-name-name&lt;>
+<div>
+<div class="cmd-link">
+</div>
+<div>
+<div class="cmd-body>
+<p>
+<p>
+<p>
+<p>
+</div>
+<div>
+<div>
+<p>
+</div>
+<div>
+<div>
+</div>
+</div>
+<div class="cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option bootfile-name &lt;name&gt;
+<div class="cmd-link" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name&lt;name&gt; option name-server &lt;address&gt;
+ 
+</div>
+<div class="cfgcmd-body">
+<p>IP-Adresse des CAPWAP-Accesspoint</div>
+<div>
+<p>
+</div>
+</div>
+</div>
+</div>
+<div class="cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service service dhcp-server shared-network-name &lt;name&gt; option file-name &lt;
+<a class="href="http://>
+</="">
+</div>
+<div">
+<div>
+<p>Informieren Sie den Client darüber, dass der DNS-Server unter <code class="docutils literal notranslate">&lt;address&gt;</code> gefunden werden kann (DHCP Option 6). Dies ist der Konfigurationsparameter für die gesamte gemeinsame Netzwerkkonfiguration.Alle Subnetze erben diesen Konfigurationswert, sofern nicht lokal festgelegt. Mehrere DNS-Server können definiert werden.</ </p> 
+</div> 
+</div> 
+<div<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &&lt;name&gt; option ntp-server 
+&lt;address&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-ntp-server-address" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>IP-Adresse des NTP-Servers (DHCP Option 42). Diese Option kann mehrmals angegeben werden.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &lt>
+<p> 
+<p>
+<p>
+<p>
+</p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+</p>
+<p>
+</p>
+<p>
+</div>
+</div>
+<div>
+<div>
+<div>
+<div>
+<div>
+<div>
+<div>
+<div>
+<div>
+<p>
+<p>
+</div>
+</div>
+<div>
+<div>
+<div>
+<div>
+<div>
+<div>
+<div>
+<div>
+<div>
+</div>
+<div>
+</div>
+</div>
+<div>
+</div>
+<div>
+</div>
+</div>
+<div>
+<div class="cmd-cfg 
+<div class="cfgcmd-body"> 
+<p>IP-Adresse des POP3-Servers (DHCP Option 70). Diese Option kann mehrmals angegeben werden.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &lt;name&gt; option server-identifier &lt;address&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-server-identifier-address" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>Adresse für DHCP-Server-Identifier (DHCP Option 54).</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &lt;name&gt; option smtp-server &lt;address&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-smtp-server-address" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>IP-Adresse des SMTP-Servers (DHCP Option 69). Diese Option kann mehrmals angegeben werden.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &lt;name&gt; option static-route & 
+&lt;subnet&gt 
+next-hop &lt;address&gt; 
+<a class class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-static-route-subnet-next-hop-address" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>Classless static route destination subnet ( DHCP Options 121 and 249). This option can be specified multiple times"> 
+<div class="cfgcmd"> 
+set service dhcp-server shared-network-name &lt;name&gt; option ipv6-only-preferred &lt;seconds&gt; 
+class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-ipv6-only-preferred</div> 
+</div>
+</div> 
+</div> 
+<div class="cfgcmd-body"> 
+</aktiviert IPv4 auf IPv6-only-Host. 
+</div 
+</div>
+</div> 
+</div>
+</div>
+</div> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &lt;name&gt; option tftp-server-name &lt;server-name&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-tftp-server-name-server-name" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>TFTP-Server-Name (DHCP Option 66).</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfgcmd-body"> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p>Client subnet offset in seconds from Coordinated Universal Time (UTC) (DHCP-<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p> 
+<p>Time zone to send to clients (DHCP Options 100 and 101, <code class="docutils literal notranslate">pcode</code> and <code class="docutils literal notranslate">tcode</code>, RFC 4833).</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &lt;name&gt; option vendor-option &lt;vendor&gt; &lt;option-name&gt; &lt;value&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-vendor-option-vendor-option-name-value" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>This configuration parameter lets you specify a vendor-option for the entire shared network definition. All subnets will inherit this configuration item if not specified locally (DHCP Option 43). An example for Ubiquiti is shown below:</p> 
+</div> 
+</div> 
+<p><strong>Example:</strong></p> 
+<p>Pass address of Unifi controller at <code class="docutils literal notranslate">172.16.100.1</code> to all clients of <code class="docutils literal notranslate">NET1</code></p> 
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server shared-network-name &#39;NET1&#39; option vendor-option ubiquiti unifi-controller &#39;172.16.100.1&#39;</pre></div> 
+</div<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &lt;name&gt; option wins-server &lt;address&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-wins-server-address" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>IP-Adresse des Windows Internet Name Service (WINS)-Servers (DHCP Option 44). Diese Option kann mehrmals angegeben werden.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &lt;name&gt; option wpad-url &lt;url&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-wpad-url-url" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>Web Proxy Autodiscovery (WPAD) URL (DHCP Option 252).</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server listen-address &lt;address&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-listen-address-address" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>This configuration parameter lets the DHCP server to listen for DHCP requests sent to the specified address, it is only realistically useful for a server whose only clients are reached via unicasts, such as via DHCP relay agents.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server log-level &lt;fatal | error | warn | info | debug&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-log-level-fatal-error-warn-info-debug" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>Set the logging verbosity of the Kea DHCP server. The default level is <code class="docutils literal notranslate">info</code>.</p> 
+</div> 
+</div> 
+</section> 
+<section id="individual-client-subnet"> 
+<h4>Individ 
+</div> 
+<div class="cfgcmd-body"> 
+<p> 
+</div> 
+<div class="cfgcmd-body"> 
+<p> 
+<div class="cfgcmd-body"> 
+<p> 
+<div class="cfgcmd-body"> 
+<p> 
+<div class="cfgcmd-body"> 
+<p> 
+<div class="set="set="set="set="set</div="set="set="set 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &lt;name&gt; authoritative 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-authoritative" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>This says that this device is the only DHCP server for this network. If other devices are trying to="set="set="set="set="set="="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set 
+<div="set="set="set="set="set="set 
+<div="set="set="set="set="set="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>This configuration parameter is="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="="set="set="set="set="set 
+<div class="cfgcmd-body"> 
+<p>This configuration parameter is="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set 
+<div class="cfgcmd="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>It is required to map subnets to lease file entries.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; subnet-id &lt;id&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-subnet-id-id" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>This configuration parameter is required and must be unique to each subnet. It is required to map subnets to lease file entries.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; option default-router &lt;address&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network="set="network="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>This is a configuration parameter for the <code class="docutils literal notranslate">&lt;subnet&gt;</code>, saying that as part of the response, tell the client that the default gateway can be reached at <code class="docutils literal notranslate">&lt;address&gt;</code> (DHCP Option 3).</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; option name-server &lt;address&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-option-name-server-address" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>This is a configuration parameter for the subnet, saying that as part of the response, tell the client that the DNS server can be found at <code class="docutils literal notranslate">&lt;address&gt;</code> (DHCP Option 6).</p> 
+<p>Multiple DNS servers can be defined.</p="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="="set="set="set="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>Assign the IP address to this machine for <code class="docutils literal notranslate">&lt;time&gt;</code> seconds.</p> 
+<p>The default value is 86400 seconds which corresponds to one day.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfg="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="="="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set 
+<div="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="="set="set="set="set="set="set="set="set="set="set="set="set="="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>Create DHCP="set="set="set="set="set="set="set="set="="="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>Always exclude this address from any defined range. This address will never be assigned by the DHCP server.</p> 
+<p>This option can be specified multiple times.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet="set="set="set="set="set="set="="set="set="set="="="="="="set="set="set="set="set="set="set="set="="set="="="="="="set="="set="set="="="="="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>The domain-name parameter should be the domain name that will be appended to the client’s hostname to form a fully-qualified domain-name (FQDN) (DHCP Option 15).</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; option domain-search &lt="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>The domain-name parameter should be the domain name used when completing DNS request where no full FQDN is passed. This option can be given multiple times if you need multiple search domains (DHCP Option 119).</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; option vendor-option &lt;vendor&gt; &lt;option-name&gt; &lt;value&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-option-vendor-option-vendor-option-name-value" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfg="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="="="set="set="set="set="set="set="="set="set="set="set="set="="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="="="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>This configuration parameter lets you specify a vendor-option for the subnet specified within the shared network definition (DHCP Option 43). An example for Ubiquiti is shown below:</p> 
+</div> 
+</div> 
+<p><strong>Example:</strong></p> 
+<p>Create <code class="docutils literal notranslate">172.18.201.set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set 
+<div class="cfgcmd-body"> 
+<p>These settings can be configured on the global level and overridden on the scope level, i.e. for individual shared networks or subnets. See examples below.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server dynamic-dns-update send-updates &lt;enable | disable&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-send-updates-enable-disable" title="Permalink to this Command"></a> 
+</div> 
+<div class="set="set 
+<div class="cfgcmd-body"> 
+<p>If set to <code class="docutils literal notranslate">enable</code> on global level, updates for all scopes will be enabled, except if explicitly set to <code class="docutils literal notranslate">disable</code> on the scope level. If set to <code class="docutils literal notranslate">disable</code>, updates will only be sent for scopes, where <code class="docutils literal notranslate">send-updates</code> is explicitly set to <code class="docutils literal notranslate">enable</code>.</p> 
+<p>This model is followed for a few behavioral settings below: if the option is not set, the setting is inherited from the parent scope. You can override the parent scope setting by setting the option explicitly.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server dynamic-dns-update override-no-update &lt;enable | disable&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-override-no-update-enable-disable" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>VyOS will ignore client request not to update DNS records and send DDNS update requests regardless.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server dynamic-dns-update override-client-update &lt;enable | disable&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-override-client-update-enable-disable" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>VyOS will override client DDNS request settings and always update both forward and reverse DNS records.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server dynamic-dns-update update-on-renew &lt;enable | disable&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-update-on-renew-enable-disable" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>Issue DDNS update requests on DHCP lease renew. In busy networks this may generate a lot of traffic.</p> 
+</set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>Use RFC-4703 conflict resolution. This algorithm helps in situation when multiple clients reserve same IP addresses or advertise identical hostnames. Should be used in="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div="set="set="set="set="set="set="set="set="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>Replace the name the client sent with a generated one, if the client didn’t send any, do not generate one</p> 
+</div> 
+</div> 
+<div="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set 
+<div="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set 
+<div="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div="set="set="set="set="set="set="set="set="set="set="="set="set="set="set="set 
+<div class="cfgcmd-body"> 
+<p>Prefix used in client name generation.</set="set="set="set="set="="set="set="set 
+<div class="cfgcmd-body"> 
+<p>DNS suffix used in client="set="set="set="set="set="set="set="set="="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="="set="set="="set="set="set="set="set="set="set="set="="set="set="="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="="="="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>Characters, that are considered invalid in the client name. They will be replaced with <code class="docutils literal notranslate">hostname-char-replacement</code> string.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server dynamic-dns-update hostname-char-replacement &lt;character string&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-hostname-char-re="set="set="set="set="set="set="set="set="set="set="set="set="set 
+<div class="cfgcmd-body"> 
+<p>Replacement string for the invalid characters defined by <code class="docutils literal notranslate">hostname-char-set</code>.</p> 
+</div> 
+</div> 
+<p><strong>TSIG keys definition</strong></p> 
+<p>This is the global list of TSIG keys for DDNS updates. They need to be specified by the name in the DNS domain definitions.</p> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server dynamic-dns-update tsig-key &lt;key-name&gt; algorithm &lt;algorithm&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-tsig-key-key-name-algorithm-algorithm" title="Permalink to this="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>Sets the algorithm for the TSIG key. Supported algorithms are <code class="docutils literal notranslate">hmac-md5</code>, <code class="docutils literal notranslate">hmac-sha1</code>, <code class="docutils literal notranslate">hmac-sha224</code>, <code class="docutils literal notranslate">hmac-sha256</code>, <code class="docutils literal notranslate">hmac-sha384</code>, <code class="docutils literal notranslate">hmac-sha512</code></p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server dynamic-dns-update tsig-key &lt;key-name&gt; secret &lt;key-secret&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-tsig-key-key-name-secret-key-secret" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>base64-encoded TSIG key secret value</p> 
+</div> 
+</div> 
+<p><strong>DNS domains definition</strong></p> 
+<p>This is global configuration of DNS servers for the updatable forward and reverse DNS domains. For every domain multiple DNS servers can be specified.</p> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server dynamic-dns-update [forward|reverse]-domain &lt;domain-name&gt; key-name &lt;tsig-key-name&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-forward-reverse-domain-domain-name-key-name-tsig-key-name" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>TSIG key used for the domain.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server dynamic-dns-update [forward|reverse]-domain &lt;domain-name&gt; dns-server &lt;number&gt; address &lt;ip-address&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-forward-reverse-domain-domain-name-dns-server-number-address-ip-address" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>IP address of the DNS server.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server dynamic-dns-update [forward|reverse]-domain &lt;domain-name&gt; dns-server &lt;number&gt; port &lt;port&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-forward-reverse-domain-domain-name-dns-server-number-port-port" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>UDP port of the DNS server. <code class="docutils literal notranslate">53</code> is the default.</p> 
+</div> 
+</div> 
+<p><strong>Example:</strong></p> 
+<p>Global configuration you will most likely want:</p> 
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server dynamic-dns-update send-updates enable
+set service dhcp-server dynamic-dns-update conflict-resolution enable
+</pre></div>
+</div>
+<p>Override the above configuration for a shared network NET1:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server shared-network-name 'NET1' dynamic-dns-update replace-client-name when-not-present
+set service dhcp-server shared-network-name 'NET1' dynamic-dns-update generated-prefix ip
+set service dhcp-server shared-network-name 'NET1' dynamic-dns-update qualifying-suffix mybigdomain.net
+</pre></div>
+</div>
+<p>And in a subnet within the same shared network:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server shared-network-name 'NET1' subnet '172.18.201.0/24' dynamic-dns-update qualifying-suffix mydomain.net
+</pre></div>
+</div>
+<p>Configure TSIG keys:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server dynamic-dns-update tsig-key mydomain-net algorithm hmac-sha256
+set service dhcp-server dynamic-dns-update tsig-key mydomain-net secret eWF5YW15bGl0dGxla2V5IQ==
+set service dhcp-server dynamic-dns-update tsig-key reverse-172-18-201 algorithm hmac-sha256
+set service dhcp-server dynamic-dns-update tsig-key reverse-172- <span="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>Base64 encoded TSIG key secret value</p> 
+</div> 
+</div> 
+<p><strong>DNS domains definition</strong></p> 
+<p>This is global configuration of DNS servers for the updatable forward and reverse DNS domains. For every domain multiple DNS servers can be specified.</p> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server dynamic-dns-update [forward|reverse]-domain &lt;domain-name&gt; key-name &lt;tsig-key-name&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic"
+</set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>TSIG key used for the domain.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server dynamic-dns-update [forward|reverse]-domain &lt;domain-name&gt; dns-server &lt;number&gt; address &lt;ip-address&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-forward-reverse-domain-domain-name-dns-server-number-address-ip-address" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>IP address of the DNS server.</p> 
+</div> 
+</div> 
+<div class="cmd cmd="set="set="set="set="set="set="set="set="set="set="set="set="set 
+<div class="cfgcmd-body"> 
+<p>UDP port of the DNS server. <code class="docutils literal notranslate">53</code> is the default.</p> 
+</div> 
+</div> 
+<p><strong>Example:</strong></p> 
+<p>Global configuration you will most likely want:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set 
+<div class="cfgcmd-body"> 
+<p>IP address of the DNS server.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server dynamic-dns-update [forward|reverse]-domain &lt;domain-name&gt; dns-server &lt;number&gt; port &lt;port&gt; 
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-forward-reverse-domain-domain-name-dns-server-number-port-port" title="Permalink to this Command"></a> 
+</div> 
+<div class="cfgcmd-body"> 
+<p>UDP port of the DNS server. <code class="docutils literal notranslate">53</code> is the default.</p> 
+</div> 
+</div> 
+<p><strong>Example:</strong></p> 
+<p>Global configuration you will most likely want:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server dynamic-dns-update send-updates enable
+set service dhcp-server dynamic-dns-update conflict-resolution enable
+</pre></div>
+</div>
+<p>Override the above configuration for a shared network NET1:</p>
+<div class="highlight-none notranslate"><div class="highlight"><set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div class="highlight"><pre>set service dhcp-server shared-network-name 'set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set 
+<div class="highlight"><pre>set service dhcp-server shared-network-name 'NET1' dynamic-dns-update generated-prefix ip
+set service dhcp-server shared-network-name 'NET1' dynamic-dns-update qualifying-suffix mybigdomain.net
+</pre></div>
+</div>
+<p>And in a subnet within the same shared network:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server shared-network-name 'NET1' subnet '172set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div class="highlight"><pre>set service dhcp-server shared-network-name 'NET1' subnet '172.18.201.0/24' dynamic-dns-update qualifying-suffix mydomain.net
+</pre></div>
+</div>
+<p>Configure TSIG keys:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server dynamic-dns-update tsig-key mydomain-net algorithm hmac-sha256
+set service dhcp-server dynamic-dns-update tsig-key mydomain-net secret eWF5YW15YW5vdGhlcmxpdHRsZWtleSE=
+</pre></div>
+</div>
+<p>Configure DDNS domains:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server dynamic-dns-update forward-domain mydomain.net key-name mydomain-net
+set service dhcp-server dynamic-dns-update forward-domain mydomain.net dns-server 1 address '172.18.0.254'
+set service dhcp-server dynamic-dns-update forward-domain mydomain.net dns-server 1 port 1053
+set service dhcp-server dynamic-dns-update forward-domain mydomain.net dns-server 2 address '192.168.124.254'
+set service dhcp-server dynamic-dns-update forward-domain mydomain.net dns-server 2 port 53
+set service dhcp-server dynamic-dns-update forward-domain 201.18.172.in-addr.arpa key-name reverse-172-18-201
+set service dhcp-server dynamic-dns-update forward-domain 201.18.172.in-addr.arpa dns-server 1 address '172.18.0.254'
+set service dhcp-server dynamic-dns-update forward-domain 201.18.1="set="set="default="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="1="set="set="set 
+<div="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set 
+<div class="cfgcmd-body"> 
+<p>IP address of the DNS server.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server dynamic-dns-update forward-domain 2="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set 
+<div class="cfgcmd-body"> 
+<p>IP="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div class="cfgcmd-body"> 
+<p>IP address of the DNS server.</p> 
+</div> 
+</div> 
+<div class="cmd cmd-cfg"> 
+<div class="cfgcmd-heading"> 
+set service dhcp-server dynamic-dns-update forward-domain 201.18.172.in-addr.arpa dns-server 2 port 53
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<p>Global configuration you will most likely want:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server dynamic-dns-update send-updates enable
+set service dhcp-server dynamic-dns-update conflict-resolution enable
+</pre></div>
+</div>
+<p>Override the above configuration for a shared network NET1:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server shared-network-name 'NET1' dynamic-dns-update replace-client-name when-not-present
+set service dhcp-server shared-network-name 'NET1' dynamic-dns-update generated-prefix ip
+set service dhcp-server shared-network-name 'NET1' dynamic-dns-update qualifying-suffix mybigdomain.net
+</pre></div>
+</div>
+<p>And in a subnet within the same shared network:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server shared-network-name 'NET1' subnet '172.18.201.0/24' dynamic-dns-update qualifying-suffix mydomain.net
+</pre></div>
+</div>
+<p>Configure TSIG keys:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server dynamic-dns-update tsig-key mydomain-net algorithm hmac-sha256
+set service dhcp-server dynamic-dns-update tsig-key mydomain-net secret eWF5YW15YW5vdGhlcmxpdHRlZ2V5IQ==
+set service dhcp-server dynamic-dns-update tsig-key reverse-172-18-201 algorithm hmac-sha256
+set service dhcp-server dynamic-dns-update tsig-key reverse-172-1="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set 
+<div class="highlight"><pre>set service dhcp-server dynamic-dns-update tsig-key reverse-172-18-201 secret eWF5YW15YW5vdGhlcmxpdHRlZ2V5IQ==
+</pre></div>
+</div>
+<p>Configure DDNS domains:</p>
+<div="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set="set=" 
+<div="set="set="set="set="set="set="set

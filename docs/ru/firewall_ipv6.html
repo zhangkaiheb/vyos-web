@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="ipv6-firewall-configuration">
+<h1>Конфигурация IPv6 брандмауэра</h1>
+<section id="overview">
+<h2>Обзор</h2>
+<p>Этот раздел охватывает полезную информацию о конфигурации брандмауэра IPv6 и соответствующие команды режима работы.</p>
+<p>Этот раздел описывает следующие команды конфигурации:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 …
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6" title="Постоянная ссылка на эту Команду"></a></div></div>
+<p>Чтобы узнать о общем потоке трафика в брандмауерах VyOS, см. <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Брандмауэр</a>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
+    * ipv6
+         - forward
+            + filter
+         - input
+            + filter
+         - output
+            + filter
+            + raw
+         - prerouting
+            + raw
+         - name
+            + custom_name
+</pre></div>
+</div>
+<p>Роутер сначала получает весь трафик и обрабатывает его в разделе <strong>prerouting</strong>.</p>
+<p>Этот этап включает:</p>
+<ul class="simple">
+<li><p><strong>IPv6 Prerouting</strong>: команды, найденные под <code class="docutils literal notranslate">set firewall ipv6 prerouting raw ...</code></p></li>
+<li><p><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/../system/conntrack.html">Conntrack Ignore</a>: <code class="docutils literal notranslate">set system conntrack ignore ipv6...</code></p></li>
+<li><p><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/../policy/route.html">Policy Route</a>: команды, найденные под <code class="docutils literal notranslate">set policy route6 ...</code></p></li>
+<li><p><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/../nat/nat44.html">Destination NAT</a>: команды, найденные под <code class="docutils literal notranslate">set nat66 destination ...</code></p></li>
+</ul>
+<p>Для трафика, который роутер получает и передает, базовая цепочка — это <strong>forward</strong>. Ниже приведена упрощенная диаграмма потока пакетов для транзитного трафика:</p>
+<figure class="align-default">
+<img alt="../../_images/firewall-fwd-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-fwd-packet-flow.webp" />
+</figure>
+<p>Используйте <code class="docutils literal notranslate">set firewall ipv6 forward filter ...</code>, чтобы настроить правила фильтрации для транзитного трафика. Эта команда соответствует этапу 5 и выделена красным на диаграмме.</p>
+<p>Для трафика, предназначенного для роутера, используйте цепочку <strong>input</strong>. Для трафика, который генерирует роутер, используйте цепочку <strong>output</strong>. Ниже представлена диаграмма потока пакетов для трафика, предназначенного роутеру, и трафика, который генерирует роутер (начиная с круга номер 6):</p>
+<figure class="align-default">
+<img alt="../../_images/firewall-input-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-input-packet-flow.webp" />
+</figure>
+<p>Используйте <code class="docutils literal notranslate">set firewall ipv6 input filter ...</code>, чтобы настроить трафик, предназначенный роутеру.</p>
+<p>Используйте <code class="docutils literal notranslate">set firewall ipv6 output ...</code>, чтобы настроить трафик, который генерирует роутер. Доступны две подцепочки: <strong>filter</strong> и <strong>raw</strong>:</p>
+<ul class="simple">
+<li><p><strong>Output Prerouting</strong>: <code class="docutils literal notranslate">set firewall ipv6 output raw ...</code>.
+Как описано в разделе <strong>Prerouting</strong>, брандмауэр обрабатывает правила в этом разделе до подсистемы отслеживания соединений.</p></li>
+<li><p><strong>Output Filter</strong>: <code class="docutils literal notranslate">set firewall ipv6 output filter ...</code>. Брандмауэр обрабатывает правила в этом разделе после подсистемы отслеживания соединений.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p><strong>Важное примечание о действиях по умолчанию:</strong>
+Если вы не определите действие по умолчанию для базовой цепочки, система установит действие по умолчанию как <strong>accept</strong> для этой цепочки. Для пользовательских цепочек, если вы не определили действие по умолчанию, система установит действие по умолчанию как <strong>drop</strong></p>
+</div>
+<p>Создайте пользовательские цепочки брандмауэра с помощью команд <code class="docutils literal notranslate">set firewall ipv6 name &lt;name&gt; ...</code>. Чтобы использовать пользовательскую цепочку, определите правило с <strong>action jump</strong> и соответствующим <strong>target</strong> в базовой цепочке.</p>
+</section>
+<section id="firewall-ipv6-rules">
+<h2>Брандмауэр - Правила IPv6</h2>
+<p>Создайте правила фильтрации брандмауэра. Каждое правило имеет номер и действие, которое применяется при совпадении правила. Вы можете указать несколько критериев совпадения. Пакеты проходят через правила от 1 до 999999, поэтому порядок важен. Брандмауэр выполняет действие первого совпадающего правила.</p>
+<section id="actions">
+<h3>Действия</h3>
+<p>Если вы определяете правило, вы должны определить действие для него. Действие говорит брандмауэру, что делать, когда все критерии для этого правила выполнены.</p>
+<p>Действие может быть :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">accept</code>: принять пакет.</p></li>
+<li><p><code class="docutils literal notranslate">continue</code>: продолжить анализ следующего правила.</p></li>
+<li><p><code class="docutils literal notranslate">drop</code>: отбросить пакет.</p></li>
+<li><p><code class="docutils literal notranslate">reject</code>: отклонить пакет.</p></li>
+<li><p><code class="docutils literal notranslate">jump</code>: перейти к другой пользовательской цепочке.</p></li>
+<li><p><code class="docutils literal notranslate">return</code>: вернуться из текущей цепочки и продолжить с следующего правила последней цепочки.</p></li>
+<li><p><code class="docutils literal notranslate">queue</code>: добавить пакет в очередь в пространстве пользователя.</p></li>
+<li><p><code class="docutils literal notranslate">synproxy</code>: синпрокси пакет.</p></li>
+</ul>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule &lt;1-999999&gt; action [accept | continue | drop | jump | queue | reject | return | synproxy]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-action-accept-continue-drop-jump-queue-reject-return-synproxy" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule &lt;1-999999&gt; action [accept | continue | drop | jump | queue | reject | return | synproxy]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-action-accept-continue-drop-jump-queue-reject-return-synproxy" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule &lt;1-999999&gt; action [accept | continue | drop | jump | queue | reject | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-action-accept-continue-drop-jump-queue-reject-return" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; action [accept | continue | drop | jump | queue | reject | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-action-accept-continue-drop-jump-queue-reject-return" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Это обязательное настройка определяет действие текущего правила. Если вы установите действие на jump, вы также должны определить целевую точку прыжка.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule &lt;1-999999&gt; jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-jump-target-text" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule &lt;1-999999&gt; jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-jump-target-text" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule &lt;1-999999&gt; jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-jump-target-text" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-jump-target-text" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду только при действии, установленном на <code class="docutils literal notranslate">jump</code>. Укажите целевую точку прыжка.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule &lt;1-999999&gt; queue &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-queue-0-65535" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule &lt;1-999999&gt; queue &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-queue-0-65535" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule &lt;1-999999&gt; queue &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-queue-0-65535" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; queue &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-queue-0-65535" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду только при действии, установленном на <code class="docutils literal notranslate">queue</code>. Укажите целевую очередь. Также поддерживаются диапазоны очередей.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule &lt;1-999999&gt; queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-queue-options-bypass" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule &lt;1-999999&gt; queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-queue-options-bypass" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule &lt;1-999999&gt; queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-queue-options-bypass" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-queue-options-bypass" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду только при действии, установленном на <code class="docutils literal notranslate">queue</code>. Эта команда позволяет пакету пройти через брандмауэр, когда ни одно программное обеспечение пользовательского пространства не подключено к очереди.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule &lt;1-999999&gt; queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-queue-options-fanout" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule &lt;1-999999&gt; queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-queue-options-fanout" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule &lt;1-999999&gt; queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-queue-options-fanout" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-queue-options-fanout" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду только при действии, установленном на <code class="docutils literal notranslate">queue</code>. Эта команда распределяет пакеты между несколькими очередями.</p>
+</div>
+</div>
+<p>Также <strong>default-action</strong> — это действие, которое происходит, когда пакет не соответствует никакому правилу в своей цепочке. Для базовых цепочек возможные варианты для <strong>default-action</strong> — это <strong>accept</strong> или <strong>drop</strong>.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter default-action [accept | drop]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-default-action-accept-drop" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter default-action [accept | drop]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-default-action-accept-drop" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter default-action [accept | drop]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-default-action-accept-drop" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; default-action [accept | drop | jump | queue | reject | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-default-action-accept-drop-jump-queue-reject-return" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Установите действие по умолчанию для набора правил, если пакет не соответствует критериям любого правила. Если вы установите default-action на <code class="docutils literal notranslate">jump</code>, вы также должны определить <code class="docutils literal notranslate">default-jump-target</code>. Для базовых цепочек вы можете установить действие по умолчанию только на <code class="docutils literal notranslate">accept</code> или <code class="docutils literal notranslate">drop</code>. Для пользовательских цепочек доступно больше действий.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; default-jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-default-jump-target-text" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Используется только тогда, когда <code class="docutils literal notranslate">default-action</code> установлено на <code class="docutils literal notranslate">jump</code>. Используйте эту команду, чтобы указать целевую точку прыжка для правила по умолчанию.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p><strong>Важное примечание о действиях по умолчанию:</strong>
+Если вы не определите действие по умолчанию для базовой цепочки, система устанавливает действие по умолчанию как <strong>accept</strong> для этой цепочки. Для пользовательских цепочек, если вы не определили действие по умолчанию, система устанавливает действие по умолчанию как <strong>drop</strong>.</p>
+</div>
+</section>
+<section id="firewall-logs">
+<h3>Журналы брандмауэра</h3>
+<p>Вы можете включить журналирование для каждого правила брандмауэра. При включении можно также определить другие параметры журнала.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule &lt;1-999999&gt; log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-log" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule &lt;1-999999&gt; log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-log" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule &lt;1-999999&gt; log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-log" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-log" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Включить логирование для совпадающих пакетов. Если эта конфигурационная команда отсутствует, логирование отключено.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-default-log" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-default-log" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-default-log" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-default-log" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду, чтобы включить логирование действия по умолчанию на указанной цепочке.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule &lt;1-999999&gt; log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule &lt;1-999999&gt; log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule &lt;1-999999&gt; log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Определите уровень журнала. Действует только при активированном журнале правила.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule &lt;1-999999&gt; log-options group &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-log-options-group-0-65535" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule &lt;1-999999&gt; log-options group &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-log-options-group-0-65535" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule &lt;1-999999&gt; log-options group &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-log-options-group-0-65535" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; log-options group &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-log-options-group-0-65535" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Определите группу журнала для отправки сообщений. Действует только при активированном журнале правила.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule &lt;1-999999&gt; log-options snapshot-length &lt;0-9000&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule &lt;1-999999&gt; log-options snapshot-length &lt;0-9000&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule &lt;1-999999&gt; log-options snapshot-length &lt;0-9000&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; log-options snapshot-length &lt;0-9000&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-log-options-snapshot-length-0-9000" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Определите длину заголовка пакетов, которые будут включаться в сообщение netlink. Действует только при активированном журнале правила и определенной группе журнала.</</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule &lt;1-999999&gt; log-options queue-threshold &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule &lt;1-999999&gt; log-options queue-threshold &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule &lt;1-999999&gt; log-options queue-threshold &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; log-options queue-threshold &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-log-options-queue-threshold-0-65535" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Определите количество пакетов, которые нужно сохранить в ядре, прежде чем отправить их в пространство пользователя. Действует только при активированном журнале правила и определенной группе журнала.</</div>
+</div>
+</section>
+<section id="firewall-description">
+<h3>Описание брандмауэра</h3>
+<p>Для справки вы можете определить описание для каждого правила и пользовательской цепочки.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-description-text" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Укажите описание для пользовательской цепочки брандмауэра.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule &lt;1-999999&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-description-text" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule &lt;1-999999&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-description-text" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule &lt;1-999999&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-description-text" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-description-text" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Укажите описание для каждого правила.</p>
+</div>
+</div>
+</section>
+<section id="rule-status">
+<h3>Статус правила</h3>
+<p>Новые правила включены по умолчанию. В некоторых случаях вы можете захотеть отключить правило вместо того, чтобы удалить его.</</div>
+</section>
+<section id="matching-criteria">
+<h3>Критерии совпадения</h3>
+<p>Существует множество критериев, по которым можно протестировать пакет.</</div>
+</section>
+<section id="packet-modifications">
+<h3>Изменения пакетов</h3>
+<p>Брандмауэр может изменять пакеты перед их отправкой.
+Эта функция предоставляет большую гибкость для обработки пакетов.</</div>
+</section>
+</section>
+<section id="synproxy">
+<h2>Synproxy</h2>
+<p>Синхронизация соединений</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 [input | forward] filter rule &lt;1-999999&gt; action synproxy
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-forward-filter-rule-1-999999-action-synproxy" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 [input | forward] filter rule &lt;1-999999&gt; protocol tcp
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-forward-filter-rule-1-999999-protocol-tcp" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 [input | forward] filter rule &lt;1-999999&gt; synproxy tcp mss &lt;501-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-forward-filter-rule-1-999999-synproxy-tcp-mss-501-65535" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Установите максимальный размер сегмента TCP для соединения.</</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 [input | forward] filter rule &lt;1-999999&gt; synproxy tcp window-scale &lt;1-14&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-forward-filter-rule-1-999999-synproxy-tcp-window-scale-1-14" title="Постоянная ссылка на эту Команду"></a></div><div class="cfgcmd-body">
+<p>Установите коэффициент масштабирования окна для масштабирования окна TCP.</</div>
+</div>
+<section id="example-synproxy">
+<h3>Пример Synproxy</h3>
+<p>Требования для включения Synproxy:</p>
+<ul class="simple">
+<li><p>Трафик должен быть симметричным</p></li>
+<li><p>Синпроцесс зависит от синкоуков и временных меток TCP, убедитесь, что они включены</p></li>
+<li><p>Отключите опцию loose track в conntrack</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system sysctl parameter net.ipv4.tcp_timestamps value &#39;1&#39;
+
+
+set system conntrack tcp loose disable
+
+set system conntrack ignore ipv6 rule 10 destination port &#39;8080&#39;
+
+set system conntrack ignore ipv6 rule 10 protocol &#39;tcp&#39;
+
+set system conntrack ignore ipv6 rule 10 tcp flags syn
+
+
+set firewall global-options syn-cookies &#39;enable&#39;
+
+set firewall ipv6 input filter rule 10 action &#39;synproxy&#39;
+
+set firewall ipv6 input filter rule 10 destination port &#39;8080&#39;
+
+set firewall ipv6 input filter rule 10 inbound-interface name &#39;eth1&#39;
+
+set firewall ipv6 input filter rule 10 protocol &#39;tcp&#39;
+
+set firewall ipv6 input filter rule 10 synproxy tcp mss &#39;1460&#39;
+
+set firewall ipv6 input filter rule 10 synproxy tcp window-scale &#39;7&#39;
+
+set firewall ipv6 input filter rule 1000 action &#39;drop&#39;
+
+set firewall ipv6 input filter rule 1000 state invalid
+
+</pre></div>
+</div>
+</section>
+</section>
+<section id="operation-mode-firewall">
+<h2>Брандмауэр в режиме операции</h2>
+<section id="rule-set-overview">
+<h3>Обзор набора правил</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall
+<a class="cmdlink" href="#opcmd-show-firewall" title="Постоянная ссылка на эту Команду"></a></div><div class="opcmd-body">
+<p>Показать общий обзор брандмауэра для всех наборов правил, а не только для IPv6:</p>
+<div class="highlight-none notranslate"><div class="highlight"><<pre>vyos@vyos:~$ show firewall
+Rulesets Information
+
+---------------------------------
+IPv4 Firewall &quot;forward filter&quot;
+
+Rule     Action    Protocol      Packets    Bytes  Conditions
+-------  --------  ----------  ---------  -------  -----------------------------------------
+5        jump      all                 0        0  iifname &quot;eth1&quot;  jump NAME_VyOS_MANAGEMENT
+10       jump      all                 0        0  oifname &quot;eth1&quot;  jump NAME_WAN_IN
+15       jump      all                 0        0  iifname &quot;eth3&quot;  jump NAME_WAN_IN
+default  accept    all
+
+---------------------------------
+IPv4 Firewall &quot;name VyOS_MANAGEMENT&quot;
+
+Rule     Action    Protocol      Packets    Bytes  Conditions
+-------  --------  ----------  ---------  -------  --------------------------------
+5        accept    all                 0        0  ct state established  accept
+10       drop      all                 0        0  ct state invalid
+20       accept    all                 0        0  ip saddr @A_GOOD_GUYS  accept
+30       accept    all                 0        0  ip saddr @N_ENTIRE_RANGE  accept
+40       accept    all                 0        0  ip saddr @A_VyOS_SERVERS  accept
+50       accept    icmp                0        0  meta l4proto icmp  accept
+default  drop    all                 0        0
+
+---------------------------------
+IPv6 Firewall &quot;forward filter&quot;
+
+Rule     Action    Protocol
+-------  --------  ----------
+5        jump      all
+10       jump      all
+15       jump      all
+default  accept    all
+
+---------------------------------
+IPv6 Firewall &quot;input filter&quot;
+
+Rule     Action    Protocol
+-------  --------  ----------
+5        jump      all
+default  accept    all
+
+---------------------------------
+IPv6 Firewall &quot;ipv6_name IPV6-VyOS_MANAGEMENT&quot;
+
+Rule     Action    Protocol
+-------  --------  ----------
+5        accept    all
+10       drop      all
+20       accept    all
+30       accept    all
+40       accept    all
+50       accept    ipv6-icmp
+default  drop      all
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall summary
+<a class="cmdlink" href="#opcmd-show-firewall-summary" title="Постоянная ссылка на эту Команду"></a></div><div class="opcmd-body">
+<p>Это покажет вам сводку о наборах правил и группах</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show firewall summary
+Ruleset Summary
+
+IPv6 Ruleset:
+
+Ruleset Hook    Ruleset Priority      Description
+--------------  --------------------  -------------------------
+forward         filter
+input           filter
+ipv6_name       IPV6-VyOS_MANAGEMENT
+ipv6_name       IPV6-WAN_IN           PUBLIC_INTERNET
+
+IPv4 Ruleset:
+
+Ruleset Hook    Ruleset Priority    Description
+--------------  ------------------  -------------------------
+forward         filter
+input           filter
+name            VyOS_MANAGEMENT
+name            WAN_IN              PUBLIC_INTERNET
+
+Firewall Groups
+
+Name                     Type                References               Members
+-----------------------  ------------------  -----------------------  ----------------
+PBX                      address_group       WAN_IN-100               198.51.100.77
+SERVERS                  address_group       WAN_IN-110               192.0.2.10
+WAN_IN-111               192.0.2.11
+WAN_IN-112               192.0.2.12
+WAN_IN-120
+WAN_IN-121
+WAN_IN-122
+SUPPORT                  address_group       VyOS_MANAGEMENT-20       192.168.1.2
+WAN_IN-20
+PHONE_VPN_SERVERS        address_group       WAN_IN-160               10.6.32.2
+PINGABLE_ADDRESSES        address_group       WAN_IN-170               192.168.5.2
+WAN_IN-171
+PBX                      ipv6_address_group  IPV6-WAN_IN-100          2001:db8::1
+SERVERS                  ipv6_address_group  IPV6-WAN_IN-110          2001:db8::2
+IPV6-WAN_IN-111          2001:db8::3
+IPV6-WAN_IN-112          2001:db8::4
+IPV6-WAN_IN-120
+IPV6-WAN_IN-121
+IPV6-WAN_IN-122
+SUPPORT                  ipv6_address_group  IPV6-VyOS_MANAGEMENT-20  2001:db8::5
+IPV6-WAN_IN-20
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall ipv6 [forward | input | output] filter
+<a class="cmdlink" href="#opcmd-show-firewall-ipv6-forward-input-output-filter" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall ipv6 ipv6-name &lt;name&gt;
+<a class="cmdlink" href="#opcmd-show-firewall-ipv6-ipv6-name-name" title="Постоянная ссылка на эту Команду"></a></div><div class="opcmd-body">
+<p>Эта команда даст обзор одного набора правил.</</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall ipv6 [forward | input | output] filter rule &lt;1-999999&gt;
+<a class="cmdlink" href="#opcmd-show-firewall-ipv6-forward-input-output-filter-rule-1-999999" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt;
+<a class="cmdlink" href="#opcmd-show-firewall-ipv6-name-name-rule-1-999999" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall group &lt;name&gt;
+<a class="cmdlink" href="#opcmd-show-firewall-group-name" title="Постоянная ссылка на эту Команду"></a></div><div class="opcmd-body">
+<p>Показать обзор определенных групп, включая тип, участников и где группа используется.</</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall statistics
+<a class="cmdlink" href="#opcmd-show-firewall-statistics" title="Постоянная ссылка на эту Команду"></a></div><div class="opcmd-body">
+<p>Показать статистику всех наборов правил с момента последней загрузки.</</div>
+</div>
+</div>
+</section>
+<section id="show-firewall-log">
+<h3>Показать журнал брандмауэра</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall
+<a class="cmdlink" href="#opcmd-show-log-firewall" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall ipv6
+<a class="cmdlink" href="#opcmd-show-log-firewall-ipv6" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall ipv6 [forward | input | output | name]
+<a class="cmdlink" href="#opcmd-show-log-firewall-ipv6-forward-input-output-name" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall ipv6 [forward | input | output] filter
+<a class="cmdlink" href="#opcmd-show-log-firewall-ipv6-forward-input-output-filter" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall ipv6 name &lt;name&gt;
+<a class="cmdlink" href="#opcmd-show-log-firewall-ipv6-name-name" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall ipv6 [forward | input | output] filter rule &lt;rule&gt;
+<a class="cmdlink" href="#opcmd-show-log-firewall-ipv6-forward-input-output-filter-rule-rule" title="Постоянная ссылка на эту Команду"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall ipv6 name &lt;name&gt; rule &lt;rule&gt;
+<a class="cmdlink" href="#opcmd-show-log-firewall-ipv6-name-name-rule-rule" title="Постоянная ссылка на эту Команду"></a></div><div class="opcmd-body">
+<p>Показать журнал брандмауэра для всех брандмауэров, всех IPv6 брандмауэров, специфических правил, или конкретных правил.</</div>
+</div>
+</div>
+</section>
+<section id="example-partial-config">
+<h3>Пример частичной конфигурации</h3>
+<div class="highlight-none notranslate"><div class="highlight"><<pre>firewall {
+    ipv6 {
+        input {
+            filter {
+                rule 10 {
+                    action jump
+                    inbound-interface {
+                        name eth1
+                    }
+                    jump-target INP-ETH1
+                }
+                rule 20 {
+                    action accept
+                    inbound-interface {
+                        name eth0
+                    }
+                    log
+                    protocol ipv6-icmp
+                }
+            }
+        }
+        name INP-ETH1 {
+            default-action drop
+            default-log
+            rule 10 {
+                action accept
+                protocol tcp_udp
+            }
+        }
+    }
+}
+</pre></div>
+</div>
+</section>
+<section id="update-geoip-database">
+<h3>Обновление базы данных GeoIP</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+update geoip
+<a class="cmdlink" href="#opcmd-update-geoip" title="Постоянная ссылка на эту Команду"></a></div><div class="opcmd-body">
+<p>Команда, используемая для обновления базы данных GeoIP и правил.</</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+</section>
+</body>
+</html>

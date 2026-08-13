@@ -1,0 +1,206 @@
+{
+  "zh-CN": {
+    "nat66": {
+      "source": {
+        "field": {
+          "ruleNumber": "规则编号",
+          "description": "描述",
+          "protocol": "协议",
+          "sourcePrefix": "源前缀",
+          "sourcePort": "源端口",
+          "destinationPrefix": "目标前缀",
+          "destinationPort": "目标端口",
+          "outboundInterface": "出站接口",
+          "translationAddress": "转换地址",
+          "translationPort": "转换端口",
+          "log": "日志",
+          "exclude": "排除",
+          "disable": "禁用"
+        },
+        "help": {
+          "ruleNumber": "规则编号",
+          "exclude": "排除此规则匹配"
+        },
+        "placeholder": {
+          "protocol": "协议",
+          "sourcePrefix": "源前缀",
+          "sourcePort": "源端口",
+          "destinationPrefix": "目标前缀",
+          "destinationPort": "目标端口",
+          "outboundInterface": "出站接口",
+          "translationAddress": "转换地址",
+          "translationPort": "转换端口"
+        },
+        "column": {
+          "ruleNumber": "规则编号",
+          "description": "描述",
+          "protocol": "协议",
+          "sourcePrefix": "源前缀",
+          "destinationPrefix": "目标前缀",
+          "outboundInterface": "出站接口",
+          "translationAddress": "转换地址",
+          "log": "日志",
+          "disable": "禁用"
+        },
+        "loadFailed": "加载 NAT66 源规则失败",
+        "saveFailed": "保存 NAT66 源规则失败",
+        "deleteFailed": "删除 NAT66 源规则失败",
+        "editRule": "编辑 NAT66 源规则",
+        "createRule": "创建 NAT66 源规则",
+        "ruleNumberRequired": "规则编号为必填项",
+        "confirmDelete": "确定要删除选中的规则吗？"
+      },
+      "destination": {
+        "field": {
+          "ruleNumber": "规则编号",
+          "description": "描述",
+          "protocol": "协议",
+          "sourceAddress": "源地址",
+          "sourcePort": "源端口",
+          "destinationAddress": "目标地址",
+          "destinationPort": "目标端口",
+          "inboundInterface": "入站接口",
+          "translationAddress": "转换地址",
+          "translationPort": "转换端口",
+          "log": "日志",
+          "exclude": "排除",
+          "disable": "禁用"
+        },
+        "help": {
+          "ruleNumber": "规则编号",
+          "exclude": "排除此规则匹配"
+        },
+        "placeholder": {
+          "protocol": "协议",
+          "sourceAddress": "源地址",
+          "sourcePort": "源端口",
+          "destinationAddress": "目标地址",
+          "destinationPort": "目标端口",
+          "inboundInterface": "入站接口",
+          "translationAddress": "转换地址",
+          "translationPort": "转换端口"
+        },
+        "column": {
+          "ruleNumber": "规则编号",
+          "description": "描述",
+          "protocol": "协议",
+          "sourceAddress": "源地址",
+          "destinationAddress": "目标地址",
+          "inboundInterface": "入站接口",
+          "translationAddress": "转换地址",
+          "log": "日志",
+          "disable": "禁用"
+        },
+        "loadFailed": "加载 NAT66 目标规则失败",
+        "saveFailed": "保存 NAT66 目标规则失败",
+        "deleteFailed": "删除 NAT66 目标规则失败",
+        "editRule": "编辑 NAT66 目标规则",
+        "createRule": "创建 NAT66 目标规则",
+        "ruleNumberRequired": "规则编号为必填项",
+        "confirmDelete": "确定要删除选中的规则吗？"
+      }
+    }
+  },
+  "en": {
+    "nat66": {
+      "source": {
+        "field": {
+          "ruleNumber": "Rule Number",
+          "description": "Description",
+          "protocol": "Protocol",
+          "sourcePrefix": "Source Prefix",
+          "sourcePort": "Source Port",
+          "destinationPrefix": "Destination Prefix",
+          "destinationPort": "Destination Port",
+          "outboundInterface": "Outbound Interface",
+          "translationAddress": "Translation Address",
+          "translationPort": "Translation Port",
+          "log": "Log",
+          "exclude": "Exclude",
+          "disable": "Disable"
+        },
+        "help": {
+          "ruleNumber": "Rule number",
+          "exclude": "Exclude this rule match"
+        },
+        "placeholder": {
+          "protocol": "Protocol",
+          "sourcePrefix": "Source prefix",
+          "sourcePort": "Source port",
+          "destinationPrefix": "Destination prefix",
+          "destinationPort": "Destination port",
+          "outboundInterface": "Outbound interface",
+          "translationAddress": "Translation address",
+          "translationPort": "Translation port"
+        },
+        "column": {
+          "ruleNumber": "Rule Number",
+          "description": "Description",
+          "protocol": "Protocol",
+          "sourcePrefix": "Source Prefix",
+          "destinationPrefix": "Destination Prefix",
+          "outboundInterface": "Outbound Interface",
+          "translationAddress": "Translation Address",
+          "log": "Log",
+          "disable": "Disable"
+        },
+        "loadFailed": "Failed to load NAT66 source rules",
+        "saveFailed": "Failed to save NAT66 source rule",
+        "deleteFailed": "Failed to delete NAT66 source rule",
+        "editRule": "Edit NAT66 Source Rule",
+        "createRule": "Create NAT66 Source Rule",
+        "ruleNumberRequired": "Rule number is required",
+        "confirmDelete": "Are you sure you want to delete the selected rule(s)?"
+      },
+      "destination": {
+        "field": {
+          "ruleNumber": "Rule Number",
+          "description": "Description",
+          "protocol": "Protocol",
+          "sourceAddress": "Source Address",
+          "sourcePort": "Source Port",
+          "destinationAddress": "Destination Address",
+          "destinationPort": "Destination Port",
+          "inboundInterface": "Inbound Interface",
+          "translationAddress": "Translation Address",
+          "translationPort": "Translation Port",
+          "log": "Log",
+          "exclude": "Exclude",
+          "disable": "Disable"
+        },
+        "help": {
+          "ruleNumber": "Rule number",
+          "exclude": "Exclude this rule match"
+        },
+        "placeholder": {
+          "protocol": "Protocol",
+          "sourceAddress": "Source address",
+          "sourcePort": "Source port",
+          "destinationAddress": "Destination address",
+          "destinationPort": "Destination port",
+          "inboundInterface": "Inbound interface",
+          "translationAddress": "Translation address",
+          "translationPort": "Translation port"
+        },
+        "column": {
+          "ruleNumber": "Rule Number",
+          "description": "Description",
+          "protocol": "Protocol",
+          "sourceAddress": "Source Address",
+          "destinationAddress": "Destination Address",
+          "inboundInterface": "Inbound Interface",
+          "translationAddress": "Translation Address",
+          "log": "Log",
+          "disable": "Disable"
+        },
+        "loadFailed": "Failed to load NAT66 destination rules",
+        "saveFailed": "Failed to save NAT66 destination rule",
+        "deleteFailed": "Failed to delete NAT66 destination rule",
+        "editRule": "Edit NAT66 Destination Rule",
+        "createRule": "Create NAT66 Destination Rule",
+        "ruleNumberRequired": "Rule number is required",
+        "confirmDelete": "Are you sure you want to delete the selected rule(s)?"
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { defineComponent, computed } from '/src/utils/vue-import.js';
+import { defineComponent, computed, inject } from '/src/utils/vue-import.js';
 
 export default defineComponent({
   name: 'SourceDestMatchCards',
@@ -22,6 +22,7 @@ export default defineComponent({
   },
   emits: ['update:groupType', 'update:groupValue', 'update:addressValue', 'update:macValue', 'update:portGroupValue'],
   setup(props, { emit }) {
+    const { t } = inject('i18n');
     const selectedType = computed({
       get: () => props.groupType,
       set: (val) => {
@@ -58,7 +59,7 @@ export default defineComponent({
       }
     }
 
-    return { selectedType, addressInput, groupInput, macInput, portGroupInput, getGroupOptionsForType };
+    return { selectedType, addressInput, groupInput, macInput, portGroupInput, getGroupOptionsForType, t };
   },
   template: `
     <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden; margin-bottom:16px;">
@@ -100,33 +101,33 @@ export default defineComponent({
               @change="selectedType === opt.value && (groupInput = $event.target.value)"
               @click.stop
             >
-              <option value="">请选择{{ opt.label }}名称</option>
+              <option value="">{{ t('sourceDest.selectGroupName', { type: opt.label }) }}</option>
               <option v-for="g in getGroupOptionsForType(opt.value)" :key="g" :value="g">{{ g }}</option>
             </select>
           </div>
         </div>
         <div style="display:flex; align-items:center; margin-bottom:10px; gap:8px;">
-          <label style="display:flex; align-items:center; gap:6px; white-space:nowrap; min-width:70px;">MAC组</label>
+          <label style="display:flex; align-items:center; gap:6px; white-space:nowrap; min-width:70px;">{{ t('sourceDest.macGroup') }}</label>
           <select
             :value="macInput"
             :disabled="disabled"
             :style="{ flex:1, border:'1px solid #d9d9d9', borderRadius:'2px', padding:'5px 8px', fontSize:'13px', outline:'none', background:'#fff', margin:0, color: !macInput ? '#999' : '#333' }"
             @change="macInput = $event.target.value"
           >
-            <option value="" style="color:#999;">请选择MAC组名称</option>
-            <option v-for="g in macGroupOptions" :key="g" :value="g">{{ g }}</option>
+            <option value="" style="color:#999;">{{ t('sourceDest.selectMacGroup') }}</option>
+            <option v-for="g in macGroupOptions" :key="g" :value="g" style="color:#333;">{{ g }}</option>
           </select>
         </div>
         <div style="display:flex; align-items:center; margin-bottom:10px; gap:8px;">
-          <label style="display:flex; align-items:center; gap:6px; white-space:nowrap; min-width:70px;">端口组</label>
+          <label style="display:flex; align-items:center; gap:6px; white-space:nowrap; min-width:70px;">{{ t('sourceDest.portGroup') }}</label>
           <select
             :value="portGroupInput"
             :disabled="disabled"
             :style="{ flex:1, border:'1px solid #d9d9d9', borderRadius:'2px', padding:'5px 8px', fontSize:'13px', outline:'none', background:'#fff', margin:0, color: !portGroupInput ? '#999' : '#333' }"
             @change="portGroupInput = $event.target.value"
           >
-            <option value="" style="color:#999;">请选择端口组名称</option>
-            <option v-for="g in portGroupOptions" :key="g" :value="g">{{ g }}</option>
+            <option value="" style="color:#999;">{{ t('sourceDest.selectPortGroup') }}</option>
+            <option v-for="g in portGroupOptions" :key="g" :value="g" style="color:#333;">{{ g }}</option>
           </select>
         </div>
       </div>

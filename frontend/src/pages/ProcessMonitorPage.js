@@ -5,11 +5,12 @@ import DataTable from '/src/components/Table/DataTable.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import HelpButton from '/src/components/Layout/HelpButton.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const HEADERS = ['PID', 'USER', 'PR', 'NI', 'VIRT', 'RES', 'SHR', 'S', '%CPU', '%MEM', 'TIME+', 'COMMAND'];
 const KEY_MAP = ['pid', 'user', 'pr', 'ni', 'virt', 'res', 'shr', 's', 'cpu', 'mem', 'time', 'command'];
 
-function parseSummary(output) {
+function parseSummary(output, t) {
   const lines = String(output || '').split('\n').map(s => s.replace(/\r$/, ''));
   const result = [];
   for (const line of lines) {
@@ -17,7 +18,7 @@ function parseSummary(output) {
     if (!trimmed) continue;
     if (trimmed.startsWith('PID')) break;
     if (trimmed.startsWith('top -')) {
-      result.push({ key: '系统时间 / 运行时长 / 用户数 / 负载', value: trimmed.replace(/^top\s+-\s*/, '') });
+      result.push({ key: t('processMonitor.summary.systemInfo'), value: trimmed.replace(/^top\s+-\s*/, '') });
       continue;
     }
     const idx = trimmed.indexOf(':');
@@ -70,24 +71,25 @@ function parseProcessTable(output) {
 export default defineComponent({
   name: 'ProcessMonitorPage',
   setup() {
+    const { t } = useI18n();
     const loading = ref(false);
     const activeTab = ref('summary');
     const summaryRows = ref([]);
     const processRows = ref([]);
 
     const tabs = [
-      { key: 'summary', title: '概览' },
-      { key: 'processes', title: '进程列表' },
+      { key: 'summary', title: t('processMonitor.tabs.summary') },
+      { key: 'processes', title: t('processMonitor.tabs.processes') },
     ];
 
     const infoColumns = [
-      { key: 'key', title: '项目' },
-      { key: 'value', title: '值' },
+      { key: 'key', title: t('processMonitor.columns.item') },
+      { key: 'value', title: t('processMonitor.columns.value') },
     ];
 
     const processColumns = [
       { key: 'pid', title: 'PID' },
-      { key: 'user', title: '用户' },
+      { key: 'user', title: t('processMonitor.columns.user') },
       { key: 'pr', title: 'PR' },
       { key: 'ni', title: 'NI' },
       { key: 'virt', title: 'VIRT' },
@@ -105,7 +107,7 @@ export default defineComponent({
       try {
         const res = await opModeApi.show('system processes extensive');
         const output = res.output || '';
-        summaryRows.value = parseSummary(output);
+        summaryRows.value = parseSummary(output, t);
         processRows.value = parseProcessTable(output);
       } catch (e) {
         showError(e);
@@ -127,6 +129,7 @@ export default defineComponent({
       infoColumns,
       processColumns,
       load,
+      t,
     };
   },
   components: { DataTable, ToolbarButton, HelpButton, TabGroup },
@@ -134,7 +137,7 @@ export default defineComponent({
     <div class="page-container process-monitor-page">
       <div class="toolbar toolbar-compact">
         <div class="toolbar-left">
-          <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+          <ToolbarButton icon="refresh" @click="load">{{ t('processMonitor.buttons.refresh') }}</ToolbarButton>
           <HelpButton routePath="/monitor/system-status/process-monitor" />
         </div>
       </div>

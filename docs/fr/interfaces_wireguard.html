@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="wireguard">
+<h1>WireGuard</h1>
+<p>WireGuard est un VPN extrêmement simple, rapide et moderne qui utilise la
+cryptographie de pointe. Consultez <a class="reference external" href="https://www.wireguard.com">https://www.wireguard.com</a> pour plus
+d'informations.</p>
+<section id="site-to-site-vpn">
+<h2>VPN site à site</h2>
+<p>Le diagramme suivant illustre une configuration de VPN site à site.</p>
+<figure class="align-default">
+<img alt="../../_images/wireguard_site2site_diagram.webp" src="https://docs.vyos.io/en/rolling/_images/wireguard_site2site_diagram.webp" />
+</figure>
+</section>
+<section id="keypairs">
+<h2>Clés</h2>
+<p>WireGuard nécessite une paire de clés, comprenant une <strong>clé privée</strong>
+pour décrypter le trafic entrant, et une <strong>clé publique</strong> pour les pairs afin d'encrypter
+le trafic sortant.</p>
+<section id="generate-keypair">
+<h3>Générer une paire de clés</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+generate pki wireguard key-pair
+<a class="cmdlink" href="#opcmd-generate-pki-wireguard-key-pair" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Générer une paire de clés : une clé publique et une clé privée.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette commande n'affiche que les clés dans votre console. Elle ne les stocke
+pas dans le système ni ne les applique à la configuration du système.</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ generate pki wireguard key-pair
+Clé privée : iJJyEARGK52Ls1GYRCcFvPuTj7WyWYDo//BknoDU0XY=
+Clé publique : EKY0dxRrSD98QHjfHOK13mZ5PJ7hnddRZt5woB3szyw=
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+generate pki wireguard key-pair install interface &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-generate-pki-wireguard-key-pair-install-interface-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Générer une paire de clés et afficher la commande d'attribution de la clé privée pour l'interface
+spécifiée.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ generate pki wireguard key-pair install interface wg10
+&quot;generate&quot; commande CLI exécutée depuis le niveau opérationnel.
+La clé privée générée n'est pas automatiquement ajoutée à la configuration VyOS, utilisez les commandes suivantes en mode configuration pour installer la clé :
+
+set interfaces wireguard wg10 private-key &#39;4Krkv8h6NkAYMMaBWI957yYDJDMvj9URTHstdlOcDU0=&#39;
+
+La clé publique correspondante à utiliser sur le système pair est : &#39;UxDsYT6EnpTIOKUzvMlw2p0sNOKQvFxEdSVrnNrX1Ro=&#39;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Si vous invoquez cette commande depuis le mode configuration avec le préfixe
+<code class="docutils literal notranslate">run</code>, la clé privée générée est automatiquement assignée à l'interface spécifiée.</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# run generate pki wireguard key-pair install interface wg10
+&quot;generate&quot; commande CLI exécutée depuis une session de configuration.
+La clé privée générée a été importée dans le CLI !
+
+Utilisez la commande suivante pour vérifier : show interfaces wireguard wg10
+La clé publique correspondante à utiliser sur le système pair est : &#39;7d9KwabjLhHpJiEJeIGd0CBlao/eTwFOh6xyCovTfG8=&#39;
+
+vyos@vyos# compare
+[edit interfaces]
++wireguard wg10 {
++    private-key CJweb8FC6BU3Loj4PC2pn5V82cDjIPs7G1saW0ZfLWc=
++}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show interfaces wireguard &lt;interface&gt; public-key
+<a class="cmdlink" href="#opcmd-show-interfaces-wireguard-interface-public-key" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher la clé publique assignée à l'interface.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show interfaces wireguard wg01 public-key
+EKY0dxRrSD98QHjfHOK13mZ5PJ7hnddRZt5woB3szyw=
+</pre></div>
+</div>
+</div>
+</div>
+<section id="optional">
+<h4>Optionnel</h4>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+generate pki wireguard preshared-key
+<a class="cmdlink" href="#opcmd-generate-pki-wireguard-preshared-key" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Générer une clé prédéfinie.</p>
+<p>La clé prédéfinie est optionnelle. Elle ajoute une couche supplémentaire de cryptographie symétrique au-dessus de la cryptographie asymétrique.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ generate pki wireguard preshared-key
+Clé prédéfinie : OHH2EwZfMNK+1L6BXbYw3bKCtMrfjpR4mCAEeBlFnRs=
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+generate pki wireguard preshared-key install interface &lt;interface&gt; peer &lt;peer&gt;
+<a class="cmdlink" href="#opcmd-generate-pki-wireguard-preshared-key-install-interface-interface-peer-peer" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Générer une clé prédéfinie et afficher la commande d'attribution de la clé pour le
+pair spécifié.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ generate pki wireguard preshared-key install interface wg10 peer foo
+&quot;generate&quot; commande CLI exécutée depuis le niveau opérationnel.
+La clé prédéfinie générée n'est pas stockée dans le CLI, utilisez les commandes en mode configuration pour installer la clé :
+
+set interfaces wireguard wg10 peer foo preshared-key &#39;32vQ1w1yFKTna8n7Gu7EimubSe2Y63m8bafz55EG3Ro=&#39;
+
+Clé prédéfinie : +LuaZ8W6DjsDFJFX3jJzoNqrsXHhvq08JztM9z8LHCs=
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Si vous invoquez cette commande depuis le mode configuration avec le préfixe run,
+la clé générée est automatiquement assignée au pair spécifié.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="interface-configuration">
+<h2>Configuration de l'interface</h2>
+<p>La prochaine étape consiste à configurer votre interface WireGuard locale et à définir les
+réseaux que vous souhaitez tunneliser (<code class="docutils literal notranslate">allowed-ips</code>).</p>
+<p>Si votre système n'initie que des connexions, spécifier le port d'écoute est
+optionnel. Si votre système accepte des connexions entrantes, vous devez définir un port
+pour que les pairs puissent se connecter. Sinon, WireGuard sélectionne un port aléatoire à chaque
+redémarrage, ce qui peut empêcher vos pairs de se connecter si ce port n'est pas autorisé dans vos règles de pare-feu.</p>
+<p>Pour configurer un tunnel WireGuard, vous avez également besoin de la clé publique de votre pair.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>La clé publique spécifiée dans le bloc de configuration du pair est toujours celle
+du <strong>pair distant</strong>, jamais celle de votre propre système.</p>
+</div>
+<p><strong>Configuration côté local</strong></p>
+<p>Le côté local est configuré avec les paramètres suivants :</p>
+<ul class="simple">
+<li><p>Adresse IP de l'interface WireGuard locale : <code class="docutils literal notranslate">10.1.0.1/30</code></p></li>
+<li><p>Port d'écoute local : <code class="docutils literal notranslate">51820</code></p></li>
+<li><p>Nom du pair distant : <code class="docutils literal notranslate">to-wg02</code></p></li>
+<li><p>Point de terminaison du pair distant : <code class="docutils literal notranslate">192.0.2.1</code> sur le port <code class="docutils literal notranslate">51820</code></p></li>
+<li><p>Clé publique du pair distant : <code class="docutils literal notranslate">XMrlPykaxhdAAiSjhtPlvi30NVkvLQliQuKP7AI7CyI=</code></p></li>
+<li><p>Réseaux autorisés : <code class="docutils literal notranslate">192.168.2.0/24</code></p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces wireguard wg01 address &#39;10.1.0.1/30&#39;
+set interfaces wireguard wg01 description &#39;VPN-to-wg02&#39;
+set interfaces wireguard wg01 peer to-wg02 allowed-ips &#39;192.168.2.0/24&#39;
+set interfaces wireguard wg01 peer to-wg02 address &#39;192.0.2.1&#39;
+set interfaces wireguard wg01 peer to-wg02 port &#39;51820&#39;
+set interfaces wireguard wg01 peer to-wg02 public-key &#39;XMrlPykaxhdAAiSjhtPlvi30NVkvLQliQuKP7AI7CyI=&#39;
+set interfaces wireguard wg01 port &#39;51820&#39;
+
+set protocols static route 192.168.2.0/24 interface wg01
+</pre></div>
+</div>
+<p>Pour envoyer le trafic destiné à <code class="docutils literal notranslate">192.168.2.0/24</code> via l'interface WireGuard
+(<code class="docutils literal notranslate">wg01</code>), configurez une route statique. Plusieurs adresses IP ou réseaux peuvent être
+définis et routés. Le dernier contrôle est effectué contre <code class="docutils literal notranslate">allowed-ips</code>, qui
+permet ou rejette le trafic.</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Vous ne pouvez pas attribuer le même <code class="docutils literal notranslate">allowed-ips</code> à plusieurs pairs WireGuard.
+C'est une restriction de conception stricte. Pour plus d'informations, consultez le
+<a class="reference external" href="https://docs.vyos.io/en/rolling/configuration/https://lists.zx2c4.com/pipermail/wireguard/2018-December/003704.html">liste de diffusion WireGuard</a>.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces wireguard &lt;interface&gt; private-key &lt;private-key&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-wireguard-interface-private-key-private-key" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Assigner une clé privée à l'interface WireGuard spécifiée.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces wireguard wg01 private-key &#39;iJJyEARGK52Ls1GYRCcFvPuTj7WyWYDo//BknoDU0XY=&#39;
+</pre></div>
+</div>
+<p>Pour générer une clé privée, utilisez la commande suivante :
+<code class="docutils literal notranslate">generate pki wireguard key-pair</code>.</p>
+<p>Pour afficher la clé publique assignée à l'interface afin de la partager avec un
+pair, utilisez la commande suivante :
+<code class="docutils literal notranslate">show interfaces wireguard wg01 public-key</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces wireguard &lt;interface&gt; per-client-thread
+<a class="cmdlink" href="#cfgcmd-set-interfaces-wireguard-interface-per-client-thread" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activer le mode thread pour toutes les instances NAPI de l'appareil réseau spécifié.</strong></p>
+<p>L'activation du mode thread n'affecte pas l'opération de l'appareil et peut être effectuée pendant que l'appareil est actif.</p>
+<p>Ce mode est désactivé par défaut.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces wireguard wg01 per-client-thread
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Configuration côté distant</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces wireguard wg01 address &#39;10.1.0.2/30&#39;
+set interfaces wireguard wg01 description &#39;VPN-to-wg01&#39;
+set interfaces wireguard wg01 peer to-wg01 allowed-ips &#39;192.168.1.0/24&#39;
+set interfaces wireguard wg01 peer to-wg01 address &#39;192.0.2.2&#39;
+set interfaces wireguard wg01 peer to-wg01 port &#39;51820&#39;
+set interfaces wireguard wg01 peer to-wg01 public-key &#39;EKY0dxRrSD98QHjfHOK13mZ5PJ7hnddRZt5woB3szyw=&#39;
+set interfaces wireguard wg01 port &#39;51820&#39;
+set interfaces wireguard wg01 private-key &#39;OLTQY3HuK5qWDgVs6fJR093SwPgOmCKkDI1+vJLGoFU=&#39;
+
+set protocols static route 192.168.1.0/24 interface wg01
+</pre></div>
+</div>
+</section>
+<section id="firewall-exceptions">
+<h2>Exceptions de pare-feu</h2>
+<p>Pour permettre le trafic WireGuard à travers l'interface WAN, créez une exception de pare-feu :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv4 name OUTSIDE_LOCAL rule 10 action accept
+set firewall ipv4 name OUTSIDE_LOCAL rule 10 description &#39;Allow established/related&#39;
+set firewall ipv4 name OUTSIDE_LOCAL rule 10 state established enable
+set firewall ipv4 name OUTSIDE_LOCAL rule 10 state related enable
+set firewall ipv4 name OUTSIDE_LOCAL rule 20 action accept
+set firewall ipv4 name OUTSIDE_LOCAL rule 20 description WireGuard_IN
+set firewall ipv4 name OUTSIDE_LOCAL rule 20 destination port 51820
+set firewall ipv4 name OUTSIDE_LOCAL rule 20 log enable
+set firewall ipv4 name OUTSIDE_LOCAL rule 20 protocol udp
+</pre></div>
+</div>
+<p>Vérifiez que le groupe de pare-feu OUTSIDE_LOCAL est appliqué à l'interface WAN
+et dans une direction d'entrée (locale).</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv4 input filter rule 10 action jump
+set firewall ipv4 input filter rule 10 jump-target &#39;OUTSIDE_LOCAL&#39;
+set firewall ipv4 input filter rule 10 inbound-interface name &#39;eth0&#39;
+</pre></div>
+</div>
+<p>Vérifiez que vos règles de pare-feu autorisent le trafic. Si c'est le cas, votre VPN WireGuard
+devrait fonctionner.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>wg01# ping 192.168.1.1
+PING 192.168.1.1 (192.168.1.1) 56(84) bytes of data.
+64 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=1.16 ms
+64 bytes from 192.168.1.1: icmp_seq=2 ttl=64 time=1.77 ms
+
+wg02# ping 192.168.2.1
+PING 192.168.2.1 (192.168.2.1) 56(84) bytes of data.
+64 bytes from 192.168.2.1: icmp_seq=1 ttl=64 time=4.40 ms
+64 bytes from 192.168.2.1: icmp_seq=2 ttl=64 time=1.02 ms
+</pre></div>
+</div>
+<p>Une couche supplémentaire de cryptographie symétrique peut être utilisée au-dessus de la
+cryptographie asymétrique. Cela est optionnel.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ generate pki wireguard preshared-key
+Clé prédéfinie : rvVDOoc2IYEnV+k5p7TNAmHBMEGTHbPU8Qqg8c/sUqc=
+</pre></div>
+</div>
+<p>Copiez la clé, car elle n'est pas stockée localement. Étant donné qu'il s'agit d'une clé symétrique, seul vous et votre pair devriez connaître son contenu. Distribuez la clé en toute sécurité.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>wg01# set interfaces wireguard wg01 peer to-wg02 preshared-key &#39;rvVDOoc2IYEnV+k5p7TNAmHBMEGTHbPU8Qqg8c/sUqc=&#39;
+wg02# set interfaces wireguard wg01 peer to-wg01 preshared-key &#39;rvVDOoc2IYEnV+k5p7TNAmHBMEGTHbPU8Qqg8c/sUqc=&#39;
+</pre></div>
+</div>
+</section>
+<section id="remote-access-road-warrior">
+<h2>Accès à distance (road warrior)</h2>
+<p>Avec WireGuard, une configuration de VPN road warrior est similaire à un VPN site à site.
+Elle omet simplement les déclarations <code class="docutils literal notranslate">address</code> et <code class="docutils literal notranslate">port</code>.</p>
+<p>Dans l'exemple suivant, les adresses IP des clients distants sont définies
+dans chaque configuration de pair. Cela permet aux pairs de communiquer entre eux.</p>
+<p>De plus, cette configuration utilise un indicateur <code class="docutils literal notranslate">persistent-keepalive</code> défini à 15 secondes
+pour maintenir la connexion active. Cette configuration est principalement pertinente si un pair
+est derrière un NAT et ne peut pas être atteint si la connexion est perdue. Pour une efficacité,
+la valeur doit être inférieure au délai d'expiration UDP.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>wireguard wg01 {
+    address 10.172.24.1/24
+    address 2001:db8:470:22::1/64
+    description RoadWarrior
+    peer MacBook {
+        allowed-ips 10.172.24.30/32
+        allowed-ips 2001:db8:470:22::30/128
+        persistent-keepalive 15
+        pubkey F5MbW7ye7DsoxdOaixjdrudshjjxN5UdNV+pGFHqehc=
+    }
+    peer iPhone {
+        allowed-ips 10.172.24.20/32
+        allowed-ips 2001:db8:470:22::20/128
+        persistent-keepalive 15
+        pubkey BknHcLFo8nOo8Dwq2CjaC/TedchKQ0ebxC7GYn7Al00=
+    }
+    port 2224
+    private-key OLTQY3HuK5qWDgVs6fJR093SwPgOmCKkDI1+vJLGoFU=
+}
+</pre></div>
+</div>
+<p>Voici la configuration du pair iPhone. Le paramètre <code class="docutils literal notranslate">AllowedIPs</code> wildcard indique tout le trafic IPv4 et IPv6
+via la connexion VPN.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>[Interface]
+PrivateKey = ARAKLSDJsadlkfjasdfiowqeruriowqeuasdf=
+Address = 10.172.24.20/24, 2001:db8:470:22::20/64
+DNS = 10.0.0.53, 10.0.0.54
+
+[Peer]
+PublicKey = RIbtUTCfgzNjnLNPQ/ulkGnnB2vMWHm7l2H/xUfbyjc=
+AllowedIPs = 0.0.0.0/0, ::/0
+Endpoint = 192.0.2.1:2224
+PersistentKeepalive = 15
+</pre></div>
+</div>
+<p>Pour activer le tunnel partagé, spécifiez les sous-réseaux distants. Cela garantit que seul
+le trafic destiné au site distant est envoyé via le tunnel, tandis que tout le reste du trafic reste inchangé.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>[Interface]
+PrivateKey = 8Iasdfweirousd1EVGUk5XsT+wYFZ9mhPnQhmjzaJE6Go=
+Address = 10.172.24.30/24, 2001:db8:470:22::30/64
+
+[Peer]
+PublicKey = RIbtUTCfgzNjnLNPQ/ulkGnnB2vMWHm7l2H/xUfbyjc=
+AllowedIPs = 10.172.24.30/24, 2001:db8:470:22::/64
+Endpoint = 192.0.2.1:2224
+PersistentKeepalive = 15
+</pre></div>
+</div>
+</section>
+<section id="operational-commands">
+<h2>Commandes opérationnelles</h2>
+<section id="status">
+<h3>Status</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show interfaces wireguard wg01 summary
+<a class="cmdlink" href="#opcmd-show-interfaces-wireguard-wg01-summary" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les informations sur le service WireGuard, y compris la dernière main de handshake.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show interfaces wireguard wg01 summary
+interface: wg01
+public key:
+private key: (caché)
+listening port: 51820
+
+peer: &lt;peer pubkey&gt;
+endpoint: &lt;peer public IP&gt;
+allowed ips: 10.69.69.2/32
+latest handshake: 23 heures, 45 minutes, 26 secondes ago
+transfer: 1.26 MiB reçus, 6.47 MiB envoyés
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show interfaces wireguard
+<a class="cmdlink" href="#opcmd-show-interfaces-wireguard" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher la liste de toutes les interfaces WireGuard.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Codes: S - State, L - Link, u - Up, D - Down, A - Admin Down
+Interface        IP Address                        S/L  Description
+---------        ----------                        ---  -----------
+wg01             10.0.0.1/24                       u/u
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show interfaces wireguard &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-show-interfaces-wireguard-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les informations générales sur une interface WireGuard spécifique.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show interfaces wireguard wg01
+interface: wg01
+address: 10.0.0.1/24
+public key: h1HkYlSuHdJN6Qv4Hz4bBzjGg5WUty+U1L7DJsZy1iE=
+private key: (caché)
+listening port: 41751
+RX:  bytes  packets  errors  dropped  overrun       mcast
+0        0       0        0        0           0
+TX:  bytes  packets  errors  dropped  carrier  collisions
+0        0       0        0        0           0
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="remote-access-road-warrior-clients">
+<h2>Clients d'accès à distance (road warrior)</h2>
+<p>Certaines personnes connectent leurs appareils mobiles à leur routeur VyOS à l'aide de WireGuard. Pour
+simplifier le déploiement, générez une configuration par appareil mobile à partir du CLI VyOS.</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>En termes de sécurité, il n'est pas recommandé de permettre à un tiers de créer et de partager la clé privée pour une connexion sécurisée. Vous devriez créer la partie privée vous-même et ne distribuer que la clé publique.</p>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+generate wireguard client-config &lt;name&gt; interface &lt;interface&gt; server &lt;ip|fqdn&gt; address &lt;client-ip&gt;
+<a class="cmdlink" href="#opcmd-generate-wireguard-client-config-name-interface-interface-server-ip-fqdn-address-client-ip" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p><strong>Générer un fichier de configuration client qui établit une connexion à l'interface
+spécifiée.</strong></p>
+<p>La clé publique de l'interface spécifiée est automatiquement incluse dans le
+fichier de configuration.</p>
+<p>La commande génère également un fragment de configuration pouvant être copié dans le
+CLI VyOS. Le <code class="docutils literal notranslate">&lt;name&gt;</code> que vous fournissez sera utilisé comme nom de pair dans le
+fragment.</p>
+<p>Vous devez également spécifier l'adresse IP ou le FQDN du serveur auquel le client se connecte.
+Le paramètre address peut être utilisé deux fois pour attribuer à la fois une adresse IPv4 (/32) et
+une adresse IPv6 (/128) au client.</p>
+<figure class="align-default">
+<img alt="Code QR client WireGuard" src="https://docs.vyos.io/en/rolling/_images/wireguard_qrcode.webp" />
+</figure>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

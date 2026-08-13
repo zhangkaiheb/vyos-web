@@ -2,7 +2,7 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "action",
     "title": "动作",
-    "help": "Rule action",
+    "help": "firewall.rule.help.action",
     "type": "select",
     "options": [
       "accept",
@@ -19,26 +19,26 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "add-address-to-group",
     "title": "动态地址组",
-    "help": "Add ip address to dynamic address-group",
+    "help": "firewall.rule.help.add-address-to-group",
     "type": "group",
     "children": [
       {
         "key": "destination-address",
         "title": "目的地址",
-        "help": "Add destination ip addresses to dynamic address-group",
+        "help": "firewall.rule.help.destination-address",
         "type": "group",
         "children": [
           {
             "key": "address-group",
             "title": "地址组",
-            "help": "Dynamic address-group",
-            "type": "text",
+            "help": "firewall.rule.help.dynamic-addr-group",
+            "type": "select",
             "dynamic": true
           },
           {
             "key": "timeout",
             "title": "超时",
-            "help": "Set timeout",
+            "help": "firewall.rule.help.timeout",
             "type": "text"
           }
         ]
@@ -46,20 +46,20 @@ export const FIREWALL_RULE_SCHEMA = [
       {
         "key": "source-address",
         "title": "源地址",
-        "help": "Add source ip addresses to dynamic address-group",
+        "help": "firewall.rule.help.source-address",
         "type": "group",
         "children": [
           {
             "key": "address-group",
             "title": "地址组",
-            "help": "Dynamic address-group",
-            "type": "text",
+            "help": "firewall.rule.help.dynamic-addr-group",
+            "type": "select",
             "dynamic": true
           },
           {
             "key": "timeout",
             "title": "超时",
-            "help": "Set timeout",
+            "help": "firewall.rule.help.timeout",
             "type": "text"
           }
         ]
@@ -70,7 +70,7 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "connection-mark",
     "title": "连接标记",
-    "help": "Connection mark",
+    "help": "firewall.rule.help.connection-mark",
     "type": "textarea",
     "placeholder": "每行一个值",
     "multi": true,
@@ -79,13 +79,13 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "connection-status",
     "title": "连接状态",
-    "help": "Connection status",
+    "help": "firewall.rule.help.connection-status",
     "type": "group",
     "children": [
       {
         "key": "nat",
         "title": "NAT",
-        "help": "NAT connection status",
+        "help": "firewall.rule.help.nat",
         "type": "select",
         "options": [
           "destination",
@@ -98,7 +98,7 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "conntrack-helper",
     "title": "连接跟踪助手",
-    "help": "Match related traffic from conntrack helpers",
+    "help": "firewall.rule.help.conntrack-helper",
     "type": "multi-select",
     "options": [
       "ftp",
@@ -115,45 +115,45 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "description",
     "title": "描述",
-    "help": "Description",
+    "help": "firewall.rule.help.description",
     "type": "text"
   },
   {
     "key": "destination",
     "title": "目的",
-    "help": "Destination parameters",
+    "help": "firewall.rule.help.destination",
     "type": "group",
     "children": [
       {
         "key": "address",
         "title": "地址",
-        "help": "IP address, subnet, or range",
+        "help": "firewall.rule.help.address",
         "type": "text",
         "validate": "ip-segment"
       },
       {
         "key": "address-mask",
         "title": "地址掩码",
-        "help": "IP mask",
+        "help": "firewall.rule.help.address-mask",
         "type": "text",
         "validate": "ipv4"
       },
       {
         "key": "fqdn",
         "title": "FQDN",
-        "help": "Fully qualified domain name",
+        "help": "firewall.rule.help.fqdn",
         "type": "text"
       },
       {
         "key": "geoip",
         "title": "GeoIP",
-        "help": "GeoIP options - Data provided by DB-IP.com",
+        "help": "firewall.rule.help.geoip",
         "type": "group",
         "children": [
           {
             "key": "country-code",
             "title": "国家代码",
-            "help": "GeoIP country code",
+            "help": "firewall.rule.help.country-code",
             "type": "textarea",
             "placeholder": "每行一个值",
             "multi": true
@@ -161,7 +161,7 @@ export const FIREWALL_RULE_SCHEMA = [
           {
             "key": "inverse-match",
             "title": "反向匹配",
-            "help": "Inverse match of country-codes",
+            "help": "firewall.rule.help.inverse-match",
             "type": "checkbox",
             "valueless": true
           }
@@ -170,49 +170,49 @@ export const FIREWALL_RULE_SCHEMA = [
       {
         "key": "group",
         "title": "组",
-        "help": "Group",
+        "help": "firewall.rule.help.group",
         "type": "group",
         "children": [
           {
             "key": "address-group",
             "title": "地址组",
-            "help": "Group of addresses",
-            "type": "text",
+            "help": "firewall.rule.help.address-group",
+            "type": "select",
             "dynamic": true
           },
           {
             "key": "domain-group",
             "title": "域名组",
-            "help": "Group of domains",
-            "type": "text",
+            "help": "firewall.rule.help.domain-group",
+            "type": "select",
             "dynamic": true
           },
           {
             "key": "dynamic-address-group",
             "title": "动态地址组",
-            "help": "Group of dynamic addresses",
-            "type": "text",
+            "help": "firewall.rule.help.dynamic-address-group",
+            "type": "select",
             "dynamic": true
           },
           {
             "key": "mac-group",
             "title": "MAC 组",
-            "help": "Group of MAC addresses",
-            "type": "text",
+            "help": "firewall.rule.help.mac-group",
+            "type": "select",
             "dynamic": true
           },
           {
             "key": "network-group",
             "title": "网络组",
-            "help": "Group of networks",
-            "type": "text",
+            "help": "firewall.rule.help.network-group",
+            "type": "select",
             "dynamic": true
           },
           {
             "key": "port-group",
             "title": "端口组",
-            "help": "Group of ports",
-            "type": "text",
+            "help": "firewall.rule.help.port-group",
+            "type": "select",
             "dynamic": true
           }
         ]
@@ -220,14 +220,14 @@ export const FIREWALL_RULE_SCHEMA = [
       {
         "key": "mac-address",
         "title": "MAC 地址",
-        "help": "MAC address",
+        "help": "firewall.rule.help.mac-address",
         "type": "text",
         "validate": "mac"
       },
       {
         "key": "port",
         "title": "端口",
-        "help": "Port",
+        "help": "firewall.rule.help.port",
         "type": "text",
         "validate": "port"
       }
@@ -236,14 +236,14 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "disable",
     "title": "禁用",
-    "help": "Disable instance",
+    "help": "firewall.rule.help.disable",
     "type": "checkbox",
     "valueless": true
   },
   {
     "key": "dscp",
     "title": "DSCP",
-    "help": "DSCP value",
+    "help": "firewall.rule.help.dscp",
     "type": "textarea",
     "placeholder": "每行一个值",
     "multi": true,
@@ -252,7 +252,7 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "dscp-exclude",
     "title": "DSCP 排除",
-    "help": "DSCP value not to match",
+    "help": "firewall.rule.help.dscp-exclude",
     "type": "textarea",
     "placeholder": "每行一个值",
     "multi": true,
@@ -261,20 +261,20 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "fragment",
     "title": "分片",
-    "help": "IP fragment match",
+    "help": "firewall.rule.help.fragment",
     "type": "group",
     "children": [
       {
         "key": "match-frag",
         "title": "匹配分片",
-        "help": "Second and further fragments of fragmented packets",
+        "help": "firewall.rule.help.match-frag",
         "type": "checkbox",
         "valueless": true
       },
       {
         "key": "match-non-frag",
         "title": "匹配非分片",
-        "help": "Head fragments or unfragmented packets",
+        "help": "firewall.rule.help.match-non-frag",
         "type": "checkbox",
         "valueless": true
       }
@@ -284,13 +284,13 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "icmp",
     "title": "ICMP",
-    "help": "ICMP type and code information",
+    "help": "firewall.rule.help.icmp",
     "type": "group",
     "children": [
       {
         "key": "code",
         "title": "Code",
-        "help": "ICMP code",
+        "help": "firewall.rule.help.code",
         "type": "number",
         "min": 0,
         "max": 255
@@ -298,7 +298,7 @@ export const FIREWALL_RULE_SCHEMA = [
       {
         "key": "type",
         "title": "Type",
-        "help": "ICMP type",
+        "help": "firewall.rule.help.type",
         "type": "number",
         "min": 0,
         "max": 255
@@ -306,7 +306,7 @@ export const FIREWALL_RULE_SCHEMA = [
       {
         "key": "type-name",
         "title": "类型名称",
-        "help": "ICMP type-name",
+        "help": "firewall.rule.help.type-name",
         "type": "select",
         "options": [
           "echo-reply",
@@ -332,45 +332,42 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "inbound-interface",
     "title": "入接口",
-    "help": "Match inbound-interface",
+    "help": "firewall.rule.help.inbound-interface",
     "type": "group",
     "children": [
       {
         "key": "group",
         "title": "组",
-        "help": "Match interface-group",
-        "type": "text",
+        "help": "firewall.rule.help.interface-group",
+        "type": "select",
         "dynamic": true
       },
       {
         "key": "name",
         "title": "名称",
-        "help": "Match interface",
-        "type": "text",
-        "dynamic": true,
-        "suggestions": [
-          "txt*"
-        ]
+        "help": "firewall.rule.help.interface-name",
+        "type": "select",
+        "dynamic": true
       }
     ]
   },
   {
     "key": "ipsec",
     "title": "IPsec",
-    "help": "Inbound IPsec packets",
+    "help": "firewall.rule.help.ipsec",
     "type": "group",
     "children": [
       {
         "key": "match-ipsec",
         "title": "匹配 IPsec",
-        "help": "Inbound IPsec packets",
+        "help": "firewall.rule.help.match-ipsec",
         "type": "checkbox",
         "valueless": true
       },
       {
         "key": "match-none",
         "title": "匹配非 IPsec",
-        "help": "Inbound non-IPsec packets",
+        "help": "firewall.rule.help.match-none",
         "type": "checkbox",
         "valueless": true
       }
@@ -380,21 +377,21 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "jump-target",
     "title": "跳转目标",
-    "help": "Set jump target. Action jump must be defined to use this setting",
-    "type": "text",
+    "help": "firewall.rule.help.jump-target",
+    "type": "select",
     "dynamic": true,
     "advanced": true
   },
   {
     "key": "limit",
     "title": "限速",
-    "help": "Rate limit using a token bucket filter",
+    "help": "firewall.rule.help.limit",
     "type": "group",
     "children": [
       {
         "key": "burst",
         "title": "突发",
-        "help": "Maximum number of packets to allow in excess of rate",
+        "help": "firewall.rule.help.burst",
         "type": "number",
         "min": 0,
         "max": 4294967295
@@ -402,7 +399,7 @@ export const FIREWALL_RULE_SCHEMA = [
       {
         "key": "rate",
         "title": "速率",
-        "help": "Maximum average matching rate",
+        "help": "firewall.rule.help.rate",
         "type": "text"
       }
     ],
@@ -411,20 +408,20 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "log",
     "title": "日志",
-    "help": "Log packets hitting this rule",
+    "help": "firewall.rule.help.log",
     "type": "checkbox",
     "valueless": true
   },
   {
     "key": "log-options",
     "title": "日志选项",
-    "help": "Log options",
+    "help": "firewall.rule.help.log-options",
     "type": "group",
     "children": [
       {
         "key": "group",
         "title": "组",
-        "help": "Set log group",
+        "help": "firewall.rule.help.log-group",
         "type": "number",
         "min": 0,
         "max": 65535
@@ -432,7 +429,7 @@ export const FIREWALL_RULE_SCHEMA = [
       {
         "key": "level",
         "title": "级别",
-        "help": "Set log-level",
+        "help": "firewall.rule.help.level",
         "type": "select",
         "options": [
           "emerg",
@@ -448,7 +445,7 @@ export const FIREWALL_RULE_SCHEMA = [
       {
         "key": "queue-threshold",
         "title": "队列阈值",
-        "help": "Number of packets to queue inside the kernel before sending them",
+        "help": "firewall.rule.help.queue-threshold",
         "type": "number",
         "min": 0,
         "max": 65535
@@ -456,7 +453,7 @@ export const FIREWALL_RULE_SCHEMA = [
       {
         "key": "snapshot-length",
         "title": "快照长度",
-        "help": "Length of packet payload to include in netlink message",
+        "help": "firewall.rule.help.snapshot-length",
         "type": "number",
         "min": 0,
         "max": 9000
@@ -467,47 +464,44 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "mark",
     "title": "防火墙标记",
-    "help": "Firewall mark",
+    "help": "firewall.rule.help.mark",
     "type": "text",
     "advanced": true
   },
   {
     "key": "offload-target",
     "title": "卸载目标",
-    "help": "Set flowtable offload target. Action offload must be defined to",
-    "type": "text",
+    "help": "firewall.rule.help.offload-target",
+    "type": "select",
     "dynamic": true,
     "advanced": true
   },
   {
     "key": "outbound-interface",
     "title": "出接口",
-    "help": "Match outbound-interface",
+    "help": "firewall.rule.help.outbound-interface",
     "type": "group",
     "children": [
       {
         "key": "group",
         "title": "组",
-        "help": "Match interface-group",
-        "type": "text",
+        "help": "firewall.rule.help.interface-group",
+        "type": "select",
         "dynamic": true
       },
       {
         "key": "name",
         "title": "名称",
-        "help": "Match interface",
-        "type": "text",
-        "dynamic": true,
-        "suggestions": [
-          "txt*"
-        ]
+        "help": "firewall.rule.help.interface-name",
+        "type": "select",
+        "dynamic": true
       }
     ]
   },
   {
     "key": "packet-length",
     "title": "包长度",
-    "help": "Payload size in bytes, including header and data to match",
+    "help": "firewall.rule.help.packet-length",
     "type": "textarea",
     "placeholder": "每行一个值",
     "multi": true,
@@ -516,7 +510,7 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "packet-length-exclude",
     "title": "包长度排除",
-    "help": "Payload size in bytes, including header and data not to match",
+    "help": "firewall.rule.help.packet-length-exclude",
     "type": "textarea",
     "placeholder": "每行一个值",
     "multi": true,
@@ -525,7 +519,7 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "packet-type",
     "title": "包类型",
-    "help": "Packet type",
+    "help": "firewall.rule.help.packet-type",
     "type": "select",
     "options": [
       "broadcast",
@@ -538,18 +532,57 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "protocol",
     "title": "协议",
-    "help": "Protocol to match (protocol name, number, or \"all\")",
-    "type": "text",
-    "dynamic": true,
-    "suggestions": [
+    "help": "firewall.rule.help.protocol",
+    "type": "select",
+    "options": [
       "all",
-      "tcp_udp"
+      "tcp_udp",
+      "ah",
+      "ax.25",
+      "dccp",
+      "egp",
+      "eigrp",
+      "encap",
+      "esp",
+      "etherip",
+      "gre",
+      "hmp",
+      "icmp",
+      "icmpv6",
+      "igmp",
+      "ip",
+      "ipcomp",
+      "ipencap",
+      "ipip",
+      "ipv6",
+      "ipv6-frag",
+      "ipv6-icmp",
+      "ipv6-nonxt",
+      "ipv6-opts",
+      "ipv6-route",
+      "iso-tp4",
+      "l2tp",
+      "mtp",
+      "ospf",
+      "pim",
+      "pup",
+      "rdp",
+      "rsvp",
+      "sctp",
+      "st",
+      "tcp",
+      "udp",
+      "udplite",
+      "vmtp",
+      "vrrp",
+      "xns-idp",
+      "xtp"
     ]
   },
   {
     "key": "queue",
     "title": "队列",
-    "help": "Queue target to use. Action queue must be defined to use this",
+    "help": "firewall.rule.help.queue",
     "type": "number",
     "min": 0,
     "max": 65535,
@@ -558,7 +591,7 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "queue-options",
     "title": "队列选项",
-    "help": "Options used for queue target. Action queue must be defined to",
+    "help": "firewall.rule.help.queue-options",
     "type": "multi-select",
     "options": [
       "bypass",
@@ -569,13 +602,13 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "recent",
     "title": "近期匹配",
-    "help": "Parameters for matching recently seen sources",
+    "help": "firewall.rule.help.recent",
     "type": "group",
     "children": [
       {
         "key": "count",
         "title": "计数",
-        "help": "Source addresses seen more than N times",
+        "help": "firewall.rule.help.count",
         "type": "number",
         "min": 1,
         "max": 255
@@ -583,7 +616,7 @@ export const FIREWALL_RULE_SCHEMA = [
       {
         "key": "time",
         "title": "时间",
-        "help": "Source addresses seen in the last second/minute/hour",
+        "help": "firewall.rule.help.time",
         "type": "select",
         "options": [
           "second",
@@ -598,39 +631,39 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "source",
     "title": "源",
-    "help": "Source parameters",
+    "help": "firewall.rule.help.source",
     "type": "group",
     "children": [
       {
         "key": "address",
         "title": "地址",
-        "help": "IP address, subnet, or range",
+        "help": "firewall.rule.help.address",
         "type": "text",
         "validate": "ip-segment"
       },
       {
         "key": "address-mask",
         "title": "地址掩码",
-        "help": "IP mask",
+        "help": "firewall.rule.help.address-mask",
         "type": "text",
         "validate": "ipv4"
       },
       {
         "key": "fqdn",
         "title": "FQDN",
-        "help": "Fully qualified domain name",
+        "help": "firewall.rule.help.fqdn",
         "type": "text"
       },
       {
         "key": "geoip",
         "title": "GeoIP",
-        "help": "GeoIP options - Data provided by DB-IP.com",
+        "help": "firewall.rule.help.geoip",
         "type": "group",
         "children": [
           {
             "key": "country-code",
             "title": "国家代码",
-            "help": "GeoIP country code",
+            "help": "firewall.rule.help.country-code",
             "type": "textarea",
             "placeholder": "每行一个值",
             "multi": true
@@ -638,7 +671,7 @@ export const FIREWALL_RULE_SCHEMA = [
           {
             "key": "inverse-match",
             "title": "反向匹配",
-            "help": "Inverse match of country-codes",
+            "help": "firewall.rule.help.inverse-match",
             "type": "checkbox",
             "valueless": true
           }
@@ -647,49 +680,49 @@ export const FIREWALL_RULE_SCHEMA = [
       {
         "key": "group",
         "title": "组",
-        "help": "Group",
+        "help": "firewall.rule.help.group",
         "type": "group",
         "children": [
           {
             "key": "address-group",
             "title": "地址组",
-            "help": "Group of addresses",
-            "type": "text",
+            "help": "firewall.rule.help.address-group",
+            "type": "select",
             "dynamic": true
           },
           {
             "key": "domain-group",
             "title": "域名组",
-            "help": "Group of domains",
-            "type": "text",
+            "help": "firewall.rule.help.domain-group",
+            "type": "select",
             "dynamic": true
           },
           {
             "key": "dynamic-address-group",
             "title": "动态地址组",
-            "help": "Group of dynamic addresses",
-            "type": "text",
+            "help": "firewall.rule.help.dynamic-address-group",
+            "type": "select",
             "dynamic": true
           },
           {
             "key": "mac-group",
             "title": "MAC 组",
-            "help": "Group of MAC addresses",
-            "type": "text",
+            "help": "firewall.rule.help.mac-group",
+            "type": "select",
             "dynamic": true
           },
           {
             "key": "network-group",
             "title": "网络组",
-            "help": "Group of networks",
-            "type": "text",
+            "help": "firewall.rule.help.network-group",
+            "type": "select",
             "dynamic": true
           },
           {
             "key": "port-group",
             "title": "端口组",
-            "help": "Group of ports",
-            "type": "text",
+            "help": "firewall.rule.help.port-group",
+            "type": "select",
             "dynamic": true
           }
         ]
@@ -697,14 +730,14 @@ export const FIREWALL_RULE_SCHEMA = [
       {
         "key": "mac-address",
         "title": "MAC 地址",
-        "help": "MAC address",
+        "help": "firewall.rule.help.mac-address",
         "type": "text",
         "validate": "mac"
       },
       {
         "key": "port",
         "title": "端口",
-        "help": "Port",
+        "help": "firewall.rule.help.port",
         "type": "text",
         "validate": "port"
       }
@@ -713,7 +746,7 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "state",
     "title": "连接状态",
-    "help": "Session state",
+    "help": "firewall.rule.help.state",
     "type": "multi-select",
     "options": [
       "established",
@@ -726,19 +759,19 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "synproxy",
     "title": "SYN 代理",
-    "help": "Synproxy options",
+    "help": "firewall.rule.help.synproxy",
     "type": "group",
     "children": [
       {
         "key": "tcp",
         "title": "TCP 选项",
-        "help": "TCP synproxy options",
+        "help": "firewall.rule.help.tcp-synproxy",
         "type": "group",
         "children": [
           {
             "key": "mss",
             "title": "MSS",
-            "help": "TCP Maximum segment size",
+            "help": "firewall.rule.help.mss",
             "type": "number",
             "min": 501,
             "max": 65535
@@ -746,7 +779,7 @@ export const FIREWALL_RULE_SCHEMA = [
           {
             "key": "window-scale",
             "title": "窗口缩放",
-            "help": "TCP window scale for synproxy connections",
+            "help": "firewall.rule.help.window-scale",
             "type": "number",
             "min": 1,
             "max": 14
@@ -760,102 +793,102 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "tcp",
     "title": "TCP 选项",
-    "help": "TCP options to match",
+    "help": "firewall.rule.help.tcp",
     "type": "group",
     "children": [
       {
         "key": "flags",
         "title": "标志",
-        "help": "TCP flags to match",
+        "help": "firewall.rule.help.flags",
         "type": "group",
         "children": [
           {
             "key": "ack",
             "title": "Ack",
-            "help": "Acknowledge flag",
+            "help": "firewall.rule.help.ack",
             "type": "checkbox",
             "valueless": true
           },
           {
             "key": "cwr",
             "title": "Cwr",
-            "help": "Congestion Window Reduced flag",
+            "help": "firewall.rule.help.cwr",
             "type": "checkbox",
             "valueless": true
           },
           {
             "key": "ecn",
             "title": "Ecn",
-            "help": "Explicit Congestion Notification flag",
+            "help": "firewall.rule.help.ecn",
             "type": "checkbox",
             "valueless": true
           },
           {
             "key": "fin",
             "title": "Fin",
-            "help": "Finish flag",
+            "help": "firewall.rule.help.fin",
             "type": "checkbox",
             "valueless": true
           },
           {
             "key": "not",
             "title": "Not",
-            "help": "Match flags not set",
+            "help": "firewall.rule.help.not",
             "type": "group",
             "children": [
               {
                 "key": "ack",
                 "title": "Ack",
-                "help": "Acknowledge flag",
+                "help": "firewall.rule.help.ack",
                 "type": "checkbox",
                 "valueless": true
               },
               {
                 "key": "cwr",
                 "title": "Cwr",
-                "help": "Congestion Window Reduced flag",
+                "help": "firewall.rule.help.cwr",
                 "type": "checkbox",
                 "valueless": true
               },
               {
                 "key": "ecn",
                 "title": "Ecn",
-                "help": "Explicit Congestion Notification flag",
+                "help": "firewall.rule.help.ecn",
                 "type": "checkbox",
                 "valueless": true
               },
               {
                 "key": "fin",
                 "title": "Fin",
-                "help": "Finish flag",
+                "help": "firewall.rule.help.fin",
                 "type": "checkbox",
                 "valueless": true
               },
               {
                 "key": "psh",
                 "title": "Psh",
-                "help": "Push flag",
+                "help": "firewall.rule.help.psh",
                 "type": "checkbox",
                 "valueless": true
               },
               {
                 "key": "rst",
                 "title": "Rst",
-                "help": "Reset flag",
+                "help": "firewall.rule.help.rst",
                 "type": "checkbox",
                 "valueless": true
               },
               {
                 "key": "syn",
                 "title": "Syn",
-                "help": "Synchronise flag",
+                "help": "firewall.rule.help.syn",
                 "type": "checkbox",
                 "valueless": true
               },
               {
                 "key": "urg",
                 "title": "Urg",
-                "help": "Urgent flag",
+                "help": "firewall.rule.help.urg",
                 "type": "checkbox",
                 "valueless": true
               }
@@ -864,28 +897,28 @@ export const FIREWALL_RULE_SCHEMA = [
           {
             "key": "psh",
             "title": "Psh",
-            "help": "Push flag",
+            "help": "firewall.rule.help.psh",
             "type": "checkbox",
             "valueless": true
           },
           {
             "key": "rst",
             "title": "Rst",
-            "help": "Reset flag",
+            "help": "firewall.rule.help.rst",
             "type": "checkbox",
             "valueless": true
           },
           {
             "key": "syn",
             "title": "Syn",
-            "help": "Synchronise flag",
+            "help": "firewall.rule.help.syn",
             "type": "checkbox",
             "valueless": true
           },
           {
             "key": "urg",
             "title": "Urg",
-            "help": "Urgent flag",
+            "help": "firewall.rule.help.urg",
             "type": "checkbox",
             "valueless": true
           }
@@ -894,7 +927,7 @@ export const FIREWALL_RULE_SCHEMA = [
       {
         "key": "mss",
         "title": "MSS",
-        "help": "Maximum segment size (MSS)",
+        "help": "firewall.rule.help.tcp-mss",
         "type": "text"
       }
     ],
@@ -903,38 +936,51 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "time",
     "title": "时间",
-    "help": "Time to match rule",
+    "help": "firewall.rule.help.time-rule",
     "type": "group",
     "children": [
       {
         "key": "startdate",
         "title": "开始日期",
-        "help": "Date to start matching rule",
-        "type": "text"
+        "help": "firewall.rule.help.startdate",
+        "type": "date",
+        "placeholder": "YYYY-MM-DD"
       },
       {
         "key": "starttime",
         "title": "开始时间",
-        "help": "Time of day to start matching rule",
-        "type": "text"
+        "help": "firewall.rule.help.starttime",
+        "type": "time",
+        "placeholder": "hh:mm:ss"
       },
       {
         "key": "stopdate",
         "title": "结束日期",
-        "help": "Date to stop matching rule",
-        "type": "text"
+        "help": "firewall.rule.help.stopdate",
+        "type": "date",
+        "placeholder": "YYYY-MM-DD"
       },
       {
         "key": "stoptime",
         "title": "结束时间",
-        "help": "Time of day to stop matching rule",
-        "type": "text"
+        "help": "firewall.rule.help.stoptime",
+        "type": "time",
+        "placeholder": "hh:mm:ss"
       },
       {
         "key": "weekdays",
         "title": "工作日",
-        "help": "Comma separated weekdays to match rule on",
-        "type": "text"
+        "help": "firewall.rule.help.weekdays",
+        "type": "multiselect",
+        "options": [
+          { "value": "Monday", "label": "周一" },
+          { "value": "Tuesday", "label": "周二" },
+          { "value": "Wednesday", "label": "周三" },
+          { "value": "Thursday", "label": "周四" },
+          { "value": "Friday", "label": "周五" },
+          { "value": "Saturday", "label": "周六" },
+          { "value": "Sunday", "label": "周日" }
+        ]
       }
     ],
     "advanced": true
@@ -942,13 +988,13 @@ export const FIREWALL_RULE_SCHEMA = [
   {
     "key": "ttl",
     "title": "TTL",
-    "help": "Time to live limit",
+    "help": "firewall.rule.help.ttl",
     "type": "group",
     "children": [
       {
         "key": "eq",
         "title": "等于",
-        "help": "Match on equal value",
+        "help": "firewall.rule.help.eq",
         "type": "number",
         "min": 0,
         "max": 255
@@ -956,7 +1002,7 @@ export const FIREWALL_RULE_SCHEMA = [
       {
         "key": "gt",
         "title": "大于",
-        "help": "Match on greater then value",
+        "help": "firewall.rule.help.gt",
         "type": "number",
         "min": 0,
         "max": 255
@@ -964,7 +1010,7 @@ export const FIREWALL_RULE_SCHEMA = [
       {
         "key": "lt",
         "title": "小于",
-        "help": "Match on less then value",
+        "help": "firewall.rule.help.lt",
         "type": "number",
         "min": 0,
         "max": 255

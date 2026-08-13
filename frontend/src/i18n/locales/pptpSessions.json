@@ -1,0 +1,128 @@
+{
+  "zh-CN": {
+    "pptpSessions": {
+      "title": "PPTP 会话",
+      "rawOutput": "原始输出",
+      "columns": {
+        "ifname": "接口",
+        "username": "用户名",
+        "rateLimit": "速率限制",
+        "state": "状态",
+        "uptime": "运行时间",
+        "rxBytes": "接收字节",
+        "txBytes": "发送字节"
+      },
+      "buttons": {
+        "refresh": "刷新"
+      }
+    }
+  },
+  "en": {
+    "pptpSessions": {
+      "title": "PPTP Sessions",
+      "rawOutput": "Raw Output",
+      "columns": {
+        "ifname": "Interface",
+        "username": "Username",
+        "rateLimit": "Rate Limit",
+        "state": "State",
+        "uptime": "Uptime",
+        "rxBytes": "RX Bytes",
+        "txBytes": "TX Bytes"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "zh-TW": {
+    "pptpSessions": {
+      "title": "PPTP Sessions",
+      "rawOutput": "Raw Output",
+      "columns": {
+        "ifname": "Interface",
+        "username": "Username",
+        "rateLimit": "Rate Limit",
+        "state": "State",
+        "uptime": "Uptime",
+        "rxBytes": "RX Bytes",
+        "txBytes": "TX Bytes"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "ru": {
+    "pptpSessions": {
+      "title": "PPTP Sessions",
+      "rawOutput": "Raw Output",
+      "columns": {
+        "ifname": "Interface",
+        "username": "Username",
+        "rateLimit": "Rate Limit",
+        "state": "State",
+        "uptime": "Uptime",
+        "rxBytes": "RX Bytes",
+        "txBytes": "TX Bytes"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "de": {
+    "pptpSessions": {
+      "title": "PPTP Sessions",
+      "rawOutput": "Raw Output",
+      "columns": {
+        "ifname": "Interface",
+        "username": "Username",
+        "rateLimit": "Rate Limit",
+        "state": "State",
+        "uptime": "Uptime",
+        "rxBytes": "RX Bytes",
+        "txBytes": "TX Bytes"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "fr": {
+    "pptpSessions": {
+      "title": "PPTP Sessions",
+      "rawOutput": "Raw Output",
+      "columns": {
+        "ifname": "Interface",
+        "username": "Username",
+        "rateLimit": "Rate Limit",
+        "state": "State",
+        "uptime": "Uptime",
+        "rxBytes": "RX Bytes",
+        "txBytes": "TX Bytes"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "ko": {
+    "pptpSessions": {
+      "title": "PPTP Sessions",
+      "rawOutput": "Raw Output",
+      "columns": {
+        "ifname": "Interface",
+        "username": "Username",
+        "rateLimit": "Rate Limit",
+        "state": "State",
+        "uptime": "Uptime",
+        "rxBytes": "RX Bytes",
+        "txBytes": "TX Bytes"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  }
+}

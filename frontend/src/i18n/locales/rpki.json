@@ -1,0 +1,331 @@
+{
+  "zh-CN": {
+    "rpki": {
+      "alerts": {
+        "saved": "保存d"
+      },
+      "columns": {
+        "address": "添加ress",
+        "port": "端口",
+        "preference": "preference"
+      },
+      "errors": {
+        "addressRequired": "添加ress 为必填项"
+      },
+      "labels": {
+        "addressRequired": "添加ress 为必填项",
+        "expireInterval": "expireInterval",
+        "pollingPeriod": "pollingPeriod",
+        "retryInterval": "retryInterval"
+      },
+      "messages": {
+        "confirmDeleteCache": "确定 删除 cache"
+      },
+      "modals": {
+        "addCache": "添加 cache",
+        "confirmDelete": "确定 删除",
+        "editCache": "编辑 cache"
+      },
+      "placeholders": {
+        "expireInterval": "expireInterval",
+        "ipv4": "ipv4",
+        "pollingPeriod": "pollingPeriod",
+        "port": "端口",
+        "preference": "preference",
+        "retryInterval": "retryInterval"
+      },
+      "sections": {
+        "parameters": "parameters"
+      },
+      "tabs": {
+        "basic": "basic",
+        "cache": "cache"
+      },
+      "validation": {
+        "ipv4": "ipv4"
+      }
+    }
+  },
+  "en": {
+    "rpki": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "columns": {
+        "address": "Address",
+        "port": "Port",
+        "preference": "Preference"
+      },
+      "errors": {
+        "addressRequired": "Address Required"
+      },
+      "labels": {
+        "addressRequired": "Address Required",
+        "expireInterval": "Expire Interval",
+        "pollingPeriod": "Polling Period",
+        "retryInterval": "Retry Interval"
+      },
+      "messages": {
+        "confirmDeleteCache": "Confirm Delete Cache"
+      },
+      "modals": {
+        "addCache": "Add Cache",
+        "confirmDelete": "Confirm Delete",
+        "editCache": "Edit Cache"
+      },
+      "placeholders": {
+        "expireInterval": "Expire Interval",
+        "ipv4": "Ipv4",
+        "pollingPeriod": "Polling Period",
+        "port": "Port",
+        "preference": "Preference",
+        "retryInterval": "Retry Interval"
+      },
+      "sections": {
+        "parameters": "Parameters"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "cache": "Cache"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  },
+  "zh-TW": {
+    "rpki": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "columns": {
+        "address": "Address",
+        "port": "Port",
+        "preference": "Preference"
+      },
+      "errors": {
+        "addressRequired": "Address Required"
+      },
+      "labels": {
+        "addressRequired": "Address Required",
+        "expireInterval": "Expire Interval",
+        "pollingPeriod": "Polling Period",
+        "retryInterval": "Retry Interval"
+      },
+      "messages": {
+        "confirmDeleteCache": "Confirm Delete Cache"
+      },
+      "modals": {
+        "addCache": "Add Cache",
+        "confirmDelete": "Confirm Delete",
+        "editCache": "Edit Cache"
+      },
+      "placeholders": {
+        "expireInterval": "Expire Interval",
+        "ipv4": "Ipv4",
+        "pollingPeriod": "Polling Period",
+        "port": "Port",
+        "preference": "Preference",
+        "retryInterval": "Retry Interval"
+      },
+      "sections": {
+        "parameters": "Parameters"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "cache": "Cache"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  },
+  "ru": {
+    "rpki": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "columns": {
+        "address": "Address",
+        "port": "Port",
+        "preference": "Preference"
+      },
+      "errors": {
+        "addressRequired": "Address Required"
+      },
+      "labels": {
+        "addressRequired": "Address Required",
+        "expireInterval": "Expire Interval",
+        "pollingPeriod": "Polling Period",
+        "retryInterval": "Retry Interval"
+      },
+      "messages": {
+        "confirmDeleteCache": "Confirm Delete Cache"
+      },
+      "modals": {
+        "addCache": "Add Cache",
+        "confirmDelete": "Confirm Delete",
+        "editCache": "Edit Cache"
+      },
+      "placeholders": {
+        "expireInterval": "Expire Interval",
+        "ipv4": "Ipv4",
+        "pollingPeriod": "Polling Period",
+        "port": "Port",
+        "preference": "Preference",
+        "retryInterval": "Retry Interval"
+      },
+      "sections": {
+        "parameters": "Parameters"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "cache": "Cache"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  },
+  "de": {
+    "rpki": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "columns": {
+        "address": "Address",
+        "port": "Port",
+        "preference": "Preference"
+      },
+      "errors": {
+        "addressRequired": "Address Required"
+      },
+      "labels": {
+        "addressRequired": "Address Required",
+        "expireInterval": "Expire Interval",
+        "pollingPeriod": "Polling Period",
+        "retryInterval": "Retry Interval"
+      },
+      "messages": {
+        "confirmDeleteCache": "Confirm Delete Cache"
+      },
+      "modals": {
+        "addCache": "Add Cache",
+        "confirmDelete": "Confirm Delete",
+        "editCache": "Edit Cache"
+      },
+      "placeholders": {
+        "expireInterval": "Expire Interval",
+        "ipv4": "Ipv4",
+        "pollingPeriod": "Polling Period",
+        "port": "Port",
+        "preference": "Preference",
+        "retryInterval": "Retry Interval"
+      },
+      "sections": {
+        "parameters": "Parameters"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "cache": "Cache"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  },
+  "fr": {
+    "rpki": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "columns": {
+        "address": "Address",
+        "port": "Port",
+        "preference": "Preference"
+      },
+      "errors": {
+        "addressRequired": "Address Required"
+      },
+      "labels": {
+        "addressRequired": "Address Required",
+        "expireInterval": "Expire Interval",
+        "pollingPeriod": "Polling Period",
+        "retryInterval": "Retry Interval"
+      },
+      "messages": {
+        "confirmDeleteCache": "Confirm Delete Cache"
+      },
+      "modals": {
+        "addCache": "Add Cache",
+        "confirmDelete": "Confirm Delete",
+        "editCache": "Edit Cache"
+      },
+      "placeholders": {
+        "expireInterval": "Expire Interval",
+        "ipv4": "Ipv4",
+        "pollingPeriod": "Polling Period",
+        "port": "Port",
+        "preference": "Preference",
+        "retryInterval": "Retry Interval"
+      },
+      "sections": {
+        "parameters": "Parameters"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "cache": "Cache"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  },
+  "ko": {
+    "rpki": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "columns": {
+        "address": "Address",
+        "port": "Port",
+        "preference": "Preference"
+      },
+      "errors": {
+        "addressRequired": "Address Required"
+      },
+      "labels": {
+        "addressRequired": "Address Required",
+        "expireInterval": "Expire Interval",
+        "pollingPeriod": "Polling Period",
+        "retryInterval": "Retry Interval"
+      },
+      "messages": {
+        "confirmDeleteCache": "Confirm Delete Cache"
+      },
+      "modals": {
+        "addCache": "Add Cache",
+        "confirmDelete": "Confirm Delete",
+        "editCache": "Edit Cache"
+      },
+      "placeholders": {
+        "expireInterval": "Expire Interval",
+        "ipv4": "Ipv4",
+        "pollingPeriod": "Polling Period",
+        "port": "Port",
+        "preference": "Preference",
+        "retryInterval": "Retry Interval"
+      },
+      "sections": {
+        "parameters": "Parameters"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "cache": "Cache"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  }
+}

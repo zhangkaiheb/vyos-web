@@ -4,7 +4,7 @@ const ICON_MAP = {
   create: '＋',
   edit: '✎',
   delete: '✕',
-  move: '⇄',
+  move: '⇅',
   moveUp: '↑',
   moveDown: '↓',
   copy: '⧉',

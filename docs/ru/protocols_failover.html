@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3483; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="failover">
+<h1>Failover</h1>
+<p>Маршруты failover настраиваются вручную и используются только тогда, когда целевой адрес доступен. Если целевой адрес перестает отвечать, VyOS удаляет маршрут из таблицы маршрутизации и снова добавляет его, когда целевой адрес восстанавливается.</p>
+<section id="configuration">
+<h2>Настройка</h2>
+<p>Используйте следующие команды для настройки маршрутов failover для определенного удаленного подсети <code class="docutils literal notranslate">&lt;subnet&gt;</code>, доступной через следующий хоп <code class="docutils literal notranslate">&lt;address&gt;</code>.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; check target &lt;target-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-target-target-address" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IP-адрес цели проверки работоспособности.</strong></p>
+<p>Обычно это высокодоступный хост, находящийся либо в подсети назначения, либо в интернете.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 check target 8.8.8.8
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; check timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-timeout-timeout" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интервал времени ожидания, в секундах, между проверками работоспособности цели.</strong></p>
+<p>Допустимый диапазон — 1–300 секунд. По умолчанию — 10 секунд.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 check timeout 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; check type &lt;protocol&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-type-protocol" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте протокол, используемый для проверки работоспособности.</strong></p>
+<p>Доступные протоколы:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">icmp</code>: VyOS отправляет два пакета ICMP echo request с таймаутом ответа 1 секунда. Проверка работоспособности успешна, если хотя бы один ответ получен.</p></li>
+<li><p><code class="docutils literal notranslate">arp</code>: VyOS отправляет два запроса ARP с таймаутом ответа 1 секунда. Проверка работоспособности успешна, если хотя бы один ответ получен.</p></li>
+<li><p><code class="docutils literal notranslate">tcp</code>: VyOS проверяет, открыт ли целевой TCP-порт. Проверка работоспособности успешна, если успешно установлено TCP-соединение с целевым портом.</p></li>
+</ul>
+<p>По умолчанию используется протокол <code class="docutils literal notranslate">icmp</code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если тип проверки установлен в <code class="docutils literal notranslate">tcp</code>, необходимо также указать целевой TCP-порт.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 check type tcp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; check port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-port-port" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте целевой TCP-порт для проверки работоспособности.</strong></p>
+<p>Этот параметр применяется только при настройке типа проверки как <code class="docutils literal notranslate">tcp</code>.</p>
+<p>Допустимый диапазон портов — 1–65535.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 check port 443
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; check policy &lt;policy&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-policy-policy" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте политику успешной проверки работоспособности для нескольких целей.</strong></p>
+<p>Доступные политики:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">any-available</code>: Проверка работоспособности успешна, если хотя бы одна из настроенных целей отвечает успешно.</p></li>
+<li><p><code class="docutils literal notranslate">all-available</code>: Проверка работоспособности успешна только в том случае, если каждая настроенная цель отвечает успешно.</p></li>
+</ul>
+<p>По умолчанию используется политика <code class="docutils literal notranslate">any-available</code>.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 check policy all-available
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-interface-interface" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте локальный интерфейс, используемый для достижения следующего хопа.</strong></p>
+<p>Этот параметр обязателен.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 interface eth0
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; metric &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-metric-1-255" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте метрику (стоимость) для маршрута failover.</strong></p>
+<p>Метрика определяет приоритет маршрута. Чем ниже значение метрики, тем более предпочтительный маршрут.</p>
+<p>Значение по умолчанию — 1.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 metric 50
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; onlink
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-onlink" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Настройте следующий хоп как достижимый через назначенный интерфейс, даже если <code class="docutils literal notranslate">&lt;address&gt;</code> находится вне любой подсети, настроенной на этом интерфейсе.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 onlink
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="examples">
+<h2>Примеры</h2>
+<section id="failover-route-with-a-single-next-hop-and-icmp-health-check">
+<h3>Маршрут failover с одним следующим хопом и проверкой работоспособности ICMP</h3>
+<p>В следующем примере настраивается маршрут failover для <code class="docutils literal notranslate">203.0.113.1/32</code> через следующий хоп <code class="docutils literal notranslate">192.0.2.1</code> на <code class="docutils literal notranslate">eth0</code>. Следующий хоп контролируется проверками ICMP к <code class="docutils literal notranslate">192.0.2.1</code> каждые 5 секунд, а маршрут устанавливается с метрикой 10.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check target &#39;192.0.2.1&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check timeout &#39;5&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check type &#39;icmp&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 interface &#39;eth0&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 metric &#39;10&#39;
+</pre></div>
+</div>
+<p>Проверьте маршрут:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show ip route 203.0.113.1
+Routing entry for 203.0.113.1/32
+  Known via &quot;kernel&quot;, distance 0, metric 10, best
+  Last update 00:00:39 ago
+  Flags: Selected
+  Status: Installed
+  * 192.0.2.1, via eth0, weight 1
+</pre></div>
+</div>
+</section>
+<section id="two-failover-routes-with-different-metrics">
+<h3>Два маршрута failover с разными метриками</h3>
+<p>В следующем примере настраиваются два маршрута failover для <code class="docutils literal notranslate">203.0.113.1/32</code>, каждый через другой следующий хоп. Основной следующий хоп <code class="docutils literal notranslate">192.0.2.1</code> достигается через <code class="docutils literal notranslate">eth0</code> с метрикой 10, а резервный следующий хоп <code class="docutils literal notranslate">198.51.100.1</code> достигается через <code class="docutils literal notranslate">eth2</code> с метрикой 20. Оба следующих хопа контролируются проверками ICMP каждые 5 секунд.</p>
+<p>Пока обе проверки работоспособности успешны, маршрут с меньшей метрикой через <code class="docutils literal notranslate">eth0</code> предпочитается. Если основной целевой адрес перестает отвечать, его маршрут удаляется из таблицы маршрутизации, и трафик переключается на <code class="docutils literal notranslate">198.51.100.1</code> через <code class="docutils literal notranslate">eth2</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check target &#39;192.0.2.1&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check timeout &#39;5&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check type &#39;icmp&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 interface &#39;eth0&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 metric &#39;10&#39;
+
+set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 check target &#39;198.51.100.99&#39;
+set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 check timeout &#39;5&#39;
+set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 check type &#39;icmp&#39;
+set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 interface &#39;eth2&#39;
+set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 metric &#39;20&#39;
+</pre></div>
+</div>
+<p>Проверьте маршруты:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show ip route 203.0.113.1
+Routing entry for 203.0.113.1/32
+  Known via &quot;kernel&quot;, distance 0, metric 10, best
+  Last update 00:08:06 ago
+  Flags: Selected
+  Status: Installed
+  * 192.0.2.1, via eth0, weight 1
+
+Routing entry for 203.0.113.1/32
+  Known via &quot;kernel&quot;, distance 0, metric 20
+  Last update 00:08:14 ago
+  Flags: None
+  Status: Installed
+  * 198.51.100.1, via eth2, weight 1
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

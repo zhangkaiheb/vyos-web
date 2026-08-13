@@ -1,0 +1,114 @@
+{
+  "zh-CN": {
+    "dhcpStatistics": {
+      "title": "DHCP 统计",
+      "columns": {
+        "pool": "地址池",
+        "size": "总地址数",
+        "leases": "已分配",
+        "available": "可用数",
+        "usage": "使用率"
+      },
+      "filterByPool": "按地址池过滤",
+      "allPools": "全部地址池",
+      "refresh": "刷新",
+      "rawOutput": "原始输出"
+    }
+  },
+  "en": {
+    "dhcpStatistics": {
+      "title": "DHCP Statistics",
+      "columns": {
+        "pool": "Pool",
+        "size": "Size",
+        "leases": "Leases",
+        "available": "Available",
+        "usage": "Usage"
+      },
+      "filterByPool": "Filter by pool",
+      "allPools": "All Pools",
+      "refresh": "Refresh",
+      "rawOutput": "Raw Output"
+    }
+  },
+  "zh-TW": {
+    "dhcpStatistics": {
+      "title": "DHCP Statistics",
+      "columns": {
+        "pool": "Pool",
+        "size": "Size",
+        "leases": "Leases",
+        "available": "Available",
+        "usage": "Usage"
+      },
+      "filterByPool": "Filter by pool",
+      "allPools": "All Pools",
+      "refresh": "Refresh",
+      "rawOutput": "Raw Output"
+    }
+  },
+  "ru": {
+    "dhcpStatistics": {
+      "title": "DHCP Statistics",
+      "columns": {
+        "pool": "Pool",
+        "size": "Size",
+        "leases": "Leases",
+        "available": "Available",
+        "usage": "Usage"
+      },
+      "filterByPool": "Filter by pool",
+      "allPools": "All Pools",
+      "refresh": "Refresh",
+      "rawOutput": "Raw Output"
+    }
+  },
+  "de": {
+    "dhcpStatistics": {
+      "title": "DHCP Statistics",
+      "columns": {
+        "pool": "Pool",
+        "size": "Size",
+        "leases": "Leases",
+        "available": "Available",
+        "usage": "Usage"
+      },
+      "filterByPool": "Filter by pool",
+      "allPools": "All Pools",
+      "refresh": "Refresh",
+      "rawOutput": "Raw Output"
+    }
+  },
+  "fr": {
+    "dhcpStatistics": {
+      "title": "DHCP Statistics",
+      "columns": {
+        "pool": "Pool",
+        "size": "Size",
+        "leases": "Leases",
+        "available": "Available",
+        "usage": "Usage"
+      },
+      "filterByPool": "Filter by pool",
+      "allPools": "All Pools",
+      "refresh": "Refresh",
+      "rawOutput": "Raw Output"
+    }
+  },
+  "ko": {
+    "dhcpStatistics": {
+      "title": "DHCP Statistics",
+      "columns": {
+        "pool": "Pool",
+        "size": "Size",
+        "leases": "Leases",
+        "available": "Available",
+        "usage": "Usage"
+      },
+      "filterByPool": "Filter by pool",
+      "allPools": "All Pools",
+      "refresh": "Refresh",
+      "rawOutput": "Raw Output"
+    }
+  }
+}

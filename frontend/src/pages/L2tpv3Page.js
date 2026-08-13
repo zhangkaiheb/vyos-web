@@ -3,41 +3,17 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
-import { api, interfaceApi } from '/src/api/index.js';
-
-const COLUMNS = [
-  { key: 'name', title: '接口名称', width: 120 },
-  { key: 'description', title: '描述', width: 160 },
-  { key: 'encapsulation', title: '封装类型', width: 100 },
-  { key: 'remote', title: '远端地址', width: 140 },
-  { key: 'tunnel_id', title: '隧道 ID', width: 80 },
-  { key: 'session_id', title: '会话 ID', width: 80 },
-  { key: 'mtu', title: 'MTU', width: 80 },
-  { key: 'disable', title: '禁用', width: 80 },
-  { key: 'actions', title: '操作', width: 100 },
-];
-
-const ENCAPSULATION_OPTIONS = [
-  { value: 'udp', label: 'udp (UDP - 默认)' },
-  { value: 'ip', label: 'ip (IP)' },
-];
-
-const SOURCE_VALIDATION_OPTIONS = [
-  { value: 'strict', label: 'strict (严格)' },
-  { value: 'loose', label: 'loose (宽松)' },
-  { value: 'disable', label: 'disable (禁用)' },
-];
-
-const ACCEPT_DAD_OPTIONS = [
-  { value: '0', label: '0 (禁用 DAD)' },
-  { value: '1', label: '1 (启用 DAD - 默认)' },
-  { value: '2', label: '2 (启用 DAD - MAC 重复时禁用 IPv6)' },
-];
+import { api, configApi, interfaceApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { showError } from '/src/components/Layout/ErrorDisplay.js';
+import { useI18n } from '/src/i18n/index.js';
 
 export default defineComponent({
   name: 'L2tpv3Page',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
+    const { t } = useI18n();
     const loading = ref(false);
     const l2tpv3s = ref([]);
     const modalVisible = ref(false);
@@ -45,59 +21,90 @@ export default defineComponent({
     const interfaceOptions = ref([]);
     const activeTab = ref('basic');
     const selectedL2tpv3 = ref([]);
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
+
+    const COLUMNS = computed(() => [
+      { key: 'name', title: t('l2tpv3.columns.name'), width: 120 },
+      { key: 'description', title: t('l2tpv3.columns.description'), width: 160 },
+      { key: 'encapsulation', title: t('l2tpv3.columns.encapsulation'), width: 100 },
+      { key: 'remote', title: t('l2tpv3.columns.remote'), width: 140 },
+      { key: 'tunnel_id', title: t('l2tpv3.columns.tunnelId'), width: 80 },
+      { key: 'session_id', title: t('l2tpv3.columns.sessionId'), width: 80 },
+      { key: 'mtu', title: t('l2tpv3.columns.mtu'), width: 80 },
+      { key: 'disable', title: t('l2tpv3.columns.disable'), width: 80 },
+      { key: 'actions', title: t('l2tpv3.columns.actions'), width: 100 },
+    ]);
+
+    const ENCAPSULATION_OPTIONS = computed(() => [
+      { value: 'udp', label: t('l2tpv3.options.encapsulation.udp') },
+      { value: 'ip', label: t('l2tpv3.options.encapsulation.ip') },
+    ]);
+
+    const SOURCE_VALIDATION_OPTIONS = computed(() => [
+      { value: 'strict', label: t('l2tpv3.options.sourceValidation.strict') },
+      { value: 'loose', label: t('l2tpv3.options.sourceValidation.loose') },
+      { value: 'disable', label: t('l2tpv3.options.sourceValidation.disable') },
+    ]);
+
+    const ACCEPT_DAD_OPTIONS = computed(() => [
+      { value: '0', label: t('l2tpv3.options.acceptDad.0') },
+      { value: '1', label: t('l2tpv3.options.acceptDad.1') },
+      { value: '2', label: t('l2tpv3.options.acceptDad.2') },
+    ]);
 
     // Schema definitions
     const basicSchema = computed(() => [
-      { key: 'name', title: '接口名称', type: 'text', required: true, placeholder: '如 l2tpeth0, l2tpeth1', help: '格式: l2tpethN' },
-      { key: 'description', title: '描述', type: 'text', placeholder: '接口描述' },
-      { key: 'address', title: 'IP 地址', type: 'textarea', placeholder: '每行一个 IPv4/IPv6 地址或 CIDR', help: '接口 IP 地址 (支持多行)' },
-      { key: 'encapsulation', title: '封装类型', type: 'select', options: ENCAPSULATION_OPTIONS, help: '封装类型 (默认: udp)' },
-      { key: 'remote', title: '远端地址', type: 'text', placeholder: 'IPv4 或 IPv6 地址', help: '隧道远端地址' },
-      { key: 'source_address', title: '源地址', type: 'text', placeholder: 'IPv4 或 IPv6 地址', help: '用于建立连接的源 IP 地址' },
-      { key: 'source_port', title: '源端口', type: 'number', min: 1, max: 65535, placeholder: '1-65535', help: 'UDP 源端口 (默认: 5000)' },
-      { key: 'destination_port', title: '目的端口', type: 'number', min: 1, max: 65535, placeholder: '1-65535', help: 'UDP 目的端口 (默认: 5000)' },
-      { key: 'tunnel_id', title: '本地隧道 ID', type: 'number', min: 1, max: 429496729, placeholder: '1-429496729', help: '本地隧道标识符' },
-      { key: 'peer_tunnel_id', title: '对端隧道 ID', type: 'number', min: 1, max: 429496729, placeholder: '1-429496729', help: '对端隧道标识符' },
-      { key: 'session_id', title: '会话 ID', type: 'number', min: 1, max: 429496729, placeholder: '1-429496729', help: '会话标识符' },
-      { key: 'peer_session_id', title: '对端会话 ID', type: 'number', min: 1, max: 429496729, placeholder: '1-429496729', help: '对端会话标识符' },
-      { key: 'mtu', title: 'MTU', type: 'number', min: 68, max: 16000, placeholder: '68-16000', help: '最大传输单元 (默认: 1488)' },
-      { key: 'disable', title: '禁用接口', type: 'checkbox', help: '管理性禁用接口' },
+      { key: 'name', title: t('l2tpv3.schema.basic.name'), type: 'text', required: true, placeholder: t('l2tpv3.schema.basic.namePlaceholder'), help: t('l2tpv3.schema.basic.nameHelp') },
+      { key: 'description', title: t('l2tpv3.schema.basic.description'), type: 'text', placeholder: t('l2tpv3.schema.basic.descriptionPlaceholder') },
+      { key: 'address', title: t('l2tpv3.schema.basic.address'), type: 'textarea', placeholder: t('l2tpv3.schema.basic.addressPlaceholder'), help: t('l2tpv3.schema.basic.addressHelp') },
+      { key: 'encapsulation', title: t('l2tpv3.schema.basic.encapsulation'), type: 'select', options: ENCAPSULATION_OPTIONS.value, help: t('l2tpv3.schema.basic.encapsulationHelp') },
+      { key: 'remote', title: t('l2tpv3.schema.basic.remote'), type: 'text', placeholder: t('l2tpv3.schema.basic.remotePlaceholder'), help: t('l2tpv3.schema.basic.remoteHelp') },
+      { key: 'source_address', title: t('l2tpv3.schema.basic.sourceAddress'), type: 'text', placeholder: t('l2tpv3.schema.basic.sourceAddressPlaceholder'), help: t('l2tpv3.schema.basic.sourceAddressHelp') },
+      { key: 'source_port', title: t('l2tpv3.schema.basic.sourcePort'), type: 'number', min: 1, max: 65535, placeholder: t('l2tpv3.schema.basic.sourcePortPlaceholder'), help: t('l2tpv3.schema.basic.sourcePortHelp') },
+      { key: 'destination_port', title: t('l2tpv3.schema.basic.destinationPort'), type: 'number', min: 1, max: 65535, placeholder: t('l2tpv3.schema.basic.destinationPortPlaceholder'), help: t('l2tpv3.schema.basic.destinationPortHelp') },
+      { key: 'tunnel_id', title: t('l2tpv3.schema.basic.tunnelId'), type: 'number', min: 1, max: 429496729, placeholder: t('l2tpv3.schema.basic.tunnelIdPlaceholder'), help: t('l2tpv3.schema.basic.tunnelIdHelp') },
+      { key: 'peer_tunnel_id', title: t('l2tpv3.schema.basic.peerTunnelId'), type: 'number', min: 1, max: 429496729, placeholder: t('l2tpv3.schema.basic.peerTunnelIdPlaceholder'), help: t('l2tpv3.schema.basic.peerTunnelIdHelp') },
+      { key: 'session_id', title: t('l2tpv3.schema.basic.sessionId'), type: 'number', min: 1, max: 429496729, placeholder: t('l2tpv3.schema.basic.sessionIdPlaceholder'), help: t('l2tpv3.schema.basic.sessionIdHelp') },
+      { key: 'peer_session_id', title: t('l2tpv3.schema.basic.peerSessionId'), type: 'number', min: 1, max: 429496729, placeholder: t('l2tpv3.schema.basic.peerSessionIdPlaceholder'), help: t('l2tpv3.schema.basic.peerSessionIdHelp') },
+      { key: 'mtu', title: t('l2tpv3.schema.basic.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('l2tpv3.schema.basic.mtuPlaceholder'), help: t('l2tpv3.schema.basic.mtuHelp') },
+      { key: 'disable', title: t('l2tpv3.schema.basic.disable'), type: 'checkbox', help: t('l2tpv3.schema.basic.disableHelp') },
     ]);
 
     const ipSchema = computed(() => [
-      { key: 'ip_adjust_mss', title: '调整 MSS', type: 'text', placeholder: 'clamp-mss-to-pmtu 或 536-65535', help: 'TCP MSS 值' },
-      { key: 'ip_arp_cache_timeout', title: 'ARP 缓存超时', type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: 'ARP 缓存条目超时 (秒, 默认: 30)' },
-      { key: 'ip_disable_arp_filter', title: '禁用 ARP 过滤', type: 'checkbox', help: '禁用 ARP 过滤' },
-      { key: 'ip_disable_forwarding', title: '禁用转发', type: 'checkbox', help: '禁用 IP 转发' },
-      { key: 'ip_enable_arp_accept', title: '启用 ARP 接受', type: 'checkbox', help: '启用 ARP 接受' },
-      { key: 'ip_enable_arp_announce', title: '启用 ARP 通告', type: 'checkbox', help: '启用 ARP 通告' },
-      { key: 'ip_enable_arp_ignore', title: '启用 ARP 忽略', type: 'checkbox', help: '启用 ARP 忽略' },
-      { key: 'ip_enable_directed_broadcast', title: '启用定向广播', type: 'checkbox', help: '启用定向广播转发' },
-      { key: 'ip_enable_proxy_arp', title: '启用代理 ARP', type: 'checkbox', help: '启用代理 ARP' },
-      { key: 'ip_proxy_arp_pvlan', title: '私有 VLAN 代理 ARP', type: 'checkbox', help: '启用私有 VLAN 代理 ARP' },
-      { key: 'ip_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
+      { key: 'ip_adjust_mss', title: t('l2tpv3.schema.ip.adjustMss'), type: 'text', placeholder: t('l2tpv3.schema.ip.adjustMssPlaceholder'), help: t('l2tpv3.schema.ip.adjustMssHelp') },
+      { key: 'ip_arp_cache_timeout', title: t('l2tpv3.schema.ip.arpCacheTimeout'), type: 'number', min: 1, max: 86400, placeholder: t('l2tpv3.schema.ip.arpCacheTimeoutPlaceholder'), help: t('l2tpv3.schema.ip.arpCacheTimeoutHelp') },
+      { key: 'ip_disable_arp_filter', title: t('l2tpv3.schema.ip.disableArpFilter'), type: 'checkbox', help: t('l2tpv3.schema.ip.disableArpFilterHelp') },
+      { key: 'ip_disable_forwarding', title: t('l2tpv3.schema.ip.disableForwarding'), type: 'checkbox', help: t('l2tpv3.schema.ip.disableForwardingHelp') },
+      { key: 'ip_enable_arp_accept', title: t('l2tpv3.schema.ip.enableArpAccept'), type: 'checkbox', help: t('l2tpv3.schema.ip.enableArpAcceptHelp') },
+      { key: 'ip_enable_arp_announce', title: t('l2tpv3.schema.ip.enableArpAnnounce'), type: 'checkbox', help: t('l2tpv3.schema.ip.enableArpAnnounceHelp') },
+      { key: 'ip_enable_arp_ignore', title: t('l2tpv3.schema.ip.enableArpIgnore'), type: 'checkbox', help: t('l2tpv3.schema.ip.enableArpIgnoreHelp') },
+      { key: 'ip_enable_directed_broadcast', title: t('l2tpv3.schema.ip.enableDirectedBroadcast'), type: 'checkbox', help: t('l2tpv3.schema.ip.enableDirectedBroadcastHelp') },
+      { key: 'ip_enable_proxy_arp', title: t('l2tpv3.schema.ip.enableProxyArp'), type: 'checkbox', help: t('l2tpv3.schema.ip.enableProxyArpHelp') },
+      { key: 'ip_proxy_arp_pvlan', title: t('l2tpv3.schema.ip.proxyArpPvlan'), type: 'checkbox', help: t('l2tpv3.schema.ip.proxyArpPvlanHelp') },
+      { key: 'ip_source_validation', title: t('l2tpv3.schema.ip.sourceValidation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS.value, placeholder: t('l2tpv3.schema.ip.sourceValidationPlaceholder'), help: t('l2tpv3.schema.ip.sourceValidationHelp') },
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: '接受 DAD', type: 'select', options: ACCEPT_DAD_OPTIONS, help: '重复地址检测 (默认: 1)' },
-      { key: 'ipv6_autoconf', title: '自动配置', type: 'checkbox', help: '使用 SLAAC 获取 IPv6 地址' },
-      { key: 'ipv6_eui64', title: 'EUI-64 前缀', type: 'text', placeholder: 'IPv6 前缀', help: '基于 MAC 的 EUI-64 地址前缀' },
-      { key: 'ipv6_interface_identifier', title: '接口标识符', type: 'text', placeholder: '如 ::1:2:3:4', help: 'SLAAC 接口标识符' },
-      { key: 'ipv6_no_default_link_local', title: '无默认链路本地地址', type: 'checkbox', help: '移除默认链路本地地址' },
-      { key: 'ipv6_adjust_mss', title: '调整 MSS', type: 'text', placeholder: 'clamp-mss-to-pmtu 或 536-65535', help: 'TCP MSS 值' },
-      { key: 'ipv6_base_reachable_time', title: '基础可达时间', type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: '基础可达时间 (秒, 默认: 30)' },
-      { key: 'ipv6_disable_forwarding', title: '禁用转发', type: 'checkbox', help: '禁用 IPv6 转发' },
-      { key: 'ipv6_dup_addr_detect_transmits', title: 'DAD 传输次数', type: 'number', min: 0, max: 100, placeholder: '0-100', help: 'DAD 期间发送的 NS 消息数 (默认: 1, 0=禁用)' },
-      { key: 'ipv6_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
+      { key: 'ipv6_accept_dad', title: t('l2tpv3.schema.ipv6.acceptDad'), type: 'select', options: ACCEPT_DAD_OPTIONS.value, help: t('l2tpv3.schema.ipv6.acceptDadHelp') },
+      { key: 'ipv6_autoconf', title: t('l2tpv3.schema.ipv6.autoconf'), type: 'checkbox', help: t('l2tpv3.schema.ipv6.autoconfHelp') },
+      { key: 'ipv6_eui64', title: t('l2tpv3.schema.ipv6.eui64'), type: 'text', placeholder: t('l2tpv3.schema.ipv6.eui64Placeholder'), help: t('l2tpv3.schema.ipv6.eui64Help') },
+      { key: 'ipv6_interface_identifier', title: t('l2tpv3.schema.ipv6.interfaceIdentifier'), type: 'text', placeholder: t('l2tpv3.schema.ipv6.interfaceIdentifierPlaceholder'), help: t('l2tpv3.schema.ipv6.interfaceIdentifierHelp') },
+      { key: 'ipv6_no_default_link_local', title: t('l2tpv3.schema.ipv6.noDefaultLinkLocal'), type: 'checkbox', help: t('l2tpv3.schema.ipv6.noDefaultLinkLocalHelp') },
+      { key: 'ipv6_adjust_mss', title: t('l2tpv3.schema.ipv6.adjustMss'), type: 'text', placeholder: t('l2tpv3.schema.ipv6.adjustMssPlaceholder'), help: t('l2tpv3.schema.ipv6.adjustMssHelp') },
+      { key: 'ipv6_base_reachable_time', title: t('l2tpv3.schema.ipv6.baseReachableTime'), type: 'number', min: 1, max: 86400, placeholder: t('l2tpv3.schema.ipv6.baseReachableTimePlaceholder'), help: t('l2tpv3.schema.ipv6.baseReachableTimeHelp') },
+      { key: 'ipv6_disable_forwarding', title: t('l2tpv3.schema.ipv6.disableForwarding'), type: 'checkbox', help: t('l2tpv3.schema.ipv6.disableForwardingHelp') },
+      { key: 'ipv6_dup_addr_detect_transmits', title: t('l2tpv3.schema.ipv6.dupAddrDetectTransmits'), type: 'number', min: 0, max: 100, placeholder: t('l2tpv3.schema.ipv6.dupAddrDetectTransmitsPlaceholder'), help: t('l2tpv3.schema.ipv6.dupAddrDetectTransmitsHelp') },
+      { key: 'ipv6_source_validation', title: t('l2tpv3.schema.ipv6.sourceValidation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS.value, placeholder: t('l2tpv3.schema.ipv6.sourceValidationPlaceholder'), help: t('l2tpv3.schema.ipv6.sourceValidationHelp') },
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: '镜像出方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像出方向流量到目标接口' },
-      { key: 'mirror_ingress', title: '镜像入方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像入方向流量到目标接口' },
+      { key: 'mirror_egress', title: t('l2tpv3.schema.mirror.egress'), type: 'select', options: interfaceOptions.value, placeholder: t('l2tpv3.schema.mirror.placeholder'), help: t('l2tpv3.schema.mirror.egressHelp') },
+      { key: 'mirror_ingress', title: t('l2tpv3.schema.mirror.ingress'), type: 'select', options: interfaceOptions.value, placeholder: t('l2tpv3.schema.mirror.placeholder'), help: t('l2tpv3.schema.mirror.ingressHelp') },
     ]);
 
     const otherSchema = computed(() => [
-      { key: 'vrf', title: 'VRF 实例', type: 'text', placeholder: 'VRF 实例名称', help: 'VRF 实例名称' },
+      { key: 'vrf', title: t('l2tpv3.schema.other.vrf'), type: 'text', placeholder: t('l2tpv3.schema.other.vrfPlaceholder'), help: t('l2tpv3.schema.other.vrfHelp') },
     ]);
 
     // Command text
@@ -157,16 +164,15 @@ export default defineComponent({
       // Other
       if (l.vrf) lines.push(`set interfaces l2tpv3 ${name} vrf ${l.vrf}`);
 
-      return lines.length ? lines.join('\n') : '# 未配置任何参数';
+      return lines.length ? lines.join('\n') : t('l2tpv3.command.noConfig');
     });
 
     const modalTabs = computed(() => [
-      { key: 'basic', title: '基本配置' },
-      { key: 'ip', title: 'IPv4 参数' },
-      { key: 'ipv6', title: 'IPv6 参数' },
-      { key: 'mirror', title: '流量镜像' },
-      { key: 'other', title: '其他' },
-      { key: 'command', title: '命令预览' },
+      { key: 'basic', title: t('l2tpv3.tabs.basic') },
+      { key: 'ip', title: t('l2tpv3.tabs.ip') },
+      { key: 'ipv6', title: t('l2tpv3.tabs.ipv6') },
+      { key: 'mirror', title: t('l2tpv3.tabs.mirror') },
+      { key: 'other', title: t('l2tpv3.tabs.other') },
     ]);
 
     function getDefaultForm() {
@@ -294,7 +300,7 @@ export default defineComponent({
     async function load() {
       loading.value = true;
       try {
-        const res = await api.get('/config', { path: 'interfaces l2tpv3' });
+        const res = await configApi.get('/config', { path: 'interfaces l2tpv3' });
         const cfg = res.data || {};
         l2tpv3s.value = Object.entries(cfg).map(([name, val]) => ({
           name,
@@ -316,14 +322,14 @@ export default defineComponent({
           label: iface.name || iface,
         }));
       } catch (err) {
-        showError(err);
+        handleError(err);
       } finally {
         loading.value = false;
       }
     }
 
-    function showError(err) {
-      alert(`错误码: ${err.code || 'ERROR'}\n错误信息: ${err.message || err}`);
+    function handleError(err) {
+      showError({ message: `${t('l2tpv3.error.code')}: ${err.code || 'ERROR'}\n${t('l2tpv3.error.message')}: ${err.message || err}` });
     }
 
     function openModal(index = -1) {
@@ -340,43 +346,56 @@ export default defineComponent({
       try {
         const form = editingL2tpv3.value;
         const name = form.name;
-        if (!name) { alert('请输入接口名称'); return; }
+        if (!name) return showError({ message: t('l2tpv3.error.nameRequired') });
 
         const config = formToL2tpv3(form);
-        console.log('[L2TPv3] 保存配置:', JSON.stringify(config, null, 2));
+        console.log('[L2TPv3] Save config:', JSON.stringify(config, null, 2));
 
         const path = `interfaces l2tpv3 ${name}`;
-        await api.put('/config', { path, value: config });
+        await configStore.setConfig(path, config);
+        configStore.markPending();
 
         modalVisible.value = false;
         await load();
       } catch (err) {
-        showError(err);
+        handleError(err);
       }
     }
 
-    async function remove() {
-      if (!selectedL2tpv3.value.length) { alert('请先选择要删除的 L2TPv3 接口'); return; }
-      if (!confirm(`确定删除选中的 ${selectedL2tpv3.value.length} 个 L2TPv3 接口?`)) return;
+    function remove() {
+      if (!selectedL2tpv3.value.length) return showError({ message: t('l2tpv3.error.selectToDelete') });
+      pendingDeleteNames.value = selectedL2tpv3.value.map(l => l.name);
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemove() {
+      deleteModalVisible.value = false;
       try {
-        for (const l of selectedL2tpv3.value) {
-          await api.delete('/config', { path: `interfaces l2tpv3 ${l.name}` });
+        for (const name of pendingDeleteNames.value) {
+          await configStore.deleteConfig(`interfaces l2tpv3 ${name}`);
+          configStore.markPending();
         }
         selectedL2tpv3.value = [];
+        pendingDeleteNames.value = [];
         await load();
       } catch (err) {
-        showError(err);
+        handleError(err);
       }
     }
 
-    onMounted(() => { load(); });
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
-    return {
+    return {t,
+      
       loading, l2tpv3s, selected: selectedL2tpv3, modalVisible, editingL2tpv3, interfaceOptions, activeTab,
+      deleteModalVisible, pendingDeleteNames,
       COLUMNS,
       basicSchema, ipSchema, ipv6Schema, mirrorSchema, otherSchema,
       commandText, modalTabs,
-      openModal, save, remove, load,
+      openModal, save, remove, confirmRemove, load,
     };
   },
   template: `
@@ -394,7 +413,7 @@ export default defineComponent({
         @selection-change="selected = $event"
       />
 
-      <DraggableModal v-model:visible="modalVisible" :title="editingL2tpv3?.name ? '编辑 L2TPv3 接口' : '创建 L2TPv3 接口'" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingL2tpv3?.name ? t('l2tpv3.modal.edit') : t('l2tpv3.modal.create')" width="900px">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic>
@@ -412,15 +431,18 @@ export default defineComponent({
             <template #other>
               <ConfigForm :schema="otherSchema" :model="editingL2tpv3" />
             </template>
-            <template #command>
-              <pre style="background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;font-size:13px;">{{ commandText }}</pre>
-            </template>
           </TabGroup>
         </template>
         <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">取消</button>
-          <button type="button" class="btn btn-primary" @click="save">确定</button>
+          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('l2tpv3.buttons.cancel') }}</button>
+          <button type="button" class="btn btn-primary" @click="save">{{ t('l2tpv3.buttons.confirm') }}</button>
         </template>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('l2tpv3.modal.confirmDelete')" width="400px" @confirm="confirmRemove">
+        <div>{{ t('l2tpv3.modal.confirmDeleteMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

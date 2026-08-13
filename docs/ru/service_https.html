@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="http-api">
+<h1>HTTP API</h1>
+<p>VyOS предоставляет HTTP API. Вы можете использовать его для выполнения команд в режиме операций
+или для изменения или удаления конфигурации. API доступен как REST API, так и как GraphQL API.</p>
+<p>Для примеров запросов REST API, конечных точек и деталей аутентификации,
+см. <a class="reference internal" href="../../automation/vyos-api.html#vyosapi">VyOS API</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если для сервиса не настроены сертификаты PKI, VyOS автоматически генерирует самоподписанный сертификат. Это не рекомендуется для использования в производственной среде.</p>
+</div>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<section id="https-listener">
+<h3>HTTPS-слушатель</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https listen-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-https-listen-address-address" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте локальный IPv4 или IPv6 адрес, на котором HTTPS-слушатель
+принимает входящие соединения.</strong></p>
+<p>IP-адрес должен уже быть назначен локальному интерфейсу. Повторите
+команду, чтобы настроить несколько IP-адресов.</p>
+<p>При отсутствии настройки слушатель принимает входящие соединения на всех локальных IP-адресах.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https listen-address 192.0.2.1
+set service https listen-address 2001:db8::1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https port &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-https-port-1-65535" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте TCP-порт, на котором HTTPS-слушатель принимает входящие
+соединения.</strong></p>
+<p>По умолчанию используется 443.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если выбранный порт уже используется другим сервисом, коммит завершится ошибкой.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https port 8443
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https vrf &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-https-vrf-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Привязать HTTPS-слушатель к указанному экземпляру
+<abbr title="Virtual Routing and Forwarding">VRF</abbr>.</strong></p>
+<p>VRF должен уже быть настроен под <code class="docutils literal notranslate">set vrf name &lt;name&gt;</code>.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https vrf mgmt
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https allow-client address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-https-allow-client-address-address" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Ограничьте доступ к конечным точкам API HTTPS указанным IPv4 или
+IPv6 адресом или префиксом.</strong></p>
+<p>Повторите команду, чтобы разрешить несколько IP-адресов или префиксов.</p>
+<p>При отсутствии настройки API принимает соединения с любого IP-адреса.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https allow-client address 192.0.2.0/24
+set service https allow-client address 2001:db8::/32
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https enable-http-redirect
+<a class="cmdlink" href="#cfgcmd-set-service-https-enable-http-redirect" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить перенаправление входящих HTTP-запросов (порт 80) на HTTPS.</strong></p>
+<p>Перенаправление отправляет трафик на стандартный HTTPS-порт (443). Если вы
+изменили HTTPS-порт, перенаправление не будет работать.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https enable-http-redirect
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https request-body-size-limit &lt;1-256&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-https-request-body-size-limit-1-256" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте максимальный размер, в мегабайтах, тела HTTP-запроса,
+принимаемого слушателем.</strong></p>
+<p>Запросы, превышающие этот лимит, отклоняются.</p>
+<p>По умолчанию установлено значение 1.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https request-body-size-limit 10
+</pre></div>
+</div>
+</section>
+<section id="tls">
+<h3>TLS</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https tls-version &lt;1.2 | 1.3&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-https-tls-version-1-2-1-3" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить конкретную версию протокола TLS для HTTPS-слушателя.</strong></p>
+<p>Повторите команду, чтобы включить несколько версий протокола.</p>
+<p>По умолчанию включены TLS 1.2 и TLS 1.3.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https tls-version 1.3
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https certificates certificate &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-https-certificates-certificate-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Привязать сертификат TLS из подсистемы PKI к HTTPS-слушателю.</strong></p>
+<p>Сертификат должен уже быть определен под <code class="docutils literal notranslate">set pki certificate &lt;name&gt;</code> с сертификатом и частным
+ключом.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https certificates certificate my-server-cert
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https certificates ca-certificate &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-https-certificates-ca-certificate-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Привязать сертификат <abbr title="Certificate Authority">CA</abbr> из подсистемы PKI к HTTPS-слушателю.</strong></p>
+<p>CA должен уже быть определен под <code class="docutils literal notranslate">set pki ca &lt;name&gt;</code>. Сертификат CA добавляется к TLS-сертификату, чтобы сформировать полную цепочку,
+представленную клиентам во время TLS-рукопожатия.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https certificates ca-certificate my-internal-ca
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https certificates dh-params &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-https-certificates-dh-params-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Выберите параметры Диффи-Хеллмана из подсистемы PKI для HTTPS-слушателя.</strong></p>
+<p>Параметры должны уже быть определены под <code class="docutils literal notranslate">set pki dh &lt;name&gt;</code> с размером ключа не менее 2048 бит. Параметры используются DHE-шифрами в TLS 1.2. TLS 1.3 не использует их.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https certificates dh-params my-dh-2048
+</pre></div>
+</div>
+</section>
+<section id="api-authentication">
+<h3>Аутентификация API</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api keys id &lt;name&gt; key &lt;apikey&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-keys-id-name-key-apikey" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте ключ HTTP API для аутентификации запросов REST и запросов GraphQL, если GraphQL не переключен на аутентификацию JWT-токеном.</strong></p>
+<p>Ключ указывается в виде обычного текста и предоставляет полный доступ к API.</p>
+<p>Для использования REST API необходимо настроить хотя бы один ключ. GraphQL может работать без ключей, если включен JWT-токен аутентификации.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api keys id MY-HTTPS-API-ID key &#39;MY-HTTPS-API-PLAINTEXT-KEY&#39;
+</pre></div>
+</div>
+</section>
+<section id="rest">
+<h3>REST</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api rest
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-rest" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить REST API для управления VyOS через HTTPS.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api rest
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api rest strict
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-rest-strict" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Отказывать в запросах удаления на конечной точке <code class="docutils literal notranslate">/configure</code>, когда целевой путь конфигурации не существует.</strong></p>
+<p>Без этого флага такие запросы завершаются успешно без сообщений.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api rest strict
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api rest debug
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-rest-debug" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Записывать подробные сообщения об ошибках в журнал systemd при неудаче запросов конфигурации API.</strong></p>
+<p>Без этого флага записываются только короткие сообщения об ошибках.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api rest debug
+</pre></div>
+</div>
+</section>
+<section id="graphql">
+<h3>GraphQL</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api graphql introspection
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-graphql-introspection" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить интроспекцию графа GraphQL.</strong></p>
+<p>Авторизованные клиенты могут затем запросить конечную точку для получения полной схемы.
+По умолчанию отключено, и обычно остается отключенным в производственной среде из-за проблем безопасности.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api graphql introspection
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api graphql authentication type &lt;key | token&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-graphql-authentication-type-key-token" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте тип аутентификации для запросов GraphQL:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">key</code>: Использует API-ключи, настроенные в <code class="docutils literal notranslate">service https api keys</code>.</p></li>
+<li><p><code class="docutils literal notranslate">token</code>: Использует <abbr title="JSON Web Token">JWT</abbr> токены.</p></li>
+</ul>
+<p>По умолчанию установлено значение <code class="docutils literal notranslate">key</code>.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api graphql authentication type token
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api graphql authentication expiration &lt;60-31536000&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-graphql-authentication-expiration-60-31536000" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте продолжительность жизни JWT-токена, в секундах.</strong></p>
+<p>По умолчанию установлено значение 3600.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api graphql authentication expiration 86400
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api graphql authentication secret-length &lt;16-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-graphql-authentication-secret-length-16-65535" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте длину, в байтах, общего секрета, используемого для подписания JWT-токенов.</strong></p>
+<p>По умолчанию установлено значение 32.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api graphql authentication secret-length 64
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api graphql cors allow-origin &lt;origin&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-graphql-cors-allow-origin-origin" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, какие сайты (источники) могут читать ответы от GraphQL API в браузере, используя
+<abbr title="Cross-Origin Resource Sharing">CORS</abbr>.</strong></p>
+<p>Повторите команду, чтобы разрешить несколько источников.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api graphql cors allow-origin https://app.example.com
+</pre></div>
+</div>
+</section>
+</section>
+<section id="example">
+<h2>Пример</h2>
+<p>Минимальная конфигурация для работы REST API требует включения REST
+и настройки хотя бы одного API-ключа:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api keys id MY-HTTPS-API-ID key MY-HTTPS-API-PLAINTEXT-KEY
+set service https api rest
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

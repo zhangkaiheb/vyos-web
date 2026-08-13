@@ -1,6 +1,7 @@
-import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, watch, inject } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
@@ -10,6 +11,7 @@ import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 export default defineComponent({
   name: 'Nat66SourcePage',
   setup() {
+    const { t } = inject('i18n');
     const route = useRoute();
     const configStore = useConfigStore();
     const path = 'nat66 source';
@@ -20,34 +22,36 @@ export default defineComponent({
     const modalVisible = ref(false);
     const editingRule = ref(null);
     const editingOriginalId = ref(null);
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
 
-    const ruleSchema = [
-      { key: 'id', title: '规则编号', type: 'number', min: 1, max: 999999, required: true, help: '范围: 1-999999' },
-      { key: 'description', title: '描述', type: 'text' },
-      { key: 'protocol', title: '协议', type: 'text', placeholder: 'all, tcp_udp, 协议号(0-255), 或协议名' },
-      { key: 'sourcePrefix', title: 'IPv6 源前缀', type: 'text', placeholder: 'h:h:h:h:h:h:h:h/x' },
-      { key: 'sourcePort', title: '源端口', type: 'text', placeholder: '1-65535 或 start-end' },
-      { key: 'destinationPrefix', title: 'IPv6 目的前缀', type: 'text', placeholder: 'h:h:h:h:h:h:h:h/x' },
-      { key: 'destinationPort', title: '目的端口', type: 'text', placeholder: '1-65535 或 start-end' },
-      { key: 'outboundInterface', title: '出站接口', type: 'text', placeholder: '接口名称' },
-      { key: 'translationAddress', title: '翻译地址', type: 'text', placeholder: 'h:h:h:h:h:h:h:h 或 masquerade' },
-      { key: 'translationPort', title: '翻译端口', type: 'text', placeholder: '1-65535 或 start-end' },
-      { key: 'log', title: '日志', type: 'checkbox' },
-      { key: 'exclude', title: '排除', type: 'checkbox', help: '排除匹配此规则的数据包' },
-      { key: 'disable', title: '禁用', type: 'checkbox' },
-    ];
+    const ruleSchema = computed(() => [
+      { key: 'id', title: t('nat66.source.field.ruleNumber'), type: 'number', min: 1, max: 999999, required: true, help: t('nat66.source.help.ruleNumber') },
+      { key: 'description', title: t('nat66.source.field.description'), type: 'text' },
+      { key: 'protocol', title: t('nat66.source.field.protocol'), type: 'text', placeholder: t('nat66.source.placeholder.protocol') },
+      { key: 'sourcePrefix', title: t('nat66.source.field.sourcePrefix'), type: 'text', placeholder: t('nat66.source.placeholder.sourcePrefix') },
+      { key: 'sourcePort', title: t('nat66.source.field.sourcePort'), type: 'text', placeholder: t('nat66.source.placeholder.sourcePort') },
+      { key: 'destinationPrefix', title: t('nat66.source.field.destinationPrefix'), type: 'text', placeholder: t('nat66.source.placeholder.destinationPrefix') },
+      { key: 'destinationPort', title: t('nat66.source.field.destinationPort'), type: 'text', placeholder: t('nat66.source.placeholder.destinationPort') },
+      { key: 'outboundInterface', title: t('nat66.source.field.outboundInterface'), type: 'text', placeholder: t('nat66.source.placeholder.outboundInterface') },
+      { key: 'translationAddress', title: t('nat66.source.field.translationAddress'), type: 'text', placeholder: t('nat66.source.placeholder.translationAddress') },
+      { key: 'translationPort', title: t('nat66.source.field.translationPort'), type: 'text', placeholder: t('nat66.source.placeholder.translationPort') },
+      { key: 'log', title: t('nat66.source.field.log'), type: 'checkbox' },
+      { key: 'exclude', title: t('nat66.source.field.exclude'), type: 'checkbox', help: t('nat66.source.help.exclude') },
+      { key: 'disable', title: t('nat66.source.field.disable'), type: 'checkbox' },
+    ]);
 
-    const ruleColumns = [
-      { key: 'id', title: '规则编号' },
-      { key: 'description', title: '描述' },
-      { key: 'protocol', title: '协议' },
-      { key: 'sourcePrefix', title: 'IPv6 源前缀' },
-      { key: 'destinationPrefix', title: 'IPv6 目的前缀' },
-      { key: 'outboundInterface', title: '出站接口' },
-      { key: 'translationAddress', title: '翻译地址' },
-      { key: 'log', title: '日志' },
-      { key: 'disable', title: '禁用' },
-    ];
+    const ruleColumns = computed(() => [
+      { key: 'id', title: t('nat66.source.column.ruleNumber') },
+      { key: 'description', title: t('nat66.source.column.description') },
+      { key: 'protocol', title: t('nat66.source.column.protocol') },
+      { key: 'sourcePrefix', title: t('nat66.source.column.sourcePrefix') },
+      { key: 'destinationPrefix', title: t('nat66.source.column.destinationPrefix') },
+      { key: 'outboundInterface', title: t('nat66.source.column.outboundInterface') },
+      { key: 'translationAddress', title: t('nat66.source.column.translationAddress') },
+      { key: 'log', title: t('nat66.source.column.log') },
+      { key: 'disable', title: t('nat66.source.column.disable') },
+    ]);
 
     async function load() {
       loading.value = true;
@@ -67,7 +71,7 @@ export default defineComponent({
           });
         }
       } catch (e) {
-        showError('加载 NAT66 源配置失败', e);
+        showError(t('nat66.source.loadFailed'), e);
       } finally {
         loading.value = false;
       }
@@ -145,40 +149,56 @@ export default defineComponent({
     async function saveRule() {
       try {
         const rule = editingRule.value;
-        if (!rule.id) return showError({ message: '请输入规则编号' });
+        if (!rule.id) return showError({ message: t('nat66.source.ruleNumberRequired') });
         const value = buildRuleValue(rule);
         if (editingOriginalId.value && editingOriginalId.value !== rule.id) {
           await configStore.deleteConfig(`${path} rule ${editingOriginalId.value}`);
+          configStore.markPending();
         }
         await configStore.setConfig(`${path} rule ${rule.id}`, value);
+        configStore.markPending();
         modalVisible.value = false;
         await load();
       } catch (e) {
-        showError('保存 NAT66 源规则失败', e);
+        showError(t('nat66.source.saveFailed'), e);
       }
     }
 
-    async function deleteRule(index) {
+    function deleteRule(index) {
       const row = rules.value[index];
       if (!row) return;
-      if (!confirm('确认删除此 NAT66 源规则？')) return;
-      try {
-        await configStore.deleteConfig(`${path} rule ${row.id}`);
-        await load();
-      } catch (e) {
-        showError('删除 NAT66 源规则失败', e);
-      }
+      pendingDeleteNames.value = [row.id];
+      deleteModalVisible.value = true;
     }
 
-    onMounted(load);
+    async function confirmRemove() {
+      deleteModalVisible.value = false;
+      for (const id of pendingDeleteNames.value) {
+        try {
+          await configStore.deleteConfig(`${path} rule ${id}`);
+          configStore.markPending();
+        } catch (e) {
+          showError(t('nat66.source.deleteFailed'), e);
+        }
+      }
+      pendingDeleteNames.value = [];
+      await load();
+    }
+
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
     watch(() => route.path, load);
 
     return {
       path, writeDisabled,
       rules, loading,
       modalVisible, editingRule, editingOriginalId,
+      deleteModalVisible, pendingDeleteNames,
       ruleSchema, ruleColumns,
-      openModal, saveRule, deleteRule,
+      openModal, saveRule, deleteRule, confirmRemove,
+      t,
     };
   },
   components: { DataTable, DraggableModal, ConfigForm, ToolbarButton },
@@ -187,15 +207,18 @@ export default defineComponent({
       <DataTable :columns="ruleColumns" :data="rules" :loading="loading" :disabled="writeDisabled"
                  rowKey="id" :actions="['create', 'edit', 'delete']"
                  @create="openModal(-1)" @edit="openModal" @delete="deleteRule" />
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
-      </div>
-      <DraggableModal v-model:visible="modalVisible" :title="editingOriginalId ? '编辑 NAT66 源规则' : '创建 NAT66 源规则'" width="700px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingOriginalId ? t('nat66.source.editRule') : t('nat66.source.createRule')" width="700px">
         <ConfigForm v-model="editingRule" :schema="ruleSchema" :showAdvanced="true" />
         <template #footer>
-          <button @click="modalVisible = false">取消</button>
-          <button class="btn-primary" @click="saveRule">确定</button>
+          <button @click="modalVisible = false">{{ t('app.cancel') }}</button>
+          <button class="btn-primary" @click="saveRule">{{ t('app.confirm') }}</button>
         </template>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('config.confirmDelete')" width="400px" @confirm="confirmRemove">
+        <div>{{ t('nat66.source.confirmDelete') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="id in pendingDeleteNames" :key="id" style="padding:2px 0;">{{ id }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

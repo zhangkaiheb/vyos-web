@@ -5,6 +5,9 @@ import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -21,158 +24,9 @@ function isPresent(value) {
   return true;
 }
 
-function validateIPv4(value) {
-  if (!value) return '';
-  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return 'IPv4 地址格式错误';
-  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return 'IPv4 地址格式错误';
-  return '';
-}
+// Validation functions moved inside setup() for i18n access
 
-function validateAreaId(value) {
-  if (!value) return '';
-  // 支持数字格式 (0-4294967295) 或点分十进制格式
-  if (/^\d+$/.test(value)) {
-    const n = parseInt(value, 10);
-    if (n < 0 || n > 4294967295) return '区域 ID 必须在 0-4294967295 之间';
-  } else if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) {
-    return '区域 ID 格式错误 (数字或点分十进制)';
-  }
-  return '';
-}
-
-function validateNetwork(value) {
-  if (!value) return '';
-  const match = value.match(/^(\d{1,3}\.){3}\d{1,3}\/(\d{1,2})$/);
-  if (!match) return '网络格式错误 (例如: 192.168.1.0/24)';
-  const [, , prefix] = match;
-  if (parseInt(prefix, 10) < 0 || parseInt(prefix, 10) > 32) return '前缀长度必须在 0-32 之间';
-  return '';
-}
-
-function validateCost(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 65535) return '成本必须在 1-65535 之间';
-  return '';
-}
-
-function validateBandwidth(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 100000) return '带宽必须在 1-100000 Mbit/s 之间';
-  return '';
-}
-
-function validateTimer(value, min, max, name) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < min || n > max) return `${name}必须在 ${min}-${max} 之间`;
-  return '';
-}
-
-function validatePriority(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 0 || n > 255) return '优先级必须在 0-255 之间';
-  return '';
-}
-
-function validateMetric(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 0 || n > 16777214) return '度量值必须在 0-16777214 之间';
-  return '';
-}
-
-function validateMetricType(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || (n !== 1 && n !== 2)) return '度量类型必须为 1 或 2';
-  return '';
-}
-
-function validateHelloMultiplier(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 10) return 'Hello 乘数必须在 1-10 之间';
-  return '';
-}
-
-function validateAdvertiseRangeCost(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 65535) return '通告范围成本必须在 1-65535 之间';
-  return '';
-}
-
-function validateAutoCost(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 4000000) return '参考带宽必须在 1-4000000 Kbit/s 之间';
-  return '';
-}
-
-function validateAccessList(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 199) return '访问列表必须在 1-199 之间';
-  return '';
-}
-
-function validateSummaryAddress(value) {
-  if (!value) return '';
-  const match = value.match(/^(\d{1,3}\.){3}\d{1,3}\/(\d{1,2})$/);
-  if (!match) return '汇总地址格式错误 (例如: 10.0.0.0/8)';
-  const [, , prefix] = match;
-  if (parseInt(prefix, 10) < 0 || parseInt(prefix, 10) > 32) return '前缀长度必须在 0-32 之间';
-  return '';
-}
-
-function validateDistance(value, name) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 255) return `${name}必须在 1-255 之间`;
-  return '';
-}
-
-function validateGracePeriod(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 1800) return 'Grace 周期必须在 1-1800 秒之间';
-  return '';
-}
-
-function validatePollInterval(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 65535) return '轮询间隔必须在 1-65535 秒之间';
-  return '';
-}
-
-function validateLabel(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 0 || n > 1048575) return '标签值必须在 0-1048575 之间';
-  return '';
-}
-
-function validateRefreshTimer(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 10 || n > 1800) return '刷新定时器必须在 10-1800 秒之间';
-  return '';
-}
-
-function validateLdpHolddown(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 0 || n > 10000) return '保持时间必须在 0-10000 秒之间';
-  return '';
-}
-
-// OSPF 配置转换
 function configToForm(data = {}) {
-  // 区域列表
   const areas = [];
   const areaData = data.area || {};
   for (const [areaId, attrs] of Object.entries(areaData)) {
@@ -212,7 +66,6 @@ function configToForm(data = {}) {
       });
     }
     
-    // 解析 area-type: API 返回 { normal: {} } 或 { nssa: {} } 等对象
     let areaType = '';
     if (attrs['area-type']) {
       if (typeof attrs['area-type'] === 'string') {
@@ -235,7 +88,6 @@ function configToForm(data = {}) {
     });
   }
 
-  // 接口列表
   const interfaces = [];
   const interfaceData = data.interface || {};
   for (const [ifName, attrs] of Object.entries(interfaceData)) {
@@ -259,7 +111,6 @@ function configToForm(data = {}) {
     });
   }
 
-  // 邻居列表
   const neighbors = [];
   const neighborData = data.neighbor || {};
   for (const [ip, attrs] of Object.entries(neighborData)) {
@@ -270,11 +121,10 @@ function configToForm(data = {}) {
     });
   }
 
-  // 重分发列表
   const redistributes = [];
   const redistributeData = data.redistribute || {};
   for (const [proto, attrs] of Object.entries(redistributeData)) {
-    if (proto === 'table') continue; // table 单独处理
+    if (proto === 'table') continue;
     redistributes.push({
       protocol: proto,
       metric: attrs.metric || '',
@@ -283,7 +133,6 @@ function configToForm(data = {}) {
     });
   }
 
-  // 重分发路由表
   const redistributeTables = [];
   const tableData = redistributeData.table || {};
   for (const [tableId, attrs] of Object.entries(tableData)) {
@@ -298,7 +147,6 @@ function configToForm(data = {}) {
   const defInfo = data['default-information'] || {};
   const defOrig = defInfo.originate || {};
 
-  // 解析 summary-address 详细配置
   const summaryAddresses = [];
   const summaryData = data['summary-address'] || {};
   for (const [addr, attrs] of Object.entries(summaryData)) {
@@ -309,7 +157,6 @@ function configToForm(data = {}) {
     });
   }
 
-  // 解析访问列表: API 返回 { "1": { export: ["kernel", "static"] } }
   const accessLists = [];
   const accessListData = data['access-list'] || {};
   for (const [aclNum, attrs] of Object.entries(accessListData)) {
@@ -708,6 +555,158 @@ function configToConfig(form) {
 export default defineComponent({
   name: 'OspfPage',
   setup() {
+    const { t } = useI18n();
+    
+    // Validation functions with i18n support
+    function validateIPv4(value) {
+      if (!value) return '';
+      if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return t('ospf.validation.ipv4Format');
+      if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return t('ospf.validation.ipv4Format');
+      return '';
+    }
+
+    function validateAreaId(value) {
+      if (!value) return '';
+      if (/^\d+$/.test(value)) {
+        const n = parseInt(value, 10);
+        if (n < 0 || n > 4294967295) return t('ospf.validation.areaIdRange', { min: 0, max: 4294967295 });
+      } else if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) {
+        return t('ospf.validation.areaIdFormat');
+      }
+      return '';
+    }
+
+    function validateNetwork(value) {
+      if (!value) return '';
+      const match = value.match(/^(\d{1,3}\.){3}\d{1,3}\/(\d{1,2})$/);
+      if (!match) return t('ospf.validation.networkFormat');
+      const [, , prefix] = match;
+      if (parseInt(prefix, 10) < 0 || parseInt(prefix, 10) > 32) return t('ospf.validation.prefixLengthRange', { min: 0, max: 32 });
+      return '';
+    }
+
+    function validateCost(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 65535) return t('ospf.validation.costRange', { min: 1, max: 65535 });
+      return '';
+    }
+
+    function validateBandwidth(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 100000) return t('ospf.validation.bandwidthRange', { min: 1, max: 100000 });
+      return '';
+    }
+
+    function validateTimer(value, min, max, name) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < min || n > max) return t('ospf.validation.timerRange', { name, min, max });
+      return '';
+    }
+
+    function validatePriority(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 0 || n > 255) return t('ospf.validation.priorityRange', { min: 0, max: 255 });
+      return '';
+    }
+
+    function validateMetric(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 0 || n > 16777214) return t('ospf.validation.metricRange', { min: 0, max: 16777214 });
+      return '';
+    }
+
+    function validateMetricType(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || (n !== 1 && n !== 2)) return t('ospf.validation.metricTypeInvalid');
+      return '';
+    }
+
+    function validateHelloMultiplier(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 10) return t('ospf.validation.helloMultiplierRange', { min: 1, max: 10 });
+      return '';
+    }
+
+    function validateAdvertiseRangeCost(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 65535) return t('ospf.validation.advertiseRangeCostRange', { min: 1, max: 65535 });
+      return '';
+    }
+
+    function validateAutoCost(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 4000000) return t('ospf.validation.autoCostRange', { min: 1, max: 4000000 });
+      return '';
+    }
+
+    function validateAccessList(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 199) return t('ospf.validation.accessListRange', { min: 1, max: 199 });
+      return '';
+    }
+
+    function validateSummaryAddress(value) {
+      if (!value) return '';
+      const match = value.match(/^(\d{1,3}\.){3}\d{1,3}\/(\d{1,2})$/);
+      if (!match) return t('ospf.validation.summaryAddressFormat');
+      const [, , prefix] = match;
+      if (parseInt(prefix, 10) < 0 || parseInt(prefix, 10) > 32) return t('ospf.validation.prefixLengthRange', { min: 0, max: 32 });
+      return '';
+    }
+
+    function validateDistance(value, name) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 255) return t('ospf.validation.distanceRange', { name, min: 1, max: 255 });
+      return '';
+    }
+
+    function validateGracePeriod(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 1800) return t('ospf.validation.gracePeriodRange', { min: 1, max: 1800 });
+      return '';
+    }
+
+    function validatePollInterval(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 65535) return t('ospf.validation.pollIntervalRange', { min: 1, max: 65535 });
+      return '';
+    }
+
+    function validateLabel(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 0 || n > 1048575) return t('ospf.validation.labelRange', { min: 0, max: 1048575 });
+      return '';
+    }
+
+    function validateRefreshTimer(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 10 || n > 1800) return t('ospf.validation.refreshTimerRange', { min: 10, max: 1800 });
+      return '';
+    }
+
+    function validateLdpHolddown(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 0 || n > 10000) return t('ospf.validation.ldpHolddownRange', { min: 0, max: 10000 });
+      return '';
+    }
+
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -764,45 +763,45 @@ export default defineComponent({
     });
 
     const areaColumns = [
-      { key: 'id', title: '区域 ID' },
-      { key: 'area-type', title: '区域类型' },
-      { key: 'networks', title: '网络数量', render: (row) => row.networks?.length || 0 },
+      { key: 'id', title: t('ospf.area.id') },
+      { key: 'area-type', title: t('ospf.area.type') },
+      { key: 'networks', title: t('ospf.area.networkCount'), render: (row) => row.networks?.length || 0 },
     ];
 
     const interfaceColumns = [
-      { key: 'name', title: '接口名称' },
-      { key: 'area', title: '区域' },
-      { key: 'cost', title: '成本' },
-      { key: 'network', title: '网络类型' },
+      { key: 'name', title: t('ospf.interface.name') },
+      { key: 'area', title: t('ospf.area.title') },
+      { key: 'cost', title: t('ospf.interface.cost') },
+      { key: 'network', title: t('ospf.interface.networkType') },
     ];
 
     const neighborColumns = [
-      { key: 'address', title: '邻居地址' },
-      { key: 'poll-interval', title: '轮询间隔' },
-      { key: 'priority', title: '优先级' },
+      { key: 'address', title: t('ospf.neighbor.address') },
+      { key: 'poll-interval', title: t('ospf.neighbor.pollInterval') },
+      { key: 'priority', title: t('ospf.neighbor.priority') },
     ];
 
     const redistributeColumns = [
-      { key: 'protocol', title: '协议' },
-      { key: 'metric', title: '度量值' },
-      { key: 'metric-type', title: '度量类型' },
+      { key: 'protocol', title: t('ospf.redistribute.protocol') },
+      { key: 'metric', title: t('ospf.redistribute.metric') },
+      { key: 'metric-type', title: t('ospf.redistribute.metricType') },
     ];
 
     const redistributeTableColumns = [
-      { key: 'table', title: '路由表编号' },
-      { key: 'metric', title: '度量值' },
-      { key: 'metric-type', title: '度量类型' },
+      { key: 'table', title: t('ospf.redistribute.tableNumber') },
+      { key: 'metric', title: t('ospf.redistribute.metric') },
+      { key: 'metric-type', title: t('ospf.redistribute.metricType') },
     ];
 
     const summaryAddressColumns = [
-      { key: 'address', title: '汇总地址' },
-      { key: 'no-advertise', title: '不通告', render: (row) => row['no-advertise'] ? '是' : '否' },
-      { key: 'tag', title: '标签' },
+      { key: 'address', title: t('ospf.summaryAddress.address') },
+      { key: 'no-advertise', title: t('ospf.summaryAddress.noAdvertise'), render: (row) => row['no-advertise'] ? t('common.yes') : t('common.no') },
+      { key: 'tag', title: t('ospf.summaryAddress.tag') },
     ];
 
     const accessListColumns = [
-      { key: 'number', title: '编号' },
-      { key: 'export', title: '导出协议', render: (row) => row.export?.join(', ') || '' },
+      { key: 'number', title: t('ospf.accessList.number') },
+      { key: 'export', title: t('ospf.accessList.exportProtocols'), render: (row) => row.export?.join(', ') || '' },
     ];
 
     const EXPORT_PROTOCOL_OPTIONS = [
@@ -819,6 +818,28 @@ export default defineComponent({
     const editingAccessListIndex = ref(-1);
     const accessListForm = ref({ number: '', export: [] });
 
+    // Delete confirmation modals
+    const deleteAccessListModalVisible = ref(false);
+    const pendingDeleteAccessListNames = ref([]);
+
+    const deleteSummaryAddressModalVisible = ref(false);
+    const pendingDeleteSummaryAddressNames = ref([]);
+
+    const deleteRedistributeTableModalVisible = ref(false);
+    const pendingDeleteRedistributeTableNames = ref([]);
+
+    const deleteAreaModalVisible = ref(false);
+    const pendingDeleteAreaNames = ref([]);
+
+    const deleteInterfaceModalVisible = ref(false);
+    const pendingDeleteInterfaceNames = ref([]);
+
+    const deleteNeighborModalVisible = ref(false);
+    const pendingDeleteNeighborNames = ref([]);
+
+    const deleteRedistributeModalVisible = ref(false);
+    const pendingDeleteRedistributeNames = ref([]);
+
     const commandPath = computed(() => {
       if (activeTab.value === 'areas') return 'protocols ospf area';
       if (activeTab.value === 'interfaces') return 'protocols ospf interface';
@@ -834,22 +855,22 @@ export default defineComponent({
       return 'protocols ospf';
     });
 
-    const AREA_TYPE_OPTIONS = [
-      { value: '', label: '默认' },
+    const AREA_TYPE_OPTIONS = computed(() => [
+      { value: '', label: t('option.default') },
       { value: 'stub', label: 'Stub' },
       { value: 'nssa', label: 'NSSA' },
       { value: 'stub no-summary', label: 'Stub No Summary' },
-    ];
+    ]);
 
-    const NETWORK_TYPE_OPTIONS = [
-      { value: '', label: '默认' },
+    const NETWORK_TYPE_OPTIONS = computed(() => [
+      { value: '', label: t('option.default') },
       { value: 'broadcast', label: 'Broadcast' },
       { value: 'non-broadcast', label: 'Non-Broadcast' },
       { value: 'point-to-point', label: 'Point-to-Point' },
       { value: 'point-to-multipoint', label: 'Point-to-Multipoint' },
-    ];
+    ]);
 
-    const REDISTRIBUTE_PROTOCOL_OPTIONS = [
+    const REDISTRIBUTE_PROTOCOL_OPTIONS = computed(() => [
       { value: 'babel', label: 'Babel' },
       { value: 'bgp', label: 'BGP' },
       { value: 'connected', label: 'Connected' },
@@ -857,12 +878,12 @@ export default defineComponent({
       { value: 'kernel', label: 'Kernel' },
       { value: 'rip', label: 'RIP' },
       { value: 'static', label: 'Static' },
-    ];
+    ]);
 
-    const AUTH_TYPE_OPTIONS = [
-      { value: '', label: '无' },
+    const AUTH_TYPE_OPTIONS = computed(() => [
+      { value: '', label: t('option.none') },
       { value: 'message-digest', label: 'Message Digest' },
-    ];
+    ]);
 
     async function load() {
       loading.value = true;
@@ -891,230 +912,215 @@ export default defineComponent({
     }
 
     async function save() {
-      // 验证基本设置
       if (config.value['router-id']) {
         const err = validateIPv4(config.value['router-id']);
-        if (err) return alert(`路由器 ID：${err}`);
+        if (err) return showError({ message: `${t('ospf.validation.routerId')}${err}` });
       }
       if (config.value['default-metric']) {
         const err = validateMetric(config.value['default-metric']);
-        if (err) return alert(`默认度量值：${err}`);
+        if (err) return showError({ message: `${t('ospf.validation.defaultMetric')}${err}` });
       }
       if (config.value['maximum-paths']) {
         const n = parseInt(config.value['maximum-paths'], 10);
-        if (isNaN(n) || n < 1 || n > 64) return alert('最大路径数必须在 1-64 之间');
+        if (isNaN(n) || n < 1 || n > 64) return showError({ message: t('ospf.validation.maxPathsRange') });
       }
       if (config.value['auto-cost']?.['reference-bandwidth']) {
         const err = validateAutoCost(config.value['auto-cost']['reference-bandwidth']);
-        if (err) return alert(`参考带宽：${err}`);
+        if (err) return showError({ message: `${t('ospf.validation.refBandwidth')}${err}` });
       }
 
-      // 验证区域
       for (let i = 0; i < config.value.areas.length; i++) {
         const area = config.value.areas[i];
         if (area.id) {
           const err = validateAreaId(area.id);
-          if (err) return alert(`区域 ${i + 1}：${err}`);
+          if (err) return showError({ message: `${t('ospf.validation.area')} ${i + 1}${err}` });
         }
         for (let j = 0; j < area.networks.length; j++) {
           const err = validateNetwork(area.networks[j].network);
-          if (err) return alert(`区域 ${area.id || i + 1} 网络 ${j + 1}：${err}`);
+          if (err) return showError({ message: `${t('ospf.validation.area')} ${area.id || i + 1} ${t('ospf.validation.network')} ${j + 1}${err}` });
         }
       }
 
-      // 验证接口
       for (let i = 0; i < config.value.interfaces.length; i++) {
         const iface = config.value.interfaces[i];
         if (iface.cost) {
           const err = validateCost(iface.cost);
-          if (err) return alert(`接口 ${iface.name || i + 1}：成本 ${err}`);
+          if (err) return showError({ message: `${t('ospf.validation.interface')} ${iface.name || i + 1}${t('ospf.validation.cost')} ${err}` });
         }
         if (iface.bandwidth) {
           const err = validateBandwidth(iface.bandwidth);
-          if (err) return alert(`接口 ${iface.name || i + 1}：带宽 ${err}`);
+          if (err) return showError({ message: `${t('ospf.validation.interface')} ${iface.name || i + 1}${t('ospf.validation.bandwidth')} ${err}` });
         }
         if (iface.priority) {
           const err = validatePriority(iface.priority);
-          if (err) return alert(`接口 ${iface.name || i + 1}：优先级 ${err}`);
+          if (err) return showError({ message: `${t('ospf.validation.interface')} ${iface.name || i + 1}${t('ospf.validation.priority')} ${err}` });
         }
         if (iface['dead-interval']) {
-          const err = validateTimer(iface['dead-interval'], 1, 65535, '死亡间隔');
-          if (err) return alert(`接口 ${iface.name || i + 1}：${err}`);
+          const err = validateTimer(iface['dead-interval'], 1, 65535, t('ospf.validation.deadInterval'));
+          if (err) return showError({ message: `${t('ospf.validation.interface')} ${iface.name || i + 1}${err}` });
         }
         if (iface['hello-interval']) {
-          const err = validateTimer(iface['hello-interval'], 1, 65535, 'Hello 间隔');
-          if (err) return alert(`接口 ${iface.name || i + 1}：${err}`);
+          const err = validateTimer(iface['hello-interval'], 1, 65535, t('ospf.validation.helloInterval'));
+          if (err) return showError({ message: `${t('ospf.validation.interface')} ${iface.name || i + 1}${err}` });
         }
         if (iface['retransmit-interval']) {
-          const err = validateTimer(iface['retransmit-interval'], 1, 65535, '重传间隔');
-          if (err) return alert(`接口 ${iface.name || i + 1}：${err}`);
+          const err = validateTimer(iface['retransmit-interval'], 1, 65535, t('ospf.validation.retransmitInterval'));
+          if (err) return showError({ message: `${t('ospf.validation.interface')} ${iface.name || i + 1}${err}` });
         }
         if (iface['transmit-delay']) {
-          const err = validateTimer(iface['transmit-delay'], 1, 65535, '发送延迟');
-          if (err) return alert(`接口 ${iface.name || i + 1}：${err}`);
+          const err = validateTimer(iface['transmit-delay'], 1, 65535, t('ospf.validation.transmitDelay'));
+          if (err) return showError({ message: `${t('ospf.validation.interface')} ${iface.name || i + 1}${err}` });
         }
       }
 
-      // 验证邻居
       for (let i = 0; i < config.value.neighbors.length; i++) {
         const neighbor = config.value.neighbors[i];
         if (neighbor.address) {
           const err = validateIPv4(neighbor.address);
-          if (err) return alert(`邻居 ${i + 1}：${err}`);
+          if (err) return showError({ message: `${t('ospf.validation.neighbor')} ${i + 1}${err}` });
         }
         if (neighbor['poll-interval']) {
-          const err = validateTimer(neighbor['poll-interval'], 1, 65535, '轮询间隔');
-          if (err) return alert(`邻居 ${i + 1}：${err}`);
+          const err = validateTimer(neighbor['poll-interval'], 1, 65535, t('ospf.validation.pollInterval'));
+          if (err) return showError({ message: `${t('ospf.validation.neighbor')} ${i + 1}${err}` });
         }
         if (neighbor.priority) {
           const err = validatePriority(neighbor.priority);
-          if (err) return alert(`邻居 ${i + 1}：优先级 ${err}`);
+          if (err) return showError({ message: `${t('ospf.validation.neighbor')} ${i + 1}${t('ospf.validation.priority')} ${err}` });
         }
       }
 
-      // 验证重分发
       for (let i = 0; i < config.value.redistributes.length; i++) {
         const redist = config.value.redistributes[i];
         if (redist.metric) {
           const err = validateMetric(redist.metric);
-          if (err) return alert(`重分发 ${redist.protocol || i + 1}：度量值 ${err}`);
+          if (err) return showError({ message: `${t('ospf.validation.redistribute')} ${redist.protocol || i + 1}${t('ospf.validation.metric')} ${err}` });
         }
         if (redist['metric-type']) {
           const err = validateMetricType(redist['metric-type']);
-          if (err) return alert(`重分发 ${redist.protocol || i + 1}：${err}`);
+          if (err) return showError({ message: `${t('ospf.validation.redistribute')} ${redist.protocol || i + 1}${err}` });
         }
       }
 
-      // 验证重分发路由表
       for (let i = 0; i < config.value.redistributeTables.length; i++) {
         const tableItem = config.value.redistributeTables[i];
         if (tableItem.table) {
           const tableNum = parseInt(tableItem.table, 10);
           if (isNaN(tableNum) || tableNum < 1 || tableNum > 200) {
-            return alert(`重分发路由表 ${i + 1}：路由表编号必须在 1-200 之间`);
+            return showError({ message: `${t('ospf.validation.redistributeTable')} ${i + 1}${t('ospf.validation.tableNumberRange')}` });
           }
         }
         if (tableItem.metric) {
           const err = validateMetric(tableItem.metric);
-          if (err) return alert(`重分发路由表 ${tableItem.table || i + 1}：度量值 ${err}`);
+          if (err) return showError({ message: `${t('ospf.validation.redistributeTable')} ${tableItem.table || i + 1}${t('ospf.validation.metric')} ${err}` });
         }
         if (tableItem['metric-type']) {
           const err = validateMetricType(tableItem['metric-type']);
-          if (err) return alert(`重分发路由表 ${tableItem.table || i + 1}：${err}`);
+          if (err) return showError({ message: `${t('ospf.validation.redistributeTable')} ${tableItem.table || i + 1}${err}` });
         }
       }
 
-      // 验证定时器
       if (config.value.timers?.throttle?.spf) {
         const spf = config.value.timers.throttle.spf;
         if (spf.delay) {
-          const err = validateTimer(spf.delay, 1, 65535, 'SPF 延迟');
-          if (err) return alert(`SPF 定时器：${err}`);
+          const err = validateTimer(spf.delay, 1, 65535, t('ospf.validation.spfDelay'));
+          if (err) return showError({ message: `${t('ospf.validation.spfTimer')}${err}` });
         }
         if (spf['initial-holdtime']) {
-          const err = validateTimer(spf['initial-holdtime'], 1, 65535, 'SPF 初始保持时间');
-          if (err) return alert(`SPF 定时器：${err}`);
+          const err = validateTimer(spf['initial-holdtime'], 1, 65535, t('ospf.validation.spfInitialHoldtime'));
+          if (err) return showError({ message: `${t('ospf.validation.spfTimer')}${err}` });
         }
         if (spf['max-holdtime']) {
-          const err = validateTimer(spf['max-holdtime'], 1, 65535, 'SPF 最大保持时间');
-          if (err) return alert(`SPF 定时器：${err}`);
+          const err = validateTimer(spf['max-holdtime'], 1, 65535, t('ospf.validation.spfMaxHoldtime'));
+          if (err) return showError({ message: `${t('ospf.validation.spfTimer')}${err}` });
         }
       }
 
-      // 验证默认信息
       if (config.value['default-information']?.originate) {
         const orig = config.value['default-information'].originate;
         if (orig.metric) {
           const err = validateMetric(orig.metric);
-          if (err) return alert(`默认信息：度量值 ${err}`);
+          if (err) return showError({ message: `${t('ospf.validation.defaultInfo')}${t('ospf.validation.metric')} ${err}` });
         }
         if (orig['metric-type']) {
           const err = validateMetricType(orig['metric-type']);
-          if (err) return alert(`默认信息：${err}`);
+          if (err) return showError({ message: `${t('ospf.validation.defaultInfo')}${err}` });
         }
       }
 
-      // 验证距离配置
       if (config.value['distance']?.global) {
-        const err = validateDistance(config.value['distance'].global, '全局距离');
-        if (err) return alert(`距离：${err}`);
+        const err = validateDistance(config.value['distance'].global, t('ospf.validation.globalDistance'));
+        if (err) return showError({ message: `${t('ospf.validation.distance')}${err}` });
       }
       if (config.value['distance']?.ospf) {
         const ospf = config.value['distance'].ospf;
         if (ospf.external) {
-          const err = validateDistance(ospf.external, 'OSPF 外部距离');
-          if (err) return alert(`距离：${err}`);
+          const err = validateDistance(ospf.external, t('ospf.validation.externalDistance'));
+          if (err) return showError({ message: `${t('ospf.validation.distance')}${err}` });
         }
         if (ospf['inter-area']) {
-          const err = validateDistance(ospf['inter-area'], 'OSPF 区域间距离');
-          if (err) return alert(`距离：${err}`);
+          const err = validateDistance(ospf['inter-area'], t('ospf.validation.interAreaDistance'));
+          if (err) return showError({ message: `${t('ospf.validation.distance')}${err}` });
         }
         if (ospf['intra-area']) {
-          const err = validateDistance(ospf['intra-area'], 'OSPF 区域内距离');
-          if (err) return alert(`距离：${err}`);
+          const err = validateDistance(ospf['intra-area'], t('ospf.validation.intraAreaDistance'));
+          if (err) return showError({ message: `${t('ospf.validation.distance')}${err}` });
         }
       }
 
-      // 验证平滑重启
       if (config.value['graceful-restart']?.['grace-period']) {
         const err = validateGracePeriod(config.value['graceful-restart']['grace-period']);
-        if (err) return alert(`平滑重启：${err}`);
+        if (err) return showError({ message: `${t('ospf.validation.gracefulRestart')}${err}` });
       }
 
-      // 验证最大度量值
       if (config.value['max-metric']?.['router-lsa']) {
         const routerLsa = config.value['max-metric']['router-lsa'];
         if (routerLsa['on-shutdown']) {
-          const err = validateTimer(routerLsa['on-shutdown'], 1, 65535, '关闭前通告时间');
-          if (err) return alert(`最大度量值：${err}`);
+          const err = validateTimer(routerLsa['on-shutdown'], 1, 65535, t('ospf.validation.onShutdown'));
+          if (err) return showError({ message: `${t('ospf.validation.maxMetric')}${err}` });
         }
         if (routerLsa['on-startup']) {
-          const err = validateTimer(routerLsa['on-startup'], 1, 65535, '启动时通告时间');
-          if (err) return alert(`最大度量值：${err}`);
+          const err = validateTimer(routerLsa['on-startup'], 1, 65535, t('ospf.validation.onStartup'));
+          if (err) return showError({ message: `${t('ospf.validation.maxMetric')}${err}` });
         }
       }
 
-      // 验证 MPLS-TE
       if (config.value['mpls-te']?.['router-address']) {
         const err = validateIPv4(config.value['mpls-te']['router-address']);
-        if (err) return alert(`MPLS-TE：路由器地址 ${err}`);
+        if (err) return showError({ message: `${t('ospf.validation.mplsTe')}${err}` });
       }
 
-      // 验证 LDP 同步
       if (config.value['ldp-sync']?.holddown) {
         const err = validateLdpHolddown(config.value['ldp-sync'].holddown);
-        if (err) return alert(`LDP 同步：${err}`);
+        if (err) return showError({ message: `${t('ospf.validation.ldpSync')}${err}` });
       }
 
-      // 验证段路由
       if (config.value['segment-routing']) {
         const sr = config.value['segment-routing'];
         if (sr['global-block']) {
           if (sr['global-block']['low-label-value']) {
             const err = validateLabel(sr['global-block']['low-label-value']);
-            if (err) return alert(`段路由全局块：${err}`);
+            if (err) return showError({ message: `${t('ospf.validation.segmentRoutingGlobalBlock')}${err}` });
           }
           if (sr['global-block']['high-label-value']) {
             const err = validateLabel(sr['global-block']['high-label-value']);
-            if (err) return alert(`段路由全局块：${err}`);
+            if (err) return showError({ message: `${t('ospf.validation.segmentRoutingGlobalBlock')}${err}` });
           }
         }
         if (sr['local-block']) {
           if (sr['local-block']['low-label-value']) {
             const err = validateLabel(sr['local-block']['low-label-value']);
-            if (err) return alert(`段路由本地块：${err}`);
+            if (err) return showError({ message: `${t('ospf.validation.segmentRoutingLocalBlock')}${err}` });
           }
           if (sr['local-block']['high-label-value']) {
             const err = validateLabel(sr['local-block']['high-label-value']);
-            if (err) return alert(`段路由本地块：${err}`);
+            if (err) return showError({ message: `${t('ospf.validation.segmentRoutingLocalBlock')}${err}` });
           }
         }
       }
 
-      // 验证聚合定时器
       if (config.value['aggregation']?.timer) {
-        const err = validateTimer(config.value['aggregation'].timer, 1, 60, '聚合定时器');
-        if (err) return alert(`聚合：${err}`);
+        const err = validateTimer(config.value['aggregation'].timer, 1, 60, t('ospf.validation.aggregationTimer'));
+        if (err) return showError({ message: `${t('ospf.validation.aggregation')}${err}` });
       }
 
       saving.value = true;
@@ -1122,6 +1128,7 @@ export default defineComponent({
       try {
         const payload = configToConfig(config.value);
         await configApi.set('protocols ospf', payload);
+        configStore.markPending();
         saved.value = true;
         setTimeout(() => (saved.value = false), 2000);
         areaModalVisible.value = false;
@@ -1198,7 +1205,7 @@ export default defineComponent({
     }
 
     function saveAccessList() {
-      if (!accessListForm.value.number) return alert('请输入访问列表编号');
+      if (!accessListForm.value.number) return showError({ message: t('ospf.validation.enterAccessListNumber') });
       if (editingAccessListIndex.value >= 0) {
         config.value['access-list'].splice(editingAccessListIndex.value, 1, JSON.parse(JSON.stringify(accessListForm.value)));
       } else {
@@ -1208,9 +1215,17 @@ export default defineComponent({
     }
 
     function deleteAccessList(index) {
-      if (confirm('确定删除此访问列表？')) {
+      pendingDeleteAccessListNames.value = [config.value['access-list'][index].number];
+      deleteAccessListModalVisible.value = true;
+    }
+
+    function confirmDeleteAccessList() {
+      const index = config.value['access-list'].findIndex(a => String(a.number) === String(pendingDeleteAccessListNames.value[0]));
+      if (index >= 0) {
         config.value['access-list'].splice(index, 1);
       }
+      deleteAccessListModalVisible.value = false;
+      pendingDeleteAccessListNames.value = [];
     }
 
     function openSummaryAddressModal(index = -1) {
@@ -1224,9 +1239,9 @@ export default defineComponent({
     }
 
     function saveSummaryAddress() {
-      if (!summaryAddressForm.value.address) return alert('请输入汇总地址');
+      if (!summaryAddressForm.value.address) return showError({ message: t('ospf.validation.enterSummaryAddress') });
       const err = validateSummaryAddress(summaryAddressForm.value.address);
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       
       if (editingSummaryAddressIndex.value >= 0) {
         config.value['summary-address'].splice(editingSummaryAddressIndex.value, 1, JSON.parse(JSON.stringify(summaryAddressForm.value)));
@@ -1237,52 +1252,59 @@ export default defineComponent({
     }
 
     function deleteSummaryAddress(index) {
-      if (confirm('确定删除此汇总地址？')) {
+      pendingDeleteSummaryAddressNames.value = [config.value['summary-address'][index].address];
+      deleteSummaryAddressModalVisible.value = true;
+    }
+
+    function confirmDeleteSummaryAddress() {
+      const index = config.value['summary-address'].findIndex(a => a.address === pendingDeleteSummaryAddressNames.value[0]);
+      if (index >= 0) {
         config.value['summary-address'].splice(index, 1);
       }
+      deleteSummaryAddressModalVisible.value = false;
+      pendingDeleteSummaryAddressNames.value = [];
     }
 
     function saveArea() {
-      if (!areaForm.value.id) return alert('请输入区域 ID');
+      if (!areaForm.value.id) return showError({ message: t('ospf.validation.enterAreaId') });
       const err = validateAreaId(areaForm.value.id);
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       for (const net of areaForm.value.networks) {
         const netErr = validateNetwork(net.network);
-        if (netErr) return alert(netErr);
+        if (netErr) return showError({ message: netErr });
       }
       for (const range of areaForm.value.ranges) {
         const rangeErr = validateNetwork(range.range);
-        if (rangeErr) return alert(`汇总范围: ${rangeErr}`);
+        if (rangeErr) return showError({ message: `${t('ospf.validation.summaryRange')}${rangeErr}` });
         if (range['advertise-range-cost']) {
           const costErr = validateAdvertiseRangeCost(range['advertise-range-cost']);
-          if (costErr) return alert(`汇总范围: ${costErr}`);
+          if (costErr) return showError({ message: `${t('ospf.validation.summaryRange')}${costErr}` });
         }
         if (range['substitute']) {
           const subErr = validateNetwork(range['substitute']);
-          if (subErr) return alert(`替代地址: ${subErr}`);
+          if (subErr) return showError({ message: `${t('ospf.validation.substituteAddress')}${subErr}` });
         }
       }
-      // 验证虚拟链路
       for (let i = 0; i < areaForm.value.virtualLinks.length; i++) {
         const vlink = areaForm.value.virtualLinks[i];
-        if (!vlink.address) return alert(`虚拟链路 ${i + 1}: 请输入邻居路由器 ID`);
+        if (!vlink.address) return showError({ message: `${t('ospf.validation.virtualLink')} ${i + 1}${t('ospf.validation.enterNeighborRouterId')}` });
         const addrErr = validateIPv4(vlink.address);
-        if (addrErr) return alert(`虚拟链路 ${i + 1}: ${addrErr}`);
+        if (addrErr) return showError({ message: `${t('ospf.validation.virtualLink')} ${i + 1}${addrErr}` });
         if (vlink['hello-interval']) {
-          const helloErr = validateTimer(vlink['hello-interval'], 1, 65535, 'Hello 间隔');
-          if (helloErr) return alert(`虚拟链路 ${vlink.address}: ${helloErr}`);
+          const helloErr = validateTimer(vlink['hello-interval'], 1, 65535, t('ospf.validation.helloInterval'));
+          if (helloErr) return showError({ message: `${t('ospf.validation.virtualLink')} ${vlink.address}${helloErr}` });
         }
         if (vlink['dead-interval']) {
-          const deadErr = validateTimer(vlink['dead-interval'], 1, 65535, '死亡间隔');
-          if (deadErr) return alert(`虚拟链路 ${vlink.address}: ${deadErr}`);
+          const deadErr = validateTimer(vlink['dead-interval'], 1, 65535, t('ospf.validation.deadInterval'));
+          if (deadErr) return showError({ message: `${t('ospf.validation.virtualLink')} ${vlink.address}${deadErr}` });
         }
         if (vlink['retransmit-interval']) {
-          const retransmitErr = validateTimer(vlink['retransmit-interval'], 1, 65535, '重传间隔');
-          if (retransmitErr) return alert(`虚拟链路 ${vlink.address}: ${retransmitErr}`);
+          const retransmitErr = validateTimer(vlink['retransmit-interval'], 1, 65535, t('ospf.validation.retransmitInterval'));
+          if (retransmitErr) return showError({ message: `${t('ospf.validation.virtualLink')} ${vlink.address}${retransmitErr}` });
         }
         if (vlink['transmit-delay']) {
-          const delayErr = validateTimer(vlink['transmit-delay'], 1, 65535, '发送延迟');
-          if (delayErr) return alert(`虚拟链路 ${vlink.address}: ${delayErr}`);
+          const delayErr = validateTimer(vlink['transmit-delay'], 1, 65535, t('ospf.validation.transmitDelay'));
+          if (delayErr) return showError({ message: `${t('ospf.validation.virtualLink')} ${vlink.address}${delayErr}` });
         }
       }
       if (editingAreaIndex.value >= 0) {
@@ -1294,38 +1316,38 @@ export default defineComponent({
     }
 
     function saveInterface() {
-      if (!interfaceForm.value.name) return alert('请输入接口名称');
+      if (!interfaceForm.value.name) return showError({ message: t('ospf.validation.enterInterfaceName') });
       if (interfaceForm.value.cost) {
         const err = validateCost(interfaceForm.value.cost);
-        if (err) return alert(err);
+        if (err) return showError({ message: err });
       }
       if (interfaceForm.value.bandwidth) {
         const err = validateBandwidth(interfaceForm.value.bandwidth);
-        if (err) return alert(err);
+        if (err) return showError({ message: err });
       }
       if (interfaceForm.value.priority) {
         const err = validatePriority(interfaceForm.value.priority);
-        if (err) return alert(err);
+        if (err) return showError({ message: err });
       }
       if (interfaceForm.value['hello-interval']) {
-        const err = validateTimer(interfaceForm.value['hello-interval'], 1, 65535, 'Hello 间隔');
-        if (err) return alert(err);
+        const err = validateTimer(interfaceForm.value['hello-interval'], 1, 65535, t('ospf.validation.helloInterval'));
+        if (err) return showError({ message: err });
       }
       if (interfaceForm.value['dead-interval']) {
-        const err = validateTimer(interfaceForm.value['dead-interval'], 1, 65535, '死亡间隔');
-        if (err) return alert(err);
+        const err = validateTimer(interfaceForm.value['dead-interval'], 1, 65535, t('ospf.validation.deadInterval'));
+        if (err) return showError({ message: err });
       }
       if (interfaceForm.value['retransmit-interval']) {
-        const err = validateTimer(interfaceForm.value['retransmit-interval'], 1, 65535, '重传间隔');
-        if (err) return alert(err);
+        const err = validateTimer(interfaceForm.value['retransmit-interval'], 1, 65535, t('ospf.validation.retransmitInterval'));
+        if (err) return showError({ message: err });
       }
       if (interfaceForm.value['transmit-delay']) {
-        const err = validateTimer(interfaceForm.value['transmit-delay'], 1, 65535, '发送延迟');
-        if (err) return alert(err);
+        const err = validateTimer(interfaceForm.value['transmit-delay'], 1, 65535, t('ospf.validation.transmitDelay'));
+        if (err) return showError({ message: err });
       }
       if (interfaceForm.value['hello-multiplier']) {
         const err = validateHelloMultiplier(interfaceForm.value['hello-multiplier']);
-        if (err) return alert(err);
+        if (err) return showError({ message: err });
       }
       if (editingInterfaceIndex.value >= 0) {
         config.value.interfaces.splice(editingInterfaceIndex.value, 1, JSON.parse(JSON.stringify(interfaceForm.value)));
@@ -1336,16 +1358,16 @@ export default defineComponent({
     }
 
     function saveNeighbor() {
-      if (!neighborForm.value.address) return alert('请输入邻居地址');
+      if (!neighborForm.value.address) return showError({ message: t('ospf.validation.enterNeighborAddress') });
       const err = validateIPv4(neighborForm.value.address);
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       if (neighborForm.value['poll-interval']) {
         const err = validatePollInterval(neighborForm.value['poll-interval']);
-        if (err) return alert(err);
+        if (err) return showError({ message: err });
       }
       if (neighborForm.value.priority) {
         const err = validatePriority(neighborForm.value.priority);
-        if (err) return alert(err);
+        if (err) return showError({ message: err });
       }
       if (editingNeighborIndex.value >= 0) {
         config.value.neighbors.splice(editingNeighborIndex.value, 1, JSON.parse(JSON.stringify(neighborForm.value)));
@@ -1356,14 +1378,14 @@ export default defineComponent({
     }
 
     function saveRedistribute() {
-      if (!redistributeForm.value.protocol) return alert('请选择协议');
+      if (!redistributeForm.value.protocol) return showError({ message: t('ospf.validation.selectProtocol') });
       if (redistributeForm.value.metric) {
         const err = validateMetric(redistributeForm.value.metric);
-        if (err) return alert(err);
+        if (err) return showError({ message: err });
       }
       if (redistributeForm.value['metric-type']) {
         const err = validateMetricType(redistributeForm.value['metric-type']);
-        if (err) return alert(err);
+        if (err) return showError({ message: err });
       }
       if (editingRedistributeIndex.value >= 0) {
         config.value.redistributes.splice(editingRedistributeIndex.value, 1, JSON.parse(JSON.stringify(redistributeForm.value)));
@@ -1384,16 +1406,16 @@ export default defineComponent({
     }
 
     function saveRedistributeTable() {
-      if (!redistributeTableForm.value.table) return alert('请输入路由表编号');
+      if (!redistributeTableForm.value.table) return showError({ message: t('ospf.validation.enterTableId') });
       const tableNum = parseInt(redistributeTableForm.value.table, 10);
-      if (isNaN(tableNum) || tableNum < 1 || tableNum > 200) return alert('路由表编号必须在 1-200 之间');
+      if (isNaN(tableNum) || tableNum < 1 || tableNum > 200) return showError({ message: t('ospf.validation.tableIdRange') });
       if (redistributeTableForm.value.metric) {
         const err = validateMetric(redistributeTableForm.value.metric);
-        if (err) return alert(err);
+        if (err) return showError({ message: err });
       }
       if (redistributeTableForm.value['metric-type']) {
         const err = validateMetricType(redistributeTableForm.value['metric-type']);
-        if (err) return alert(err);
+        if (err) return showError({ message: err });
       }
       if (editingRedistributeTableIndex.value >= 0) {
         config.value.redistributeTables.splice(editingRedistributeTableIndex.value, 1, JSON.parse(JSON.stringify(redistributeTableForm.value)));
@@ -1404,9 +1426,17 @@ export default defineComponent({
     }
 
     function deleteRedistributeTable(index) {
-      if (confirm('确定删除此重分发路由表配置？')) {
+      pendingDeleteRedistributeTableNames.value = [config.value.redistributeTables[index].table];
+      deleteRedistributeTableModalVisible.value = true;
+    }
+
+    function confirmDeleteRedistributeTable() {
+      const index = config.value.redistributeTables.findIndex(a => String(a.table) === String(pendingDeleteRedistributeTableNames.value[0]));
+      if (index >= 0) {
         config.value.redistributeTables.splice(index, 1);
       }
+      deleteRedistributeTableModalVisible.value = false;
+      pendingDeleteRedistributeTableNames.value = [];
     }
 
     function openInterfaceModal(index = -1) {
@@ -1444,49 +1474,90 @@ export default defineComponent({
     }
 
     function deleteArea(index) {
-      if (confirm('确定删除此区域？')) {
+      pendingDeleteAreaNames.value = [config.value.areas[index].id];
+      deleteAreaModalVisible.value = true;
+    }
+
+    function confirmDeleteArea() {
+      const index = config.value.areas.findIndex(a => a.id === pendingDeleteAreaNames.value[0]);
+      if (index >= 0) {
         config.value.areas.splice(index, 1);
       }
+      deleteAreaModalVisible.value = false;
+      pendingDeleteAreaNames.value = [];
     }
 
     function deleteInterface(index) {
-      if (confirm('确定删除此接口？')) {
+      pendingDeleteInterfaceNames.value = [config.value.interfaces[index].name];
+      deleteInterfaceModalVisible.value = true;
+    }
+
+    function confirmDeleteInterface() {
+      const index = config.value.interfaces.findIndex(a => a.name === pendingDeleteInterfaceNames.value[0]);
+      if (index >= 0) {
         config.value.interfaces.splice(index, 1);
       }
+      deleteInterfaceModalVisible.value = false;
+      pendingDeleteInterfaceNames.value = [];
     }
 
     function deleteNeighbor(index) {
-      if (confirm('确定删除此邻居？')) {
+      pendingDeleteNeighborNames.value = [config.value.neighbors[index].address];
+      deleteNeighborModalVisible.value = true;
+    }
+
+    function confirmDeleteNeighbor() {
+      const index = config.value.neighbors.findIndex(a => a.address === pendingDeleteNeighborNames.value[0]);
+      if (index >= 0) {
         config.value.neighbors.splice(index, 1);
       }
+      deleteNeighborModalVisible.value = false;
+      pendingDeleteNeighborNames.value = [];
     }
 
     function deleteRedistribute(index) {
-      if (confirm('确定删除此重分发配置？')) {
+      pendingDeleteRedistributeNames.value = [config.value.redistributes[index].protocol];
+      deleteRedistributeModalVisible.value = true;
+    }
+
+    function confirmDeleteRedistribute() {
+      const index = config.value.redistributes.findIndex(a => a.protocol === pendingDeleteRedistributeNames.value[0]);
+      if (index >= 0) {
         config.value.redistributes.splice(index, 1);
       }
+      deleteRedistributeModalVisible.value = false;
+      pendingDeleteRedistributeNames.value = [];
     }
 
     onMounted(() => {
       load();
       loadInterfaces();
+      onMenuRefresh(load);
     });
 
-    return {
+    return {t,
+      
       loading, saving, saved, config, activeTab, writeDisabled,
       interfaces,
       newPassiveInterface, addPassiveInterface, removePassiveInterface,
       accessListModalVisible, editingAccessListIndex, accessListForm,
       accessListColumns, EXPORT_PROTOCOL_OPTIONS,
-      openAccessListModal, saveAccessList, deleteAccessList,
+      openAccessListModal, saveAccessList, deleteAccessList, confirmDeleteAccessList,
+      deleteAccessListModalVisible, pendingDeleteAccessListNames,
       summaryAddressModalVisible, editingSummaryAddressIndex, summaryAddressForm,
-      openSummaryAddressModal, saveSummaryAddress, deleteSummaryAddress,
+      openSummaryAddressModal, saveSummaryAddress, deleteSummaryAddress, confirmDeleteSummaryAddress,
+      deleteSummaryAddressModalVisible, pendingDeleteSummaryAddressNames,
       areaModalVisible, editingAreaIndex, areaForm,
       interfaceModalVisible, editingInterfaceIndex, interfaceForm,
       neighborModalVisible, editingNeighborIndex, neighborForm,
       redistributeModalVisible, editingRedistributeIndex, redistributeForm,
       redistributeTableModalVisible, editingRedistributeTableIndex, redistributeTableForm,
-      openRedistributeTableModal, saveRedistributeTable, deleteRedistributeTable,
+      openRedistributeTableModal, saveRedistributeTable, deleteRedistributeTable, confirmDeleteRedistributeTable,
+      deleteRedistributeTableModalVisible, pendingDeleteRedistributeTableNames,
+      deleteAreaModalVisible, pendingDeleteAreaNames, confirmDeleteArea,
+      deleteInterfaceModalVisible, pendingDeleteInterfaceNames, confirmDeleteInterface,
+      deleteNeighborModalVisible, pendingDeleteNeighborNames, confirmDeleteNeighbor,
+      deleteRedistributeModalVisible, pendingDeleteRedistributeNames, confirmDeleteRedistribute,
       areaColumns, interfaceColumns, neighborColumns, redistributeColumns, redistributeTableColumns, summaryAddressColumns,
       AREA_TYPE_OPTIONS, NETWORK_TYPE_OPTIONS, REDISTRIBUTE_PROTOCOL_OPTIONS, AUTH_TYPE_OPTIONS, commandPath,
       openAreaModal, openInterfaceModal, openNeighborModal, openRedistributeModal,
@@ -1499,40 +1570,40 @@ export default defineComponent({
   components: { TabGroup, ToolbarButton, DataTable, DraggableModal },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('common.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本设置' },
-        { key: 'areas', title: '区域' },
-        { key: 'interfaces', title: '接口' },
-        { key: 'neighbors', title: '邻居' },
-        { key: 'redistribute', title: '重分发' },
-        { key: 'access-list', title: '访问列表' },
-        { key: 'summary-address', title: '汇总地址' },
-        { key: 'distance', title: '距离' },
-        { key: 'graceful-restart', title: '平滑重启' },
-        { key: 'timers', title: '定时器' },
-        { key: 'default-info', title: '默认信息' },
-        { key: 'max-metric', title: '最大度量' },
-        { key: 'mpls-te', title: 'MPLS-TE' },
-        { key: 'ldp-sync', title: 'LDP 同步' },
-        { key: 'segment-routing', title: '段路由' }
+        { key: 'basic', title: t('ospf.tabs.basic') },
+        { key: 'areas', title: t('ospf.tabs.areas') },
+        { key: 'interfaces', title: t('ospf.tabs.interfaces') },
+        { key: 'neighbors', title: t('ospf.tabs.neighbors') },
+        { key: 'redistribute', title: t('ospf.tabs.redistribute') },
+        { key: 'access-list', title: t('ospf.tabs.accessList') },
+        { key: 'summary-address', title: t('ospf.tabs.summaryAddress') },
+        { key: 'distance', title: t('ospf.tabs.distance') },
+        { key: 'graceful-restart', title: t('ospf.tabs.gracefulRestart') },
+        { key: 'timers', title: t('ospf.tabs.timers') },
+        { key: 'default-info', title: t('ospf.tabs.defaultInfo') },
+        { key: 'max-metric', title: t('ospf.tabs.maxMetric') },
+        { key: 'mpls-te', title: t('ospf.tabs.mplsTe') },
+        { key: 'ldp-sync', title: t('ospf.tabs.ldpSync') },
+        { key: 'segment-routing', title: t('ospf.tabs.segmentRouting') }
       ]">
 
         <template #basic>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">OSPF 参数</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.basic.parameters') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">路由器 ID</label>
+                  <label class="form-label">{{ t('ospf.basic.routerId') }}</label>
                   <input type="text" class="form-control" v-model="config['router-id']"
-                         placeholder="例如: 1.1.1.1" style="width:100%;"
-                         title="OSPF 路由器标识符 (IPv4 地址格式)" />
+                         :placeholder="t('ospf.basic.routerIdPlaceholder')" style="width:100%;"
+                         :title="t('ospf.basic.routerIdTitle')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">ABR 类型</label>
+                  <label class="form-label">{{ t('ospf.basic.abrType') }}</label>
                   <select class="form-control" v-model="config['parameters']['abr-type']" style="width:100%;">
-                    <option value="">默认 (cisco)</option>
+                    <option value="">{{ t('ospf.basic.abrTypeDefault') }}</option>
                     <option value="cisco">Cisco</option>
                     <option value="ibm">IBM</option>
                     <option value="shortcut">Shortcut</option>
@@ -1540,49 +1611,49 @@ export default defineComponent({
                   </select>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">启用 Opaque-LSA 能力 (RFC2370)</label>
+                  <label class="form-label">{{ t('ospf.basic.opaqueLsa') }}</label>
                   <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['parameters']['opaque-lsa']" /></label>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">启用 RFC1583 兼容性</label>
+                  <label class="form-label">{{ t('ospf.basic.rfc1583') }}</label>
                   <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['parameters']['rfc1583-compatibility']" /></label>
                 </div>
               </div>
             </div>
 
             <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">基本配置</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.basic.config') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">默认度量值</label>
+                  <label class="form-label">{{ t('ospf.basic.defaultMetric') }}</label>
                   <input type="number" class="form-control" v-model="config['default-metric']"
                          min="0" max="16777214" placeholder="0-16777214" style="width:100%;"
-                         title="重分发路由的默认度量值 (0-16777214)" />
+                         :title="t('ospf.basic.defaultMetricTitle')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">最大路径数</label>
+                  <label class="form-label">{{ t('ospf.basic.maxPaths') }}</label>
                   <input type="number" class="form-control" v-model="config['maximum-paths']"
                          min="1" max="64" placeholder="1-64" style="width:100%;"
-                         title="ECMP 最大路径数 (1-64)" />
+                         :title="t('ospf.basic.maxPathsTitle')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">参考带宽</label>
+                  <label class="form-label">{{ t('ospf.basic.refBandwidth') }}</label>
                   <input type="number" class="form-control" v-model="config['auto-cost']['reference-bandwidth']"
                          min="1" max="4000000" placeholder="1-4000000 Kbit/s" style="width:100%;"
-                         title="auto-cost 参考带宽 (1-4000000 Kbit/s)" />
+                         :title="t('ospf.basic.refBandwidthTitle')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">记录邻接关系变化</label>
+                  <label class="form-label">{{ t('ospf.basic.logAdjacency') }}</label>
                   <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['log-adjacency-changes']" /></label>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">被动接口</label>
+                  <label class="form-label">{{ t('ospf.basic.passiveInterface') }}</label>
                   <div style="display:flex; gap:10px; align-items:center;">
-                    <select class="form-control" v-model="newPassiveInterface" style="width:100%;" title="选择被动接口">
-                      <option value="">请选择接口</option>
+                    <select class="form-control" v-model="newPassiveInterface" style="width:100%;" :title="t('ospf.basic.selectPassiveInterface')">
+                      <option value="">{{ t('ospf.basic.selectInterface') }}</option>
                       <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
                     </select>
-                    <ToolbarButton size="small" @click="addPassiveInterface">添加</ToolbarButton>
+                    <ToolbarButton size="small" @click="addPassiveInterface">{{ t('common.add') }}</ToolbarButton>
                   </div>
                 </div>
                 <div v-if="config['passive-interface'].length > 0" class="form-row">
@@ -1591,7 +1662,7 @@ export default defineComponent({
                     <div v-for="(iface, idx) in config['passive-interface']" :key="idx"
                          style="display:flex; gap:10px; align-items:center;">
                       <span>{{ iface }}</span>
-                      <ToolbarButton size="small" danger @click="removePassiveInterface(idx)">删除</ToolbarButton>
+                      <ToolbarButton size="small" danger @click="removePassiveInterface(idx)">{{ t('common.delete') }}</ToolbarButton>
                     </div>
                   </div>
                 </div>
@@ -1599,35 +1670,35 @@ export default defineComponent({
             </div>
 
             <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">能力配置</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.basic.capability') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">启用 Opaque LSA</label>
+                  <label class="form-label">{{ t('ospf.basic.enableOpaqueLsa') }}</label>
                   <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['capability'].opaque" /></label>
                 </div>
               </div>
             </div>
 
             <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">外部路由聚合</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.basic.externalAggregation') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">延迟定时器</label>
+                  <label class="form-label">{{ t('ospf.basic.delayTimer') }}</label>
                   <input type="number" class="form-control" v-model="config['aggregation']['timer']"
-                         min="5" max="1800" placeholder="5-1800 秒" style="width:100%;"
-                         title="延迟定时器 (5-1800 秒，默认 5)" />
+                         min="5" max="1800" :placeholder="t('ospf.basic.delayTimerPlaceholder')" style="width:100%;"
+                         :title="t('ospf.basic.delayTimerTitle')" />
                 </div>
               </div>
             </div>
 
             <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">LSA 刷新</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.basic.lsaRefresh') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">刷新定时器</label>
+                  <label class="form-label">{{ t('ospf.basic.refreshTimer') }}</label>
                   <input type="number" class="form-control" v-model="config.refresh.timers"
-                         min="10" max="1800" placeholder="10-1800 秒" style="width:100%;"
-                         title="LSA 刷新定时器 (10-1800 秒，默认 1800)" />
+                         min="10" max="1800" :placeholder="t('ospf.basic.refreshTimerPlaceholder')" style="width:100%;"
+                         :title="t('ospf.basic.refreshTimerTitle')" />
                 </div>
               </div>
             </div>
@@ -1655,7 +1726,7 @@ export default defineComponent({
         <template #redistribute>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">协议重分发</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.redistribute.protocolRedist') }}</div>
               <div style="padding:16px;">
                 <DataTable :columns="redistributeColumns" :data="config.redistributes" :loading="loading" :disabled="writeDisabled"
                            rowKey="protocol" :actions="['create', 'edit', 'delete']"
@@ -1663,9 +1734,9 @@ export default defineComponent({
               </div>
             </div>
             <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">路由表重分发</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.redistribute.tableRedist') }}</div>
               <div style="padding:16px;">
-                <p style="color:#666; font-size:12px; margin-top:0;">重分发非主内核路由表</p>
+                <p style="color:#666; font-size:12px; margin-top:0;">{{ t('ospf.redistribute.tableRedistDesc') }}</p>
                 <DataTable :columns="redistributeTableColumns" :data="config.redistributeTables" :loading="loading" :disabled="writeDisabled"
                            rowKey="table" :actions="['create', 'edit', 'delete']"
                            @create="openRedistributeTableModal(-1)" @edit="openRedistributeTableModal" @delete="deleteRedistributeTable" />
@@ -1677,25 +1748,25 @@ export default defineComponent({
         <template #timers>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">SPF 定时器</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.timers.spfTimer') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">延迟</label>
+                  <label class="form-label">{{ t('ospf.timers.delay') }}</label>
                   <input type="number" class="form-control" v-model="config.timers.throttle.spf.delay"
-                         min="1" max="65535" placeholder="1-65535 毫秒" style="width:100%;"
-                         title="从收到第一个变化到 SPF 计算的延迟 (1-65535 毫秒，默认 200)" />
+                         min="1" max="65535" :placeholder="t('ospf.timers.delayPlaceholder')" style="width:100%;"
+                         :title="t('ospf.timers.delayTitle')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">初始保持时间</label>
+                  <label class="form-label">{{ t('ospf.timers.initialHoldtime') }}</label>
                   <input type="number" class="form-control" v-model="config.timers.throttle.spf['initial-holdtime']"
-                         min="1" max="65535" placeholder="1-65535 毫秒" style="width:100%;"
-                         title="连续 SPF 计算之间的初始保持时间 (1-65535 毫秒，默认 1000)" />
+                         min="1" max="65535" :placeholder="t('ospf.timers.initialHoldtimePlaceholder')" style="width:100%;"
+                         :title="t('ospf.timers.initialHoldtimeTitle')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">最大保持时间</label>
+                  <label class="form-label">{{ t('ospf.timers.maxHoldtime') }}</label>
                   <input type="number" class="form-control" v-model="config.timers.throttle.spf['max-holdtime']"
-                         min="1" max="65535" placeholder="1-65535 毫秒" style="width:100%;"
-                         title="连续 SPF 计算之间的最大保持时间 (1-65535 毫秒，默认 10000)" />
+                         min="1" max="65535" :placeholder="t('ospf.timers.maxHoldtimePlaceholder')" style="width:100%;"
+                         :title="t('ospf.timers.maxHoldtimeTitle')" />
                 </div>
               </div>
             </div>
@@ -1707,30 +1778,30 @@ export default defineComponent({
         <template #default-info>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">默认信息通告</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.defaultInfo.title') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">始终通告默认路由</label>
+                  <label class="form-label">{{ t('ospf.defaultInfo.alwaysOriginate') }}</label>
                   <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['default-information'].originate.always" /></label>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">度量值</label>
+                  <label class="form-label">{{ t('ospf.defaultInfo.metric') }}</label>
                   <input type="number" class="form-control" v-model="config['default-information'].originate.metric"
                          min="0" max="16777214" placeholder="0-16777214" style="width:100%;"
-                         title="默认路由的度量值 (0-16777214)" />
+                         :title="t('ospf.defaultInfo.metricTitle')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">度量类型</label>
+                  <label class="form-label">{{ t('ospf.defaultInfo.metricType') }}</label>
                   <select class="form-control" v-model="config['default-information'].originate['metric-type']" style="width:100%;">
-                    <option value="">默认 (2)</option>
-                    <option value="1">类型 1</option>
-                    <option value="2">类型 2</option>
+                    <option value="">{{ t('ospf.defaultInfo.metricTypeDefault') }}</option>
+                    <option value="1">{{ t('ospf.defaultInfo.metricType1') }}</option>
+                    <option value="2">{{ t('ospf.defaultInfo.metricType2') }}</option>
                   </select>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">路由映射</label>
+                  <label class="form-label">{{ t('ospf.defaultInfo.routeMap') }}</label>
                   <input type="text" class="form-control" v-model="config['default-information'].originate['route-map']"
-                         placeholder="路由映射名称" style="width:100%;" />
+                         :placeholder="t('ospf.defaultInfo.routeMapPlaceholder')" style="width:100%;" />
                 </div>
               </div>
             </div>
@@ -1740,9 +1811,9 @@ export default defineComponent({
         <template #access-list>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">访问列表</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.accessList.title') }}</div>
               <div style="padding:16px;">
-                <p style="color:#666; font-size:12px; margin-top:0;">过滤路由更新中的网络</p>
+                <p style="color:#666; font-size:12px; margin-top:0;">{{ t('ospf.accessList.desc') }}</p>
                 <DataTable :columns="accessListColumns" :data="config['access-list']" :loading="loading" :disabled="writeDisabled"
                            rowKey="number" :actions="['create', 'edit', 'delete']"
                            @create="openAccessListModal(-1)" @edit="openAccessListModal" @delete="deleteAccessList" />
@@ -1754,9 +1825,9 @@ export default defineComponent({
         <template #summary-address>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">汇总地址</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.summaryAddress.title') }}</div>
               <div style="padding:16px;">
-                <p style="color:#666; font-size:12px; margin-top:0;">外部汇总地址配置</p>
+                <p style="color:#666; font-size:12px; margin-top:0;">{{ t('ospf.summaryAddress.desc') }}</p>
                 <DataTable :columns="summaryAddressColumns" :data="config['summary-address']" :loading="loading" :disabled="writeDisabled"
                            rowKey="address" :actions="['create', 'edit', 'delete']"
                            @create="openSummaryAddressModal(-1)" @edit="openSummaryAddressModal" @delete="deleteSummaryAddress" />
@@ -1768,36 +1839,36 @@ export default defineComponent({
         <template #distance>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">管理距离</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.distance.title') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">全局距离</label>
+                  <label class="form-label">{{ t('ospf.distance.global') }}</label>
                   <input type="number" class="form-control" v-model="config['distance']['global']"
                          min="1" max="255" placeholder="1-255" style="width:100%;"
-                         title="全局管理距离 (1-255)" />
+                         :title="t('ospf.distance.globalTitle')" />
                 </div>
               </div>
             </div>
             <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">OSPF 特定距离</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.distance.ospfSpecific') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">外部路由距离</label>
+                  <label class="form-label">{{ t('ospf.distance.external') }}</label>
                   <input type="number" class="form-control" v-model="config['distance']['ospf']['external']"
                          min="1" max="255" placeholder="1-255" style="width:100%;"
-                         title="外部路由的管理距离 (1-255)" />
+                         :title="t('ospf.distance.externalTitle')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">区域间路由距离</label>
+                  <label class="form-label">{{ t('ospf.distance.interArea') }}</label>
                   <input type="number" class="form-control" v-model="config['distance']['ospf']['inter-area']"
                          min="1" max="255" placeholder="1-255" style="width:100%;"
-                         title="区域间路由的管理距离 (1-255)" />
+                         :title="t('ospf.distance.interAreaTitle')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">区域内路由距离</label>
+                  <label class="form-label">{{ t('ospf.distance.intraArea') }}</label>
                   <input type="number" class="form-control" v-model="config['distance']['ospf']['intra-area']"
                          min="1" max="255" placeholder="1-255" style="width:100%;"
-                         title="区域内路由的管理距离 (1-255)" />
+                         :title="t('ospf.distance.intraAreaTitle')" />
                 </div>
               </div>
             </div>
@@ -1807,25 +1878,25 @@ export default defineComponent({
         <template #graceful-restart>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">平滑重启</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.gracefulRestart.title') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">Grace 周期</label>
+                  <label class="form-label">{{ t('ospf.gracefulRestart.gracePeriod') }}</label>
                   <input type="number" class="form-control" v-model="config['graceful-restart']['grace-period']"
-                         min="1" max="1800" placeholder="1-1800 秒" style="width:100%;"
-                         title="最大 grace 周期长度 (1-1800 秒，默认 120)" />
+                         min="1" max="1800" :placeholder="t('ospf.gracefulRestart.gracePeriodPlaceholder')" style="width:100%;"
+                         :title="t('ospf.gracefulRestart.gracePeriodTitle')" />
                 </div>
               </div>
             </div>
             <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">助手配置</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.gracefulRestart.helperConfig') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">启用助手支持</label>
+                  <label class="form-label">{{ t('ospf.gracefulRestart.enableHelper') }}</label>
                   <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['graceful-restart']['helper']['enable']" /></label>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">仅支持计划内重启</label>
+                  <label class="form-label">{{ t('ospf.gracefulRestart.plannedOnly') }}</label>
                   <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['graceful-restart']['helper']['planned-only']" /></label>
                 </div>
               </div>
@@ -1836,24 +1907,24 @@ export default defineComponent({
         <template #max-metric>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">最大度量值 (Router-LSA)</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.maxMetric.title') }}</div>
               <div style="padding:16px;">
-                <p style="color:#666; font-size:12px; margin-top:0;">通告自己的 Router-LSA 为无限距离（stub 路由器）</p>
+                <p style="color:#666; font-size:12px; margin-top:0;">{{ t('ospf.maxMetric.desc') }}</p>
                 <div class="form-row">
-                  <label class="form-label">管理应用（无限期）</label>
+                  <label class="form-label">{{ t('ospf.maxMetric.administrative') }}</label>
                   <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['max-metric']['router-lsa']['administrative']" /></label>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">关闭前通告</label>
+                  <label class="form-label">{{ t('ospf.maxMetric.onShutdown') }}</label>
                   <input type="number" class="form-control" v-model="config['max-metric']['router-lsa']['on-shutdown']"
-                         min="1" max="65535" placeholder="1-65535 秒" style="width:100%;"
-                         title="在完全关闭 OSPF 前通告 stub-router 的时间" />
+                         min="1" max="65535" :placeholder="t('ospf.maxMetric.onShutdownPlaceholder')" style="width:100%;"
+                         :title="t('ospf.maxMetric.onShutdownTitle')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">启动时通告</label>
+                  <label class="form-label">{{ t('ospf.maxMetric.onStartup') }}</label>
                   <input type="number" class="form-control" v-model="config['max-metric']['router-lsa']['on-startup']"
-                         min="1" max="65535" placeholder="1-65535 秒" style="width:100%;"
-                         title="启动 OSPF 时自动通告 stub Router-LSA 的时间" />
+                         min="1" max="65535" :placeholder="t('ospf.maxMetric.onStartupPlaceholder')" style="width:100%;"
+                         :title="t('ospf.maxMetric.onStartupTitle')" />
                 </div>
               </div>
             </div>
@@ -1863,17 +1934,17 @@ export default defineComponent({
         <template #mpls-te>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">MPLS 流量工程</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.mplsTe.title') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">启用 MPLS-TE 功能</label>
+                  <label class="form-label">{{ t('ospf.mplsTe.enable') }}</label>
                   <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['mpls-te']['enable']" /></label>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">路由器地址</label>
+                  <label class="form-label">{{ t('ospf.mplsTe.routerAddress') }}</label>
                   <input type="text" class="form-control" v-model="config['mpls-te']['router-address']"
-                         placeholder="例如: 1.1.1.1" style="width:100%;"
-                         title="通告路由器的稳定 IP 地址 (默认: 0.0.0.0)" />
+                         :placeholder="t('ospf.mplsTe.routerAddressPlaceholder')" style="width:100%;"
+                         :title="t('ospf.mplsTe.routerAddressTitle')" />
                 </div>
               </div>
             </div>
@@ -1883,14 +1954,14 @@ export default defineComponent({
         <template #ldp-sync>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">LDP-IGP 同步</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.ldpSync.title') }}</div>
               <div style="padding:16px;">
-                <p style="color:#666; font-size:12px; margin-top:0;">协议级 LDP-IGP 同步配置</p>
+                <p style="color:#666; font-size:12px; margin-top:0;">{{ t('ospf.ldpSync.desc') }}</p>
                 <div class="form-row">
-                  <label class="form-label">保持时间</label>
+                  <label class="form-label">{{ t('ospf.ldpSync.holddown') }}</label>
                   <input type="number" class="form-control" v-model="config['ldp-sync']['holddown']"
-                         min="0" max="10000" placeholder="0-10000 秒" style="width:100%;"
-                         title="LDP-IGP 成本恢复的保持时间 (0-10000 秒)" />
+                         min="0" max="10000" :placeholder="t('ospf.ldpSync.holddownPlaceholder')" style="width:100%;"
+                         :title="t('ospf.ldpSync.holddownTitle')" />
                 </div>
               </div>
             </div>
@@ -1900,47 +1971,47 @@ export default defineComponent({
         <template #segment-routing>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">段路由 (Segment Routing)</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ospf.segmentRouting.title') }}</div>
               <div style="padding:16px;">
                 <div style="margin-top:8px; border:1px solid #e8e8e8; border-radius:4px; overflow:hidden;">
-                  <div style="background:#fafafa; padding:8px 14px; font-weight:bold; font-size:13px; border-bottom:1px solid #e8e8e8;">全局块 (Global Block)</div>
+                  <div style="background:#fafafa; padding:8px 14px; font-weight:bold; font-size:13px; border-bottom:1px solid #e8e8e8;">{{ t('ospf.segmentRouting.globalBlock') }}</div>
                   <div style="padding:12px 14px;">
                     <div class="form-row">
-                      <label class="form-label">低标签值</label>
+                      <label class="form-label">{{ t('ospf.segmentRouting.lowLabelValue') }}</label>
                       <input type="number" class="form-control" v-model="config['segment-routing']['global-block']['low-label-value']"
                              min="0" max="1048575" placeholder="0-1048575" style="width:100%;"
-                             title="MPLS 标签下限" />
+                             :title="t('ospf.segmentRouting.lowLabelTitle')" />
                     </div>
                     <div class="form-row">
-                      <label class="form-label">高标签值</label>
+                      <label class="form-label">{{ t('ospf.segmentRouting.highLabelValue') }}</label>
                       <input type="number" class="form-control" v-model="config['segment-routing']['global-block']['high-label-value']"
                              min="0" max="1048575" placeholder="0-1048575" style="width:100%;"
-                             title="MPLS 标签上限" />
+                             :title="t('ospf.segmentRouting.highLabelTitle')" />
                     </div>
                   </div>
                 </div>
                 <div style="margin-top:12px; border:1px solid #e8e8e8; border-radius:4px; overflow:hidden;">
-                  <div style="background:#fafafa; padding:8px 14px; font-weight:bold; font-size:13px; border-bottom:1px solid #e8e8e8;">本地块 (Local Block)</div>
+                  <div style="background:#fafafa; padding:8px 14px; font-weight:bold; font-size:13px; border-bottom:1px solid #e8e8e8;">{{ t('ospf.segmentRouting.localBlock') }}</div>
                   <div style="padding:12px 14px;">
                     <div class="form-row">
-                      <label class="form-label">低标签值</label>
+                      <label class="form-label">{{ t('ospf.segmentRouting.lowLabelValue') }}</label>
                       <input type="number" class="form-control" v-model="config['segment-routing']['local-block']['low-label-value']"
                              min="0" max="1048575" placeholder="0-1048575" style="width:100%;"
-                             title="MPLS 标签下限" />
+                             :title="t('ospf.segmentRouting.lowLabelTitle')" />
                     </div>
                     <div class="form-row">
-                      <label class="form-label">高标签值</label>
+                      <label class="form-label">{{ t('ospf.segmentRouting.highLabelValue') }}</label>
                       <input type="number" class="form-control" v-model="config['segment-routing']['local-block']['high-label-value']"
                              min="0" max="1048575" placeholder="0-1048575" style="width:100%;"
-                             title="MPLS 标签上限" />
+                             :title="t('ospf.segmentRouting.highLabelTitle')" />
                     </div>
                   </div>
                 </div>
                 <div class="form-row" style="margin-top:12px;">
-                  <label class="form-label">最大标签深度</label>
+                  <label class="form-label">{{ t('ospf.segmentRouting.maxLabelDepth') }}</label>
                   <input type="number" class="form-control" v-model="config['segment-routing']['maximum-label-depth']"
                          min="1" max="10" placeholder="1-10" style="width:100%;"
-                         title="此路由器允许的最大 MPLS 标签深度" />
+                         :title="t('ospf.segmentRouting.maxLabelDepthTitle')" />
                 </div>
               </div>
             </div>
@@ -1950,40 +2021,36 @@ export default defineComponent({
 
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
-
       <!-- Summary Address Modal -->
-      <DraggableModal v-model:visible="summaryAddressModalVisible" :title="editingSummaryAddressIndex >= 0 ? '编辑汇总地址' : '添加汇总地址'" width="600px" @confirm="saveSummaryAddress">
+      <DraggableModal v-model:visible="summaryAddressModalVisible" :title="editingSummaryAddressIndex >= 0 ? t('ospf.summaryAddress.editTitle') : t('ospf.summaryAddress.addTitle')" width="600px" @confirm="saveSummaryAddress">
         <div class="form-row">
-          <label class="form-label">汇总地址 *</label>
+          <label class="form-label">{{ t('ospf.summaryAddress.addressLabel') }} *</label>
           <input type="text" class="form-control" v-model="summaryAddressForm.address"
-                 placeholder="例如: 10.0.0.0/8" style="width:100%;"
-                 title="汇总网络地址 (CIDR 格式)" :disabled="editingSummaryAddressIndex >= 0" />
+                 :placeholder="t('ospf.summaryAddress.addressPlaceholder')" style="width:100%;"
+                 :title="t('ospf.summaryAddress.addressTitle')" :disabled="editingSummaryAddressIndex >= 0" />
         </div>
         <div class="form-row">
-          <label class="form-label">不通告此汇总路由</label>
+          <label class="form-label">{{ t('ospf.summaryAddress.noAdvertiseLabel') }}</label>
           <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="summaryAddressForm['no-advertise']" /></label>
         </div>
         <div class="form-row">
-          <label class="form-label">标签</label>
+          <label class="form-label">{{ t('ospf.summaryAddress.tagLabel') }}</label>
           <input type="number" class="form-control" v-model="summaryAddressForm.tag"
                  min="0" max="4294967295" placeholder="0-4294967295" style="width:100%;"
-                 title="路由标签值" />
+                 :title="t('ospf.summaryAddress.tagTitle')" />
         </div>
       </DraggableModal>
 
       <!-- Access List Modal -->
-      <DraggableModal v-model:visible="accessListModalVisible" :title="editingAccessListIndex >= 0 ? '编辑访问列表' : '添加访问列表'" width="600px" @confirm="saveAccessList">
+      <DraggableModal v-model:visible="accessListModalVisible" :title="editingAccessListIndex >= 0 ? t('ospf.accessList.editTitle') : t('ospf.accessList.addTitle')" width="600px" @confirm="saveAccessList">
         <div class="form-row">
-          <label class="form-label">访问列表编号 *</label>
+          <label class="form-label">{{ t('ospf.accessList.numberLabel') }} *</label>
           <input type="number" class="form-control" v-model="accessListForm.number"
                  min="0" max="4294967295" placeholder="0-4294967295" style="width:100%;"
-                 title="访问列表编号" :disabled="editingAccessListIndex >= 0" />
+                 :title="t('ospf.accessList.numberTitle')" :disabled="editingAccessListIndex >= 0" />
         </div>
         <div class="form-row">
-          <label class="form-label">导出协议</label>
+          <label class="form-label">{{ t('ospf.accessList.exportProtocols') }}</label>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
             <label v-for="opt in EXPORT_PROTOCOL_OPTIONS" :key="opt.value"
                    style="display:flex; align-items:center; gap:8px;">
@@ -1995,270 +2062,270 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Area Modal -->
-      <DraggableModal v-model:visible="areaModalVisible" :title="editingAreaIndex >= 0 ? '编辑 OSPF 区域' : '添加 OSPF 区域'" width="600px" @confirm="saveArea">
+      <DraggableModal v-model:visible="areaModalVisible" :title="editingAreaIndex >= 0 ? t('ospf.area.editTitle') : t('ospf.area.addTitle')" width="600px" @confirm="saveArea">
         <div class="form-row">
-          <label class="form-label">区域 ID *</label>
+          <label class="form-label">{{ t('ospf.area.idLabel') }} *</label>
           <input type="text" class="form-control" v-model="areaForm.id"
-                 placeholder="例如: 0 或 0.0.0.0" style="width:100%;"
-                 title="OSPF 区域标识符 (数字 0-4294967295 或点分十进制)" :disabled="editingAreaIndex >= 0" />
+                 :placeholder="t('ospf.area.idPlaceholder')" style="width:100%;"
+                 :title="t('ospf.area.idTitle')" :disabled="editingAreaIndex >= 0" />
         </div>
         <div class="form-row">
-          <label class="form-label">区域类型</label>
+          <label class="form-label">{{ t('ospf.area.typeLabel') }}</label>
           <select class="form-control" v-model="areaForm['area-type']" style="width:100%;">
             <option v-for="opt in AREA_TYPE_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">认证类型</label>
+          <label class="form-label">{{ t('ospf.area.authType') }}</label>
           <select class="form-control" v-model="areaForm.authentication" style="width:100%;">
             <option v-for="opt in AUTH_TYPE_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">导出列表</label>
+          <label class="form-label">{{ t('ospf.area.exportList') }}</label>
           <input type="text" class="form-control" v-model="areaForm['export-list']"
-                 placeholder="访问列表名称" style="width:100%;" />
+                 :placeholder="t('ospf.area.accessListName')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">导入列表</label>
+          <label class="form-label">{{ t('ospf.area.importList') }}</label>
           <input type="text" class="form-control" v-model="areaForm['import-list']"
-                 placeholder="访问列表名称" style="width:100%;" />
+                 :placeholder="t('ospf.area.accessListName')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">启用快捷模式</label>
+          <label class="form-label">{{ t('ospf.area.enableShortcut') }}</label>
           <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="areaForm.shortcut" /></label>
         </div>
 
-        <h4 style="margin-top:20px;">网络</h4>
+        <h4 style="margin-top:20px;">{{ t('ospf.area.networks') }}</h4>
         <div v-for="(net, idx) in areaForm.networks" :key="idx" style="display:flex; gap:10px; margin-bottom:10px;">
           <input type="text" class="form-control" v-model="net.network"
-                 placeholder="例如: 192.168.1.0/24" style="flex:1;"
-                 title="OSPF 网络地址 (CIDR 格式)" />
-          <ToolbarButton size="small" danger @click="removeAreaNetwork(idx)">删除</ToolbarButton>
+                 :placeholder="t('ospf.area.networkPlaceholder')" style="flex:1;"
+                 :title="t('ospf.area.networkTitle')" />
+          <ToolbarButton size="small" danger @click="removeAreaNetwork(idx)">{{ t('common.delete') }}</ToolbarButton>
         </div>
-        <ToolbarButton size="small" @click="addAreaNetwork">添加网络</ToolbarButton>
+        <ToolbarButton size="small" @click="addAreaNetwork">{{ t('ospf.area.addNetwork') }}</ToolbarButton>
 
-        <h4 style="margin-top:20px;">汇总范围</h4>
+        <h4 style="margin-top:20px;">{{ t('ospf.area.summaryRanges') }}</h4>
         <div v-for="(range, idx) in areaForm.ranges" :key="idx" style="margin-bottom:15px; padding:10px; border:1px solid #ddd; border-radius:4px;">
           <div style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
             <input type="text" class="form-control" v-model="range.range"
-                   placeholder="例如: 10.0.0.0/8" style="flex:1;"
-                   title="汇总网络地址 (CIDR 格式)" />
-            <ToolbarButton size="small" danger @click="removeAreaRange(idx)">删除</ToolbarButton>
+                   :placeholder="t('ospf.area.rangePlaceholder')" style="flex:1;"
+                   :title="t('ospf.area.rangeTitle')" />
+            <ToolbarButton size="small" danger @click="removeAreaRange(idx)">{{ t('common.delete') }}</ToolbarButton>
           </div>
           <div style="display:flex; gap:10px; align-items:center;">
             <input type="number" class="form-control" v-model="range['advertise-range-cost']"
-                   min="1" max="65535" placeholder="成本 1-65535" style="width:150px;"
-                   title="通告范围成本 (1-65535)" />
+                   min="1" max="65535" :placeholder="t('ospf.area.costPlaceholder')" style="width:150px;"
+                   :title="t('ospf.area.costTitle')" />
             <input type="text" class="form-control" v-model="range.substitute"
-                   placeholder="替代地址 (例如: 10.0.0.0/16)" style="flex:1;"
-                   title="将范围通告为另一个前缀" />
+                   :placeholder="t('ospf.area.substitutePlaceholder')" style="flex:1;"
+                   :title="t('ospf.area.substituteTitle')" />
             <label style="white-space:nowrap;">
               <input type="checkbox" v-model="range['not-advertise']" />
-              不通告
+              {{ t('ospf.area.noAdvertise') }}
             </label>
           </div>
         </div>
-        <ToolbarButton size="small" @click="addAreaRange">添加汇总范围</ToolbarButton>
+        <ToolbarButton size="small" @click="addAreaRange">{{ t('ospf.area.addSummaryRange') }}</ToolbarButton>
 
-        <h4 style="margin-top:20px;">虚拟链路</h4>
+        <h4 style="margin-top:20px;">{{ t('ospf.area.virtualLinks') }}</h4>
         <div v-for="(vlink, idx) in areaForm.virtualLinks" :key="idx" style="margin-bottom:15px; padding:10px; border:1px solid #ddd; border-radius:4px;">
           <div style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
             <input type="text" class="form-control" v-model="vlink.address"
-                   placeholder="邻居路由器 ID (例如: 1.1.1.1)" style="flex:1;"
-                   title="虚拟链路邻居的路由器 ID" />
-            <ToolbarButton size="small" danger @click="removeAreaVirtualLink(idx)">删除</ToolbarButton>
+                   :placeholder="t('ospf.area.vlinkPlaceholder')" style="flex:1;"
+                   :title="t('ospf.area.vlinkTitle')" />
+            <ToolbarButton size="small" danger @click="removeAreaVirtualLink(idx)">{{ t('common.delete') }}</ToolbarButton>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <input type="number" class="form-control" v-model="vlink['hello-interval']"
-                   min="1" max="65535" placeholder="Hello 间隔 (秒)"
-                   title="Hello 包发送间隔 (1-65535 秒，默认 10)" />
+                   min="1" max="65535" :placeholder="t('ospf.area.helloIntervalPlaceholder')"
+                   :title="t('ospf.area.helloIntervalTitle')" />
             <input type="number" class="form-control" v-model="vlink['dead-interval']"
-                   min="1" max="65535" placeholder="死亡间隔 (秒)"
-                   title="邻居死亡检测间隔 (1-65535 秒，默认 40)" />
+                   min="1" max="65535" :placeholder="t('ospf.area.deadIntervalPlaceholder')"
+                   :title="t('ospf.area.deadIntervalTitle')" />
             <input type="number" class="form-control" v-model="vlink['retransmit-interval']"
-                   min="1" max="65535" placeholder="重传间隔 (秒)"
-                   title="LSA 重传间隔 (1-65535 秒，默认 5)" />
+                   min="1" max="65535" :placeholder="t('ospf.area.retransmitIntervalPlaceholder')"
+                   :title="t('ospf.area.retransmitIntervalTitle')" />
             <input type="number" class="form-control" v-model="vlink['transmit-delay']"
-                   min="1" max="65535" placeholder="发送延迟 (秒)"
-                   title="链路状态发送延迟 (1-65535 秒，默认 1)" />
+                   min="1" max="65535" :placeholder="t('ospf.area.transmitDelayPlaceholder')"
+                   :title="t('ospf.area.transmitDelayTitle')" />
           </div>
           <div style="margin-top:10px;">
             <label>
               <input type="checkbox" v-model="vlink.authentication" />
-              启用认证
+              {{ t('ospf.area.enableAuth') }}
             </label>
           </div>
         </div>
-        <ToolbarButton size="small" @click="addAreaVirtualLink">添加虚拟链路</ToolbarButton>
+        <ToolbarButton size="small" @click="addAreaVirtualLink">{{ t('ospf.area.addVirtualLink') }}</ToolbarButton>
       </DraggableModal>
 
       <!-- Interface Modal -->
-      <DraggableModal v-model:visible="interfaceModalVisible" :title="editingInterfaceIndex >= 0 ? '编辑 OSPF 接口' : '添加 OSPF 接口'" width="600px" @confirm="saveInterface">
+      <DraggableModal v-model:visible="interfaceModalVisible" :title="editingInterfaceIndex >= 0 ? t('ospf.interface.editTitle') : t('ospf.interface.addTitle')" width="600px" @confirm="saveInterface">
         <div class="form-row">
-          <label class="form-label">接口名称 *</label>
+          <label class="form-label">{{ t('ospf.interface.nameLabel') }} *</label>
           <template v-if="editingInterfaceIndex >= 0">
             <input type="text" class="form-control" v-model="interfaceForm.name"
                    style="width:100%;" disabled />
           </template>
           <template v-else>
             <select class="form-control" v-model="interfaceForm.name" style="width:100%;">
-              <option value="">请选择接口</option>
+              <option value="">{{ t('ospf.interface.selectInterface') }}</option>
               <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
             </select>
           </template>
         </div>
         <div class="form-row">
-          <label class="form-label">区域</label>
+          <label class="form-label">{{ t('ospf.interface.area') }}</label>
           <input type="text" class="form-control" v-model="interfaceForm.area"
-                 placeholder="例如: 0" style="width:100%;"
-                 title="OSPF 区域 ID" />
+                 :placeholder="t('ospf.interface.areaPlaceholder')" style="width:100%;"
+                 :title="t('ospf.interface.areaTitle')" />
         </div>
         <div class="form-row">
-          <label class="form-label">成本</label>
+          <label class="form-label">{{ t('ospf.interface.cost') }}</label>
           <input type="number" class="form-control" v-model="interfaceForm.cost"
                  min="1" max="65535" placeholder="1-65535" style="width:100%;"
-                 title="接口 OSPF 成本 (1-65535)" />
+                 :title="t('ospf.interface.costTitle')" />
         </div>
         <div class="form-row">
-          <label class="form-label">带宽 (Mbit/s)</label>
+          <label class="form-label">{{ t('ospf.interface.bandwidth') }}</label>
           <input type="number" class="form-control" v-model="interfaceForm.bandwidth"
                  min="1" max="100000" placeholder="1-100000" style="width:100%;"
-                 title="接口带宽 (1-100000 Mbit/s)" />
+                 :title="t('ospf.interface.bandwidthTitle')" />
         </div>
         <div class="form-row">
-          <label class="form-label">网络类型</label>
+          <label class="form-label">{{ t('ospf.interface.networkType') }}</label>
           <select class="form-control" v-model="interfaceForm.network" style="width:100%;">
             <option v-for="opt in NETWORK_TYPE_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">Hello 间隔</label>
+          <label class="form-label">{{ t('ospf.interface.helloInterval') }}</label>
           <input type="number" class="form-control" v-model="interfaceForm['hello-interval']"
-                 min="1" max="65535" placeholder="1-65535 秒" style="width:100%;"
-                 title="Hello 包发送间隔 (1-65535 秒，默认 10)" />
+                 min="1" max="65535" :placeholder="t('ospf.interface.helloIntervalPlaceholder')" style="width:100%;"
+                 :title="t('ospf.interface.helloIntervalTitle')" />
         </div>
         <div class="form-row">
-          <label class="form-label">Hello 乘数</label>
+          <label class="form-label">{{ t('ospf.interface.helloMultiplier') }}</label>
           <input type="number" class="form-control" v-model="interfaceForm['hello-multiplier']"
                  min="1" max="10" placeholder="1-10" style="width:100%;"
-                 title="Hello 乘数，用于计算死亡间隔 (1-10，默认 1)" />
+                 :title="t('ospf.interface.helloMultiplierTitle')" />
         </div>
         <div class="form-row">
-          <label class="form-label">死亡间隔</label>
+          <label class="form-label">{{ t('ospf.interface.deadInterval') }}</label>
           <input type="number" class="form-control" v-model="interfaceForm['dead-interval']"
-                 min="1" max="65535" placeholder="1-65535 秒" style="width:100%;"
-                 title="邻居死亡检测间隔 (1-65535 秒，默认 40)" />
+                 min="1" max="65535" :placeholder="t('ospf.interface.deadIntervalPlaceholder')" style="width:100%;"
+                 :title="t('ospf.interface.deadIntervalTitle')" />
         </div>
         <div class="form-row">
-          <label class="form-label">重传间隔</label>
+          <label class="form-label">{{ t('ospf.interface.retransmitInterval') }}</label>
           <input type="number" class="form-control" v-model="interfaceForm['retransmit-interval']"
-                 min="1" max="65535" placeholder="1-65535 秒" style="width:100%;"
-                 title="LSA 重传间隔 (1-65535 秒，默认 5)" />
+                 min="1" max="65535" :placeholder="t('ospf.interface.retransmitIntervalPlaceholder')" style="width:100%;"
+                 :title="t('ospf.interface.retransmitIntervalTitle')" />
         </div>
         <div class="form-row">
-          <label class="form-label">发送延迟</label>
+          <label class="form-label">{{ t('ospf.interface.transmitDelay') }}</label>
           <input type="number" class="form-control" v-model="interfaceForm['transmit-delay']"
-                 min="1" max="65535" placeholder="1-65535 秒" style="width:100%;"
-                 title="链路状态发送延迟 (1-65535 秒，默认 1)" />
+                 min="1" max="65535" :placeholder="t('ospf.interface.transmitDelayPlaceholder')" style="width:100%;"
+                 :title="t('ospf.interface.transmitDelayTitle')" />
         </div>
         <div class="form-row">
-          <label class="form-label">优先级</label>
+          <label class="form-label">{{ t('ospf.interface.priority') }}</label>
           <input type="number" class="form-control" v-model="interfaceForm.priority"
                  min="0" max="255" placeholder="0-255" style="width:100%;"
-                 title="路由器优先级 (0-255，默认 1)" />
+                 :title="t('ospf.interface.priorityTitle')" />
         </div>
         <div class="form-row">
-          <label class="form-label">启用 BFD</label>
+          <label class="form-label">{{ t('ospf.interface.enableBfd') }}</label>
           <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="interfaceForm.bfd" /></label>
         </div>
         <div class="form-row">
-          <label class="form-label">被动模式</label>
+          <label class="form-label">{{ t('ospf.interface.passiveMode') }}</label>
           <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="interfaceForm.passive" /></label>
         </div>
         <div class="form-row">
-          <label class="form-label">忽略 MTU 不匹配</label>
+          <label class="form-label">{{ t('ospf.interface.ignoreMtu') }}</label>
           <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="interfaceForm['mtu-ignore']" /></label>
         </div>
       </DraggableModal>
 
       <!-- Neighbor Modal -->
-      <DraggableModal v-model:visible="neighborModalVisible" :title="editingNeighborIndex >= 0 ? '编辑 OSPF 邻居' : '添加 OSPF 邻居'" width="600px" @confirm="saveNeighbor">
+      <DraggableModal v-model:visible="neighborModalVisible" :title="editingNeighborIndex >= 0 ? t('ospf.neighbor.editTitle') : t('ospf.neighbor.addTitle')" width="600px" @confirm="saveNeighbor">
         <div class="form-row">
-          <label class="form-label">邻居地址 *</label>
+          <label class="form-label">{{ t('ospf.neighbor.addressLabel') }} *</label>
           <input type="text" class="form-control" v-model="neighborForm.address"
-                 placeholder="例如: 192.168.1.1" style="width:100%;"
-                 title="邻居 IPv4 地址" :disabled="editingNeighborIndex >= 0" />
+                 :placeholder="t('ospf.neighbor.addressPlaceholder')" style="width:100%;"
+                 :title="t('ospf.neighbor.addressTitle')" :disabled="editingNeighborIndex >= 0" />
         </div>
         <div class="form-row">
-          <label class="form-label">轮询间隔</label>
+          <label class="form-label">{{ t('ospf.neighbor.pollIntervalLabel') }}</label>
           <input type="number" class="form-control" v-model="neighborForm['poll-interval']"
-                 min="1" max="65535" placeholder="1-65535 秒" style="width:100%;"
-                 title="死亡邻居轮询间隔 (1-65535 秒，默认 60)" />
+                 min="1" max="65535" :placeholder="t('ospf.neighbor.pollIntervalPlaceholder')" style="width:100%;"
+                 :title="t('ospf.neighbor.pollIntervalTitle')" />
         </div>
         <div class="form-row">
-          <label class="form-label">优先级</label>
+          <label class="form-label">{{ t('ospf.neighbor.priorityLabel') }}</label>
           <input type="number" class="form-control" v-model="neighborForm.priority"
                  min="0" max="255" placeholder="0-255" style="width:100%;"
-                 title="邻居优先级 (0-255，默认 0)" />
+                 :title="t('ospf.neighbor.priorityTitle')" />
         </div>
       </DraggableModal>
 
       <!-- Redistribute Modal -->
-      <DraggableModal v-model:visible="redistributeModalVisible" :title="editingRedistributeIndex >= 0 ? '编辑 OSPF 重分发' : '添加 OSPF 重分发'" width="600px" @confirm="saveRedistribute">
+      <DraggableModal v-model:visible="redistributeModalVisible" :title="editingRedistributeIndex >= 0 ? t('ospf.redistribute.editTitle') : t('ospf.redistribute.addTitle')" width="600px" @confirm="saveRedistribute">
         <div class="form-row">
-          <label class="form-label">协议 *</label>
+          <label class="form-label">{{ t('ospf.redistribute.protocolLabel') }} *</label>
           <select class="form-control" v-model="redistributeForm.protocol" style="width:100%;" :disabled="editingRedistributeIndex >= 0">
             <option v-for="opt in REDISTRIBUTE_PROTOCOL_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">度量值</label>
+          <label class="form-label">{{ t('ospf.redistribute.metricLabel') }}</label>
           <input type="number" class="form-control" v-model="redistributeForm.metric"
                  min="0" max="16777214" placeholder="0-16777214" style="width:100%;"
-                 title="重分发路由的度量值 (0-16777214)" />
+                 :title="t('ospf.redistribute.metricTitle')" />
         </div>
         <div class="form-row">
-          <label class="form-label">度量类型</label>
+          <label class="form-label">{{ t('ospf.redistribute.metricTypeLabel') }}</label>
           <select class="form-control" v-model="redistributeForm['metric-type']" style="width:100%;">
-            <option value="">默认 (2)</option>
-            <option value="1">类型 1</option>
-            <option value="2">类型 2</option>
+            <option value="">{{ t('ospf.redistribute.metricTypeDefault') }}</option>
+            <option value="1">{{ t('ospf.redistribute.metricType1') }}</option>
+            <option value="2">{{ t('ospf.redistribute.metricType2') }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
+          <label class="form-label">{{ t('ospf.redistribute.routeMapLabel') }}</label>
           <input type="text" class="form-control" v-model="redistributeForm['route-map']"
-                 placeholder="路由映射名称" style="width:100%;" />
+                 :placeholder="t('ospf.redistribute.routeMapPlaceholder')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- Redistribute Table Modal -->
-      <DraggableModal v-model:visible="redistributeTableModalVisible" :title="editingRedistributeTableIndex >= 0 ? '编辑路由表重分发' : '添加路由表重分发'" width="600px" @confirm="saveRedistributeTable">
+      <DraggableModal v-model:visible="redistributeTableModalVisible" :title="editingRedistributeTableIndex >= 0 ? t('ospf.redistributeTable.editTitle') : t('ospf.redistributeTable.addTitle')" width="600px" @confirm="saveRedistributeTable">
         <div class="form-row">
-          <label class="form-label">路由表编号 *</label>
+          <label class="form-label">{{ t('ospf.redistributeTable.tableIdLabel') }} *</label>
           <input type="number" class="form-control" v-model="redistributeTableForm.table"
                  min="1" max="200" placeholder="1-200" style="width:100%;"
-                 title="非主内核路由表编号 (1-200)" :disabled="editingRedistributeTableIndex >= 0" />
+                 :title="t('ospf.redistributeTable.tableIdTitle')" :disabled="editingRedistributeTableIndex >= 0" />
         </div>
         <div class="form-row">
-          <label class="form-label">度量值</label>
+          <label class="form-label">{{ t('ospf.redistributeTable.metricLabel') }}</label>
           <input type="number" class="form-control" v-model="redistributeTableForm.metric"
                  min="0" max="16777214" placeholder="0-16777214" style="width:100%;"
-                 title="重分发路由的度量值 (0-16777214)" />
+                 :title="t('ospf.redistributeTable.metricTitle')" />
         </div>
         <div class="form-row">
-          <label class="form-label">度量类型</label>
+          <label class="form-label">{{ t('ospf.redistributeTable.metricTypeLabel') }}</label>
           <select class="form-control" v-model="redistributeTableForm['metric-type']" style="width:100%;">
-            <option value="">默认 (2)</option>
-            <option value="1">类型 1</option>
-            <option value="2">类型 2</option>
+            <option value="">{{ t('ospf.redistributeTable.metricTypeDefault') }}</option>
+            <option value="1">{{ t('ospf.redistributeTable.metricType1') }}</option>
+            <option value="2">{{ t('ospf.redistributeTable.metricType2') }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
+          <label class="form-label">{{ t('ospf.redistributeTable.routeMapLabel') }}</label>
           <input type="text" class="form-control" v-model="redistributeTableForm['route-map']"
-                 placeholder="路由映射名称" style="width:100%;" />
+                 :placeholder="t('ospf.redistributeTable.routeMapPlaceholder')" style="width:100%;" />
         </div>
       </DraggableModal>
     </div>

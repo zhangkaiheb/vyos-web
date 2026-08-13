@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="geneve">
+<h1>Geneve</h1>
+<p><abbr title="Generic Network Virtualization Encapsulation">Geneve</abbr> Schnittstellen
+fungieren als virtuelle Netzwerkports. Administratoren können Standardnetzwerkkonfigurationen darauf anwenden, wie z. B. IP-Adressierung, Brücken oder Firewall-Regeln,
+genauso wie auf physische Ethernet-Ports.</p>
+<p>Das Geneve-Protokoll kapselt Layer-2-Ethernet-Frames, die von Endpunkten wie virtuellen Maschinen, Containern oder physischen Servern stammen, in UDP-Pakete. Es vereint die Funktionen früherer Kapselungsprotokolle, einschließlich VXLAN, NVGRE und STT, und behebt deren Einschränkungen, wie z. B. feste Header-Strukturen und fehlende Metadatenunterstützung. Aufgrund seiner Erweiterbarkeit kann Geneve möglicherweise diese älteren Protokolle ersetzen.</p>
+<p>Geneve-Tunnels werden verwendet, um virtuelle Switches zu verbinden, die sich innerhalb von Hypervisoren, physischen Switches, Middleboxes und anderen Netzwerkgeräten befinden.</p>
+<p>Geneve-Tunnels laufen über jedes standardmäßige IP-Netzwerk. In größeren Umgebungen wird das zugrunde liegende Netzwerk (Underlay) oft mit einer <strong>Clos</strong>-Topologie, auch bekannt als <em>Leaf-and-Spine</em> oder <em>Fat-Tree</em>-Topologie, gebaut.</p>
+<p>Geneve-Header:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|Ver|  Opt Len  |O|C|    Rsvd.  |          Protocol Type        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|        Virtual Network Identifier (VNI)       |    Reserved   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Variable Length Options                    |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+</pre></div>
+</div>
+<section id="configuration">
+<h2>Konfiguration</h2>
+<section id="common-interface-configuration">
+<h3>Gemeinsame Schnittstellenkonfiguration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine oder mehrere Schnittstellen-IP-Adressen.</strong></p>
+<p><code class="docutils literal notranslate">&lt;address&gt;</code> unterstützt IPv4 und IPv6 in CIDR-Schreibweise. Verwenden Sie z. B.
+<code class="docutils literal notranslate">192.0.2.1/24</code> für IPv4 oder <code class="docutils literal notranslate">2001:db8::1/64</code> für IPv6.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 address 192.0.2.1/24
+set interfaces geneve gnv0 address 2001:db8::1/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie einen klaren, beschreibenden Alias für die Schnittstelle.</strong></p>
+<p>Dieser Alias erscheint im Befehl <code class="docutils literal notranslate">show interfaces</code> und in SNMP-basierten
+Überwachungstools.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie die Schnittstelle.</strong></p>
+<p>Die Schnittstelle wird auf den administrativ heruntergefahrenen
+(<code class="docutils literal notranslate">A/D</code>) Zustand gesetzt.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; mac &lt;xx:xx:xx:xx:xx:xx&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-mac-xx-xx-xx-xx-xx-xx" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine benutzerdefinierte MAC-Adresse für die Schnittstelle.</strong></p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 mac &#39;00:53:01:02:03:04&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie das MTU der Schnittstelle.</strong></p>
+<p>Dieser Wert definiert die größte Paketgröße in Bytes, die die Schnittstelle ohne Fragmentierung überträgt.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>, die in ausgehenden
+TCP SYN-Paketen auf der angegebenen Schnittstelle angegeben wird.</strong></p>
+<p>Durch das Erschweren des MSS-Werts in TCP SYN-Paketen informieren Sie explizit das Remote-Gerät, dass keine Pakete größer als dieser Wert gesendet werden sollen. Dies verhindert Verbindungsprobleme, die auftreten, wenn die Pfad-MTU-Entdeckung (PMTUD) fehlschlägt.</p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Legt die MSS auf einen bestimmten Wert in Bytes fest. Nutzen Sie diese Option, wenn Sie eine bestimmte MSS erzwingen müssen, z. B. um Verbindungsprobleme zu beheben oder spezifische Netzwerkanforderungen zu berücksichtigen.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> Der Router berechnet die MSS automatisch als das MTU der Schnittstelle minus 40 Bytes für IPv4-Datenverkehr (20 Bytes für den IPv4-Header und 20 Bytes für den TCP-Header). Diese Option wird empfohlen, um den richtigen Wert automatisch zu setzen.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-arp-cache-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie, wie lange ein ARP-Eintrag gültig bleibt, nachdem eine IP-zu-MAC-Zuordnung auf dieser Schnittstelle erlernt wurde.</strong></p>
+<p>Die Standarddauer beträgt 30 Sekunden.</p>
+<p>Ein ARP-Eintrag bleibt gültig, wenn er positive Rückmeldungen von höheren Protokollen erhält.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-disable-arp-filter" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie das ARP-Filtern auf dieser Schnittstelle.</strong></p>
+<p><strong>Standardverhalten:</strong> Das Kernel antwortet auf ARP-Anfragen auf dieser Schnittstelle nur dann, wenn der Datenverkehr über diese spezifische Schnittstelle zurück zum ARP-Absender weitergeleitet wird.</p>
+<p><strong>Wenn konfiguriert:</strong> Das Kernel antwortet auf ARP-Anfragen auf dieser Schnittstelle für jede IP-Adresse, die auf dem lokalen Host konfiguriert ist, unabhängig davon, welche spezifische Schnittstelle diese IP-Adresse zugewiesen ist, und unabhängig vom Routing-Tabellen. Dies spiegelt das Linux-Konzept wider, dass IP-Adressen dem Host gehören, nicht einzelnen Schnittstellen.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip disable-arp-filter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie das Verhalten der Schnittstelle als Host oder Router.</strong></p>
+<p>Wenn konfiguriert, wechselt die Schnittstelle in den Host-Modus, und IPv4-Weiterleitung wird auf ihr deaktiviert.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie, ob IP-gerichtete Broadcast-Pakete, die auf dieser Schnittstelle empfangen werden, weitergeleitet werden.</strong></p>
+<p><strong>Standardverhalten:</strong> IP-gerichtete Broadcast-Pakete werden verworfen.</p>
+<p><strong>Wenn konfiguriert:</strong> IP-gerichtete Broadcast-Pakete werden an alle Hosts auf dem Ziel-Subnetz weitergeleitet, wie in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> und <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a> definiert.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-enable-arp-accept" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie, wie Gratuitous ARPs auf dieser Schnittstelle verarbeitet werden.</strong></p>
+<p>Wenn konfiguriert, wird eine IP-zu-MAC-Zuordnung in der ARP-Tabelle basierend auf Gratuitous ARP-Anfragen oder Antworten hinzugefügt.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Wenn die ARP-Tabelle bereits einen IP-Adress-Eintrag aus einem Gratuitous ARP enthält, wird dieser Eintrag aktualisiert, unabhängig davon, ob diese Einstellung konfiguriert ist.</p>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-enable-arp-announce" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Quell-IP-Auswahl für ARP-Anfragen auf dieser Schnittstelle.</strong></p>
+<p><strong>Standardverhalten:</strong> Das Kernel kann jede IP-Adresse verwenden, die der Host besitzt, als Quell-IP-Adresse in ARP-Anfragen auf dieser Schnittstelle.</p>
+<p><strong>Wenn konfiguriert:</strong> Das Kernel versucht zunächst, eine Quell-IP-Adresse auszuwählen, die auf der Schnittstelle konfiguriert ist und mit dem Ziel-IP-Adress-Subnetz übereinstimmt. Wenn kein solches Subnetz vorhanden ist, wählt das Kernel die IP-Adresse aus, die es normalerweise verwenden würde (basierend auf der Routing-Tabelle, um das Zielziel zu erreichen).</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-enable-arp-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie, welche ARP-Anfragen auf dieser Schnittstelle ignoriert werden.</strong></p>
+<p><strong>Standardverhalten:</strong> Das Kernel antwortet auf ARP-Anfragen für beliebige lokale IP-Adressen, unabhängig davon, welcher Schnittstelle sie zugewiesen sind.</p>
+<p><strong>Wenn konfiguriert:</strong> Das Kernel antwortet nur auf ARP-Anfragen, wenn die Ziel-IP-Adresse dieser spezifischen Schnittstelle zugewiesen ist.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-enable-proxy-arp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie Proxy-ARP auf dieser Schnittstelle.</strong></p>
+<p>Wenn konfiguriert, greift der Router (Kernel) auf ARP-Anfragen für nicht lokale IP-Adressen ein und antwortet mit der <abbr title="Media Access Control">MAC</abbr>-Adresse
+der Schnittstelle, die die Anfrage empfangen hat. Danach werden Pakete, die an diese IP-Adressen gerichtet sind, an ihre tatsächlichen Ziele auf entfernten Subnetzen weitergeleitet.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip enable-proxy-arp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-proxy-arp-pvlan" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie lokales Proxy-ARP auf der Schnittstelle.</strong></p>
+<p>Wenn konfiguriert, antwortet der Router (Kernel) auf ARP-Anfragen auf dieser VLAN-Schnittstelle, auch wenn die Ziel-IP-Adresse auf dem gleichen Subnetz und der gleichen Schnittstelle liegt.</p>
+<p>Dies wird verwendet, um Netzwerkisolationsanforderungen (RFC 3069) für private VLANs (PVLANs) zu unterstützen. In PVLAN-Konfigurationen dürfen Hosts auf isolierten Ports nicht direkt miteinander kommunizieren, aber sie können mit dem Upstream-Router kommunizieren.</p>
+<p>Durch die Antwort auf inter-host ARP-Anfragen mit ihrer eigenen <abbr title="Media Access Control">MAC</abbr>-Adresse leitet der Router den inter-host-Datenverkehr durch sich selbst anstatt direkt zwischen Hosts.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Dieser Befehl funktioniert unabhängig und erfordert nicht, dass das Standard-Proxy-ARP auf der Schnittstelle aktiviert wird.</p>
+</div>
+<p>Lokales Proxy-ARP wird auch als bezeichnet:</p>
+<ul class="simple">
+<li><p>VLAN-Aggregation (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>Private VLAN (Cisco, Allied Telesyn).</p></li>
+<li><p>Quellport-Filterung oder Port-Isolation (Hewlett-Packard).</p></li>
+<li><p>MAC-Forced Forwarding (Ericsson).</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Quell-IP-Adressen-Validierung mit</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>auf dieser Schnittstelle, wie in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> <strong>angegeben.</strong></p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><strong>strict:</strong> Jeder eingehende Paket-Quell-IP-Adresse wird gegen die Forwarding Information Base (FIB) geprüft. Wenn die Schnittstelle nicht der beste Weg zur Quelle ist, schlägt die Validierung fehl, und das Paket wird gelöscht.</p></li>
+<li><p><strong>loose:</strong> Jeder eingehende Paket-Quell-IP-Adresse wird gegen die Forwarding Information Base (FIB) geprüft. Wenn die Quell-IP-Adresse über irgendeine Schnittstelle nicht erreichbar ist, schlägt die Validierung fehl.</p></li>
+<li><p><strong>disable:</strong> Keine Quell-IP-Adressen-Validierung wird durchgeführt. Alle eingehenden Pakete werden akzeptiert.</p></li>
+</ul>
+<p>RFC 3704 empfiehlt, den strengen Modus zu aktivieren, um IP-Spoofing, wie z. B. DDoS-Angriffe, zu verhindern. Für asynchrone oder andere komplexe Routing-Szenarien verwenden Sie den lockeren Modus.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Schnittstelle, um automatisch eine IPv6-Adresse mit</strong>
+<abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>zu erhalten, wie in</strong>
+<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a> <strong>festgelegt.</strong></p>
+<p>IPv6-Hosts können sich automatisch konfigurieren, wenn sie sich einem IPv6-Netzwerk anschließen, indem sie das Neighbor Discovery Protocol über ICMPv6-Router-Discovery-Nachrichten verwenden. Bei der ersten Verbindung zu einem Netzwerk sendet ein Host eine Link-Local-Router-Solicitation-Multicast-Anfrage für seine Konfigurationsparameter. Der Router antwortet mit einer Router-Advertisement-Paket, das Internet-Layer-Konfigurationsparameter enthält.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Diese Methode deaktiviert automatisch die IPv6-Verkehrsweiterleitung
+auf der Schnittstelle.</p>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ipv6 address autoconf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-address-eui64-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Schnittstelle, um sich selbst eine IPv6-Adresse mit dem</strong>
+<abbr title="64-Bit Extended Unique Identifier">EUI-64</abbr> <strong>-Methode zu weisen, wie in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a> <strong>festgelegt.</strong></p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ipv6 address eui64 2001:db8:beef::/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ipv6 address no-default-link-local
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-address-no-default-link-local" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie die automatische Zuweisung einer Link-Local-IPv6-Adresse für
+diese Schnittstelle.</strong></p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ipv6 address no-default-link-local
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie das Verhalten der Schnittstelle als Host oder Router.</strong></p>
+<p>Wenn konfiguriert, wechselt die Schnittstelle in den Host-Modus, und IPv6-Weiterleitung wird auf ihr deaktiviert.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ipv6 disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ipv6 adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>, die in ausgehenden
+TCP SYN-Paketen auf der angegebenen Schnittstelle angegeben wird.</strong></p>
+<p>Durch das Erschweren des MSS-Werts in TCP SYN-Paketen informieren Sie explizit das Remote-Gerät, dass keine Pakete größer als dieser Wert gesendet werden sollen. Dies verhindert Verbindungsprobleme, wenn die Pfad-MTU-Entdeckung (PMTUD) fehlschlägt.</p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Setzt die MSS auf einen bestimmten Wert in Bytes. Nutzen Sie diese Option, um eine bestimmte MSS zu erzwingen, z. B. um Verbindungsprobleme zu beheben oder spezifische Netzwerkanforderungen zu berücksichtigen.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> Der Router berechnet die MSS als das MTU der Schnittstelle minus 60 Bytes für IPv6-Datenverkehr (40 Bytes für den IPv6-Header und 20 Bytes für den TCP-Header). Diese Option wird empfohlen, um den richtigen Wert automatisch zu setzen.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve &lt;interface&gt; ipv6 accept-dad &lt;0 | 1 | 2&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-accept-dad-0-1-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie IPv6</strong> <abbr title="Duplicate Address Detection">DAD</abbr> <strong>auf der
+Schnittstelle.</strong></p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><strong>0:</strong> Deaktiviert DAD. Es wird keine Duplicate Address Detection durchgeführt.</p></li>
+<li><p><strong>1:</strong> Aktiviert DAD (Standard). Duplicate Addresses werden erkannt. Die IPv6-Operation der Schnittstelle wird für gültige IPv6-Adressen fortgesetzt.</p></li>
+<li><p><strong>2:</strong> Aktiviert DAD und, falls eine MAC-basierte duplicate link-local Adresse gefunden wird, deaktiviert die IPv6-Operation auf dieser Schnittstelle.</p></li>
+</ul>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ipv6 accept-dad 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve gnv0 remote &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-gnv0-remote-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Konfigurieren Sie die Remote-Endpunkt-IP-Adresse für den Geneve-Tunnel.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces geneve gnv0 vni &lt;vni&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-gnv0-vni-vni" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie</strong> <abbr title="Virtual Network Identifier">VNI</abbr> <strong>für die Geneve
+Schnittstelle.</strong></p>
+<p>Der VNI ist ein virtueller Netzwerk-Identifikator. Er ermöglicht es, mehrere virtuelle Netzwerke, die dieselbe physische Infrastruktur teilen, zu isolieren.</p>
+<p>Der VNI wird auch verwendet, um den Datenverkehr nach dem Verlassen des Tunnels zu verteilen, z. B. um Pakete mit überlappenden IP-Adressen zu spezifischen Routing-Tabellen zu mappen.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces gnv0 &lt;interface&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-gnv0-interface-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie den Ziel-UDP-Port für das entfernte Geneve-Tunnel-Endgerät.</strong>
+Stellen Sie sicher, dass das entfernte Gerät so konfiguriert ist, dass es auf diesem spezifischen Port wartet.</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

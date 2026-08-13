@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="webproxy">
+<h1>Веб-прокси</h1>
+<p>Сервис прокси в VyOS основан на <a class="reference external" href="http://www.squid-cache.org/">Squid</a> и некоторых связанных модулях.</p>
+<p><a class="reference external" href="http://www.squid-cache.org/">Squid</a> — это кэширующий и перенаправляющий HTTP-веб-прокси. У него есть широкий спектр применения, включая ускорение веб-сервера за счет кэширования повторяющихся запросов, кэширование веб-ресурсов, DNS и других компьютерных сетевых запросов для группы людей, разделяющих ресурсы сети, а также помощь в обеспечении безопасности за счет фильтрации трафика. Хотя он в основном используется для HTTP и FTP, Squid имеет ограниченную поддержку нескольких других протоколов, включая Internet Gopher, SSL,[6] TLS и HTTPS. Squid не поддерживает протокол SOCKS.</p>
+<p>Фильтрация URL предоставляется <a class="reference external" href="http://www.squidguard.org/">SquidGuard</a>.</p>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy append-domain &lt;domain&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-append-domain-domain" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду, чтобы указать имя домена, которое будет добавлено к именам доменов в URL, которые не содержат точку <code class="docutils literal notranslate">.</code> домен добавляется.</p>
+<p>Пример: если установлено значение <code class="docutils literal notranslate">vyos.net</code>, а полученный URL — <code class="docutils literal notranslate">www/foo.html</code>, система будет использовать сгенерированный окончательный URL <code class="docutils literal notranslate">www.vyos.net/foo.html</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy append-domain vyos.net
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy cache-size &lt;size&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-cache-size-size" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Размер дискового кэша прокси можно настроить пользователем. По умолчанию размер кэша прокси составляет 100 МБ.</p>
+<p>Единица измерения этой команды — МБ.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy cache-size 1024
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy default-port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-default-port-port" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Укажите порт, на котором служба прокси слушает запросы. Этот порт — это порт по умолчанию, используемый для указанного адреса прослушивания.</p>
+<p>Порт по умолчанию — 3128.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy default-port 8080
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy domain-block &lt;domain&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-domain-block-domain" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Используется для блокировки определенных доменов прокси. Указание «vyos.net» заблокирует все доступы к vyos.net, а указание «.xxx» заблокирует все доступы к URL, оканчивающимся на .xxx.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy domain-block vyos.net
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy domain-noncache &lt;domain&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-domain-noncache-domain" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Позволяет получить доступ к сайтам в домене без получения их из кэша прокси. Указание «vyos.net» позволит получить доступ к vyos.net, но страницы, которые были доступны, не будут кэшироваться. Это полезно для обхода проблем с проверкой «If-Modified-Since» на определенных сайтах.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy domain-noncache vyos.net
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy listen-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-listen-address-address" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Указывает адрес прослушивания службы прокси. Адрес прослушивания — это IP-адрес, на котором служба веб-прокси слушает клиентские запросы.</p>
+<p>Для безопасности адрес прослушивания должен использоваться только на внутренних/доверенных сетях!</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy listen-address 192.0.2.1
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy listen-address &lt;address&gt; disable-transparent
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-listen-address-address-disable-transparent" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Отключает прозрачный режим веб-прокси на адресе прослушивания.</p>
+<p>В прозрачном режиме прокси все трафик, приходящий на порт 80 и предназначенный для интернета, автоматически перенаправляется через прокси. Это позволяет немедленное перенаправление прокси без настройки браузеров клиентов.</p>
+<p>Непрозрачное перенаправление требует, чтобы браузеры клиентов были настроены с помощью настроек прокси до того, как запросы будут перенаправлены. Преимущество этого в том, что клиентский веб-браузер может обнаружить, что используется прокси, и вести себя соответственно. Кроме того, веб-малварь иногда может быть заблокирована непрозрачным веб-прокси, так как они не знают о настройках прокси.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy listen-address 192.0.2.1 disable-transparent
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy listen-address &lt;address&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-listen-address-address-port-port" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Устанавливает порт прослушивания для адреса прослушивания. Это переопределяет порт по умолчанию 3128 на конкретном адресе прослушивания.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy listen-address 192.0.2.1 port 8080
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy reply-block-mime &lt;mime&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-reply-block-mime-mime" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Используется для блокировки определенного типа MIME.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># блокировка всех PDF
+set service webproxy reply-block-mime application/pdf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy reply-body-max-size &lt;size&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-reply-body-max-size-size" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Указывает максимальный размер тела ответа в КБ, используется для ограничения размера ответа.</p>
+<p>По умолчанию принимаются все размеры ответов.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy reply-body-max-size 2048
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy safe-ports &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-safe-ports-port" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Добавляет новый порт в ACL Safe-ports. Порты, включенные по умолчанию в ACL Safe-ports: 21, 70, 80, 210, 280, 443, 488, 591, 777, 873, 1025-65535</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy ssl-safe-ports &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-ssl-safe-ports-port" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Добавляет новый порт в ACL SSL-ports. Порты, включенные по умолчанию в ACL SSL-ports: 443</p>
+</div>
+</div>
+<section id="authentication">
+<h3>Аутентификация</h3>
+<p>Встроенный прокси Squid может использовать LDAP для аутентификации пользователей против корпоративной директории. Ниже приведен пример того, как использовать Active Directory как бэкенд для аутентификации. Запросы выполняются через LDAP.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication children &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-children-number" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Максимальное количество процессов аутентификатора, которые будут запущены. Если вы запустите слишком мало, Squid будет вынужден ждать их для обработки очереди проверок учетных данных, что замедлит его. Когда проверка паролей выполняется через (медленную) сеть, вероятно, потребуется много процессов аутентификатора.</p>
+<p>По умолчанию 5.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication children 10
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication credentials-ttl &lt;time&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-credentials-ttl-time" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Указывает, как долго Squid считает, что пара username:password, проверенная внешним образом, действительна — другими словами, как часто вызывается программа-помощник для этого пользователя. Установите это низкое, чтобы заставить перепроверять с краткосрочными паролями.</p>
+<p>Время в минутах, по умолчанию 60.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication credentials-ttl 120
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication method &lt;ldap&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-method-ldap" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Метод аутентификации прокси, в настоящее время поддерживается только LDAP.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication method ldap
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication realm
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-realm" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Указывает область защиты (также называемое именем области), которая будет сообщена клиенту для схемы аутентификации. Обычно это часть текста, который пользователь увидит при запросе имени пользователя и пароля.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication realm &quot;VyOS proxy auth&quot;
+</pre></div>
+</div>
+</div>
+</div>
+<section id="ldap">
+<h4>LDAP</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap base-dn &lt;base-dn&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-base-dn-base-dn" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Указывает базовый DN, под которым находятся пользователи.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap base-dn DC=vyos,DC=net
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap bind-dn &lt;bind-dn&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-bind-dn-bind-dn" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>DN и пароль для привязки при выполнении поисков.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap bind-dn CN=proxyuser,CN=Users,DC=vyos,DC=net
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap filter-expression &lt;expr&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-filter-expression-expr" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Фильтр поиска LDAP для поиска DN пользователя. Требуется, если пользователи находятся ниже базового DN или если имя входа не является тем, что строит специфичную часть DN пользователя.</p>
+<p>Фильтр поиска может содержать до 15 вхождений %s, которые будут заменены именем пользователя, как в «uid=%s» для <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2037.html"><strong>RFC 2037</strong></a> каталогов. Для подробного описания синтаксиса фильтра поиска LDAP см. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2254.html"><strong>RFC 2254</strong></a>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap filter-expression (cn=%s)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap password &lt;password&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-password-password" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>DN и пароль для привязки при выполнении поисков. Так как пароль должен быть напечатан в виде обычного текста в вашем конфигурационном файле Squid, настоятельно рекомендуется использовать аккаунт с минимальными связанными привилегиями. Это для ограничения ущерба в случае, если кто-то получит копию вашего файла конфигурации Squid.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap password vyos
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap persistent-connection
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-persistent-connection" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Использовать постоянное соединение LDAP. Обычно соединение LDAP открыто только во время проверки имени пользователя для сохранения ресурсов на сервере LDAP. Эта опция заставляет соединение LDAP оставаться открытым, позволяя использовать его для дальнейшей проверки пользователей.</p>
+<p>Рекомендуется для крупных установок.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap persistent-connection
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-port-port" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Укажите альтернативный TCP-порт, на котором слушает сервер LDAP, если не является стандартным портом LDAP 389.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap port 389
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap server &lt;server&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-server-server" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Указывает сервер LDAP для подключения.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap server ldap.vyos.net
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap use-ssl
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-use-ssl" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Использовать шифрование TLS.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap use-ssl
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap username-attribute &lt;attr&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-username-attribute-attr" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Указывает имя атрибута DN, содержащего имя пользователя/логин. Комбинируется с базовым DN для построения DN пользователя, когда фильтр поиска не указан (filter-expression).</p>
+<p>По умолчанию «uid»</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Это можно сделать только в том случае, если все ваши пользователи расположены прямо под одним и тем же местоположением в дереве LDAP и имя входа используется для именования каждого объекта пользователя. Если ваша структура LDAP не соответствует этим критериям или если вы хотите отфильтровать, кто являются действительными пользователями, то вам нужно использовать фильтр поиска для поиска DN ваших пользователей (filter-expression).</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap username-attribute uid
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap version &lt;2 | 3&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-version-2-3" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Версия протокола LDAP. По умолчанию 3, если не указано.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap version 2
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="url-filtering">
+<h3>Фильтрация URL</h3>
+<div class="error admonition">
+<p class="admonition-title">Призыв к участию</p>
+<p>Помогите улучшить этот раздел с дополнительным содержанием, примерами и объяснениями.</p>
+<p>Для руководств по внесению изменений, см. <a class="reference internal" href="../../documentation.html#documentation">Написание документации</a>.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy url-filtering disable
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-url-filtering-disable" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Отключает фильтрацию веб-ресурсов без удаления конфигурации.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy url-filtering disable
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="operation">
+<h2>Операция</h2>
+<div class="error admonition">
+<p class="admonition-title">Призыв к участию</p>
+<p>Помогите улучшить этот раздел с дополнительным содержанием, примерами и объяснениями.</p>
+<p>Для руководств по внесению изменений, см. <a class="reference internal" href="../../documentation.html#documentation">Написание документации</a>.</p>
+</div>
+<section id="filtering">
+<h3>Фильтрация</h3>
+<section id="update">
+<h4>Обновление</h4>
+<p>Если вы хотите использовать существующие черные списки, сначала необходимо создать/скачать базу данных. В противном случае вы не сможете подтвердить изменения конфигурации.</p>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+update webproxy blacklists
+<a class="cmdlink" href="#opcmd-update-webproxy-blacklists" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Загрузить/обновить полный черный список</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ update webproxy blacklists
+Warning: No url-filtering blacklist installed
+Would you like to download a default blacklist? [confirm][y]
+Connecting to ftp.example.com (192.0.2.249:21)
+blacklists.gz        100% |*************************************************************************************************************| 17.0M  0:00:00 ETA
+Uncompressing blacklist...
+Checking permissions...
+Skip link for   [ads] -&gt; [publicite]
+Building DB for [adult/domains] - 2467177 entries
+Building DB for [adult/urls] - 67798 entries
+Skip link for   [aggressive] -&gt; [agressif]
+Building DB for [agressif/domains] - 348 entries
+Building DB for [agressif/urls] - 36 entries
+Building DB for [arjel/domains] - 69 entries
+...
+Building DB for [webmail/domains] - 374 entries
+Building DB for [webmail/urls] - 9 entries
+The webproxy daemon must be restarted
+Would you like to restart it now? [confirm][y]
+[ ok ] Restarting squid (via systemctl): squid.service.
+vyos@vyos:~$
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+update webproxy blacklists category &lt;category&gt;
+<a class="cmdlink" href="#opcmd-update-webproxy-blacklists-category-category" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Загрузить/обновить частичный черный список.</p>
+<p>Используйте завершение команды, чтобы получить список категорий.</p>
+</div>
+</div>
+<ul>
+<li><p>Чтобы автоматически обновлять файлы черного списка</p>
+<p><code class="docutils literal notranslate">set service webproxy url-filtering squidguard auto-update update-hour 23</code></p>
+</li>
+<li><p>Чтобы настроить блокировку, добавьте следующее в конфигурацию</p>
+<p><code class="docutils literal notranslate">set service webproxy url-filtering squidguard block-category ads</code></p>
+<p><code class="docutils literal notranslate">set service webproxy url-filtering squidguard block-category malware</code></p>
+</li>
+</ul>
+</section>
+<section id="bypassing-the-webproxy">
+<h4>Обход веб-прокси</h4>
+<div class="error admonition">
+<p class="admonition-title">Призыв к участию</p>
+<p>Помогите улучшить этот раздел с дополнительным содержанием, примерами и объяснениями.</p>
+<p>Для руководств по внесению изменений, см. <a class="reference internal" href="../../documentation.html#documentation">Написание документации</a>.</p>
+</div>
+<p>Некоторые службы не работают правильно, когда обрабатываются через веб-прокси. Поэтому иногда полезно обойти прозрачный прокси:</p>
+<ul>
+<li><p>Чтобы обойти прокси для каждого запроса, направленного на определенное назначение:</p>
+<p><code class="docutils literal notranslate">set service webproxy whitelist destination-address 198.51.100.33</code></p>
+<p><code class="docutils literal notranslate">set service webproxy whitelist destination-address 192.0.2.0/24</code></p>
+</li>
+<li><p>Чтобы обойти прокси для каждого запроса, поступающего с определенного источника:</p>
+<p><code class="docutils literal notranslate">set service webproxy whitelist source-address 192.168.1.2</code></p>
+<p><code class="docutils literal notranslate">set service webproxy whitelist source-address 192.168.2.0/24</code></p>
+<p>(Это может быть полезно, когда вызываемая служба имеет множество и/или часто меняющихся адресов назначения — например, Netflix.)</p>
+</li>
+</ul>
+</section>
+</section>
+</section>
+<section id="examples">
+<h2>Примеры</h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# show service webproxy
+ authentication {
+     children 5
+     credentials-ttl 60
+     ldap {
+         base-dn DC=example,DC=local
+         bind-dn CN=proxyuser,CN=Users,DC=example,DC=local
+         filter-expression (cn=%s)
+         password Qwert1234
+         server ldap.example.local
+         username-attribute cn
+     }
+     method ldap
+     realm &quot;VyOS Webproxy&quot;
+ }
+ cache-size 100
+ default-port 3128
+ listen-address 192.168.188.103 {
+     disable-transparent
+ }
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

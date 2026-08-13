@@ -1,0 +1,401 @@
+{
+  "zh-CN": {
+    "configSync": {
+      "tabs": {
+        "basic": "基本设置",
+        "secondary": "从服务器",
+        "sections": "同步配置段"
+      },
+      "column": {
+        "section": "配置段",
+        "sub": "子类型"
+      },
+      "label": {
+        "syncMode": "同步模式",
+        "address": "地址",
+        "httpApiKey": "HTTP API Key",
+        "port": "端口",
+        "timeout": "超时时间 (秒)",
+        "section": "配置段",
+        "sub": "子类型"
+      },
+      "placeholder": {
+        "address": "IPv4 / IPv6 / 域名",
+        "apiKey": "API key",
+        "select": "请选择"
+      },
+      "modal": {
+        "addSection": "添加配置段",
+        "editSection": "编辑配置段",
+        "confirmDelete": "确认删除"
+      },
+      "message": {
+        "confirmDeleteSections": "确认删除以下配置段？"
+      },
+      "validation": {
+        "ipv4": "IPv4 地址格式错误",
+        "ipv6": "IPv6 地址格式错误",
+        "fqdn": "域名格式错误",
+        "hostOrIP": "请输入有效的 IPv4/IPv6 地址或域名",
+        "range": "{name} 范围为 {min}-{max}",
+        "sectionRequired": "请选择配置段",
+        "subRequired": "请选择子类型",
+        "modeRequired": "请选择同步模式",
+        "addressRequired": "请输入从服务器地址",
+        "keyRequired": "请输入 HTTP API key"
+      },
+      "error": {
+        "sectionExists": "该配置段已存在"
+      },
+      "button": {
+        "cancel": "取消",
+        "save": "保存"
+      },
+      "alert": {
+        "saved": "已保存"
+      }
+    }
+  },
+  "en": {
+    "configSync": {
+      "tabs": {
+        "basic": "Basic Settings",
+        "secondary": "Secondary Server",
+        "sections": "Sync Sections"
+      },
+      "column": {
+        "section": "Section",
+        "sub": "Sub Type"
+      },
+      "label": {
+        "syncMode": "Sync Mode",
+        "address": "Address",
+        "httpApiKey": "HTTP API Key",
+        "port": "Port",
+        "timeout": "Timeout (seconds)",
+        "section": "Section",
+        "sub": "Sub Type"
+      },
+      "placeholder": {
+        "address": "IPv4 / IPv6 / Domain",
+        "apiKey": "API key",
+        "select": "Please select"
+      },
+      "modal": {
+        "addSection": "Add Section",
+        "editSection": "Edit Section",
+        "confirmDelete": "Confirm Delete"
+      },
+      "message": {
+        "confirmDeleteSections": "Confirm delete the following sections?"
+      },
+      "validation": {
+        "ipv4": "Invalid IPv4 address format",
+        "ipv6": "Invalid IPv6 address format",
+        "fqdn": "Invalid domain name format",
+        "hostOrIP": "Please enter a valid IPv4/IPv6 address or domain name",
+        "range": "{name} range is {min}-{max}",
+        "sectionRequired": "Please select a section",
+        "subRequired": "Please select a sub type",
+        "modeRequired": "Please select sync mode",
+        "addressRequired": "Please enter secondary server address",
+        "keyRequired": "Please enter HTTP API key"
+      },
+      "error": {
+        "sectionExists": "This section already exists"
+      },
+      "button": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "alert": {
+        "saved": "Saved"
+      }
+    }
+  },
+  "zh-TW": {
+    "configSync": {
+      "tabs": {
+        "basic": "Basic Settings",
+        "secondary": "Secondary Server",
+        "sections": "Sync Sections"
+      },
+      "column": {
+        "section": "Section",
+        "sub": "Sub Type"
+      },
+      "label": {
+        "syncMode": "Sync Mode",
+        "address": "Address",
+        "httpApiKey": "HTTP API Key",
+        "port": "Port",
+        "timeout": "Timeout (seconds)",
+        "section": "Section",
+        "sub": "Sub Type"
+      },
+      "placeholder": {
+        "address": "IPv4 / IPv6 / Domain",
+        "apiKey": "API key",
+        "select": "Please select"
+      },
+      "modal": {
+        "addSection": "Add Section",
+        "editSection": "Edit Section",
+        "confirmDelete": "Confirm Delete"
+      },
+      "message": {
+        "confirmDeleteSections": "Confirm delete the following sections?"
+      },
+      "validation": {
+        "ipv4": "Invalid IPv4 address format",
+        "ipv6": "Invalid IPv6 address format",
+        "fqdn": "Invalid domain name format",
+        "hostOrIP": "Please enter a valid IPv4/IPv6 address or domain name",
+        "range": "{name} range is {min}-{max}",
+        "sectionRequired": "Please select a section",
+        "subRequired": "Please select a sub type",
+        "modeRequired": "Please select sync mode",
+        "addressRequired": "Please enter secondary server address",
+        "keyRequired": "Please enter HTTP API key"
+      },
+      "error": {
+        "sectionExists": "This section already exists"
+      },
+      "button": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "alert": {
+        "saved": "Saved"
+      }
+    }
+  },
+  "ru": {
+    "configSync": {
+      "tabs": {
+        "basic": "Basic Settings",
+        "secondary": "Secondary Server",
+        "sections": "Sync Sections"
+      },
+      "column": {
+        "section": "Section",
+        "sub": "Sub Type"
+      },
+      "label": {
+        "syncMode": "Sync Mode",
+        "address": "Address",
+        "httpApiKey": "HTTP API Key",
+        "port": "Port",
+        "timeout": "Timeout (seconds)",
+        "section": "Section",
+        "sub": "Sub Type"
+      },
+      "placeholder": {
+        "address": "IPv4 / IPv6 / Domain",
+        "apiKey": "API key",
+        "select": "Please select"
+      },
+      "modal": {
+        "addSection": "Add Section",
+        "editSection": "Edit Section",
+        "confirmDelete": "Confirm Delete"
+      },
+      "message": {
+        "confirmDeleteSections": "Confirm delete the following sections?"
+      },
+      "validation": {
+        "ipv4": "Invalid IPv4 address format",
+        "ipv6": "Invalid IPv6 address format",
+        "fqdn": "Invalid domain name format",
+        "hostOrIP": "Please enter a valid IPv4/IPv6 address or domain name",
+        "range": "{name} range is {min}-{max}",
+        "sectionRequired": "Please select a section",
+        "subRequired": "Please select a sub type",
+        "modeRequired": "Please select sync mode",
+        "addressRequired": "Please enter secondary server address",
+        "keyRequired": "Please enter HTTP API key"
+      },
+      "error": {
+        "sectionExists": "This section already exists"
+      },
+      "button": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "alert": {
+        "saved": "Saved"
+      }
+    }
+  },
+  "de": {
+    "configSync": {
+      "tabs": {
+        "basic": "Basic Settings",
+        "secondary": "Secondary Server",
+        "sections": "Sync Sections"
+      },
+      "column": {
+        "section": "Section",
+        "sub": "Sub Type"
+      },
+      "label": {
+        "syncMode": "Sync Mode",
+        "address": "Address",
+        "httpApiKey": "HTTP API Key",
+        "port": "Port",
+        "timeout": "Timeout (seconds)",
+        "section": "Section",
+        "sub": "Sub Type"
+      },
+      "placeholder": {
+        "address": "IPv4 / IPv6 / Domain",
+        "apiKey": "API key",
+        "select": "Please select"
+      },
+      "modal": {
+        "addSection": "Add Section",
+        "editSection": "Edit Section",
+        "confirmDelete": "Confirm Delete"
+      },
+      "message": {
+        "confirmDeleteSections": "Confirm delete the following sections?"
+      },
+      "validation": {
+        "ipv4": "Invalid IPv4 address format",
+        "ipv6": "Invalid IPv6 address format",
+        "fqdn": "Invalid domain name format",
+        "hostOrIP": "Please enter a valid IPv4/IPv6 address or domain name",
+        "range": "{name} range is {min}-{max}",
+        "sectionRequired": "Please select a section",
+        "subRequired": "Please select a sub type",
+        "modeRequired": "Please select sync mode",
+        "addressRequired": "Please enter secondary server address",
+        "keyRequired": "Please enter HTTP API key"
+      },
+      "error": {
+        "sectionExists": "This section already exists"
+      },
+      "button": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "alert": {
+        "saved": "Saved"
+      }
+    }
+  },
+  "fr": {
+    "configSync": {
+      "tabs": {
+        "basic": "Basic Settings",
+        "secondary": "Secondary Server",
+        "sections": "Sync Sections"
+      },
+      "column": {
+        "section": "Section",
+        "sub": "Sub Type"
+      },
+      "label": {
+        "syncMode": "Sync Mode",
+        "address": "Address",
+        "httpApiKey": "HTTP API Key",
+        "port": "Port",
+        "timeout": "Timeout (seconds)",
+        "section": "Section",
+        "sub": "Sub Type"
+      },
+      "placeholder": {
+        "address": "IPv4 / IPv6 / Domain",
+        "apiKey": "API key",
+        "select": "Please select"
+      },
+      "modal": {
+        "addSection": "Add Section",
+        "editSection": "Edit Section",
+        "confirmDelete": "Confirm Delete"
+      },
+      "message": {
+        "confirmDeleteSections": "Confirm delete the following sections?"
+      },
+      "validation": {
+        "ipv4": "Invalid IPv4 address format",
+        "ipv6": "Invalid IPv6 address format",
+        "fqdn": "Invalid domain name format",
+        "hostOrIP": "Please enter a valid IPv4/IPv6 address or domain name",
+        "range": "{name} range is {min}-{max}",
+        "sectionRequired": "Please select a section",
+        "subRequired": "Please select a sub type",
+        "modeRequired": "Please select sync mode",
+        "addressRequired": "Please enter secondary server address",
+        "keyRequired": "Please enter HTTP API key"
+      },
+      "error": {
+        "sectionExists": "This section already exists"
+      },
+      "button": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "alert": {
+        "saved": "Saved"
+      }
+    }
+  },
+  "ko": {
+    "configSync": {
+      "tabs": {
+        "basic": "Basic Settings",
+        "secondary": "Secondary Server",
+        "sections": "Sync Sections"
+      },
+      "column": {
+        "section": "Section",
+        "sub": "Sub Type"
+      },
+      "label": {
+        "syncMode": "Sync Mode",
+        "address": "Address",
+        "httpApiKey": "HTTP API Key",
+        "port": "Port",
+        "timeout": "Timeout (seconds)",
+        "section": "Section",
+        "sub": "Sub Type"
+      },
+      "placeholder": {
+        "address": "IPv4 / IPv6 / Domain",
+        "apiKey": "API key",
+        "select": "Please select"
+      },
+      "modal": {
+        "addSection": "Add Section",
+        "editSection": "Edit Section",
+        "confirmDelete": "Confirm Delete"
+      },
+      "message": {
+        "confirmDeleteSections": "Confirm delete the following sections?"
+      },
+      "validation": {
+        "ipv4": "Invalid IPv4 address format",
+        "ipv6": "Invalid IPv6 address format",
+        "fqdn": "Invalid domain name format",
+        "hostOrIP": "Please enter a valid IPv4/IPv6 address or domain name",
+        "range": "{name} range is {min}-{max}",
+        "sectionRequired": "Please select a section",
+        "subRequired": "Please select a sub type",
+        "modeRequired": "Please select sync mode",
+        "addressRequired": "Please enter secondary server address",
+        "keyRequired": "Please enter HTTP API key"
+      },
+      "error": {
+        "sectionExists": "This section already exists"
+      },
+      "button": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "alert": {
+        "saved": "Saved"
+      }
+    }
+  }
+}

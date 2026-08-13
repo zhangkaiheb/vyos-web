@@ -1,0 +1,422 @@
+{
+  "zh-CN": {
+    "localRoute": {
+      "columns": {
+        "rule": "规则编号",
+        "protocol": "协议",
+        "inboundInterface": "入接口",
+        "source": "源",
+        "destination": "目的",
+        "routingTable": "路由表"
+      },
+      "schema": {
+        "rule": "规则编号",
+        "ruleHelp": "范围 1-32765",
+        "protocol": "协议",
+        "protocolHelp": "默认 all",
+        "fwmarkHelp": "范围 1-2147483647",
+        "inboundInterface": "入接口",
+        "source": "源",
+        "destination": "目的",
+        "address": "地址",
+        "port": "端口",
+        "ipv4AddressPlaceholder": "IP 地址或前缀，可 ! 排除",
+        "ipv4AddressHelp": "可前缀 ! 表示排除",
+        "ipv6AddressPlaceholder": "IPv6 地址或前缀",
+        "ipv6AddressHelp": "IPv6 地址或前缀",
+        "portHelp": "范围 1-65535，仅单个端口",
+        "set": "设置",
+        "routingTable": "路由表",
+        "routingTablePlaceholder": "1-200 或 main",
+        "routingTableHelp": "1-200 或 main"
+      },
+      "tabs": {
+        "basic": "基本",
+        "source": "源/目的",
+        "set": "设置"
+      },
+      "protocol": {
+        "allDefault": "all (默认)"
+      },
+      "buttons": {
+        "create": "创建",
+        "edit": "编辑",
+        "delete": "删除",
+        "refresh": "刷新"
+      },
+      "modals": {
+        "createRule": "创建本地策略路由规则",
+        "editRule": "编辑本地策略路由规则",
+        "confirmDelete": "确认删除"
+      },
+      "messages": {
+        "selectRow": "请选择一行",
+        "confirmDelete": "确认删除以下本地策略路由规则？"
+      },
+      "validation": {
+        "ruleRequired": "请输入规则编号",
+        "ruleRange": "规则编号范围 1-32765"
+      }
+    }
+  },
+  "en": {
+    "localRoute": {
+      "columns": {
+        "rule": "Rule Number",
+        "protocol": "Protocol",
+        "inboundInterface": "Inbound Interface",
+        "source": "Source",
+        "destination": "Destination",
+        "routingTable": "Routing Table"
+      },
+      "schema": {
+        "rule": "Rule Number",
+        "ruleHelp": "Range 1-32765",
+        "protocol": "Protocol",
+        "protocolHelp": "Default all",
+        "fwmarkHelp": "Range 1-2147483647",
+        "inboundInterface": "Inbound Interface",
+        "source": "Source",
+        "destination": "Destination",
+        "address": "Address",
+        "port": "Port",
+        "ipv4AddressPlaceholder": "IP address or prefix, ! to exclude",
+        "ipv4AddressHelp": "Prefix ! to exclude",
+        "ipv6AddressPlaceholder": "IPv6 address or prefix",
+        "ipv6AddressHelp": "IPv6 address or prefix",
+        "portHelp": "Range 1-65535, single port only",
+        "set": "Set",
+        "routingTable": "Routing Table",
+        "routingTablePlaceholder": "1-200 or main",
+        "routingTableHelp": "1-200 or main"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "source": "Source/Destination",
+        "set": "Set"
+      },
+      "protocol": {
+        "allDefault": "all (default)"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modals": {
+        "createRule": "Create Local Policy Routing Rule",
+        "editRule": "Edit Local Policy Routing Rule",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectRow": "Please select a row",
+        "confirmDelete": "Confirm delete the following local policy routing rules?"
+      },
+      "validation": {
+        "ruleRequired": "Please enter rule number",
+        "ruleRange": "Rule number range 1-32765"
+      }
+    }
+  },
+  "zh-TW": {
+    "localRoute": {
+      "columns": {
+        "rule": "Rule Number",
+        "protocol": "Protocol",
+        "inboundInterface": "Inbound Interface",
+        "source": "Source",
+        "destination": "Destination",
+        "routingTable": "Routing Table"
+      },
+      "schema": {
+        "rule": "Rule Number",
+        "ruleHelp": "Range 1-32765",
+        "protocol": "Protocol",
+        "protocolHelp": "Default all",
+        "fwmarkHelp": "Range 1-2147483647",
+        "inboundInterface": "Inbound Interface",
+        "source": "Source",
+        "destination": "Destination",
+        "address": "Address",
+        "port": "Port",
+        "ipv4AddressPlaceholder": "IP address or prefix, ! to exclude",
+        "ipv4AddressHelp": "Prefix ! to exclude",
+        "ipv6AddressPlaceholder": "IPv6 address or prefix",
+        "ipv6AddressHelp": "IPv6 address or prefix",
+        "portHelp": "Range 1-65535, single port only",
+        "set": "Set",
+        "routingTable": "Routing Table",
+        "routingTablePlaceholder": "1-200 or main",
+        "routingTableHelp": "1-200 or main"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "source": "Source/Destination",
+        "set": "Set"
+      },
+      "protocol": {
+        "allDefault": "all (default)"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modals": {
+        "createRule": "Create Local Policy Routing Rule",
+        "editRule": "Edit Local Policy Routing Rule",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectRow": "Please select a row",
+        "confirmDelete": "Confirm delete the following local policy routing rules?"
+      },
+      "validation": {
+        "ruleRequired": "Please enter rule number",
+        "ruleRange": "Rule number range 1-32765"
+      }
+    }
+  },
+  "ru": {
+    "localRoute": {
+      "columns": {
+        "rule": "Rule Number",
+        "protocol": "Protocol",
+        "inboundInterface": "Inbound Interface",
+        "source": "Source",
+        "destination": "Destination",
+        "routingTable": "Routing Table"
+      },
+      "schema": {
+        "rule": "Rule Number",
+        "ruleHelp": "Range 1-32765",
+        "protocol": "Protocol",
+        "protocolHelp": "Default all",
+        "fwmarkHelp": "Range 1-2147483647",
+        "inboundInterface": "Inbound Interface",
+        "source": "Source",
+        "destination": "Destination",
+        "address": "Address",
+        "port": "Port",
+        "ipv4AddressPlaceholder": "IP address or prefix, ! to exclude",
+        "ipv4AddressHelp": "Prefix ! to exclude",
+        "ipv6AddressPlaceholder": "IPv6 address or prefix",
+        "ipv6AddressHelp": "IPv6 address or prefix",
+        "portHelp": "Range 1-65535, single port only",
+        "set": "Set",
+        "routingTable": "Routing Table",
+        "routingTablePlaceholder": "1-200 or main",
+        "routingTableHelp": "1-200 or main"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "source": "Source/Destination",
+        "set": "Set"
+      },
+      "protocol": {
+        "allDefault": "all (default)"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modals": {
+        "createRule": "Create Local Policy Routing Rule",
+        "editRule": "Edit Local Policy Routing Rule",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectRow": "Please select a row",
+        "confirmDelete": "Confirm delete the following local policy routing rules?"
+      },
+      "validation": {
+        "ruleRequired": "Please enter rule number",
+        "ruleRange": "Rule number range 1-32765"
+      }
+    }
+  },
+  "de": {
+    "localRoute": {
+      "columns": {
+        "rule": "Rule Number",
+        "protocol": "Protocol",
+        "inboundInterface": "Inbound Interface",
+        "source": "Source",
+        "destination": "Destination",
+        "routingTable": "Routing Table"
+      },
+      "schema": {
+        "rule": "Rule Number",
+        "ruleHelp": "Range 1-32765",
+        "protocol": "Protocol",
+        "protocolHelp": "Default all",
+        "fwmarkHelp": "Range 1-2147483647",
+        "inboundInterface": "Inbound Interface",
+        "source": "Source",
+        "destination": "Destination",
+        "address": "Address",
+        "port": "Port",
+        "ipv4AddressPlaceholder": "IP address or prefix, ! to exclude",
+        "ipv4AddressHelp": "Prefix ! to exclude",
+        "ipv6AddressPlaceholder": "IPv6 address or prefix",
+        "ipv6AddressHelp": "IPv6 address or prefix",
+        "portHelp": "Range 1-65535, single port only",
+        "set": "Set",
+        "routingTable": "Routing Table",
+        "routingTablePlaceholder": "1-200 or main",
+        "routingTableHelp": "1-200 or main"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "source": "Source/Destination",
+        "set": "Set"
+      },
+      "protocol": {
+        "allDefault": "all (default)"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modals": {
+        "createRule": "Create Local Policy Routing Rule",
+        "editRule": "Edit Local Policy Routing Rule",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectRow": "Please select a row",
+        "confirmDelete": "Confirm delete the following local policy routing rules?"
+      },
+      "validation": {
+        "ruleRequired": "Please enter rule number",
+        "ruleRange": "Rule number range 1-32765"
+      }
+    }
+  },
+  "fr": {
+    "localRoute": {
+      "columns": {
+        "rule": "Rule Number",
+        "protocol": "Protocol",
+        "inboundInterface": "Inbound Interface",
+        "source": "Source",
+        "destination": "Destination",
+        "routingTable": "Routing Table"
+      },
+      "schema": {
+        "rule": "Rule Number",
+        "ruleHelp": "Range 1-32765",
+        "protocol": "Protocol",
+        "protocolHelp": "Default all",
+        "fwmarkHelp": "Range 1-2147483647",
+        "inboundInterface": "Inbound Interface",
+        "source": "Source",
+        "destination": "Destination",
+        "address": "Address",
+        "port": "Port",
+        "ipv4AddressPlaceholder": "IP address or prefix, ! to exclude",
+        "ipv4AddressHelp": "Prefix ! to exclude",
+        "ipv6AddressPlaceholder": "IPv6 address or prefix",
+        "ipv6AddressHelp": "IPv6 address or prefix",
+        "portHelp": "Range 1-65535, single port only",
+        "set": "Set",
+        "routingTable": "Routing Table",
+        "routingTablePlaceholder": "1-200 or main",
+        "routingTableHelp": "1-200 or main"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "source": "Source/Destination",
+        "set": "Set"
+      },
+      "protocol": {
+        "allDefault": "all (default)"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modals": {
+        "createRule": "Create Local Policy Routing Rule",
+        "editRule": "Edit Local Policy Routing Rule",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectRow": "Please select a row",
+        "confirmDelete": "Confirm delete the following local policy routing rules?"
+      },
+      "validation": {
+        "ruleRequired": "Please enter rule number",
+        "ruleRange": "Rule number range 1-32765"
+      }
+    }
+  },
+  "ko": {
+    "localRoute": {
+      "columns": {
+        "rule": "Rule Number",
+        "protocol": "Protocol",
+        "inboundInterface": "Inbound Interface",
+        "source": "Source",
+        "destination": "Destination",
+        "routingTable": "Routing Table"
+      },
+      "schema": {
+        "rule": "Rule Number",
+        "ruleHelp": "Range 1-32765",
+        "protocol": "Protocol",
+        "protocolHelp": "Default all",
+        "fwmarkHelp": "Range 1-2147483647",
+        "inboundInterface": "Inbound Interface",
+        "source": "Source",
+        "destination": "Destination",
+        "address": "Address",
+        "port": "Port",
+        "ipv4AddressPlaceholder": "IP address or prefix, ! to exclude",
+        "ipv4AddressHelp": "Prefix ! to exclude",
+        "ipv6AddressPlaceholder": "IPv6 address or prefix",
+        "ipv6AddressHelp": "IPv6 address or prefix",
+        "portHelp": "Range 1-65535, single port only",
+        "set": "Set",
+        "routingTable": "Routing Table",
+        "routingTablePlaceholder": "1-200 or main",
+        "routingTableHelp": "1-200 or main"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "source": "Source/Destination",
+        "set": "Set"
+      },
+      "protocol": {
+        "allDefault": "all (default)"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modals": {
+        "createRule": "Create Local Policy Routing Rule",
+        "editRule": "Edit Local Policy Routing Rule",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectRow": "Please select a row",
+        "confirmDelete": "Confirm delete the following local policy routing rules?"
+      },
+      "validation": {
+        "ruleRequired": "Please enter rule number",
+        "ruleRange": "Rule number range 1-32765"
+      }
+    }
+  }
+}

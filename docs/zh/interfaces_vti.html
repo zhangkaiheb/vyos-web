@@ -1,0 +1,661 @@
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="vti-virtual-tunnel-interface">
+<h1>VTI (virtual tunnel interface)</h1>
+<p><abbr title="virtual tunnel interfaces">VTIs</abbr> let you create secure, encrypted
+tunnels between private networks or hosts across public infrastructure, such as
+the Internet. They operate alongside an underlying IPsec tunnel, which handles
+encapsulation and encryption, while VTIs function exclusively as routing
+interfaces.</p>
+<section id="configuration">
+<h2>配置</h2>
+<section id="common-interface-configuration">
+<h3>Common interface configuration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> address <address>
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure one or more interface IP addresses.</strong></p>
+<p><code class="docutils literal notranslate"><address></code> supports IPv4 and IPv6 in CIDR notation. For example, use
+<code class="docutils literal notranslate">192.0.2.1/24</code> for IPv4 or <code class="docutils literal notranslate">2001:db8::1/64</code> for IPv6.</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 address 192.0.2.1/24
+set interfaces vti vti0 address 2001:db8::1/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> description <description>
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a clear, descriptive alias for the interface.</strong></p>
+<p>This alias appears in the <code class="docutils literal notranslate">show interfaces</code> command and SNMP-based
+monitoring tools.</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 description 'This is an interface running on VyOS.'
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable the interface.</strong></p>
+<p>The interface 将 set to the administratively down
+(<code class="docutils literal notranslate">A/D</code>) state.</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ip adjust-mss <mss | clamp-mss-to-pmtu>
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>advertised in outgoing
+TCP SYN packets on the specified interface.</strong></p>
+<p>By clamping the MSS value in TCP SYN packets, you explicitly inform the
+remote side not to send packets larger than that size. This prevents
+connection issues that occur when 路径 MTU Discovery (PMTUD) fails.</p>
+<p>The following options are available:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> 设置s the MSS to a specific value, in bytes. Use this option if
+you need to enforce a specific MSS, for example, to troubleshoot
+connectivity issues or accommodate specific network requirements.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> The router automatically calculates the MSS to be
+the interface’s MTU minus 40 bytes for IPv4 traffic (20 bytes for the IPv4
+header and 20 bytes for the TCP header). This option 建议
+automatically set the proper value.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-arp-cache-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure how long an ARP entry remains valid after learning an IP-to-MAC
+address mapping on this interface.</strong></p>
+<p>The default duration is 30 seconds.</p>
+<p>An ARP entry remains valid if it receives positive feedback from
+higher-level protocols.</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-disable-arp-filter" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure ARP filtering on this interface.</strong></p>
+<p><strong>默认 behavior:</strong> The kernel responds to ARP requests on this interface
+only if the traffic 将 routed back to the ARP sender through that
+specific interface.</p>
+<p><strong>If configured:</strong> The kernel responds to ARP requests on this interface for any
+IP address configured on the local host, regardless of which specific interface
+that IP address is assigned to, and regardless of the routing table. This
+reflects the Linux concept that IP addresses belong to the host, not individual
+interfaces.</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip disable-arp-filter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interface for host or router behavior.</strong></p>
+<p>If configured, the interface switches to host mode, and IPv4 forwarding is
+disabled on it.</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure whether to forward IP-directed broadcast packets received on this
+interface.</strong></p>
+<p><strong>默认 behavior:</strong> IP-directed broadcast packets are dropped.</p>
+<p><strong>If configured:</strong> IP-directed broadcast packets are forwarded to all hosts
+on the destination subnet, as defined in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> and <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-enable-arp-accept" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure how to process gratuitous ARPs on this interface.</strong></p>
+<p>If configured, an IP-to-MAC address mapping is added to the ARP table based
+on gratuitous ARP requests or replies.</p>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>If the ARP table already contains the IP address from a gratuitous
+ARP, its entry is updated regardless of whether this setting is configured.</p>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-enable-arp-announce" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the source IP selection for ARP requests on this interface.</strong></p>
+<p><strong>默认 behavior:</strong> The kernel can use any IP address the host owns as
+the source IP address in ARP requests on this interface.</p>
+<p><strong>If configured:</strong> The kernel first attempts to select a source IP address
+configured on the interface that shares a common subnet with the target
+IP address. If there is no such subnet, the kernel selects the IP address
+it would normally use (based on the routing table to reach the target
+destination).</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-enable-arp-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure which ARP requests 将 ignored on this interface.</strong></p>
+<p><strong>默认 behavior:</strong> The kernel responds to ARP requests for any local
+IP addresses, regardless of which interface they are assigned to.</p>
+<p><strong>If configured:</strong> The kernel responds to ARP requests only if the target
+IP address is assigned to this specific interface.</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-enable-proxy-arp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure proxy ARP on this interface.</strong></p>
+<p>If configured, the router (kernel) intercepts ARP requests for non-local IP
+addresses and replies with the <abbr title="Media Access Control">MAC</abbr> address
+of the interface that received the request. Subsequent packets destined
+to these IP addresses are forwarded to their actual destinations on remote
+subnets.</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip enable-proxy-arp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-proxy-arp-pvlan" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure local proxy ARP on the interface.</strong></p>
+<p>If configured, the router (kernel) responds to ARP requests on this VLAN
+interface even if the target IP address resides on the same subnet and
+interface.</p>
+<p>This 用于 support network isolation requirements (RFC 3069) for private
+VLANs (PVLANs). In PVLAN configurations, hosts on isolated ports are NOT
+allowed to communicate directly with each other at 层 2, but they can
+communicate with the upstream router.</p>
+<p>By replying to inter-host ARP requests with its own <abbr title="Media Access Control">MAC</abbr>
+address, the router (kernel) directs inter-host traffic through itself instead of
+directly between hosts.</p>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>This command works independently and does not require enabling
+the standard proxy ARP on the interface.</p>
+</div>
+<p>Local proxy ARP is also known as:</p>
+<ul class="simple">
+<li><p>VLAN aggregation (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>Private VLAN  (Cisco, Allied Telesyn).</p></li>
+<li><p>源-port filtering or port isolation (Hewlett-Packard).</p></li>
+<li><p>MAC-Forced Forwarding (Ericsson).</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ip source-validation <strict | loose | disable>
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure source IP address validation using</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>on this interface, as specified in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p>The following options are available:</p>
+<ul class="simple">
+<li><p><strong>strict:</strong> Each incoming packet’s source IP address is checked against the
+Forwarding 信息rmation Base (FIB). If the interface is not the best route
+back to that source, validation fails, and the packet is dropped.</p></li>
+<li><p><strong>loose:</strong> Each incoming packet’s source IP address is checked against the
+FIB. If the source IP address is unreachable through any interface, validation
+fails.</p></li>
+<li><p><strong>disable:</strong> No source IP address validation is performed. All incoming
+packets are accepted.</p></li>
+</ul>
+<p>RFC 3704 recommends enabling strict mode to prevent IP spoofing, such as
+DDoS attacks. For asymmetric or other complex routing scenarios, use loose
+mode.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interface to automatically obtain an IPv6 address using</strong>
+<abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>as specified in</strong>
+<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<p>IPv6 hosts can configure themselves automatically when connected to an
+IPv6 network using the Neighbor Discovery 协议 via ICMPv6 router
+discovery messages. When first connected to a network, a host sends a
+link-local router solicitation multicast request for its configuration
+parameters. The router responds with a router advertisement packet
+containing Internet 层 configuration parameters.</p>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>This method automatically disables IPv6 traffic forwarding
+on the interface.</p>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ipv6 address autoconf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ipv6 address eui64 <prefix>
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-address-eui64-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interface to assign itself an IPv6 address using the</strong>
+<abbr title="64-Bit Extended Unique Identifier">EUI-64</abbr> <strong>method, as
+specified</strong> in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ipv6 address eui64 2001:db8:beef::/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ipv6 address no-default-link-local
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-address-no-default-link-local" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable the automatic assignment of a link-local IPv6 address to
+this interface.</strong></p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ipv6 address no-default-link-local
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interface for host or router behavior.</strong></p>
+<p>If configured, the interface switches to host mode, and IPv6 forwarding is
+disabled on it.</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ipv6 disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ipv6 adjust-mss <mss | clamp-mss-to-pmtu>
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>advertised in outgoing
+TCP SYN packets on the specified interface.</strong></p>
+<p>By clamping the MSS value in TCP SYN packets, you explicitly inform
+the remote side not to send packets larger than that size. This prevents
+connection issues when 路径 MTU Discovery (PMTUD) fails.</p>
+<p>The following options are available:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> 设置 the MSS to a specific value, in bytes. Use this option to
+enforce a specific MSS, for example, to troubleshoot connectivity issues
+or accommodate specific network requirements.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> The router calculates the MSS to be the interface’s
+MTU minus 60 bytes for IPv6 traffic (40 bytes for the IPv6 header and 20
+bytes for the TCP header). This option is recommended to automatically
+set the proper value.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ipv6 accept-dad <0 | 1 | 2>
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-accept-dad-0-1-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure IPv6</strong> <abbr title="Duplicate Address Detection">DAD</abbr> <strong>on the
+interface.</strong></p>
+<p>The following options are available:</p>
+<ul class="simple">
+<li><p><strong>0:</strong> Disables DAD. No duplicate address detection is performed.</p></li>
+<li><p><strong>1:</strong> Enables DAD (default). Duplicate addresses are detected. The
+interface’s IPv6 operation continues for valid IPv6 addresses.</p></li>
+<li><p><strong>2:</strong> Enables DAD and, if a MAC-based duplicate link-local address
+is found, disables IPv6 operation on this interface.</p></li>
+</ul>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ipv6 accept-dad 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> ipv6 dup-addr-detect-transmits <n>
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-dup-addr-detect-transmits-n" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the number of</strong> <abbr title="Duplicate Address Detection">DAD</abbr>
+<strong>messages that the router (kernel) sends during IPv6 address assignment
+on this interface.</strong></p>
+<p>The default value is 1.</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ipv6 dup-addr-detect-transmits 5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> mtu <mtu>
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the MTU on the interface.</strong></p>
+<p>This value defines the largest packet size, in bytes, that the interface
+transmits without fragmentation.</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> mirror egress <monitor-interface>
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-mirror-egress-monitor-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configure mirroring of outgoing traffic from the specified VTI to the
+designated monitor interface.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> mirror ingress <monitor-interface>
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-mirror-ingress-monitor-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configure mirroring of incoming traffic from the specified VTI to the
+designated monitor interface.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> redirect <interface>
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-redirect-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Enable redirection of incoming packets to the specified interface.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti <interface> vrf <vrf>
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-vrf-vrf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Assign the interface to a specific</strong> <abbr title="Virtual Routing and Forwarding">VRF</abbr> <strong>instance.</strong></p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>For information on configuring a VRF, refer to the <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>
+section.</p>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 vrf red
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="operation">
+<h2>Operation</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show interfaces vti <vtiX>
+<a class="cmdlink" href="#opcmd-show-interfaces-vti-vtix" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>显示 the operational status and traffic statistics for the specified VTI.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show interfaces vti <vtiX> brief
+<a class="cmdlink" href="#opcmd-show-interfaces-vti-vtix-brief" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>显示 a brief operational status summary for the specified VTI.</p>
+</div>
+</div>
+</section>
+<section id="example">
+<h2>示例</h2>
+<p><strong>Configure a VTI</strong></p>
+<p>Assign IPv4 and IPv6 addresses to the VTI, along with a brief description:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 address 192.168.2.249/30
+set interfaces vti vti0 address 2001:db8:2::249/64
+set interfaces vti vti0 description "Description"
+</pre></div>
+</div>
+<p>Resulting configuration:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# show interfaces vti
+vti vti0 {
+    address 192.168.2.249/30
+    address 2001:db8:2::249/64
+    description "Description"
+}
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>When configuring site-to-site IPsec with VTIs, ensure that route
+autoinstall is disabled.</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn ipsec options disable-route-autoinstall
+</pre></div>
+</div>
+<p>For more information about the IPsec and VTI issue, as well as the
+<code class="docutils literal notranslate">disable-route-autoinstall</code> option, see:
+<a class="reference external" href="https://blog.vyos.io/vyos-1-dot-2-0-development-news-in-july.">https://blog.vyos.io/vyos-1-dot-2-0-development-news-in-july.</a></p>
+<p>The root cause of the problem is that VTI tunnels require their traffic
+selectors to be set to <code class="docutils literal notranslate">0.0.0.0/0</code> for traffic to match the tunnel, even
+though routing decisions are based on netfilter marks. Unless route insertion
+is explicitly disabled, strongSWAN incorrectly inserts a default route through
+the VTI peer address, causing all traffic to be misrouted.</p>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

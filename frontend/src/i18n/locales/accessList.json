@@ -1,0 +1,639 @@
+{
+  "zh-CN": {
+    "accesslist": {
+      "buttons": {
+        "create": "创建",
+        "delete": "删除",
+        "edit": "编辑",
+        "refresh": "刷新"
+      },
+      "columns": {
+        "description": "描述",
+        "number": "number",
+        "ruleCount": "ruleCount",
+        "type": "类型"
+      },
+      "form": {
+        "action": "action",
+        "description": "描述",
+        "destination": "destination",
+        "host": "host",
+        "hostPlaceholder": "hostPlaceholder",
+        "inverseMask": "inverseMask",
+        "inverseMaskHelp": "inverseMaskHelp",
+        "inverseMaskPlaceholder": "inverseMaskPlaceholder",
+        "network": "network",
+        "networkPlaceholder": "networkPlaceholder",
+        "number": "number",
+        "numberHelp": "numberHelp",
+        "rule": "rule",
+        "ruleHelp": "ruleHelp",
+        "source": "source",
+        "type": "类型"
+      },
+      "messages": {
+        "selectList": "请选择 list",
+        "selectRule": "请选择 rule"
+      },
+      "modals": {
+        "confirmDelete": "确定 删除",
+        "confirmDeleteList": "确定 删除 list",
+        "confirmDeleteRule": "确定 删除 rule",
+        "createList": "创建 list",
+        "createRule": "创建 rule",
+        "editList": "编辑 list",
+        "editRule": "编辑 rule"
+      },
+      "ruleColumns": {
+        "action": "action",
+        "description": "描述",
+        "destination": "destination",
+        "rule": "rule",
+        "source": "source"
+      },
+      "ruleValidation": {
+        "actionRequired": "action 为必填项",
+        "destHostInvalid": "destHostInvalid",
+        "destHostRequired": "dest host 为必填项",
+        "destMaskInvalid": "destMaskInvalid",
+        "destNetworkInvalid": "destNetworkInvalid",
+        "destNetworkRequired": "dest network 为必填项",
+        "ruleExists": "ruleExists",
+        "ruleRange": "rule 范围",
+        "ruleRequired": "rule 为必填项",
+        "sourceHostInvalid": "sourceHostInvalid",
+        "sourceHostRequired": "source host 为必填项",
+        "sourceMaskInvalid": "sourceMaskInvalid",
+        "sourceNetworkInvalid": "sourceNetworkInvalid",
+        "sourceNetworkRequired": "source network 为必填项"
+      },
+      "sections": {
+        "rules": "rules"
+      },
+      "tabs": {
+        "basic": "basic",
+        "destination": "destination",
+        "source": "source"
+      },
+      "types": {
+        "extended": "extended",
+        "extendedExpanded": "extendedExpanded",
+        "standard": "standard",
+        "standardExpanded": "standardExpanded",
+        "unknown": "unknown"
+      },
+      "validation": {
+        "numberExists": "numberExists",
+        "numberInvalid": "numberInvalid",
+        "numberRange": "number 范围",
+        "numberRequired": "number 为必填项"
+      }
+    }
+  },
+  "en": {
+    "accesslist": {
+      "buttons": {
+        "create": "Create",
+        "delete": "Delete",
+        "edit": "Edit",
+        "refresh": "Refresh"
+      },
+      "columns": {
+        "description": "Description",
+        "number": "Number",
+        "ruleCount": "Rule Count",
+        "type": "Type"
+      },
+      "form": {
+        "action": "Action",
+        "description": "Description",
+        "destination": "Destination",
+        "host": "Host",
+        "hostPlaceholder": "Host Placeholder",
+        "inverseMask": "Inverse Mask",
+        "inverseMaskHelp": "Inverse Mask Help",
+        "inverseMaskPlaceholder": "Inverse Mask Placeholder",
+        "network": "Network",
+        "networkPlaceholder": "Network Placeholder",
+        "number": "Number",
+        "numberHelp": "Number Help",
+        "rule": "Rule",
+        "ruleHelp": "Rule Help",
+        "source": "Source",
+        "type": "Type"
+      },
+      "messages": {
+        "selectList": "Select List",
+        "selectRule": "Select Rule"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteList": "Confirm Delete List",
+        "confirmDeleteRule": "Confirm Delete Rule",
+        "createList": "Create List",
+        "createRule": "Create Rule",
+        "editList": "Edit List",
+        "editRule": "Edit Rule"
+      },
+      "ruleColumns": {
+        "action": "Action",
+        "description": "Description",
+        "destination": "Destination",
+        "rule": "Rule",
+        "source": "Source"
+      },
+      "ruleValidation": {
+        "actionRequired": "Action Required",
+        "destHostInvalid": "Dest Host Invalid",
+        "destHostRequired": "Dest Host Required",
+        "destMaskInvalid": "Dest Mask Invalid",
+        "destNetworkInvalid": "Dest Network Invalid",
+        "destNetworkRequired": "Dest Network Required",
+        "ruleExists": "Rule Exists",
+        "ruleRange": "Rule Range",
+        "ruleRequired": "Rule Required",
+        "sourceHostInvalid": "Source Host Invalid",
+        "sourceHostRequired": "Source Host Required",
+        "sourceMaskInvalid": "Source Mask Invalid",
+        "sourceNetworkInvalid": "Source Network Invalid",
+        "sourceNetworkRequired": "Source Network Required"
+      },
+      "sections": {
+        "rules": "Rules"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "destination": "Destination",
+        "source": "Source"
+      },
+      "types": {
+        "extended": "Extended",
+        "extendedExpanded": "Extended Expanded",
+        "standard": "Standard",
+        "standardExpanded": "Standard Expanded",
+        "unknown": "Unknown"
+      },
+      "validation": {
+        "numberExists": "Number Exists",
+        "numberInvalid": "Number Invalid",
+        "numberRange": "Number Range",
+        "numberRequired": "Number Required"
+      }
+    }
+  },
+  "zh-TW": {
+    "accesslist": {
+      "buttons": {
+        "create": "Create",
+        "delete": "Delete",
+        "edit": "Edit",
+        "refresh": "Refresh"
+      },
+      "columns": {
+        "description": "Description",
+        "number": "Number",
+        "ruleCount": "Rule Count",
+        "type": "Type"
+      },
+      "form": {
+        "action": "Action",
+        "description": "Description",
+        "destination": "Destination",
+        "host": "Host",
+        "hostPlaceholder": "Host Placeholder",
+        "inverseMask": "Inverse Mask",
+        "inverseMaskHelp": "Inverse Mask Help",
+        "inverseMaskPlaceholder": "Inverse Mask Placeholder",
+        "network": "Network",
+        "networkPlaceholder": "Network Placeholder",
+        "number": "Number",
+        "numberHelp": "Number Help",
+        "rule": "Rule",
+        "ruleHelp": "Rule Help",
+        "source": "Source",
+        "type": "Type"
+      },
+      "messages": {
+        "selectList": "Select List",
+        "selectRule": "Select Rule"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteList": "Confirm Delete List",
+        "confirmDeleteRule": "Confirm Delete Rule",
+        "createList": "Create List",
+        "createRule": "Create Rule",
+        "editList": "Edit List",
+        "editRule": "Edit Rule"
+      },
+      "ruleColumns": {
+        "action": "Action",
+        "description": "Description",
+        "destination": "Destination",
+        "rule": "Rule",
+        "source": "Source"
+      },
+      "ruleValidation": {
+        "actionRequired": "Action Required",
+        "destHostInvalid": "Dest Host Invalid",
+        "destHostRequired": "Dest Host Required",
+        "destMaskInvalid": "Dest Mask Invalid",
+        "destNetworkInvalid": "Dest Network Invalid",
+        "destNetworkRequired": "Dest Network Required",
+        "ruleExists": "Rule Exists",
+        "ruleRange": "Rule Range",
+        "ruleRequired": "Rule Required",
+        "sourceHostInvalid": "Source Host Invalid",
+        "sourceHostRequired": "Source Host Required",
+        "sourceMaskInvalid": "Source Mask Invalid",
+        "sourceNetworkInvalid": "Source Network Invalid",
+        "sourceNetworkRequired": "Source Network Required"
+      },
+      "sections": {
+        "rules": "Rules"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "destination": "Destination",
+        "source": "Source"
+      },
+      "types": {
+        "extended": "Extended",
+        "extendedExpanded": "Extended Expanded",
+        "standard": "Standard",
+        "standardExpanded": "Standard Expanded",
+        "unknown": "Unknown"
+      },
+      "validation": {
+        "numberExists": "Number Exists",
+        "numberInvalid": "Number Invalid",
+        "numberRange": "Number Range",
+        "numberRequired": "Number Required"
+      }
+    }
+  },
+  "ru": {
+    "accesslist": {
+      "buttons": {
+        "create": "Create",
+        "delete": "Delete",
+        "edit": "Edit",
+        "refresh": "Refresh"
+      },
+      "columns": {
+        "description": "Description",
+        "number": "Number",
+        "ruleCount": "Rule Count",
+        "type": "Type"
+      },
+      "form": {
+        "action": "Action",
+        "description": "Description",
+        "destination": "Destination",
+        "host": "Host",
+        "hostPlaceholder": "Host Placeholder",
+        "inverseMask": "Inverse Mask",
+        "inverseMaskHelp": "Inverse Mask Help",
+        "inverseMaskPlaceholder": "Inverse Mask Placeholder",
+        "network": "Network",
+        "networkPlaceholder": "Network Placeholder",
+        "number": "Number",
+        "numberHelp": "Number Help",
+        "rule": "Rule",
+        "ruleHelp": "Rule Help",
+        "source": "Source",
+        "type": "Type"
+      },
+      "messages": {
+        "selectList": "Select List",
+        "selectRule": "Select Rule"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteList": "Confirm Delete List",
+        "confirmDeleteRule": "Confirm Delete Rule",
+        "createList": "Create List",
+        "createRule": "Create Rule",
+        "editList": "Edit List",
+        "editRule": "Edit Rule"
+      },
+      "ruleColumns": {
+        "action": "Action",
+        "description": "Description",
+        "destination": "Destination",
+        "rule": "Rule",
+        "source": "Source"
+      },
+      "ruleValidation": {
+        "actionRequired": "Action Required",
+        "destHostInvalid": "Dest Host Invalid",
+        "destHostRequired": "Dest Host Required",
+        "destMaskInvalid": "Dest Mask Invalid",
+        "destNetworkInvalid": "Dest Network Invalid",
+        "destNetworkRequired": "Dest Network Required",
+        "ruleExists": "Rule Exists",
+        "ruleRange": "Rule Range",
+        "ruleRequired": "Rule Required",
+        "sourceHostInvalid": "Source Host Invalid",
+        "sourceHostRequired": "Source Host Required",
+        "sourceMaskInvalid": "Source Mask Invalid",
+        "sourceNetworkInvalid": "Source Network Invalid",
+        "sourceNetworkRequired": "Source Network Required"
+      },
+      "sections": {
+        "rules": "Rules"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "destination": "Destination",
+        "source": "Source"
+      },
+      "types": {
+        "extended": "Extended",
+        "extendedExpanded": "Extended Expanded",
+        "standard": "Standard",
+        "standardExpanded": "Standard Expanded",
+        "unknown": "Unknown"
+      },
+      "validation": {
+        "numberExists": "Number Exists",
+        "numberInvalid": "Number Invalid",
+        "numberRange": "Number Range",
+        "numberRequired": "Number Required"
+      }
+    }
+  },
+  "de": {
+    "accesslist": {
+      "buttons": {
+        "create": "Create",
+        "delete": "Delete",
+        "edit": "Edit",
+        "refresh": "Refresh"
+      },
+      "columns": {
+        "description": "Description",
+        "number": "Number",
+        "ruleCount": "Rule Count",
+        "type": "Type"
+      },
+      "form": {
+        "action": "Action",
+        "description": "Description",
+        "destination": "Destination",
+        "host": "Host",
+        "hostPlaceholder": "Host Placeholder",
+        "inverseMask": "Inverse Mask",
+        "inverseMaskHelp": "Inverse Mask Help",
+        "inverseMaskPlaceholder": "Inverse Mask Placeholder",
+        "network": "Network",
+        "networkPlaceholder": "Network Placeholder",
+        "number": "Number",
+        "numberHelp": "Number Help",
+        "rule": "Rule",
+        "ruleHelp": "Rule Help",
+        "source": "Source",
+        "type": "Type"
+      },
+      "messages": {
+        "selectList": "Select List",
+        "selectRule": "Select Rule"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteList": "Confirm Delete List",
+        "confirmDeleteRule": "Confirm Delete Rule",
+        "createList": "Create List",
+        "createRule": "Create Rule",
+        "editList": "Edit List",
+        "editRule": "Edit Rule"
+      },
+      "ruleColumns": {
+        "action": "Action",
+        "description": "Description",
+        "destination": "Destination",
+        "rule": "Rule",
+        "source": "Source"
+      },
+      "ruleValidation": {
+        "actionRequired": "Action Required",
+        "destHostInvalid": "Dest Host Invalid",
+        "destHostRequired": "Dest Host Required",
+        "destMaskInvalid": "Dest Mask Invalid",
+        "destNetworkInvalid": "Dest Network Invalid",
+        "destNetworkRequired": "Dest Network Required",
+        "ruleExists": "Rule Exists",
+        "ruleRange": "Rule Range",
+        "ruleRequired": "Rule Required",
+        "sourceHostInvalid": "Source Host Invalid",
+        "sourceHostRequired": "Source Host Required",
+        "sourceMaskInvalid": "Source Mask Invalid",
+        "sourceNetworkInvalid": "Source Network Invalid",
+        "sourceNetworkRequired": "Source Network Required"
+      },
+      "sections": {
+        "rules": "Rules"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "destination": "Destination",
+        "source": "Source"
+      },
+      "types": {
+        "extended": "Extended",
+        "extendedExpanded": "Extended Expanded",
+        "standard": "Standard",
+        "standardExpanded": "Standard Expanded",
+        "unknown": "Unknown"
+      },
+      "validation": {
+        "numberExists": "Number Exists",
+        "numberInvalid": "Number Invalid",
+        "numberRange": "Number Range",
+        "numberRequired": "Number Required"
+      }
+    }
+  },
+  "fr": {
+    "accesslist": {
+      "buttons": {
+        "create": "Create",
+        "delete": "Delete",
+        "edit": "Edit",
+        "refresh": "Refresh"
+      },
+      "columns": {
+        "description": "Description",
+        "number": "Number",
+        "ruleCount": "Rule Count",
+        "type": "Type"
+      },
+      "form": {
+        "action": "Action",
+        "description": "Description",
+        "destination": "Destination",
+        "host": "Host",
+        "hostPlaceholder": "Host Placeholder",
+        "inverseMask": "Inverse Mask",
+        "inverseMaskHelp": "Inverse Mask Help",
+        "inverseMaskPlaceholder": "Inverse Mask Placeholder",
+        "network": "Network",
+        "networkPlaceholder": "Network Placeholder",
+        "number": "Number",
+        "numberHelp": "Number Help",
+        "rule": "Rule",
+        "ruleHelp": "Rule Help",
+        "source": "Source",
+        "type": "Type"
+      },
+      "messages": {
+        "selectList": "Select List",
+        "selectRule": "Select Rule"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteList": "Confirm Delete List",
+        "confirmDeleteRule": "Confirm Delete Rule",
+        "createList": "Create List",
+        "createRule": "Create Rule",
+        "editList": "Edit List",
+        "editRule": "Edit Rule"
+      },
+      "ruleColumns": {
+        "action": "Action",
+        "description": "Description",
+        "destination": "Destination",
+        "rule": "Rule",
+        "source": "Source"
+      },
+      "ruleValidation": {
+        "actionRequired": "Action Required",
+        "destHostInvalid": "Dest Host Invalid",
+        "destHostRequired": "Dest Host Required",
+        "destMaskInvalid": "Dest Mask Invalid",
+        "destNetworkInvalid": "Dest Network Invalid",
+        "destNetworkRequired": "Dest Network Required",
+        "ruleExists": "Rule Exists",
+        "ruleRange": "Rule Range",
+        "ruleRequired": "Rule Required",
+        "sourceHostInvalid": "Source Host Invalid",
+        "sourceHostRequired": "Source Host Required",
+        "sourceMaskInvalid": "Source Mask Invalid",
+        "sourceNetworkInvalid": "Source Network Invalid",
+        "sourceNetworkRequired": "Source Network Required"
+      },
+      "sections": {
+        "rules": "Rules"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "destination": "Destination",
+        "source": "Source"
+      },
+      "types": {
+        "extended": "Extended",
+        "extendedExpanded": "Extended Expanded",
+        "standard": "Standard",
+        "standardExpanded": "Standard Expanded",
+        "unknown": "Unknown"
+      },
+      "validation": {
+        "numberExists": "Number Exists",
+        "numberInvalid": "Number Invalid",
+        "numberRange": "Number Range",
+        "numberRequired": "Number Required"
+      }
+    }
+  },
+  "ko": {
+    "accesslist": {
+      "buttons": {
+        "create": "Create",
+        "delete": "Delete",
+        "edit": "Edit",
+        "refresh": "Refresh"
+      },
+      "columns": {
+        "description": "Description",
+        "number": "Number",
+        "ruleCount": "Rule Count",
+        "type": "Type"
+      },
+      "form": {
+        "action": "Action",
+        "description": "Description",
+        "destination": "Destination",
+        "host": "Host",
+        "hostPlaceholder": "Host Placeholder",
+        "inverseMask": "Inverse Mask",
+        "inverseMaskHelp": "Inverse Mask Help",
+        "inverseMaskPlaceholder": "Inverse Mask Placeholder",
+        "network": "Network",
+        "networkPlaceholder": "Network Placeholder",
+        "number": "Number",
+        "numberHelp": "Number Help",
+        "rule": "Rule",
+        "ruleHelp": "Rule Help",
+        "source": "Source",
+        "type": "Type"
+      },
+      "messages": {
+        "selectList": "Select List",
+        "selectRule": "Select Rule"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteList": "Confirm Delete List",
+        "confirmDeleteRule": "Confirm Delete Rule",
+        "createList": "Create List",
+        "createRule": "Create Rule",
+        "editList": "Edit List",
+        "editRule": "Edit Rule"
+      },
+      "ruleColumns": {
+        "action": "Action",
+        "description": "Description",
+        "destination": "Destination",
+        "rule": "Rule",
+        "source": "Source"
+      },
+      "ruleValidation": {
+        "actionRequired": "Action Required",
+        "destHostInvalid": "Dest Host Invalid",
+        "destHostRequired": "Dest Host Required",
+        "destMaskInvalid": "Dest Mask Invalid",
+        "destNetworkInvalid": "Dest Network Invalid",
+        "destNetworkRequired": "Dest Network Required",
+        "ruleExists": "Rule Exists",
+        "ruleRange": "Rule Range",
+        "ruleRequired": "Rule Required",
+        "sourceHostInvalid": "Source Host Invalid",
+        "sourceHostRequired": "Source Host Required",
+        "sourceMaskInvalid": "Source Mask Invalid",
+        "sourceNetworkInvalid": "Source Network Invalid",
+        "sourceNetworkRequired": "Source Network Required"
+      },
+      "sections": {
+        "rules": "Rules"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "destination": "Destination",
+        "source": "Source"
+      },
+      "types": {
+        "extended": "Extended",
+        "extendedExpanded": "Extended Expanded",
+        "standard": "Standard",
+        "standardExpanded": "Standard Expanded",
+        "unknown": "Unknown"
+      },
+      "validation": {
+        "numberExists": "Number Exists",
+        "numberInvalid": "Number Invalid",
+        "numberRange": "Number Range",
+        "numberRequired": "Number Required"
+      }
+    }
+  }
+}

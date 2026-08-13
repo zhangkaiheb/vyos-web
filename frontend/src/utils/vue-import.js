@@ -7,6 +7,7 @@ export const {
   watch,
   onMounted,
   onUnmounted,
+  onBeforeUnmount,
   provide,
   inject,
   defineComponent,

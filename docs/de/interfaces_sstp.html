@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="sstp-client">
+<h1>SSTP Client</h1>
+<p><abbr title="Secure Socket Tunneling Protocol">SSTP</abbr> transportiert PPP-Datenverkehr über eine SSL/TLS-Verbindung und bietet
+Transportebene Sicherheit durch Schlüsselvereinbarung, Verschlüsselung und Prüfung der Datenintegrität. Die Verwendung von SSL/TLS über TCP-Port
+443 (standardmäßig, dieser Port kann geändert werden) ermöglicht es SSTP, fast alle Firewalls und Proxyserver zu passieren, mit Ausnahme
+authentifizierter Web-Proxys.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>VyOS enthält einen integrierten SSTP-Server. Für weitere Informationen siehe
+<a class="reference internal" href="../vpn/sstp.html#sstp">SSTP Server</a>.</p>
+</div>
+<section id="configuration">
+<h2>Konfiguration</h2>
+<section id="common-interface-configuration">
+<h3>Allgemeine Schnittstellenkonfiguration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces sstpc &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie einen klaren, beschreibenden Alias für die Schnittstelle.</strong></p>
+<p>Dieser Alias erscheint im Befehl <code class="docutils literal notranslate">show interfaces</code> und in SNMP-basierten
+Überwachungstools.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces sstpc sstpc0 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces sstpc &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Schalten Sie die Schnittstelle aus.</strong></p>
+<p>Die Schnittstelle wird auf den administrativ heruntergefahrenen
+(<code class="docutils literal notranslate">A/D</code>) Zustand gesetzt.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces sstpc sstpc0 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces sstpc &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie das MTU auf der Schnittstelle.</strong></p>
+<p>Dieser Wert definiert die größte Paketgröße in Bytes, die die Schnittstelle ohne Fragmentierung überträgt.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces sstpc sstpc0 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces sstpc &lt;interface&gt; vrf &lt;vrf&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-vrf-vrf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Weisen Sie die Schnittstelle einer bestimmten</strong> <abbr title="Virtual Routing and Forwarding">VRF</abbr> <strong>Instanz zu.</strong></p>
+<div class="admonition seealso">
+<p class="admonition-title">Siehe auch</p>
+<p>Für Informationen zur Konfiguration einer VRF siehe den Abschnitt <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>.</p>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces sstpc sstpc0 vrf red
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="sstp-client-options">
+<h3>SSTP Client Optionen</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces sstpc &lt;interface&gt; no-default-route
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-no-default-route" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Einen IP-Adressantrag beim SSTP-Server ohne Installation einer Standardroute anfordern.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces sstpc sstpc0 no-default-route
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Eingeführt in VyOS 1.4, invertiert dieser Befehl die Logik des ehemaligen
+<code class="docutils literal notranslate">default-route</code> CLI-Option.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces sstpc &lt;interface&gt; default-route-distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-default-route-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Konfigurieren Sie die Entfernung für den Standardgateway, der vom SSTP-Server bereitgestellt wird.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces sstpc sstpc0 default-route-distance 220
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces sstpc &lt;interface&gt; no-peer-dns
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-no-peer-dns" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Deaktivieren Sie die Installation der angegebenen DNS-Nameserver auf dem lokalen System.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces sstpc &lt;interface&gt; server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Remote-SSTP-Server-Adresse für die Clientverbindung.</strong></p>
+<p>Die Adresse kann entweder eine IP-Adresse oder ein <abbr title="Fully Qualified Domain Name">FQDN</abbr> sein.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces sstpc &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie das</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>, das in ausgehenden TCP SYN-Paketen auf der angegebenen Schnittstelle angeboten wird.</strong></p>
+<p>Durch das Einschränken des MSS-Werts in TCP SYN-Paketen weisen Sie die andere Seite an, keine Pakete größer als die angegebene Größe zu senden. Dies hilft, Verbindungsprobleme zu vermeiden, wenn <abbr title="Path MTU Discovery">PMTUD</abbr> fehlschlägt.</p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">mss</code>: Legt das MSS auf einen spezifischen Wert in Bytes fest.</p></li>
+<li><p><code class="docutils literal notranslate">clamp-mss-to-pmtu</code>: Legt das MSS auf das MTU der Schnittstelle minus 40 Bytes für IPv4-Traffic (20 Bytes für den IPv4-Header und 20 Bytes für den TCP-Header) fest. Diese Option wird empfohlen, um den richtigen Wert automatisch einzustellen.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Eingeführt in VyOS 1.4, ersetzt dieser Befehl die ältere Syntax <code class="docutils literal notranslate">set firewall options interface &lt;name&gt; adjust-mss &lt;value&gt;</code>.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces sstpc &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Schnittstelle für Host- oder Router-Verhalten.</strong></p>
+<p>Wenn konfiguriert, wechselt die Schnittstelle in den Hostmodus und wird IPv4-Forwarding deaktiviert.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces sstpc &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Quell-IP-Adressenprüfung mithilfe von</strong>
+<abbr title="Reverse Path Forwarding">RPF</abbr> <strong>auf dieser Schnittstelle gemäß</strong>
+<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">strict</code>: Die Quell-IP-Adresse jedes eingehenden Pakets wird gegen die
+<abbr title="Forwarding Information Base">FIB</abbr> überprüft. Wenn die Schnittstelle nicht der beste Weg zurück zu dieser Quelle ist, schlägt die Validierung fehl und das Paket wird gelöscht.</p></li>
+<li><p><code class="docutils literal notranslate">loose</code>: Die Quell-IP-Adresse jedes eingehenden Pakets wird gegen die
+<abbr title="Forwarding Information Base">FIB</abbr> überprüft. Wenn die Quell-IP-Adresse durch irgendeine Schnittstelle nicht erreichbar ist, schlägt die Validierung fehl.</p></li>
+<li><p><code class="docutils literal notranslate">disable</code>: Es wird keine Quell-IP-Adressenprüfung durchgeführt. Alle eingehenden Pakete werden akzeptiert.</p></li>
+</ul>
+<p><a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> empfiehlt, den <code class="docutils literal notranslate">strict</code>-Modus zu aktivieren, um IP-Spoofing, wie z. B. DDoS-Angriffe, zu verhindern. Für asynchrone oder andere komplexe Routing-Szenarien verwenden Sie den <code class="docutils literal notranslate">loose</code>-Modus.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="operation">
+<h2>Betrieb</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show interfaces sstpc &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-show-interfaces-sstpc-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Zeigen Sie detaillierte Informationen über die angegebene Schnittstelle an.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show interfaces sstpc sstpc10
+sstpc10: &lt;POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UNKNOWN group default qlen 3
+    link/ppp
+    inet 192.0.2.5 peer 192.0.2.254/32 scope global sstpc10
+       valid_lft forever preferred_lft forever
+    inet6 fe80::fd53:c7ff:fe8b:144f/64 scope link
+       valid_lft forever preferred_lft forever
+
+    RX:  bytes  packets  errors  dropped  overrun       mcast
+           215        9       0        0        0           0
+    TX:  bytes  packets  errors  dropped  carrier  collisions
+           539       14       0        0        0           0
+</pre></div>
+</div>
+</div>
+</div>
+<section id="connect-disconnect">
+<h3>Verbinden/Trennen</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+disconnect interface &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-disconnect-interface-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Die angegebene Schnittstelle trennen.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+connect interface &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-connect-interface-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Session auf der angegebenen Schnittstelle initiieren.</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

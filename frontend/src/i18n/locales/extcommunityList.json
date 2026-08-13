@@ -1,0 +1,422 @@
+{
+  "zh-CN": {
+    "extcommunityList": {
+      "tabs": {
+        "basic": "基本"
+      },
+      "columns": {
+        "name": "名称",
+        "description": "描述",
+        "ruleCount": "规则数",
+        "rule": "规则编号",
+        "action": "动作",
+        "regex": "正则表达式"
+      },
+      "labels": {
+        "name": "名称",
+        "description": "描述",
+        "rule": "规则编号",
+        "action": "动作",
+        "regex": "正则表达式"
+      },
+      "placeholders": {
+        "name": "例如: e01",
+        "regex": "例如: rt 65001:100 或 soo 65001:100"
+      },
+      "help": {
+        "rule": "范围 1-65535"
+      },
+      "buttons": {
+        "create": "创建",
+        "edit": "编辑",
+        "delete": "删除",
+        "refresh": "刷新"
+      },
+      "modals": {
+        "editList": "编辑扩展团体列表",
+        "createList": "创建扩展团体列表",
+        "editRule": "编辑规则",
+        "createRule": "创建规则",
+        "confirmDelete": "确认删除"
+      },
+      "sections": {
+        "rules": "规则"
+      },
+      "messages": {
+        "selectList": "请选择一个扩展团体列表",
+        "enterName": "请输入名称",
+        "nameExists": "名称已存在",
+        "enterNameFirst": "请先输入名称",
+        "selectRule": "请选择一条规则",
+        "confirmDeleteList": "确认删除以下扩展团体列表？",
+        "confirmDeleteRule": "确认删除以下规则？"
+      },
+      "errors": {
+        "ruleNumberRequired": "请输入规则编号",
+        "ruleNumberRange": "规则编号范围为 1-65535",
+        "actionRequired": "请选择动作",
+        "ruleNumberExists": "规则编号已存在"
+      }
+    }
+  },
+  "en": {
+    "extcommunityList": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Regular Expression"
+      },
+      "labels": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Regular Expression"
+      },
+      "placeholders": {
+        "name": "e.g., e01",
+        "regex": "e.g., rt 65001:100 or soo 65001:100"
+      },
+      "help": {
+        "rule": "Range 1-65535"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modals": {
+        "editList": "Edit Extended Community List",
+        "createList": "Create Extended Community List",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "confirmDelete": "Confirm Delete"
+      },
+      "sections": {
+        "rules": "Rules"
+      },
+      "messages": {
+        "selectList": "Please select an extended community list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "confirmDeleteList": "Are you sure you want to delete the following extended community list(s)?",
+        "confirmDeleteRule": "Are you sure you want to delete the following rule(s)?"
+      },
+      "errors": {
+        "ruleNumberRequired": "Please enter a rule number",
+        "ruleNumberRange": "Rule number must be between 1 and 65535",
+        "actionRequired": "Please select an action",
+        "ruleNumberExists": "Rule number already exists"
+      }
+    }
+  },
+  "zh-TW": {
+    "extcommunityList": {
+      "tabs": {
+        "basic": "基本"
+      },
+      "columns": {
+        "name": "名稱",
+        "description": "描述",
+        "ruleCount": "規則數",
+        "rule": "規則編號",
+        "action": "動作",
+        "regex": "正則表達式"
+      },
+      "labels": {
+        "name": "名稱",
+        "description": "描述",
+        "rule": "規則編號",
+        "action": "動作",
+        "regex": "正則表達式"
+      },
+      "placeholders": {
+        "name": "例如: e01",
+        "regex": "例如: rt 65001:100 或 soo 65001:100"
+      },
+      "help": {
+        "rule": "範圍 1-65535"
+      },
+      "buttons": {
+        "create": "建立",
+        "edit": "編輯",
+        "delete": "刪除",
+        "refresh": "重新整理"
+      },
+      "modals": {
+        "editList": "編輯擴充團體清單",
+        "createList": "建立擴充團體清單",
+        "editRule": "編輯規則",
+        "createRule": "建立規則",
+        "confirmDelete": "確認刪除"
+      },
+      "sections": {
+        "rules": "規則"
+      },
+      "messages": {
+        "selectList": "請選擇一個擴充團體清單",
+        "enterName": "請輸入名稱",
+        "nameExists": "名稱已存在",
+        "enterNameFirst": "請先輸入名稱",
+        "selectRule": "請選擇一條規則",
+        "confirmDeleteList": "確認刪除以下擴充團體清單？",
+        "confirmDeleteRule": "確認刪除以下規則？"
+      },
+      "errors": {
+        "ruleNumberRequired": "請輸入規則編號",
+        "ruleNumberRange": "規則編號範圍為 1-65535",
+        "actionRequired": "請選擇動作",
+        "ruleNumberExists": "規則編號已存在"
+      }
+    }
+  },
+  "ru": {
+    "extcommunityList": {
+      "tabs": {
+        "basic": "Основные"
+      },
+      "columns": {
+        "name": "Имя",
+        "description": "Описание",
+        "ruleCount": "Количество правил",
+        "rule": "Номер правила",
+        "action": "Действие",
+        "regex": "Регулярное выражение"
+      },
+      "labels": {
+        "name": "Имя",
+        "description": "Описание",
+        "rule": "Номер правила",
+        "action": "Действие",
+        "regex": "Регулярное выражение"
+      },
+      "placeholders": {
+        "name": "Например: e01",
+        "regex": "Например: rt 65001:100 или soo 65001:100"
+      },
+      "help": {
+        "rule": "Диапазон 1-65535"
+      },
+      "buttons": {
+        "create": "Создать",
+        "edit": "Редактировать",
+        "delete": "Удалить",
+        "refresh": "Обновить"
+      },
+      "modals": {
+        "editList": "Редактировать список расширенных сообществ",
+        "createList": "Создать список расширенных сообществ",
+        "editRule": "Редактировать правило",
+        "createRule": "Создать правило",
+        "confirmDelete": "Подтвердить удаление"
+      },
+      "sections": {
+        "rules": "Правила"
+      },
+      "messages": {
+        "selectList": "Пожалуйста, выберите список расширенных сообществ",
+        "enterName": "Пожалуйста, введите имя",
+        "nameExists": "Имя уже существует",
+        "enterNameFirst": "Сначала введите имя",
+        "selectRule": "Пожалуйста, выберите правило",
+        "confirmDeleteList": "Подтвердите удаление следующих списков расширенных сообществ?",
+        "confirmDeleteRule": "Подтвердите удаление следующих правил?"
+      },
+      "errors": {
+        "ruleNumberRequired": "Пожалуйста, введите номер правила",
+        "ruleNumberRange": "Номер правила должен быть от 1 до 65535",
+        "actionRequired": "Пожалуйста, выберите действие",
+        "ruleNumberExists": "Номер правила уже существует"
+      }
+    }
+  },
+  "de": {
+    "extcommunityList": {
+      "tabs": {
+        "basic": "Grundlegend"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Beschreibung",
+        "ruleCount": "Regelanzahl",
+        "rule": "Regelnummer",
+        "action": "Aktion",
+        "regex": "Regulärer Ausdruck"
+      },
+      "labels": {
+        "name": "Name",
+        "description": "Beschreibung",
+        "rule": "Regelnummer",
+        "action": "Aktion",
+        "regex": "Regulärer Ausdruck"
+      },
+      "placeholders": {
+        "name": "z.B.: e01",
+        "regex": "z.B.: rt 65001:100 oder soo 65001:100"
+      },
+      "help": {
+        "rule": "Bereich 1-65535"
+      },
+      "buttons": {
+        "create": "Erstellen",
+        "edit": "Bearbeiten",
+        "delete": "Löschen",
+        "refresh": "Aktualisieren"
+      },
+      "modals": {
+        "editList": "Erweiterte Community-Liste bearbeiten",
+        "createList": "Erweiterte Community-Liste erstellen",
+        "editRule": "Regel bearbeiten",
+        "createRule": "Regel erstellen",
+        "confirmDelete": "Löschen bestätigen"
+      },
+      "sections": {
+        "rules": "Regeln"
+      },
+      "messages": {
+        "selectList": "Bitte wählen Sie eine erweiterte Community-Liste aus",
+        "enterName": "Bitte geben Sie einen Namen ein",
+        "nameExists": "Name existiert bereits",
+        "enterNameFirst": "Bitte geben Sie zuerst einen Namen ein",
+        "selectRule": "Bitte wählen Sie eine Regel aus",
+        "confirmDeleteList": "Möchten Sie die folgenden erweiterten Community-Listen wirklich löschen?",
+        "confirmDeleteRule": "Möchten Sie die folgenden Regeln wirklich löschen?"
+      },
+      "errors": {
+        "ruleNumberRequired": "Bitte geben Sie eine Regelnummer ein",
+        "ruleNumberRange": "Die Regelnummer muss zwischen 1 und 65535 liegen",
+        "actionRequired": "Bitte wählen Sie eine Aktion aus",
+        "ruleNumberExists": "Die Regelnummer existiert bereits"
+      }
+    }
+  },
+  "fr": {
+    "extcommunityList": {
+      "tabs": {
+        "basic": "Basique"
+      },
+      "columns": {
+        "name": "Nom",
+        "description": "Description",
+        "ruleCount": "Nombre de règles",
+        "rule": "Numéro de règle",
+        "action": "Action",
+        "regex": "Expression régulière"
+      },
+      "labels": {
+        "name": "Nom",
+        "description": "Description",
+        "rule": "Numéro de règle",
+        "action": "Action",
+        "regex": "Expression régulière"
+      },
+      "placeholders": {
+        "name": "Ex: e01",
+        "regex": "Ex: rt 65001:100 ou soo 65001:100"
+      },
+      "help": {
+        "rule": "Plage 1-65535"
+      },
+      "buttons": {
+        "create": "Créer",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "refresh": "Actualiser"
+      },
+      "modals": {
+        "editList": "Modifier la liste de communautés étendues",
+        "createList": "Créer une liste de communautés étendues",
+        "editRule": "Modifier la règle",
+        "createRule": "Créer une règle",
+        "confirmDelete": "Confirmer la suppression"
+      },
+      "sections": {
+        "rules": "Règles"
+      },
+      "messages": {
+        "selectList": "Veuillez sélectionner une liste de communautés étendues",
+        "enterName": "Veuillez entrer un nom",
+        "nameExists": "Le nom existe déjà",
+        "enterNameFirst": "Veuillez d'abord entrer un nom",
+        "selectRule": "Veuillez sélectionner une règle",
+        "confirmDeleteList": "Confirmer la suppression des listes de communautés étendues suivantes ?",
+        "confirmDeleteRule": "Confirmer la suppression des règles suivantes ?"
+      },
+      "errors": {
+        "ruleNumberRequired": "Veuillez entrer un numéro de règle",
+        "ruleNumberRange": "Le numéro de règle doit être compris entre 1 et 65535",
+        "actionRequired": "Veuillez sélectionner une action",
+        "ruleNumberExists": "Le numéro de règle existe déjà"
+      }
+    }
+  },
+  "ko": {
+    "extcommunityList": {
+      "tabs": {
+        "basic": "기본"
+      },
+      "columns": {
+        "name": "이름",
+        "description": "설명",
+        "ruleCount": "규칙 수",
+        "rule": "규칙 번호",
+        "action": "동작",
+        "regex": "정규식"
+      },
+      "labels": {
+        "name": "이름",
+        "description": "설명",
+        "rule": "규칙 번호",
+        "action": "동작",
+        "regex": "정규식"
+      },
+      "placeholders": {
+        "name": "예: e01",
+        "regex": "예: rt 65001:100 또는 soo 65001:100"
+      },
+      "help": {
+        "rule": "범위 1-65535"
+      },
+      "buttons": {
+        "create": "생성",
+        "edit": "편집",
+        "delete": "삭제",
+        "refresh": "새로고침"
+      },
+      "modals": {
+        "editList": "확장 커뮤니티 목록 편집",
+        "createList": "확장 커뮤니티 목록 생성",
+        "editRule": "규칙 편집",
+        "createRule": "규칙 생성",
+        "confirmDelete": "삭제 확인"
+      },
+      "sections": {
+        "rules": "규칙"
+      },
+      "messages": {
+        "selectList": "확장 커뮤니티 목록을 선택하세요",
+        "enterName": "이름을 입력하세요",
+        "nameExists": "이름이 이미 존재합니다",
+        "enterNameFirst": "먼저 이름을 입력하세요",
+        "selectRule": "규칙을 선택하세요",
+        "confirmDeleteList": "다음 확장 커뮤니티 목록을 삭제하시겠습니까?",
+        "confirmDeleteRule": "다음 규칙을 삭제하시겠습니까?"
+      },
+      "errors": {
+        "ruleNumberRequired": "규칙 번호를 입력하세요",
+        "ruleNumberRange": "규칙 번호는 1에서 65535 사이여야 합니다",
+        "actionRequired": "동작을 선택하세요",
+        "ruleNumberExists": "규칙 번호가 이미 존재합니다"
+      }
+    }
+  }
+}

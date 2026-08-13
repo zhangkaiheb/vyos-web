@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="zone-based-firewall">
+<h1>Ограждение на основе зон</h1>
+<section id="overview">
+<h2>Обзор</h2>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Все версии VyOS, созданные после 2023-10-22 (VyOS 1.4 и 1.5), поддерживают
+эту функцию.</p>
+</div>
+<p>Этот раздел предоставляет информацию о настройке брандмауэра для
+ограждения на основе зон. Этот раздел охватывает следующие команды конфигурации:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone …
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone" title="Постоянная ссылка на эту команду"></a></div></div>
+<p>Чтобы узнать о общем потоке трафика в брандмауэрах VyOS,
+см. <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Брандмауэр</a>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
+    * zone
+         - custom_zone_name
+            + ...
+</pre></div>
+</div>
+<p>В политике на основе зоны вы присваиваете интерфейсы зонам и применяете политику проверки
+трафика, движущегося между зонами. Брандмауэр действует на трафик
+в соответствии с правилами. Зона — это группа интерфейсов, имеющих похожие
+функции или особенности. Она устанавливает границы безопасности сети.
+Зона определяет границу, где система подвергает трафик политике
+ограничений при пересечении другой области сети.</p>
+<p>Основные моменты:</p>
+<ul class="simple">
+<li><p>Зона должна быть настроена до того, как вы присвоите интерфейс ей, и вы
+можете присвоить интерфейс только одной зоне.</p></li>
+<li><p>Все трафик к и от интерфейса внутри зоны свободно проходит.</p></li>
+<li><p>Существующие политики влияют на весь трафик между зонами.</p></li>
+<li><p>Трафик не может проходить между интерфейсом-членом зоны и любым интерфейсом, который
+не является членом зоны.</p></li>
+<li><p>Вы должны определить 2 отдельных брандмауэра, чтобы определить трафик: один для каждого
+направления.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>В <a class="reference external" href="https://vyos.dev/T2199">T2199</a> синтаксис конфигурации зоны был изменен.
+Конфигурация зоны была перемещена из <code class="docutils literal notranslate">zone-policy zone &lt;name&gt;</code> в
+<code class="docutils literal notranslate">firewall zone &lt;name&gt;</code>.</p>
+</div>
+</section>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<p>Вместо применения политики напрямую к интерфейсу, вы можете
+создать брандмауэр на основе зон, чтобы упростить настройку, когда несколько
+интерфейсов принадлежат одной и той же зоне безопасности. Вместо применения наборов правил
+к интерфейсам, вы применяете их к парам источника-назначения зон.</p>
+<p>Вы можете найти основное введение в брандмауэры на основе зон в
+<a class="reference external" href="https://support.vyos.io/en/kb/articles/a-primer-to-zone-based-firewall">Базе знаний VyOS</a>,
+и пример в <a class="reference internal" href="../../configexamples/zone-policy.html#examples-zone-policy">Примере политики зоны</a>.</p>
+<p>Следующие шаги необходимы для создания брандмауэра на основе зон:</p>
+<ol class="arabic simple">
+<li><p>Определите как исходную, так и целевую зону</p></li>
+<li><p>Определите набор правил</p></li>
+<li><p>Примените набор правил к зонам</p></li>
+</ol>
+<section id="define-a-zone">
+<h3>Определение зоны</h3>
+<p>Чтобы определить зону, установите либо одну с интерфейсами, либо локальную зону.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;name&gt; interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-interface-interface" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Назначьте интерфейсы как членов зоны.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<ul class="simple">
+<li><p>Интерфейс может быть членом только одной зоны.</p></li>
+<li><p>Вы можете иметь несколько интерфейсов в зоне. Трафик между
+интерфейсами в одной и той же зоне следует политике внутренней фильтрации
+(разрешено по умолчанию).</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;name&gt; local-zone
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-local-zone" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Определите зону как локальную зону для трафика, который исходит из маршрутизатора или предназначен для него.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<ul class="simple">
+<li><p>Локальная зона не может иметь никаких членов интерфейсов</p></li>
+<li><p>Вы не можете иметь несколько локальных зон</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;name&gt; default-action [drop | reject]
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-default-action-drop-reject" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Измените действие по умолчанию для зоны, которое применяется к трафику, направленному в эту
+зону, который не соответствует ни одному из правил, примененных к исходной зоне.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;name&gt; default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-default-log" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Включите логирование пакетов, соответствующих действию по умолчанию этой зоны (по умолчанию отключено).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;name&gt; description
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-description" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Добавьте значимое описание.</p>
+</div>
+</div>
+</section>
+<section id="defining-a-rule-set">
+<h3>Определение набора правил</h3>
+<p>Наборы правил брандмауэра на основе зон определяют трафик от <em>Исходной зоны</em> до
+<em>Целевой зоны</em>.</p>
+<p>Вы создаете наборы правил как пользовательскую цепочку брандмауэра, используя команды ниже
+(обратитесь к разделам брандмауэра IPv4/IPv6 для полного синтаксиса):</p>
+<ul class="simple">
+<li><p>Для <a class="reference internal" href="ipv4.html#firewall-ipv4-rules">IPv4</a>:
+<code class="docutils literal notranslate">set firewall ipv4 name &lt;name&gt; ...</code></p></li>
+<li><p>Для <a class="reference internal" href="ipv6.html#firewall-ipv6-rules">IPv6</a>:
+<code class="docutils literal notranslate">set firewall ipv6 name &lt;name&gt; ...</code></p></li>
+</ul>
+<p>Полезно называть наборы правил в формате
+<code class="docutils literal notranslate">&lt;Исходная зона&gt;-&lt;Целевая зона&gt;-&lt;v4 | v6&gt;</code>, чтобы легко их идентифицировать.</p>
+</section>
+<section id="applying-a-rule-set-to-a-zone">
+<h3>Применение набора правил к зоне</h3>
+<p>После определения набора правил, примените его к исходной и целевой зонам.
+Синтаксис конфигурации привязывается к целевой зоне, с каждым из исходных наборов правил, перечисленных против целевой.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;Destination Zone&gt; from &lt;Source Zone&gt; firewall name &lt;ipv4-rule-set-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-from-source-zone-firewall-name-ipv4-rule-set-name" title="Постоянная ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;Destination Zone&gt; from &lt;Source Zone&gt; firewall ipv6-name &lt;ipv6-rule-set-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-from-source-zone-firewall-ipv6-name-ipv6-rule-set-name" title="Постоянная ссылка на эту команду"></a></div></div>
+<p>Вы должны создать два набора правил для каждой пары исходной-целевой зоны.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall zone DMZ from LAN firewall name LAN-DMZ-v4
+set firewall zone LAN from DMZ firewall name DMZ-LAN-v4
+</pre></div>
+</div>
+</section>
+<section id="applying-a-default-rule-set-to-a-zone">
+<h3>Применение набора правил по умолчанию к зоне</h3>
+<p>Когда целевая зона имеет общий набор правил для нескольких исходных зон,
+или когда вам требуется сложный набор правил по умолчанию, вы можете применить
+опциональный набор правил по умолчанию. Набор правил по умолчанию применяется ко всем зонам, которые не имеют набора правил, определенного в
+<a class="reference internal" href="#applying-a-rule-set-to-a-zone">IPv4</a></p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;Destination Zone&gt; default-firewall name &lt;ipv4-rule-set-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-default-firewall-name-ipv4-rule-set-name" title="Постоянная ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;Destination Zone&gt; default-firewall ipv6-name &lt;ipv6-rule-set-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-default-firewall-ipv6-name-ipv6-rule-set-name" title="Постоянная ссылка на эту команду"></a></div></div>
+</section>
+</section>
+<section id="operation-mode">
+<h2>Режим работы</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall zone-policy
+<a class="cmdlink" href="#opcmd-show-firewall-zone-policy" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать краткое резюме конфигурации зоны.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show firewall zone-policy
+Zone    Interfaces    From Zone    Firewall IPv4    Firewall IPv6
+------  ------------  -----------  ---------------  ---------------
+LAN     eth1          WAN          WAN-LAN-v4
+eth2
+LOCAL   LOCAL         LAN          LAN-LOCAL-v4
+WAN          WAN-LOCAL-v4     WAN-LOCAL-v6
+WAN     eth3          LAN          LAN-WAN-v4
+eth0          LOCAL        LOCAL-WAN-v4
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall zone-policy zone &lt;zone&gt;
+<a class="cmdlink" href="#opcmd-show-firewall-zone-policy-zone-zone" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать краткое резюме конкретной зоны.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show firewall zone-policy zone WAN
+Zone    Interfaces    From Zone    Firewall IPv4    Firewall IPv6
+------  ------------  -----------  ---------------  ---------------
+WAN     eth3          LAN          LAN-WAN-v4
+eth0          LOCAL        LOCAL-WAN-v4
+vyos@vyos:~$ show firewall zone-policy zone LOCAL
+Zone    Interfaces    From Zone    Firewall IPv4    Firewall IPv6
+------  ------------  -----------  ---------------  ---------------
+LOCAL   LOCAL         LAN          LAN-LOCAL-v4
+WAN          WAN-LOCAL-v4     WAN-LOCAL-v6
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

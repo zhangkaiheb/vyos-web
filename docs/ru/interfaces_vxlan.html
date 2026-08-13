@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="vxlan">
+<h1>VXLAN</h1>
+<p><abbr title="Виртуальная расширяемая локальная сеть">VXLAN</abbr> — это технология виртуализации сети,
+которая решает проблемы масштабируемости в больших средах облачных вычислений.
+Он инкапсулирует кадры Ethernet (уровень 2) в датаграммы UDP (уровень 4), которые
+затем передаются через порт UDP 4789, назначенный IANA. Конечные точки VXLAN,
+называемые <abbr title="Точки окончания VXLAN">VTEPs</abbr>, завершают туннели VXLAN и могут
+быть либо виртуальными, либо физическими портами коммутатора.</p>
+<p>VXLAN поддерживает до 16 миллионов логических сетей и позволяет обеспечить
+связь на уровне 2 через IP-сети уровня 3. Он использует multicast или unicast
+с репликацией на стороне головного конца (HER), чтобы распространять
+вещательный, неизвестный однократный и многоадресный (BUM) трафик.</p>
+<p>Спецификация VXLAN была изначально разработана VMware, Arista Networks и
+Cisco. Другие участники включают Huawei, Broadcom, Citrix, Pica8, Big Switch
+Networks, Cumulus Networks, Dell EMC, Ericsson, Mellanox, FreeBSD, OpenBSD, Red
+Hat, Joyent и Juniper Networks.</p>
+<p>VXLAN официально документирован IETF в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc7348.html"><strong>RFC 7348</strong></a>.</p>
+<p>При настройке VXLAN в виртуальной машине VyOS убедитесь, что разрешено
+подделывание MAC-адреса (Hyper-V) или отправка фальшивых пакетов (ESX). В противном случае гипервизор
+может заблокировать переданные кадры.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Хотя порт VXLAN, назначенный IANA, равен <strong>4789</strong>, VyOS использует
+стандартный порт UDP Linux <strong>8472</strong> для интерфейсов VXLAN. Чтобы обеспечить совместимость
+с другими поставщиками, установите порт в стандартное значение IANA <strong>4789</strong>.</p>
+</div>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<section id="common-interface-configuration">
+<h3>Общая конфигурация интерфейса</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-address-address" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте одно или несколько IP-адресов интерфейса.</strong></p>
+<p><code class="docutils literal notranslate">&lt;address&gt;</code> поддерживает IPv4 и IPv6 в обозначении CIDR. Например, используйте
+<code class="docutils literal notranslate">192.0.2.1/24</code> для IPv4 или <code class="docutils literal notranslate">2001:db8::1/64</code> для IPv6.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 address 192.0.2.1/24
+set interfaces vxlan vxlan0 address 2001:db8::1/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-description-description" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте понятное, описательное имя интерфейса.</strong></p>
+<p>Это имя появляется в команде <code class="docutils literal notranslate">show interfaces</code> и инструментах мониторинга на основе SNMP.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 description &#39;Это интерфейс, работающий на VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-disable" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите интерфейс.</strong></p>
+<p>Интерфейс будет установлен в состояние административно отключен (<code class="docutils literal notranslate">A/D</code>).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt;  disable-flow-control
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-disable-flow-control" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите управление потоком Ethernet (стандарт IEEE 802.3x паузные кадры) на интерфейсе.</strong></p>
+<blockquote>
+<div><p>Управление потоком Ethernet, определенное стандартом IEEE 802.3x, временно прекращает
+передачу данных, чтобы предотвратить потерю пакетов при перегрузке сети. Например, когда
+отправитель передает данные быстрее, чем получатель может их обработать.</p>
+<p>Отключение управления потоком Ethernet означает, что интерфейс не будет сигнализировать
+подключенному устройству о паузе передачи и будет удалять пакеты, если перегружен.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 disable-flow-control
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; disable-link-detect
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-disable-link-detect" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите обнаружение изменений состояния физической линии на интерфейсе, например,
+при отсоединении кабеля.</strong></p>
+<p>По умолчанию интерфейс обнаруживает изменения состояния физической линии.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 disable-link-detect
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; mac &lt;xx:xx:xx:xx:xx:xx&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-mac-xx-xx-xx-xx-xx-xx" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте пользовательский MAC-адрес на интерфейсе.</strong></p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 mac &#39;00:53:01:02:03:04&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-mtu-mtu" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте MTU на интерфейсе.</strong></p>
+<p>Это значение определяет максимальный размер пакета, в байтах, который интерфейс
+передает без фрагментации.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте</strong> <abbr title="Максимальный размер сегмента">MSS</abbr> <strong>, объявляемый в исходящих пакетах TCP SYN на указанном интерфейсе.</strong></p>
+<p>Путем ограничения значения MSS в пакетах TCP SYN, вы явно информируете удаленную сторону, что она не должна отправлять пакеты большего размера, чем этот. Это предотвращает проблемы с соединением, возникающие при неудачной проверке пути MTU (PMTUD).</p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Устанавливает MSS в конкретное значение, в байтах. Используйте этот вариант, если необходимо принудительно установить конкретное значение MSS, например, для устранения проблем с подключением или соответствия специфическим требованиям сети.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> Роутер автоматически рассчитывает MSS как MTU интерфейса минус 40 байтов для IPv4 (20 байтов для заголовка IPv4 и 20 байтов для заголовка TCP). Этот вариант рекомендуется для автоматического установления правильного значения.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-arp-cache-timeout" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, как долго ARP-запись остается действительной после получения карты IP-адреса в MAC-адрес на этом интерфейсе.</strong></p>
+<p>По умолчанию длительность составляет 30 секунд.</p>
+<p>ARP-запись остается действительной, если она получает положительный ответ от
+вышеуровневых протоколов.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-disable-arp-filter" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте фильтрацию ARP на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> Ядро отвечает на запросы ARP на этом интерфейсе
+только в том случае, если трафик будет направлен обратно к отправителю ARP через этот
+конкретный интерфейс.</p>
+<p><strong>Если настроено:</strong> Ядро отвечает на запросы ARP на этом интерфейсе для любого
+IP-адреса, настроенного на локальном хосте, независимо от того, какой конкретный интерфейс
+этот IP-адрес назначен, и независимо от таблицы маршрутизации. Это отражает концепцию Linux, согласно которой IP-адреса принадлежат хосту, а не отдельным интерфейсам.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip disable-arp-filter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-disable-forwarding" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс на работу в режиме хоста или маршрутизатора.</strong></p>
+<p>Если настроено, интерфейс переключается в режим хоста, и IPv4-пересылка отключена на нем.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-enable-directed-broadcast" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, будут ли передаваться пакеты IP-направленного вещания, полученные на этом
+интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> Пакеты IP-направленного вещания удаляются.</p>
+<p><strong>Если настроено:</strong> Пакеты IP-направленного вещания передаются всем хостам
+на целевом подсети, как определено в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> и <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-enable-arp-accept" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, как обрабатывать бесплатные ARP на этом интерфейсе.</strong></p>
+<p>Если настроено, IP-адрес-MAC-адресная связь добавляется в таблицу ARP на основе
+бесплатных ARP-запросов или ответов.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если в таблице ARP уже есть IP-адрес из бесплатного ARP, его запись обновляется независимо от того, настроено ли это настройка.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-enable-arp-announce" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте выбор источника IP-адреса для ARP-запросов на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> Ядро может использовать любой IP-адрес, которым владеет хост, как источник IP-адреса в ARP-запросах на этом интерфейсе.</p>
+<p><strong>Если настроено:</strong> Ядро сначала пытается выбрать источник IP-адреса, настроенный на интерфейсе, который имеет общую подсеть с целевым IP-адресом. Если такой подсети нет, ядро выбирает IP-адрес, который обычно используется (на основе таблицы маршрутизации для достижения целевой цели).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-enable-arp-ignore" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, какие ARP-запросы будут игнорироваться на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> Ядро отвечает на ARP-запросы для любых локальных IP-адресов, независимо от того, к какому интерфейсу они привязаны.</p>
+<p><strong>Если настроено:</strong> Ядро отвечает на ARP-запросы только в том случае, если целевой IP-адрес привязан к этому конкретному интерфейсу.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-enable-proxy-arp" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте прокси-ARP на этом интерфейсе.</strong></p>
+<p>Если настроено, маршрутизатор (ядро) перехватывает ARP-запросы для не-локальных IP-адресов и отвечает с MAC-адресом интерфейса, который получил запрос. Последующие пакеты, предназначенные этим IP-адресам, перенаправляются на их фактические цели на удаленных подсетях.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip enable-proxy-arp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-proxy-arp-pvlan" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте локальный прокси-ARP на интерфейсе.</strong></p>
+<p>Если настроено, маршрутизатор (ядро) отвечает на ARP-запросы на этом VLAN-интерфейсе даже если целевой IP-адрес находится на той же подсети и интерфейсе.</p>
+<p>Это используется для поддержки требований к изоляции сети (RFC 3069) для частных
+VLAN (PVLAN). В конфигурациях PVLAN устройства на изолированных портах НЕ разрешается
+прямая связь между собой на уровне 2, но они могут общаться с верхним маршрутизатором.</p>
+<p>Посредством ответа на ARP-запросы между хостами своим собственным MAC-адресом,
+маршрутизатор (ядро) направляет трафик между хостами через себя вместо прямой передачи между хостами.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Эта команда работает независимо и не требует включения
+стандартного прокси-ARP на интерфейсе.</p>
+</div>
+<p>Локальный прокси-ARP также известен как:</p>
+<ul class="simple">
+<li><p>Агрегация VLAN (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>Частный VLAN (Cisco, Allied Telesyn).</p></li>
+<li><p>Фильтрация по источнику или изоляция порта (Hewlett-Packard).</p></li>
+<li><p>Перенаправление MAC-адреса (Ericsson).</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-source-validation-strict-loose-disable" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте проверку исходного IP-адреса с использованием</strong> <abbr title="Обратное перенаправление">RPF</abbr> <strong>на этом интерфейсе, как указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>strict:</strong> Каждый входящий пакет проверяется на соответствие исходному IP-адресу в таблице информации о маршрутизации (FIB). Если интерфейс не является лучшим маршрутом обратно к этому источнику, проверка не проходит, и пакет удаляется.</p></li>
+<li><p><strong>loose:</strong> Каждый входящий пакет проверяется на соответствие исходному IP-адресу в таблице информации о маршрутизации (FIB). Если исходный IP-адрес недоступен через любой интерфейс, проверка не проходит.</p></li>
+<li><p><strong>disable:</strong> Не выполняется проверка исходного IP-адреса. Все входящие пакеты принимаются.</p></li>
+</ul>
+<p>RFC 3704 рекомендует включить строгий режим для предотвращения подделки IP-адресов, например, DDoS-атак. Для асимметричных или других сложных сценариев маршрутизации используйте режим loose.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-address-autoconf" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс на автоматическое получение IPv6-адреса с помощью</strong>
+<abbr title="Автоконфигурация без состояния">SLAAC</abbr>, <strong>как указано в</strong>
+<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<p>Устройства IPv6 могут самостоятельно настраивать себя, когда подключены к сети IPv6, используя протокол обнаружения соседей через сообщения ICMPv6 о маршрутизаторе. При первом подключении к сети устройство отправляет многоадресный запрос на обнаружение маршрутизатора в локальной подсети для получения параметров своей конфигурации. Маршрутизатор отвечает пакетом объявлений маршрутизатора, содержащим параметры конфигурации уровня интернета.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Этот метод автоматически отключает передачу IPv6
+на интерфейсе.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ipv6 address autoconf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-address-eui64-prefix" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс на присвоение себе IPv6-адреса с помощью метода</strong>
+<abbr title="64-битный расширенный уникальный идентификатор">EUI-64</abbr> <strong>, как
+указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ipv6 address eui64 2001:db8:beef::/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ipv6 address no-default-link-local
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-address-no-default-link-local" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите автоматическое присвоение ссылочного IPv6-адреса этому интерфейсу.</strong></p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ipv6 address no-default-link-local
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-disable-forwarding" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс на работу в режиме хоста или маршрутизатора.</strong></p>
+<p>Если настроено, интерфейс переключается в режим хоста, и IPv6-пересылка отключена на нем.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ipv6 disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ipv6 adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте</strong> <abbr title="Максимальный размер сегмента">MSS</abbr> <strong>, объявляемый в исходящих пакетах TCP SYN на указанном интерфейсе.</strong></p>
+<p>Путем ограничения значения MSS в пакетах TCP SYN, вы явно информируете удаленную сторону, что она не должна отправлять пакеты большего размера, чем этот. Это предотвращает проблемы с соединением, возникающие при неудачной проверке пути MTU (PMTUD).</p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Устанавливает MSS в конкретное значение, в байтах. Используйте этот вариант, чтобы принудительно установить конкретное значение MSS, например, для устранения проблем с подключением или соответствия специфическим требованиям сети.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> Роутер рассчитывает MSS как MTU интерфейса минус 60 байтов для IPv6 (40 байтов для заголовка IPv6 и 20 байтов для заголовка TCP). Этот вариант рекомендуется для автоматического установления правильного значения.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ipv6 accept-dad &lt;0 | 1 | 2&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-accept-dad-0-1-2" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IPv6</strong> <abbr title="Обнаружение дублирующих адресов">DAD</abbr> <strong>на интерфейсе.</strong></p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>0:</strong> Отключает DAD. Не производится обнаружение дублирующих адресов.</p></li>
+<li><p><strong>1:</strong> Включает DAD (по умолчанию). Обнаруживаются дублирующиеся адреса. Операция IPv6 интерфейса продолжается для действительных IPv6-адресов.</p></li>
+<li><p><strong>2:</strong> Включает DAD и, если найден дублирующийся локальный адрес на основе MAC, отключает операцию IPv6 на этом интерфейсе.</p></li>
+</ul>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ipv6 accept-dad 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ipv6 dup-addr-detect-transmits &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-dup-addr-detect-transmits-n" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте количество</strong> <abbr title="Обнаружение дублирующих адресов">DAD</abbr>
+<strong>сообщений, которые отправляет роутер (ядро) во время назначения IPv6-адреса
+на этом интерфейсе.</strong></p>
+<p>Значение по умолчанию равно 1.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ipv6 dup-addr-detect-transmits 5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; vrf &lt;vrf&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-vrf-vrf" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Назначьте интерфейс определенному экземпляру</strong> <abbr title="Виртуальная маршрутизация и пересылка">VRF</abbr> <strong>.</strong></p>
+<div class="admonition seealso">
+<p class="admonition-title">См. также</p>
+<p>Для информации о настройке VRF, обратитесь к разделу <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 vrf red
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="vxlan-specific-options">
+<h3>Особенности VXLAN</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; vni &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-vni-number" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте</strong> <abbr title="Идентификатор сети VXLAN">VNI</abbr> <strong>для интерфейса VXLAN.</strong></p>
+<p>Каждый сегмент VXLAN идентифицируется этим 24-битным VNI, позволяя до 16 миллионов
+сегментов существовать в одной административной области.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-port-port" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Настройте порт UDP удаленной точки VXLAN.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Хотя порт VXLAN, назначенный IANA, равен <strong>4789</strong>, VyOS использует
+стандартный порт UDP Linux <strong>8472</strong> для интерфейсов VXLAN.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-source-address-address" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Настройте исходный IP-адрес для подстилающей сети VXLAN.</p>
+<div class="admonition warning">
+<p class="admonition-title">Предупреждение</p>
+<p>Это настройка обязательна при развертывании VXLAN через L2VPN/EVPN.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; gpe
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-gpe" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Включите</strong> <abbr title="Общая расширение протокола">GPE</abbr> <strong>для интерфейса VXLAN.</strong></p>
+<p>Чтобы использовать эту функцию, вы должны настроить интерфейс с параметром <code class="docutils literal notranslate">external</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; parameters external
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-parameters-external" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс VXLAN на использование внешней плоскости управления, такой как BGP
+L2VPN/EVPN, для обнаружения удаленных точек.</strong></p>
+<p>Если не настроено, используется внутренняя <abbr title="База данных пересылки">FDB</abbr>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; parameters neighbor-suppress
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-parameters-neighbor-suppress" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Включите подавление ARP и ND на интерфейсе VXLAN.</strong></p>
+<p>Это уменьшает распространение сообщений ARP и ND по сети VXLAN. Как определено
+в <a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc7432.html#section-10"><strong>RFC 7432#section-10</strong></a>, участвующие VTEP используют известные связи MAC-адреса и IP для ответа на локальные запросы от удаленных хостов.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; parameters nolearning
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-parameters-nolearning" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Отключите обучение SLLA и IP-адреса на интерфейсе VXLAN.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; parameters vni-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-parameters-vni-filter" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Включите</strong> <abbr title="Идентификатор сети VXLAN">VNI</abbr> <strong>фильтрации на интерфейсе VXLAN.</strong></p>
+<p>При включении интерфейс получает только пакеты с VNIs, настроенными в его таблице фильтрации VNI.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>VNI-фильтрация работает только если интерфейс настроен с параметром
+<code class="docutils literal notranslate">external</code>.</p>
+</div>
+</div>
+</div>
+<section id="unicast">
+<h4>Unicast</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; remote &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-remote-address" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IPv4 или IPv6-адрес удаленного VTEP.</strong></p>
+<p>В отличие от настроек multicast, эта команда позволяет напрямую настроить
+IPv4 или IPv6-адрес удаленного.</p>
+</div>
+</div>
+</section>
+<section id="multicast">
+<h4>Multicast</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; source-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-source-interface-interface" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте источник интерфейса для подстилающей сети VXLAN.</strong></p>
+<p>Все трафик VXLAN отправляется и получается через указанный интерфейс.
+Эта настройка обязательна при развертывании VXLAN над сетью multicast.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; group &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-group-address" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IPv4 или IPv6-адрес многоадресной группы для интерфейса VXLAN.</strong></p>
+<p>Туннели VXLAN могут быть построены с использованием многоадресной группы или
+одиночных IP-адресов.</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="multicast-vxlan">
+<h2>Multicast VXLAN</h2>
+<p>Топология: PC4 - Leaf2 - Spine1 - Leaf3 - PC5</p>
+<p>PC4 использует IP-адрес <code class="docutils literal notranslate">10.0.0.4/24</code>, а PC5 использует IP-адрес
+<code class="docutils literal notranslate">10.0.0.5/24</code>. Оба устройства предполагают, что находятся в одной широковещательной домене.</p>
+<p>Предположим, что PC4 на Leaf2 пингует PC5 на Leaf3. Вместо того, чтобы вручную указать Leaf3
+как удаленную точку, Leaf2 инкапсулирует пакет в датаграмму UDP и отправляет его в заданный многоадресный адрес через Spine1. Spine1 пересылает пакет всем листьям в той же многоадресной группе, включая Leaf3. После получения датаграммы, Leaf3 пересылает ее PC5 и узнает, что PC4 доступен через Leaf2, анализируя исходный IP-адрес в инкапсулированной датаграмме.</p>
+<p>PC5 получает пинг и отвечает эхо-ответом. Leaf3, теперь знающий расположение PC4, пересылает ответ напрямую к одиночному адресу Leaf2. Получив эхо-ответ, Leaf2 узнает, что PC5 доступен через Leaf3.</p>
+<p>После этого, последующий трафик между PC4 и PC5 не будет использовать многоадресный адрес между листьями, так как оба листа узнали расположение компьютеров. Это уменьшает многоадресный трафик и нагрузку на сеть, повышая масштабируемость при добавлении большего количества листьев.</p>
+</section>
+<section id="single-vxlan-device-svd">
+<h2>Одиночное устройство VXLAN (SVD)</h2>
+<p>В VyOS вы можете настроить несколько <strong>карт VLAN-к-VNI</strong> для EVPN-VXLAN на одном контейнерном интерфейсе, известном как одиночное устройство VXLAN (SVD). Это позволяет значительному масштабированию VNI, поскольку для каждого VNI не требуется отдельный интерфейс VXLAN.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; vlan-to-vni &lt;vlan&gt; vni &lt;vni&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-vlan-to-vni-vlan-vni-vni" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Сопоставьте VLAN ID с VNI на указанном интерфейсе VXLAN.</strong></p>
+<p>Интерфейс VXLAN может быть добавлен в мост.</p>
+<p>В следующем примере показана конфигурация SVD с несколькими картами VLAN-к-VNI.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bridge br0 member interface vxlan0
+set interfaces vxlan vxlan0 parameters external
+set interfaces vxlan vxlan0 source-interface &#39;dum0&#39;
+set interfaces vxlan vxlan0 vlan-to-vni 10 vni &#39;10010&#39;
+set interfaces vxlan vxlan0 vlan-to-vni 11 vni &#39;10011&#39;
+set interfaces vxlan vxlan0 vlan-to-vni 30 vni &#39;10030&#39;
+set interfaces vxlan vxlan0 vlan-to-vni 31 vni &#39;10031&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<section id="example">
+<h3>Пример</h3>
+<p>Следующий пример демонстрирует развертывание multicast VXLAN.</p>
+<p>Настройка включает три маршрутизатора: Spine1, маршрутизатор Cisco IOS, и Leaf2 и
+Leaf3, которые являются маршрутизаторами VyOS.</p>
+<p><strong>Топология:</strong> Leaf2 - Spine1 - Leaf3.</p>
+<p>Топология создана с использованием GNS3.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Spine1:
+fa0/2 к Leaf2, IP-адрес: 10.1.2.1/24
+fa0/3 к Leaf3, IP-адрес: 10.1.3.1/24
+
+Leaf2:
+Eth0 к Spine1, IP-адрес: 10.1.2.2/24
+Eth1 к коммутатору, поддерживающему VLAN
+
+Leaf3:
+Eth0 к Spine1, IP-адрес 10.1.3.3/24
+Eth1 к коммутатору, поддерживающему VLAN
+</pre></div>
+</div>
+<p><strong>Конфигурация Spine1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>conf t
+ip multicast-routing
+!
+interface fastethernet0/2
+ ip address 10.1.2.1 255.255.255.0
+ ip pim sparse-dense-mode
+!
+interface fastethernet0/3
+ ip address 10.1.3.1 255.255.255.0
+ ip pim sparse-dense-mode
+!
+router ospf 1
+ network 10.0.0.0 0.255.255.255 area 0
+</pre></div>
+</div>
+<p>Многоадресная маршрутизация необходима для масштабируемой передачи трафика между листьями.
+<abbr title="Независимый от протокола многоадресной маршрутизации">PIM</abbr> должен быть включен к листьям
+так, чтобы спайн мог узнать, от какой многоадресной группы каждый лист ожидает трафик.</p>
+<p><strong>Конфигурация Leaf2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address &#39;10.1.2.2/24&#39;
+set protocols ospf area 0 network &#39;10.0.0.0/8&#39;
+
+! Первый интерфейс VXLAN
+set interfaces bridge br241 address &#39;172.16.241.1/24&#39;
+set interfaces bridge br241 member interface &#39;eth1.241&#39;
+set interfaces bridge br241 member interface &#39;vxlan241&#39;
+
+set interfaces vxlan vxlan241 group &#39;239.0.0.241&#39;
+set interfaces vxlan vxlan241 source-interface &#39;eth0&#39;
+set interfaces vxlan vxlan241 vni &#39;241&#39;
+
+! Второй интерфейс VXLAN
+set interfaces bridge br242 address &#39;172.16.242.1/24&#39;
+set interfaces bridge br242 member interface &#39;eth1.242&#39;
+set interfaces bridge br242 member interface &#39;vxlan242&#39;
+
+set interfaces vxlan vxlan242 group &#39;239.0.0.242&#39;
+set interfaces vxlan vxlan242 source-interface &#39;eth0&#39;
+set interfaces vxlan vxlan242 vni &#39;242&#39;
+</pre></div>
+</div>
+<p><strong>Конфигурация Leaf3:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address &#39;10.1.3.3/24&#39;
+set protocols ospf area 0 network &#39;10.0.0.0/8&#39;
+
+! Первый интерфейс VXLAN
+set interfaces bridge br241 address &#39;172.16.241.1/24&#39;
+set interfaces bridge br241 member interface &#39;eth1.241&#39;
+set interfaces bridge br241 member interface &#39;vxlan241&#39;
+
+set interfaces vxlan vxlan241 group &#39;239.0.0.241&#39;
+set interfaces vxlan vxlan241 source-interface &#39;eth0&#39;
+set interfaces vxlan vxlan241 vni &#39;241&#39;
+
+! Второй интерфейс VXLAN
+set interfaces bridge br242 address &#39;172.16.242.1/24&#39;
+set interfaces bridge br242 member interface &#39;eth1.242&#39;
+set interfaces bridge br242 member interface &#39;vxlan242&#39;
+
+set interfaces vxlan vxlan242 group &#39;239.0.0.242&#39;
+set interfaces vxlan vxlan242 source-interface &#39;eth0&#39;
+set interfaces vxlan vxlan242 vni &#39;242&#39;
+</pre></div>
+</div>
+<p>Конфигурации Leaf2 и Leaf3 почти одинаковые. Подробные объяснения каждой команды приведены ниже.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bridge br241 address &#39;172.16.241.1/24&#39;
+</pre></div>
+</div>
+<p>Эта команда создает мост для связывания трафика на <code class="docutils literal notranslate">eth1</code> VLAN 241 с
+<code class="docutils literal notranslate">vxlan241</code> интерфейсом. IP-адрес является необязательным. Если настроен, он может служить шлюзом по умолчанию для каждого листа, позволяя устройствам на VLAN достигать других подсетей. Подсети должны быть рекламированы <abbr title="Open Shortest Path First">OSPF</abbr>, чтобы спайн мог узнать, как к ним попасть. Чтобы рекламировать <code class="docutils literal notranslate">172.16/12</code> сети, измените <abbr title="Open Shortest Path First">OSPF</abbr> сеть с
+<code class="docutils literal notranslate">10.0.0.0/8</code> на <code class="docutils literal notranslate">0.0.0.0/0</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bridge br241 member interface &#39;eth1.241&#39;
+set interfaces bridge br241 member interface &#39;vxlan241&#39;
+</pre></div>
+</div>
+<p>Эти команды связывают <code class="docutils literal notranslate">eth1.241</code> и <code class="docutils literal notranslate">vxlan241</code> как члены интерфейса одного моста.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan241 group &#39;239.0.0.241&#39;
+</pre></div>
+</div>
+<p>Эта команда настраивает многоадресную группу, используемую всеми листьями для расширения VLAN. Он должен быть таким же на всех листьях, имеющих этот интерфейс.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan241 source-interface &#39;eth0&#39;
+</pre></div>
+</div>
+<p>Эта команда настраивает интерфейс, который слушает многоадресные пакеты. Это может быть также интерфейс loopback.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan241 vni &#39;241&#39;
+</pre></div>
+</div>
+<p>Эта команда настраивает уникальный идентификатор для интерфейса VXLAN.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan241 port 12345
+</pre></div>
+</div>
+<p>VyOS использует стандартный порт UDP Linux <strong>8472</strong> для интерфейсов VXLAN. Эта
+команда позволяет настроить другой порт UDP.</p>
+</section>
+</section>
+<section id="unicast-vxlan">
+<h2>Unicast VXLAN</h2>
+<p>В качестве альтернативы multicast вы можете настроить туннель VXLAN, указав
+удаленный IPv4-адрес напрямую. Ниже приведена обновленная версия предыдущего
+примера multicast:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># leaf2 и leaf3
+delete interfaces vxlan vxlan241 group &#39;239.0.0.241&#39;
+delete interfaces vxlan vxlan241 source-interface &#39;eth0&#39;
+
+# leaf2
+set interfaces vxlan vxlan241 remote 10.1.3.3
+
+# leaf3
+set interfaces vxlan vxlan241 remote 10.1.2.2
+</pre></div>
+</div>
+<p>Порт UDP по умолчанию — 8472. Чтобы настроить другой порт, используйте <code class="docutils literal notranslate">set interfaces vxlan &lt;vxlanN&gt; port &lt;port&gt;</code>.</p>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

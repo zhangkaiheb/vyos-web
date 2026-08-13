@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, computed } from '/src/utils/vue-import.js';
+import { defineComponent, ref, onMounted, computed, inject } from '/src/utils/vue-import.js';
 import { opModeApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
@@ -55,21 +55,21 @@ function parseTable(output) {
 export default defineComponent({
   name: 'Dhcpv6StaticMappingsPage',
   setup() {
+    const { t } = inject('i18n');
     const loading = ref(false);
     const mappings = ref([]);
-    const rawOutput = ref('');
     const filterPool = ref('');
     const sortKey = ref('');
 
-    const columns = [
-      { key: 'pool', title: '地址池' },
-      { key: 'subnet', title: '子网' },
-      { key: 'name', title: '名称' },
-      { key: 'ip_address', title: 'IP 地址' },
-      { key: 'mac_address', title: 'MAC 地址' },
-      { key: 'duid', title: 'DUID' },
-      { key: 'description', title: '描述' },
-    ];
+    const columns = computed(() => [
+      { key: 'pool', title: t('dhcpv6StaticMappings.columns.pool') },
+      { key: 'subnet', title: t('dhcpv6StaticMappings.columns.subnet') },
+      { key: 'name', title: t('dhcpv6StaticMappings.columns.name') },
+      { key: 'ip_address', title: t('dhcpv6StaticMappings.columns.ipAddress') },
+      { key: 'mac_address', title: t('dhcpv6StaticMappings.columns.macAddress') },
+      { key: 'duid', title: t('dhcpv6StaticMappings.columns.duid') },
+      { key: 'description', title: t('dhcpv6StaticMappings.columns.description') },
+    ]);
 
     const poolOptions = computed(() => {
       const pools = new Set();
@@ -86,8 +86,7 @@ export default defineComponent({
         if (filterPool.value) command += ' pool ' + filterPool.value;
         if (sortKey.value) command += ' sort ' + sortKey.value;
         const res = await opModeApi.show(command);
-        rawOutput.value = res.output || '';
-        mappings.value = parseTable(rawOutput.value);
+        mappings.value = parseTable(res.output || '');
       } catch (e) {
         showError(e);
         mappings.value = [];
@@ -99,36 +98,30 @@ export default defineComponent({
     onMounted(load);
 
     return {
-      loading, mappings, columns, load, rawOutput,
-      filterPool, sortKey, poolOptions, filteredMappings,
+      loading, mappings, columns, load,
+      filterPool, sortKey, poolOptions, filteredMappings, t,
     };
   },
   components: { DataTable, ToolbarButton },
   template: `
     <div class="page-container">
-      <div class="toolbar toolbar-split">
-        <div class="toolbar-left"><h3>DHCPv6 静态映射</h3></div>
-        <div class="toolbar-right">
-          <select v-model="filterPool" @change="load" title="按地址池过滤">
-            <option value="">全部地址池</option>
+      <DataTable :columns="columns" :data="filteredMappings" :loading="loading" :selectable="false" :actions="[]" @refresh="load">
+        <template #toolbar-right-extra>
+          <select v-model="filterPool" @change="load" :title="t('dhcpv6StaticMappings.filterByPool')">
+            <option value="">{{ t('dhcpv6StaticMappings.allPools') }}</option>
             <option v-for="p in poolOptions" :key="p" :value="p">{{ p }}</option>
           </select>
-          <select v-model="sortKey" @change="load" title="排序">
-            <option value="">默认排序</option>
+          <select v-model="sortKey" @change="load" :title="t('dhcpv6StaticMappings.sort')">
+            <option value="">{{ t('dhcpv6StaticMappings.defaultSort') }}</option>
             <option value="ip">IP</option>
             <option value="mac">MAC</option>
-            <option value="name">名称</option>
-            <option value="pool">地址池</option>
-            <option value="subnet">子网</option>
+            <option value="name">{{ t('dhcpv6StaticMappings.columns.name') }}</option>
+            <option value="pool">{{ t('dhcpv6StaticMappings.columns.pool') }}</option>
+            <option value="subnet">{{ t('dhcpv6StaticMappings.columns.subnet') }}</option>
           </select>
-          <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
-        </div>
-      </div>
-      <DataTable :columns="columns" :data="filteredMappings" :loading="loading" :selectable="false" :actions="[]" />
-      <div v-if="rawOutput" style="margin-top:16px;">
-        <div style="font-weight:bold;margin-bottom:4px;">原始输出</div>
-        <pre style="background:#f5f5f5;padding:8px;border:1px solid #ddd;font-size:12px;overflow:auto;">{{ rawOutput }}</pre>
-      </div>
+          <ToolbarButton icon="refresh" @click="load">{{ t('common.refresh') }}</ToolbarButton>
+        </template>
+      </DataTable>
     </div>
   `,
 });

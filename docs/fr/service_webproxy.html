@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="webproxy">
+<h1>Webproxy</h1>
+<p>Le service de proxy dans VyOS est basé sur <a class="reference external" href="http://www.squid-cache.org/">Squid</a> et quelques modules associés.</p>
+<p><a class="reference external" href="http://www.squid-cache.org/">Squid</a> est un proxy web de cache et de transfert HTTP. Il a une grande variété d'usages, notamment pour accélérer un serveur web en stockant les requêtes répétées, pour le cache des recherches web, DNS et autres ressources réseau pour un groupe de personnes partageant des ressources réseau, et pour aider la sécurité en filtrant le trafic. Bien qu'il soit principalement utilisé pour HTTP et FTP, Squid inclut un support limité pour plusieurs autres protocoles, y compris Internet Gopher, SSL,[6] TLS et HTTPS. Squid ne prend pas en charge le protocole SOCKS.</p>
+<p>Le filtrage des URL est fourni par <a class="reference external" href="http://www.squidguard.org/">SquidGuard</a>.</p>
+<section id="configuration">
+<h2>Configuration</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy append-domain &lt;domain&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-append-domain-domain" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour spécifier un nom de domaine à ajouter aux noms de domaines dans les URLs qui n'incluent pas un point <code class="docutils literal notranslate">.</code> le domaine est ajouté.</p>
+<p>Exemple : si le domaine à ajouter est défini sur <code class="docutils literal notranslate">vyos.net</code> et que l'URL reçue est <code class="docutils literal notranslate">www/foo.html</code>, le système utilisera l'URL finale générée de <code class="docutils literal notranslate">www.vyos.net/foo.html</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy append-domain vyos.net
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy cache-size &lt;size&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-cache-size-size" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>La taille du cache sur disque du proxy est configurable par l'utilisateur. La taille par défaut du cache du proxy est configurée à 100 Mo.</p>
+<p>L'unité de cette commande est en Mo.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy cache-size 1024
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy default-port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-default-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Spécifie le port utilisé sur lequel le service de proxy écoute les demandes. Ce port est le port par défaut utilisé pour l'adresse d'écoute spécifiée.</p>
+<p>Le port par défaut est 3128.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy default-port 8080
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy domain-block &lt;domain&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-domain-block-domain" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisé pour bloquer des domaines spécifiques par le Proxy. Spécifier « vyos.net » bloquera tout l'accès à vyos.net, et spécifier « .xxx » bloquera tout l'accès aux URLs ayant une fin .xxx.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy domain-block vyos.net
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy domain-noncache &lt;domain&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-domain-noncache-domain" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Permet l'accès aux sites d'un domaine sans les récupérer depuis le cache du proxy. Spécifier « vyos.net » permettra l'accès à vyos.net mais les pages consultées ne seront pas mises en cache. Cela est utile pour contourner les problèmes avec le contrôle « If-Modified-Since » sur certains sites.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy domain-noncache vyos.net
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy listen-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-listen-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Spécifie l'adresse d'écoute du service de proxy. L'adresse d'écoute est l'adresse IP sur laquelle le service de proxy web écoute les requêtes clients.</p>
+<p>Pour des raisons de sécurité, l'adresse d'écoute doit être utilisée uniquement sur des réseaux internes/validés !</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy listen-address 192.0.2.1
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy listen-address &lt;address&gt; disable-transparent
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-listen-address-address-disable-transparent" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Désactive le mode transparent du proxy web à une adresse d'écoute.</p>
+<p>En mode transparent, tout le trafic arrivant sur le port 80 et destiné à Internet est automatiquement redirigé via le proxy. Cela permet une redirection immédiate du proxy sans configurer les navigateurs clients.</p>
+<p>Le proxy non transparent nécessite que les navigateurs clients soient configurés avec les paramètres de proxy avant que les requêtes ne soient redirigées. L'avantage de cela est que le navigateur web client peut détecter qu'un proxy est en cours d'utilisation et se comporter en conséquence. De plus, le malware transmis via le web peut parfois être bloqué par un proxy web non transparent, car ils ne sont pas conscients des paramètres de proxy.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy listen-address 192.0.2.1 disable-transparent
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy listen-address &lt;address&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-listen-address-address-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définit le port d'écoute pour une adresse d'écoute. Cela remplace le port par défaut de 3128 sur l'adresse d'écoute spécifique.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy listen-address 192.0.2.1 port 8080
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy reply-block-mime &lt;mime&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-reply-block-mime-mime" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisé pour bloquer un type mime spécifique.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># bloquer tous les PDFs
+set service webproxy reply-block-mime application/pdf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy reply-body-max-size &lt;size&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-reply-body-max-size-size" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Spécifie la taille maximale d'un corps de réponse en KB, utilisée pour limiter la taille de la réponse.</p>
+<p>Toutes les tailles de réponse sont acceptées par défaut.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy reply-body-max-size 2048
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy safe-ports &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-safe-ports-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Ajoute un nouveau port à l'acl Safe-ports. Ports inclus par défaut dans l'acl Safe-ports : 21, 70, 80, 210, 280, 443, 488, 591, 777, 873, 1025-65535</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy ssl-safe-ports &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-ssl-safe-ports-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Ajoute un nouveau port à l'acl SSL-ports. Ports inclus par défaut dans l'acl SSL-ports : 443</p>
+</div>
+</div>
+<section id="authentication">
+<h3>Authentification</h3>
+<p>Le proxy Squid intégré peut utiliser LDAP pour authentifier les utilisateurs contre un annuaire d'entreprise. La configuration suivante est un exemple de la manière d'utiliser Active Directory comme backend d'authentification. Les requêtes sont effectuées via LDAP.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication children &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-children-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Nombre maximum de processus d'authentification à lancer. Si vous en lancez trop peu, Squid devra attendre qu'ils traitent une liste d'attente de vérifications de crédentials, ce qui ralentira le processus. Quand les vérifications de mot de passe sont effectuées via un réseau (lent), vous aurez probablement besoin de nombreux processus d'authentification.</p>
+<p>Cela est par défaut à 5.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication children 10
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication credentials-ttl &lt;time&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-credentials-ttl-time" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Spécifie pendant combien de temps Squid suppose qu'une paire utilisateur/mot de passe validée externement est valide - autrement dit, à quelle fréquence le programme d'aide est appelé pour cet utilisateur. Définissez-le faible pour forcer une nouvelle validation avec des mots de passe à courte durée de vie.</p>
+<p>Le temps est en minutes et par défaut à 60.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication credentials-ttl 120
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication method &lt;ldap&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-method-ldap" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Méthode d'authentification du proxy, actuellement seul LDAP est pris en charge.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication method ldap
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication realm
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-realm" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Spécifie la portée de protection (nom de domaine) qui est rapportée au client pour le schéma d'authentification. C'est généralement partie du texte que l'utilisateur verra lorsqu'on lui demandera son nom d'utilisateur et son mot de passe.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication realm &quot;VyOS proxy auth&quot;
+</pre></div>
+</div>
+</div>
+</div>
+<section id="ldap">
+<h4>LDAP</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap base-dn &lt;base-dn&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-base-dn-base-dn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Spécifie le DN de base sous lequel les utilisateurs se trouvent.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap base-dn DC=vyos,DC=net
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap bind-dn &lt;bind-dn&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-bind-dn-bind-dn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Le DN et le mot de passe pour se connecter pendant les recherches.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap bind-dn CN=proxyuser,CN=Users,DC=vyos,DC=net
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap filter-expression &lt;expr&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-filter-expression-expr" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Filtre de recherche LDAP pour localiser le DN utilisateur. Requis si les utilisateurs sont dans une hiérarchie en dessous du DN de base, ou si le nom d'utilisateur n'est pas ce qui construit la partie spécifique de DN des utilisateurs.</p>
+<p>Le filtre de recherche peut contenir jusqu'à 15 occurrences de %s qui seront remplacées par le nom d'utilisateur, comme dans « uid=%s » pour <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2037.html"><strong>RFC 2037</strong></a> des répertoires. Pour une description détaillée de la syntaxe du filtre de recherche LDAP, voir <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2254.html"><strong>RFC 2254</strong></a>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap filter-expression (cn=%s)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap password &lt;password&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-password-password" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Le DN et le mot de passe pour se connecter pendant les recherches. Comme le mot de passe doit être imprimé en clair dans votre configuration Squid, il est fortement recommandé d'utiliser un compte avec des privilèges minimaux. Cela limite les dommages en cas où quelqu'un pourrait obtenir une copie de votre fichier de configuration Squid.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap password vyos
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap persistent-connection
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-persistent-connection" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilise une connexion LDAP persistante. Normalement, la connexion LDAP n'est ouverte que pendant la validation d'un nom d'utilisateur afin de préserver les ressources du serveur LDAP. Cette option fait en sorte que la connexion LDAP reste ouverte, permettant ainsi de la réutiliser pour d'autres validations d'utilisateurs.</p>
+<p>Recommandé pour les installations plus importantes.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap persistent-connection
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Spécifie un port TCP alternatif où le serveur LDAP écoute s'il n'est pas le port LDAP par défaut 389.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap port 389
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap server &lt;server&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-server-server" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Spécifie le serveur LDAP auquel se connecter.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap server ldap.vyos.net
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap use-ssl
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-use-ssl" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilise l'encryption TLS.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap use-ssl
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap username-attribute &lt;attr&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-username-attribute-attr" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Spécifie le nom de l'attribut DN qui contient le nom d'utilisateur/connexion. Combiné avec le DN de base pour construire le DN des utilisateurs lorsqu'aucun filtre de recherche n'est spécifié (filter-expression).</p>
+<p>Par défaut, c'est 'uid'</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cela ne peut être fait que si tous vos utilisateurs se trouvent directement sous la même position dans l'arbre LDAP et que le nom d'utilisateur est utilisé pour nommer chaque objet utilisateur. Si votre arbre LDAP ne correspond pas à ces critères ou si vous souhaitez filtrer qui sont les utilisateurs valides, vous devez utiliser un filtre de recherche pour chercher le DN des utilisateurs (filter-expression).</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap username-attribute uid
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy authentication ldap version &lt;2 | 3&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-version-2-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Version du protocole LDAP. Par défaut, c'est 3 si non spécifié.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap version 2
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="url-filtering">
+<h3>Filtrage des URL</h3>
+<div class="error admonition">
+<p class="admonition-title">Appel à la contribution</p>
+<p>Aidez-nous à améliorer cette section avec du contenu supplémentaire, des exemples et des explications.</p>
+<p>Pour les directives de contribution, voir <a class="reference internal" href="../../documentation.html#documentation">Rédiger la documentation</a>.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service webproxy url-filtering disable
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-url-filtering-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Désactive le filtrage web sans supprimer la configuration.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy url-filtering disable
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="operation">
+<h2>Opération</h2>
+<div class="error admonition">
+<p class="admonition-title">Appel à la contribution</p>
+<p>Aidez-nous à améliorer cette section avec du contenu supplémentaire, des exemples et des explications.</p>
+<p>Pour les directives de contribution, voir <a class="reference internal" href="../../documentation.html#documentation">Rédiger la documentation</a>.</p>
+</div>
+<section id="filtering">
+<h3>Filtrage</h3>
+<section id="update">
+<h4>Mise à jour</h4>
+<p>Si vous souhaitez utiliser des listes noires existantes, vous devez d'abord créer/télécharger une base de données. Sinon, vous ne pourrez pas valider les changements de configuration.</p>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+update webproxy blacklists
+<a class="cmdlink" href="#opcmd-update-webproxy-blacklists" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Télécharger/Mettre à jour la liste noire complète</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ update webproxy blacklists
+Warning: Aucune liste noire de filtrage d'URL installée
+Voulez-vous télécharger une liste noire par défaut ? [confirmer][y]
+Connexion à ftp.example.com (192.0.2.249:21)
+blacklists.gz        100% |*************************************************************************************************************| 17.0M  0:00:00 ETA
+Décompression de la liste noire...
+Vérification des autorisations...
+Sauter le lien pour   [ads] -&gt; [publicite]
+Construction de la base de données pour [adult/domains] - 2467177 entrées
+Construction de la base de données pour [adult/urls] - 67798 entrées
+Sauter le lien pour   [aggressive] -&gt; [agressif]
+Construction de la base de données pour [agressif/domains] - 348 entrées
+Construction de la base de données pour [agressif/urls] - 36 entrées
+Construction de la base de données pour [arjel/domains] - 69 entrées
+...
+Construction de la base de données pour [webmail/domains] - 374 entrées
+Construction de la base de données pour [webmail/urls] - 9 entrées
+Le daemon webproxy doit être redémarré
+Voulez-vous le redémarrer maintenant ? [confirmer][y]
+[ ok ] Redémarrage de squid (via systemctl): squid.service.
+vyos@vyos:~$
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+update webproxy blacklists category &lt;category&gt;
+<a class="cmdlink" href="#opcmd-update-webproxy-blacklists-category-category" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Télécharger/Mettre à jour une liste noire partielle.</p>
+<p>Utilisez la complétion par touche Tab pour obtenir une liste des catégories.</p>
+</div>
+</div>
+<ul>
+<li><p>Pour mettre à jour automatiquement les fichiers de liste noire</p>
+<p><code class="docutils literal notranslate">set service webproxy url-filtering squidguard auto-update update-hour 23</code></p>
+</li>
+<li><p>Pour configurer le blocage, ajoutez les lignes suivantes à la configuration</p>
+<p><code class="docutils literal notranslate">set service webproxy url-filtering squidguard block-category ads</code></p>
+<p><code class="docutils literal notranslate">set service webproxy url-filtering squidguard block-category malware</code></p>
+</li>
+</ul>
+</section>
+<section id="bypassing-the-webproxy">
+<h4>Baisser le webproxy</h4>
+<div class="error admonition">
+<p class="admonition-title">Appel à la contribution</p>
+<p>Aidez-nous à améliorer cette section avec du contenu supplémentaire, des exemples et des explications.</p>
+<p>Pour les directives de contribution, voir <a class="reference internal" href="../../documentation.html#documentation">Rédiger la documentation</a>.</p>
+</div>
+<p>Certaines services ne fonctionnent pas correctement lorsqu'ils sont gérés via un proxy web. Parfois, il est utile de contourner un proxy transparent :</p>
+<ul>
+<li><p>Pour contourner le proxy pour chaque demande dirigée vers une destination spécifique :</p>
+<p><code class="docutils literal notranslate">set service webproxy whitelist destination-address 198.51.100.33</code></p>
+<p><code class="docutils literal notranslate">set service webproxy whitelist destination-address 192.0.2.0/24</code></p>
+</li>
+<li><p>Pour contourner le proxy pour chaque demande provenant d'une source spécifique :</p>
+<p><code class="docutils literal notranslate">set service webproxy whitelist source-address 192.168.1.2</code></p>
+<p><code class="docutils literal notranslate">set service webproxy whitelist source-address 192.168.2.0/24</code></p>
+<p>(Cela peut être utile lorsque un service appelé a de nombreuses adresses de destination et/ou souvent changeantes - par exemple Netflix.)</p>
+</li>
+</ul>
+</section>
+</section>
+</section>
+<section id="examples">
+<h2>Exemples</h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# show service webproxy
+ authentication {
+     children 5
+     credentials-ttl 60
+     ldap {
+         base-dn DC=example,DC=local
+         bind-dn CN=proxyuser,CN=Users,DC=example,DC=local
+         filter-expression (cn=%s)
+         password Qwert1234
+         server ldap.example.local
+         username-attribute cn
+     }
+     method ldap
+     realm &quot;VyOS Webproxy&quot;
+ }
+ cache-size 100
+ default-port 3128
+ listen-address 192.168.188.103 {
+     disable-transparent
+ }
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

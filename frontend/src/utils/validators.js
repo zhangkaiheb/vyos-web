@@ -96,39 +96,39 @@ function validRateLimit(value) {
 
 function _validateSingle(value, rule) {
   const type = rule.validate || rule.type;
-  if (type === 'ip' && !validIP(value)) return '请输入有效的IP地址';
-  if (type === 'ip-segment' && !validIPOrSegment(value)) return '请输入有效的IP地址、CIDR 或 IP 范围';
-  if (type === 'ipv4' && !validIPv4(value)) return '请输入有效的IPv4地址';
-  if (type === 'ipv4-cidr' && !validIPv4CIDR(value)) return '请输入有效的IPv4网段';
-  if (type === 'ipv4-range' && !validIPv4Range(value)) return '请输入有效的IPv4范围，如 192.168.1.1-192.168.1.100';
-  if (type === 'ipv6' && !validIPv6(value)) return '请输入有效的IPv6地址';
-  if (type === 'mac' && !validMAC(value)) return '请输入有效的MAC地址';
-  if (type === 'mac-exclude' && !validMACExclude(value)) return '请输入有效的MAC地址，可前缀!表示排除';
-  if (type === 'port' && !validPortMulti(value)) return '请输入有效的端口、端口范围或逗号分隔列表';
-  if (type === 'port-single' && !validPort(value)) return '端口号范围为1-65535';
+  if (type === 'ip' && !validIP(value)) return { key: 'errors.invalid_ip' };
+  if (type === 'ip-segment' && !validIPOrSegment(value)) return { key: 'errors.invalid_ip_segment' };
+  if (type === 'ipv4' && !validIPv4(value)) return { key: 'errors.invalid_ipv4' };
+  if (type === 'ipv4-cidr' && !validIPv4CIDR(value)) return { key: 'errors.invalid_ipv4_cidr' };
+  if (type === 'ipv4-range' && !validIPv4Range(value)) return { key: 'errors.invalid_ipv4_range' };
+  if (type === 'ipv6' && !validIPv6(value)) return { key: 'errors.invalid_ipv6' };
+  if (type === 'mac' && !validMAC(value)) return { key: 'errors.invalid_mac' };
+  if (type === 'mac-exclude' && !validMACExclude(value)) return { key: 'errors.invalid_mac_exclude' };
+  if (type === 'port' && !validPortMulti(value)) return { key: 'errors.invalid_port' };
+  if (type === 'port-single' && !validPort(value)) return { key: 'errors.invalid_port_single' };
   if (type === 'number-range' && !validNumberRange(value, rule.min, rule.max)) {
-    const rangeText = rule.min !== undefined && rule.max !== undefined ? `${rule.min}-${rule.max}` : '';
-    return `请输入有效的数值${rangeText ? `（${rangeText}）` : ''}或范围`;
+    const rangeText = rule.min !== undefined && rule.max !== undefined ? ` (${rule.min}-${rule.max})` : '';
+    return { key: 'errors.invalid_number_range', params: { range: rangeText } };
   }
   if (type === 'number-exclude-range' && !validNumberExcludeRange(value, rule.min, rule.max)) {
-    const rangeText = rule.min !== undefined && rule.max !== undefined ? `${rule.min}-${rule.max}` : '';
-    return `请输入有效的数值${rangeText ? `（${rangeText}）` : ''}、范围，可前缀!表示排除`;
+    const rangeText = rule.min !== undefined && rule.max !== undefined ? ` (${rule.min}-${rule.max})` : '';
+    return { key: 'errors.invalid_number_exclude_range', params: { range: rangeText } };
   }
-  if (type === 'rate-limit' && !validRateLimit(value)) return '请输入有效的速率，如 5/minute';
-  if (rule.min !== undefined && parseFloat(value) < rule.min) return `最小值为 ${rule.min}`;
-  if (rule.max !== undefined && parseFloat(value) > rule.max) return `最大值为 ${rule.max}`;
-  if (rule.pattern && !new RegExp(rule.pattern).test(String(value))) return rule.patternMessage || '格式不正确';
+  if (type === 'rate-limit' && !validRateLimit(value)) return { key: 'errors.invalid_rate_limit' };
+  if (rule.min !== undefined && parseFloat(value) < rule.min) return { key: 'errors.min_value', params: { min: rule.min } };
+  if (rule.max !== undefined && parseFloat(value) > rule.max) return { key: 'errors.max_value', params: { max: rule.max } };
+  if (rule.pattern && !new RegExp(rule.pattern).test(String(value))) return { key: 'errors.invalid_format' };
   return '';
 }
 
 export function validateField(value, rule) {
   if (rule.required && (value === '' || value === undefined || value === null || (Array.isArray(value) && value.length === 0))) {
-    return '此项为必填项';
+    return { key: 'errors.required' };
   }
   if (value === '' || value === undefined || value === null) return '';
   if (Array.isArray(value)) {
     const errors = value.map(v => _validateSingle(String(v), rule)).filter(Boolean);
-    return errors.length ? errors.join('；') : '';
+    return errors.length ? { key: 'errors._array', items: errors } : '';
   }
   return _validateSingle(String(value), rule);
 }

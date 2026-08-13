@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="flowtables-firewall-configuration">
+<h1>Настройка брандмауэра Flowtables</h1>
+<div class="error admonition">
+<p class="admonition-title">Призыв к участию</p>
+<p>Помогите улучшить этот раздел, добавив дополнительный контент, примеры и объяснения.</p>
+<p>Для руководства по вкладу, см. <a class="reference internal" href="../../documentation.html#documentation">Написание документации</a>.</p>
+</div>
+<section id="overview">
+<h2>Обзор</h2>
+<p>Этот раздел предоставляет информацию о настройке брандмауэра для flowtables.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall flowtable …
+<a class="cmdlink" href="#cfgcmd-set-firewall-flowtable" title="Постоянная ссылка на эту команду"></a></div></div>
+<p>Чтобы узнать о общем потоке трафика в брандмауэрах VyOS,
+см. <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Брандмауэр</a>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
+    * flowtable
+         - custom_flow_table
+            + ...
+</pre></div>
+</div>
+<p>Flowtables позволяют определить быстрый путь через datapath flowtable.
+Flowtables поддерживают уровни 3 (IPv4 и IPv6) и уровень 4 (TCP и UDP)
+протоколы.</p>
+<figure class="align-default">
+<img alt="../../_images/firewall-flowtable-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-flowtable-packet-flow.webp" />
+</figure>
+<p>После того как первый пакет успешно проходит путь IP-пересылки (черный
+путь), вы можете перенаправить последующие пакеты на flowtable через ваш
+набор правил. Вы указываете, когда добавить поток в flowtable во время
+фильтрации прямого направления (красный круг номер 6).</p>
+<p>Когда пакет находит совпадающую запись в flowtable (hit flowtable), система
+передает его на выходной netdevice. Это означает, что пакеты обходят классический
+путь IP-пересылки и используют <strong>Быстрый путь</strong> (оранжевые круги). В результате вы не
+видите эти пакеты из любого хука Netfilter после входа. Если в flowtable нет
+совпадающей записи (miss flowtable), пакет проходит классический путь IP-пересылки.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p><strong>Справочник по flowtable:</strong>
+<a class="reference external" href="https://docs.vyos.io/en/rolling/configuration/https://docs.kernel.org/networking/nf_flowtable.html">https://docs.kernel.org/networking/nf_flowtable.html</a></p>
+</div>
+</section>
+<section id="flowtable-configuration">
+<h2>Настройка flowtable</h2>
+<p>Для использования flowtables вам нужно настроить следующее:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Создайте flowtable, который включает интерфейсы,
+которые будут использоваться flowtable.</p></li>
+<li><p>Создайте правило брандмауэра. Установите действие в
+<code class="docutils literal notranslate">offload</code> и используйте желаемый flowtable для <code class="docutils literal notranslate">offload-target</code>.</p></li>
+</ul>
+</div></blockquote>
+<p>Создание flow table:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall flowtable &lt;flow_table_name&gt; interface &lt;iface&gt; Specify interfaces to use in the flowtable.
+<a class="cmdlink" href="#cfgcmd-set-firewall-flowtable-flow-table-name-interface-iface-specify-interfaces-to-use-in-the-flowtable" title="Постоянная ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall flowtable &lt;flow_table_name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-flowtable-flow-table-name-description-text" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Укажите описание для flow table.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall flowtable &lt;flow_table_name&gt; offload &lt;hardware | software&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-flowtable-flow-table-name-offload-hardware-software" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Укажите тип offload, который использует flowtable: <code class="docutils literal notranslate">hardware</code> или
+<code class="docutils literal notranslate">software</code>. По умолчанию используется <code class="docutils literal notranslate">software</code> offload.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p><strong>Hardware offload</strong>: Убедитесь, что ваш сетевой контроллер (NIC)
+поддерживает аппаратное отключение и что у вас установлены необходимые драйверы
+до включения этого варианта.</p>
+</div>
+<p>Создание правил для использования flow tables:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall [ipv4 | ipv6] forward filter rule &lt;1-999999&gt; action offload
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-ipv6-forward-filter-rule-1-999999-action-offload" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Создайте правило брандмауэра в цепочке forward с действием, установленным на
+<code class="docutils literal notranslate">offload</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall [ipv4 | ipv6] forward filter rule &lt;1-999999&gt; offload-target &lt;flowtable&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-ipv6-forward-filter-rule-1-999999-offload-target-flowtable" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Создайте правило брандмауэра в цепочке forward и укажите, какой flowtable
+использовать. Действует только если действие — <code class="docutils literal notranslate">offload</code>.</p>
+</div>
+</div>
+<section id="interface-selection">
+<h3>Выбор интерфейса</h3>
+<div class="admonition important">
+<p class="admonition-title">Важно</p>
+<p>Всегда настраивайте flowtable с интерфейсом, который наблюдает VyOS
+на hook forward — это не обязательно физический интерфейс. Когда трафик
+приходит или отправляется через логический интерфейс, VyOS отслеживает
+этот логический интерфейс, а не базовое физическое устройство. Регистрация
+неправильного интерфейса в flowtable приводит к тому, что каждый поиск потока
+не удается, возвращаясь к классическому пути пересылки и разрушая цель
+быстрого отключения.</p>
+</div>
+</section>
+</section>
+<section id="configuration-example">
+<h2>Пример конфигурации</h2>
+<p>Рассмотрим следующее в этом наборе:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>В этом примере используются два интерфейса в flowtables: <code class="docutils literal notranslate">eth0</code> и <code class="docutils literal notranslate">eth1</code>.</p></li>
+<li><p>Пример предоставляет минимальный набор правил брандмауэра с правилами фильтрации
+и правилами использования возможностей отключения flowtable.</p></li>
+</ul>
+</div></blockquote>
+<p>Первый пакет оценивается путем брандмауэра, поэтому желаемое соединение должно быть явно принято.
+То же самое должно происходить для трафика в обратном порядке.
+В большинстве случаев политики состояния используются
+для принятия соединения в обратном направлении.</p>
+<p>В следующем примере принимается только трафик, приходящий с интерфейса <code class="docutils literal notranslate">eth0</code>,
+протокол TCP и порт назначения 1122. Все остальные трафик к роутеру отбрасываются.</p>
+<section id="commands">
+<h3>Команды</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall flowtable FT01 interface &#39;eth0&#39;
+set firewall flowtable FT01 interface &#39;eth1&#39;
+set firewall ipv4 forward filter default-action &#39;drop&#39;
+set firewall ipv4 forward filter rule 10 action &#39;offload&#39;
+set firewall ipv4 forward filter rule 10 offload-target &#39;FT01&#39;
+set firewall ipv4 forward filter rule 10 state &#39;established&#39;
+set firewall ipv4 forward filter rule 20 action &#39;accept&#39;
+set firewall ipv4 forward filter rule 20 state &#39;established&#39;
+set firewall ipv4 forward filter rule 20 state &#39;related&#39;
+set firewall ipv4 forward filter rule 110 action &#39;accept&#39;
+set firewall ipv4 forward filter rule 110 destination address &#39;192.0.2.100&#39;
+set firewall ipv4 forward filter rule 110 destination port &#39;1122&#39;
+set firewall ipv4 forward filter rule 110 inbound-interface name &#39;eth0&#39;
+set firewall ipv4 forward filter rule 110 protocol &#39;tcp&#39;
+</pre></div>
+</div>
+</section>
+<section id="explanation">
+<h3>Объяснение</h3>
+<p>Вот что происходит для желаемого соединения:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Пакет приходит на <code class="docutils literal notranslate">eth0</code> с адресом назначения <code class="docutils literal notranslate">192.0.2.100</code>, протоколом TCP
+и портом назначения 1122. Предположим, что этот адрес достижим
+через интерфейс <code class="docutils literal notranslate">eth1</code>.</p></li>
+<li><p>Для этого первого пакета состояние соединения — <strong>новое</strong>. Ни правило 10
+ни правило 20 не применяются.</p></li>
+<li><p>Правило 110 совпадает, поэтому соединение принимается.</p></li>
+<li><p>Когда сервер 192.0.2.100 отвечает, состояние соединения становится
+<strong>установленным</strong>, и правило 20 принимает ответ.</p></li>
+<li><p>Роутер получает второй пакет для этого соединения. Поскольку состояние соединения
+— <strong>установленное</strong>, правило 10 совпадает и добавляет новую запись в flowtable FT01
+для этого соединения.</p></li>
+<li><p>Последующие пакеты пропускают традиционный путь и используют <strong>Быстрый путь</strong>
+для отключения.</p></li>
+</ol>
+</div></blockquote>
+</section>
+</section>
+<section id="flowtable-configuration-on-logical-and-sub-interfaces">
+<h2>Настройка flowtable на логических и подинтерфейсах</h2>
+<p>Настройте flowtable с именем интерфейса, которое вы использовали в конфигурации VyOS.
+Когда задействованы VLAN, bonds или bridges, это логический интерфейс (<code class="docutils literal notranslate">bond0</code>, <code class="docutils literal notranslate">br0</code>, <code class="docutils literal notranslate">eth0.10</code>) — не физический порт.</p>
+<p>Например:</p>
+<ul class="simple">
+<li><p>Если <code class="docutils literal notranslate">bond0</code> настроен, VyOS видит <code class="docutils literal notranslate">bond0</code> — не <code class="docutils literal notranslate">eth0</code> или <code class="docutils literal notranslate">eth1</code></p></li>
+<li><p>Если <code class="docutils literal notranslate">br0</code> настроен, VyOS видит <code class="docutils literal notranslate">br0</code> — не его членские интерфейсы</p></li>
+<li><p>Flowtable должен ссылаться на то же имя интерфейса, которое видит VyOS</p></li>
+</ul>
+<p>Два формата принимаются, но рекомендуется регистрировать родителя:</p>
+<ul class="simple">
+<li><p>Регистрация <code class="docutils literal notranslate">bond1</code> отключает родительский интерфейс <strong>и все его подинтерфейсы VLAN</strong>
+(<code class="docutils literal notranslate">bond1.10</code>, <code class="docutils literal notranslate">bond1.20</code>, и т.д.) — ядро автоматически обнаруживает их, анализируя заголовки L2 (Linux 5.13+).</p></li>
+<li><p>Регистрация <code class="docutils literal notranslate">bond1.10</code> напрямую отключает <strong>только трафик VLAN 10</strong>.
+Однако подинтерфейс <strong>должен существовать во время коммита</strong>; если он еще не существует
+во время загрузки набора правил, конфигурация может не сработать.</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre># Отключение bond1 и всех подинтерфейсов (bond1.10, bond1.20, ...)
+set firewall flowtable FT01 interface &#39;bond1&#39;
+
+# Отключение только VLAN 10: зарегистрируйте подинтерфейс напрямую
+set firewall flowtable FT01 interface &#39;bond1.10&#39;
+</pre></div>
+</div>
+<section id="example-mixed-parent-and-sub-interface-offload">
+<h3>Пример: Смешанная регистрация родительского и подинтерфейса</h3>
+<p>Рассмотрим настройку, где:</p>
+<ul class="simple">
+<li><p>Трафик входит на <code class="docutils literal notranslate">bond1.10</code> (VLAN 10)</p></li>
+<li><p>Трафик исходит на <code class="docutils literal notranslate">bond2.20</code> (VLAN 20)</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall flowtable FT01 interface &#39;bond1&#39;
+set firewall flowtable FT01 interface &#39;bond2.20&#39;
+set firewall ipv4 forward filter default-action &#39;drop&#39;
+set firewall ipv4 forward filter rule 10 action &#39;offload&#39;
+set firewall ipv4 forward filter rule 10 offload-target &#39;FT01&#39;
+set firewall ipv4 forward filter rule 10 state &#39;established&#39;
+set firewall ipv4 forward filter rule 20 action &#39;accept&#39;
+set firewall ipv4 forward filter rule 20 state &#39;established&#39;
+set firewall ipv4 forward filter rule 20 state &#39;related&#39;
+set firewall ipv4 forward filter rule 200 action &#39;accept&#39;
+set firewall ipv4 forward filter rule 200 inbound-interface name &#39;bond*&#39;
+</pre></div>
+</div>
+<p>В этой конфигурации:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">bond1</code> охватывает входящий трафик с <code class="docutils literal notranslate">bond1.10</code> и любые другие подинтерфейсы <code class="docutils literal notranslate">bond1</code>.</p></li>
+<li><p><code class="docutils literal notranslate">bond2.20</code> отключает только VLAN 20 — другие подинтерфейсы <code class="docutils literal notranslate">bond2</code> остаются на
+стандартном пути пересылки. Это показывает, как выбрать отключение одного VLAN, оставив другие на медленном пути.</p></li>
+<li><p>Правило 200 использует маску для приема любого трафика, поступающего
+на любой интерфейс bond или подинтерфейс до того, как поток достигнет состояния established
+и будет пригоден для отключения</p></li>
+<li><p>Как только поток установлен, правило 10 добавляет его в flowtable, и последующие
+пакеты полностью пропускают хук forward через быстрый путь</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Направления интерфейсов в этом примере с точки зрения клиент-серверного трафика. На практике каждый интерфейс обрабатывает трафик в обоих направлениях, и flowtable управляет отключением симметрично, как только поток установлен.
+Чтобы подтвердить входящие и исходящие интерфейсы, включите <code class="docutils literal notranslate">log</code> в правило в forward hook и проверьте журналы брандмауэра — см. раздел
+<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Брандмауэр</a> для настройки.</p>
+</div>
+</section>
+<section id="checks">
+<h3>Проверки</h3>
+<p>Проверьте таблицу conntrack, чтобы убедиться, что система приняла и правильно
+отключила соединения.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@FlowTables:~$ show firewall ipv4 forward filter
+Ruleset Information
+
+---------------------------------
+ipv4 Firewall &quot;forward filter&quot;
+
+Rule     Action    Protocol      Packets    Bytes  Conditions
+-------  --------  ----------  ---------  -------  ----------------------------------------------------------------
+10       offload   all                 8      468  ct state { established, related }  flow add @VYOS_FLOWTABLE_FT01
+20       accept    all                 8      468  ct state { established, related }  accept
+110      accept    tcp                 2      120  ip daddr 192.0.2.100 tcp dport 1122 iifname &quot;eth0&quot;  accept
+default  drop      all                 7      420
+
+vyos@FlowTables:~$ show conntrack table ipv4
+Original src        Original dst    Reply src        Reply dst           Protocol    State    Timeout    Mark    Zone
+------------------  --------------  ---------------  ------------------  ----------  -------  ---------  ------  ------
+198.51.100.100:41676  192.0.2.100:1122  192.0.2.100:1122  198.51.100.100:41676  tcp                  n/a        0
+</pre></div>
+</div>
+<section id="interface-identification">
+<h4>Идентификация интерфейса</h4>
+<p>Чтобы убедиться, что VyOS идентифицирует трафик по его логическому подинтерфейсу
+и не по underlying физическому устройству, проверьте журнал брандмауэра:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@FlowTables:~$ show log firewall
+Jun 18 22:22:00 kernel: [ipv4-FWD-filter-200-A] IN=bond1.10 OUT=bond2.20 \
+  MAC=00:53:00:00:00:02:00:53:00:00:00:01:08:00 SRC=192.168.10.2 \
+  DST=192.168.20.2 LEN=84 PROTO=ICMP TYPE=8 CODE=0 ID=3572 SEQ=1
+</pre></div>
+</div>
+<p>Поля <code class="docutils literal notranslate">IN</code> и <code class="docutils literal notranslate">OUT</code> показывают <code class="docutils literal notranslate">bond1.10</code> и <code class="docutils literal notranslate">bond2.20</code> — логические
+подинтерфейсы — а не underlying физическое устройство или bond.</p>
+</section>
+<section id="flowtable-offload">
+<h4>Отключение flowtable</h4>
+<p>Выполните следующую команду, чтобы убедиться, что соединения отключены на fast path flowtable:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@FlowTables:~$ show conntrack table ipv4
+Original src        Original dst       Reply src          Reply dst           Protocol    State    Timeout    Mark    Zone
+------------------  -----------------  -----------------  ------------------  ----------  -------  ---------  ------  ------
+192.168.10.2:45140  192.168.20.2:5201  192.168.20.2:5201  192.168.10.2:45140  tcp                  n/a        0
+192.168.10.2:45124  192.168.20.2:5201  192.168.20.2:5201  192.168.10.2:45124  tcp                  n/a        0
+
+
+vyos@FlowTables:~$ show conntrack table ipv4
+Original src        Original dst       Reply src          Reply dst           Protocol    State      Timeout    Mark    Zone
+------------------  -----------------  -----------------  ------------------  ----------  ---------  ---------  ------  ------
+192.168.10.2:45124  192.168.20.2:5201  192.168.20.2:5201  192.168.10.2:45124  tcp         TIME_WAIT  105        0
+</pre></div>
+</div>
+<p>Записи с <code class="docutils literal notranslate">Timeout</code>, отображаемыми как <code class="docutils literal notranslate">n/a</code>, и пустым <code class="docutils literal notranslate">State</code> подтверждают, что
+потоки отключены на fast path flowtable — последующие пакеты полностью пропускают брандмауэр. Как только сессия TCP закрывается, запись переходит в <code class="docutils literal notranslate">TIME_WAIT</code> и счетчик таймаута возобновляется.</p>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

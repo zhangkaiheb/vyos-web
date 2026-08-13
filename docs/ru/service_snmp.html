@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3483; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="snmp">
+<h1>SNMP</h1>
+<p><abbr title="Простой протокол управления сетью">SNMP</abbr> — это интернет-стандартный протокол для сбора и организации информации о
+управляемых устройствах на IP-сетях и для изменения этой информации, чтобы изменить поведение устройств.
+Устройства, которые обычно поддерживают SNMP, включают кабельные модемы, маршрутизаторы, коммутаторы,
+серверы, рабочие станции, принтеры и т. д.</p>
+<p>SNMP широко используется в управлении сетью для мониторинга сети. SNMP предоставляет управляющую информацию
+в виде переменных на управляемых системах, организованных в базе данных управляющей информации (<a class="reference external" href="https://en.wikipedia.org/wiki/Management_information_base">MIB</a>), которая описывает статус и
+конфигурацию системы. Эти переменные затем могут быть удаленно запрошены (и, в некоторых случаях, изменены)
+управляющими приложениями.</p>
+<p>Было разработано и внедрено три значимые версии SNMP. SNMPv1 — оригинальная версия протокола. Более новые версии, SNMPv2c и SNMPv3,
+предлагают улучшения в производительности, гибкости и безопасности.</p>
+<p>SNMP является компонентом набора протоколов Интернета, как определено Инженерной задачей по интернету (IETF). Он состоит из набора стандартов для управления сетью, включая протокол прикладного уровня, схему базы данных и набор объектов данных.</p>
+<section id="overview-and-basic-concepts">
+<h2>Обзор и основные понятия</h2>
+<p>В типичном использовании SNMP, одно или несколько административных компьютеров, называемых менеджерами,
+имеют задачу мониторинга или управления группой хостов или устройств на компьютерной сети. Каждое управляемое устройство выполняет программный компонент, называемый агентом, который сообщает информацию через SNMP менеджеру.</p>
+<p>Сеть, управляемая SNMP, состоит из трех ключевых компонентов:</p>
+<ul class="simple">
+<li><p>Управляемые устройства</p></li>
+<li><p>Агент — программное обеспечение, работающее на управляемых устройствах</p></li>
+<li><p>Станция управления сетью (NMS) — программное обеспечение, работающее на менеджере</p></li>
+</ul>
+<p>Управляемое устройство — это узел сети, реализующий интерфейс SNMP, который позволяет односторонний (только чтение) или двусторонний (чтение и запись) доступ к специфическим данным узла. Управляемые устройства обмениваются информацией о конкретных узлах с NMS. Иногда их называют элементами сети, управляемые устройства могут быть любым типом устройства, включая, но не ограничиваясь, маршрутизаторами, серверами доступа, коммутаторами, кабельными модемами, мостами, концентраторами, IP-телефонами, IP-видеокамерами, компьютерными хостами и принтерами.</p>
+<p>Агент — это модуль программного обеспечения для управления сетью, находящийся на управляемом устройстве. Агент имеет локальное знание о управляющей информации и переводит эту информацию в или из формата SNMP.</p>
+<p>Станция управления сетью выполняет приложения, которые мониторят и управляют управляемыми устройствами. NMS обеспечивают основную часть процессорных ресурсов и памяти, необходимых для управления сетью. На любой управляемой сети может существовать одно или несколько NMS.</p>
+<figure class="align-default" id="id3">
+<a class="reference internal image-reference" href="https://docs.vyos.io/en/rolling/_images/service_snmp_communication_principles_diagram.webp"><img alt="Принципы работы SNMP" src="https://docs.vyos.io/en/rolling/_images/service_snmp_communication_principles_diagram.webp" style="width: 735.8000000000001px; height: 340.0px;" /></a>
+<figcaption>
+<p>Изображение взято с
+<a class="reference external" href="https://en.wikipedia.org/wiki/File:SNMP_communication_principles_diagram.PNG">https://en.wikipedia.org/wiki/File:SNMP_communication_principles_diagram.PNG</a>
+под лицензией GNU Free Documentation License</p>
+</figcaption>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>VyOS поддерживает как IPv4, так и IPv6.</p>
+</div>
+</section>
+<section id="snmp-protocol-versions">
+<h2>Версии протокола SNMP</h2>
+<p>VyOS сам поддерживает <a class="reference external" href="https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol#Version_2">SNMPv2</a> (версия 2) и <a class="reference external" href="https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol#Version_3">SNMPv3</a> (версия 3), где последняя рекомендуется из-за улучшенной безопасности (опциональная аутентификация и шифрование).</p>
+<section id="snmpv2">
+<h3>SNMPv2</h3>
+<p>SNMPv2 — это оригинальная и наиболее часто используемая версия. Для авторизации клиентов SNMP использует понятие сообществ. Сообщества могут иметь авторизацию только для чтения (это наиболее часто), или для чтения и записи (этот вариант не активно используется в VyOS).</p>
+<p>SNMP может работать синхронно или асинхронно. В синхронной коммуникации система мониторинга периодически запрашивает маршрутизатор. В асинхронном случае маршрутизатор отправляет уведомление на «trap» (управляющий хост).</p>
+<p>SNMPv2 не поддерживает никаких механизмов аутентификации, кроме адреса источника клиента, поэтому вы должны указать адреса клиентов, разрешенных для мониторинга маршрутизатора. Обратите внимание, что SNMPv2 также не поддерживает шифрования и всегда отправляет данные в открытом виде.</p>
+<section id="example">
+<h4>Пример</h4>
+<div class="highlight-none notranslate"><div class="highlight"><pre># Определить сообщество
+set service snmp community routers authorization ro
+
+# Разрешить доступ к мониторингу со всей сети
+set service snmp community routers network 192.0.2.0/24
+set service snmp community routers network 2001::db8:ffff:eeee::/64
+
+# Разрешить доступ к мониторингу с конкретных адресов
+set service snmp community routers client 203.0.113.10
+set service snmp community routers client 203.0.113.20
+
+# Определить дополнительную информацию о маршрутизаторе
+set service snmp location &quot;UK, London&quot;
+set service snmp contact &quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="94f5f0f9fdfad4f1ecf5f9e4f8f1baf7fbf9">[email&#160;protected]</a>&quot;
+
+# Цель тревоги, если вы хотите асинхронную связь
+set service snmp trap-target 203.0.113.10
+
+# Слушать только на определенных IP-адресах (порт по умолчанию 161)
+set service snmp listen-address 172.16.254.36 port 161
+set service snmp listen-address 2001:db8::f00::1
+</pre></div>
+</div>
+</section>
+</section>
+<section id="snmpv3">
+<h3>SNMPv3</h3>
+<p>SNMPv3 (третья версия протокола SNMP) ввёл целый ряд новых функций безопасности, которых не было в предыдущих версиях. Безопасность была одной из самых больших слабостей SNMP до версии 3. Аутентификация в SNMP-версиях 1 и 2 сводится к простому паролю (строке сообщества), передаваемому в открытом виде между менеджером и агентом. Каждое сообщение SNMPv3 содержит параметры безопасности, закодированные как октетная строка. Значение этих параметров зависит от используемой модели безопасности.</p>
+<p>Подход к безопасности в SNMPv3 направлен на:</p>
+<ul class="simple">
+<li><p>Конфиденциальность — шифрование пакетов, чтобы предотвратить прослушивание неавторизованным источником.</p></li>
+<li><p>Целостность — целостность сообщений, чтобы убедиться, что пакет не был изменён во время передачи, включая опциональный механизм защиты от повторного использования пакета.</p></li>
+<li><p>Аутентификацию — чтобы проверить, что сообщение исходит от действительного источника.</p></li>
+</ul>
+<section id="snmp-v3-example">
+<h4>Пример</h4>
+<ul class="simple">
+<li><p>Пусть демон SNMP слушает только на IP-адресе 192.0.2.1</p></li>
+<li><p>Настроить нового пользователя SNMP с именем «vyos» и паролем «vyos12345678»</p></li>
+<li><p>Новый пользователь будет использовать SHA/AES для аутентификации и конфиденциальности</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service snmp listen-address 192.0.2.1
+set service snmp location &#39;VyOS Datacenter&#39;
+set service snmp v3 engineid &#39;000000000000000000000002&#39;
+set service snmp v3 group default mode &#39;ro&#39;
+set service snmp v3 group default view &#39;default&#39;
+set service snmp v3 user vyos auth plaintext-password &#39;vyos12345678&#39;
+set service snmp v3 user vyos auth type &#39;sha&#39;
+set service snmp v3 user vyos group &#39;default&#39;
+set service snmp v3 user vyos privacy plaintext-password &#39;vyos12345678&#39;
+set service snmp v3 user vyos privacy type &#39;aes&#39;
+set service snmp v3 view default oid 1
+</pre></div>
+</div>
+<p>После выполнения commit, текстовые пароли будут хешироваться и храниться в вашей конфигурации. Результирующая конфигурация CLI будет выглядеть следующим образом:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# show service snmp
+ listen-address 192.0.2.1 {
+ }
+ location &quot;VyOS Datacenter&quot;
+ v3 {
+     engineid 000000000000000000000002
+     group default {
+         mode ro
+         view default
+     }
+     user vyos {
+         auth {
+             encrypted-password 4e52fe55fd011c9c51ae2c65f4b78ca93dcafdfe
+             type sha
+         }
+         group default
+         privacy {
+             encrypted-password 4e52fe55fd011c9c51ae2c65f4b78ca93dcafdfe
+             type aes
+         }
+     }
+     view default {
+         oid 1 {
+         }
+     }
+ }
+</pre></div>
+</div>
+<p>Вы можете протестировать функциональность SNMPv3 с любого Linux-системы, просто запустив следующую команду: <code class="docutils literal notranslate">snmpwalk -v 3 -u vyos -a SHA -A vyos12345678 -x AES -X vyos12345678 -l authPriv 192.0.2.1 .1</code></p>
+</section>
+</section>
+</section>
+<section id="vyos-mibs">
+<h2>MIBs VyOS</h2>
+<p>Все MIBs SNMP находятся в каждом образе VyOS здесь: <code class="docutils literal notranslate">/usr/share/snmp/mibs/</code></p>
+<p>Вы сможете загрузить файлы с помощью SCP, после того как сервис SSH будет активирован, например:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>scp -r vyos@your_router:/usr/share/snmp/mibs /your_folder/mibs
+</pre></div>
+</div>
+</section>
+<section id="snmp-extensions">
+<h2>Расширения SNMP</h2>
+<p>Чтобы расширить функциональность агента SNMP, можно запускать пользовательские скрипты каждый раз, когда вызывается агент. Это можно достичь, используя
+<code class="docutils literal notranslate">произвольные команды расширения</code>. Первым шагом является создание рабочего скрипта, затем загрузка его на ваш экземпляр VyOS через команду
+<code class="docutils literal notranslate">scp your_script.sh vyos&#64;your_router:/config/user-data</code>.
+После загрузки скрипта, он должен быть настроен с помощью команды ниже.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service snmp script-extensions extension-name my-extension script your_script.sh
+commit
+</pre></div>
+</div>
+<p>OID <code class="docutils literal notranslate">.1.3.6.1.4.1.8072.1.3.2.3.1.1.4.116.101.115.116</code>, при вызове, будет содержать вывод расширения.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>root@vyos:/home/vyos# snmpwalk -v2c  -c public 127.0.0.1 nsExtendOutput1
+NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.&quot;my-extension&quot; = STRING: hello
+NET-SNMP-EXTEND-MIB::nsExtendOutputFull.&quot;my-extension&quot; = STRING: hello
+NET-SNMP-EXTEND-MIB::nsExtendOutNumLines.&quot;my-extension&quot; = INTEGER: 1
+NET-SNMP-EXTEND-MIB::nsExtendResult.&quot;my-extension&quot; = INTEGER: 0
+</pre></div>
+</div>
+</section>
+<section id="solarwinds">
+<h2>SolarWinds</h2>
+<p>Если вы используете SolarWinds Orion как NMS, вы также можете использовать Управление шаблонами устройств. Шаблон для VyOS можно легко импортировать.</p>
+<p>Создайте файл с именем <code class="docutils literal notranslate">VyOS-1.3.6.1.4.1.44641.ConfigMgmt-Commands</code> с следующим содержанием:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>&lt;Configuration-Management Device=&quot;VyOS&quot; SystemOID=&quot;1.3.6.1.4.1.44641&quot;&gt;
+    &lt;Commands&gt;
+        &lt;Command Name=&quot;Reset&quot; Value=&quot;set terminal width 0${CRLF}set terminal length 0&quot;/&gt;
+        &lt;Command Name=&quot;Reboot&quot; Value=&quot;reboot${CRLF}Yes&quot;/&gt;
+        &lt;Command Name=&quot;EnterConfigMode&quot; Value=&quot;configure&quot;/&gt;
+        &lt;Command Name=&quot;ExitConfigMode&quot; Value=&quot;commit${CRLF}exit&quot;/&gt;
+        &lt;Command Name=&quot;DownloadConfig&quot; Value=&quot;show configuration commands&quot;/&gt;
+        &lt;Command Name=&quot;SaveConfig&quot; Value=&quot;commit${CRLF}save&quot;/&gt;
+        &lt;Command Name=&quot;Version&quot; Value=&quot;show version&quot;/&gt;
+        &lt;Command Name=&quot;MenuBased&quot; Value=&quot;False&quot;/&gt;
+        &lt;Command Name=&quot;VirtualPrompt&quot; Value=&quot;:~&quot;/&gt;
+    &lt;/Commands&gt;
+&lt;/Configuration-Management&gt;
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

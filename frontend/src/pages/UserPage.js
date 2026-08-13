@@ -1,6 +1,7 @@
 import { defineComponent, ref, onMounted, computed } from '/src/utils/vue-import.js';
 import { userApi, aclApi } from '/src/api/index.js';
-import { t } from '/src/i18n/index.js';
+import { useI18n } from '/src/i18n/index.js';
+import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
@@ -8,6 +9,7 @@ import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 export default defineComponent({
   name: 'UserPage',
   setup() {
+    const { t } = useI18n();
     const users = ref([]);
     const acls = ref([]);
     const modalVisible = ref(false);
@@ -16,6 +18,8 @@ export default defineComponent({
     const passwordUser = ref({ username: '', password: '' });
     const selected = ref([]);
     const message = ref('');
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
 
     async function load() {
       const [u, a] = await Promise.all([userApi.list(), aclApi.list()]);
@@ -37,7 +41,7 @@ export default defineComponent({
     }
 
     function edit() {
-      if (!selected.value.length) return alert(t('msg.noSelection'));
+      if (!selected.value.length) return showError({ message: t('msg.noSelection') });
       const u = users.value.find(x => x.username === selected.value[0]);
       if (!u) return;
       editingUser.value = { ...u, password: '' };
@@ -45,7 +49,7 @@ export default defineComponent({
     }
 
     function changePassword() {
-      if (!selected.value.length) return alert(t('msg.noSelection'));
+      if (!selected.value.length) return showError({ message: t('msg.noSelection') });
       passwordUser.value = { username: selected.value[0], password: '' };
       pwdModalVisible.value = true;
     }
@@ -56,17 +60,23 @@ export default defineComponent({
         pwdModalVisible.value = false;
         message.value = t('msg.saved');
       } catch (e) {
-        alert(e.message);
+        showError({ message: e.message });
       }
     }
 
     async function remove() {
-      if (!selected.value.length) return alert(t('msg.noSelection'));
-      if (!confirm(t('msg.confirmDelete'))) return;
-      for (const name of selected.value) {
+      if (!selected.value.length) return showError({ message: t('msg.noSelection') });
+      pendingDeleteNames.value = [...selected.value];
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemove() {
+      deleteModalVisible.value = false;
+      for (const name of pendingDeleteNames.value) {
         await userApi.delete(name);
       }
       selected.value = [];
+      pendingDeleteNames.value = [];
       await load();
     }
 
@@ -84,7 +94,7 @@ export default defineComponent({
         modalVisible.value = false;
         await load();
       } catch (e) {
-        alert(e.message);
+        showError({ message: e.message });
       }
     }
 
@@ -98,9 +108,11 @@ export default defineComponent({
       set(v) { editingUser.value.allowed_macs = v.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 8); },
     });
 
-    return {
+    return {t,
+      
       users, acls, modalVisible, pwdModalVisible, editingUser, passwordUser, selected, message,
-      aclMap, load, create, edit, remove, save, changePassword, savePassword, ipInput, macInput,
+      deleteModalVisible, pendingDeleteNames,
+      aclMap, load, create, edit, remove, confirmRemove, save, changePassword, savePassword, ipInput, macInput,
       columns: [
         { key: 'username', title: t('user.username') },
         { key: 'full_name', title: t('user.fullName') },
@@ -152,9 +164,15 @@ export default defineComponent({
         <div class="form-row"><label class="form-label">{{ $t('user.allowedIps') }}</label><textarea class="form-control" v-model="ipInput" :placeholder="$t('user.ipsHint')" /></div>
         <div class="form-row"><label class="form-label">{{ $t('user.allowedMacs') }}</label><textarea class="form-control" v-model="macInput" :placeholder="$t('user.macsHint')" /></div>
       </DraggableModal>
-      <DraggableModal v-model:visible="pwdModalVisible" title="修改密码" @confirm="savePassword">
+      <DraggableModal v-model:visible="pwdModalVisible" :title="$t('user.changePassword')" @confirm="savePassword">
         <div class="form-row"><label class="form-label">{{ $t('user.username') }}</label><input class="form-control" v-model="passwordUser.username" disabled /></div>
         <div class="form-row"><label class="form-label">{{ $t('user.password') }}</label><input class="form-control" type="password" v-model="passwordUser.password" /></div>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="$t('user.modals.confirmDelete')" width="400px" @confirm="confirmRemove">
+        <div>{{ $t('user.messages.confirmDeleteUser') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

@@ -3,6 +3,7 @@ import { opModeApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function isSeparator(line) {
   return /^\s*-+(\s+-+)*\s*$/.test(line);
@@ -47,23 +48,22 @@ function parseFixedTable(output) {
 export default defineComponent({
   name: 'SshFingerprintsPage',
   setup() {
+    const { t } = useI18n();
     const loading = ref(false);
     const rows = ref([]);
-    const rawOutput = ref('');
 
     const columns = [
-      { key: 'type', title: '类型' },
-      { key: 'key_size', title: '密钥大小' },
-      { key: 'fingerprint', title: '指纹' },
-      { key: 'comment', title: '注释' },
+      { key: 'type', title: t('sshFingerprints.columns.type') },
+      { key: 'key_size', title: t('sshFingerprints.columns.key_size') },
+      { key: 'fingerprint', title: t('sshFingerprints.columns.fingerprint') },
+      { key: 'comment', title: t('sshFingerprints.columns.comment') },
     ];
 
     async function load() {
       loading.value = true;
       try {
         const res = await opModeApi.show('ssh fingerprints');
-        rawOutput.value = res.output || '';
-        rows.value = parseFixedTable(rawOutput.value);
+        rows.value = parseFixedTable(res.output || '');
       } catch (e) {
         showError(e);
         rows.value = [];
@@ -74,23 +74,13 @@ export default defineComponent({
 
     onMounted(load);
 
-    return { loading, rows, columns, load, rawOutput };
+    return { loading, rows, columns, load, t };
   },
   components: { DataTable, ToolbarButton },
   template: `
     <div class="page-container">
-      <div class="toolbar toolbar-split">
-        <div class="toolbar-left"><h3>SSH 指纹</h3></div>
-        <div class="toolbar-right">
-          <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
-        </div>
-      </div>
       <div class="data-table-wrapper">
         <DataTable :columns="columns" :data="rows" row-key="type" :selectable="false" :external-toolbar="true" />
-      </div>
-      <div v-if="rawOutput" class="page-section">
-        <h4>原始输出</h4>
-        <pre style="background:#f5f5f5;padding:12px;border:1px solid #d0d0d0;overflow:auto;">{{ rawOutput }}</pre>
       </div>
     </div>
   `,

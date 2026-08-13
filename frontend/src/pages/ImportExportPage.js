@@ -1,9 +1,11 @@
 import { defineComponent, ref } from '/src/utils/vue-import.js';
 import { configApi, firewallApi } from '/src/api/index.js';
+import { useI18n } from '/src/i18n/index.js';
 
 export default defineComponent({
   name: 'ImportExportPage',
   setup() {
+    const { t } = useI18n();
     const password = ref('');
     const configText = ref('');
     const message = ref('');
@@ -21,7 +23,7 @@ export default defineComponent({
       try {
         const res = await configApi.export(password.value);
         configText.value = res.config;
-        setMessage('导出成功');
+        setMessage(t('importExport.message.exportSuccess'));
       } catch (e) {
         setMessage(e.message, true);
       }
@@ -30,7 +32,7 @@ export default defineComponent({
     async function doImport() {
       try {
         await configApi.load(configText.value, password.value);
-        setMessage('导入成功');
+        setMessage(t('importExport.message.importSuccess'));
       } catch (e) {
         setMessage(e.message, true);
       }
@@ -46,19 +48,19 @@ export default defineComponent({
         a.href = URL.createObjectURL(blob);
         a.download = `firewall_rules_${Date.now()}.${exportFormat.value}`;
         a.click();
-        setMessage('规则导出成功');
+        setMessage(t('importExport.message.ruleExportSuccess'));
       } catch (e) {
         setMessage(e.message, true);
       }
     }
 
     async function importFirewall() {
-      if (!importFile.value) return setMessage('请选择文件', true);
+      if (!importFile.value) return setMessage(t('importExport.message.selectFile'), true);
       try {
         const text = await importFile.value.text();
         const rows = parseCsv(text);
         await firewallApi.importRules(firewallPath.value, rows);
-        setMessage('规则导入成功');
+        setMessage(t('importExport.message.ruleImportSuccess'));
       } catch (e) {
         setMessage(e.message, true);
       }
@@ -76,15 +78,15 @@ export default defineComponent({
       });
     }
 
-    return { password, configText, message, error, firewallPath, importFile, exportFormat, doExport, doImport, exportFirewall, importFirewall };
+    return { t, password, configText, message, error, firewallPath, importFile, exportFormat, doExport, doImport, exportFirewall, importFirewall };
   },
   template: `
     <div>
       <div v-if="message" class="alert alert-info">{{ message }}</div>
       <div v-if="error" class="alert alert-error">{{ error }}</div>
-      <div class="toolbar"><div class="toolbar-left"><h3>整机配置导入/导出</h3></div></div>
-      <div class="form-row"><label class="form-label">密码</label><input class="form-control" type="password" v-model="password" /></div>
-      <div class="form-row"><label class="form-label">配置内容</label><textarea class="form-control" v-model="configText" rows="10"></textarea></div>
+      <div class="toolbar"><div class="toolbar-left"><h3>{{ t('importExport.title.configImportExport') }}</h3></div></div>
+      <div class="form-row"><label class="form-label">{{ t('importExport.label.password') }}</label><input class="form-control" type="password" v-model="password" /></div>
+      <div class="form-row"><label class="form-label">{{ t('importExport.label.configContent') }}</label><textarea class="form-control" v-model="configText" rows="10"></textarea></div>
       <div class="form-row"><label class="form-label"></label>
         <div style="display:flex;gap:8px;">
           <ToolbarButton icon="export" primary @click="doExport">{{ $t('config.export') }}</ToolbarButton>
@@ -92,19 +94,19 @@ export default defineComponent({
         </div>
       </div>
       <hr style="margin:20px 0;" />
-      <div class="toolbar"><div class="toolbar-left"><h3>防火墙规则导入/导出</h3></div></div>
-      <div class="form-row"><label class="form-label">规则路径</label><input class="form-control" v-model="firewallPath" /></div>
-      <div class="form-row"><label class="form-label">导出格式</label>
+      <div class="toolbar"><div class="toolbar-left"><h3>{{ t('importExport.title.firewallImportExport') }}</h3></div></div>
+      <div class="form-row"><label class="form-label">{{ t('importExport.label.rulePath') }}</label><input class="form-control" v-model="firewallPath" /></div>
+      <div class="form-row"><label class="form-label">{{ t('importExport.label.exportFormat') }}</label>
         <select class="form-control" v-model="exportFormat">
-          <option value="xlsx">Excel (.xlsx)</option>
-          <option value="csv">CSV (.csv)</option>
+          <option value="xlsx">{{ t('importExport.option.excel') }}</option>
+          <option value="csv">{{ t('importExport.option.csv') }}</option>
         </select>
       </div>
-      <div class="form-row"><label class="form-label">导入文件</label><input type="file" @change="importFile = $event.target.files[0]" /></div>
+      <div class="form-row"><label class="form-label">{{ t('importExport.label.importFile') }}</label><input type="file" @change="importFile = $event.target.files[0]" /></div>
       <div class="form-row"><label class="form-label"></label>
         <div style="display:flex;gap:8px;">
-          <ToolbarButton icon="export" primary @click="exportFirewall">导出规则</ToolbarButton>
-          <ToolbarButton icon="import" @click="importFirewall">导入规则</ToolbarButton>
+          <ToolbarButton icon="export" primary @click="exportFirewall">{{ t('importExport.button.exportRule') }}</ToolbarButton>
+          <ToolbarButton icon="import" @click="importFirewall">{{ t('importExport.button.importRule') }}</ToolbarButton>
         </div>
       </div>
     </div>

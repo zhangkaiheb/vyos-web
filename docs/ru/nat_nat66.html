@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="nat66-nptv6">
+<h1>NAT66(NPTv6)</h1>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Задача</p>
+<p>Преобразовать блоки команд в этом файле в директивы cfgcmd/opcmd для отслеживания покрытия команд.</p>
+</div>
+<p><abbr title="IPv6-to-IPv6 Network Prefix Translation">NPTv6</abbr> - это технология перевода адресов, основанная на сетях IPv6, используемая для преобразования префикса IPv6 в сообщении IPv6 в другой префикс IPv6. Мы называем этот метод перевода адресов NAT66. Устройства, поддерживающие функцию NAT66, называются устройствами NAT66, которые могут предоставлять функции перевода исходного и целевого адреса NAT66.</p>
+<section id="overview">
+<h2>Обзор</h2>
+<section id="different-nat-types">
+<h3>Различные типы NAT</h3>
+<section id="snat66">
+<h4>SNAT66</h4>
+<p><abbr title="Source IPv6-to-IPv6 Network Prefix Translation">SNPTv6</abbr> Функция преобразования используется в следующих сценариях:</p>
+<ul class="simple">
+<li><p>Одна внутренняя сеть и внешняя сеть. Используйте устройство NAT66 для подключения одной внутренней сети и публичной сети, а хосты в внутренней сети используют префиксы IPv6, которые поддерживают маршрутизацию только внутри локального диапазона. Когда хост в внутренней сети обращается к внешней сети, исходный префикс IPv6 в сообщении будет преобразован в глобальный одноранговый префикс IPv6 устройством NAT66.</p></li>
+<li><p>Резервирование и распределение нагрузки. На границе IPv6-сети к другой IPv6-сети имеется несколько устройств NAT66. Путь через устройство NAT66 к другой IPv6-сети формирует эквивалентный маршрут, и трафик может распределяться между этими устройствами NAT66. В этом случае вы можете настроить одинаковые правила перевода исходных адресов на этих устройствах NAT66, чтобы любое устройство NAT66 могло обрабатывать IPv6-трафик между разными сайтами.</p></li>
+<li><p>Мульти-хомед. В многохомедной сетевой среде устройство NAT66 подключается к внутренней сети и одновременно подключается к разным внешним сетям. На интерфейсе внешней сети устройства NAT66 можно настроить перевод адресов, чтобы преобразовать один и тот же внутренний адрес в различные внешние адреса и реализовать соответствие одного внутреннего адреса нескольким внешним адресам.</p></li>
+</ul>
+</section>
+<section id="dnat66">
+<h4>DNAT66</h4>
+<p>Функция перевода целевого адреса <abbr title="Destination IPv6-to-IPv6 Network Prefix Translation">DNPTv6</abbr> используется в сценариях, где сервер в внутренней сети предоставляет услуги внешней сети, например, предоставляет веб-сервисы или FTP-сервисы внешней сети. На интерфейсе внешней сети устройства NAT66 можно настроить соотношение между внутренним сервером и внешним сетевым адресом, чтобы пользователи внешней сети могли получить доступ к серверу внутренней сети через заданный внешний сетевой адрес.</p>
+</section>
+</section>
+<section id="prefix-conversion">
+<h3>Преобразование префиксов</h3>
+<section id="source-prefix">
+<h4>Исходный префикс</h4>
+<p>Каждое правило SNAT66 имеет определенную команду перевода. Префикс, определенный для перевода, используется при замене информации о адресе в пакете.</p>
+<p><a class="reference internal" href="#source-nat66">SNAT66</a> правило заменяет исходный адрес пакета и рассчитывает преобразованный адрес с использованием префикса, указанного в правиле.</p>
+<p>Пример:</p>
+<ul class="simple">
+<li><p>Преобразование префикса адреса единственной сети <code class="docutils literal notranslate">fc01::/64</code> в <code class="docutils literal notranslate">fc00::/64</code></p></li>
+<li><p>Выход через сеть <code class="docutils literal notranslate">eth0</code></p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat66 source rule 1 outbound-interface name &#39;eth0&#39;
+set nat66 source rule 1 source prefix &#39;fc01::/64&#39;
+set nat66 source rule 1 translation address &#39;fc00::/64&#39;
+</pre></div>
+</div>
+</section>
+<section id="destination-prefix">
+<h4>Целевой префикс</h4>
+<p>Для правила <a class="reference internal" href="#destination-nat66">DNAT66</a>, целевой адрес пакета заменяется на адрес, рассчитанный из указанного адреса или префикса в команде <code class="docutils literal notranslate">translation address</code>.</p>
+<p>Пример:</p>
+<ul class="simple">
+<li><p>Преобразование префикса адреса единственной сети <code class="docutils literal notranslate">fc00::/64</code> в <code class="docutils literal notranslate">fc01::/64</code></p></li>
+<li><p>Вход через сеть <code class="docutils literal notranslate">eth0</code></p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat66 destination rule 1 inbound-interface name &#39;eth0&#39;
+set nat66 destination rule 1 destination address &#39;fc00::/64&#39;
+set nat66 destination rule 1 translation address &#39;fc01::/64&#39;
+</pre></div>
+</div>
+<p>Для назначения также можно использовать группы вместо адреса.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group ipv6-address-group ADR-INSIDE-v6 address fc00::1
+
+set nat66 destination rule 1 inbound-interface name &#39;eth0&#39;
+set nat66 destination rule 1 destination group address-group ADR-INSIDE-v6
+set nat66 destination rule 1 translation address &#39;fc01::/64&#39;
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="configuration-examples">
+<h2>Примеры конфигурации</h2>
+<p>Используйте следующую топологию для создания изолированной сети на основе NAT66 между внутренней и внешней сетями (динамические префиксы не поддерживаются):</p>
+<figure class="align-default">
+<img alt="VyOS NAT66 Simple Configure" src="https://docs.vyos.io/en/rolling/_images/vyos_1_4_nat66_simple.webp" />
+</figure>
+<p>R1:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 ipv6 address autoconf
+set interfaces ethernet eth1 address &#39;fc01::1/64&#39;
+set nat66 destination rule 1 destination address &#39;fc00:470:f1cd:101::/64&#39;
+set nat66 destination rule 1 inbound-interface name &#39;eth0&#39;
+set nat66 destination rule 1 translation address &#39;fc01::/64&#39;
+set nat66 source rule 1 outbound-interface name &#39;eth0&#39;
+set nat66 source rule 1 source prefix &#39;fc01::/64&#39;
+set nat66 source rule 1 translation address &#39;fc00:470:f1cd:101::/64&#39;
+</pre></div>
+</div>
+<p>R2:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bridge br1 address &#39;fc01::2/64&#39;
+set interfaces bridge br1 member interface eth0
+set interfaces bridge br1 member interface eth1
+set protocols static route6 ::/0 next-hop fc01::1
+set service router-advert interface br1 prefix ::/0
+</pre></div>
+</div>
+<p>Используйте следующую топологию для перевода локальных адресов внутренних пользователей (<code class="docutils literal notranslate">fc::/7</code>) в префиксы, предоставленные ISP через VyOS HA-пару, с использованием виртуального интерфейса.</p>
+<figure class="align-default">
+<img alt="VyOS NAT66 DHCPv6 using a dummy interface" src="https://docs.vyos.io/en/rolling/_images/vyos_1_5_nat66_dhcpv6_wdummy.webp" />
+</figure>
+<p>Настройте оба маршрутизатора (a и b) для DHCPv6-PD через виртуальный интерфейс:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum1 description &#39;DHCPv6-PD NPT dummy&#39;
+set interfaces bonding bond0 vif 20 dhcpv6-options pd 0 interface dum1 address &#39;0&#39;
+set interfaces bonding bond0 vif 20 dhcpv6-options pd 1 interface dum1 address &#39;0&#39;
+set interfaces bonding bond0 vif 20 dhcpv6-options pd 2 interface dum1 address &#39;0&#39;
+set interfaces bonding bond0 vif 20 dhcpv6-options pd 3 interface dum1 address &#39;0&#39;
+set interfaces bonding bond0 vif 20 dhcpv6-options rapid-commit
+commit
+</pre></div>
+</div>
+<p>Получите префиксы DHCPv6-PD с обоих маршрутизаторов:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>trae@cr01a-vyos# run show interfaces dummy dum1 br
+Codes: S - State, L - Link, u - Up, D - Down, A - Admin Down
+Interface        IP Address                        S/L  Description
+---------        ----------                        ---  -----------
+dum1             2001:db8:123:b008::/64           u/u  DHCPv6-PD NPT dummy
+                 2001:db8:123:b00a::/64
+                 2001:db8:123:b00b::/64
+                 2001:db8:123:b009::/64
+
+trae@cr01b-vyos# run show int dummy dum1 brief
+Codes: S - State, L - Link, u - Up, D - Down, A - Admin Down
+Interface        IP Address                        S/L  Description
+---------        ----------                        ---  -----------
+dum1             2001:db8:123:b00d::/64           u/u  DHCPv6-PD NPT dummy
+                 2001:db8:123:b00c::/64
+                 2001:db8:123:b00e::/64
+                 2001:db8:123:b00f::/64
+</pre></div>
+</div>
+<p>Настройте маршрутизатор A для NPTv6 с использованием вышеуказанных префиксов:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat66 source rule 10 description &#39;NPT to VLAN 10&#39;
+set nat66 source rule 10 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 10 source prefix &#39;fd52:d62e:8011:a::/64&#39;
+set nat66 source rule 10 translation address &#39;2001:db8:123:b008::/64&#39;
+set nat66 source rule 20 description &#39;NPT to VLAN 70&#39;
+set nat66 source rule 20 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 20 source prefix &#39;fd52:d62e:8011:46::/64&#39;
+set nat66 source rule 20 translation address &#39;2001:db8:123:b009::/64&#39;
+set nat66 source rule 30 description &#39;NPT to VLAN 200&#39;
+set nat66 source rule 30 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 30 source prefix &#39;fd52:d62e:8011:c8::/64&#39;
+set nat66 source rule 30 translation address &#39;2001:db8:123:b00a::/64&#39;
+set nat66 source rule 40 description &#39;NPT to VLAN 240&#39;
+set nat66 source rule 40 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 40 source prefix &#39;fd52:d62e:8011:f0::/64&#39;
+set nat66 source rule 40 translation address &#39;2001:db8:123:b00b::/64&#39;
+commit
+</pre></div>
+</div>
+<p>Настройте маршрутизатор B для NPTv6 с использованием вышеуказанных префиксов:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat66 source rule 10 description &#39;NPT to VLAN 10&#39;
+set nat66 source rule 10 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 10 source prefix &#39;fd52:d62e:8011:a::/64&#39;
+set nat66 source rule 10 translation address &#39;2001:db8:123:b00c::/64&#39;
+set nat66 source rule 20 description &#39;NPT to VLAN 70&#39;
+set nat66 source rule 20 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 20 source prefix &#39;fd52:d62e:8011:46::/64&#39;
+set nat66 source rule 20 translation address &#39;2001:db8:123:b00d::/64&#39;
+set nat66 source rule 30 description &#39;NPT to VLAN 200&#39;
+set nat66 source rule 30 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 30 source prefix &#39;fd52:d62e:8011:c8::/64&#39;
+set nat66 source rule 30 translation address &#39;2001:db8:123:b00e::/64&#39;
+set nat66 source rule 40 description &#39;NPT to VLAN 240&#39;
+set nat66 source rule 40 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 40 source prefix &#39;fd52:d62e:8011:f0::/64&#39;
+set nat66 source rule 40 translation address &#39;2001:db8:123:b00f::/64&#39;
+commit
+</pre></div>
+</div>
+<p>Проверьте, что соединения затрагивают правило на обеих сторонах:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>trae@cr01a-vyos# run show nat66 source statistics
+Rule    Packets    Bytes    Interface
+------  ---------  -------  -----------
+10      1          104      bond0.20
+20      1          104      bond0.20
+30      8093       669445   bond0.20
+40      2446       216912   bond0.20
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

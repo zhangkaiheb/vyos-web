@@ -2,11 +2,13 @@ import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const ACTION_OPTIONS = [
   { value: 'permit', label: 'permit' },
@@ -14,12 +16,13 @@ const ACTION_OPTIONS = [
 ];
 
 const RULE_TABS = [
-  { key: 'basic', title: '基本' },
+  { key: 'basic', title: 'extcommunityList.tabs.basic' },
 ];
 
 export default defineComponent({
   name: 'ExtcommunityListPage',
   setup() {
+    const { t } = useI18n();
     const route = useRoute();
     const configStore = useConfigStore();
     const lists = ref([]);
@@ -36,6 +39,11 @@ export default defineComponent({
     const editingRuleOriginalNumber = ref('');
     const ruleActiveTab = ref('basic');
 
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
+    const ruleDeleteModalVisible = ref(false);
+    const pendingDeleteRuleNumbers = ref([]);
+
     const path = computed(() => route.path.replace(/^\//, '').replace(/\//g, ' '));
     const writeDisabled = computed(() => route.meta?.menuItem?.permission === 'read');
 
@@ -43,34 +51,36 @@ export default defineComponent({
       return !!editingList.value?.name;
     });
 
-    const listColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'description', title: '描述' },
-      { key: 'ruleCount', title: '规则数' },
-    ];
+    const listColumns = computed(() => [
+      { key: 'name', title: t('extcommunityList.columns.name') },
+      { key: 'description', title: t('extcommunityList.columns.description') },
+      { key: 'ruleCount', title: t('extcommunityList.columns.ruleCount') },
+    ]);
 
-    const ruleColumns = [
-      { key: 'rule', title: '规则编号' },
-      { key: 'action', title: '动作' },
-      { key: 'regex', title: '正则表达式' },
-      { key: 'description', title: '描述' },
-    ];
+    const ruleColumns = computed(() => [
+      { key: 'rule', title: t('extcommunityList.columns.rule') },
+      { key: 'action', title: t('extcommunityList.columns.action') },
+      { key: 'regex', title: t('extcommunityList.columns.regex') },
+      { key: 'description', title: t('extcommunityList.columns.description') },
+    ]);
 
     const listSchema = computed(() => [
-      { key: 'name', title: '名称', type: 'text', required: true, placeholder: '例如: e01' },
-      { key: 'description', title: '描述', type: 'text' },
+      { key: 'name', title: t('extcommunityList.labels.name'), type: 'text', required: true, placeholder: t('extcommunityList.placeholders.name') },
+      { key: 'description', title: t('extcommunityList.labels.description'), type: 'text' },
     ]);
 
     const basicRuleSchema = computed(() => [
-      { key: 'rule', title: '规则编号', type: 'number', min: 1, max: 65535, required: true, help: '范围 1-65535' },
-      { key: 'action', title: '动作', type: 'select', options: ACTION_OPTIONS, required: true },
-      { key: 'regex', title: '正则表达式', type: 'text', placeholder: '例如: rt 65001:100 或 soo 65001:100' },
-      { key: 'description', title: '描述', type: 'text' },
+      { key: 'rule', title: t('extcommunityList.labels.rule'), type: 'number', min: 1, max: 65535, required: true, help: t('extcommunityList.help.rule') },
+      { key: 'action', title: t('extcommunityList.labels.action'), type: 'select', options: ACTION_OPTIONS, required: true },
+      { key: 'regex', title: t('extcommunityList.labels.regex'), type: 'text', placeholder: t('extcommunityList.placeholders.regex') },
+      { key: 'description', title: t('extcommunityList.labels.description'), type: 'text' },
     ]);
 
     const ruleTabSchemas = computed(() => ({
       basic: basicRuleSchema.value,
     }));
+
+    const ruleTabs = computed(() => RULE_TABS.map(tab => ({ ...tab, title: t(tab.title) })));
 
     async function load() {
       loading.value = true;
@@ -99,7 +109,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(load);
+    onMounted(() => { load(); onMenuRefresh(load); });
     watch(() => route.path, () => {
       selectedListNames.value = [];
       selectedRuleNumbers.value = [];
@@ -122,8 +132,8 @@ export default defineComponent({
     function createList() { editingList.value = emptyList(); editingListOriginalName.value = ''; selectedRuleNumbers.value = []; listModalVisible.value = true; }
 
     async function editList() {
-      if (!selectedListNames.value.length) return showError({ message: '请选择一个扩展团体列表' });
-      if (selectedListNames.value.length > 1) return showError({ message: '请选择一个扩展团体列表' });
+      if (!selectedListNames.value.length) return showError({ message: t('extcommunityList.messages.selectList') });
+      if (selectedListNames.value.length > 1) return showError({ message: t('extcommunityList.messages.selectList') });
       const list = lists.value.find(l => l.name === selectedListNames.value[0]);
       if (!list) return;
       editingList.value = {
@@ -138,27 +148,35 @@ export default defineComponent({
     }
 
     async function removeList() {
-      if (!selectedListNames.value.length) return showError({ message: '请选择一个扩展团体列表' });
-      if (!confirm('确认删除选中的扩展团体列表及其所有规则？')) return;
-      for (const name of selectedListNames.value) {
+      if (!selectedListNames.value.length) return showError({ message: t('extcommunityList.messages.selectList') });
+      pendingDeleteNames.value = [...selectedListNames.value];
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveList() {
+      deleteModalVisible.value = false;
+      for (const name of pendingDeleteNames.value) {
         await configStore.deleteConfig(`${path.value} ${name}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selectedListNames.value = [];
+      pendingDeleteNames.value = [];
       await load();
     }
 
     async function saveList() {
-      if (!editingList.value.name) return showError({ message: '请输入名称' });
+      if (!editingList.value.name) return showError({ message: t('extcommunityList.messages.enterName') });
       const original = editingListOriginalName.value;
       if (!original && lists.value.some(l => l.name === editingList.value.name)) {
-        return showError({ message: '名称已存在' });
+        return showError({ message: t('extcommunityList.messages.nameExists') });
       }
       const value = {};
       if (editingList.value.description) value.description = editingList.value.description;
       try {
         if (original && original !== editingList.value.name) {
           await configStore.deleteConfig(`${path.value} ${original}`);
+          configStore.markPending();
           const newValue = { ...value };
           if (editingList.value.rules?.length) {
             const rules = {};
@@ -168,8 +186,10 @@ export default defineComponent({
             newValue.rule = rules;
           }
           await configStore.setConfig(`${path.value} ${editingList.value.name}`, newValue);
+          configStore.markPending();
         } else {
           await configStore.setConfig(`${path.value} ${editingList.value.name}`, value);
+          configStore.markPending();
         }
         listModalVisible.value = false;
         await configStore.checkSessionChanged();
@@ -181,9 +201,9 @@ export default defineComponent({
 
     function createRule() {
       if (!editingList.value) return;
-      if (!editingList.value.name) return showError({ message: '请先输入名称' });
+      if (!editingList.value.name) return showError({ message: t('extcommunityList.messages.enterNameFirst') });
       if (!editingListOriginalName.value && lists.value.some(l => l.name === editingList.value.name)) {
-        return showError({ message: '名称已存在' });
+        return showError({ message: t('extcommunityList.messages.nameExists') });
       }
       editingRule.value = emptyRule();
       editingRuleOriginalNumber.value = '';
@@ -193,8 +213,8 @@ export default defineComponent({
 
     function editRule() {
       if (!editingList.value) return;
-      if (!selectedRuleNumbers.value.length) return showError({ message: '请选择一条规则' });
-      if (selectedRuleNumbers.value.length > 1) return showError({ message: '请选择一条规则' });
+      if (!selectedRuleNumbers.value.length) return showError({ message: t('extcommunityList.messages.selectRule') });
+      if (selectedRuleNumbers.value.length > 1) return showError({ message: t('extcommunityList.messages.selectRule') });
       const row = editingList.value.rules.find(r => String(r.rule) === String(selectedRuleNumbers.value[0]));
       if (!row) return;
       editingRule.value = JSON.parse(JSON.stringify(row));
@@ -205,24 +225,31 @@ export default defineComponent({
 
     async function removeRule() {
       if (!editingList.value) return;
-      if (!selectedRuleNumbers.value.length) return showError({ message: '请选择一条规则' });
-      if (!confirm('确认删除选中的规则？')) return;
+      if (!selectedRuleNumbers.value.length) return showError({ message: t('extcommunityList.messages.selectRule') });
+      pendingDeleteRuleNumbers.value = [...selectedRuleNumbers.value];
+      ruleDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveRule() {
+      ruleDeleteModalVisible.value = false;
       const listName = editingList.value.name;
-      for (const num of selectedRuleNumbers.value) {
+      for (const num of pendingDeleteRuleNumbers.value) {
         await configStore.deleteConfig(`${path.value} ${listName} rule ${num}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selectedRuleNumbers.value = [];
+      pendingDeleteRuleNumbers.value = [];
       await loadListRules(listName);
       await load();
     }
 
     function validateRule() {
       const r = editingRule.value;
-      if (!r.rule) return '请输入规则编号';
+      if (!r.rule) return t('extcommunityList.errors.ruleNumberRequired');
       const n = parseInt(r.rule, 10);
-      if (isNaN(n) || n < 1 || n > 65535) return '规则编号范围 1-65535';
-      if (!r.action) return '请选择动作';
+      if (isNaN(n) || n < 1 || n > 65535) return t('extcommunityList.errors.ruleNumberRange');
+      if (!r.action) return t('extcommunityList.errors.actionRequired');
       return '';
     }
 
@@ -233,7 +260,7 @@ export default defineComponent({
       const listName = editingList.value.name;
       const original = editingRuleOriginalNumber.value;
       if (!original && editingList.value.rules.some(r => String(r.rule) === String(editingRule.value.rule))) {
-        return showError({ message: '规则编号已存在' });
+        return showError({ message: t('extcommunityList.errors.ruleNumberExists') });
       }
       const value = {};
       if (editingRule.value.action) value.action = editingRule.value.action;
@@ -242,8 +269,10 @@ export default defineComponent({
       try {
         if (original && String(original) !== String(editingRule.value.rule)) {
           await configStore.deleteConfig(`${path.value} ${listName} rule ${original}`);
+          configStore.markPending();
         }
         await configStore.setConfig(`${path.value} ${listName} rule ${editingRule.value.rule}`, value);
+        configStore.markPending();
         ruleModalVisible.value = false;
         await configStore.checkSessionChanged();
         await load();
@@ -259,10 +288,11 @@ export default defineComponent({
       lists, loading, selectedListNames, selectedRuleNumbers,
       listModalVisible, editingList, editingListOriginalName,
       ruleModalVisible, ruleActiveTab, editingRule, editingRuleOriginalNumber,
-      listColumns, ruleColumns, listSchema, ruleTabs: RULE_TABS, ruleTabSchemas,
-      path, writeDisabled, canCreateRule, ACTION_OPTIONS,
-      load, createList, editList, removeList, saveList,
-      createRule, editRule, removeRule, saveRule, loadListRules,
+      deleteModalVisible, pendingDeleteNames, ruleDeleteModalVisible, pendingDeleteRuleNumbers,
+      listColumns, ruleColumns, listSchema, ruleTabs, ruleTabSchemas,
+      path, writeDisabled, canCreateRule, ACTION_OPTIONS, t,
+      load, createList, editList, removeList, confirmRemoveList, saveList,
+      createRule, editRule, removeRule, confirmRemoveRule, saveRule, loadListRules,
     };
   },
   template: `
@@ -270,10 +300,10 @@ export default defineComponent({
       <div class="section">
         <div class="toolbar">
           <div class="toolbar-left">
-            <ToolbarButton icon="create" @click="createList" :disabled="writeDisabled">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editList" :disabled="writeDisabled || !selectedListNames.length || selectedListNames.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeList" :disabled="writeDisabled || !selectedListNames.length">删除</ToolbarButton>
-            <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+            <ToolbarButton icon="create" @click="createList" :disabled="writeDisabled">{{ t('extcommunityList.buttons.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editList" :disabled="writeDisabled || !selectedListNames.length || selectedListNames.length > 1">{{ t('extcommunityList.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeList" :disabled="writeDisabled || !selectedListNames.length">{{ t('extcommunityList.buttons.delete') }}</ToolbarButton>
+            <ToolbarButton icon="refresh" @click="load">{{ t('extcommunityList.buttons.refresh') }}</ToolbarButton>
           </div>
         </div>
         <DataTable :columns="listColumns" :data="lists" :loading="loading" :disabled="writeDisabled"
@@ -282,16 +312,16 @@ export default defineComponent({
       </div>
       <div class="section">
       </div>
-      <DraggableModal v-model:visible="listModalVisible" :title="editingListOriginalName ? '编辑' : '创建'" width="780px" @confirm="saveList">
+      <DraggableModal v-model:visible="listModalVisible" :title="editingListOriginalName ? t('extcommunityList.modals.editList') : t('extcommunityList.modals.createList')" width="780px" @confirm="saveList">
         <div>
           <ConfigForm v-model="editingList" :schema="listSchema" :disabled="writeDisabled" :showAdvanced="true" />
           <div style="margin-top:16px;">
-            <div class="section-title" style="font-weight:bold;margin-bottom:8px;">规则</div>
+            <div class="section-title" style="font-weight:bold;margin-bottom:8px;">{{ t('extcommunityList.sections.rules') }}</div>
             <div class="toolbar toolbar-compact">
               <div class="toolbar-left">
-                <ToolbarButton icon="create" @click="createRule" :disabled="writeDisabled || !canCreateRule">创建</ToolbarButton>
-                <ToolbarButton icon="edit" @click="editRule" :disabled="writeDisabled || !selectedRuleNumbers.length || selectedRuleNumbers.length > 1">编辑</ToolbarButton>
-                <ToolbarButton icon="delete" @click="removeRule" :disabled="writeDisabled || !selectedRuleNumbers.length">删除</ToolbarButton>
+                <ToolbarButton icon="create" @click="createRule" :disabled="writeDisabled || !canCreateRule">{{ t('extcommunityList.buttons.create') }}</ToolbarButton>
+                <ToolbarButton icon="edit" @click="editRule" :disabled="writeDisabled || !selectedRuleNumbers.length || selectedRuleNumbers.length > 1">{{ t('extcommunityList.buttons.edit') }}</ToolbarButton>
+                <ToolbarButton icon="delete" @click="removeRule" :disabled="writeDisabled || !selectedRuleNumbers.length">{{ t('extcommunityList.buttons.delete') }}</ToolbarButton>
               </div>
             </div>
             <DataTable :columns="ruleColumns" :data="editingList.rules" :disabled="writeDisabled"
@@ -300,12 +330,24 @@ export default defineComponent({
           </div>
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ruleModalVisible" :title="editingRuleOriginalNumber ? '编辑规则' : '创建规则'" width="780px" @confirm="saveRule" modal-class="on-top">
+      <DraggableModal v-model:visible="ruleModalVisible" :title="editingRuleOriginalNumber ? t('extcommunityList.modals.editRule') : t('extcommunityList.modals.createRule')" width="780px" @confirm="saveRule" modal-class="on-top">
         <TabGroup v-model="ruleActiveTab" :tabs="ruleTabs">
           <template #basic>
             <ConfigForm v-model="editingRule" :schema="ruleTabSchemas.basic" :disabled="writeDisabled" :showAdvanced="true" />
           </template>
         </TabGroup>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('extcommunityList.modals.confirmDelete')" width="400px" @confirm="confirmRemoveList">
+        <div>{{ t('extcommunityList.messages.confirmDeleteList') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+      <DraggableModal v-model:visible="ruleDeleteModalVisible" :title="t('extcommunityList.modals.confirmDelete')" width="400px" @confirm="confirmRemoveRule">
+        <div>{{ t('extcommunityList.messages.confirmDeleteRule') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="num in pendingDeleteRuleNumbers" :key="num" style="padding:2px 0;">{{ num }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

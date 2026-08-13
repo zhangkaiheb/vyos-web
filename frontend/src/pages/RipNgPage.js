@@ -1,10 +1,13 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -21,27 +24,9 @@ function isPresent(value) {
   return true;
 }
 
-function validateIPv6Prefix(value) {
-  if (!value) return '';
-  if (!/^[0-9a-fA-F:]+\/\d{1,3}$/.test(value)) return 'IPv6 前缀格式错误 (例如: 2001:db8::/32)';
-  return '';
-}
+// Validation functions moved inside setup() for i18n access
 
-function validateMetric(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 0 || n > 16) return '度量值必须在 0-16 之间';
-  return '';
-}
-
-function validateTimer(value, min, max, name) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < min || n > max) return `${name}必须在 ${min}-${max} 之间`;
-  return '';
-}
-
-// RIPng 配置转换
+// RIPng configuration conversion
 function configToForm(data = {}) {
   const interfaces = [];
   const interfaceData = data.interface || {};
@@ -160,6 +145,8 @@ function configToConfig(form) {
 export default defineComponent({
   name: 'RipNgPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -172,6 +159,27 @@ export default defineComponent({
     const newPassiveInterface = ref('');
     const interfaces = ref([]);
 
+    // Validation functions with i18n
+    function validateIPv6Prefix(value) {
+      if (!value) return '';
+      if (!/^[0-9a-fA-F:]+\/\d{1,3}$/.test(value)) return t('validation.ipv6PrefixFormat');
+      return '';
+    }
+
+    function validateMetric(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 0 || n > 16) return t('validation.metricRange');
+      return '';
+    }
+
+    function validateTimer(value, min, max, name) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < min || n > max) return t('validation.timerRange');
+      return '';
+    }
+
     const interfaceModalVisible = ref(false);
     const editingInterfaceIndex = ref(-1);
     const interfaceForm = ref({ name: '', 'split-horizon': '' });
@@ -180,16 +188,16 @@ export default defineComponent({
     const editingRedistributeIndex = ref(-1);
     const redistributeForm = ref({ protocol: '', metric: '', 'route-map': '' });
 
-    const interfaceColumns = [
-      { key: 'name', title: '接口名称' },
-      { key: 'split-horizon', title: '水平分割' },
-    ];
+    const interfaceColumns = computed(() => [
+      { key: 'name', title: t('ripNg.col.interfaceName') },
+      { key: 'split-horizon', title: t('ripNg.col.splitHorizon') },
+    ]);
 
-    const redistributeColumns = [
-      { key: 'protocol', title: '协议' },
-      { key: 'metric', title: '度量值' },
-      { key: 'route-map', title: '路由映射' },
-    ];
+    const redistributeColumns = computed(() => [
+      { key: 'protocol', title: t('ripNg.col.protocol') },
+      { key: 'metric', title: t('ripNg.col.metric') },
+      { key: 'route-map', title: t('ripNg.col.routeMap') },
+    ]);
 
     const commandPath = computed(() => {
       if (activeTab.value === 'interfaces') return 'protocols ripng interface';
@@ -198,11 +206,11 @@ export default defineComponent({
       return 'protocols ripng';
     });
 
-    const SPLIT_HORIZON_OPTIONS = [
-      { value: '', label: '默认' },
-      { value: 'disable', label: '禁用' },
+    const SPLIT_HORIZON_OPTIONS = computed(() => [
+      { value: '', label: t('option.default') },
+      { value: 'disable', label: t('option.disable') },
       { value: 'poison-reverse', label: 'Poison Reverse' },
-    ];
+    ]);
 
     const REDISTRIBUTE_PROTOCOL_OPTIONS = [
       { value: 'babel', label: 'Babel' },
@@ -238,18 +246,19 @@ export default defineComponent({
     async function save() {
       if (config.value['default-metric']) {
         const err = validateMetric(config.value['default-metric']);
-        if (err) return alert(`默认度量值：${err}`);
+        if (err) return showError({ message: t('ripNg.error.defaultMetric') + err });
       }
       for (let i = 0; i < config.value.networks.length; i++) {
         const err = validateIPv6Prefix(config.value.networks[i]);
-        if (err) return alert(`网络 ${i + 1}：${err}`);
+        if (err) return showError({ message: t('ripNg.error.network', { index: i + 1 }) + err });
       }
 
       saving.value = true;
       saved.value = false;
       try {
         const payload = configToConfig(config.value);
-        await configApi.set('protocols ripng', payload);
+        await configStore.setConfig('protocols ripng', payload);
+        configStore.markPending();
         saved.value = true;
         setTimeout(() => (saved.value = false), 2000);
         interfaceModalVisible.value = false;
@@ -305,7 +314,7 @@ export default defineComponent({
     }
 
     function saveInterface() {
-      if (!interfaceForm.value.name) return alert('请输入接口名称');
+      if (!interfaceForm.value.name) return showError({ message: t('ripNg.error.interfaceNameRequired') });
       if (editingInterfaceIndex.value >= 0) {
         config.value.interfaces.splice(editingInterfaceIndex.value, 1, JSON.parse(JSON.stringify(interfaceForm.value)));
       } else {
@@ -325,10 +334,10 @@ export default defineComponent({
     }
 
     function saveRedistribute() {
-      if (!redistributeForm.value.protocol) return alert('请选择协议');
+      if (!redistributeForm.value.protocol) return showError({ message: t('ripNg.error.protocolRequired') });
       if (redistributeForm.value.metric) {
         const err = validateMetric(redistributeForm.value.metric);
-        if (err) return alert(err);
+        if (err) return showError({ message: err });
       }
       if (editingRedistributeIndex.value >= 0) {
         config.value.redistributes.splice(editingRedistributeIndex.value, 1, JSON.parse(JSON.stringify(redistributeForm.value)));
@@ -338,19 +347,49 @@ export default defineComponent({
       redistributeModalVisible.value = false;
     }
 
+    // Delete confirmation modals
+    const deleteInterfaceModalVisible = ref(false);
+    const pendingDeleteInterfaceNames = ref([]);
+
+    const deleteRedistributeModalVisible = ref(false);
+    const pendingDeleteRedistributeNames = ref([]);
+
     function deleteInterface(index) {
-      if (confirm('确定删除此接口？')) config.value.interfaces.splice(index, 1);
+      pendingDeleteInterfaceNames.value = [config.value.interfaces[index].name];
+      deleteInterfaceModalVisible.value = true;
     }
+
+    function confirmDeleteInterface() {
+      const index = config.value.interfaces.findIndex(a => a.name === pendingDeleteInterfaceNames.value[0]);
+      if (index >= 0) {
+        config.value.interfaces.splice(index, 1);
+      }
+      deleteInterfaceModalVisible.value = false;
+      pendingDeleteInterfaceNames.value = [];
+    }
+
     function deleteRedistribute(index) {
-      if (confirm('确定删除此重分发配置？')) config.value.redistributes.splice(index, 1);
+      pendingDeleteRedistributeNames.value = [config.value.redistributes[index].protocol];
+      deleteRedistributeModalVisible.value = true;
+    }
+
+    function confirmDeleteRedistribute() {
+      const index = config.value.redistributes.findIndex(a => a.protocol === pendingDeleteRedistributeNames.value[0]);
+      if (index >= 0) {
+        config.value.redistributes.splice(index, 1);
+      }
+      deleteRedistributeModalVisible.value = false;
+      pendingDeleteRedistributeNames.value = [];
     }
 
     onMounted(() => {
       load();
       loadInterfaces();
+      onMenuRefresh(load);
     });
 
-    return {
+    return {t,
+      
       loading, saving, saved, config, activeTab, writeDisabled,
       interfaces,
       newNetwork, newAggregate, newRoute, newPassiveInterface,
@@ -362,6 +401,9 @@ export default defineComponent({
       SPLIT_HORIZON_OPTIONS, REDISTRIBUTE_PROTOCOL_OPTIONS, commandPath,
       openInterfaceModal, openRedistributeModal,
       deleteInterface, deleteRedistribute,
+      confirmDeleteInterface, confirmDeleteRedistribute,
+      deleteInterfaceModalVisible, pendingDeleteInterfaceNames,
+      deleteRedistributeModalVisible, pendingDeleteRedistributeNames,
       saveInterface, saveRedistribute,
       save, configToConfig,
     };
@@ -369,52 +411,52 @@ export default defineComponent({
   components: { TabGroup, ToolbarButton, DataTable, DraggableModal },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('msg.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本设置' },
-        { key: 'interfaces', title: '接口' },
-        { key: 'networks', title: '网络' },
-        { key: 'aggregate', title: '聚合地址' },
-        { key: 'routes', title: '静态路由' },
-        { key: 'redistribute', title: '重分发' },
-        { key: 'passive', title: '被动接口' },
-        { key: 'timers', title: '定时器' },
-        { key: 'default-info', title: '默认信息' }
+        { key: 'basic', title: t('ripNg.tab.basic') },
+        { key: 'interfaces', title: t('ripNg.tab.interfaces') },
+        { key: 'networks', title: t('ripNg.tab.networks') },
+        { key: 'aggregate', title: t('ripNg.tab.aggregate') },
+        { key: 'routes', title: t('ripNg.tab.routes') },
+        { key: 'redistribute', title: t('ripNg.tab.redistribute') },
+        { key: 'passive', title: t('ripNg.tab.passive') },
+        { key: 'timers', title: t('ripNg.tab.timers') },
+        { key: 'default-info', title: t('ripNg.tab.defaultInfo') }
       ]">
 
         <template #basic>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">基本配置</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ripNg.basic.title') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">默认度量值</label>
+                  <label class="form-label">{{ t('ripNg.basic.defaultMetric') }}</label>
                   <input type="number" class="form-control" v-model="config['default-metric']" min="0" max="16" placeholder="0-16" style="width:100%;" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">路由映射</label>
-                  <input type="text" class="form-control" v-model="config['route-map']" placeholder="路由映射名称" style="width:100%;" />
+                  <label class="form-label">{{ t('ripNg.basic.routeMap') }}</label>
+                  <input type="text" class="form-control" v-model="config['route-map']" :placeholder="t('ripNg.basic.routeMapPlaceholder')" style="width:100%;" />
                 </div>
               </div>
             </div>
             <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">分发列表</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('ripNg.basic.distributeList') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">访问列表 (入)</label>
-                  <input type="text" class="form-control" v-model="config['distribute-list']['access-list'].in" placeholder="访问列表名称" style="width:100%;" />
+                  <label class="form-label">{{ t('ripNg.basic.accessListIn') }}</label>
+                  <input type="text" class="form-control" v-model="config['distribute-list']['access-list'].in" :placeholder="t('ripNg.basic.accessListPlaceholder')" style="width:100%;" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">访问列表 (出)</label>
-                  <input type="text" class="form-control" v-model="config['distribute-list']['access-list'].out" placeholder="访问列表名称" style="width:100%;" />
+                  <label class="form-label">{{ t('ripNg.basic.accessListOut') }}</label>
+                  <input type="text" class="form-control" v-model="config['distribute-list']['access-list'].out" :placeholder="t('ripNg.basic.accessListPlaceholder')" style="width:100%;" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">前缀列表 (入)</label>
-                  <input type="text" class="form-control" v-model="config['distribute-list']['prefix-list'].in" placeholder="前缀列表名称" style="width:100%;" />
+                  <label class="form-label">{{ t('ripNg.basic.prefixListIn') }}</label>
+                  <input type="text" class="form-control" v-model="config['distribute-list']['prefix-list'].in" :placeholder="t('ripNg.basic.prefixListPlaceholder')" style="width:100%;" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">前缀列表 (出)</label>
-                  <input type="text" class="form-control" v-model="config['distribute-list']['prefix-list'].out" placeholder="前缀列表名称" style="width:100%;" />
+                  <label class="form-label">{{ t('ripNg.basic.prefixListOut') }}</label>
+                  <input type="text" class="form-control" v-model="config['distribute-list']['prefix-list'].out" :placeholder="t('ripNg.basic.prefixListPlaceholder')" style="width:100%;" />
                 </div>
               </div>
             </div>
@@ -430,15 +472,15 @@ export default defineComponent({
         <template #networks>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">网络</label>
+              <label class="form-label">{{ t('ripNg.networks.label') }}</label>
               <div style="display:flex; gap:10px; align-items:center;">
-                <input type="text" class="form-control" v-model="newNetwork" placeholder="例如: 2001:db8::/32" style="width:100%;" />
-                <ToolbarButton size="small" @click="addNetwork">添加</ToolbarButton>
+                <input type="text" class="form-control" v-model="newNetwork" :placeholder="t('ripNg.networks.placeholder')" style="width:100%;" />
+                <ToolbarButton size="small" @click="addNetwork">{{ t('btn.add') }}</ToolbarButton>
               </div>
             </div>
             <div v-for="(n, idx) in config.networks" :key="idx" style="display:flex; gap:10px; margin-bottom:5px; align-items:center;">
               <span>{{ n }}</span>
-              <ToolbarButton size="small" danger @click="removeNetwork(idx)">删除</ToolbarButton>
+              <ToolbarButton size="small" danger @click="removeNetwork(idx)">{{ t('btn.delete') }}</ToolbarButton>
             </div>
           </div>
         </template>
@@ -446,15 +488,15 @@ export default defineComponent({
         <template #aggregate>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">聚合地址</label>
+              <label class="form-label">{{ t('ripNg.aggregate.label') }}</label>
               <div style="display:flex; gap:10px; align-items:center;">
-                <input type="text" class="form-control" v-model="newAggregate" placeholder="例如: 2001:db8::/48" style="width:100%;" />
-                <ToolbarButton size="small" @click="addAggregate">添加</ToolbarButton>
+                <input type="text" class="form-control" v-model="newAggregate" :placeholder="t('ripNg.aggregate.placeholder')" style="width:100%;" />
+                <ToolbarButton size="small" @click="addAggregate">{{ t('btn.add') }}</ToolbarButton>
               </div>
             </div>
             <div v-for="(n, idx) in config.aggregateAddresses" :key="idx" style="display:flex; gap:10px; margin-bottom:5px; align-items:center;">
               <span>{{ n }}</span>
-              <ToolbarButton size="small" danger @click="removeAggregate(idx)">删除</ToolbarButton>
+              <ToolbarButton size="small" danger @click="removeAggregate(idx)">{{ t('btn.delete') }}</ToolbarButton>
             </div>
           </div>
         </template>
@@ -462,15 +504,15 @@ export default defineComponent({
         <template #routes>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">静态路由</label>
+              <label class="form-label">{{ t('ripNg.routes.label') }}</label>
               <div style="display:flex; gap:10px; align-items:center;">
-                <input type="text" class="form-control" v-model="newRoute" placeholder="例如: 2001:db8:1::/48" style="width:100%;" />
-                <ToolbarButton size="small" @click="addRoute">添加</ToolbarButton>
+                <input type="text" class="form-control" v-model="newRoute" :placeholder="t('ripNg.routes.placeholder')" style="width:100%;" />
+                <ToolbarButton size="small" @click="addRoute">{{ t('btn.add') }}</ToolbarButton>
               </div>
             </div>
             <div v-for="(r, idx) in config.routes" :key="idx" style="display:flex; gap:10px; margin-bottom:5px; align-items:center;">
               <span>{{ r }}</span>
-              <ToolbarButton size="small" danger @click="removeRoute(idx)">删除</ToolbarButton>
+              <ToolbarButton size="small" danger @click="removeRoute(idx)">{{ t('btn.delete') }}</ToolbarButton>
             </div>
           </div>
         </template>
@@ -484,18 +526,18 @@ export default defineComponent({
         <template #passive>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">被动接口</label>
+              <label class="form-label">{{ t('ripNg.passive.label') }}</label>
               <div style="display:flex; gap:10px; align-items:center;">
                 <select class="form-control" v-model="newPassiveInterface" style="width:100%;">
-                  <option value="">请选择接口</option>
+                  <option value="">{{ t('ripNg.passive.selectPlaceholder') }}</option>
                   <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
                 </select>
-                <ToolbarButton size="small" @click="addPassiveInterface">添加</ToolbarButton>
+                <ToolbarButton size="small" @click="addPassiveInterface">{{ t('btn.add') }}</ToolbarButton>
               </div>
             </div>
             <div v-for="(iface, idx) in config['passive-interface']" :key="idx" style="display:flex; gap:10px; margin-bottom:5px; align-items:center;">
               <span>{{ iface }}</span>
-              <ToolbarButton size="small" danger @click="removePassiveInterface(idx)">删除</ToolbarButton>
+              <ToolbarButton size="small" danger @click="removePassiveInterface(idx)">{{ t('btn.delete') }}</ToolbarButton>
             </div>
           </div>
         </template>
@@ -503,16 +545,16 @@ export default defineComponent({
         <template #timers>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">垃圾回收定时器</label>
-              <input type="number" class="form-control" v-model="config.timers['garbage-collection']" min="1" max="65535" placeholder="默认: 120 秒" style="width:100%;" />
+              <label class="form-label">{{ t('ripNg.timers.garbageCollection') }}</label>
+              <input type="number" class="form-control" v-model="config.timers['garbage-collection']" min="1" max="65535" :placeholder="t('ripNg.timers.garbageCollectionPlaceholder')" style="width:100%;" />
             </div>
             <div class="form-row">
-              <label class="form-label">超时定时器</label>
-              <input type="number" class="form-control" v-model="config.timers.timeout" min="1" max="65535" placeholder="默认: 180 秒" style="width:100%;" />
+              <label class="form-label">{{ t('ripNg.timers.timeout') }}</label>
+              <input type="number" class="form-control" v-model="config.timers.timeout" min="1" max="65535" :placeholder="t('ripNg.timers.timeoutPlaceholder')" style="width:100%;" />
             </div>
             <div class="form-row">
-              <label class="form-label">更新定时器</label>
-              <input type="number" class="form-control" v-model="config.timers.update" min="1" max="65535" placeholder="默认: 30 秒" style="width:100%;" />
+              <label class="form-label">{{ t('ripNg.timers.update') }}</label>
+              <input type="number" class="form-control" v-model="config.timers.update" min="1" max="65535" :placeholder="t('ripNg.timers.updatePlaceholder')" style="width:100%;" />
             </div>
           </div>
         </template>
@@ -520,34 +562,30 @@ export default defineComponent({
         <template #default-info>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">通告默认路由</label>
+              <label class="form-label">{{ t('ripNg.defaultInfo.originate') }}</label>
               <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['default-information'].originate" /></label>
             </div>
           </div>
         </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
-
       <!-- Interface Modal -->
-      <DraggableModal v-model:visible="interfaceModalVisible" :title="editingInterfaceIndex >= 0 ? '编辑 RIPng 接口' : '添加 RIPng 接口'" width="600px" @confirm="saveInterface">
+      <DraggableModal v-model:visible="interfaceModalVisible" :title="editingInterfaceIndex >= 0 ? t('ripNg.modal.editInterface') : t('ripNg.modal.addInterface')" width="600px" @confirm="saveInterface">
         <div class="form-row">
-          <label class="form-label">接口名称 *</label>
+          <label class="form-label">{{ t('ripNg.modal.interfaceName') }} *</label>
           <template v-if="editingInterfaceIndex >= 0">
             <input type="text" class="form-control" v-model="interfaceForm.name"
                    style="width:100%;" disabled />
           </template>
           <template v-else>
             <select class="form-control" v-model="interfaceForm.name" style="width:100%;">
-              <option value="">请选择接口</option>
+              <option value="">{{ t('ripNg.modal.selectInterface') }}</option>
               <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
             </select>
           </template>
         </div>
         <div class="form-row">
-          <label class="form-label">水平分割</label>
+          <label class="form-label">{{ t('ripNg.modal.splitHorizon') }}</label>
           <select class="form-control" v-model="interfaceForm['split-horizon']" style="width:100%;">
             <option v-for="opt in SPLIT_HORIZON_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
@@ -555,20 +593,35 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Redistribute Modal -->
-      <DraggableModal v-model:visible="redistributeModalVisible" :title="editingRedistributeIndex >= 0 ? '编辑 RIPng 重分发' : '添加 RIPng 重分发'" width="600px" @confirm="saveRedistribute">
+      <DraggableModal v-model:visible="redistributeModalVisible" :title="editingRedistributeIndex >= 0 ? t('ripNg.modal.editRedistribute') : t('ripNg.modal.addRedistribute')" width="600px" @confirm="saveRedistribute">
         <div class="form-row">
-          <label class="form-label">协议 *</label>
+          <label class="form-label">{{ t('ripNg.modal.protocol') }} *</label>
           <select class="form-control" v-model="redistributeForm.protocol" style="width:100%;" :disabled="editingRedistributeIndex >= 0">
             <option v-for="opt in REDISTRIBUTE_PROTOCOL_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">度量值</label>
+          <label class="form-label">{{ t('ripNg.modal.metric') }}</label>
           <input type="number" class="form-control" v-model="redistributeForm.metric" min="0" max="16" placeholder="0-16" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="redistributeForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('ripNg.modal.routeMap') }}</label>
+          <input type="text" class="form-control" v-model="redistributeForm['route-map']" :placeholder="t('ripNg.modal.routeMapPlaceholder')" style="width:100%;" />
+        </div>
+      </DraggableModal>
+
+      <!-- Delete Confirmation Modals -->
+      <DraggableModal v-model:visible="deleteInterfaceModalVisible" :title="t('modal.confirmDelete')" width="400px" @confirm="confirmDeleteInterface">
+        <div>{{ t('ripNg.delete.confirmInterface') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteInterfaceNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="deleteRedistributeModalVisible" :title="t('modal.confirmDelete')" width="400px" @confirm="confirmDeleteRedistribute">
+        <div>{{ t('ripNg.delete.confirmRedistribute') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteRedistributeNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
     </div>

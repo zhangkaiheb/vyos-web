@@ -1,0 +1,457 @@
+{
+  "zh-CN": {
+    "prefixList6": {
+      "tabs": {
+        "basic": "基本"
+      },
+      "columns": {
+        "name": "名称",
+        "description": "描述",
+        "ruleCount": "规则数",
+        "rule": "规则编号",
+        "action": "动作",
+        "prefix": "IPv6 前缀",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "labels": {
+        "name": "名称",
+        "description": "描述",
+        "rule": "规则编号",
+        "action": "动作",
+        "prefix": "IPv6 前缀",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "placeholders": {
+        "name": "例如: p01",
+        "prefix": "例如: 2001:db8::/32",
+        "ge": "0-128",
+        "le": "0-128"
+      },
+      "help": {
+        "rule": "范围 1-65535",
+        "ge": "前缀长度大于等于",
+        "le": "前缀长度小于等于"
+      },
+      "buttons": {
+        "create": "创建",
+        "edit": "编辑",
+        "delete": "删除",
+        "refresh": "刷新"
+      },
+      "titles": {
+        "edit": "编辑",
+        "create": "创建",
+        "editRule": "编辑规则",
+        "createRule": "创建规则",
+        "rules": "规则",
+        "confirmDelete": "确认删除"
+      },
+      "messages": {
+        "selectList": "请选择一个 IPv6 前缀列表",
+        "enterName": "请输入名称",
+        "nameExists": "名称已存在",
+        "enterNameFirst": "请先输入名称",
+        "selectRule": "请选择一条规则",
+        "enterRuleNumber": "请输入规则编号",
+        "ruleNumberRange": "规则编号范围 1-65535",
+        "selectAction": "请选择动作",
+        "enterPrefix": "请输入 IPv6 前缀",
+        "ruleNumberExists": "规则编号已存在",
+        "confirmDeleteList": "确认删除以下 IPv6 前缀列表？",
+        "confirmDeleteRule": "确认删除以下规则？"
+      }
+    }
+  },
+  "en": {
+    "prefixList6": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "IPv6 Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "labels": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "IPv6 Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "placeholders": {
+        "name": "e.g., p01",
+        "prefix": "e.g., 2001:db8::/32",
+        "ge": "0-128",
+        "le": "0-128"
+      },
+      "help": {
+        "rule": "Range 1-65535",
+        "ge": "Greater than or equal to prefix length",
+        "le": "Less than or equal to prefix length"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "titles": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "rules": "Rules",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectList": "Please select an IPv6 prefix list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "enterRuleNumber": "Please enter a rule number",
+        "ruleNumberRange": "Rule number range is 1-65535",
+        "selectAction": "Please select an action",
+        "enterPrefix": "Please enter an IPv6 prefix",
+        "ruleNumberExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following IPv6 prefix lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      }
+    }
+  },
+  "zh-TW": {
+    "prefixList6": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "IPv6 Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "labels": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "IPv6 Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "placeholders": {
+        "name": "e.g., p01",
+        "prefix": "e.g., 2001:db8::/32",
+        "ge": "0-128",
+        "le": "0-128"
+      },
+      "help": {
+        "rule": "Range 1-65535",
+        "ge": "Greater than or equal to prefix length",
+        "le": "Less than or equal to prefix length"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "titles": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "rules": "Rules",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectList": "Please select an IPv6 prefix list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "enterRuleNumber": "Please enter a rule number",
+        "ruleNumberRange": "Rule number range is 1-65535",
+        "selectAction": "Please select an action",
+        "enterPrefix": "Please enter an IPv6 prefix",
+        "ruleNumberExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following IPv6 prefix lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      }
+    }
+  },
+  "ru": {
+    "prefixList6": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "IPv6 Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "labels": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "IPv6 Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "placeholders": {
+        "name": "e.g., p01",
+        "prefix": "e.g., 2001:db8::/32",
+        "ge": "0-128",
+        "le": "0-128"
+      },
+      "help": {
+        "rule": "Range 1-65535",
+        "ge": "Greater than or equal to prefix length",
+        "le": "Less than or equal to prefix length"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "titles": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "rules": "Rules",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectList": "Please select an IPv6 prefix list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "enterRuleNumber": "Please enter a rule number",
+        "ruleNumberRange": "Rule number range is 1-65535",
+        "selectAction": "Please select an action",
+        "enterPrefix": "Please enter an IPv6 prefix",
+        "ruleNumberExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following IPv6 prefix lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      }
+    }
+  },
+  "de": {
+    "prefixList6": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "IPv6 Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "labels": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "IPv6 Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "placeholders": {
+        "name": "e.g., p01",
+        "prefix": "e.g., 2001:db8::/32",
+        "ge": "0-128",
+        "le": "0-128"
+      },
+      "help": {
+        "rule": "Range 1-65535",
+        "ge": "Greater than or equal to prefix length",
+        "le": "Less than or equal to prefix length"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "titles": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "rules": "Rules",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectList": "Please select an IPv6 prefix list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "enterRuleNumber": "Please enter a rule number",
+        "ruleNumberRange": "Rule number range is 1-65535",
+        "selectAction": "Please select an action",
+        "enterPrefix": "Please enter an IPv6 prefix",
+        "ruleNumberExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following IPv6 prefix lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      }
+    }
+  },
+  "fr": {
+    "prefixList6": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "IPv6 Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "labels": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "IPv6 Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "placeholders": {
+        "name": "e.g., p01",
+        "prefix": "e.g., 2001:db8::/32",
+        "ge": "0-128",
+        "le": "0-128"
+      },
+      "help": {
+        "rule": "Range 1-65535",
+        "ge": "Greater than or equal to prefix length",
+        "le": "Less than or equal to prefix length"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "titles": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "rules": "Rules",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectList": "Please select an IPv6 prefix list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "enterRuleNumber": "Please enter a rule number",
+        "ruleNumberRange": "Rule number range is 1-65535",
+        "selectAction": "Please select an action",
+        "enterPrefix": "Please enter an IPv6 prefix",
+        "ruleNumberExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following IPv6 prefix lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      }
+    }
+  },
+  "ko": {
+    "prefixList6": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "IPv6 Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "labels": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "IPv6 Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "placeholders": {
+        "name": "e.g., p01",
+        "prefix": "e.g., 2001:db8::/32",
+        "ge": "0-128",
+        "le": "0-128"
+      },
+      "help": {
+        "rule": "Range 1-65535",
+        "ge": "Greater than or equal to prefix length",
+        "le": "Less than or equal to prefix length"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "titles": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "rules": "Rules",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectList": "Please select an IPv6 prefix list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "enterRuleNumber": "Please enter a rule number",
+        "ruleNumberRange": "Rule number range is 1-65535",
+        "selectAction": "Please select an action",
+        "enterPrefix": "Please enter an IPv6 prefix",
+        "ruleNumberExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following IPv6 prefix lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      }
+    }
+  }
+}

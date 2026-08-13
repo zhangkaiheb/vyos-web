@@ -5,6 +5,9 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const LEGACY_PROTOCOLS_OPTIONS = ['cdp', 'edp', 'fdp', 'sonmp'];
 
@@ -29,25 +32,6 @@ function joinMembers(val) {
 
 function splitMembers(text) {
   return String(text || '').split('\n').map(s => s.trim()).filter(Boolean);
-}
-
-function validateIPv4(value) {
-  if (!value) return '';
-  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return 'IPv4 地址格式错误';
-  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return 'IPv4 地址格式错误';
-  return '';
-}
-
-function validateIPv6(value) {
-  if (!value) return '';
-  if (!/^([0-9a-fA-F:]+)$/.test(value) || !value.includes(':')) return 'IPv6 地址格式错误';
-  return '';
-}
-
-function validateIPAddress(value) {
-  if (!value) return '';
-  if (!validateIPv4(value) || !validateIPv6(value)) return '';
-  return 'IP 地址格式错误';
 }
 
 function lldpInterfacesToForm(interfaces = {}) {
@@ -94,6 +78,8 @@ function lldpToConfig(form) {
 export default defineComponent({
   name: 'LldpPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -101,6 +87,25 @@ export default defineComponent({
     const activeTab = ref('basic');
     const writeDisabled = ref(false);
     const interfaces = ref([]);
+
+    function validateIPv4(value) {
+      if (!value) return '';
+      if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return t('lldp.validation.ipv4');
+      if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return t('lldp.validation.ipv4');
+      return '';
+    }
+
+    function validateIPv6(value) {
+      if (!value) return '';
+      if (!/^([0-9a-fA-F:]+)$/.test(value) || !value.includes(':')) return t('lldp.validation.ipv6');
+      return '';
+    }
+
+    function validateIPAddress(value) {
+      if (!value) return '';
+      if (!validateIPv4(value) || !validateIPv6(value)) return '';
+      return t('lldp.validation.ip');
+    }
 
     async function loadInterfaces() {
       try {
@@ -118,9 +123,9 @@ export default defineComponent({
     });
 
     const interfaceColumns = [
-      { key: 'interface', title: '接口' },
-      { key: 'location', title: '位置' },
-      { key: 'disable', title: '禁用', render: (v) => v ? '是' : '否' },
+      { key: 'interface', title: t('lldp.columns.interface') },
+      { key: 'location', title: t('lldp.columns.location') },
+      { key: 'disable', title: t('lldp.columns.disable'), render: (v) => v ? t('common.yes') : t('common.no') },
     ];
 
     const selectedInterface = ref([]);
@@ -145,15 +150,16 @@ export default defineComponent({
       const managementAddresses = splitMembers(config.value.management_address);
       for (const ip of managementAddresses) {
         const err = validateIPAddress(ip);
-        if (err) return alert(`管理地址 ${ip} 格式错误`);
+        if (err) return showError({ message: t('lldp.errors.managementAddress', { ip }) });
       }
       for (const iface of config.value.interfaces || []) {
-        if (!iface.interface) return alert('接口不能为空');
+        if (!iface.interface) return showError({ message: t('lldp.errors.interfaceEmpty') });
       }
 
       saving.value = true;
       try {
-        await configApi.set('service lldp', lldpToConfig(config.value));
+        await configStore.setConfig('service lldp', lldpToConfig(config.value));
+        configStore.markPending();
         saved.value = true;
         await load();
       } catch (e) {
@@ -169,21 +175,21 @@ export default defineComponent({
     }
 
     function editInterface() {
-      if (!selectedInterface.value.length) return alert('请选择要编辑的接口');
+      if (!selectedInterface.value.length) return showError({ message: t('lldp.errors.selectEdit') });
       const row = (config.value.interfaces || []).find(i => i.interface === selectedInterface.value[0]);
-      if (!row) return alert('未找到选中的接口');
+      if (!row) return showError({ message: t('lldp.errors.notFound') });
       editingInterface.value = { ...row };
       showInterfaceModal.value = true;
     }
 
     function removeInterface() {
-      if (!selectedInterface.value.length) return alert('请选择要删除的接口');
+      if (!selectedInterface.value.length) return showError({ message: t('lldp.errors.selectDelete') });
       config.value.interfaces = (config.value.interfaces || []).filter(i => i.interface !== selectedInterface.value[0]);
       selectedInterface.value = [];
     }
 
     function saveInterface() {
-      if (!editingInterface.value.interface) return alert('请选择接口');
+      if (!editingInterface.value.interface) return showError({ message: t('lldp.errors.selectInterface') });
       const list = config.value.interfaces || [];
       const idx = list.findIndex(i => i._interface === editingInterface.value._interface);
       if (idx >= 0) list.splice(idx, 1, { ...editingInterface.value });
@@ -192,9 +198,13 @@ export default defineComponent({
       showInterfaceModal.value = false;
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
-    return {
+    return {t,
+      
       LEGACY_PROTOCOLS_OPTIONS,
       loading, saving, saved, config, activeTab, writeDisabled, interfaces, commandPath,
       interfaceColumns, selectedInterface, showInterfaceModal, editingInterface,
@@ -204,51 +214,47 @@ export default defineComponent({
   components: { DataTable, DraggableModal, TabGroup, ToolbarButton },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('lldp.messages.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本' },
-        { key: 'interface', title: '接口' }
+        { key: 'basic', title: t('lldp.tabs.basic') },
+        { key: 'interface', title: t('lldp.tabs.interface') }
       ]">
 
         <template #basic>
           <div class="form-row">
-            <label class="form-label">Legacy Protocols</label>
-            <select class="form-control" v-model="config.legacy_protocols" title="兼容的 LLDP 旧协议">
-              <option value="">未选择</option>
+            <label class="form-label">{{ t('lldp.labels.legacyProtocols') }}</label>
+            <select class="form-control" v-model="config.legacy_protocols" :title="t('lldp.titles.legacyProtocols')">
+              <option value="">{{ t('lldp.options.notSelected') }}</option>
               <option v-for="o in LEGACY_PROTOCOLS_OPTIONS" :key="o" :value="o">{{ o }}</option>
             </select>
           </div>
           <div class="form-row">
-            <label class="form-label">管理地址</label>
-            <textarea class="form-control" v-model="config.management_address" rows="3" placeholder="每行一个 IPv4/IPv6 管理地址" title="发送的 LLDP 管理地址" />
+            <label class="form-label">{{ t('lldp.labels.managementAddress') }}</label>
+            <textarea class="form-control" v-model="config.management_address" rows="3" :placeholder="t('lldp.placeholders.managementAddress')" :title="t('lldp.titles.managementAddress')" />
           </div>
-          <div class="form-row"><label class="form-label">SNMP</label><input type="checkbox" v-model="config.snmp" title="启用 SNMP 支持" /></div>
+          <div class="form-row"><label class="form-label">{{ t('lldp.labels.snmp') }}</label><input type="checkbox" v-model="config.snmp" :title="t('lldp.titles.snmp')" /></div>
         </template>
 
         <template #interface>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createInterface">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editInterface" :disabled="!selectedInterface.length || selectedInterface.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeInterface" :disabled="!selectedInterface.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createInterface">{{ t('lldp.buttons.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editInterface" :disabled="!selectedInterface.length || selectedInterface.length > 1">{{ t('lldp.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeInterface" :disabled="!selectedInterface.length">{{ t('lldp.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="interfaceColumns" :data="config.interfaces" row-key="interface" :externalToolbar="true" @selection-change="selectedInterface = $event" :selectable="true" />
         </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="showInterfaceModal" title="接口" @confirm="saveInterface" @close="showInterfaceModal = false">
+      <DraggableModal v-model:visible="showInterfaceModal" :title="t('lldp.modal.interface.title')" @confirm="saveInterface" @close="showInterfaceModal = false">
         <div class="form-row">
-          <label class="form-label">接口</label>
-          <select class="form-control" v-model="editingInterface.interface" :disabled="editingInterface._interface" title="LLDP 接口">
-            <option value="">请选择接口</option>
+          <label class="form-label">{{ t('lldp.labels.interface') }}</label>
+          <select class="form-control" v-model="editingInterface.interface" :disabled="editingInterface._interface" :title="t('lldp.titles.interface')">
+            <option value="">{{ t('lldp.options.selectInterface') }}</option>
             <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">位置</label><input class="form-control" v-model="editingInterface.location" title="接口 LLDP 位置" /></div>
-        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingInterface.disable" title="禁用该接口 LLDP" /></div>
+        <div class="form-row"><label class="form-label">{{ t('lldp.labels.location') }}</label><input class="form-control" v-model="editingInterface.location" :title="t('lldp.titles.location')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('lldp.labels.disable') }}</label><input type="checkbox" v-model="editingInterface.disable" :title="t('lldp.titles.disable')" /></div>
       </DraggableModal>
     </div>
   `,

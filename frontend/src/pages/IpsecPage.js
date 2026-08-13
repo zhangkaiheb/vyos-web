@@ -1,6 +1,8 @@
 import { defineComponent, ref, computed, watch, onMounted } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { configApi, firewallApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import { validateField, validIP, validIPOrSegment } from '/src/utils/validators.js';
 import DataTable from '/src/components/Table/DataTable.js';
@@ -8,6 +10,7 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const KEY_EXCHANGE_OPTIONS = ['', 'ikev1', 'ikev2'];
 const IKE_MODE_OPTIONS = ['', 'main', 'aggressive'];
@@ -102,15 +105,15 @@ function inRange(value, min, max) {
   return !isNaN(n) && n >= min && n <= max;
 }
 
-function validateName(name) {
-  if (!name || !String(name).trim()) return '请输入名称';
-  if (!/^[a-zA-Z0-9_-]+$/.test(String(name))) return '名称只能包含字母、数字、下划线和连字符';
+function validateName(name, t) {
+  if (!name || !String(name).trim()) return t('ipsec.validation.nameRequired');
+  if (!/^[a-zA-Z0-9_-]+$/.test(String(name))) return t('ipsec.validation.namePattern');
   return '';
 }
 
-function validateInterface(name) {
+function validateInterface(name, t) {
   if (!name || !String(name).trim()) return '';
-  if (!/^[a-zA-Z0-9_.-]+$/.test(String(name))) return '接口名只能包含字母、数字、下划线、点、连字符';
+  if (!/^[a-zA-Z0-9_.-]+$/.test(String(name))) return t('ipsec.validation.interfacePattern');
   return '';
 }
 
@@ -381,7 +384,9 @@ function raRadiusServerToConfig(servers) {
 export default defineComponent({
   name: 'IpsecPage',
   setup() {
+    const { t } = useI18n();
     const route = useRoute();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -431,6 +436,24 @@ export default defineComponent({
     const editingRaPool = ref(null);
     const editingRaRadiusServer = ref(null);
 
+    // Delete modal refs
+    const ikeDeleteModalVisible = ref(false);
+    const pendingDeleteIkeNames = ref([]);
+    const espDeleteModalVisible = ref(false);
+    const pendingDeleteEspNames = ref([]);
+    const pskDeleteModalVisible = ref(false);
+    const pendingDeletePskNames = ref([]);
+    const profileDeleteModalVisible = ref(false);
+    const pendingDeleteProfileNames = ref([]);
+    const s2sDeleteModalVisible = ref(false);
+    const pendingDeleteS2sNames = ref([]);
+    const raDeleteModalVisible = ref(false);
+    const pendingDeleteRaNames = ref([]);
+    const poolDeleteModalVisible = ref(false);
+    const pendingDeletePoolNames = ref([]);
+    const radiusDeleteModalVisible = ref(false);
+    const pendingDeleteRadiusNames = ref([]);
+
     async function load() {
       loading.value = true;
       saved.value = false;
@@ -461,92 +484,95 @@ export default defineComponent({
       }
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
     const tabs = [
-      { key: 'ike', title: 'IKE 组' },
-      { key: 'esp', title: 'ESP 组' },
-      { key: 'auth', title: '认证' },
-      { key: 'interface', title: '接口' },
-      { key: 'options', title: '选项' },
-      { key: 'log', title: '日志' },
-      { key: 'profile', title: 'Profile' },
-      { key: 'site_to_site', title: '站点互联' },
-      { key: 'remote_access', title: '远程接入' },
+      { key: 'ike', title: t('ipsec.tabs.ike') },
+      { key: 'esp', title: t('ipsec.tabs.esp') },
+      { key: 'auth', title: t('ipsec.tabs.auth') },
+      { key: 'interface', title: t('ipsec.tabs.interface') },
+      { key: 'options', title: t('ipsec.tabs.options') },
+      { key: 'log', title: t('ipsec.tabs.log') },
+      { key: 'profile', title: t('ipsec.tabs.profile') },
+      { key: 'site_to_site', title: t('ipsec.tabs.siteToSite') },
+      { key: 'remote_access', title: t('ipsec.tabs.remoteAccess') },
     ];
 
     const raTabs = [
-      { key: 'connection', title: '连接' },
-      { key: 'pool', title: '地址池' },
-      { key: 'dhcp', title: 'DHCP' },
-      { key: 'radius', title: 'RADIUS' },
+      { key: 'connection', title: t('ipsec.raTabs.connection') },
+      { key: 'pool', title: t('ipsec.raTabs.pool') },
+      { key: 'dhcp', title: t('ipsec.raTabs.dhcp') },
+      { key: 'radius', title: t('ipsec.raTabs.radius') },
     ];
 
     const ikeColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'key_exchange', title: '密钥交换' },
-      { key: 'mode', title: '模式' },
-      { key: 'lifetime', title: '生命周期' },
-      { key: 'close_action', title: '关闭动作' },
-      { key: 'proposals', title: '提议' },
+      { key: 'name', title: t('ipsec.columns.name') },
+      { key: 'key_exchange', title: t('ipsec.columns.keyExchange') },
+      { key: 'mode', title: t('ipsec.columns.mode') },
+      { key: 'lifetime', title: t('ipsec.columns.lifetime') },
+      { key: 'close_action', title: t('ipsec.columns.closeAction') },
+      { key: 'proposals', title: t('ipsec.columns.proposals') },
     ];
 
     const espColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'mode', title: '模式' },
-      { key: 'lifetime', title: '生命周期' },
-      { key: 'pfs', title: 'PFS' },
-      { key: 'compression', title: '压缩' },
-      { key: 'proposals', title: '提议' },
+      { key: 'name', title: t('ipsec.columns.name') },
+      { key: 'mode', title: t('ipsec.columns.mode') },
+      { key: 'lifetime', title: t('ipsec.columns.lifetime') },
+      { key: 'pfs', title: t('ipsec.columns.pfs') },
+      { key: 'compression', title: t('ipsec.columns.compression') },
+      { key: 'proposals', title: t('ipsec.columns.proposals') },
     ];
 
     const pskColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'ids', title: 'ID' },
-      { key: 'dhcp_interface', title: 'DHCP 接口' },
-      { key: 'secret', title: '密钥' },
+      { key: 'name', title: t('ipsec.columns.name') },
+      { key: 'ids', title: t('ipsec.columns.id') },
+      { key: 'dhcp_interface', title: t('ipsec.columns.dhcpInterface') },
+      { key: 'secret', title: t('ipsec.columns.secret') },
     ];
 
     const profileColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'ike_group', title: 'IKE 组' },
-      { key: 'esp_group', title: 'ESP 组' },
-      { key: 'authentication_mode', title: '认证模式' },
-      { key: 'disable', title: '禁用' },
+      { key: 'name', title: t('ipsec.columns.name') },
+      { key: 'ike_group', title: t('ipsec.columns.ikeGroup') },
+      { key: 'esp_group', title: t('ipsec.columns.espGroup') },
+      { key: 'authentication_mode', title: t('ipsec.columns.authMode') },
+      { key: 'disable', title: t('ipsec.columns.disable') },
     ];
 
     const s2sColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'remote_address', title: '远端地址' },
-      { key: 'local_address', title: '本地地址' },
-      { key: 'ike_group', title: 'IKE 组' },
-      { key: 'default_esp_group', title: '默认 ESP 组' },
-      { key: 'connection_type', title: '连接类型' },
-      { key: 'disable', title: '禁用' },
+      { key: 'name', title: t('ipsec.columns.name') },
+      { key: 'remote_address', title: t('ipsec.columns.remoteAddress') },
+      { key: 'local_address', title: t('ipsec.columns.localAddress') },
+      { key: 'ike_group', title: t('ipsec.columns.ikeGroup') },
+      { key: 'default_esp_group', title: t('ipsec.columns.defaultEspGroup') },
+      { key: 'connection_type', title: t('ipsec.columns.connectionType') },
+      { key: 'disable', title: t('ipsec.columns.disable') },
     ];
 
     const raColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'ike_group', title: 'IKE 组' },
-      { key: 'esp_group', title: 'ESP 组' },
-      { key: 'local_address', title: '本地地址' },
-      { key: 'pool', title: '地址池' },
-      { key: 'disable', title: '禁用' },
+      { key: 'name', title: t('ipsec.columns.name') },
+      { key: 'ike_group', title: t('ipsec.columns.ikeGroup') },
+      { key: 'esp_group', title: t('ipsec.columns.espGroup') },
+      { key: 'local_address', title: t('ipsec.columns.localAddress') },
+      { key: 'pool', title: t('ipsec.columns.pool') },
+      { key: 'disable', title: t('ipsec.columns.disable') },
     ];
 
     const raPoolColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'prefix', title: '前缀' },
-      { key: 'name_servers', title: 'DNS 服务器' },
-      { key: 'excludes', title: '排除前缀' },
+      { key: 'name', title: t('ipsec.columns.name') },
+      { key: 'prefix', title: t('ipsec.columns.prefix') },
+      { key: 'name_servers', title: t('ipsec.columns.dnsServers') },
+      { key: 'excludes', title: t('ipsec.columns.excludes') },
     ];
 
     const raRadiusServerColumns = [
-      { key: 'ip', title: '服务器地址' },
-      { key: 'port', title: '端口' },
-      { key: 'key', title: '共享密钥' },
-      { key: 'disable', title: '禁用' },
-      { key: 'disable_accounting', title: '禁用计费' },
+      { key: 'ip', title: t('ipsec.columns.serverAddress') },
+      { key: 'port', title: t('ipsec.columns.port') },
+      { key: 'key', title: t('ipsec.columns.sharedSecret') },
+      { key: 'disable', title: t('ipsec.columns.disable') },
+      { key: 'disable_accounting', title: t('ipsec.columns.disableAccounting') },
     ];
 
     function formatProposals(row) {
@@ -601,19 +627,25 @@ export default defineComponent({
     }
 
     function editIke() {
-      if (!selectedIke.value.length) return alert('请选择一行');
+      if (!selectedIke.value.length) return showError({ message: t('ipsec.messages.selectRow') });
       const row = ikeGroups.value.find(r => r.name === selectedIke.value[0]);
       editingIke.value = JSON.parse(JSON.stringify(row));
       ikeModalVisible.value = true;
     }
 
     async function removeIke() {
-      if (!selectedIke.value.length) return alert('请选择一行');
-      if (!confirm('确认删除选中的 IKE 组？')) return;
-      for (const name of selectedIke.value) {
+      if (!selectedIke.value.length) return showError({ message: t('ipsec.messages.selectRow') });
+      pendingDeleteIkeNames.value = [...selectedIke.value];
+      ikeDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveIke() {
+      ikeDeleteModalVisible.value = false;
+      for (const name of pendingDeleteIkeNames.value) {
         await configApi.delete(`vpn ipsec ike-group ${name}`);
       }
       selectedIke.value = [];
+      pendingDeleteIkeNames.value = [];
       await save();
     }
 
@@ -631,19 +663,25 @@ export default defineComponent({
     }
 
     function editEsp() {
-      if (!selectedEsp.value.length) return alert('请选择一行');
+      if (!selectedEsp.value.length) return showError({ message: t('ipsec.messages.selectRow') });
       const row = espGroups.value.find(r => r.name === selectedEsp.value[0]);
       editingEsp.value = JSON.parse(JSON.stringify(row));
       espModalVisible.value = true;
     }
 
     async function removeEsp() {
-      if (!selectedEsp.value.length) return alert('请选择一行');
-      if (!confirm('确认删除选中的 ESP 组？')) return;
-      for (const name of selectedEsp.value) {
+      if (!selectedEsp.value.length) return showError({ message: t('ipsec.messages.selectRow') });
+      pendingDeleteEspNames.value = [...selectedEsp.value];
+      espDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveEsp() {
+      espDeleteModalVisible.value = false;
+      for (const name of pendingDeleteEspNames.value) {
         await configApi.delete(`vpn ipsec esp-group ${name}`);
       }
       selectedEsp.value = [];
+      pendingDeleteEspNames.value = [];
       await save();
     }
 
@@ -653,19 +691,25 @@ export default defineComponent({
     }
 
     function editPsk() {
-      if (!selectedPsk.value.length) return alert('请选择一行');
+      if (!selectedPsk.value.length) return showError({ message: t('ipsec.messages.selectRow') });
       const row = psks.value.find(r => r.name === selectedPsk.value[0]);
       editingPsk.value = JSON.parse(JSON.stringify(row));
       pskModalVisible.value = true;
     }
 
     async function removePsk() {
-      if (!selectedPsk.value.length) return alert('请选择一行');
-      if (!confirm('确认删除选中的 PSK？')) return;
-      for (const name of selectedPsk.value) {
+      if (!selectedPsk.value.length) return showError({ message: t('ipsec.messages.selectRow') });
+      pendingDeletePskNames.value = [...selectedPsk.value];
+      pskDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemovePsk() {
+      pskDeleteModalVisible.value = false;
+      for (const name of pendingDeletePskNames.value) {
         await configApi.delete(`vpn ipsec authentication psk ${name}`);
       }
       selectedPsk.value = [];
+      pendingDeletePskNames.value = [];
       await save();
     }
 
@@ -675,19 +719,25 @@ export default defineComponent({
     }
 
     function editProfile() {
-      if (!selectedProfile.value.length) return alert('请选择一行');
+      if (!selectedProfile.value.length) return showError({ message: t('ipsec.messages.selectRow') });
       const row = profiles.value.find(r => r.name === selectedProfile.value[0]);
       editingProfile.value = JSON.parse(JSON.stringify(row));
       profileModalVisible.value = true;
     }
 
     async function removeProfile() {
-      if (!selectedProfile.value.length) return alert('请选择一行');
-      if (!confirm('确认删除选中的 Profile？')) return;
-      for (const name of selectedProfile.value) {
+      if (!selectedProfile.value.length) return showError({ message: t('ipsec.messages.selectRow') });
+      pendingDeleteProfileNames.value = [...selectedProfile.value];
+      profileDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveProfile() {
+      profileDeleteModalVisible.value = false;
+      for (const name of pendingDeleteProfileNames.value) {
         await configApi.delete(`vpn ipsec profile ${name}`);
       }
       selectedProfile.value = [];
+      pendingDeleteProfileNames.value = [];
       await save();
     }
 
@@ -701,19 +751,25 @@ export default defineComponent({
     }
 
     function editS2s() {
-      if (!selectedS2s.value.length) return alert('请选择一行');
+      if (!selectedS2s.value.length) return showError({ message: t('ipsec.messages.selectRow') });
       const row = siteToSitePeers.value.find(r => r.name === selectedS2s.value[0]);
       editingS2s.value = JSON.parse(JSON.stringify(row));
       s2sModalVisible.value = true;
     }
 
     async function removeS2s() {
-      if (!selectedS2s.value.length) return alert('请选择一行');
-      if (!confirm('确认删除选中的站点互联？')) return;
-      for (const name of selectedS2s.value) {
+      if (!selectedS2s.value.length) return showError({ message: t('ipsec.messages.selectRow') });
+      pendingDeleteS2sNames.value = [...selectedS2s.value];
+      s2sDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveS2s() {
+      s2sDeleteModalVisible.value = false;
+      for (const name of pendingDeleteS2sNames.value) {
         await configApi.delete(`vpn ipsec site-to-site peer ${name}`);
       }
       selectedS2s.value = [];
+      pendingDeleteS2sNames.value = [];
       await save();
     }
 
@@ -730,19 +786,25 @@ export default defineComponent({
     }
 
     function editRa() {
-      if (!selectedRa.value.length) return alert('请选择一行');
+      if (!selectedRa.value.length) return showError({ message: t('ipsec.messages.selectRow') });
       const row = remoteAccessConns.value.find(r => r.name === selectedRa.value[0]);
       editingRa.value = JSON.parse(JSON.stringify(row));
       raModalVisible.value = true;
     }
 
     async function removeRa() {
-      if (!selectedRa.value.length) return alert('请选择一行');
-      if (!confirm('确认删除选中的远程接入连接？')) return;
-      for (const name of selectedRa.value) {
+      if (!selectedRa.value.length) return showError({ message: t('ipsec.messages.selectRow') });
+      pendingDeleteRaNames.value = [...selectedRa.value];
+      raDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveRa() {
+      raDeleteModalVisible.value = false;
+      for (const name of pendingDeleteRaNames.value) {
         await configApi.delete(`vpn ipsec remote-access connection ${name}`);
       }
       selectedRa.value = [];
+      pendingDeleteRaNames.value = [];
       await save();
     }
 
@@ -752,41 +814,47 @@ export default defineComponent({
     }
 
     function editRaPool() {
-      if (!selectedRaPool.value.length) return alert('请选择一行');
+      if (!selectedRaPool.value.length) return showError({ message: t('ipsec.messages.selectRow') });
       const row = remoteAccessPools.value.find(r => r.name === selectedRaPool.value[0]);
       editingRaPool.value = JSON.parse(JSON.stringify(row));
       raPoolModalVisible.value = true;
     }
 
     async function removeRaPool() {
-      if (!selectedRaPool.value.length) return alert('请选择一行');
-      if (!confirm('确认删除选中的地址池？')) return;
-      for (const name of selectedRaPool.value) {
+      if (!selectedRaPool.value.length) return showError({ message: t('ipsec.messages.selectRow') });
+      pendingDeletePoolNames.value = [...selectedRaPool.value];
+      poolDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveRaPool() {
+      poolDeleteModalVisible.value = false;
+      for (const name of pendingDeletePoolNames.value) {
         await configApi.delete(`vpn ipsec remote-access pool ${name}`);
       }
       selectedRaPool.value = [];
+      pendingDeletePoolNames.value = [];
       await save();
     }
 
     async function saveRaPool() {
       const item = editingRaPool.value;
-      const nameErr = validateName(item.name);
-      if (nameErr) return alert(nameErr);
-      if (!item.prefix) return alert('请输入地址池前缀');
+      const nameErr = validateName(item.name, t);
+      if (nameErr) return showError({ message: nameErr });
+      if (!item.prefix) return showError({ message: t('ipsec.validation.poolPrefixRequired') });
       const prefixErr = validateField(item.prefix, { validate: 'ip-segment' });
-      if (prefixErr) return alert('地址池前缀：' + prefixErr);
+      if (prefixErr) return showError({ message: t('ipsec.validation.poolPrefix') + prefixErr });
       const value = {};
       value.prefix = String(item.prefix);
       const nameServers = splitMembers(item.name_servers);
       for (const ns of nameServers) {
         const nsErr = validateField(ns, { validate: 'ip' });
-        if (nsErr) return alert('DNS 服务器 ' + ns + '：' + nsErr);
+        if (nsErr) return showError({ message: t('ipsec.validation.dnsServer') + ns + t('ipsec.validation.colon') + nsErr });
       }
       if (nameServers.length) value['name-server'] = nameServers;
       const excludes = splitMembers(item.excludes);
       for (const ex of excludes) {
         const exErr = validateField(ex, { validate: 'ip-segment' });
-        if (exErr) return alert('排除前缀 ' + ex + '：' + exErr);
+        if (exErr) return showError({ message: t('ipsec.validation.excludePrefix') + ex + t('ipsec.validation.colon') + exErr });
       }
       if (excludes.length) value.exclude = excludes;
       await configApi.set(`vpn ipsec remote-access pool ${item.name}`, value);
@@ -799,12 +867,12 @@ export default defineComponent({
       const value = {};
       if (isPresent(item.server)) {
         const serverErr = validateField(item.server, { validate: 'ip' });
-        if (serverErr) return alert('DHCP 服务器：' + serverErr);
+        if (serverErr) return showError({ message: t('ipsec.validation.dhcpServer') + serverErr });
         value.server = String(item.server);
       }
       if (isPresent(item.interface)) {
-        const ifErr = validateInterface(item.interface);
-        if (ifErr) return alert('DHCP 接口：' + ifErr);
+        const ifErr = validateInterface(item.interface, t);
+        if (ifErr) return showError({ message: t('ipsec.validation.dhcpInterface') + ifErr });
         value.interface = String(item.interface).trim();
       }
       if (Object.keys(value).length) {
@@ -821,28 +889,34 @@ export default defineComponent({
     }
 
     function editRaRadiusServer() {
-      if (!selectedRaRadiusServer.value.length) return alert('请选择一行');
+      if (!selectedRaRadiusServer.value.length) return showError({ message: t('ipsec.messages.selectRow') });
       const row = remoteAccessRadius.value.servers.find(r => r.ip === selectedRaRadiusServer.value[0]);
       editingRaRadiusServer.value = JSON.parse(JSON.stringify(row));
       raRadiusServerModalVisible.value = true;
     }
 
     async function removeRaRadiusServer() {
-      if (!selectedRaRadiusServer.value.length) return alert('请选择一行');
-      if (!confirm('确认删除选中的 RADIUS 服务器？')) return;
-      for (const ip of selectedRaRadiusServer.value) {
+      if (!selectedRaRadiusServer.value.length) return showError({ message: t('ipsec.messages.selectRow') });
+      pendingDeleteRadiusNames.value = [...selectedRaRadiusServer.value];
+      radiusDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveRaRadiusServer() {
+      radiusDeleteModalVisible.value = false;
+      for (const ip of pendingDeleteRadiusNames.value) {
         await configApi.delete(`vpn ipsec remote-access radius server ${ip}`);
       }
       selectedRaRadiusServer.value = [];
+      pendingDeleteRadiusNames.value = [];
       await save();
     }
 
     async function saveRaRadiusServer() {
       const item = editingRaRadiusServer.value;
-      if (!item.ip) return alert('请输入 RADIUS 服务器地址');
+      if (!item.ip) return showError({ message: t('ipsec.validation.radiusServerRequired') });
       const ipErr = validateField(item.ip, { validate: 'ip' });
-      if (ipErr) return alert('RADIUS 服务器地址：' + ipErr);
-      if (isPresent(item.port) && !inRange(item.port, 1, 65535)) return alert('RADIUS 端口范围为 1-65535');
+      if (ipErr) return showError({ message: t('ipsec.validation.radiusServer') + ipErr });
+      if (isPresent(item.port) && !inRange(item.port, 1, 65535)) return showError({ message: t('ipsec.validation.radiusPortRange') });
       const value = {};
       if (isPresent(item.key)) value.key = String(item.key);
       if (isPresent(item.port)) value.port = String(item.port);
@@ -857,7 +931,7 @@ export default defineComponent({
       const item = remoteAccessRadius.value;
       const value = {};
       if (isPresent(item.nas_identifier)) value['nas-identifier'] = String(item.nas_identifier);
-      if (isPresent(item.timeout) && !inRange(item.timeout, 1, 240)) return alert('RADIUS 超时范围为 1-240');
+      if (isPresent(item.timeout) && !inRange(item.timeout, 1, 240)) return showError({ message: t('ipsec.validation.radiusTimeoutRange') });
       if (isPresent(item.timeout)) value.timeout = String(item.timeout);
       const servers = raRadiusServerToConfig(item.servers || []);
       if (Object.keys(servers).length) value.server = servers;
@@ -871,11 +945,11 @@ export default defineComponent({
 
     async function saveIke() {
       const item = editingIke.value;
-      const nameErr = validateName(item.name);
-      if (nameErr) return alert(nameErr);
-      if (isPresent(item.lifetime) && !inRange(item.lifetime, 0, 86400)) return alert('IKE 生命周期范围为 0-86400');
-      if (isPresent(item.dpd_interval) && !inRange(item.dpd_interval, 2, 86400)) return alert('DPD 间隔范围为 2-86400');
-      if (isPresent(item.dpd_timeout) && !inRange(item.dpd_timeout, 2, 86400)) return alert('DPD 超时范围为 2-86400');
+      const nameErr = validateName(item.name, t);
+      if (nameErr) return showError({ message: nameErr });
+      if (isPresent(item.lifetime) && !inRange(item.lifetime, 0, 86400)) return showError({ message: t('ipsec.validation.ikeLifetimeRange') });
+      if (isPresent(item.dpd_interval) && !inRange(item.dpd_interval, 2, 86400)) return showError({ message: t('ipsec.validation.dpdIntervalRange') });
+      if (isPresent(item.dpd_timeout) && !inRange(item.dpd_timeout, 2, 86400)) return showError({ message: t('ipsec.validation.dpdTimeoutRange') });
       const value = {};
       if (isPresent(item.close_action)) value['close-action'] = String(item.close_action);
       if (item.disable_mobike) value['disable-mobike'] = '';
@@ -897,11 +971,11 @@ export default defineComponent({
 
     async function saveEsp() {
       const item = editingEsp.value;
-      const nameErr = validateName(item.name);
-      if (nameErr) return alert(nameErr);
-      if (isPresent(item.lifetime) && !inRange(item.lifetime, 30, 86400)) return alert('ESP 生命周期范围为 30-86400');
-      if (isPresent(item.life_bytes) && !inRange(item.life_bytes, 1024, 26843545600000)) return alert('ESP 生命周期（字节）范围为 1024-26843545600000');
-      if (isPresent(item.life_packets) && !inRange(item.life_packets, 1000, 26843545600000)) return alert('ESP 生命周期（包数）范围为 1000-26843545600000');
+      const nameErr = validateName(item.name, t);
+      if (nameErr) return showError({ message: nameErr });
+      if (isPresent(item.lifetime) && !inRange(item.lifetime, 30, 86400)) return showError({ message: t('ipsec.validation.espLifetimeRange') });
+      if (isPresent(item.life_bytes) && !inRange(item.life_bytes, 1024, 26843545600000)) return showError({ message: t('ipsec.validation.espLifeBytesRange') });
+      if (isPresent(item.life_packets) && !inRange(item.life_packets, 1000, 26843545600000)) return showError({ message: t('ipsec.validation.espLifePacketsRange') });
       const value = {};
       if (isPresent(item.compression)) value.compression = String(item.compression);
       if (isPresent(item.life_bytes)) value['life-bytes'] = String(item.life_bytes);
@@ -918,17 +992,17 @@ export default defineComponent({
 
     async function savePsk() {
       const item = editingPsk.value;
-      const nameErr = validateName(item.name);
-      if (nameErr) return alert(nameErr);
-      if (!item.secret) return alert('请输入密钥');
+      const nameErr = validateName(item.name, t);
+      if (nameErr) return showError({ message: nameErr });
+      if (!item.secret) return showError({ message: t('ipsec.validation.secretRequired') });
       const value = {};
       const ids = splitMembers(item.ids);
       if (ids.length) value.id = ids;
       if (isPresent(item.secret)) value.secret = String(item.secret);
       const dhcp = String(item.dhcp_interface || '').split(',').map(s => s.trim()).filter(Boolean);
       for (const d of dhcp) {
-        const dhcpErr = validateInterface(d);
-        if (dhcpErr) return alert('DHCP 接口 ' + d + '：' + dhcpErr);
+        const dhcpErr = validateInterface(d, t);
+        if (dhcpErr) return showError({ message: t('ipsec.validation.dhcpInterface') + d + t('ipsec.validation.colon') + dhcpErr });
       }
       if (dhcp.length) value['dhcp-interface'] = dhcp;
       await configApi.set(`vpn ipsec authentication psk ${item.name}`, value);
@@ -938,8 +1012,8 @@ export default defineComponent({
 
     async function saveProfile() {
       const item = editingProfile.value;
-      const nameErr = validateName(item.name);
-      if (nameErr) return alert(nameErr);
+      const nameErr = validateName(item.name, t);
+      if (nameErr) return showError({ message: nameErr });
       const value = {};
       if (item.disable) value.disable = '';
       if (isPresent(item.esp_group)) value['esp-group'] = String(item.esp_group);
@@ -957,24 +1031,24 @@ export default defineComponent({
 
     async function saveS2s() {
       const item = editingS2s.value;
-      const nameErr = validateName(item.name);
-      if (nameErr) return alert(nameErr);
+      const nameErr = validateName(item.name, t);
+      if (nameErr) return showError({ message: nameErr });
       const remoteAddrs = splitMembers(item.remote_address);
-      if (!remoteAddrs.length) return alert('请输入至少一个远端地址');
+      if (!remoteAddrs.length) return showError({ message: t('ipsec.validation.remoteAddressRequired') });
       const remoteErr = validateLines(item.remote_address, 'ip-segment');
-      if (remoteErr) return alert('远端地址：' + remoteErr);
+      if (remoteErr) return showError({ message: t('ipsec.validation.remoteAddress') + remoteErr });
       if (isPresent(item.local_address)) {
         const localErr = validateField(item.local_address, { validate: 'ip' });
-        if (localErr) return alert('本地地址：' + localErr);
+        if (localErr) return showError({ message: t('ipsec.validation.localAddress') + localErr });
       }
-      if (isPresent(item.replay_window) && !inRange(item.replay_window, 0, 1024)) return alert('Replay window 范围为 0-1024');
+      if (isPresent(item.replay_window) && !inRange(item.replay_window, 0, 1024)) return showError({ message: t('ipsec.validation.replayWindowRange') });
       const value = {};
       if (isPresent(item.connection_type)) value['connection-type'] = String(item.connection_type);
       if (isPresent(item.default_esp_group)) value['default-esp-group'] = String(item.default_esp_group);
       if (isPresent(item.description)) value.description = String(item.description);
       if (isPresent(item.dhcp_interface)) {
-        const dhcpIfErr = validateInterface(item.dhcp_interface);
-        if (dhcpIfErr) return alert('DHCP 接口：' + dhcpIfErr);
+        const dhcpIfErr = validateInterface(item.dhcp_interface, t);
+        if (dhcpIfErr) return showError({ message: t('ipsec.validation.dhcpInterface') + dhcpIfErr });
         value['dhcp-interface'] = String(item.dhcp_interface).trim();
       }
       if (item.disable) value.disable = '';
@@ -988,13 +1062,13 @@ export default defineComponent({
       const virtualAddrs = splitMembers(item.virtual_address);
       if (virtualAddrs.length) {
         const virtErr = validateLines(item.virtual_address, 'ip-segment');
-        if (virtErr) return alert('虚拟地址：' + virtErr);
+        if (virtErr) return showError({ message: t('ipsec.validation.virtualAddress') + virtErr });
         value['virtual-address'] = virtualAddrs;
       }
       const vti = {};
       if (isPresent(item.vti_bind)) {
-        const vtiErr = validateInterface(item.vti_bind);
-        if (vtiErr) return alert('VTI 绑定接口：' + vtiErr);
+        const vtiErr = validateInterface(item.vti_bind, t);
+        if (vtiErr) return showError({ message: t('ipsec.validation.vtiBindInterface') + vtiErr });
         vti.bind = String(item.vti_bind);
       }
       if (isPresent(item.vti_esp_group)) vti['esp-group'] = String(item.vti_esp_group);
@@ -1032,25 +1106,25 @@ export default defineComponent({
       if (Object.keys(auth).length) value.authentication = auth;
       const tunnels = tunnelToConfig(item.tunnels || []);
       if (Object.keys(tunnels).length) {
-        for (const t of item.tunnels) {
-          if (!t.number) continue;
-          if (!inRange(t.number, 0, 4294967295)) return alert(`隧道 ${t.number} 编号范围为 0-4294967295`);
-          if (isPresent(t.priority) && !inRange(t.priority, 1, 100)) return alert(`隧道 ${t.number} 优先级范围为 1-100`);
-          if (isPresent(t.local_port)) {
-            const portErr = validateField(t.local_port, { validate: 'port-single' });
-            if (portErr) return alert(`隧道 ${t.number} 本地端口：` + portErr);
+        for (const tunnel of item.tunnels) {
+          if (!tunnel.number) continue;
+          if (!inRange(tunnel.number, 0, 4294967295)) return showError({ message: t('ipsec.validation.tunnelNumberRange') + tunnel.number + t('ipsec.validation.tunnelNumberRangeSuffix') });
+          if (isPresent(tunnel.priority) && !inRange(tunnel.priority, 1, 100)) return showError({ message: t('ipsec.validation.tunnelPriorityRange') + tunnel.number + t('ipsec.validation.tunnelPriorityRangeSuffix') });
+          if (isPresent(tunnel.local_port)) {
+            const portErr = validateField(tunnel.local_port, { validate: 'port-single' });
+            if (portErr) return showError({ message: t('ipsec.validation.tunnelLocalPort') + tunnel.number + t('ipsec.validation.colon') + portErr });
           }
-          if (isPresent(t.remote_port)) {
-            const portErr = validateField(t.remote_port, { validate: 'port-single' });
-            if (portErr) return alert(`隧道 ${t.number} 远端端口：` + portErr);
+          if (isPresent(tunnel.remote_port)) {
+            const portErr = validateField(tunnel.remote_port, { validate: 'port-single' });
+            if (portErr) return showError({ message: t('ipsec.validation.tunnelRemotePort') + tunnel.number + t('ipsec.validation.colon') + portErr });
           }
-          if (isPresent(t.local_prefix)) {
-            const err = validateLines(t.local_prefix, 'ip-segment');
-            if (err) return alert(`隧道 ${t.number} 本地前缀：` + err);
+          if (isPresent(tunnel.local_prefix)) {
+            const err = validateLines(tunnel.local_prefix, 'ip-segment');
+            if (err) return showError({ message: t('ipsec.validation.tunnelLocalPrefix') + tunnel.number + t('ipsec.validation.colon') + err });
           }
-          if (isPresent(t.remote_prefix)) {
-            const err = validateLines(t.remote_prefix, 'ip-segment');
-            if (err) return alert(`隧道 ${t.number} 远端前缀：` + err);
+          if (isPresent(tunnel.remote_prefix)) {
+            const err = validateLines(tunnel.remote_prefix, 'ip-segment');
+            if (err) return showError({ message: t('ipsec.validation.tunnelRemotePrefix') + tunnel.number + t('ipsec.validation.colon') + err });
           }
         }
         value.tunnel = tunnels;
@@ -1062,28 +1136,28 @@ export default defineComponent({
 
     async function saveRa() {
       const item = editingRa.value;
-      const nameErr = validateName(item.name);
-      if (nameErr) return alert(nameErr);
-      if (isPresent(item.replay_window) && !inRange(item.replay_window, 0, 1024)) return alert('Replay window 范围为 0-1024');
-      if (isPresent(item.timeout) && !inRange(item.timeout, 1, 86400)) return alert('超时范围为 1-86400');
+      const nameErr = validateName(item.name, t);
+      if (nameErr) return showError({ message: nameErr });
+      if (isPresent(item.replay_window) && !inRange(item.replay_window, 0, 1024)) return showError({ message: t('ipsec.validation.replayWindowRange') });
+      if (isPresent(item.timeout) && !inRange(item.timeout, 1, 86400)) return showError({ message: t('ipsec.validation.timeoutRange') });
       if (isPresent(item.local_address)) {
         const localErr = validateField(item.local_address, { validate: 'ip' });
-        if (localErr) return alert('本地地址：' + localErr);
+        if (localErr) return showError({ message: t('ipsec.validation.localAddress') + localErr });
       }
       const localPrefix = splitMembers(item.local_prefix);
       if (localPrefix.length) {
         const prefixErr = validateLines(item.local_prefix, 'ip-segment');
-        if (prefixErr) return alert('本地前缀：' + prefixErr);
+        if (prefixErr) return showError({ message: t('ipsec.validation.localPrefix') + prefixErr });
       }
       if (isPresent(item.local_port)) {
         const portErr = validateField(item.local_port, { validate: 'port-single' });
-        if (portErr) return alert('本地端口：' + portErr);
+        if (portErr) return showError({ message: t('ipsec.validation.localPort') + portErr });
       }
       const value = {};
       if (isPresent(item.description)) value.description = String(item.description);
       if (isPresent(item.dhcp_interface)) {
-        const dhcpIfErr = validateInterface(item.dhcp_interface);
-        if (dhcpIfErr) return alert('DHCP 接口：' + dhcpIfErr);
+        const dhcpIfErr = validateInterface(item.dhcp_interface, t);
+        if (dhcpIfErr) return showError({ message: t('ipsec.validation.dhcpInterface') + dhcpIfErr });
         value['dhcp-interface'] = String(item.dhcp_interface).trim();
       }
       if (item.disable) value.disable = '';
@@ -1097,8 +1171,8 @@ export default defineComponent({
       }
       const pools = toArray(item.pool).map(s => String(s).trim()).filter(Boolean);
       for (const p of pools) {
-        const nameErr = validateName(p);
-        if (nameErr) return alert('地址池名称 ' + p + '：' + nameErr);
+        const nameErr = validateName(p, t);
+        if (nameErr) return showError({ message: t('ipsec.validation.poolName') + p + t('ipsec.validation.colon') + nameErr });
       }
       if (pools.length) value.pool = pools;
       if (isPresent(item.replay_window)) value['replay-window'] = String(item.replay_window);
@@ -1135,8 +1209,8 @@ export default defineComponent({
       try {
         const ifaceList = splitMembers(interfaces.value);
         for (const iface of ifaceList) {
-          const ifErr = validateInterface(iface);
-          if (ifErr) return alert('接口 ' + iface + '：' + ifErr);
+          const ifErr = validateInterface(iface, t);
+          if (ifErr) return showError({ message: t('ipsec.validation.interface') + iface + t('ipsec.validation.colon') + ifErr });
         }
         if (ifaceList.length) {
           await configApi.set('vpn ipsec interface', ifaceList);
@@ -1144,8 +1218,8 @@ export default defineComponent({
           try { await configApi.delete('vpn ipsec interface'); } catch (_) {}
         }
 
-        const optIfErr = validateInterface(options.value.interface);
-        if (optIfErr) return alert('选项接口：' + optIfErr);
+        const optIfErr = validateInterface(options.value.interface, t);
+        if (optIfErr) return showError({ message: t('ipsec.validation.optionsInterface') + optIfErr });
 
         if (disableUniqreqids.value) {
           await configApi.set('vpn ipsec disable-uniqreqids', '');
@@ -1174,6 +1248,7 @@ export default defineComponent({
           try { await configApi.delete('vpn ipsec log'); } catch (_) {}
         }
 
+        configStore.markPending();
         saved.value = true;
         await load();
       } catch (e) {
@@ -1219,7 +1294,8 @@ export default defineComponent({
       editingS2s.value.tunnels.splice(index, 1);
     }
 
-    return {
+    return {t,
+      
       loading, saving, saved, activeTab, tabs, writeDisabled,
       raActiveTab, raTabs,
       ikeGroups, espGroups, psks, interfaces, disableUniqreqids, options, logConfig, profiles,
@@ -1228,20 +1304,28 @@ export default defineComponent({
       selectedRaPool, selectedRaRadiusServer,
       ikeModalVisible, espModalVisible, pskModalVisible, profileModalVisible,
       s2sModalVisible, raModalVisible, raPoolModalVisible, raRadiusServerModalVisible,
+      ikeDeleteModalVisible, pendingDeleteIkeNames,
+      espDeleteModalVisible, pendingDeleteEspNames,
+      pskDeleteModalVisible, pendingDeletePskNames,
+      profileDeleteModalVisible, pendingDeleteProfileNames,
+      s2sDeleteModalVisible, pendingDeleteS2sNames,
+      raDeleteModalVisible, pendingDeleteRaNames,
+      poolDeleteModalVisible, pendingDeletePoolNames,
+      radiusDeleteModalVisible, pendingDeleteRadiusNames,
       editingIke, editingEsp, editingPsk, editingProfile, editingS2s, editingRa,
       editingRaPool, editingRaRadiusServer,
       ikeColumns, espColumns, pskColumns, profileColumns, s2sColumns, raColumns,
       raPoolColumns, raRadiusServerColumns,
       load, save,
-      createIke, editIke, removeIke, saveIke,
-      createEsp, editEsp, removeEsp, saveEsp,
-      createPsk, editPsk, removePsk, savePsk,
-      createProfile, editProfile, removeProfile, saveProfile,
-      createS2s, editS2s, removeS2s, saveS2s,
-      createRa, editRa, removeRa, saveRa,
-      createRaPool, editRaPool, removeRaPool, saveRaPool,
+      createIke, editIke, removeIke, confirmRemoveIke, saveIke,
+      createEsp, editEsp, removeEsp, confirmRemoveEsp, saveEsp,
+      createPsk, editPsk, removePsk, confirmRemovePsk, savePsk,
+      createProfile, editProfile, removeProfile, confirmRemoveProfile, saveProfile,
+      createS2s, editS2s, removeS2s, confirmRemoveS2s, saveS2s,
+      createRa, editRa, removeRa, confirmRemoveRa, saveRa,
+      createRaPool, editRaPool, removeRaPool, confirmRemoveRaPool, saveRaPool,
       saveRaDhcp,
-      createRaRadiusServer, editRaRadiusServer, removeRaRadiusServer, saveRaRadiusServer, saveRaRadius,
+      createRaRadiusServer, editRaRadiusServer, removeRaRadiusServer, confirmRemoveRaRadiusServer, saveRaRadiusServer, saveRaRadius,
       addIkeProposal, removeIkeProposal, addEspProposal, removeEspProposal,
       addLogSubsystem, removeLogSubsystem, addS2sTunnel, removeS2sTunnel,
       formatProposals, formatLines, optionValue, optionLabel,
@@ -1254,14 +1338,14 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('ipsec.messages.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="tabs">
         <template #ike>
           <div class="toolbar">
             <div class="toolbar-left">
-              <ToolbarButton icon="create" @click="createIke" :disabled="writeDisabled">创建</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editIke" :disabled="writeDisabled || !selectedIke.length || selectedIke.length > 1">编辑</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removeIke" :disabled="writeDisabled || !selectedIke.length">删除</ToolbarButton>
+              <ToolbarButton icon="create" @click="createIke" :disabled="writeDisabled">{{ t('ipsec.buttons.create') }}</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editIke" :disabled="writeDisabled || !selectedIke.length || selectedIke.length > 1">{{ t('ipsec.buttons.edit') }}</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removeIke" :disabled="writeDisabled || !selectedIke.length">{{ t('ipsec.buttons.delete') }}</ToolbarButton>
             </div>
           </div>
           <DataTable :columns="ikeColumns" :data="ikeGroups" row-key="name" :externalToolbar="true" @selection-change="selectedIke = $event" :selectable="true">
@@ -1271,9 +1355,9 @@ export default defineComponent({
         <template #esp>
           <div class="toolbar">
             <div class="toolbar-left">
-              <ToolbarButton icon="create" @click="createEsp" :disabled="writeDisabled">创建</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editEsp" :disabled="writeDisabled || !selectedEsp.length || selectedEsp.length > 1">编辑</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removeEsp" :disabled="writeDisabled || !selectedEsp.length">删除</ToolbarButton>
+              <ToolbarButton icon="create" @click="createEsp" :disabled="writeDisabled">{{ t('ipsec.buttons.create') }}</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editEsp" :disabled="writeDisabled || !selectedEsp.length || selectedEsp.length > 1">{{ t('ipsec.buttons.edit') }}</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removeEsp" :disabled="writeDisabled || !selectedEsp.length">{{ t('ipsec.buttons.delete') }}</ToolbarButton>
             </div>
           </div>
           <DataTable :columns="espColumns" :data="espGroups" row-key="name" :externalToolbar="true" @selection-change="selectedEsp = $event" :selectable="true">
@@ -1283,74 +1367,65 @@ export default defineComponent({
         <template #auth>
           <div class="toolbar">
             <div class="toolbar-left">
-              <ToolbarButton icon="create" @click="createPsk" :disabled="writeDisabled">创建</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editPsk" :disabled="writeDisabled || !selectedPsk.length || selectedPsk.length > 1">编辑</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removePsk" :disabled="writeDisabled || !selectedPsk.length">删除</ToolbarButton>
+              <ToolbarButton icon="create" @click="createPsk" :disabled="writeDisabled">{{ t('ipsec.buttons.create') }}</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editPsk" :disabled="writeDisabled || !selectedPsk.length || selectedPsk.length > 1">{{ t('ipsec.buttons.edit') }}</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removePsk" :disabled="writeDisabled || !selectedPsk.length">{{ t('ipsec.buttons.delete') }}</ToolbarButton>
             </div>
           </div>
           <DataTable :columns="pskColumns" :data="psks" row-key="name" :externalToolbar="true" @selection-change="selectedPsk = $event" :selectable="true" />
         </template>
         <template #interface>
           <div class="form-row">
-            <label class="form-label" title="禁用唯一请求 ID，用于特定兼容性场景">禁用唯一请求 ID (disable-uniqreqids)</label>
-            <input type="checkbox" v-model="disableUniqreqids" :disabled="writeDisabled" title="禁用唯一请求 ID" />
+            <label class="form-label" :title="t('ipsec.form.disableUniqreqidsTitle')">{{ t('ipsec.form.disableUniqreqids') }}</label>
+            <input type="checkbox" v-model="disableUniqreqids" :disabled="writeDisabled" :title="t('ipsec.form.disableUniqreqidsTitle')" />
           </div>
           <div class="form-row">
-            <label class="form-label" title="启用 IPsec 的接口，每行一个接口名（如 eth0）">接口</label>
-            <textarea class="form-control" v-model="interfaces" placeholder="每行一个接口名（如 eth0）" :disabled="writeDisabled" title="IPsec 接口" />
-          </div>
-          <div class="page-actions-bottom">
-            <ToolbarButton icon="save" primary @click="save" :disabled="writeDisabled || saving">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
+            <label class="form-label" :title="t('ipsec.form.interfaceTitle')">{{ t('ipsec.form.interface') }}</label>
+            <textarea class="form-control" v-model="interfaces" :placeholder="t('ipsec.form.interfacePlaceholder')" :disabled="writeDisabled" :title="t('ipsec.form.interfaceTitle')" />
           </div>
         </template>
         <template #options>
           <div class="form-row">
-            <label class="form-label" title="禁止自动安装 IPsec 路由">禁用路由自动安装</label>
-            <input type="checkbox" v-model="options.disable_route_autoinstall" :disabled="writeDisabled" title="禁用路由自动安装" />
+            <label class="form-label" :title="t('ipsec.form.disableRouteAutoinstallTitle')">{{ t('ipsec.form.disableRouteAutoinstall') }}</label>
+            <input type="checkbox" v-model="options.disable_route_autoinstall" :disabled="writeDisabled" :title="t('ipsec.form.disableRouteAutoinstallTitle')" />
           </div>
           <div class="form-row">
-            <label class="form-label" title="启用 Cisco FlexVPN 兼容性">FlexVPN</label>
-            <input type="checkbox" v-model="options.flexvpn" :disabled="writeDisabled" title="FlexVPN" />
+            <label class="form-label" :title="t('ipsec.form.flexvpnTitle')">{{ t('ipsec.form.flexvpn') }}</label>
+            <input type="checkbox" v-model="options.flexvpn" :disabled="writeDisabled" :title="t('ipsec.form.flexvpnTitle')" />
           </div>
           <div class="form-row">
-            <label class="form-label" title="启用虚拟 IP 支持">虚拟 IP</label>
-            <input type="checkbox" v-model="options.virtual_ip" :disabled="writeDisabled" title="虚拟 IP" />
+            <label class="form-label" :title="t('ipsec.form.virtualIpTitle')">{{ t('ipsec.form.virtualIp') }}</label>
+            <input type="checkbox" v-model="options.virtual_ip" :disabled="writeDisabled" :title="t('ipsec.form.virtualIpTitle')" />
           </div>
           <div class="form-row">
-            <label class="form-label" title="全局选项接口，如 eth0">选项接口</label>
-            <input class="form-control" v-model="options.interface" placeholder="如 eth0" :disabled="writeDisabled" title="选项接口" />
-          </div>
-          <div class="page-actions-bottom">
-            <ToolbarButton icon="save" primary @click="save" :disabled="writeDisabled || saving">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
+            <label class="form-label" :title="t('ipsec.form.optionsInterfaceTitle')">{{ t('ipsec.form.optionsInterface') }}</label>
+            <input class="form-control" v-model="options.interface" :placeholder="t('ipsec.form.optionsInterfacePlaceholder')" :disabled="writeDisabled" :title="t('ipsec.form.optionsInterfaceTitle')" />
           </div>
         </template>
         <template #log>
           <div class="form-row">
-            <label class="form-label" title="全局日志级别，数值越大越详细（0-4）">全局日志级别</label>
-            <select class="form-control" v-model="logConfig.level" :disabled="writeDisabled" title="全局日志级别">
+            <label class="form-label" :title="t('ipsec.form.globalLogLevelTitle')">{{ t('ipsec.form.globalLogLevel') }}</label>
+            <select class="form-control" v-model="logConfig.level" :disabled="writeDisabled" :title="t('ipsec.form.globalLogLevelTitle')">
               <option v-for="o in LOG_LEVEL_OPTIONS" :key="o" :value="o">{{ o }}</option>
             </select>
           </div>
           <div style="margin:12px 0;">
-            <ToolbarButton icon="create" @click="addLogSubsystem" :disabled="writeDisabled">添加子系统</ToolbarButton>
+            <ToolbarButton icon="create" @click="addLogSubsystem" :disabled="writeDisabled">{{ t('ipsec.buttons.addSubsystem') }}</ToolbarButton>
           </div>
           <div v-for="(s, i) in logConfig.subsystems" :key="i" class="form-row">
-            <label class="form-label" title="日志子系统名称">子系统</label>
-            <select class="form-control" v-model="s.name" :disabled="writeDisabled" title="日志子系统">
+            <label class="form-label" :title="t('ipsec.form.subsystemTitle')">{{ t('ipsec.form.subsystem') }}</label>
+            <select class="form-control" v-model="s.name" :disabled="writeDisabled" :title="t('ipsec.form.subsystemTitle')">
               <option v-for="o in LOG_SUBSYSTEM_OPTIONS" :key="o" :value="o">{{ o }}</option>
             </select>
-            <ToolbarButton icon="delete" @click="removeLogSubsystem(i)" :disabled="writeDisabled">删除</ToolbarButton>
-          </div>
-          <div class="page-actions-bottom">
-            <ToolbarButton icon="save" primary @click="save" :disabled="writeDisabled || saving">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeLogSubsystem(i)" :disabled="writeDisabled">{{ t('ipsec.buttons.delete') }}</ToolbarButton>
           </div>
         </template>
         <template #profile>
           <div class="toolbar">
             <div class="toolbar-left">
-              <ToolbarButton icon="create" @click="createProfile" :disabled="writeDisabled">创建</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editProfile" :disabled="writeDisabled || !selectedProfile.length || selectedProfile.length > 1">编辑</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removeProfile" :disabled="writeDisabled || !selectedProfile.length">删除</ToolbarButton>
+              <ToolbarButton icon="create" @click="createProfile" :disabled="writeDisabled">{{ t('ipsec.buttons.create') }}</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editProfile" :disabled="writeDisabled || !selectedProfile.length || selectedProfile.length > 1">{{ t('ipsec.buttons.edit') }}</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removeProfile" :disabled="writeDisabled || !selectedProfile.length">{{ t('ipsec.buttons.delete') }}</ToolbarButton>
             </div>
           </div>
           <DataTable :columns="profileColumns" :data="profiles" row-key="name" :externalToolbar="true" @selection-change="selectedProfile = $event" :selectable="true" />
@@ -1358,9 +1433,9 @@ export default defineComponent({
         <template #site_to_site>
           <div class="toolbar">
             <div class="toolbar-left">
-              <ToolbarButton icon="create" @click="createS2s" :disabled="writeDisabled">创建</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editS2s" :disabled="writeDisabled || !selectedS2s.length || selectedS2s.length > 1">编辑</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removeS2s" :disabled="writeDisabled || !selectedS2s.length">删除</ToolbarButton>
+              <ToolbarButton icon="create" @click="createS2s" :disabled="writeDisabled">{{ t('ipsec.buttons.create') }}</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editS2s" :disabled="writeDisabled || !selectedS2s.length || selectedS2s.length > 1">{{ t('ipsec.buttons.edit') }}</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removeS2s" :disabled="writeDisabled || !selectedS2s.length">{{ t('ipsec.buttons.delete') }}</ToolbarButton>
             </div>
           </div>
           <DataTable :columns="s2sColumns" :data="siteToSitePeers" row-key="name" :externalToolbar="true" @selection-change="selectedS2s = $event" :selectable="true">
@@ -1372,9 +1447,9 @@ export default defineComponent({
             <template #connection>
               <div class="toolbar">
                 <div class="toolbar-left">
-                  <ToolbarButton icon="create" @click="createRa" :disabled="writeDisabled">创建</ToolbarButton>
-                  <ToolbarButton icon="edit" @click="editRa" :disabled="writeDisabled || !selectedRa.length || selectedRa.length > 1">编辑</ToolbarButton>
-                  <ToolbarButton icon="delete" @click="removeRa" :disabled="writeDisabled || !selectedRa.length">删除</ToolbarButton>
+                  <ToolbarButton icon="create" @click="createRa" :disabled="writeDisabled">{{ t('ipsec.buttons.create') }}</ToolbarButton>
+                  <ToolbarButton icon="edit" @click="editRa" :disabled="writeDisabled || !selectedRa.length || selectedRa.length > 1">{{ t('ipsec.buttons.edit') }}</ToolbarButton>
+                  <ToolbarButton icon="delete" @click="removeRa" :disabled="writeDisabled || !selectedRa.length">{{ t('ipsec.buttons.delete') }}</ToolbarButton>
                 </div>
               </div>
               <DataTable :columns="raColumns" :data="remoteAccessConns" row-key="name" :externalToolbar="true" @selection-change="selectedRa = $event" :selectable="true">
@@ -1384,9 +1459,9 @@ export default defineComponent({
             <template #pool>
               <div class="toolbar">
                 <div class="toolbar-left">
-                  <ToolbarButton icon="create" @click="createRaPool" :disabled="writeDisabled">创建</ToolbarButton>
-                  <ToolbarButton icon="edit" @click="editRaPool" :disabled="writeDisabled || !selectedRaPool.length || selectedRaPool.length > 1">编辑</ToolbarButton>
-                  <ToolbarButton icon="delete" @click="removeRaPool" :disabled="writeDisabled || !selectedRaPool.length">删除</ToolbarButton>
+                  <ToolbarButton icon="create" @click="createRaPool" :disabled="writeDisabled">{{ t('ipsec.buttons.create') }}</ToolbarButton>
+                  <ToolbarButton icon="edit" @click="editRaPool" :disabled="writeDisabled || !selectedRaPool.length || selectedRaPool.length > 1">{{ t('ipsec.buttons.edit') }}</ToolbarButton>
+                  <ToolbarButton icon="delete" @click="removeRaPool" :disabled="writeDisabled || !selectedRaPool.length">{{ t('ipsec.buttons.delete') }}</ToolbarButton>
                 </div>
               </div>
               <DataTable :columns="raPoolColumns" :data="remoteAccessPools" row-key="name" :externalToolbar="true" @selection-change="selectedRaPool = $event" :selectable="true">
@@ -1396,221 +1471,272 @@ export default defineComponent({
             </template>
             <template #dhcp>
               <div class="form-row">
-                <label class="form-label" title="DHCP 服务器 IPv4 地址">DHCP 服务器</label>
-                <input class="form-control" v-model="remoteAccessDhcp.server" placeholder="如 192.168.1.1" :disabled="writeDisabled" title="DHCP 服务器 IPv4 地址" />
+                <label class="form-label" :title="t('ipsec.form.dhcpServerTitle')">{{ t('ipsec.form.dhcpServer') }}</label>
+                <input class="form-control" v-model="remoteAccessDhcp.server" :placeholder="t('ipsec.form.dhcpServerPlaceholder')" :disabled="writeDisabled" :title="t('ipsec.form.dhcpServerTitle')" />
               </div>
               <div class="form-row">
-                <label class="form-label" title="使用 DHCP 的接口，如 eth0">DHCP 接口</label>
-                <input class="form-control" v-model="remoteAccessDhcp.interface" placeholder="如 eth0" :disabled="writeDisabled" title="DHCP 接口" />
-              </div>
-              <div class="page-actions-bottom">
-                <ToolbarButton icon="save" primary @click="saveRaDhcp" :disabled="writeDisabled || saving">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
+                <label class="form-label" :title="t('ipsec.form.dhcpInterfaceTitle')">{{ t('ipsec.form.dhcpInterface') }}</label>
+                <input class="form-control" v-model="remoteAccessDhcp.interface" :placeholder="t('ipsec.form.dhcpInterfacePlaceholder')" :disabled="writeDisabled" :title="t('ipsec.form.dhcpInterfaceTitle')" />
               </div>
             </template>
             <template #radius>
               <div class="form-row">
-                <label class="form-label" title="发送给 RADIUS 的 NAS-Identifier 属性">NAS-Identifier</label>
-                <input class="form-control" v-model="remoteAccessRadius.nas_identifier" :disabled="writeDisabled" title="NAS-Identifier" />
+                <label class="form-label" :title="t('ipsec.form.nasIdentifierTitle')">NAS-Identifier</label>
+                <input class="form-control" v-model="remoteAccessRadius.nas_identifier" :disabled="writeDisabled" :title="t('ipsec.form.nasIdentifierTitle')" />
               </div>
               <div class="form-row">
-                <label class="form-label" title="会话超时时间，范围 1-240 秒，默认 2">超时</label>
+                <label class="form-label" :title="t('ipsec.form.timeoutTitle')">{{ t('ipsec.form.timeout') }}</label>
                 <div style="flex:1;">
-                  <input class="form-control" type="number" min="1" max="240" v-model="remoteAccessRadius.timeout" placeholder="2" :disabled="writeDisabled" title="RADIUS 超时（秒）" style="width:100%;" />
-                  <div class="form-hint">范围：1-240，默认 2</div>
+                  <input class="form-control" type="number" min="1" max="240" v-model="remoteAccessRadius.timeout" placeholder="2" :disabled="writeDisabled" :title="t('ipsec.form.timeoutTitle')" style="width:100%;" />
+                  <div class="form-hint">{{ t('ipsec.form.timeoutHint') }}</div>
                 </div>
               </div>
               <div class="toolbar">
                 <div class="toolbar-left">
-                  <ToolbarButton icon="create" @click="createRaRadiusServer" :disabled="writeDisabled">添加服务器</ToolbarButton>
-                  <ToolbarButton icon="edit" @click="editRaRadiusServer" :disabled="writeDisabled || !selectedRaRadiusServer.length || selectedRaRadiusServer.length > 1">编辑</ToolbarButton>
-                  <ToolbarButton icon="delete" @click="removeRaRadiusServer" :disabled="writeDisabled || !selectedRaRadiusServer.length">删除</ToolbarButton>
+                  <ToolbarButton icon="create" @click="createRaRadiusServer" :disabled="writeDisabled">{{ t('ipsec.buttons.create') }}</ToolbarButton>
+                  <ToolbarButton icon="edit" @click="editRaRadiusServer" :disabled="writeDisabled || !selectedRaRadiusServer.length || selectedRaRadiusServer.length > 1">{{ t('ipsec.buttons.edit') }}</ToolbarButton>
+                  <ToolbarButton icon="delete" @click="removeRaRadiusServer" :disabled="writeDisabled || !selectedRaRadiusServer.length">{{ t('ipsec.buttons.delete') }}</ToolbarButton>
                 </div>
               </div>
               <DataTable :columns="raRadiusServerColumns" :data="remoteAccessRadius.servers" row-key="ip" :externalToolbar="true" @selection-change="selectedRaRadiusServer = $event" :selectable="true" />
-              <div class="page-actions-bottom">
-                <ToolbarButton icon="save" primary @click="saveRaRadius" :disabled="writeDisabled || saving">{{ saving ? '保存中...' : '保存 RADIUS' }}</ToolbarButton>
-              </div>
             </template>
           </TabGroup>
         </template>
       </TabGroup>
 
 
-      <DraggableModal v-model:visible="ikeModalVisible" title="IKE 组" width="920px" @confirm="saveIke">
-        <div class="form-row"><label class="form-label" title="IKE 组名称，只能包含字母、数字、下划线和连字符">名称</label><input class="form-control" v-model="editingIke.name" :disabled="editingIke._name" title="IKE 组名称" /></div>
-        <div class="form-row"><label class="form-label" title="IKE 密钥交换版本：ikev1 或 ikev2">密钥交换</label><select class="form-control" v-model="editingIke.key_exchange" title="IKE 密钥交换版本"><option v-for="o in KEY_EXCHANGE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="IKE 协商模式：main（主模式）或 aggressive（积极模式）">模式</label><select class="form-control" v-model="editingIke.mode" title="IKE 协商模式"><option v-for="o in IKE_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="IKE SA 生命周期，单位秒，范围 0-86400，默认 28800">生命周期</label><div style="flex:1;"><input class="form-control" type="number" min="0" max="86400" v-model="editingIke.lifetime" placeholder="28800" title="IKE SA 生命周期（秒）" style="width:100%;" /><div class="form-hint">范围：0-86400，默认 28800</div></div></div>
-        <div class="form-row"><label class="form-label" title="连接关闭时的动作：none/clear/hold/restart">关闭动作</label><select class="form-control" v-model="editingIke.close_action" title="连接关闭动作"><option v-for="o in CLOSE_ACTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="禁用 MOBIKE（IKEv2 移动性与多重宿主协议）">禁用 MOBIKE</label><input type="checkbox" v-model="editingIke.disable_mobike" title="禁用 MOBIKE" /></div>
-        <div class="form-row"><label class="form-label" title="启用 IKEv2 重新认证">IKEv2 重新认证</label><input type="checkbox" v-model="editingIke.ikev2_reauth" title="启用 IKEv2 重新认证" /></div>
-        <div style="font-weight:bold;margin:12px 0 8px;">Dead Peer Detection</div>
-        <div class="form-row"><label class="form-label" title="DPD 检测到对端失效时执行的动作：clear/hold/restart">动作</label><select class="form-control" v-model="editingIke.dpd_action" title="DPD 动作"><option v-for="o in DPD_ACTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="DPD 探测间隔，单位秒，范围 2-86400，默认 30">间隔</label><div style="flex:1;"><input class="form-control" type="number" min="2" max="86400" v-model="editingIke.dpd_interval" placeholder="30" title="DPD 探测间隔（秒）" style="width:100%;" /><div class="form-hint">范围：2-86400，默认 30</div></div></div>
-        <div class="form-row"><label class="form-label" title="DPD 超时时间，单位秒，范围 2-86400，默认 120">超时</label><div style="flex:1;"><input class="form-control" type="number" min="2" max="86400" v-model="editingIke.dpd_timeout" placeholder="120" title="DPD 超时时间（秒）" style="width:100%;" /><div class="form-hint">范围：2-86400，默认 120</div></div></div>
-        <div style="font-weight:bold;margin:12px 0 8px;">提议</div>
+      <DraggableModal v-model:visible="ikeModalVisible" :title="t('ipsec.modals.ikeGroup')" width="920px" @confirm="saveIke">
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.nameTitle')">{{ t('ipsec.form.name') }}</label><input class="form-control" v-model="editingIke.name" :disabled="editingIke._name" :title="t('ipsec.form.nameTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.keyExchangeTitle')">{{ t('ipsec.form.keyExchange') }}</label><select class="form-control" v-model="editingIke.key_exchange" :title="t('ipsec.form.keyExchangeTitle')"><option v-for="o in KEY_EXCHANGE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.modeTitle')">{{ t('ipsec.form.mode') }}</label><select class="form-control" v-model="editingIke.mode" :title="t('ipsec.form.modeTitle')"><option v-for="o in IKE_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.lifetimeTitle')">{{ t('ipsec.form.lifetime') }}</label><div style="flex:1;"><input class="form-control" type="number" min="0" max="86400" v-model="editingIke.lifetime" :placeholder="t('ipsec.form.lifetimePlaceholder')" :title="t('ipsec.form.lifetimeTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.lifetimeHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.closeActionTitle')">{{ t('ipsec.form.closeAction') }}</label><select class="form-control" v-model="editingIke.close_action" :title="t('ipsec.form.closeActionTitle')"><option v-for="o in CLOSE_ACTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.disableMobikeTitle')">{{ t('ipsec.form.disableMobike') }}</label><input type="checkbox" v-model="editingIke.disable_mobike" :title="t('ipsec.form.disableMobikeTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.ikev2ReauthTitle')">{{ t('ipsec.form.ikev2Reauth') }}</label><input type="checkbox" v-model="editingIke.ikev2_reauth" :title="t('ipsec.form.ikev2ReauthTitle')" /></div>
+        <div style="font-weight:bold;margin:12px 0 8px;">{{ t('ipsec.form.dpd') }}</div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.dpdActionTitle')">{{ t('ipsec.form.dpdAction') }}</label><select class="form-control" v-model="editingIke.dpd_action" :title="t('ipsec.form.dpdActionTitle')"><option v-for="o in DPD_ACTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.dpdIntervalTitle')">{{ t('ipsec.form.dpdInterval') }}</label><div style="flex:1;"><input class="form-control" type="number" min="2" max="86400" v-model="editingIke.dpd_interval" :placeholder="t('ipsec.form.dpdIntervalPlaceholder')" :title="t('ipsec.form.dpdIntervalTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.dpdIntervalHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.dpdTimeoutTitle')">{{ t('ipsec.form.dpdTimeout') }}</label><div style="flex:1;"><input class="form-control" type="number" min="2" max="86400" v-model="editingIke.dpd_timeout" :placeholder="t('ipsec.form.dpdTimeoutPlaceholder')" :title="t('ipsec.form.dpdTimeoutTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.dpdTimeoutHint') }}</div></div></div>
+        <div style="font-weight:bold;margin:12px 0 8px;">{{ t('ipsec.form.proposal') }}</div>
         <div style="display:grid;grid-template-columns:70px 140px 110px 140px 110px auto;gap:8px;align-items:end;margin-bottom:4px;">
-          <div style="font-size:12px;color:#666;">编号</div>
-          <div style="font-size:12px;color:#666;">加密</div>
-          <div style="font-size:12px;color:#666;">哈希</div>
-          <div style="font-size:12px;color:#666;">DH 组</div>
-          <div style="font-size:12px;color:#666;">PRF</div>
+          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.proposalNumber') }}</div>
+          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.encryption') }}</div>
+          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.hash') }}</div>
+          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.dhGroup') }}</div>
+          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.prf') }}</div>
         </div>
         <div v-for="(p, i) in editingIke.proposals" :key="i" style="display:grid;grid-template-columns:70px 140px 110px 140px 110px auto;gap:8px;align-items:start;">
-          <input class="form-control" v-model="p.number" placeholder="编号" title="提议编号" />
-          <select class="form-control" v-model="p.encryption" title="加密算法，默认 aes128"><option v-for="o in ENCRYPTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select>
-          <select class="form-control" v-model="p.hash" title="哈希算法，默认 sha1"><option v-for="o in HASH_OPTIONS" :key="o" :value="o">{{ o }}</option></select>
-          <select class="form-control" v-model="p.dh_group" title="Diffie-Hellman 组，默认 2 (modp1024)"><option v-for="o in DH_GROUP_OPTIONS" :key="optionValue(o)" :value="optionValue(o)">{{ optionLabel(o) }}</option></select>
-          <select class="form-control" v-model="p.prf" title="伪随机函数，默认 prfsha1"><option v-for="o in PRF_OPTIONS" :key="o" :value="o">{{ o }}</option></select>
-          <ToolbarButton icon="delete" @click="removeIkeProposal(i)">删除</ToolbarButton>
+          <input class="form-control" v-model="p.number" :placeholder="t('ipsec.form.proposalNumberPlaceholder')" :title="t('ipsec.form.proposalNumberTitle')" />
+          <select class="form-control" v-model="p.encryption" :title="t('ipsec.form.encryptionTitle')"><option v-for="o in ENCRYPTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select>
+          <select class="form-control" v-model="p.hash" :title="t('ipsec.form.hashTitle')"><option v-for="o in HASH_OPTIONS" :key="o" :value="o">{{ o }}</option></select>
+          <select class="form-control" v-model="p.dh_group" :title="t('ipsec.form.dhGroupTitle')"><option v-for="o in DH_GROUP_OPTIONS" :key="optionValue(o)" :value="optionValue(o)">{{ optionLabel(o) }}</option></select>
+          <select class="form-control" v-model="p.prf" :title="t('ipsec.form.prfTitle')"><option v-for="o in PRF_OPTIONS" :key="o" :value="o">{{ o }}</option></select>
+          <ToolbarButton icon="delete" @click="removeIkeProposal(i)">{{ t('ipsec.buttons.delete') }}</ToolbarButton>
         </div>
-        <ToolbarButton icon="create" @click="addIkeProposal">添加提议</ToolbarButton>
+        <ToolbarButton icon="create" @click="addIkeProposal">{{ t('ipsec.buttons.addProposal') }}</ToolbarButton>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="espModalVisible" title="ESP 组" width="700px" @confirm="saveEsp">
-        <div class="form-row"><label class="form-label" title="ESP 组名称，只能包含字母、数字、下划线和连字符">名称</label><input class="form-control" v-model="editingEsp.name" :disabled="editingEsp._name" title="ESP 组名称" /></div>
-        <div class="form-row"><label class="form-label" title="ESP 模式：tunnel（隧道模式）或 transport（传输模式）">模式</label><select class="form-control" v-model="editingEsp.mode" title="ESP 模式"><option v-for="o in ESP_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="ESP SA 生命周期，单位秒，范围 30-86400，默认 3600">生命周期</label><div style="flex:1;"><input class="form-control" type="number" min="30" max="86400" v-model="editingEsp.lifetime" placeholder="3600" title="ESP SA 生命周期（秒）" style="width:100%;" /><div class="form-hint">范围：30-86400，默认 3600</div></div></div>
-        <div class="form-row"><label class="form-label" title="完美前向保密（PFS）：enable 或 disable">PFS</label><select class="form-control" v-model="editingEsp.pfs" title="完美前向保密"><option v-for="o in PFS_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="是否启用 IPsec 压缩：enable 或 disable">压缩</label><select class="form-control" v-model="editingEsp.compression" title="IPsec 压缩"><option v-for="o in COMPRESSION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="ESP 生命周期（字节），范围 1024-26843545600000">生命周期（字节）</label><div style="flex:1;"><input class="form-control" type="number" min="1024" max="26843545600000" v-model="editingEsp.life_bytes" title="ESP 生命周期（字节）" style="width:100%;" /><div class="form-hint">范围：1024-26843545600000</div></div></div>
-        <div class="form-row"><label class="form-label" title="ESP 生命周期（包数），范围 1000-26843545600000">生命周期（包数）</label><div style="flex:1;"><input class="form-control" type="number" min="1000" max="26843545600000" v-model="editingEsp.life_packets" title="ESP 生命周期（包数）" style="width:100%;" /><div class="form-hint">范围：1000-26843545600000</div></div></div>
-        <div style="font-weight:bold;margin:12px 0 8px;">提议</div>
+      <DraggableModal v-model:visible="espModalVisible" :title="t('ipsec.modals.espGroup')" width="700px" @confirm="saveEsp">
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.nameTitle')">{{ t('ipsec.form.name') }}</label><input class="form-control" v-model="editingEsp.name" :disabled="editingEsp._name" :title="t('ipsec.form.nameTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.espModeTitle')">{{ t('ipsec.form.espMode') }}</label><select class="form-control" v-model="editingEsp.mode" :title="t('ipsec.form.espModeTitle')"><option v-for="o in ESP_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.espLifetimeTitle')">{{ t('ipsec.form.espLifetime') }}</label><div style="flex:1;"><input class="form-control" type="number" min="30" max="86400" v-model="editingEsp.lifetime" :placeholder="t('ipsec.form.espLifetimePlaceholder')" :title="t('ipsec.form.espLifetimeTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.espLifetimeHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.pfsTitle')">{{ t('ipsec.form.pfs') }}</label><select class="form-control" v-model="editingEsp.pfs" :title="t('ipsec.form.pfsTitle')"><option v-for="o in PFS_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.compressionTitle')">{{ t('ipsec.form.compression') }}</label><select class="form-control" v-model="editingEsp.compression" :title="t('ipsec.form.compressionTitle')"><option v-for="o in COMPRESSION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.lifeBytesTitle')">{{ t('ipsec.form.lifeBytes') }}</label><div style="flex:1;"><input class="form-control" type="number" min="1024" max="26843545600000" v-model="editingEsp.life_bytes" :title="t('ipsec.form.lifeBytesTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.lifeBytesHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.lifePacketsTitle')">{{ t('ipsec.form.lifePackets') }}</label><div style="flex:1;"><input class="form-control" type="number" min="1000" max="26843545600000" v-model="editingEsp.life_packets" :title="t('ipsec.form.lifePacketsTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.lifePacketsHint') }}</div></div></div>
+        <div style="font-weight:bold;margin:12px 0 8px;">{{ t('ipsec.form.proposal') }}</div>
         <div style="display:grid;grid-template-columns:70px 180px 150px auto;gap:8px;align-items:end;margin-bottom:4px;">
-          <div style="font-size:12px;color:#666;">编号</div>
-          <div style="font-size:12px;color:#666;">加密</div>
-          <div style="font-size:12px;color:#666;">哈希</div>
+          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.proposalNumber') }}</div>
+          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.encryption') }}</div>
+          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.hash') }}</div>
         </div>
         <div v-for="(p, i) in editingEsp.proposals" :key="i" style="display:grid;grid-template-columns:70px 180px 150px auto;gap:8px;align-items:start;">
-          <input class="form-control" v-model="p.number" placeholder="编号" title="提议编号" />
-          <select class="form-control" v-model="p.encryption" title="加密算法，默认 aes128"><option v-for="o in ENCRYPTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select>
-          <select class="form-control" v-model="p.hash" title="哈希算法，默认 sha1"><option v-for="o in HASH_OPTIONS" :key="o" :value="o">{{ o }}</option></select>
-          <ToolbarButton icon="delete" @click="removeEspProposal(i)">删除</ToolbarButton>
+          <input class="form-control" v-model="p.number" :placeholder="t('ipsec.form.proposalNumberPlaceholder')" :title="t('ipsec.form.proposalNumberTitle')" />
+          <select class="form-control" v-model="p.encryption" :title="t('ipsec.form.encryptionTitle')"><option v-for="o in ENCRYPTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select>
+          <select class="form-control" v-model="p.hash" :title="t('ipsec.form.hashTitle')"><option v-for="o in HASH_OPTIONS" :key="o" :value="o">{{ o }}</option></select>
+          <ToolbarButton icon="delete" @click="removeEspProposal(i)">{{ t('ipsec.buttons.delete') }}</ToolbarButton>
         </div>
-        <ToolbarButton icon="create" @click="addEspProposal">添加提议</ToolbarButton>
+        <ToolbarButton icon="create" @click="addEspProposal">{{ t('ipsec.buttons.addProposal') }}</ToolbarButton>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="pskModalVisible" title="PSK 认证" width="600px" @confirm="savePsk">
-        <div class="form-row"><label class="form-label" title="PSK 名称，只能包含字母、数字、下划线和连字符">名称</label><input class="form-control" v-model="editingPsk.name" :disabled="editingPsk._name" title="PSK 名称" /></div>
-        <div class="form-row"><label class="form-label" title="IKE 身份标识，每行一个（如 IP 地址、FQDN、email）">ID（每行一个）</label><textarea class="form-control" v-model="editingPsk.ids" title="IKE 身份标识" /></div>
-        <div class="form-row"><label class="form-label" title="预共享密钥，用于 IKE 认证">密钥</label><input class="form-control" type="password" v-model="editingPsk.secret" title="预共享密钥" /></div>
-        <div class="form-row"><label class="form-label" title="通过 DHCP 获取地址的接口，多个用逗号分隔">DHCP 接口</label><input class="form-control" v-model="editingPsk.dhcp_interface" placeholder="多个用逗号分隔" title="DHCP 接口" /></div>
+      <DraggableModal v-model:visible="pskModalVisible" :title="t('ipsec.modals.pskAuth')" width="600px" @confirm="savePsk">
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.nameTitle')">{{ t('ipsec.form.name') }}</label><input class="form-control" v-model="editingPsk.name" :disabled="editingPsk._name" :title="t('ipsec.form.nameTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.idsTitle')">{{ t('ipsec.form.ids') }}</label><textarea class="form-control" v-model="editingPsk.ids" :title="t('ipsec.form.idsTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.secretTitle')">{{ t('ipsec.form.secret') }}</label><input class="form-control" type="password" v-model="editingPsk.secret" :title="t('ipsec.form.secretTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.dhcpInterfaceFieldTitle')">{{ t('ipsec.form.dhcpInterfaceField') }}</label><input class="form-control" v-model="editingPsk.dhcp_interface" :placeholder="t('ipsec.form.dhcpInterfaceFieldPlaceholder')" :title="t('ipsec.form.dhcpInterfaceFieldTitle')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="profileModalVisible" title="Profile" width="600px" @confirm="saveProfile">
-        <div class="form-row"><label class="form-label" title="Profile 名称，只能包含字母、数字、下划线和连字符">名称</label><input class="form-control" v-model="editingProfile.name" :disabled="editingProfile._name" title="Profile 名称" /></div>
-        <div class="form-row"><label class="form-label" title="引用的 IKE 组名称">IKE 组</label><select class="form-control" v-model="editingProfile.ike_group" title="IKE 组名称"><option value=""></option><option v-for="g in ikeGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="引用的 ESP 组名称">ESP 组</label><select class="form-control" v-model="editingProfile.esp_group" title="ESP 组名称"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="认证模式：pre-shared-secret、x509 或 rsa">认证模式</label><select class="form-control" v-model="editingProfile.authentication_mode" title="认证模式"><option v-for="o in AUTH_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="pre-shared-secret 模式下的预共享密钥">预共享密钥</label><input class="form-control" type="password" v-model="editingProfile.pre_shared_secret" title="预共享密钥" /></div>
-        <div class="form-row"><label class="form-label" title="绑定的隧道接口名称，每行一个">绑定隧道（每行一个）</label><textarea class="form-control" v-model="editingProfile.bind_tunnels" title="绑定隧道接口" /></div>
-        <div class="form-row"><label class="form-label" title="禁用该 Profile">禁用</label><input type="checkbox" v-model="editingProfile.disable" title="禁用 Profile" /></div>
+      <DraggableModal v-model:visible="profileModalVisible" :title="t('ipsec.modals.profile')" width="600px" @confirm="saveProfile">
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.nameTitle')">{{ t('ipsec.form.name') }}</label><input class="form-control" v-model="editingProfile.name" :disabled="editingProfile._name" :title="t('ipsec.form.nameTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.ikeGroupFieldTitle')">{{ t('ipsec.form.ikeGroupField') }}</label><select class="form-control" v-model="editingProfile.ike_group" :title="t('ipsec.form.ikeGroupFieldTitle')"><option value=""></option><option v-for="g in ikeGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.espGroupFieldTitle')">{{ t('ipsec.form.espGroupField') }}</label><select class="form-control" v-model="editingProfile.esp_group" :title="t('ipsec.form.espGroupFieldTitle')"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.authModeFieldTitle')">{{ t('ipsec.form.authModeField') }}</label><select class="form-control" v-model="editingProfile.authentication_mode" :title="t('ipsec.form.authModeFieldTitle')"><option v-for="o in AUTH_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.preSharedSecretTitle')">{{ t('ipsec.form.preSharedSecret') }}</label><input class="form-control" type="password" v-model="editingProfile.pre_shared_secret" :title="t('ipsec.form.preSharedSecretTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.bindTunnelsTitle')">{{ t('ipsec.form.bindTunnels') }}</label><textarea class="form-control" v-model="editingProfile.bind_tunnels" :title="t('ipsec.form.bindTunnelsTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.disableFieldTitle')">{{ t('ipsec.form.disableField') }}</label><input type="checkbox" v-model="editingProfile.disable" :title="t('ipsec.form.disableFieldTitle')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="s2sModalVisible" title="站点互联 Peer" width="760px" @confirm="saveS2s">
-        <div class="form-row"><label class="form-label" title="站点互联 Peer 名称，只能包含字母、数字、下划线和连字符">名称</label><input class="form-control" v-model="editingS2s.name" :disabled="editingS2s._name" title="Peer 名称" /></div>
-        <div class="form-row"><label class="form-label" title="远端网关地址，每行一个（IPv4/IPv6 地址或网段）">远端地址（每行一个）</label><textarea class="form-control" v-model="editingS2s.remote_address" placeholder="IPv4/IPv6 地址" title="远端网关地址" /></div>
-        <div class="form-row"><label class="form-label" title="本地网关地址（IPv4/IPv6 地址）">本地地址</label><input class="form-control" v-model="editingS2s.local_address" placeholder="IPv4/IPv6 地址" title="本地网关地址" /></div>
-        <div class="form-row"><label class="form-label" title="连接类型：initiator（发起方）、responder（响应方）或 response-only">连接类型</label><select class="form-control" v-model="editingS2s.connection_type" title="连接类型"><option v-for="o in CONNECTION_TYPE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="引用的 IKE 组名称">IKE 组</label><select class="form-control" v-model="editingS2s.ike_group" title="IKE 组名称"><option value=""></option><option v-for="g in ikeGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="默认引用的 ESP 组名称">默认 ESP 组</label><select class="form-control" v-model="editingS2s.default_esp_group" title="默认 ESP 组名称"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="该 Peer 的描述信息">描述</label><input class="form-control" v-model="editingS2s.description" title="描述" /></div>
-        <div class="form-row"><label class="form-label" title="通过 DHCP 获取地址的接口，如 eth0">DHCP 接口</label><input class="form-control" v-model="editingS2s.dhcp_interface" placeholder="如 eth0" title="DHCP 接口" /></div>
-        <div class="form-row"><label class="form-label" title="抗重放窗口大小，范围 0-1024，默认 32">Replay window</label><div style="flex:1;"><input class="form-control" type="number" min="0" max="1024" v-model="editingS2s.replay_window" placeholder="32" title="Replay window" style="width:100%;" /><div class="form-hint">范围：0-1024，默认 32</div></div></div>
-        <div class="form-row"><label class="form-label" title="虚拟地址，每行一个（IPv4/IPv6 地址或网段）">虚拟地址（每行一个）</label><textarea class="form-control" v-model="editingS2s.virtual_address" title="虚拟地址" /></div>
-        <div class="form-row"><label class="form-label" title="VTI 隧道绑定接口，如 vti0">VTI 绑定接口</label><input class="form-control" v-model="editingS2s.vti_bind" title="VTI 绑定接口" /></div>
-        <div class="form-row"><label class="form-label" title="VTI 使用的 ESP 组名称">VTI ESP 组</label><select class="form-control" v-model="editingS2s.vti_esp_group" title="VTI ESP 组"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="认证模式：pre-shared-secret、x509 或 rsa">认证模式</label><select class="form-control" v-model="editingS2s.auth_mode" title="认证模式"><option v-for="o in AUTH_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="本地 IKE 身份标识">本地 ID</label><input class="form-control" v-model="editingS2s.auth_local_id" title="本地 ID" /></div>
-        <div class="form-row"><label class="form-label" title="远端 IKE 身份标识">远端 ID</label><input class="form-control" v-model="editingS2s.auth_remote_id" title="远端 ID" /></div>
-        <div class="form-row"><label class="form-label" title="x509 认证时使用证书中的 ID">使用 X509 ID</label><input type="checkbox" v-model="editingS2s.auth_use_x509_id" title="使用 X509 ID" /></div>
-        <div class="form-row"><label class="form-label" title="强制使用 UDP 封装（NAT-T）">强制 UDP 封装</label><input type="checkbox" v-model="editingS2s.force_udp_encapsulation" title="强制 UDP 封装" /></div>
-        <div class="form-row"><label class="form-label" title="禁用该 Peer">禁用</label><input type="checkbox" v-model="editingS2s.disable" title="禁用 Peer" /></div>
-        <div class="form-row"><label class="form-label" title="启用 IKEv2 重新认证">IKEv2 重新认证</label><input type="checkbox" v-model="editingS2s.ikev2_reauth" title="IKEv2 重新认证" /></div>
-        <div style="font-weight:bold;margin:12px 0 8px;">隧道</div>
-        <div v-for="(t, i) in editingS2s.tunnels" :key="i" style="border:1px solid var(--color-border);border-radius:4px;padding:12px;margin-bottom:12px;background:#fafafa;">
+      <DraggableModal v-model:visible="s2sModalVisible" :title="t('ipsec.modals.s2sPeer')" width="760px" @confirm="saveS2s">
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.nameTitle')">{{ t('ipsec.form.name') }}</label><input class="form-control" v-model="editingS2s.name" :disabled="editingS2s._name" :title="t('ipsec.form.nameTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.remoteAddressTitle')">{{ t('ipsec.form.remoteAddress') }}</label><textarea class="form-control" v-model="editingS2s.remote_address" :placeholder="t('ipsec.form.remoteAddressPlaceholder')" :title="t('ipsec.form.remoteAddressTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.localAddressTitle')">{{ t('ipsec.form.localAddress') }}</label><input class="form-control" v-model="editingS2s.local_address" :placeholder="t('ipsec.form.localAddressPlaceholder')" :title="t('ipsec.form.localAddressTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.connectionTypeTitle')">{{ t('ipsec.form.connectionType') }}</label><select class="form-control" v-model="editingS2s.connection_type" :title="t('ipsec.form.connectionTypeTitle')"><option v-for="o in CONNECTION_TYPE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.ikeGroupFieldTitle')">{{ t('ipsec.form.ikeGroupField') }}</label><select class="form-control" v-model="editingS2s.ike_group" :title="t('ipsec.form.ikeGroupFieldTitle')"><option value=""></option><option v-for="g in ikeGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.defaultEspGroupTitle')">{{ t('ipsec.form.defaultEspGroup') }}</label><select class="form-control" v-model="editingS2s.default_esp_group" :title="t('ipsec.form.defaultEspGroupTitle')"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.descriptionTitle')">{{ t('ipsec.form.description') }}</label><input class="form-control" v-model="editingS2s.description" :title="t('ipsec.form.descriptionTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.dhcpInterfaceField2Title')">{{ t('ipsec.form.dhcpInterfaceField2') }}</label><input class="form-control" v-model="editingS2s.dhcp_interface" :placeholder="t('ipsec.form.dhcpInterfaceField2Placeholder')" :title="t('ipsec.form.dhcpInterfaceField2Title')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.replayWindowTitle')">{{ t('ipsec.form.replayWindow') }}</label><div style="flex:1;"><input class="form-control" type="number" min="0" max="1024" v-model="editingS2s.replay_window" :placeholder="t('ipsec.form.replayWindowPlaceholder')" :title="t('ipsec.form.replayWindowTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.replayWindowHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.virtualAddressTitle')">{{ t('ipsec.form.virtualAddress') }}</label><textarea class="form-control" v-model="editingS2s.virtual_address" :title="t('ipsec.form.virtualAddressTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.vtiBindTitle')">{{ t('ipsec.form.vtiBind') }}</label><input class="form-control" v-model="editingS2s.vti_bind" :title="t('ipsec.form.vtiBindTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.vtiEspGroupTitle')">{{ t('ipsec.form.vtiEspGroup') }}</label><select class="form-control" v-model="editingS2s.vti_esp_group" :title="t('ipsec.form.vtiEspGroupTitle')"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.authModeFieldTitle')">{{ t('ipsec.form.authModeField') }}</label><select class="form-control" v-model="editingS2s.auth_mode" :title="t('ipsec.form.authModeFieldTitle')"><option v-for="o in AUTH_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.localIdTitle')">{{ t('ipsec.form.localId') }}</label><input class="form-control" v-model="editingS2s.auth_local_id" :title="t('ipsec.form.localIdTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.remoteIdTitle')">{{ t('ipsec.form.remoteId') }}</label><input class="form-control" v-model="editingS2s.auth_remote_id" :title="t('ipsec.form.remoteIdTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.useX509IdTitle')">{{ t('ipsec.form.useX509Id') }}</label><input type="checkbox" v-model="editingS2s.auth_use_x509_id" :title="t('ipsec.form.useX509IdTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.forceUdpEncapTitle')">{{ t('ipsec.form.forceUdpEncap') }}</label><input type="checkbox" v-model="editingS2s.force_udp_encapsulation" :title="t('ipsec.form.forceUdpEncapTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.disableFieldTitle')">{{ t('ipsec.form.disableField') }}</label><input type="checkbox" v-model="editingS2s.disable" :title="t('ipsec.form.disableFieldTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.ikev2ReauthTitle')">{{ t('ipsec.form.ikev2Reauth') }}</label><input type="checkbox" v-model="editingS2s.ikev2_reauth" :title="t('ipsec.form.ikev2ReauthTitle')" /></div>
+        <div style="font-weight:bold;margin:12px 0 8px;">{{ t('ipsec.form.tunnel') }}</div>
+        <div v-for="(tun, i) in editingS2s.tunnels" :key="i" style="border:1px solid var(--color-border);border-radius:4px;padding:12px;margin-bottom:12px;background:#fafafa;">
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
             <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">编号</div>
-              <input class="form-control" type="number" min="0" max="4294967295" v-model="t.number" placeholder="0-4294967295" title="隧道编号，范围 0-4294967295" style="width:100%;" />
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelNumber') }}</div>
+              <input class="form-control" type="number" min="0" max="4294967295" v-model="tun.number" :placeholder="t('ipsec.form.tunnelNumberPlaceholder')" :title="t('ipsec.form.tunnelNumberTitle')" style="width:100%;" />
             </div>
             <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">ESP 组</div>
-              <select class="form-control" v-model="t.esp_group" title="隧道 ESP 组" style="width:100%;"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select>
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelEspGroup') }}</div>
+              <select class="form-control" v-model="tun.esp_group" :title="t('ipsec.form.tunnelEspGroupTitle')" style="width:100%;"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select>
             </div>
             <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">优先级</div>
-              <input class="form-control" type="number" min="1" max="100" v-model="t.priority" placeholder="1-100" title="隧道优先级，范围 1-100，数值越小越优先" style="width:100%;" />
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelPriority') }}</div>
+              <input class="form-control" type="number" min="1" max="100" v-model="tun.priority" :placeholder="t('ipsec.form.tunnelPriorityPlaceholder')" :title="t('ipsec.form.tunnelPriorityTitle')" style="width:100%;" />
             </div>
             <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">协议</div>
-              <select class="form-control" v-model="t.protocol" title="协议名称" style="width:100%;"><option v-for="o in protocolOptions" :key="o" :value="o">{{ o }}</option></select>
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelProtocol') }}</div>
+              <select class="form-control" v-model="tun.protocol" :title="t('ipsec.form.tunnelProtocolTitle')" style="width:100%;"><option v-for="o in protocolOptions" :key="o" :value="o">{{ o }}</option></select>
             </div>
             <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">本地端口</div>
-              <input class="form-control" type="number" min="1" max="65535" v-model="t.local_port" placeholder="1-65535" title="本地端口，范围 1-65535" style="width:100%;" />
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelLocalPort') }}</div>
+              <input class="form-control" type="number" min="1" max="65535" v-model="tun.local_port" :placeholder="t('ipsec.form.tunnelLocalPortPlaceholder')" :title="t('ipsec.form.tunnelLocalPortTitle')" style="width:100%;" />
             </div>
             <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">远端端口</div>
-              <input class="form-control" type="number" min="1" max="65535" v-model="t.remote_port" placeholder="1-65535" title="远端端口，范围 1-65535" style="width:100%;" />
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelRemotePort') }}</div>
+              <input class="form-control" type="number" min="1" max="65535" v-model="tun.remote_port" :placeholder="t('ipsec.form.tunnelRemotePortPlaceholder')" :title="t('ipsec.form.tunnelRemotePortTitle')" style="width:100%;" />
             </div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
             <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">本地前缀（每行一个）</div>
-              <textarea class="form-control" v-model="t.local_prefix" placeholder="IPv4/IPv6 网段" title="本地子网前缀" rows="2" style="width:100%;" />
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelLocalPrefix') }}</div>
+              <textarea class="form-control" v-model="tun.local_prefix" :placeholder="t('ipsec.form.tunnelLocalPrefixPlaceholder')" :title="t('ipsec.form.tunnelLocalPrefixTitle')" rows="2" style="width:100%;" />
             </div>
             <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">远端前缀（每行一个）</div>
-              <textarea class="form-control" v-model="t.remote_prefix" placeholder="IPv4/IPv6 网段" title="远端子网前缀" rows="2" style="width:100%;" />
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelRemotePrefix') }}</div>
+              <textarea class="form-control" v-model="tun.remote_prefix" :placeholder="t('ipsec.form.tunnelRemotePrefixPlaceholder')" :title="t('ipsec.form.tunnelRemotePrefixTitle')" rows="2" style="width:100%;" />
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:12px;margin-top:12px;">
-            <label style="white-space:nowrap;" title="禁用该隧道"><input type="checkbox" v-model="t.disable" /> 禁用</label>
-            <ToolbarButton icon="delete" @click="removeS2sTunnel(i)">删除隧道</ToolbarButton>
+            <label style="white-space:nowrap;" :title="t('ipsec.form.tunnelDisableTitle')"><input type="checkbox" v-model="tun.disable" /> {{ t('ipsec.form.tunnelDisable') }}</label>
+            <ToolbarButton icon="delete" @click="removeS2sTunnel(i)">{{ t('ipsec.buttons.deleteTunnel') }}</ToolbarButton>
           </div>
         </div>
-        <ToolbarButton icon="create" @click="addS2sTunnel">添加隧道</ToolbarButton>
+        <ToolbarButton icon="create" @click="addS2sTunnel">{{ t('ipsec.buttons.addTunnel') }}</ToolbarButton>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="raModalVisible" title="远程接入连接" width="650px" @confirm="saveRa">
-        <div class="form-row"><label class="form-label" title="远程接入连接名称，只能包含字母、数字、下划线和连字符">名称</label><input class="form-control" v-model="editingRa.name" :disabled="editingRa._name" title="连接名称" /></div>
-        <div class="form-row"><label class="form-label" title="引用的 IKE 组名称">IKE 组</label><select class="form-control" v-model="editingRa.ike_group" title="IKE 组名称"><option value=""></option><option v-for="g in ikeGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="引用的 ESP 组名称">ESP 组</label><select class="form-control" v-model="editingRa.esp_group" title="ESP 组名称"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="本地监听地址（IPv4/IPv6 地址）">本地地址</label><input class="form-control" v-model="editingRa.local_address" placeholder="IPv4/IPv6 地址" title="本地监听地址" /></div>
-        <div class="form-row"><label class="form-label" title="本地保护前缀，每行一个（IPv4/IPv6 网段）">本地前缀（每行一个）</label><textarea class="form-control" v-model="editingRa.local_prefix" placeholder="IPv4/IPv6 网段" title="本地保护前缀" /></div>
-        <div class="form-row"><label class="form-label" title="本地监听端口，范围 1-65535">本地端口</label><div style="flex:1;"><input class="form-control" type="number" min="1" max="65535" v-model="editingRa.local_port" title="本地监听端口" style="width:100%;" /><div class="form-hint">范围：1-65535</div></div></div>
-        <div class="form-row"><label class="form-label" title="选择已创建的地址池名称（按住 Ctrl 多选）">地址池</label><select class="form-control" v-model="editingRa.pool" multiple title="选择已创建的地址池名称" style="min-height:80px;"><option value=""></option><option v-for="p in remoteAccessPools" :key="p.name" :value="p.name">{{ p.name }} ({{ p.prefix }})</option></select></div>
-        <div class="form-row"><label class="form-label" title="该连接的描述信息">描述</label><input class="form-control" v-model="editingRa.description" title="描述" /></div>
-        <div class="form-row"><label class="form-label" title="通过 DHCP 获取地址的接口，如 eth0">DHCP 接口</label><input class="form-control" v-model="editingRa.dhcp_interface" placeholder="如 eth0" title="DHCP 接口" /></div>
-        <div class="form-row"><label class="form-label" title="抗重放窗口大小，范围 0-1024，默认 32">Replay window</label><div style="flex:1;"><input class="form-control" type="number" min="0" max="1024" v-model="editingRa.replay_window" placeholder="32" title="Replay window" style="width:100%;" /><div class="form-hint">范围：0-1024，默认 32</div></div></div>
-        <div class="form-row"><label class="form-label" title="连接超时时间，单位秒，范围 1-86400，默认 28800">超时</label><div style="flex:1;"><input class="form-control" type="number" min="1" max="86400" v-model="editingRa.timeout" placeholder="28800" title="连接超时（秒）" style="width:100%;" /><div class="form-hint">范围：1-86400，默认 28800</div></div></div>
-        <div class="form-row"><label class="form-label" title="IKE 唯一性策略：never/replace/no">唯一性策略</label><select class="form-control" v-model="editingRa.unique" title="唯一性策略"><option v-for="o in UNIQUE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div style="font-weight:bold;margin:12px 0 8px;">认证</div>
-        <div class="form-row"><label class="form-label" title="服务器认证模式：x509 或 none">Server 模式</label><select class="form-control" v-model="editingRa.server_mode" title="服务器认证模式"><option v-for="o in SERVER_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="客户端认证模式：eap-mschapv2、eap-tls 或 eap-ttls">Client 模式</label><select class="form-control" v-model="editingRa.client_mode" title="客户端认证模式"><option v-for="o in CLIENT_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" title="EAP 身份标识">EAP ID</label><input class="form-control" v-model="editingRa.eap_id" title="EAP ID" /></div>
-        <div class="form-row"><label class="form-label" title="EAP 等模式使用的预共享密钥">预共享密钥</label><input class="form-control" type="password" v-model="editingRa.pre_shared_secret" title="预共享密钥" /></div>
-        <div class="form-row"><label class="form-label" title="本地 IKE 身份标识">本地 ID</label><input class="form-control" v-model="editingRa.auth_local_id" title="本地 ID" /></div>
-        <div class="form-row"><label class="form-label" title="X509 CA 证书名称，每行一个">X509 CA 证书（每行一个）</label><textarea class="form-control" v-model="editingRa.x509_ca_certs" title="X509 CA 证书" /></div>
-        <div class="form-row"><label class="form-label" title="X509 本地证书名称">X509 证书</label><input class="form-control" v-model="editingRa.x509_cert" title="X509 证书" /></div>
-        <div class="form-row"><label class="form-label" title="X509 证书私钥密码">X509 密码</label><input class="form-control" type="password" v-model="editingRa.x509_passphrase" title="X509 密码" /></div>
-        <div class="form-row"><label class="form-label" title="禁用该连接">禁用</label><input type="checkbox" v-model="editingRa.disable" title="禁用连接" /></div>
+      <DraggableModal v-model:visible="raModalVisible" :title="t('ipsec.modals.raConnection')" width="650px" @confirm="saveRa">
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.nameTitle')">{{ t('ipsec.form.name') }}</label><input class="form-control" v-model="editingRa.name" :disabled="editingRa._name" :title="t('ipsec.form.nameTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.ikeGroupFieldTitle')">{{ t('ipsec.form.ikeGroupField') }}</label><select class="form-control" v-model="editingRa.ike_group" :title="t('ipsec.form.ikeGroupFieldTitle')"><option value=""></option><option v-for="g in ikeGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.espGroupFieldTitle')">{{ t('ipsec.form.espGroupField') }}</label><select class="form-control" v-model="editingRa.esp_group" :title="t('ipsec.form.espGroupFieldTitle')"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.localAddressTitle')">{{ t('ipsec.form.localAddress') }}</label><input class="form-control" v-model="editingRa.local_address" :placeholder="t('ipsec.form.localAddressPlaceholder')" :title="t('ipsec.form.localAddressTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.localPrefixTitle')">{{ t('ipsec.form.localPrefix') }}</label><textarea class="form-control" v-model="editingRa.local_prefix" :placeholder="t('ipsec.form.localPrefixPlaceholder')" :title="t('ipsec.form.localPrefixTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.localPortTitle')">{{ t('ipsec.form.localPort') }}</label><div style="flex:1;"><input class="form-control" type="number" min="1" max="65535" v-model="editingRa.local_port" :title="t('ipsec.form.localPortTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.localPortHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.addressPoolTitle')">{{ t('ipsec.form.addressPool') }}</label><select class="form-control" v-model="editingRa.pool" multiple :title="t('ipsec.form.addressPoolTitle')" style="min-height:80px;"><option value=""></option><option v-for="p in remoteAccessPools" :key="p.name" :value="p.name">{{ p.name }} ({{ p.prefix }})</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.descriptionTitle')">{{ t('ipsec.form.description') }}</label><input class="form-control" v-model="editingRa.description" :title="t('ipsec.form.descriptionTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.dhcpInterfaceField2Title')">{{ t('ipsec.form.dhcpInterfaceField2') }}</label><input class="form-control" v-model="editingRa.dhcp_interface" :placeholder="t('ipsec.form.dhcpInterfaceField2Placeholder')" :title="t('ipsec.form.dhcpInterfaceField2Title')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.replayWindowTitle')">{{ t('ipsec.form.replayWindow') }}</label><div style="flex:1;"><input class="form-control" type="number" min="0" max="1024" v-model="editingRa.replay_window" :placeholder="t('ipsec.form.replayWindowPlaceholder')" :title="t('ipsec.form.replayWindowTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.replayWindowHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.timeoutFieldTitle')">{{ t('ipsec.form.timeoutField') }}</label><div style="flex:1;"><input class="form-control" type="number" min="1" max="86400" v-model="editingRa.timeout" :placeholder="t('ipsec.form.timeoutFieldPlaceholder')" :title="t('ipsec.form.timeoutFieldTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.timeoutFieldHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.uniqueTitle')">{{ t('ipsec.form.unique') }}</label><select class="form-control" v-model="editingRa.unique" :title="t('ipsec.form.uniqueTitle')"><option v-for="o in UNIQUE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div style="font-weight:bold;margin:12px 0 8px;">{{ t('ipsec.form.authentication') }}</div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.serverModeTitle')">{{ t('ipsec.form.serverMode') }}</label><select class="form-control" v-model="editingRa.server_mode" :title="t('ipsec.form.serverModeTitle')"><option v-for="o in SERVER_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.clientModeTitle')">{{ t('ipsec.form.clientMode') }}</label><select class="form-control" v-model="editingRa.client_mode" :title="t('ipsec.form.clientModeTitle')"><option v-for="o in CLIENT_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.eapIdTitle')">{{ t('ipsec.form.eapId') }}</label><input class="form-control" v-model="editingRa.eap_id" :title="t('ipsec.form.eapIdTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.preSharedSecretFieldTitle')">{{ t('ipsec.form.preSharedSecretField') }}</label><input class="form-control" type="password" v-model="editingRa.pre_shared_secret" :title="t('ipsec.form.preSharedSecretFieldTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.localIdTitle')">{{ t('ipsec.form.localId') }}</label><input class="form-control" v-model="editingRa.auth_local_id" :title="t('ipsec.form.localIdTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.x509CaCertsTitle')">{{ t('ipsec.form.x509CaCerts') }}</label><textarea class="form-control" v-model="editingRa.x509_ca_certs" :title="t('ipsec.form.x509CaCertsTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.x509CertTitle')">{{ t('ipsec.form.x509Cert') }}</label><input class="form-control" v-model="editingRa.x509_cert" :title="t('ipsec.form.x509CertTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.x509PassphraseTitle')">{{ t('ipsec.form.x509Passphrase') }}</label><input class="form-control" type="password" v-model="editingRa.x509_passphrase" :title="t('ipsec.form.x509PassphraseTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.disableFieldTitle')">{{ t('ipsec.form.disableField') }}</label><input type="checkbox" v-model="editingRa.disable" :title="t('ipsec.form.disableFieldTitle')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="raPoolModalVisible" title="远程接入地址池" width="600px" @confirm="saveRaPool">
-        <div class="form-row"><label class="form-label" title="地址池名称，只能包含字母、数字、下划线和连字符">名称</label><input class="form-control" v-model="editingRaPool.name" :disabled="editingRaPool._name" title="地址池名称" /></div>
-        <div class="form-row"><label class="form-label" title="地址池前缀，如 10.10.10.0/24">前缀</label><input class="form-control" v-model="editingRaPool.prefix" placeholder="如 10.10.10.0/24" title="地址池前缀" /></div>
-        <div class="form-row"><label class="form-label" title="DNS 服务器地址，每行一个">DNS 服务器（每行一个）</label><textarea class="form-control" v-model="editingRaPool.name_servers" placeholder="每行一个 DNS 地址" title="DNS 服务器" /></div>
-        <div class="form-row"><label class="form-label" title="从地址池中排除的前缀，每行一个">排除前缀（每行一个）</label><textarea class="form-control" v-model="editingRaPool.excludes" placeholder="每行一个排除前缀" title="排除前缀" /></div>
+      <DraggableModal v-model:visible="raPoolModalVisible" :title="t('ipsec.modals.raPool')" width="600px" @confirm="saveRaPool">
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.poolNameTitle')">{{ t('ipsec.form.poolName') }}</label><input class="form-control" v-model="editingRaPool.name" :disabled="editingRaPool._name" :title="t('ipsec.form.poolNameTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.poolPrefixTitle')">{{ t('ipsec.form.poolPrefix') }}</label><input class="form-control" v-model="editingRaPool.prefix" :placeholder="t('ipsec.form.poolPrefixPlaceholder')" :title="t('ipsec.form.poolPrefixTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.dnsServerTitle')">{{ t('ipsec.form.dnsServer') }}</label><textarea class="form-control" v-model="editingRaPool.name_servers" :placeholder="t('ipsec.form.dnsServerPlaceholder')" :title="t('ipsec.form.dnsServerTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.excludePrefixTitle')">{{ t('ipsec.form.excludePrefix') }}</label><textarea class="form-control" v-model="editingRaPool.excludes" :placeholder="t('ipsec.form.excludePrefixPlaceholder')" :title="t('ipsec.form.excludePrefixTitle')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="raRadiusServerModalVisible" title="RADIUS 服务器" width="560px" @confirm="saveRaRadiusServer">
-        <div class="form-row"><label class="form-label" title="RADIUS 服务器 IPv4 地址">服务器地址</label><input class="form-control" v-model="editingRaRadiusServer.ip" :disabled="editingRaRadiusServer._ip" placeholder="如 192.168.5.1" title="RADIUS 服务器地址" /></div>
-        <div class="form-row"><label class="form-label" title="RADIUS 认证端口，默认 1812，范围 1-65535">端口</label><div style="flex:1;"><input class="form-control" type="number" min="1" max="65535" v-model="editingRaRadiusServer.port" placeholder="1812" title="RADIUS 端口" style="width:100%;" /><div class="form-hint">范围：1-65535，默认 1812</div></div></div>
-        <div class="form-row"><label class="form-label" title="RADIUS 共享密钥">共享密钥</label><input class="form-control" type="password" v-model="editingRaRadiusServer.key" title="共享密钥" /></div>
-        <div class="form-row"><label class="form-label" title="禁用该 RADIUS 服务器">禁用</label><input type="checkbox" v-model="editingRaRadiusServer.disable" title="禁用" /></div>
-        <div class="form-row"><label class="form-label" title="禁用 RADIUS 计费">禁用计费</label><input type="checkbox" v-model="editingRaRadiusServer.disable_accounting" title="禁用计费" /></div>
+      <DraggableModal v-model:visible="raRadiusServerModalVisible" :title="t('ipsec.modals.radiusServer')" width="560px" @confirm="saveRaRadiusServer">
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.radiusServerAddressTitle')">{{ t('ipsec.form.radiusServerAddress') }}</label><input class="form-control" v-model="editingRaRadiusServer.ip" :disabled="editingRaRadiusServer._ip" :placeholder="t('ipsec.form.radiusServerAddressPlaceholder')" :title="t('ipsec.form.radiusServerAddressTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.radiusPortTitle')">{{ t('ipsec.form.radiusPort') }}</label><div style="flex:1;"><input class="form-control" type="number" min="1" max="65535" v-model="editingRaRadiusServer.port" :placeholder="t('ipsec.form.radiusPortPlaceholder')" :title="t('ipsec.form.radiusPortTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.radiusPortHint') }}</div></div></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.radiusKeyTitle')">{{ t('ipsec.form.radiusKey') }}</label><input class="form-control" type="password" v-model="editingRaRadiusServer.key" :title="t('ipsec.form.radiusKeyTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.radiusDisableTitle')">{{ t('ipsec.form.radiusDisable') }}</label><input type="checkbox" v-model="editingRaRadiusServer.disable" :title="t('ipsec.form.radiusDisableTitle')" /></div>
+        <div class="form-row"><label class="form-label" :title="t('ipsec.form.radiusDisableAccountingTitle')">{{ t('ipsec.form.radiusDisableAccounting') }}</label><input type="checkbox" v-model="editingRaRadiusServer.disable_accounting" :title="t('ipsec.form.radiusDisableAccountingTitle')" /></div>
+      </DraggableModal>
+
+      <!-- Delete Confirmation Modals -->
+      <DraggableModal v-model:visible="ikeDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemoveIke">
+        <div>{{ t('ipsec.messages.confirmDeleteIke') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteIkeNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="espDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemoveEsp">
+        <div>{{ t('ipsec.messages.confirmDeleteEsp') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteEspNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="pskDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemovePsk">
+        <div>{{ t('ipsec.messages.confirmDeletePsk') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeletePskNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="profileDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemoveProfile">
+        <div>{{ t('ipsec.messages.confirmDeleteProfile') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteProfileNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="s2sDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemoveS2s">
+        <div>{{ t('ipsec.messages.confirmDeleteS2s') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteS2sNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="raDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemoveRa">
+        <div>{{ t('ipsec.messages.confirmDeleteRa') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteRaNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="poolDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemoveRaPool">
+        <div>{{ t('ipsec.messages.confirmDeletePool') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeletePoolNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="radiusDeleteModalVisible" :title="t('ipsec.modals.confirmDelete')" width="400px" @confirm="confirmRemoveRaRadiusServer">
+        <div>{{ t('ipsec.messages.confirmDeleteRadius') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteRadiusNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

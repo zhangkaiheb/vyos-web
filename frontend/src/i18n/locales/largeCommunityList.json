@@ -1,0 +1,394 @@
+{
+  "zh-CN": {
+    "largeCommunityList": {
+      "tabs": {
+        "basic": "基本"
+      },
+      "columns": {
+        "name": "名称",
+        "description": "描述",
+        "ruleCount": "规则数",
+        "rule": "规则编号",
+        "action": "动作",
+        "regex": "过滤表达式"
+      },
+      "schema": {
+        "name": "名称",
+        "namePlaceholder": "例如: l01",
+        "description": "描述",
+        "rule": "规则编号",
+        "ruleHelp": "范围 1-65535",
+        "action": "动作",
+        "regex": "过滤表达式",
+        "regexPlaceholder": "例如: 65001:100:200"
+      },
+      "buttons": {
+        "create": "创建",
+        "edit": "编辑",
+        "delete": "删除",
+        "refresh": "刷新"
+      },
+      "modals": {
+        "edit": "编辑",
+        "create": "创建",
+        "editRule": "编辑规则",
+        "createRule": "创建规则",
+        "confirmDelete": "确认删除"
+      },
+      "messages": {
+        "selectList": "请选择一个大型团体列表",
+        "enterName": "请输入名称",
+        "nameExists": "名称已存在",
+        "enterNameFirst": "请先输入名称",
+        "selectRule": "请选择一条规则",
+        "ruleNumberExists": "规则编号已存在",
+        "confirmDeleteList": "确认删除以下大型团体列表？",
+        "confirmDeleteRule": "确认删除以下规则？"
+      },
+      "validation": {
+        "enterRuleNumber": "请输入规则编号",
+        "ruleNumberRange": "规则编号范围 1-65535",
+        "selectAction": "请选择动作"
+      },
+      "sections": {
+        "rules": "规则"
+      }
+    }
+  },
+  "en": {
+    "largeCommunityList": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Filter Expression"
+      },
+      "schema": {
+        "name": "Name",
+        "namePlaceholder": "e.g., l01",
+        "description": "Description",
+        "rule": "Rule Number",
+        "ruleHelp": "Range 1-65535",
+        "action": "Action",
+        "regex": "Filter Expression",
+        "regexPlaceholder": "e.g., 65001:100:200"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modals": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectList": "Please select a large community list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "ruleNumberExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following large community list?",
+        "confirmDeleteRule": "Confirm delete the following rule?"
+      },
+      "validation": {
+        "enterRuleNumber": "Please enter a rule number",
+        "ruleNumberRange": "Rule number range is 1-65535",
+        "selectAction": "Please select an action"
+      },
+      "sections": {
+        "rules": "Rules"
+      }
+    }
+  },
+  "zh-TW": {
+    "largeCommunityList": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Filter Expression"
+      },
+      "schema": {
+        "name": "Name",
+        "namePlaceholder": "e.g., l01",
+        "description": "Description",
+        "rule": "Rule Number",
+        "ruleHelp": "Range 1-65535",
+        "action": "Action",
+        "regex": "Filter Expression",
+        "regexPlaceholder": "e.g., 65001:100:200"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modals": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectList": "Please select a large community list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "ruleNumberExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following large community list?",
+        "confirmDeleteRule": "Confirm delete the following rule?"
+      },
+      "validation": {
+        "enterRuleNumber": "Please enter a rule number",
+        "ruleNumberRange": "Rule number range is 1-65535",
+        "selectAction": "Please select an action"
+      },
+      "sections": {
+        "rules": "Rules"
+      }
+    }
+  },
+  "ru": {
+    "largeCommunityList": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Filter Expression"
+      },
+      "schema": {
+        "name": "Name",
+        "namePlaceholder": "e.g., l01",
+        "description": "Description",
+        "rule": "Rule Number",
+        "ruleHelp": "Range 1-65535",
+        "action": "Action",
+        "regex": "Filter Expression",
+        "regexPlaceholder": "e.g., 65001:100:200"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modals": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectList": "Please select a large community list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "ruleNumberExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following large community list?",
+        "confirmDeleteRule": "Confirm delete the following rule?"
+      },
+      "validation": {
+        "enterRuleNumber": "Please enter a rule number",
+        "ruleNumberRange": "Rule number range is 1-65535",
+        "selectAction": "Please select an action"
+      },
+      "sections": {
+        "rules": "Rules"
+      }
+    }
+  },
+  "de": {
+    "largeCommunityList": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Filter Expression"
+      },
+      "schema": {
+        "name": "Name",
+        "namePlaceholder": "e.g., l01",
+        "description": "Description",
+        "rule": "Rule Number",
+        "ruleHelp": "Range 1-65535",
+        "action": "Action",
+        "regex": "Filter Expression",
+        "regexPlaceholder": "e.g., 65001:100:200"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modals": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectList": "Please select a large community list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "ruleNumberExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following large community list?",
+        "confirmDeleteRule": "Confirm delete the following rule?"
+      },
+      "validation": {
+        "enterRuleNumber": "Please enter a rule number",
+        "ruleNumberRange": "Rule number range is 1-65535",
+        "selectAction": "Please select an action"
+      },
+      "sections": {
+        "rules": "Rules"
+      }
+    }
+  },
+  "fr": {
+    "largeCommunityList": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Filter Expression"
+      },
+      "schema": {
+        "name": "Name",
+        "namePlaceholder": "e.g., l01",
+        "description": "Description",
+        "rule": "Rule Number",
+        "ruleHelp": "Range 1-65535",
+        "action": "Action",
+        "regex": "Filter Expression",
+        "regexPlaceholder": "e.g., 65001:100:200"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modals": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectList": "Please select a large community list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "ruleNumberExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following large community list?",
+        "confirmDeleteRule": "Confirm delete the following rule?"
+      },
+      "validation": {
+        "enterRuleNumber": "Please enter a rule number",
+        "ruleNumberRange": "Rule number range is 1-65535",
+        "selectAction": "Please select an action"
+      },
+      "sections": {
+        "rules": "Rules"
+      }
+    }
+  },
+  "ko": {
+    "largeCommunityList": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Filter Expression"
+      },
+      "schema": {
+        "name": "Name",
+        "namePlaceholder": "e.g., l01",
+        "description": "Description",
+        "rule": "Rule Number",
+        "ruleHelp": "Range 1-65535",
+        "action": "Action",
+        "regex": "Filter Expression",
+        "regexPlaceholder": "e.g., 65001:100:200"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modals": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectList": "Please select a large community list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "ruleNumberExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following large community list?",
+        "confirmDeleteRule": "Confirm delete the following rule?"
+      },
+      "validation": {
+        "enterRuleNumber": "Please enter a rule number",
+        "ruleNumberRange": "Rule number range is 1-65535",
+        "selectAction": "Please select an action"
+      },
+      "sections": {
+        "rules": "Rules"
+      }
+    }
+  }
+}

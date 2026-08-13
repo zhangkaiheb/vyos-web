@@ -3,6 +3,7 @@ import { opModeApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function parseTable(output) {
   const lines = String(output || '').split('\n').map(s => s.replace(/\r$/, ''));
@@ -55,18 +56,18 @@ function parseTable(output) {
 export default defineComponent({
   name: 'DhcpStatisticsPage',
   setup() {
+    const { t } = useI18n();
     const loading = ref(false);
     const stats = ref([]);
-    const rawOutput = ref('');
     const filterPool = ref('');
 
-    const columns = [
-      { key: 'pool', title: '地址池' },
-      { key: 'size', title: '总地址数' },
-      { key: 'leases', title: '已分配' },
-      { key: 'available', title: '可用数' },
-      { key: 'usage', title: '使用率' },
-    ];
+    const columns = computed(() => [
+      { key: 'pool', title: t('dhcpStatistics.columns.pool') },
+      { key: 'size', title: t('dhcpStatistics.columns.size') },
+      { key: 'leases', title: t('dhcpStatistics.columns.leases') },
+      { key: 'available', title: t('dhcpStatistics.columns.available') },
+      { key: 'usage', title: t('dhcpStatistics.columns.usage') },
+    ]);
 
     const poolOptions = computed(() => {
       const pools = new Set();
@@ -85,8 +86,7 @@ export default defineComponent({
         let command = 'dhcp server statistics';
         if (filterPool.value) command += ' pool ' + filterPool.value;
         const res = await opModeApi.show(command);
-        rawOutput.value = res.output || '';
-        stats.value = parseTable(rawOutput.value);
+        stats.value = parseTable(res.output || '');
       } catch (e) {
         showError(e);
         stats.value = [];
@@ -97,26 +97,21 @@ export default defineComponent({
 
     onMounted(load);
 
-    return { loading, stats, columns, load, rawOutput, filterPool, poolOptions, filteredStats };
+    return { t,
+      loading, stats, columns, load, filterPool, poolOptions, filteredStats };
   },
   components: { DataTable, ToolbarButton },
   template: `
     <div class="page-container">
-      <div class="toolbar toolbar-split">
-        <div class="toolbar-left"><h3>DHCP 统计</h3></div>
-        <div class="toolbar-right">
-          <select v-model="filterPool" @change="load" title="按地址池过滤">
-            <option value="">全部地址池</option>
+      <DataTable :columns="columns" :data="filteredStats" :loading="loading" :selectable="false" :actions="[]" @refresh="load">
+        <template #toolbar-right-extra>
+          <select v-model="filterPool" @change="load" :title="t('dhcpStatistics.filterByPool')">
+            <option value="">{{ t('dhcpStatistics.allPools') }}</option>
             <option v-for="p in poolOptions" :key="p" :value="p">{{ p }}</option>
           </select>
-          <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
-        </div>
-      </div>
-      <DataTable :columns="columns" :data="filteredStats" :loading="loading" :selectable="false" :actions="[]" />
-      <div v-if="rawOutput" style="margin-top:16px;">
-        <div style="font-weight:bold;margin-bottom:4px;">原始输出</div>
-        <pre style="background:#f5f5f5;padding:8px;border:1px solid #ddd;font-size:12px;overflow:auto;">{{ rawOutput }}</pre>
-      </div>
+          <ToolbarButton icon="refresh" @click="load">{{ t('dhcpStatistics.refresh') }}</ToolbarButton>
+        </template>
+      </DataTable>
     </div>
   `,
 });

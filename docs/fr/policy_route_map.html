@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="route-map-policy">
+<h1>Politique de carte de routage</h1>
+<p>La carte de routage est une commande puissante qui offre aux administrateurs réseau un outil très utile et flexible pour la manipulation du trafic.</p>
+<section id="configuration">
+<h2>Configuration</h2>
+<section id="route-map">
+<h3>Carte de routage</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande crée une nouvelle politique de carte de routage, identifiée par &lt;text&gt;.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la description de la politique de carte de routage.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; action &lt;permit|deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-action-permit-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir l'action pour la politique de carte de routage.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; call &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-call-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Appeler une autre politique de carte de routage en cas de correspondance.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; continue &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-continue-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Passer à une règle différente dans cette carte de routage en cas de correspondance.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la description de la règle dans la politique de carte de routage.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match as-path &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-as-path-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Liste d'as-path BGP à matcher.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match community community-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-community-community-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Liste de communauté BGP à matcher.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match community exact-match
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-community-exact-match" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la liste de communauté BGP pour une correspondance exacte.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match extcommunity &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-extcommunity-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Communauté étendue BGP à matcher.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match interface &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-interface-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Interface de saut initial d'une route à matcher.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip address access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-address-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Adresse IP de la route à matcher, basée sur la liste d'accès.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip address prefix-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-address-prefix-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Adresse IP de la route à matcher, basée sur la liste de préfixe.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip address prefix-len &lt;0-32&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-address-prefix-len-0-32" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Adresse IP de la route à matcher, basée sur la longueur de préfixe spécifiée.
+Remarque : cela ne peut être utilisé que pour les routes du noyau.
+Ne pas appliquer aux routes des protocoles de routage dynamique (par exemple, BGP,
+RIP, OSPF), car cela peut entraîner des résultats inattendus.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip nexthop access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Prochain saut IP de la route à matcher, basé sur la liste d'accès.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip nexthop address &lt;x.x.x.x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-address-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Prochain saut IP de la route à matcher, basé sur l'adresse IP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip nexthop prefix-len &lt;0-32&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-prefix-len-0-32" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Prochain saut IP de la route à matcher, basé sur la longueur de préfixe.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip nexthop prefix-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-prefix-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Prochain saut IP de la route à matcher, basé sur la liste de préfixe.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip nexthop type &lt;blackhole&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-type-blackhole" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Prochain saut IP de la route à matcher, basé sur le type.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip route-source access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-route-source-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Source IP de la route à matcher, basée sur la liste d'accès.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip route-source prefix-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-route-source-prefix-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Source IP de la route à matcher, basée sur la liste de préfixe.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ipv6 address access-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-address-access-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Adresse IPv6 de la route à matcher, basée sur la liste d'accès IPv6.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ipv6 address prefix-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-address-prefix-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Adresse IPv6 de la route à matcher, basée sur la liste de préfixe IPv6.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ipv6 address prefix-len &lt;0-128&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-address-prefix-len-0-128" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Adresse IPv6 de la route à matcher, basée sur la longueur de préfixe spécifiée.
+Remarque : cela ne peut être utilisé que pour les routes du noyau.
+Ne pas appliquer aux routes des protocoles de routage dynamique (par exemple, BGP,
+RIP, OSPF), car cela peut entraîner des résultats inattendus.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ipv6 nexthop &lt;h:h:h:h:h:h:h:h&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-nexthop-h-h-h-h-h-h-h-h" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Adresse IPv6 du prochain saut à matcher.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match large-community large-community-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-large-community-large-community-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Correspondre aux grandes communautés BGP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match local-preference &lt;0-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-local-preference-0-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Correspondre à la préférence locale.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match metric &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-metric-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Correspondre à la métrique de la route.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match origin &lt;egp|igp|incomplete&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-origin-egp-igp-incomplete" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Code d'origine du protocole de passerelle bord (BGP) à matcher.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match peer &lt;x.x.x.x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-peer-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Adresse IP du pair à matcher.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match protocol &lt;protocol&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-protocol-protocol" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<dl class="simple">
+<dt>Protocole source à matcher.</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate">babel</code> - Protocole de routage Babel (Babel)</p></li>
+<li><p><code class="docutils literal notranslate">bgp</code> - Protocole de passerelle bord (BGP)</p></li>
+<li><p><code class="docutils literal notranslate">connected</code> - Routes connectées (sous-réseau ou hôte directement attaché)</p></li>
+<li><p><code class="docutils literal notranslate">isis</code> - Système intermédiaire à système intermédiaire (IS-IS)</p></li>
+<li><p><code class="docutils literal notranslate">kernel</code> - Routes du noyau</p></li>
+<li><p><code class="docutils literal notranslate">ospf</code> - Premier chemin le plus court (OSPFv2)</p></li>
+<li><p><code class="docutils literal notranslate">ospfv3</code> - Premier chemin le plus court (IPv6) (OSPFv3)</p></li>
+<li><p><code class="docutils literal notranslate">rip</code> - Protocole de information de routage (RIP)</p></li>
+<li><p><code class="docutils literal notranslate">ripng</code> - Protocole de information de routage de génération suivante (IPv6) (RIPng)</p></li>
+<li><p><code class="docutils literal notranslate">static</code> - Routes configurées statiquement</p></li>
+<li><p><code class="docutils literal notranslate">table</code> - Table de routage du noyau non principale</p></li>
+<li><p><code class="docutils literal notranslate">vnc</code> - Contrôle de réseau virtuel (VNC)</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match rpki &lt;invalid|notfound|valid&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-rpki-invalid-notfound-valid" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Correspondre au résultat de validation RPKI.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match source-vrf &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-source-vrf-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>VRF source à matcher.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match tag &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-tag-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Étiquette de route à matcher.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; on-match goto &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-on-match-goto-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Sortie de la politique en cas de correspondance : aller à la règle &lt;1-65535&gt;</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; on-match next
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-on-match-next" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Sortie de la politique en cas de correspondance : passer à la prochaine séquence.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set aggregator &lt;as|ip&gt; &lt;1-4294967295|x.x.x.x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-aggregator-as-ip-1-4294967295-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Attribut d'agrégateur BGP : numéro AS ou adresse IP d'une agrégation.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set as-path exclude &lt;1-4294967295 | all&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-as-path-exclude-1-4294967295-all" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Supprimer le numéro AS de l'AS path BGP.</p>
+<p>Si <code class="docutils literal notranslate">all</code> est spécifié, supprimez tous les numéros AS de l'AS_PATH de l'NLRI du chemin BGP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set as-path prepend &lt;1-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-as-path-prepend-1-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Ajouter la chaîne spécifiée de numéros AS au AS_PATH de l'NLRI du chemin BGP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set as-path prepend-last-as &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-as-path-prepend-last-as-n" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Ajouter le dernier numéro AS existant (le premier ASN) au AS_PATH.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set atomic-aggregate
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-atomic-aggregate" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Attribut d'agrégat atomique BGP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set community &lt;add|replace&gt; &lt;community&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-community-add-replace-community" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Ajouter ou remplacer l'attribut de communauté BGP au format <code class="docutils literal notranslate">&lt;0-65535:0-65535&gt;</code>
+ou à partir d'une liste de communautés connues</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set community none
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-community-none" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Supprimer toutes les communautés BGP</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set community delete &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-community-delete-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Supprimer les communautés BGP correspondant à la liste de communauté.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set large-community &lt;add|replace&gt; &lt;GA:LDP1:LDP2&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-large-community-add-replace-ga-ldp1-ldp2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Ajouter ou remplacer l'attribut de grande communauté BGP au format
+<code class="docutils literal notranslate">&lt;0-4294967295:0-4294967295:0-4294967295&gt;</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set large-community none
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-large-community-none" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Supprimer toutes les grandes communautés BGP</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set large-community delete &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-large-community-delete-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Supprimer les communautés BGP correspondant à la liste de grandes communautés.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set extcommunity bandwidth &lt;1-25600|cumulative|num-multipaths&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-bandwidth-1-25600-cumulative-num-multipaths" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la bande passante de la communauté étendue</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set extcommunity bandwidth-non-transitive
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-bandwidth-non-transitive" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>La communauté de bande passante étendue est encodée de manière non transitive</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set extcommunity rt &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-rt-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la valeur de cible de routage au format <code class="docutils literal notranslate">&lt;0-65535:0-4294967295&gt;</code> ou <code class="docutils literal notranslate">&lt;IP:0-65535&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set extcommunity soo &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-soo-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la valeur de site d'origine au format <code class="docutils literal notranslate">&lt;0-65535:0-4294967295&gt;</code> ou <code class="docutils literal notranslate">&lt;IP:0-65535&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set extcommunity none
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-none" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Effacer toutes les extcommunities BGP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set distance &lt;0-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-distance-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Distance administrative significative localement.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ip-next-hop &lt;x.x.x.x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ip-next-hop-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Adresse IP du prochain saut.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ip-next-hop unchanged
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ip-next-hop-unchanged" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le prochain saut comme inchangé. Passer à travers la carte de routage sans
+changer sa valeur</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ip-next-hop peer-address
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ip-next-hop-peer-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir l'adresse du prochain saut BGP sur l'adresse du pair. Pour une carte de routage entrante, cela signifie que l'adresse IP de notre pair est utilisée. Pour une carte de routage sortante, cela signifie que l'adresse IP de notre propre appareil est utilisée pour établir le pair avec notre voisin.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ipv6-next-hop &lt;global|local&gt; &lt;h:h:h:h:h:h:h:h&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ipv6-next-hop-global-local-h-h-h-h-h-h-h-h" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Adresse IPv6 du prochain saut.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ipv6-next-hop peer-address
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ipv6-next-hop-peer-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir l'adresse du prochain saut BGP sur l'adresse du pair. Pour une carte de routage entrante, cela signifie que l'adresse IP de notre pair est utilisée. Pour une carte de routage sortante, cela signifie que l'adresse IP de notre propre appareil est utilisée pour établir le pair avec notre voisin.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ipv6-next-hop prefer-global
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ipv6-next-hop-prefer-global" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Pour les cartes de routage entrantes et d'importation, si nous recevons une adresse v6 globale et une adresse v6 LL pour la route, préférons utiliser l'adresse globale comme prochain saut.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set local-preference &lt;0-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-local-preference-0-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir l'attribut de préférence locale BGP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set metric &lt;+/-metric|0-4294967295|rtt|+rtt|-rtt&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-metric-metric-0-4294967295-rtt-rtt-rtt" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la métrique de la route. Lorsqu'elle est utilisée avec BGP, définir l'attribut MED à une valeur spécifique. Utilisez <code class="docutils literal notranslate">+/-</code> pour ajouter ou soustraire la valeur spécifiée
+à/from la métrique/MED existante. Utilisez <code class="docutils literal notranslate">rtt</code> pour définir la MED sur le temps de trajet aller-retour ou <code class="docutils literal notranslate">+rtt/-rtt</code> pour ajouter/soustraire le temps de trajet aller-retour à/from la MED.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set metric-type &lt;type-1|type-2&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-metric-type-type-1-type-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le type de métrique OSPF externe.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set origin &lt;igp|egp|incomplete&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-origin-igp-egp-incomplete" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le code d'origine BGP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set originator-id &lt;x.x.x.x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-originator-id-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir l'attribut ID d'originateur BGP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set src &lt;x.x.x.x|h:h:h:h:h:h:h:h&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-src-x-x-x-x-h-h-h-h-h-h-h-h" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir l'adresse IP/IPv6 source pour la route.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set table &lt;1-200&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-table-1-200" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir les préfixes vers le tableau.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set tag &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-tag-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la valeur d'étiquette pour le protocole de routage.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set weight &lt;0-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-weight-0-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir l'attribut de poids BGP</p>
+</div>
+</div>
+</section>
+<section id="list-of-well-known-communities">
+<h3>Liste des communautés bien connues</h3>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate">local-as</code> - Valeur de communauté bien connue NO_EXPORT_SUBCONFED 0xFFFFFF03</p></li>
+<li><p><code class="docutils literal notranslate">no-advertise</code> - Valeur de communauté bien connue NO_ADVERTISE 0xFFFFFF02</p></li>
+<li><p><code class="docutils literal notranslate">no-export</code> - Valeur de communauté bien connue NO_EXPORT 0xFFFFFF01</p></li>
+<li><p><code class="docutils literal notranslate">graceful-shutdown</code> - Valeur de communauté bien connue GRACEFUL_SHUTDOWN 0xFFFF0000</p></li>
+<li><p><code class="docutils literal notranslate">accept-own</code> - Valeur de communauté bien connue ACCEPT_OWN 0xFFFF0001</p></li>
+<li><p><code class="docutils literal notranslate">route-filter-translated-v4</code> - Valeur de communauté bien connue ROUTE_FILTER_TRANSLATED_v4 0xFFFF0002</p></li>
+<li><p><code class="docutils literal notranslate">route-filter-v4</code> - Valeur de communauté bien connue ROUTE_FILTER_v4 0xFFFF0003</p></li>
+<li><p><code class="docutils literal notranslate">route-filter-translated-v6</code> - Valeur de communauté bien connue ROUTE_FILTER_TRANSLATED_v6 0xFFFF0004</p></li>
+<li><p><code class="docutils literal notranslate">route-filter-v6</code> - Valeur de communauté bien connue ROUTE_FILTER_v6 0xFFFF0005</p></li>
+<li><p><code class="docutils literal notranslate">llgr-stale</code> - Valeur de communauté bien connue LLGR_STALE 0xFFFF0006</p></li>
+<li><p><code class="docutils literal notranslate">no-llgr</code> - Valeur de communauté bien connue NO_LLGR 0xFFFF0007</p></li>
+<li><p><code class="docutils literal notranslate">accept-own-nexthop</code> - Valeur de communauté bien connue accept-own-nexthop 0xFFFF0008</p></li>
+<li><p><code class="docutils literal notranslate">blackhole</code> - Valeur de communauté bien connue BLACKHOLE 0xFFFF029A</p></li>
+<li><p><code class="docutils literal notranslate">no-peer</code> - Valeur de communauté bien connue NOPEER 0xFFFFFF04</p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="syslog">
+<h1>Syslog</h1>
+<section id="overview">
+<h2>Aperçu</h2>
+<p>Par défaut, VyOS fournit une configuration de journalisation minimale avec un stockage local
+et une rotation des journaux. Tous les erreurs, y compris les messages local7, sont enregistrés dans un fichier local.
+Les alertes d'urgence sont envoyées au terminal.</p>
+<p>Pour modifier ces paramètres, entrez le mode de configuration.</p>
+</section>
+<section id="syslog-configuration">
+<h2>Configuration du syslog</h2>
+<p>Le syslog prend en charge la journalisation vers plusieurs destinations : un fichier local, un terminal ou
+un serveur syslog distant via UDP ou TCP.</p>
+<p>La configuration du syslog est organisée en catégories suivantes :</p>
+<ul class="simple">
+<li><p>Paramètres globaux</p></li>
+<li><p>Journalisation locale</p></li>
+<li><p>Journalisation sur le terminal</p></li>
+<li><p>Journalisation distante</p></li>
+<li><p>Journalisation distante chiffrée avec TLS</p></li>
+</ul>
+<section id="global-settings">
+<h3>Paramètres globaux</h3>
+<p>Configurez le comportement général du service syslog.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog marker interval &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-marker-interval-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'intervalle, en secondes, pour l'envoi des messages de marque syslog.</strong></p>
+<p>Les messages de marque syslog confirment que le service de journalisation est opérationnel.</p>
+<p>Par défaut : 1200 secondes.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog marker disable
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-marker-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Désactiver l'envoi des messages de marque syslog.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog preserve-fqdn
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-preserve-fqdn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez comment le nom d'hôte de l'appareil de journalisation apparaît dans les messages de journal envoyés
+à un serveur syslog distant.</strong></p>
+<p>Si configuré, l'appareil inclut son <abbr title="Fully Qualified Domain Name">FQDN</abbr> dans les messages de journal, même si le serveur syslog se trouve dans le même domaine.</p>
+</div>
+</div>
+</section>
+<section id="local-logging">
+<h3>Journalisation locale</h3>
+<p>Configurez quels messages de journal à enregistrer dans un fichier de journal local.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog local &lt;filename&gt; facility &lt;keyword&gt; level &lt;keyword&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-local-filename-facility-keyword-level-keyword" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le syslog pour enregistrer les messages de journal pour une installation et
+un niveau de gravité spécifiques dans ``/var/log/messages``.</strong></p>
+<p>Référez-vous aux tableaux ci-dessous pour les options valides d'installation et de niveau de gravité.</p>
+</div>
+</div>
+</section>
+<section id="console-logging">
+<h3>Journalisation sur le terminal</h3>
+<p>Configurez quels messages de journal à envoyer à <code class="docutils literal notranslate">/dev/console</code>.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog console facility &lt;keyword&gt; level &lt;keyword&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-console-facility-keyword-level-keyword" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le syslog pour envoyer les messages de journal pour une installation et une gravité
+spécifiques au terminal de l'appareil.</strong></p>
+<p>Référez-vous aux tableaux ci-dessous pour les options valides d'installation et de niveau de gravité.</p>
+</div>
+</div>
+</section>
+<section id="remote-logging">
+<h3>Journalisation distante</h3>
+<p>Configurez la <strong>journalisation distante</strong> pour envoyer les messages de journal à un serveur syslog distant.</p>
+<p>La journalisation distante n'affecte ni la <strong>journalisation locale</strong> ni la <strong>journalisation sur le terminal</strong> et
+s'exécute en parallèle avec elles. La journalisation distante permet d'envoyer les messages de journal
+à plusieurs hôtes.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; facility &lt;keyword&gt; level &lt;keyword&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-facility-keyword-level-keyword" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'envoi des messages de journal vers le serveur syslog distant pour une installation
+et un niveau de gravité spécifiques.</strong></p>
+<p>L'adresse du serveur peut être spécifiée à l'aide d'un <abbr title="Fully Qualified Domain Name">FQDN</abbr> ou d'une adresse IP.</p>
+<p>Référez-vous aux tableaux ci-dessous pour les options valides d'installation et de niveau de gravité.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; protocol &lt;udp | tcp&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-protocol-udp-tcp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le protocole pour l'envoi des messages de journal.</strong></p>
+<p>Le protocole peut être UDP ou TCP. Par défaut, les messages de journal sont envoyés
+via UDP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le port pour l'envoi des messages de journal.</strong></p>
+<p>Par défaut, le port standard 514 est utilisé.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; format include-timezone
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-format-include-timezone" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'envoi des messages de journal au format RFC 5424.</strong></p>
+<p>Le format RFC 5424 inclut la zone horaire dans l'horodatage. Par exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>&lt;34&gt;1 2003-10-11T22:14:15.003-07:00 mymachine.example.com su - ID47 - BOM’su root’ failed for lonvick on /dev/pts/8.
+</pre></div>
+</div>
+<p>Par défaut, les messages de journal sont envoyés au format RFC 3164. Par exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>&lt;34&gt;Oct 11 22:14:15 mymachine su: ‘su root’ failed for lonvick on /dev/pts/8
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; format octet-counted
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-format-octet-counted" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activez le format d'encapsulation octet-compté pour l'envoi des messages de journal.</strong></p>
+<p>Lorsqu'elle est activée, les messages de journal multilignes sont envoyés sans séparation. Assurez-vous
+que le serveur distant prend en charge le format d'encapsulation octet-compté pour éviter les erreurs de parsing.</p>
+<p>Le format d'encapsulation octet-compté n'est pas disponible pour le protocole UDP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; vrf &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez l'instance <abbr title="Virtual Routing and Forwarding">VRF</abbr>
+pour l'envoi des messages de journal.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez l'adresse IP source (IPv4 ou IPv6) pour l'envoi des messages de journal.</p>
+</div>
+</div>
+<section id="tls-encrypted-remote-logging">
+<h4><abbr title="Transport Layer Security">TLS</abbr>-journalisation distante chiffrée</h4>
+<p>VyOS prend en charge la <abbr title="Transport Layer Security">TLS</abbr>-journalisation distante chiffrée
+sur TCP pour assurer une transmission sécurisée des données syslog vers les serveurs syslog distants.</p>
+<p><strong>Prérequis</strong> : Avant de configurer la <abbr title="Transport Layer Security">TLS</abbr>-journalisation distante chiffrée, assurez-vous que vous avez :</p>
+<ul>
+<li><p>Une adresse de serveur syslog distant valide.</p></li>
+<li><p>Des certificats CA et client valides chargés
+dans le stockage PKI local.</p></li>
+<li><p>Le <strong>protocole de transport syslog distant</strong> est défini sur <strong>TCP</strong> :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system syslog remote &lt;address&gt; protocol tcp
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>La journalisation distante chiffrée avec <abbr title="Transport Layer Security">TLS</abbr> n'est
+<strong>pas prise en charge</strong> sur <strong>UDP</strong>.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; tls
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-tls" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Activer la journalisation distante chiffrée avec TLS.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; tls ca-certificate &lt;ca_name&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-tls-ca-certificate-ca-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le certificat</strong> <abbr title="Certificate Authority">CA</abbr> <strong>.</strong></p>
+<p>Le client syslog utilise le certificat <abbr title="Certificate Authority">CA</abbr> pour
+vérifier l'identité du serveur syslog distant.</p>
+<p>Le certificat <abbr title="Certificate Authority">CA</abbr> est requis pour <strong>tous</strong>
+les modes d'authentification sauf <code class="docutils literal notranslate">anon</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; tls certificate &lt;cert_name&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-tls-certificate-cert-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le certificat client.</strong></p>
+<p>Le serveur syslog distant utilise le certificat client pour vérifier l'identité
+du client syslog.</p>
+<p>Le certificat client est requis si le serveur syslog distant impose la vérification du certificat client.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; tls auth-mode &lt;anon | fingerprint | certvalid | name&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-tls-auth-mode-anon-fingerprint-certvalid-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le mode d'authentification.</strong></p>
+<p>Le mode d'authentification définit comment le client syslog vérifie l'identité du serveur syslog.</p>
+<p>Les modes d'authentification suivants sont disponibles :</p>
+<ul>
+<li><p><code class="docutils literal notranslate">anon</code> <strong>(par défaut)</strong> : Permet des connexions chiffrées sans vérifier l'identité du serveur syslog.
+Ce mode n'est <strong>pas recommandé</strong>, car il est vulnérable aux attaques <abbr title="Man-in-the-Middle">MITM</abbr>.</p></li>
+<li><p><code class="docutils literal notranslate">fingerprint</code> : Vérifie la empreinte digitale du certificat du serveur contre la valeur prédéfinie avec :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system syslog remote &lt;address&gt; tls permitted-peer &lt;peer&gt;
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate">certvalid</code> : Vérifie que le certificat du serveur est signé par une <abbr title="Certificate Authority">CA</abbr> de confiance, en ignorant le contrôle <abbr title="Common Name">CN</abbr>.</p></li>
+<li><p><code class="docutils literal notranslate">name</code> : Vérifie que :</p>
+<ul class="simple">
+<li><p>Le certificat du serveur est signé par une <abbr title="Certificate Authority">CA</abbr> de confiance.</p></li>
+<li><p>Le <abbr title="Common Name">CN</abbr> du certificat correspond à la valeur
+prédéfinie avec :</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system syslog remote &lt;address&gt; tls permitted-peer &lt;peer&gt;
+</pre></div>
+</div>
+<p>Ce mode est <strong>recommandé</strong> pour les environnements de production.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; tls permitted-peer &lt;peer&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-tls-permitted-peer-peer" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez les identifiants de certificat du pair.</strong></p>
+<p>Le format de l'identifiant du certificat dépend du mode d'authentification :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">fingerprint</code> : Entrez les empreintes digitales de certificat attendues (SHA-1 ou
+SHA-256).</p></li>
+<li><p><code class="docutils literal notranslate">name</code> : Entrez les noms <abbr title="Common Names">CNs</abbr> de certificat attendus.</p></li>
+</ul>
+<p>Pour les modes d'authentification <code class="docutils literal notranslate">anon</code> et <code class="docutils literal notranslate">certvalid</code>, les identifiants de certificat
+ne sont pas requis.</p>
+</div>
+</div>
+</section>
+<section id="examples">
+<h4>Exemples :</h4>
+<div class="highlight-none notranslate"><div class="highlight"><pre># Exemple de mode d'authentification 'anon'
+set system syslog remote 10.10.2.3 facility all level debug
+set system syslog remote 10.10.2.3 port 6514
+set system syslog remote 10.10.2.3 protocol tcp
+set system syslog remote 10.10.2.3 tls auth-mode anon
+# ou utiliser simplement 'set system syslog remote 10.10.2.3 tls'
+
+# Exemple de mode d'authentification 'certvalid'
+set system syslog remote elk.example.com facility all level debug
+set system syslog remote elk.example.com port 6514
+set system syslog remote elk.example.com protocol tcp
+set system syslog remote elk.example.com tls ca-certificate my-ca
+set system syslog remote elk.example.com tls auth-mode certvalid
+
+# Exemple de mode d'authentification 'fingerprint'
+set system syslog remote syslog.example.com facility all level debug
+set system syslog remote syslog.example.com port 6514
+set system syslog remote syslog.example.com protocol tcp
+set system syslog remote syslog.example.com tls ca-certificate my-ca
+set system syslog remote syslog.example.com tls auth-mode fingerprint
+set system syslog remote syslog.example.com tls permitted-peers &#39;SHA1:10:C4:26:...,SHA256:7B:4B:10:...&#39;
+
+# Exemple de mode d'authentification 'name'
+set system syslog remote graylog.example.com facility all level debug
+set system syslog remote graylog.example.com port 6514
+set system syslog remote graylog.example.com protocol tcp
+set system syslog remote graylog.example.com tls ca-certificate my-ca
+set system syslog remote graylog.example.com tls certificate syslog-client
+set system syslog remote graylog.example.com tls auth-mode name
+set system syslog remote graylog.example.com tls permitted-peers &#39;graylog.example.com&#39;
+</pre></div>
+</div>
+</section>
+<section id="security-recommendations">
+<h4>Recommandations de sécurité</h4>
+<ul class="simple">
+<li><p>Pour les déploiements sécurisés, utilisez toujours le mode d'authentification <code class="docutils literal notranslate">name</code>. Cela
+assure que le serveur est validé par une <abbr title="Certificate Authority">CA</abbr> de confiance et que le nom d'hôte correspond au certificat.</p></li>
+<li><p>Utilisez le mode d'authentification <code class="docutils literal notranslate">anon</code> uniquement dans les environnements de test, car il
+ne fournit pas d'authentification du serveur.</p></li>
+<li><p>Assurez-vous que les clés privées sont générées, stockées et maintenues exclusivement dans
+le <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/../pki/index.html">système PKI</a>.</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="syslog-facilities">
+<h2>Facilités syslog</h2>
+<p>Cette section liste les facilités utilisées par syslog. La plupart des noms de facilité sont auto-expliquants. Les facilités local0–local7 sont utilisées à des fins personnalisées, comme
+la journalisation provenant des nœuds réseau et équipements. L'attribution de facilité est flexible et doit être adaptée aux besoins de votre entreprise. Considérez les facilités comme des outils de catégorisation,
+plutôt que des directives strictes.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Code de facilité</p></th>
+<th class="head"><p>Mot-clé</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td><p>all</p></td>
+<td><p>Toutes les facilités</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>kern</p></td>
+<td><p>Messages du noyau</p></td>
+</tr>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>user</p></td>
+<td><p>Messages de niveau utilisateur</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>mail</p></td>
+<td><p>Système de messagerie</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>daemon</p></td>
+<td><p>Services système</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>auth</p></td>
+<td><p>Messages de sécurité/authentification</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>syslog</p></td>
+<td><p>Messages générés internement par syslog</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p>lpr</p></td>
+<td><p>Sous-système imprimante</p></td>
+</tr>
+<tr class="row-even"><td><p>7</p></td>
+<td><p>news</p></td>
+<td><p>Sous-système de nouvelles réseau</p></td>
+</tr>
+<tr class="row-odd"><td><p>8</p></td>
+<td><p>uucp</p></td>
+<td><p>Sous-système UUCP</p></td>
+</tr>
+<tr class="row-even"><td><p>9</p></td>
+<td><p>cron</p></td>
+<td><p>Démon de l'horloge</p></td>
+</tr>
+<tr class="row-odd"><td><p>10</p></td>
+<td><p>security</p></td>
+<td><p>Messages de sécurité/authentification</p></td>
+</tr>
+<tr class="row-even"><td><p>11</p></td>
+<td><p>ftp</p></td>
+<td><p>Démon FTP</p></td>
+</tr>
+<tr class="row-odd"><td><p>12</p></td>
+<td><p>ntp</p></td>
+<td><p>Sous-système NTP</p></td>
+</tr>
+<tr class="row-even"><td><p>13</p></td>
+<td><p>logaudit</p></td>
+<td><p>Journal d'audit</p></td>
+</tr>
+<tr class="row-odd"><td><p>14</p></td>
+<td><p>logalert</p></td>
+<td><p>Journal d'alerte</p></td>
+</tr>
+<tr class="row-even"><td><p>15</p></td>
+<td><p>clock</p></td>
+<td><p>Démon de l'horloge (note 2)</p></td>
+</tr>
+<tr class="row-odd"><td><p>16</p></td>
+<td><p>local0</p></td>
+<td><p>Utilisation locale 0 (local0)</p></td>
+</tr>
+<tr class="row-even"><td><p>17</p></td>
+<td><p>local1</p></td>
+<td><p>Utilisation locale 1 (local1)</p></td>
+</tr>
+<tr class="row-odd"><td><p>18</p></td>
+<td><p>local2</p></td>
+<td><p>Utilisation locale 2 (local2)</p></td>
+</tr>
+<tr class="row-even"><td><p>19</p></td>
+<td><p>local3</p></td>
+<td><p>Utilisation locale 3 (local3)</p></td>
+</tr>
+<tr class="row-odd"><td><p>20</p></td>
+<td><p>local4</p></td>
+<td><p>Utilisation locale 4 (local4)</p></td>
+</tr>
+<tr class="row-even"><td><p>21</p></td>
+<td><p>local5</p></td>
+<td><p>Utilisation locale 5 (local5)</p></td>
+</tr>
+<tr class="row-odd"><td><p>22</p></td>
+<td><p>local6</p></td>
+<td><p>Utilisation locale 6 (local6)</p></td>
+</tr>
+<tr class="row-even"><td><p>23</p></td>
+<td><p>local7</p></td>
+<td><p>Utilisation locale 7 (local7)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="severity-levels">
+<h2>Niveaux de gravité</h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Valeur</p></th>
+<th class="head"><p>Gravité</p></th>
+<th class="head"><p>Mot-clé</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td><p>all</p></td>
+<td><p>Enregistrer tout.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>Urgence</p></td>
+<td><p>emerg</p></td>
+<td><p>Le système est inutilisable - une condition de panique.</p></td>
+</tr>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>Alerte</p></td>
+<td><p>alert</p></td>
+<td><p>Une action doit être prise immédiatement - Une
+condition qui doit être corrigée
+immédiatement, telle qu'une base de données système corrompue.</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>Critique</p></td>
+<td><p>crit</p></td>
+<td><p>Conditions critiques - par exemple, erreurs de disque dur.</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>Erreur</p></td>
+<td><p>err</p></td>
+<td><p>Conditions d'erreur.</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>Avertissement</p></td>
+<td><p>warning</p></td>
+<td><p>Conditions d'avertissement.</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>Notification</p></td>
+<td><p>notice</p></td>
+<td><p>Conditions normales mais importantes -
+des conditions qui ne sont pas des conditions d'erreur,
+mais qui peuvent nécessiter un traitement spécial.</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p>Informationnelle</p></td>
+<td><p>info</p></td>
+<td><p>Messages d'information.</p></td>
+</tr>
+<tr class="row-even"><td><p>7</p></td>
+<td><p>Débogage</p></td>
+<td><p>debug</p></td>
+<td><p>Messages de niveau débogage - Messages qui
+contiennent des informations normalement utiles uniquement
+lors du débogage d'un programme.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="display-logs">
+<h2>Afficher les journaux</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log [all | authorization | cluster | conntrack-sync | …]
+<a class="cmdlink" href="#opcmd-show-log-all-authorization-cluster-conntrack-sync" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p><strong>Afficher les journaux pour une catégorie spécifique sur le terminal.</strong></p>
+<p>Utilisez la complétion tabulaire pour afficher la liste des catégories disponibles.</p>
+<p>Si aucune catégorie n'est spécifiée, tous les journaux sont affichés.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log image &lt;name&gt; [all | authorization | directory | file &lt;file name&gt; | tail &lt;lines&gt;]
+<a class="cmdlink" href="#opcmd-show-log-image-name-all-authorization-directory-file-file-name-tail-lines" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p><strong>Afficher les journaux pour une image spécifique sur le terminal.</strong></p>
+<p>Les catégories de journal disponibles :</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>all</p></td>
+<td><p>Affiche le contenu des fichiers de journal du système de l'image spécifiée.</p></td>
+</tr>
+<tr class="row-even"><td><p>authorization</p></td>
+<td><p>Affiche les tentatives d'autorisation de l'image spécifiée.</p></td>
+</tr>
+<tr class="row-odd"><td><p>directory</p></td>
+<td><p>Affiche les fichiers de journal définis par l'utilisateur de l'image spécifiée.</p></td>
+</tr>
+<tr class="row-even"><td><p>file &lt;file name&gt;</p></td>
+<td><p>Affiche le contenu d'un fichier de journal défini par l'utilisateur de l'image spécifiée.</p></td>
+</tr>
+<tr class="row-odd"><td><p>tail</p></td>
+<td><p>Affiche les dernières lignes du journal système de l'image spécifiée.</p></td>
+</tr>
+<tr class="row-even"><td><p>&lt;lines&gt;</p></td>
+<td><p>Nombre de lignes à afficher, par défaut 10.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Si aucune catégorie n'est spécifiée, le contenu du fichier syslog principal est affiché.</p>
+<div class="admonition hint">
+<p class="admonition-title">Conseil</p>
+<p>Utilisez <code class="docutils literal notranslate">show log | strip-private</code> pour masquer les données privées
+lors de l'affichage de vos journaux.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

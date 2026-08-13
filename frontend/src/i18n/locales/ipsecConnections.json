@@ -1,0 +1,121 @@
+{
+  "zh-CN": {
+    "ipsecConnections": {
+      "title": "IPsec 连接",
+      "rawOutput": "原始输出",
+      "columns": {
+        "connection": "连接",
+        "state": "状态",
+        "type": "类型",
+        "remoteAddress": "远端地址",
+        "localTs": "本地 TS",
+        "remoteTs": "远端 TS",
+        "localId": "本地 ID",
+        "remoteId": "远端 ID",
+        "proposal": "提议"
+      }
+    }
+  },
+  "en": {
+    "ipsecConnections": {
+      "title": "IPsec Connections",
+      "rawOutput": "Raw Output",
+      "columns": {
+        "connection": "Connection",
+        "state": "State",
+        "type": "Type",
+        "remoteAddress": "Remote Address",
+        "localTs": "Local TS",
+        "remoteTs": "Remote TS",
+        "localId": "Local ID",
+        "remoteId": "Remote ID",
+        "proposal": "Proposal"
+      }
+    }
+  },
+  "zh-TW": {
+    "ipsecConnections": {
+      "title": "IPsec Connections",
+      "rawOutput": "Raw Output",
+      "columns": {
+        "connection": "Connection",
+        "state": "State",
+        "type": "Type",
+        "remoteAddress": "Remote Address",
+        "localTs": "Local TS",
+        "remoteTs": "Remote TS",
+        "localId": "Local ID",
+        "remoteId": "Remote ID",
+        "proposal": "Proposal"
+      }
+    }
+  },
+  "ru": {
+    "ipsecConnections": {
+      "title": "IPsec Connections",
+      "rawOutput": "Raw Output",
+      "columns": {
+        "connection": "Connection",
+        "state": "State",
+        "type": "Type",
+        "remoteAddress": "Remote Address",
+        "localTs": "Local TS",
+        "remoteTs": "Remote TS",
+        "localId": "Local ID",
+        "remoteId": "Remote ID",
+        "proposal": "Proposal"
+      }
+    }
+  },
+  "de": {
+    "ipsecConnections": {
+      "title": "IPsec Connections",
+      "rawOutput": "Raw Output",
+      "columns": {
+        "connection": "Connection",
+        "state": "State",
+        "type": "Type",
+        "remoteAddress": "Remote Address",
+        "localTs": "Local TS",
+        "remoteTs": "Remote TS",
+        "localId": "Local ID",
+        "remoteId": "Remote ID",
+        "proposal": "Proposal"
+      }
+    }
+  },
+  "fr": {
+    "ipsecConnections": {
+      "title": "IPsec Connections",
+      "rawOutput": "Raw Output",
+      "columns": {
+        "connection": "Connection",
+        "state": "State",
+        "type": "Type",
+        "remoteAddress": "Remote Address",
+        "localTs": "Local TS",
+        "remoteTs": "Remote TS",
+        "localId": "Local ID",
+        "remoteId": "Remote ID",
+        "proposal": "Proposal"
+      }
+    }
+  },
+  "ko": {
+    "ipsecConnections": {
+      "title": "IPsec Connections",
+      "rawOutput": "Raw Output",
+      "columns": {
+        "connection": "Connection",
+        "state": "State",
+        "type": "Type",
+        "remoteAddress": "Remote Address",
+        "localTs": "Local TS",
+        "remoteTs": "Remote TS",
+        "localId": "Local ID",
+        "remoteId": "Remote ID",
+        "proposal": "Proposal"
+      }
+    }
+  }
+}

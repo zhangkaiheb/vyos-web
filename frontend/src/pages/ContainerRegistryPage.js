@@ -7,6 +7,7 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -33,29 +34,29 @@ export default defineComponent({
   name: 'ContainerRegistryPage',
   components: { DataTable, DraggableModal, ConfigForm, ToolbarButton },
   setup() {
+    const { t } = useI18n();
     const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
 
     const registries = ref([]);
 
-    const registryColumns = [
-      { key: 'name', title: '注册表名称', dataIndex: 'name', width: 180 },
-      { key: 'username', title: '认证用户名', dataIndex: 'username', width: 150 },
-      { key: 'insecure', title: '不安全', dataIndex: 'insecure', width: 80 },
-      { key: 'disable', title: '禁用', dataIndex: 'disable', width: 80 },
-      { key: 'mirror_count', title: '镜像数', dataIndex: 'mirror_count', width: 80 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const registryColumns = computed(() => [
+      { key: 'name', title: t('containerRegistry.columns.registryName'), dataIndex: 'name', width: 180 },
+      { key: 'username', title: t('containerRegistry.columns.username'), dataIndex: 'username', width: 150 },
+      { key: 'insecure', title: t('containerRegistry.columns.insecure'), dataIndex: 'insecure', width: 80 },
+      { key: 'disable', title: t('containerRegistry.columns.disable'), dataIndex: 'disable', width: 80 },
+      { key: 'mirror_count', title: t('containerRegistry.columns.mirrorCount'), dataIndex: 'mirror_count', width: 80 },
+      { key: 'actions', title: t('containerRegistry.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
-    const mirrorColumns = [
-      { key: 'host_name', title: '主机名', dataIndex: 'host_name', width: 180 },
-      { key: 'address', title: '地址', dataIndex: 'address', width: 150 },
-      { key: 'port', title: '端口', dataIndex: 'port', width: 80 },
-      { key: 'path', title: '路径', dataIndex: 'path', width: 150 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const mirrorColumns = computed(() => [
+      { key: 'host_name', title: t('containerRegistry.columns.hostName'), dataIndex: 'host_name', width: 180 },
+      { key: 'address', title: t('containerRegistry.columns.address'), dataIndex: 'address', width: 150 },
+      { key: 'port', title: t('containerRegistry.columns.port'), dataIndex: 'port', width: 80 },
+      { key: 'path', title: t('containerRegistry.columns.path'), dataIndex: 'path', width: 150 },
+      { key: 'actions', title: t('containerRegistry.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
     const selectedRegistries = ref([]);
     const selectedMirrors = ref([]);
@@ -124,12 +125,11 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('container registry', true);
         registries.value = registryToForm(res.data || {});
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('containerRegistry.errors.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -143,11 +143,10 @@ export default defineComponent({
         if (Object.keys(payload).length) {
           await configApi.set('container registry', payload);
         }
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('containerRegistry.errors.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -167,9 +166,9 @@ export default defineComponent({
     }
 
     function editRegistry() {
-      if (!selectedRegistries.value.length) return alert('请选择要编辑的注册表');
+      if (!selectedRegistries.value.length) return showError({ message: t('containerRegistry.errors.selectRegistryToEdit') });
       const row = registries.value.find(r => r.name === selectedRegistries.value[0]);
-      if (!row) return alert('未找到选中的注册表');
+      if (!row) return showError({ message: t('containerRegistry.errors.registryNotFound') });
       editingRegistry.value = JSON.parse(JSON.stringify(row));
       selectedMirrors.value = [];
       showRegistryModal.value = true;
@@ -184,7 +183,7 @@ export default defineComponent({
     }
 
     function removeRegistry() {
-      if (!selectedRegistries.value.length) return alert('请选择要删除的注册表');
+      if (!selectedRegistries.value.length) return showError({ message: t('containerRegistry.errors.selectRegistryToDelete') });
       registries.value = registries.value.filter(r => r.name !== selectedRegistries.value[0]);
       selectedRegistries.value = [];
     }
@@ -194,7 +193,7 @@ export default defineComponent({
     }
 
     function saveRegistry() {
-      if (!editingRegistry.value.name) return alert('请输入注册表名称');
+      if (!editingRegistry.value.name) return showError({ message: t('containerRegistry.errors.registryNameRequired') });
       const list = registries.value;
       const idx = list.findIndex(r => r._name === editingRegistry.value._name);
       const reg = { ...editingRegistry.value };
@@ -218,9 +217,9 @@ export default defineComponent({
     }
 
     function editMirror() {
-      if (!selectedMirrors.value.length) return alert('请选择要编辑的镜像');
+      if (!selectedMirrors.value.length) return showError({ message: t('containerRegistry.errors.selectMirrorToEdit') });
       const row = editingRegistry.value.mirrors.find(m => m._key === selectedMirrors.value[0]);
-      if (!row) return alert('未找到选中的镜像');
+      if (!row) return showError({ message: t('containerRegistry.errors.mirrorNotFound') });
       editingMirror.value = JSON.parse(JSON.stringify(row));
       showMirrorModal.value = true;
     }
@@ -233,7 +232,7 @@ export default defineComponent({
     }
 
     function removeMirror() {
-      if (!selectedMirrors.value.length) return alert('请选择要删除的镜像');
+      if (!selectedMirrors.value.length) return showError({ message: t('containerRegistry.errors.selectMirrorToDelete') });
       editingRegistry.value.mirrors = editingRegistry.value.mirrors.filter(m => m._key !== selectedMirrors.value[0]);
       editingRegistry.value.mirror_count = editingRegistry.value.mirrors.length;
       selectedMirrors.value = [];
@@ -245,9 +244,9 @@ export default defineComponent({
     }
 
     function saveMirror() {
-      if (!editingMirror.value.host_name) return alert('请输入镜像主机名');
+      if (!editingMirror.value.host_name) return showError({ message: t('containerRegistry.errors.hostNameRequired') });
       if (editingMirror.value.path && !editingMirror.value.path.startsWith('/')) {
-        return alert('路径必须以 / 开头');
+        return showError({ message: t('containerRegistry.errors.pathMustStartWithSlash') });
       }
       const list = editingRegistry.value.mirrors;
       if (editingMirror.value._key) {
@@ -268,7 +267,8 @@ export default defineComponent({
     });
 
     return {
-      loading, saving, saved, registries, commandPath,
+      t,
+      loading, saving, registries, commandPath,
       registryColumns, mirrorColumns,
       selectedRegistries, selectedMirrors,
       showRegistryModal, editingRegistry,
@@ -280,63 +280,57 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
-
-      <div style="font-weight:bold;margin:16px 0 8px;">容器注册表</div>
+      <div style="font-weight:bold;margin:16px 0 8px;">{{ t('containerRegistry.pageTitle') }}</div>
       <div class="toolbar">
-        <ToolbarButton icon="create" @click="createRegistry">创建</ToolbarButton>
-        <ToolbarButton icon="edit" @click="editRegistry" :disabled="!selectedRegistries.length || selectedRegistries.length > 1">编辑</ToolbarButton>
-        <ToolbarButton icon="delete" @click="removeRegistry" :disabled="!selectedRegistries.length">删除</ToolbarButton>
+        <ToolbarButton icon="create" @click="createRegistry">{{ t('containerRegistry.buttons.create') }}</ToolbarButton>
+        <ToolbarButton icon="edit" @click="editRegistry" :disabled="!selectedRegistries.length || selectedRegistries.length > 1">{{ t('containerRegistry.buttons.edit') }}</ToolbarButton>
+        <ToolbarButton icon="delete" @click="removeRegistry" :disabled="!selectedRegistries.length">{{ t('containerRegistry.buttons.delete') }}</ToolbarButton>
       </div>
       <DataTable :columns="registryColumns" :data="registries" rowKey="name" :externalToolbar="true" @selection-change="selectedRegistries = $event" :selectable="true">
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'insecure'">
-            <span>{{ record.insecure ? '是' : '否' }}</span>
+            <span>{{ record.insecure ? t('containerRegistry.labels.yes') : t('containerRegistry.labels.no') }}</span>
           </template>
           <template v-if="column.key === 'disable'">
-            <span>{{ record.disable ? '是' : '否' }}</span>
+            <span>{{ record.disable ? t('containerRegistry.labels.yes') : t('containerRegistry.labels.no') }}</span>
           </template>
           <template v-if="column.key === 'actions'">
-            <a @click="editRegistryByRecord(record)" style="margin-right:8px">编辑</a>
-            <a @click="removeRegistryByRecord(record)" style="color:#ff4d4f">删除</a>
+            <a @click="editRegistryByRecord(record)" style="margin-right:8px">{{ t('containerRegistry.actions.edit') }}</a>
+            <a @click="removeRegistryByRecord(record)" style="color:#ff4d4f">{{ t('containerRegistry.actions.delete') }}</a>
           </template>
         </template>
       </DataTable>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-      </div>
+      <DraggableModal v-model:visible="showRegistryModal" :title="editingRegistry && editingRegistry._name ? t('containerRegistry.modals.editRegistry') : t('containerRegistry.modals.createRegistry')" @confirm="saveRegistry" @close="showRegistryModal = false" width="800px">
+        <div class="form-row"><label class="form-label">{{ t('containerRegistry.columns.registryName') }}</label><input class="form-control" v-model="editingRegistry.name" :disabled="editingRegistry._name" :placeholder="t('containerRegistry.placeholders.registryName')" :title="t('containerRegistry.titles.registryName')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('containerRegistry.columns.insecure') }}</label><input type="checkbox" v-model="editingRegistry.insecure" :title="t('containerRegistry.titles.insecure')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('containerRegistry.columns.disable') }}</label><input type="checkbox" v-model="editingRegistry.disable" :title="t('containerRegistry.titles.disable')" /></div>
 
-      <DraggableModal v-model:visible="showRegistryModal" :title="editingRegistry && editingRegistry._name ? '编辑注册表' : '新建注册表'" @confirm="saveRegistry" @close="showRegistryModal = false" width="800px">
-        <div class="form-row"><label class="form-label">注册表名称</label><input class="form-control" v-model="editingRegistry.name" :disabled="editingRegistry._name" placeholder="如 docker.io" title="注册表名称，如 docker.io、quay.io" /></div>
-        <div class="form-row"><label class="form-label">不安全</label><input type="checkbox" v-model="editingRegistry.insecure" title="允许通过未加密 HTTP 或不受信任证书的 TLS 连接访问注册表" /></div>
-        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingRegistry.disable" title="禁用该实例" /></div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('containerRegistry.labels.authentication') }}</div>
+        <div class="form-row"><label class="form-label">{{ t('containerRegistry.labels.username') }}</label><input class="form-control" v-model="editingRegistry.username" :title="t('containerRegistry.titles.username')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('containerRegistry.labels.password') }}</label><input class="form-control" type="password" v-model="editingRegistry.password" :title="t('containerRegistry.titles.password')" /></div>
 
-        <div style="font-weight:bold;margin:16px 0 8px;">认证</div>
-        <div class="form-row"><label class="form-label">用户名</label><input class="form-control" v-model="editingRegistry.username" title="认证用户名" /></div>
-        <div class="form-row"><label class="form-label">密码</label><input class="form-control" type="password" v-model="editingRegistry.password" title="认证密码" /></div>
-
-        <div style="font-weight:bold;margin:16px 0 8px;">镜像</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('containerRegistry.labels.mirrors') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createMirror">添加</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editMirror" :disabled="!selectedMirrors.length || selectedMirrors.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeMirror" :disabled="!selectedMirrors.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createMirror">{{ t('containerRegistry.buttons.add') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editMirror" :disabled="!selectedMirrors.length || selectedMirrors.length > 1">{{ t('containerRegistry.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeMirror" :disabled="!selectedMirrors.length">{{ t('containerRegistry.buttons.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="mirrorColumns" :data="editingRegistry.mirrors" rowKey="_key" :externalToolbar="true" @selection-change="selectedMirrors = $event" :selectable="true">
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'actions'">
-              <a @click="editMirrorByRecord(record)" style="margin-right:8px">编辑</a>
-              <a @click="removeMirrorByRecord(record)" style="color:#ff4d4f">删除</a>
+              <a @click="editMirrorByRecord(record)" style="margin-right:8px">{{ t('containerRegistry.actions.edit') }}</a>
+              <a @click="removeMirrorByRecord(record)" style="color:#ff4d4f">{{ t('containerRegistry.actions.delete') }}</a>
             </template>
           </template>
         </DataTable>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showMirrorModal" :title="editingMirror && editingMirror._key ? '编辑镜像' : '添加镜像'" @confirm="saveMirror" @close="showMirrorModal = false" width="600px">
-        <div class="form-row"><label class="form-label">主机名</label><input class="form-control" v-model="editingMirror.host_name" :disabled="editingMirror._key" placeholder="如 mirror.example.com" title="容器注册表镜像的主机名" /></div>
-        <div class="form-row"><label class="form-label">地址</label><input class="form-control" v-model="editingMirror.address" placeholder="x.x.x.x" title="镜像的 IP 地址" /></div>
-        <div class="form-row"><label class="form-label">端口</label><input class="form-control" type="number" min="1" max="65535" v-model="editingMirror.port" title="连接使用的端口号" /></div>
-        <div class="form-row"><label class="form-label">路径</label><input class="form-control" v-model="editingMirror.path" placeholder="/v2" title="镜像路径，必须以 / 开头（可选）" /></div>
+      <DraggableModal v-model:visible="showMirrorModal" :title="editingMirror && editingMirror._key ? t('containerRegistry.modals.editMirror') : t('containerRegistry.modals.addMirror')" @confirm="saveMirror" @close="showMirrorModal = false" width="600px">
+        <div class="form-row"><label class="form-label">{{ t('containerRegistry.columns.hostName') }}</label><input class="form-control" v-model="editingMirror.host_name" :disabled="editingMirror._key" :placeholder="t('containerRegistry.placeholders.hostName')" :title="t('containerRegistry.titles.hostName')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('containerRegistry.columns.address') }}</label><input class="form-control" v-model="editingMirror.address" :placeholder="t('containerRegistry.placeholders.address')" :title="t('containerRegistry.titles.address')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('containerRegistry.columns.port') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="editingMirror.port" :title="t('containerRegistry.titles.port')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('containerRegistry.columns.path') }}</label><input class="form-control" v-model="editingMirror.path" :placeholder="t('containerRegistry.placeholders.path')" :title="t('containerRegistry.titles.path')" /></div>
       </DraggableModal>
     </div>
   `,

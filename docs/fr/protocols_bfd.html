@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="bfd">
+<h1>BFD</h1>
+<p><abbr title="Détecteur de transmission unidirectionnelle">BFD</abbr> est un protocole réseau qui
+détecte les échecs de communication entre deux appareils de routage connectés en quelques
+millisecondes — bien plus rapidement que les protocoles de routage traditionnels.
+BFD ne route pas le trafic lui-même. Il fournit plutôt une détection rapide des pannes
+pour d'autres protocoles, tels que <abbr title="Border Gateway Protocol">BGP</abbr>,
+<abbr title="Open Shortest Path First">OSPF</abbr>, et les routes statiques.</p>
+<p>BFD est décrit et étendu par les RFCs suivantes : <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5880.html"><strong>RFC 5880</strong></a>, <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5881.html"><strong>RFC 5881</strong></a>
+et <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5883.html"><strong>RFC 5883</strong></a>.</p>
+<p><strong>Comment fonctionne BFD</strong></p>
+<p>BFD établit une session entre deux pairs et échange des paquets de contrôle UDP rapides à un intervalle négocié
+(par exemple, 300 ms entre les paquets consécutifs). Si un pair ne reçoit pas ces
+paquets dans le délai de détection (l'intervalle négocié multiplié par un multiplicateur de détection), BFD suppose une panne de connexion et informe
+les protocoles de routage.</p>
+<section id="configuration">
+<h2>Configuration</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'adresse IPv4 ou IPv6 du pair BFD.</strong></p>
+<p>Vous pouvez configurer plusieurs pairs BFD en spécifiant une adresse IP différente
+pour chaque voisin que vous souhaitez surveiller.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Remarque</p>
+<p>Pour les pairs IPv6, vous devez configurer une adresse IP source ou une interface.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 198.51.100.33
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer &lt;address&gt; echo-mode
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-echo-mode" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activez le mode d'envoi d'écho BFD pour le pair à l'adresse IP spécifiée.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 198.51.100.33 echo-mode
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer &lt;address&gt; multihop
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-multihop" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le pair à l'adresse IP spécifiée comme voisin multihop.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Pour les pairs BFD multihop, vous devez configurer une adresse IP source locale.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 198.51.100.33 multihop
+set protocols bfd peer 198.51.100.33 source address 198.51.100.1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer &lt;address&gt; source address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'adresse IP source pour la session BFD avec le pair à l'adresse IP
+spécifiée.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>La configuration d'une adresse IP source ou d'une interface est obligatoire pour les pairs BFD IPv6.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 198.51.100.33 source address 198.51.100.1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer &lt;address&gt; source interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-source-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface source pour la session BFD avec le pair à l'adresse IP
+spécifiée.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>La configuration d'une adresse IP source ou d'une interface est obligatoire pour les pairs BFD IPv6.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 2001:db8::2 source interface eth0
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer &lt;address&gt; interval echo-interval &lt;10-60000&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-interval-echo-interval-10-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'intervalle minimum, en millisecondes, auquel le système local
+peut recevoir des paquets d'écho du pair à l'adresse IP spécifiée.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 198.51.100.33 interval echo-interval 50
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer &lt;address&gt; interval multiplier &lt;2-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-interval-multiplier-2-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le multiplicateur de détection pour le pair à l'adresse IP spécifiée.</strong></p>
+<p>BFD multiplie l'intervalle négocié par cette valeur pour calculer le temps de détection —
+la période après laquelle il déclare la session comme tombée si aucun paquet de contrôle n'arrive.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 192.0.2.1 interval multiplier 3
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer &lt;address&gt; interval receive &lt;10-60000&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-interval-receive-10-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'intervalle, en millisecondes, auquel le système local peut
+recevoir des paquets de contrôle BFD du pair à l'adresse IP spécifiée.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 192.0.2.1 interval receive 300
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer &lt;address&gt; interval transmit &lt;10-60000&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-interval-transmit-10-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'intervalle, en millisecondes, auquel vous souhaitez que le système local
+transmette des paquets de contrôle BFD au pair à l'adresse IP spécifiée.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 192.0.2.1 interval transmit 300
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer &lt;address&gt; shutdown
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-shutdown" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez la session BFD avec le pair à l'adresse IP spécifiée.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 198.51.100.33 shutdown
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer &lt;address&gt; minimum-ttl &lt;1-254&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-minimum-ttl-1-254" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la valeur minimale de <abbr title="Time to Live">TTL</abbr> que doivent avoir les paquets de contrôle BFD entrants pour être acceptés du pair à l'adresse IP spécifiée.</strong></p>
+<p>BFD supprime tout paquet dont le TTL est inférieur à cette limite.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette configuration s'applique uniquement aux sessions multihop.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 192.0.2.1 minimum-ttl 250
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer &lt;address&gt; passive
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-passive" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la session BFD avec le pair à l'adresse IP spécifiée pour qu'elle fonctionne en mode passif.</strong></p>
+<p>En mode passif, le système local ne démarre pas la session BFD.
+Au lieu de cela, il attend de recevoir le premier paquet de contrôle BFD du pair distant.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Au moins l'un des deux pairs doit rester en mode actif pour que la session puisse être établie. Si les deux pairs sont passifs, aucun ne démarre, et la session ne s'établit jamais.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 198.51.100.33 passive
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer &lt;address&gt; profile &lt;profile&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-profile-profile" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Appliquez les paramètres d'un profil BFD désigné au pair à l'adresse IP spécifiée.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 192.0.2.1 profile datacenter-fast
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer &lt;address&gt; vrf &lt;vrf&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-vrf-vrf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Liez la session BFD avec le pair à l'adresse IP spécifiée à une instance spécifique de <abbr title="Virtual Routing and Forwarding">VRF</abbr>.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 192.0.2.1 vrf customer-a
+</pre></div>
+</div>
+<section id="enable-bfd-in-bgp">
+<h3>Activer BFD dans BGP</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;neighbor&gt; bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-neighbor-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activez la détection des pannes BFD pour la session BGP avec le voisin à l'adresse IP spécifiée.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bgp neighbor 192.0.2.1 bfd
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp peer-group &lt;neighbor&gt; bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-peer-group-neighbor-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activez la détection des pannes BFD pour tous les voisins du groupe de pairs BGP spécifié.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bgp peer-group INTERNAL-PEERS bfd
+</pre></div>
+</div>
+</section>
+<section id="enable-bfd-in-ospf">
+<h3>Activer BFD dans OSPF</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf interface &lt;interface&gt; bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activez la détection des pannes BFD pour les voisins OSPF découverts sur l'interface spécifiée.</strong></p>
+<p>Lorsque OSPF forme une adjacence avec un voisin sur cette interface, il demande à BFD d'établir une session avec ce voisin.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospf interface eth0 bfd
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospfv3 interface &lt;interface&gt; bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-interface-interface-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activez la détection des pannes BFD pour les voisins OSPFv3 découverts sur l'interface spécifiée.</strong></p>
+<p>Lorsque OSPFv3 forme une adjacence avec un voisin sur cette interface, il demande à BFD d'établir une session avec ce voisin.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospfv3 interface eth0 bfd
+</pre></div>
+</div>
+</section>
+<section id="enable-bfd-in-is-is">
+<h3>Activer BFD dans IS-IS</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface &lt;interface&gt; bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activez la détection des pannes BFD pour les voisins IS-IS découverts sur l'interface spécifiée.</strong></p>
+<p>Lorsque IS-IS forme une adjacence avec un voisin sur cette interface, il demande à BFD d'établir une session avec ce voisin.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth0 bfd
+</pre></div>
+</div>
+</section>
+</section>
+<section id="operation">
+<h2>Opération</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bfd peers
+<a class="cmdlink" href="#opcmd-show-bfd-peers" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p><strong>Affichez tous les pairs BFD.</strong></p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show bfd peers
+Peers BFD :
+        pair 198.51.100.33 vrf default
+                ID : 4182341893
+                ID distant : 3267892964
+                Mode actif
+                Statut : up
+                Durée de fonctionnement : 1 mois(s), 16 heure(s), 29 minute(s), 38 seconde(s)
+                Diagnostics : ok
+                Diagnostics distants : ok
+                Type de pair : configuré
+                RTT min/moy/max : 245/267/289 usec
+                Horloges locales :
+                        Multiplicateur de détection : 3
+                        Intervalle de réception : 300ms
+                        Intervalle de transmission : 300ms
+                        Intervalle de réception d'écho : 50ms
+                        Intervalle de transmission d'écho : désactivé
+                Horloges distantes :
+                        Multiplicateur de détection : 3
+                        Intervalle de réception : 300ms
+                        Intervalle de transmission : 300ms
+                        Intervalle de réception d'écho : désactivé
+
+        pair 198.51.100.55 multihop adresse locale 198.51.100.1 vrf default
+                ID : 3618932327
+                ID distant : 3312345688
+                Mode actif
+                TTL minimal : 254
+                Statut : up
+                Durée de fonctionnement : 20 heure(s), 16 minute(s), 19 seconde(s)
+                Diagnostics : ok
+                Diagnostics distants : ok
+                Type de pair : configuré
+                RTT min/moy/max : 1240/1289/1356 usec
+                Horloges locales :
+                        Multiplicateur de détection : 3
+                        Intervalle de réception : 300ms
+                        Intervalle de transmission : 300ms
+                        Intervalle de réception d'écho : 50ms
+                        Intervalle de transmission d'écho : désactivé
+                Horloges distantes :
+                        Multiplicateur de détection : 3
+                        Intervalle de réception : 1000ms
+                        Intervalle de transmission : 1000ms
+                        Intervalle de réception d'écho : désactivé
+</pre></div>
+</div>
+</section>
+<section id="bfd-static-route-monitoring">
+<h2>Surveillance des routes statiques BFD</h2>
+<p>Une route statique surveillée est présente dans le
+<abbr title="Routing Information Base">RIB</abbr> uniquement lorsque la session BFD est active. Si
+la session tombe, la route est supprimée.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; bfd profile &lt;profile&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd-profile-profile" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la détection des pannes BFD pour une route statique à un saut.</strong></p>
+<p>BFD utilise l'adresse IP du prochain saut comme adresse IP du pair BFD et applique
+les paramètres du profil BFD spécifié.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/24 next-hop 192.0.2.1 bfd profile datacenter-fast
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; bfd multi-hop source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd-multi-hop-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la détection des pannes BFD pour une route statique à plusieurs sauts.</strong></p>
+<p>BFD utilise l'adresse IP du prochain saut comme adresse IP du pair BFD et l'adresse IP source
+multihop comme adresse source locale pour les paquets BFD sortants.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/24 next-hop 198.51.100.33 bfd multi-hop source-address 198.51.100.1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; bfd profile &lt;profile&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd-profile-profile" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la détection des pannes BFD pour une route statique IPv6 à un saut.</strong></p>
+<p>BFD utilise l'adresse IPv6 du prochain saut comme adresse IPv6 du pair BFD et applique
+les paramètres du profil BFD spécifié.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8::1 bfd profile datacenter-fast
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; bfd multi-hop source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd-multi-hop-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la détection des pannes BFD pour une route statique IPv6 à plusieurs sauts.</strong></p>
+<p>BFD utilise l'adresse IPv6 du prochain saut comme adresse IPv6 du pair BFD et l'adresse IPv6 source
+multihop comme adresse source locale pour les paquets BFD sortants.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::33 bfd multi-hop source-address 2001:db8::1
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

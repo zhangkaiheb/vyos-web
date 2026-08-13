@@ -1,0 +1,135 @@
+{
+  "zh-CN": {
+    "processMonitor": {
+      "tabs": {
+        "summary": "概览",
+        "processes": "进程列表"
+      },
+      "columns": {
+        "item": "项目",
+        "value": "值",
+        "user": "用户"
+      },
+      "summary": {
+        "systemInfo": "系统时间 / 运行时长 / 用户数 / 负载"
+      },
+      "buttons": {
+        "refresh": "刷新"
+      }
+    }
+  },
+  "en": {
+    "processMonitor": {
+      "tabs": {
+        "summary": "Overview",
+        "processes": "Process List"
+      },
+      "columns": {
+        "item": "Item",
+        "value": "Value",
+        "user": "User"
+      },
+      "summary": {
+        "systemInfo": "System Time / Uptime / Users / Load"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "zh-TW": {
+    "processMonitor": {
+      "tabs": {
+        "summary": "Overview",
+        "processes": "Process List"
+      },
+      "columns": {
+        "item": "Item",
+        "value": "Value",
+        "user": "User"
+      },
+      "summary": {
+        "systemInfo": "System Time / Uptime / Users / Load"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "ru": {
+    "processMonitor": {
+      "tabs": {
+        "summary": "Overview",
+        "processes": "Process List"
+      },
+      "columns": {
+        "item": "Item",
+        "value": "Value",
+        "user": "User"
+      },
+      "summary": {
+        "systemInfo": "System Time / Uptime / Users / Load"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "de": {
+    "processMonitor": {
+      "tabs": {
+        "summary": "Overview",
+        "processes": "Process List"
+      },
+      "columns": {
+        "item": "Item",
+        "value": "Value",
+        "user": "User"
+      },
+      "summary": {
+        "systemInfo": "System Time / Uptime / Users / Load"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "fr": {
+    "processMonitor": {
+      "tabs": {
+        "summary": "Overview",
+        "processes": "Process List"
+      },
+      "columns": {
+        "item": "Item",
+        "value": "Value",
+        "user": "User"
+      },
+      "summary": {
+        "systemInfo": "System Time / Uptime / Users / Load"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "ko": {
+    "processMonitor": {
+      "tabs": {
+        "summary": "Overview",
+        "processes": "Process List"
+      },
+      "columns": {
+        "item": "Item",
+        "value": "Value",
+        "user": "User"
+      },
+      "summary": {
+        "systemInfo": "System Time / Uptime / Users / Load"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  }
+}

@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="dns-forwarding">
+<h1>Перенаправление DNS</h1>
+<p>VyOS предоставляет инфраструктуру DNS для небольших сетей, предназначенную
+для легкого использования и подходящую для ресурсоограниченных маршрутизаторов и
+межсетевых экранов.</p>
+<p>Подключенные клиенты обслуживаются через службу перенаправления DNS,
+настроенную под <code class="docutils literal notranslate">service dns forwarding</code>. Она может либо перенаправлять
+запросы на настраиваемые серверы верхнего уровня DNS, либо работать как полный
+рекурсивный сервер DNS без необходимости наличия серверов верхнего уровня. Работа
+без серверов верхнего уровня избегает экспозиции запросов клиентов оператору DNS верхнего уровня.</p>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Конфигурация перенаправления DNS может быть сохранена только в том случае, если оба
+<code class="docutils literal notranslate">listen-address</code> и <code class="docutils literal notranslate">allow-from</code> установлены. В противном случае, сохранение не удастся.</p>
+</div>
+<section id="listener">
+<h3>Прослушиватель</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding listen-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-listen-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте локальный IPv4 или IPv6 адрес, на котором DNS-перенаправление слушает входящие запросы.</strong></p>
+<p>Адрес должен уже быть назначен локальной интерфейс. Повторите команду, чтобы настроить несколько адресов прослушивания. Для успешного сохранения требуется хотя бы один listen-address.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding listen-address 192.0.2.1
+set service dns forwarding listen-address 2001:db8::1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding port &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-port-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте порт, на котором DNS-перенаправление слушает входящие запросы.</strong></p>
+<p>По умолчанию — 53.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding port 5353
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding allow-from &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-allow-from-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Ограничьте входящие запросы клиентами, чей IP-адрес находится в указанном
+IPv4 или IPv6 префиксе.</strong></p>
+<p>Повторите команду, чтобы разрешить несколько префиксов. Для успешного сохранения требуется хотя бы один префикс.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Ограничьте <code class="docutils literal notranslate">allow-from</code> доверенными сетями. Не используйте <code class="docutils literal notranslate">0.0.0.0/0</code> или
+<code class="docutils literal notranslate">::/0</code>, если сервис доступен из интернета.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding allow-from 192.0.2.0/24
+set service dns forwarding allow-from 2001:db8::/32
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding exclude-throttle-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-exclude-throttle-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Исключите из торможения авторитетные серверы, совпадающие с указанным
+IPv4 или IPv6 адресом или префиксом.</strong></p>
+<p>DNS-перенаправление тормозит авторитетные серверы, которые не отвечают на запрос или возвращают ответы, которые DNS-перенаправление отклоняет. Эта команда исключает указанные адреса из торможения. Повторите команду, чтобы добавить несколько адресов.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding exclude-throttle-address 192.0.2.53
+set service dns forwarding exclude-throttle-address 2001:db8::53
+</pre></div>
+</div>
+</section>
+<section id="upstream-forwarding">
+<h3>Перенаправление вверх</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-name-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Перенаправляйте запросы на указанный IPv4 или IPv6 сервер верхнего уровня DNS.</strong></p>
+<p>Серверы верхнего уровня настраиваются напрямую под DNS-перенаправлением.
+Повторите команду, чтобы настроить несколько серверов верхнего уровня.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding name-server 192.0.2.53
+set service dns forwarding name-server 2001:db8::53
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding name-server &lt;address&gt; port &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-name-server-address-port-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте порт назначения, используемый при перенаправлении запросов на указанный сервер верхнего уровня DNS.</strong></p>
+<p>По умолчанию — 53.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding name-server 192.0.2.53 port 853
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding system
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-system" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Перенаправляйте запросы на серверы верхнего уровня, настроенные под <code class="docutils literal notranslate">system name-server</code>.</strong></p>
+<p>Серверы верхнего уровня наследуются от <code class="docutils literal notranslate">system name-server</code>.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding system
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding dhcp &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-dhcp-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Перенаправляйте запросы на серверы DNS, полученные через клиент DHCPv4 или DHCPv6 на указанной интерфейсе.</strong></p>
+<p>Повторите команду, чтобы перенаправлять запросы на серверы, полученные через DHCP, с нескольких интерфейсов.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding dhcp eth0
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте локальный IPv4 или IPv6 адрес, используемый как источник при отправке исходящих запросов DNS-перенаправлением.</strong></p>
+<p>По умолчанию — <code class="docutils literal notranslate">0.0.0.0</code> и <code class="docutils literal notranslate">::</code>, что означает, что адрес источника выбирается для каждого исходящего запроса. Повторите команду, чтобы настроить несколько адресов источника.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding source-address 192.0.2.1
+set service dns forwarding source-address 2001:db8::1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding no-serve-rfc1918
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-no-serve-rfc1918" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите авторитетный ответ на запросы для <code class="docutils literal notranslate">10.in-addr.arpa</code>,
+<code class="docutils literal notranslate">168.192.in-addr.arpa</code> и <code class="docutils literal notranslate">16-31.172.in-addr.arpa</code> зон.</strong></p>
+<p>Это обратные зоны для приватных диапазонов RFC 1918. Запросы для этих зон затем перенаправляются на настроенные серверы верхнего уровня.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding no-serve-rfc1918
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding ignore-hosts-file
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-ignore-hosts-file" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Не используйте локальный файл <code class="docutils literal notranslate">/etc/hosts</code> при разрешении имен.</strong></p>
+<p>По умолчанию DNS-перенаправление отвечает на запросы, используя <code class="docutils literal notranslate">/etc/hosts</code> перед рекурсией или перенаправлением.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding ignore-hosts-file
+</pre></div>
+</div>
+</section>
+<section id="cache-and-timers">
+<h3>Кэш и таймеры</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding cache-size &lt;0-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-cache-size-0-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте максимальное количество записей кэша DNS.</strong></p>
+<p>По умолчанию — 10000. Значение 0 отключает кэш.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding cache-size 1000000
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding negative-ttl &lt;0-7200&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-negative-ttl-0-7200" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте максимальное время, в секундах, в течение которого отрицательные ответы
+(NXDOMAIN и NODATA) хранятся в кэше.</strong></p>
+<p>По умолчанию — 3600.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding negative-ttl 60
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding minimum-ttl-override &lt;0-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-minimum-ttl-override-0-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте минимальное значение <abbr title="Time-to-Live">TTL</abbr>, в секундах,
+применяемое к кэшированным записям независимо от TTL, полученного от авторитетного сервера.</strong></p>
+<p>Записи с TTL ниже этого значения кэшируются с этим минимальным TTL. По умолчанию — <code class="docutils literal notranslate">1</code>.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Изменяйте это значение только в том случае, если у вас есть конкретная причина увеличить короткие TTL, так как более высокие значения расширяют кэширование за пределами авторитетного TTL. Если запись изменится на стороне сервера, клиенты получат устаревшее значение кэша, пока не истечет время переопределения.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding minimum-ttl-override 30
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding timeout &lt;10-60000&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-timeout-10-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте время, в миллисекундах, которое DNS-перенаправление ждет ответа от удаленного авторитетного сервера на исходящий запрос.</strong></p>
+<p>По умолчанию — 1500.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding timeout 2000
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding ttl-percent &lt;0-100&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-ttl-percent-0-100" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Обновляйте кэшированные записи в фоновом режиме, когда оставшееся время TTL падает ниже этого процента от оригинального TTL.</strong></p>
+<p>Клиенты продолжают получать существующий ответ из кэша во время обновления. По умолчанию — 0, что отключает фоновое обновление.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding ttl-percent 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding serve-stale-extension &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-serve-stale-extension-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, сколько раз TTL истекшей записи можно продлить на 30 секунд, когда запись не может быть обновлена.</strong></p>
+<p>По умолчанию — 0, что отключает обслуживание устаревших записей.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding serve-stale-extension 30
+</pre></div>
+</div>
+</section>
+<section id="dnssec-and-nxdomain-behavior">
+<h3>DNSSEC и поведение NXDOMAIN</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding dnssec &lt;off | process-no-validate | process | log-fail | validate&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-dnssec-off-process-no-validate-process-log-fail-validate" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте режим обработки DNSSEC для исходящих запросов и ответов:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">off</code>: Нет обработки DNSSEC. Биты DO в запросах клиентов игнорируются,
+и не запрашиваются записи DNSSEC от авторитетных серверов.</p></li>
+<li><p><code class="docutils literal notranslate">process-no-validate</code>: Возвращает записи DNSSEC (RRSIG, NSEC) клиентам, которые их запрашивают, но не проверяет.</p></li>
+<li><p><code class="docutils literal notranslate">process</code>: Проверяет ответы только тогда, когда клиент запрашивает это (бит DO или AD). Возвращает <code class="docutils literal notranslate">SERVFAIL</code> на поддельные данные.</p></li>
+<li><p><code class="docutils literal notranslate">log-fail</code>: Проверяет все ответы независимо от запроса клиента, логирует поддельные ответы, но возвращает те же ответы, что и в режиме <code class="docutils literal notranslate">process</code>.</p></li>
+<li><p><code class="docutils literal notranslate">validate</code>: Проверяет все ответы и возвращает <code class="docutils literal notranslate">SERVFAIL</code> на поддельные данные независимо от запроса клиента.</p></li>
+</ul>
+<p>По умолчанию — <code class="docutils literal notranslate">process-no-validate</code>.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding dnssec validate
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding nothing-below-nxdomain &lt;no | dnssec | yes&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-nothing-below-nxdomain-no-dnssec-yes" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, как DNS-перенаправление обрабатывает вырезку NXDOMAIN.</strong></p>
+<p>Когда DNS-перенаправление имеет кэшированный NXDOMAIN, оно также может вернуть NXDOMAIN для любого имени ниже запрещенного имени, не спрашивая у верхнего уровня. Это настройка контролирует, когда это поведение применяется:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">no</code>: никогда не применять вырезку NXDOMAIN.</p></li>
+<li><p><code class="docutils literal notranslate">dnssec</code>: применять вырезку NXDOMAIN только для проверенных DNSSEC NXDOMAIN записей.</p></li>
+<li><p><code class="docutils literal notranslate">yes</code>: применять вырезку NXDOMAIN для любого кэшированного NXDOMAIN, который не является поддельным.</p></li>
+</ul>
+<p>По умолчанию — <code class="docutils literal notranslate">dnssec</code>.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding nothing-below-nxdomain yes
+</pre></div>
+</div>
+</section>
+<section id="dns64">
+<h3>DNS64</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding dns64-prefix &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-dns64-prefix-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Синтезировать AAAA-записи из A-записей для имен, которые не имеют AAAA-записей, используя указанный префикс NAT64 IPv6.</strong></p>
+<p>Длина префикса должна быть точно <code class="docutils literal notranslate">/96</code>.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding dns64-prefix 2001:db8:64::/96
+</pre></div>
+</div>
+</section>
+<section id="edns-client-subnet">
+<h3>EDNS Клиентский Подсет</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding options ecs-add-for &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-options-ecs-add-for-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, какой адрес клиента отправляется как значение <abbr title="EDNS Client Subnet">ECS</abbr> в исходящих запросах.</strong></p>
+<p>Для клиентов, чей адрес соответствует указанному префиксу, отправляется реальный адрес клиента. Для клиентов, не соответствующих префиксу, отправляется заменяющий адрес, чтобы не было экспозиции подсети клиента.</p>
+<p>ECS отправляется только для запросов, соответствующих <code class="docutils literal notranslate">edns-subnet-allow-list</code>. Эта опция контролирует только значение, а не то, отправляется ли ECS.</p>
+<p>Добавьте <code class="docutils literal notranslate">!</code> перед префиксом, чтобы исключить его. Повторите команду для нескольких записей.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding options ecs-add-for 192.0.2.0/24
+set service dns forwarding options ecs-add-for !192.0.2.128/25
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding options ecs-ipv4-bits &lt;0-32&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-options-ecs-ipv4-bits-0-32" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте количество битов IPv4-адреса клиента, включаемых в параметр ECS, отправляемый авторитетным серверам.</strong></p>
+<p>Применяется только к запросам, для которых отправляется ECS (те, которые соответствуют <code class="docutils literal notranslate">edns-subnet-allow-list</code>).</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding options ecs-ipv4-bits 24
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding options edns-subnet-allow-list &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-options-edns-subnet-allow-list-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Включить ECS в исходящих запросах, когда адрес сервера назначения находится в указанной маске сети, или когда имя запроса находится под указанным доменом.</strong></p>
+<p>Повторите команду, чтобы добавить несколько записей.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding options edns-subnet-allow-list example.com
+set service dns forwarding options edns-subnet-allow-list 192.0.2.0/24
+</pre></div>
+</div>
+</section>
+<section id="per-domain-forwarding">
+<h3>Перенаправление по домену</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding domain &lt;domain-name&gt; name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-domain-domain-name-name-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Перенаправляйте запросы для указанного домена на указанный IPv4 или IPv6 сервер верхнего уровня DNS.</strong></p>
+<p>Повторите команду, чтобы настроить несколько серверов имен для одного и того же домена. Используйте эту опцию для реализации разделения зон DNS. Домен также может быть обратной зоной, такой как <code class="docutils literal notranslate">2.0.192.in-addr.arpa</code>.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding domain example.com name-server 192.0.2.53
+set service dns forwarding domain example.com name-server 2001:db8::53
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding domain &lt;domain-name&gt; name-server &lt;address&gt; port &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-domain-domain-name-name-server-address-port-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте порт на указанном сервере верхнего уровня DNS, на который перенаправляются запросы для указанного домена.</strong></p>
+<p>По умолчанию — 53.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding domain example.com name-server 192.0.2.53 port 853
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding domain &lt;domain-name&gt; addnta
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-domain-domain-name-addnta" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте указанный домен как <abbr title="Negative Trust Anchor">NTA</abbr>, отключив проверку DNSSEC для него.</strong></p>
+<p>Настройте это, когда запросы для домена с поврежденным DNSSEC возвращают <code class="docutils literal notranslate">SERVFAIL</code>, чтобы домен снова стал доступным.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding domain example.com addnta
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding domain &lt;domain-name&gt; recursion-desired
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-domain-domain-name-recursion-desired" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Установите бит <abbr title="Recursion Desired">RD</abbr> в запросах, отправляемых на сервер верхнего уровня для этого домена.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding domain example.com recursion-desired
+</pre></div>
+</div>
+</section>
+<section id="authoritative-zones">
+<h3>Авторитетные зоны</h3>
+<p>DNS-перенаправление может содержать авторитетные записи для домена, отвечая напрямую вместо перенаправления или рекурсии запросов.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Предотвратить обслуживание указанной авторитетной зоны DNS-перенаправлением, не удаляя ее из конфигурации.</strong></p>
+<p>Запросы для имен в зоне перенаправляются или рекурсируются вместо этого.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records &lt;type&gt; &lt;name&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-type-name-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Предотвратить обслуживание определенной записи в авторитетной зоне, не удаляя ее из конфигурации.</strong></p>
+<p>Запросы, соответствующие записи, перенаправляются или рекурсируются вместо этого.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records a www disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records &lt;type&gt; &lt;name&gt; ttl &lt;0-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-type-name-ttl-0-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте TTL, в секундах, для указанной записи.</strong></p>
+<p>По умолчанию — 300.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records a www ttl 600
+</pre></div>
+</div>
+<section id="record-types">
+<h4>Типы записей</h4>
+<p>Команды типа записи в этом разделе принимают следующие ключевые слова имен записей:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">&#64;</code>: Представляет вершину зоны, например, <code class="docutils literal notranslate">example.com</code>. Принимается каждым типом записи.</p></li>
+<li><p><code class="docutils literal notranslate">any</code>: Представляет шаблонную запись, например, <code class="docutils literal notranslate">*.example.com</code>, которая совпадает со всеми поддоменами под вершиной. Принимается только для записей <code class="docutils literal notranslate">a</code> и <code class="docutils literal notranslate">aaaa</code>.</p></li>
+</ul>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records a &lt;name&gt; address &lt;ipv4-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-a-name-address-ipv4-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте запись <abbr title="IPv4 address">A</abbr> в указанной авторитетной зоне.</strong></p>
+<p>Поддерживает <code class="docutils literal notranslate">&#64;</code> и <code class="docutils literal notranslate">any</code> как <code class="docutils literal notranslate">&lt;name&gt;</code>. Повторите команду, чтобы добавить несколько IPv4 адресов в одну запись.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records a www address 192.0.2.10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records aaaa &lt;name&gt; address &lt;ipv6-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-aaaa-name-address-ipv6-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте запись <abbr title="IPv6 address">AAAA</abbr> в указанной авторитетной зоне.</strong></p>
+<p>Поддерживает <code class="docutils literal notranslate">&#64;</code> и <code class="docutils literal notranslate">any</code> как <code class="docutils literal notranslate">&lt;name&gt;</code>. Повторите команду, чтобы добавить несколько IPv6 адресов в одну запись.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records aaaa www address 2001:db8::10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records cname &lt;name&gt; target &lt;target-domain-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-cname-name-target-target-domain-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте запись <abbr title="Canonical Name">CNAME</abbr> в указанной авторитетной зоне.</strong></p>
+<p>Поддерживает <code class="docutils literal notranslate">&#64;</code> как <code class="docutils literal notranslate">&lt;name&gt;</code>.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records cname www target host.example.com
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records mx &lt;name&gt; server &lt;server&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-mx-name-server-server" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте запись <abbr title="Mail Exchanger">MX</abbr> в указанной авторитетной зоне.</strong></p>
+<p>Поддерживает <code class="docutils literal notranslate">&#64;</code> как <code class="docutils literal notranslate">&lt;name&gt;</code>. Повторите команду, чтобы добавить несколько почтовых серверов в одну запись.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records mx @ server mail.example.com
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records mx &lt;name&gt; server &lt;server&gt; priority &lt;1-999&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-mx-name-server-server-priority-1-999" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте приоритет указанной записи MX.</strong></p>
+<p>Меньшие значения предпочтительнее. По умолчанию — 10.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records mx @ server mail.example.com priority 20
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records ns &lt;name&gt; target &lt;target-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-ns-name-target-target-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте запись <abbr title="Name Server">NS</abbr> в указанной авторитетной зоне.</strong></p>
+<p>Поддерживает <code class="docutils literal notranslate">&#64;</code> как <code class="docutils literal notranslate">&lt;name&gt;</code>. Повторите команду, чтобы добавить несколько серверов имен в одну запись.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records ns @ target ns1.example.com
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records ptr &lt;name&gt; target &lt;target-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-ptr-name-target-target-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте запись <abbr title="Pointer">PTR</abbr> в указанной авторитетной зоне.</strong></p>
+<p>Поддерживает <code class="docutils literal notranslate">&#64;</code> как <code class="docutils literal notranslate">&lt;name&gt;</code>.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain 2.0.192.in-addr.arpa records ptr 10 target host.example.com
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records txt &lt;name&gt; value &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-txt-name-value-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте запись <abbr title="Text">TXT</abbr> в указанной авторитетной зоне.</strong></p>
+<p>Поддерживает <code class="docutils literal notranslate">&#64;</code> как <code class="docutils literal notranslate">&lt;name&gt;</code>. Повторите команду, чтобы добавить несколько строк TXT в одну запись.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records txt @ value &#39;v=spf1 -all&#39;
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records spf &lt;name&gt; value &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-spf-name-value-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте запись <abbr title="Sender Policy Framework">SPF</abbr> в
+указанной авторитетной зоне.</strong></p>
+<p>Поддерживает <code class="docutils literal notranslate">&#64;</code> как <code class="docutils literal notranslate">&lt;name&gt;</code>.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Записи SPF устарели в пользу записей TXT. Предпочитайте TXT-записи для новых развертываний.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records spf @ value &#39;v=spf1 -all&#39;
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records srv &lt;name&gt; entry &lt;0-65535&gt; hostname &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-srv-name-entry-0-65535-hostname-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте целевой хост записи <abbr title="Service Locator">SRV</abbr> в указанной авторитетной зоне.</strong></p>
+<p>Поддерживает <code class="docutils literal notranslate">&#64;</code> как <code class="docutils literal notranslate">&lt;name&gt;</code>.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records srv _sip._tcp entry 0 hostname sip.example.com
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records srv &lt;name&gt; entry &lt;0-65535&gt; port &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-srv-name-entry-0-65535-port-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте порт записи SRV в указанной авторитетной зоне.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records srv _sip._tcp entry 0 port 5060
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records srv &lt;name&gt; entry &lt;0-65535&gt; priority &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-srv-name-entry-0-65535-priority-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте приоритет записи SRV в указанной авторитетной зоне.</strong></p>
+<p>Меньшие значения предпочтительнее. По умолчанию — 10.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records srv _sip._tcp entry 0 priority 20
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records srv &lt;name&gt; entry &lt;0-65535&gt; weight &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-srv-name-entry-0-65535-weight-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте вес записи SRV в указанной авторитетной зоне.</strong></p>
+<p>Вес используется для распределения нагрузки между записями с одинаковым приоритетом. По умолчанию — 0.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records srv _sip._tcp entry 0 weight 50
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; order &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-order-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте поле порядка правила NAPTR в указанной авторитетной зоне.</strong></p>
+<p>Поддерживает <code class="docutils literal notranslate">&#64;</code> как <code class="docutils literal notranslate">&lt;name&gt;</code>. Правила с меньшим порядком оцениваются первыми.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 order 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; preference &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-preference-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте поле предпочтения правила NAPTR в указанной авторитетной зоне.</strong></p>
+<p>Поддерживает <code class="docutils literal notranslate">&#64;</code> как <code class="docutils literal notranslate">&lt;name&gt;</code>. По умолчанию — 0.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 preference 50
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; lookup-a
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-lookup-a" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Установите флаг A в правиле NAPTR в указанной авторитетной зоне.</strong></p>
+<p>Когда установлено, DNS-перенаправление рассматривает вывод правила как доменное имя и ищет его A или AAAA-запись. Дальнейших NAPTR-поисков не происходит.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Установите не более одного из <code class="docutils literal notranslate">lookup-a</code>, <code class="docutils literal notranslate">lookup-srv</code>, <code class="docutils literal notranslate">resolve-uri</code> и
+<code class="docutils literal notranslate">protocol-specific</code> на одном правиле NAPTR. Эти флаги определяют взаимно исключающие действия в процессе разрешения DNS.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 lookup-a
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; lookup-srv
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-lookup-srv" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Установите флаг S в правиле NAPTR в указанной авторитетной зоне.</strong></p>
+<p>Когда установлено, DNS-перенаправление рассматривает вывод правила как доменное имя и ищет его SRV-запись. Дальнейших NAPTR-поисков не происходит.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 lookup-srv
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; resolve-uri
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-resolve-uri" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Установите флаг U в правиле NAPTR в указанной авторитетной зоне.</strong></p>
+<p>Когда установлено, DNS-перенаправление рассматривает вывод правила как URI и использует его напрямую. Дальнейших DNS-поисков не происходит.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 resolve-uri
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; protocol-specific
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-protocol-specific" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Установите флаг P в правиле NAPTR в указанной авторитетной зоне.</strong></p>
+<p>Когда установлено, DNS-перенаправление рассматривает вывод правила в соответствии с соответствующим прикладным протоколом. Дальнейших DNS-поисков не происходит.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 protocol-specific
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; service &lt;service&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-service-service" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте поле Service правила NAPTR в указанной авторитетной зоне.</strong></p>
+<p>Определяет протокол и сервис разрешения, который это правило предлагает в формате <code class="docutils literal notranslate">Protocol+ResolutionService</code> (например, SIP над TCP → <code class="docutils literal notranslate">SIP+D2T</code>).</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 service SIP+D2T
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; regexp &lt;expression&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-translation"><pre="</code</code="<!--##br="="content="set="html="span="set="description>
+<p>"code="code="set="blockquote="table><code="title="="="</code="code="class="<code="code>
+"""
+</code="code:</code="label>
+<span>
+</="=
+ ="code>
+="|
+"""
+
+</code="</code=""
+</code>
+</code:
+   ="=
+   code</code>
+</code>
+div>
+code">
+code>
+   code>
+</code">
+code>
+code>
+="code>
+code>
+</code>
+="code</code>
+span>
+="span="code>
+</code>
+</code>
+="code>
+<p>
+code>
+code>
+<p><strong>Настройте поле Regexp правила NAPTR в указанной авторитетной зоне.</strong></p>
+<p>Выражение замены в формате <code class="docutils literal notranslate">!ere!replacement!</code>, применяется к имени запроса, чтобы получить следующий целевой объект или URI.</p>
+</div>
+</div>
+<div class="code>
+</code>
+</code="
+</pose>
+code>
+code>
+</code>
+</code="</code="text="code="code>
+</code>
+</code>
+code>
+code="code>
+</code>
+</code>
+<p>
+</code>
+<p>
+code>
+="code>
+</code>
+</code="code>
+code>
+   ="code>
+</code>
+   ="code>
+   ="
+   code>
+code>
+</code>
+   ="code>
+</code>
+code>
+   code>
+code>
+code>
+code>
+</code>
+</code>
+code>
+code>
+</code>
+   >
+</code>
+</code>
+code>
+code>
+code>
+</code>
+   code>
+code</code="code>
+</code>
+code>
+   =
+code>
+</code>
+<br>
+</code>
+code>
+</code="code>
+code>
+code>
+</code="code>
+<code>
+   code>
+    |
+</code>
+code>
+code>
+code>
+code>
+<p><strong>Настройте поле Regexp правила NAPAPTR в указанной авторитетной зон</code>
+</code>
+</code>
+</code>
+</code>
+</code>
+</code>
+code</code>
+</code</code>
+</code>
+-<code>
+<div>
+</code|
+</code="code>
+code>
+</code>
+</code>
+code>
+</code</code</code>
+</code>
+    </code>
+</code</code>
+=
+code>
+<p>
+</code>
+   code>
+<p>
+</code>
+code>
+   code</code</code>
+</code</code</code>
+code>
+   =
+code>
+</code>
+   code>
+</code>
+   code>
+   =
+</code>
+</code>
+code>
+code>
+   ="
+    >
+   code>
+</code>
+</code>
+</code>
+code>
+   code>
+   code>
+   =
+   code>
+    |
+</code>
+   code>
+</code>
+   code>
+   =
+   =
+   code>
+   code>
+   code>
+   =
+   code>
+   >
+code>
+   code>
+    <
+   ="code>
+    ```
+<p>
+    />
+code>
+</code>
+code</code>
+    код|
+code>
+    =
+   ="
+code>
+    |
+    |
+p>
+|
+   =
+</code>
+code>
+   ="
+</code>
+    |
+   code>
+    |
+code>
+code>
+   code>
+    |
+    |
+   =
+   code>
+   code</code="code>
+    |
+</code>
+</="=
+code>
+   p>
+code>
+code>
+   code>
+    |
+   code>
+   ="
+</code>
+   code>
+code>
+|
+code>
+   ="
+</code>
+   code>
+-<p><strong>Настройте поле Replacement>
+   code>
+    <code>
+code>
+   code>
+    "
+   code>
+    |
+   code>
+    |
+   =
+   code>
+   code>
+   code>
+   =

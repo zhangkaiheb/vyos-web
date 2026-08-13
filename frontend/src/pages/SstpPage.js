@@ -8,6 +8,7 @@ import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -31,10 +32,10 @@ export default defineComponent({
   name: 'SstpPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
+    const { t } = useI18n();
     const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
     const activeTab = ref('basic');
 
     const config = ref({
@@ -96,33 +97,33 @@ export default defineComponent({
     });
 
     const userColumns = [
-      { key: 'username', title: '用户名', dataIndex: 'username', width: 150 },
-      { key: 'password', title: '密码', dataIndex: 'password', width: 150 },
-      { key: 'static_ip', title: '静态 IP', dataIndex: 'static_ip', width: 120 },
-      { key: 'disable', title: '禁用', dataIndex: 'disable', width: 60 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'username', title: t('sstp.columns.username'), dataIndex: 'username', width: 150 },
+      { key: 'password', title: t('sstp.columns.password'), dataIndex: 'password', width: 150 },
+      { key: 'static_ip', title: t('sstp.columns.staticIp'), dataIndex: 'static_ip', width: 120 },
+      { key: 'disable', title: t('sstp.columns.disable'), dataIndex: 'disable', width: 60 },
+      { key: 'actions', title: t('sstp.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const radiusServerColumns = [
-      { key: 'address', title: '地址', dataIndex: 'address', width: 150 },
-      { key: 'key', title: '密钥', dataIndex: 'key', width: 150 },
-      { key: 'port', title: '端口', dataIndex: 'port', width: 80 },
-      { key: 'disable', title: '禁用', dataIndex: 'disable', width: 60 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'address', title: t('sstp.columns.address'), dataIndex: 'address', width: 150 },
+      { key: 'key', title: t('sstp.columns.key'), dataIndex: 'key', width: 150 },
+      { key: 'port', title: t('sstp.columns.port'), dataIndex: 'port', width: 80 },
+      { key: 'disable', title: t('sstp.columns.disable'), dataIndex: 'disable', width: 60 },
+      { key: 'actions', title: t('sstp.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const ipPoolColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 150 },
-      { key: 'next_pool', title: '下一个池', dataIndex: 'next_pool', width: 120 },
-      { key: 'range', title: '范围', dataIndex: 'range', width: 200 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'name', title: t('sstp.columns.name'), dataIndex: 'name', width: 150 },
+      { key: 'next_pool', title: t('sstp.columns.nextPool'), dataIndex: 'next_pool', width: 120 },
+      { key: 'range', title: t('sstp.columns.range'), dataIndex: 'range', width: 200 },
+      { key: 'actions', title: t('sstp.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const ipv6PoolColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 150 },
-      { key: 'delegate', title: '委派前缀', dataIndex: 'delegate', width: 200 },
-      { key: 'prefix', title: '客户端前缀', dataIndex: 'prefix', width: 200 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'name', title: t('sstp.columns.name'), dataIndex: 'name', width: 150 },
+      { key: 'delegate', title: t('sstp.columns.delegatePrefix'), dataIndex: 'delegate', width: 200 },
+      { key: 'prefix', title: t('sstp.columns.clientPrefix'), dataIndex: 'prefix', width: 200 },
+      { key: 'actions', title: t('sstp.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const selectedUsers = ref([]);
@@ -450,12 +451,11 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('vpn sstp', true);
         config.value = sstpToForm(res.data || {});
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('sstp.errors.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -466,11 +466,10 @@ export default defineComponent({
       try {
         const payload = formToSstp(config.value);
         await configApi.set('vpn sstp', payload);
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('sstp.errors.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -482,21 +481,21 @@ export default defineComponent({
     }
 
     function editUser() {
-      if (!selectedUsers.value.length) return alert('请选择要编辑的用户');
+      if (!selectedUsers.value.length) return showError({ message: t('sstp.errors.selectUserToEdit') });
       const row = config.value.authentication.local_users.find(u => u.username === selectedUsers.value[0]);
-      if (!row) return alert('未找到选中的用户');
+      if (!row) return showError({ message: t('sstp.errors.userNotFound') });
       editingUser.value = JSON.parse(JSON.stringify(row));
       showUserModal.value = true;
     }
 
     function removeUser() {
-      if (!selectedUsers.value.length) return alert('请选择要删除的用户');
+      if (!selectedUsers.value.length) return showError({ message: t('sstp.errors.selectUserToDelete') });
       config.value.authentication.local_users = config.value.authentication.local_users.filter(u => u.username !== selectedUsers.value[0]);
       selectedUsers.value = [];
     }
 
     function saveUser() {
-      if (!editingUser.value.username) return alert('请输入用户名');
+      if (!editingUser.value.username) return showError({ message: t('sstp.errors.usernameRequired') });
       const list = config.value.authentication.local_users;
       const idx = list.findIndex(u => u._username === editingUser.value._username);
       if (idx >= 0) list.splice(idx, 1, { ...editingUser.value });
@@ -511,21 +510,21 @@ export default defineComponent({
     }
 
     function editRadiusServer() {
-      if (!selectedRadiusServers.value.length) return alert('请选择要编辑的服务器');
+      if (!selectedRadiusServers.value.length) return showError({ message: t('sstp.errors.selectServerToEdit') });
       const row = config.value.authentication.radius.servers.find(s => s.address === selectedRadiusServers.value[0]);
-      if (!row) return alert('未找到选中的服务器');
+      if (!row) return showError({ message: t('sstp.errors.serverNotFound') });
       editingRadiusServer.value = JSON.parse(JSON.stringify(row));
       showRadiusModal.value = true;
     }
 
     function removeRadiusServer() {
-      if (!selectedRadiusServers.value.length) return alert('请选择要删除的服务器');
+      if (!selectedRadiusServers.value.length) return showError({ message: t('sstp.errors.selectServerToDelete') });
       config.value.authentication.radius.servers = config.value.authentication.radius.servers.filter(s => s.address !== selectedRadiusServers.value[0]);
       selectedRadiusServers.value = [];
     }
 
     function saveRadiusServer() {
-      if (!editingRadiusServer.value.address) return alert('请输入服务器地址');
+      if (!editingRadiusServer.value.address) return showError({ message: t('sstp.errors.serverAddressRequired') });
       const list = config.value.authentication.radius.servers;
       const idx = list.findIndex(s => s._address === editingRadiusServer.value._address);
       if (idx >= 0) list.splice(idx, 1, { ...editingRadiusServer.value });
@@ -540,21 +539,21 @@ export default defineComponent({
     }
 
     function editIpPool() {
-      if (!selectedIpPools.value.length) return alert('请选择要编辑的 IP 池');
+      if (!selectedIpPools.value.length) return showError({ message: t('sstp.errors.selectIpPoolToEdit') });
       const row = config.value.client_ip_pools.find(p => p.name === selectedIpPools.value[0]);
-      if (!row) return alert('未找到选中的 IP 池');
+      if (!row) return showError({ message: t('sstp.errors.ipPoolNotFound') });
       editingIpPool.value = JSON.parse(JSON.stringify(row));
       showIpPoolModal.value = true;
     }
 
     function removeIpPool() {
-      if (!selectedIpPools.value.length) return alert('请选择要删除的 IP 池');
+      if (!selectedIpPools.value.length) return showError({ message: t('sstp.errors.selectIpPoolToDelete') });
       config.value.client_ip_pools = config.value.client_ip_pools.filter(p => p.name !== selectedIpPools.value[0]);
       selectedIpPools.value = [];
     }
 
     function saveIpPool() {
-      if (!editingIpPool.value.name) return alert('请输入 IP 池名称');
+      if (!editingIpPool.value.name) return showError({ message: t('sstp.errors.ipPoolNameRequired') });
       const list = config.value.client_ip_pools;
       const idx = list.findIndex(p => p._name === editingIpPool.value._name);
       if (idx >= 0) list.splice(idx, 1, { ...editingIpPool.value });
@@ -569,21 +568,21 @@ export default defineComponent({
     }
 
     function editIpv6Pool() {
-      if (!selectedIpv6Pools.value.length) return alert('请选择要编辑的 IPv6 池');
+      if (!selectedIpv6Pools.value.length) return showError({ message: t('sstp.errors.selectIpv6PoolToEdit') });
       const row = config.value.client_ipv6_pools.find(p => p.name === selectedIpv6Pools.value[0]);
-      if (!row) return alert('未找到选中的 IPv6 池');
+      if (!row) return showError({ message: t('sstp.errors.ipv6PoolNotFound') });
       editingIpv6Pool.value = JSON.parse(JSON.stringify(row));
       showIpv6PoolModal.value = true;
     }
 
     function removeIpv6Pool() {
-      if (!selectedIpv6Pools.value.length) return alert('请选择要删除的 IPv6 池');
+      if (!selectedIpv6Pools.value.length) return showError({ message: t('sstp.errors.selectIpv6PoolToDelete') });
       config.value.client_ipv6_pools = config.value.client_ipv6_pools.filter(p => p.name !== selectedIpv6Pools.value[0]);
       selectedIpv6Pools.value = [];
     }
 
     function saveIpv6Pool() {
-      if (!editingIpv6Pool.value.name) return alert('请输入 IPv6 池名称');
+      if (!editingIpv6Pool.value.name) return showError({ message: t('sstp.errors.ipv6PoolNameRequired') });
       const list = config.value.client_ipv6_pools;
       const idx = list.findIndex(p => p._name === editingIpv6Pool.value._name);
       if (idx >= 0) list.splice(idx, 1, { ...editingIpv6Pool.value });
@@ -598,7 +597,8 @@ export default defineComponent({
     });
 
     return {
-      loading, saving, saved, config, activeTab, commandPath,
+      t,
+      loading, saving, config, activeTab, commandPath,
       userColumns, radiusServerColumns, ipPoolColumns, ipv6PoolColumns,
       selectedUsers, selectedRadiusServers, selectedIpPools, selectedIpv6Pools,
       showUserModal, editingUser, showRadiusModal, editingRadiusServer,
@@ -612,40 +612,39 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本' },
-        { key: 'auth', title: '认证' },
-        { key: 'pool', title: 'IP 池' },
-        { key: 'ppp', title: 'PPP 选项' },
-        { key: 'ssl', title: 'SSL' },
-        { key: 'network', title: '网络' }
+        { key: 'basic', title: t('sstp.tabs.basic') },
+        { key: 'auth', title: t('sstp.tabs.auth') },
+        { key: 'pool', title: t('sstp.tabs.pool') },
+        { key: 'ppp', title: t('sstp.tabs.ppp') },
+        { key: 'ssl', title: t('sstp.tabs.ssl') },
+        { key: 'network', title: t('sstp.tabs.network') }
       ]">
 
       <template #basic>
-        <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="config.description" title="SSTP 服务器描述" /></div>
-        <div class="form-row"><label class="form-label">端口</label><input class="form-control" type="number" min="1" max="65535" v-model="config.port" title="SSTP 连接端口，默认 443" /></div>
-        <div class="form-row"><label class="form-label">MTU</label><input class="form-control" type="number" min="68" max="1500" v-model="config.mtu" title="最大传输单元，默认 1500" /></div>
-        <div class="form-row"><label class="form-label">网关地址</label><input class="form-control" v-model="config.gateway_address" placeholder="x.x.x.x" title="发送给客户端的默认网关" /></div>
-        <div class="form-row"><label class="form-label">主机名</label><input class="form-control" v-model="config.host_name" title="仅允许连接到具有相同 TLS SNI 的指定主机" /></div>
-        <div class="form-row"><label class="form-label">线程数</label>
-          <select class="form-control" v-model="config.thread_count" title="工作线程数，默认 all">
-            <option value="all">所有 CPU 核心 (默认)</option>
-            <option value="half">一半 CPU 核心</option>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.description') }}</label><input class="form-control" v-model="config.description" :title="t('sstp.tips.description')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.port') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="config.port" :title="t('sstp.tips.port')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.mtu') }}</label><input class="form-control" type="number" min="68" max="1500" v-model="config.mtu" :title="t('sstp.tips.mtu')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.gatewayAddress') }}</label><input class="form-control" v-model="config.gateway_address" placeholder="x.x.x.x" :title="t('sstp.tips.gatewayAddress')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.hostName') }}</label><input class="form-control" v-model="config.host_name" :title="t('sstp.tips.hostName')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.threadCount') }}</label>
+          <select class="form-control" v-model="config.thread_count" :title="t('sstp.tips.threadCount')">
+            <option value="all">{{ t('sstp.options.threadCount.all') }}</option>
+            <option value="half">{{ t('sstp.options.threadCount.half') }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">最大并发会话</label><input class="form-control" type="number" min="0" max="65535" v-model="config.max_concurrent_sessions" title="最大并发会话启动尝试数" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.maxConcurrentSessions') }}</label><input class="form-control" type="number" min="0" max="65535" v-model="config.max_concurrent_sessions" :title="t('sstp.tips.maxConcurrentSessions')" /></div>
       </template>
 
       <template #auth>
-        <div class="form-row"><label class="form-label">认证模式</label>
-          <select class="form-control" v-model="config.authentication.mode" title="认证模式">
-            <option value="local">本地认证 (默认)</option>
-            <option value="radius">RADIUS 认证</option>
-            <option value="noauth">禁用认证</option>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.authMode') }}</label>
+          <select class="form-control" v-model="config.authentication.mode" :title="t('sstp.tips.authMode')">
+            <option value="local">{{ t('sstp.options.authMode.local') }}</option>
+            <option value="radius">{{ t('sstp.options.authMode.radius') }}</option>
+            <option value="noauth">{{ t('sstp.options.authMode.noauth') }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">认证协议</label>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.authProtocols') }}</label>
           <div style="display:flex;gap:16px;flex-wrap:wrap;">
             <label><input type="checkbox" value="pap" v-model="config.authentication.protocols" /> PAP</label>
             <label><input type="checkbox" value="chap" v-model="config.authentication.protocols" /> CHAP</label>
@@ -655,180 +654,176 @@ export default defineComponent({
         </div>
 
         <div v-if="config.authentication.mode === 'local'">
-          <div style="font-weight:bold;margin:16px 0 8px;">本地用户</div>
+          <div style="font-weight:bold;margin:16px 0 8px;">{{ t('sstp.sections.localUsers') }}</div>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createUser">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editUser" :disabled="!selectedUsers.length || selectedUsers.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeUser" :disabled="!selectedUsers.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createUser">{{ t('sstp.buttons.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editUser" :disabled="!selectedUsers.length || selectedUsers.length > 1">{{ t('sstp.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeUser" :disabled="!selectedUsers.length">{{ t('sstp.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="userColumns" :data="config.authentication.local_users" rowKey="username" :externalToolbar="true" @selection-change="selectedUsers = $event" :selectable="true" />
         </div>
 
         <div v-if="config.authentication.mode === 'radius'">
-          <div class="form-row"><label class="form-label">源地址</label><input class="form-control" v-model="config.authentication.radius.source_address" placeholder="x.x.x.x" title="发起连接的 IPv4 源地址" /></div>
+          <div class="form-row"><label class="form-label">{{ t('sstp.labels.sourceAddress') }}</label><input class="form-control" v-model="config.authentication.radius.source_address" placeholder="x.x.x.x" :title="t('sstp.tips.sourceAddress')" /></div>
 
-          <div style="font-weight:bold;margin:16px 0 8px;">RADIUS 全局设置</div>
-          <div class="form-row"><label class="form-label">计费间隔</label><input class="form-control" type="number" min="1" max="3600" v-model="config.authentication.radius.accounting_interim_interval" title="发送计费信息间隔（秒）" /></div>
-          <div class="form-row"><label class="form-label">计费抖动</label><input class="form-control" type="number" min="1" max="60" v-model="config.authentication.radius.acct_interim_jitter" title="计费信息最大抖动值（秒）" /></div>
-          <div class="form-row"><label class="form-label">计费超时</label><input class="form-control" type="number" min="0" max="60" v-model="config.authentication.radius.acct_timeout" title="中间更新包超时，0 保持活跃（默认 3）" /></div>
-          <div class="form-row"><label class="form-label">最大重试</label><input class="form-control" type="number" min="1" max="20" v-model="config.authentication.radius.max_try" title="发送 Access-Request/Accounting-Request 查询的最大次数（默认 3）" /></div>
-          <div class="form-row"><label class="form-label">NAS 标识符</label><input class="form-control" v-model="config.authentication.radius.nas_identifier" title="发送到 RADIUS 的 NAS-Identifier 属性" /></div>
-          <div class="form-row"><label class="form-label">NAS IP 地址</label><input class="form-control" v-model="config.authentication.radius.nas_ip_address" placeholder="x.x.x.x" title="发送到 RADIUS 的 NAS-IP-Address 属性" /></div>
-          <div class="form-row"><label class="form-label">预分配 VIF</label><input type="checkbox" v-model="config.authentication.radius.preallocate_vif" title="在 Access-Request 中启用 NAS-Port-Id 属性" /></div>
-          <div class="form-row"><label class="form-label">限速属性</label><input class="form-control" v-model="config.authentication.radius.rate_limit.attribute" title="包含速率信息的 RADIUS 属性（默认 Filter-Id）" /></div>
-          <div class="form-row"><label class="form-label">启用限速</label><input type="checkbox" v-model="config.authentication.radius.rate_limit.enable" title="通过 RADIUS 启用带宽整形" /></div>
-          <div class="form-row"><label class="form-label">限速乘数</label><input class="form-control" v-model="config.authentication.radius.rate_limit.multiplier" title="整形乘数（默认 1）" /></div>
-          <div class="form-row"><label class="form-label">限速厂商</label><input class="form-control" v-model="config.authentication.radius.rate_limit.vendor" title="厂商字典" /></div>
-          <div style="font-weight:bold;margin:16px 0 8px;">动态授权 (CoA)</div>
-          <div class="form-row"><label class="form-label">CoA 密钥</label><input class="form-control" v-model="config.authentication.radius.dynamic_author.key" title="动态授权扩展服务器共享密钥" /></div>
-          <div class="form-row"><label class="form-label">CoA 端口</label><input class="form-control" type="number" min="1" max="65535" v-model="config.authentication.radius.dynamic_author.port" title="连接端口（默认 1700）" /></div>
-          <div class="form-row"><label class="form-label">CoA 服务器</label><input class="form-control" v-model="config.authentication.radius.dynamic_author.server" placeholder="x.x.x.x" title="动态授权服务器 IPv4 地址" /></div>
-          <div style="font-weight:bold;margin:16px 0 8px;">RADIUS 服务器</div>
+          <div style="font-weight:bold;margin:16px 0 8px;">{{ t('sstp.sections.radiusGlobal') }}</div>
+          <div class="form-row"><label class="form-label">{{ t('sstp.labels.accountingInterval') }}</label><input class="form-control" type="number" min="1" max="3600" v-model="config.authentication.radius.accounting_interim_interval" :title="t('sstp.tips.accountingInterval')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('sstp.labels.accountingJitter') }}</label><input class="form-control" type="number" min="1" max="60" v-model="config.authentication.radius.acct_interim_jitter" :title="t('sstp.tips.accountingJitter')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('sstp.labels.accountingTimeout') }}</label><input class="form-control" type="number" min="0" max="60" v-model="config.authentication.radius.acct_timeout" :title="t('sstp.tips.accountingTimeout')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('sstp.labels.maxRetry') }}</label><input class="form-control" type="number" min="1" max="20" v-model="config.authentication.radius.max_try" :title="t('sstp.tips.maxRetry')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('sstp.labels.nasIdentifier') }}</label><input class="form-control" v-model="config.authentication.radius.nas_identifier" :title="t('sstp.tips.nasIdentifier')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('sstp.labels.nasIpAddress') }}</label><input class="form-control" v-model="config.authentication.radius.nas_ip_address" placeholder="x.x.x.x" :title="t('sstp.tips.nasIpAddress')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('sstp.labels.preallocateVif') }}</label><input type="checkbox" v-model="config.authentication.radius.preallocate_vif" :title="t('sstp.tips.preallocateVif')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('sstp.labels.rateLimitAttribute') }}</label><input class="form-control" v-model="config.authentication.radius.rate_limit.attribute" :title="t('sstp.tips.rateLimitAttribute')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('sstp.labels.enableRateLimit') }}</label><input type="checkbox" v-model="config.authentication.radius.rate_limit.enable" :title="t('sstp.tips.enableRateLimit')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('sstp.labels.rateLimitMultiplier') }}</label><input class="form-control" v-model="config.authentication.radius.rate_limit.multiplier" :title="t('sstp.tips.rateLimitMultiplier')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('sstp.labels.rateLimitVendor') }}</label><input class="form-control" v-model="config.authentication.radius.rate_limit.vendor" :title="t('sstp.tips.rateLimitVendor')" /></div>
+          <div style="font-weight:bold;margin:16px 0 8px;">{{ t('sstp.sections.dynamicAuthor') }}</div>
+          <div class="form-row"><label class="form-label">{{ t('sstp.labels.coaKey') }}</label><input class="form-control" v-model="config.authentication.radius.dynamic_author.key" :title="t('sstp.tips.coaKey')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('sstp.labels.coaPort') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="config.authentication.radius.dynamic_author.port" :title="t('sstp.tips.coaPort')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('sstp.labels.coaServer') }}</label><input class="form-control" v-model="config.authentication.radius.dynamic_author.server" placeholder="x.x.x.x" :title="t('sstp.tips.coaServer')" /></div>
+          <div style="font-weight:bold;margin:16px 0 8px;">{{ t('sstp.sections.radiusServers') }}</div>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createRadiusServer">添加</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editRadiusServer" :disabled="!selectedRadiusServers.length || selectedRadiusServers.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeRadiusServer" :disabled="!selectedRadiusServers.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createRadiusServer">{{ t('sstp.buttons.add') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editRadiusServer" :disabled="!selectedRadiusServers.length || selectedRadiusServers.length > 1">{{ t('sstp.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeRadiusServer" :disabled="!selectedRadiusServers.length">{{ t('sstp.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="radiusServerColumns" :data="config.authentication.radius.servers" rowKey="address" :externalToolbar="true" @selection-change="selectedRadiusServers = $event" :selectable="true" />
         </div>
       </template>
 
       <template #pool>
-        <div class="form-row"><label class="form-label">默认 IP 池</label><input class="form-control" v-model="config.default_pool" title="默认客户端 IP 池名称" /></div>
-        <div class="form-row"><label class="form-label">默认 IPv6 池</label><input class="form-control" v-model="config.default_ipv6_pool" title="默认客户端 IPv6 池名称" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.defaultIpPool') }}</label><input class="form-control" v-model="config.default_pool" :title="t('sstp.tips.defaultIpPool')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.defaultIpv6Pool') }}</label><input class="form-control" v-model="config.default_ipv6_pool" :title="t('sstp.tips.defaultIpv6Pool')" /></div>
 
-        <div style="font-weight:bold;margin:16px 0 8px;">客户端 IP 池</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('sstp.sections.clientIpPool') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createIpPool">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editIpPool" :disabled="!selectedIpPools.length || selectedIpPools.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeIpPool" :disabled="!selectedIpPools.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createIpPool">{{ t('sstp.buttons.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editIpPool" :disabled="!selectedIpPools.length || selectedIpPools.length > 1">{{ t('sstp.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeIpPool" :disabled="!selectedIpPools.length">{{ t('sstp.buttons.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="ipPoolColumns" :data="config.client_ip_pools" rowKey="name" :externalToolbar="true" @selection-change="selectedIpPools = $event" :selectable="true" />
 
-        <div style="font-weight:bold;margin:16px 0 8px;">客户端 IPv6 池</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('sstp.sections.clientIpv6Pool') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createIpv6Pool">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editIpv6Pool" :disabled="!selectedIpv6Pools.length || selectedIpv6Pools.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeIpv6Pool" :disabled="!selectedIpv6Pools.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createIpv6Pool">{{ t('sstp.buttons.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editIpv6Pool" :disabled="!selectedIpv6Pools.length || selectedIpv6Pools.length > 1">{{ t('sstp.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeIpv6Pool" :disabled="!selectedIpv6Pools.length">{{ t('sstp.buttons.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="ipv6PoolColumns" :data="config.client_ipv6_pools" rowKey="name" :externalToolbar="true" @selection-change="selectedIpv6Pools = $event" :selectable="true" />
       </template>
 
       <template #ppp>
-        <div class="form-row"><label class="form-label">禁用 CCP</label><input type="checkbox" v-model="config.ppp_options.disable_ccp" title="禁用压缩控制协议 (CCP)" /></div>
-        <div class="form-row"><label class="form-label">接口缓存</label><input class="form-control" type="number" min="1" max="256000" v-model="config.ppp_options.interface_cache" title="缓存的接口数量" /></div>
-        <div class="form-row"><label class="form-label">IPv4 协商</label>
-          <select class="form-control" v-model="config.ppp_options.ipv4" title="IPv4 (IPCP) 协商算法">
-            <option value="deny">拒绝</option>
-            <option value="allow">允许（仅客户端请求时）</option>
-            <option value="prefer">优先（默认）</option>
-            <option value="require">必须</option>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.disableCcp') }}</label><input type="checkbox" v-model="config.ppp_options.disable_ccp" :title="t('sstp.tips.disableCcp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.interfaceCache') }}</label><input class="form-control" type="number" min="1" max="256000" v-model="config.ppp_options.interface_cache" :title="t('sstp.tips.interfaceCache')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.ipv4Negotiation') }}</label>
+          <select class="form-control" v-model="config.ppp_options.ipv4" :title="t('sstp.tips.ipv4Negotiation')">
+            <option value="deny">{{ t('sstp.options.negotiation.deny') }}</option>
+            <option value="allow">{{ t('sstp.options.negotiation.allow') }}</option>
+            <option value="prefer">{{ t('sstp.options.negotiation.prefer') }}</option>
+            <option value="require">{{ t('sstp.options.negotiation.require') }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">IPv6 协商</label>
-          <select class="form-control" v-model="config.ppp_options.ipv6" title="IPv6 (IPCP6) 协商算法，默认拒绝">
-            <option value="deny">拒绝 (默认)</option>
-            <option value="allow">允许（仅客户端请求时）</option>
-            <option value="prefer">优先</option>
-            <option value="require">必须</option>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.ipv6Negotiation') }}</label>
+          <select class="form-control" v-model="config.ppp_options.ipv6" :title="t('sstp.tips.ipv6Negotiation')">
+            <option value="deny">{{ t('sstp.options.negotiation.deny') }}</option>
+            <option value="allow">{{ t('sstp.options.negotiation.allow') }}</option>
+            <option value="prefer">{{ t('sstp.options.negotiation.prefer') }}</option>
+            <option value="require">{{ t('sstp.options.negotiation.require') }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">接受对端接口 ID</label><input type="checkbox" v-model="config.ppp_options.ipv6_accept_peer_interface_id" title="接受对端接口标识符" /></div>
-        <div class="form-row"><label class="form-label">IPv6 接口 ID</label><input class="form-control" v-model="config.ppp_options.ipv6_interface_id" placeholder="random 或 x:x:x:x" title="IPv6 接口标识符" /></div>
-        <div class="form-row"><label class="form-label">IPv6 对端接口 ID</label><input class="form-control" v-model="config.ppp_options.ipv6_peer_interface_id" placeholder="random/ipv4-addr/calling-sid/x:x:x:x" title="对端 IPv6 接口标识符" /></div>
-        <div class="form-row"><label class="form-label">LCP 回显失败</label><input class="form-control" type="number" v-model="config.ppp_options.lcp_echo_failure" title="最大无响应回显请求数，默认 3" /></div>
-        <div class="form-row"><label class="form-label">LCP 回显间隔</label><input class="form-control" type="number" v-model="config.ppp_options.lcp_echo_interval" title="LCP 回显请求/秒，默认 30" /></div>
-        <div class="form-row"><label class="form-label">LCP 回显超时</label><input class="form-control" type="number" v-model="config.ppp_options.lcp_echo_timeout" title="等待对端活动的超时时间（秒），默认 0" /></div>
-        <div class="form-row"><label class="form-label">最小 MTU</label><input class="form-control" type="number" min="68" max="65535" v-model="config.ppp_options.min_mtu" title="最小可接受 MTU" /></div>
-        <div class="form-row"><label class="form-label">MPPE</label>
-          <select class="form-control" v-model="config.ppp_options.mppe" title="MPPE 协商偏好">
-            <option value="require">必须</option>
-            <option value="prefer">优先 (默认)</option>
-            <option value="deny">拒绝</option>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.acceptPeerInterfaceId') }}</label><input type="checkbox" v-model="config.ppp_options.ipv6_accept_peer_interface_id" :title="t('sstp.tips.acceptPeerInterfaceId')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.ipv6InterfaceId') }}</label><input class="form-control" v-model="config.ppp_options.ipv6_interface_id" :placeholder="t('sstp.placeholders.ipv6InterfaceId')" :title="t('sstp.tips.ipv6InterfaceId')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.ipv6PeerInterfaceId') }}</label><input class="form-control" v-model="config.ppp_options.ipv6_peer_interface_id" placeholder="random/ipv4-addr/calling-sid/x:x:x:x" :title="t('sstp.tips.ipv6PeerInterfaceId')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.lcpEchoFailure') }}</label><input class="form-control" type="number" v-model="config.ppp_options.lcp_echo_failure" :title="t('sstp.tips.lcpEchoFailure')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.lcpEchoInterval') }}</label><input class="form-control" type="number" v-model="config.ppp_options.lcp_echo_interval" :title="t('sstp.tips.lcpEchoInterval')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.lcpEchoTimeout') }}</label><input class="form-control" type="number" v-model="config.ppp_options.lcp_echo_timeout" :title="t('sstp.tips.lcpEchoTimeout')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.minMtu') }}</label><input class="form-control" type="number" min="68" max="65535" v-model="config.ppp_options.min_mtu" :title="t('sstp.tips.minMtu')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.mppe') }}</label>
+          <select class="form-control" v-model="config.ppp_options.mppe" :title="t('sstp.tips.mppe')">
+            <option value="require">{{ t('sstp.options.negotiation.require') }}</option>
+            <option value="prefer">{{ t('sstp.options.negotiation.prefer') }}</option>
+            <option value="deny">{{ t('sstp.options.negotiation.deny') }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">MRU</label><input class="form-control" type="number" min="68" max="65535" v-model="config.ppp_options.mru" title="首选 MRU" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.mru') }}</label><input class="form-control" type="number" min="68" max="65535" v-model="config.ppp_options.mru" :title="t('sstp.tips.mru')" /></div>
       </template>
 
       <template #ssl>
-        <div class="form-row"><label class="form-label">CA 证书</label><input class="form-control" v-model="config.ssl.ca_certificate" title="PKI 配置中的 CA 证书链" /></div>
-        <div class="form-row"><label class="form-label">证书</label><input class="form-control" v-model="config.ssl.certificate" title="PKI 配置中的证书名称" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.caCertificate') }}</label><input class="form-control" v-model="config.ssl.ca_certificate" :title="t('sstp.tips.caCertificate')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.certificate') }}</label><input class="form-control" v-model="config.ssl.certificate" :title="t('sstp.tips.certificate')" /></div>
       </template>
 
       <template #network>
-        <div class="form-row"><label class="form-label">DNS 服务器</label><textarea class="form-control" v-model="config.name_servers" rows="3" placeholder="每行一个 DNS 地址" title="域名服务器地址" /></div>
-        <div class="form-row"><label class="form-label">WINS 服务器</label><textarea class="form-control" v-model="config.wins_servers" rows="3" placeholder="每行一个 WINS 地址" title="WINS 服务器地址" /></div>
-        <div class="form-row"><label class="form-label">防火墙标记</label><input class="form-control" type="number" min="1" max="2147483647" v-model="config.shaper.fwmark" title="排除整形的防火墙标记值" /></div>
-        <div class="form-row"><label class="form-label">突发计数</label><input class="form-control" v-model="config.limits.burst" title="突发计数" /></div>
-        <div class="form-row"><label class="form-label">连接限制</label><input class="form-control" v-model="config.limits.connection_limit" placeholder="如 1/min, 60/sec" title="可接受的连接速率" /></div>
-        <div class="form-row"><label class="form-label">超时</label><input class="form-control" v-model="config.limits.timeout" title="超时时间（秒）" /></div>
-        <div class="form-row"><label class="form-label">日志级别</label>
-          <select class="form-control" v-model="config.log.level" title="日志级别，默认 3">
-            <option value="0">关闭日志</option>
-            <option value="1">仅错误</option>
-            <option value="2">错误和警告</option>
-            <option value="3">错误、警告和基本信息 (默认)</option>
-            <option value="4">错误、警告和完整信息</option>
-            <option value="5">所有消息（含调试）</option>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.dnsServer') }}</label><textarea class="form-control" v-model="config.name_servers" rows="3" :placeholder="t('sstp.placeholders.dnsServer')" :title="t('sstp.tips.dnsServer')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.winsServer') }}</label><textarea class="form-control" v-model="config.wins_servers" rows="3" :placeholder="t('sstp.placeholders.winsServer')" :title="t('sstp.tips.winsServer')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.fwmark') }}</label><input class="form-control" type="number" min="1" max="2147483647" v-model="config.shaper.fwmark" :title="t('sstp.tips.fwmark')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.burst') }}</label><input class="form-control" v-model="config.limits.burst" :title="t('sstp.tips.burst')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.connectionLimit') }}</label><input class="form-control" v-model="config.limits.connection_limit" :placeholder="t('sstp.placeholders.connectionLimit')" :title="t('sstp.tips.connectionLimit')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.timeout') }}</label><input class="form-control" v-model="config.limits.timeout" :title="t('sstp.tips.timeout')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.logLevel') }}</label>
+          <select class="form-control" v-model="config.log.level" :title="t('sstp.tips.logLevel')">
+            <option value="0">{{ t('sstp.options.logLevel.off') }}</option>
+            <option value="1">{{ t('sstp.options.logLevel.error') }}</option>
+            <option value="2">{{ t('sstp.options.logLevel.errorWarning') }}</option>
+            <option value="3">{{ t('sstp.options.logLevel.default') }}</option>
+            <option value="4">{{ t('sstp.options.logLevel.verbose') }}</option>
+            <option value="5">{{ t('sstp.options.logLevel.debug') }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">SNMP 主代理</label><input type="checkbox" v-model="config.snmp.master_agent" title="启用 SNMP 主代理模式" /></div>
-        <div class="form-row"><label class="form-label">变更脚本</label><input class="form-control" v-model="config.extended_scripts.on_change" title="RADIUS CoA 处理时运行的脚本" /></div>
-        <div class="form-row"><label class="form-label">断开脚本</label><input class="form-control" v-model="config.extended_scripts.on_down" title="会话接口终止时运行的脚本" /></div>
-        <div class="form-row"><label class="form-label">预启动脚本</label><input class="form-control" v-model="config.extended_scripts.on_pre_up" title="会话接口启动前运行的脚本" /></div>
-        <div class="form-row"><label class="form-label">启动脚本</label><input class="form-control" v-model="config.extended_scripts.on_up" title="会话接口完全配置并启动后运行的脚本" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.snmpMasterAgent') }}</label><input type="checkbox" v-model="config.snmp.master_agent" :title="t('sstp.tips.snmpMasterAgent')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.onChangeScript') }}</label><input class="form-control" v-model="config.extended_scripts.on_change" :title="t('sstp.tips.onChangeScript')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.onDownScript') }}</label><input class="form-control" v-model="config.extended_scripts.on_down" :title="t('sstp.tips.onDownScript')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.onPreUpScript') }}</label><input class="form-control" v-model="config.extended_scripts.on_pre_up" :title="t('sstp.tips.onPreUpScript')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.onUpScript') }}</label><input class="form-control" v-model="config.extended_scripts.on_up" :title="t('sstp.tips.onUpScript')" /></div>
       </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="showUserModal" :title="editingUser && editingUser._username ? '编辑本地用户' : '新建本地用户'" @confirm="saveUser" @close="showUserModal = false" width="600px">
-        <div class="form-row"><label class="form-label">用户名</label><input class="form-control" v-model="editingUser.username" :disabled="editingUser._username" title="认证用户名" /></div>
-        <div class="form-row"><label class="form-label">密码</label><input class="form-control" type="password" v-model="editingUser.password" title="认证密码" /></div>
-        <div class="form-row"><label class="form-label">静态 IP</label><input class="form-control" v-model="editingUser.static_ip" placeholder="x.x.x.x" title="静态客户端 IP 地址" /></div>
-        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingUser.disable" title="禁用该用户" /></div>
-        <div class="form-row"><label class="form-label">下载限速</label><input class="form-control" v-model="editingUser.rate_limit.download" title="下载带宽限制 (kbits/sec)" /></div>
-        <div class="form-row"><label class="form-label">上传限速</label><input class="form-control" v-model="editingUser.rate_limit.upload" title="上传带宽限制 (kbits/sec)" /></div>
+      <DraggableModal v-model:visible="showUserModal" :title="editingUser && editingUser._username ? t('sstp.modals.editUser') : t('sstp.modals.createUser')" @confirm="saveUser" @close="showUserModal = false" width="600px">
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.username') }}</label><input class="form-control" v-model="editingUser.username" :disabled="editingUser._username" :title="t('sstp.tips.username')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.password') }}</label><input class="form-control" type="password" v-model="editingUser.password" :title="t('sstp.tips.password')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.staticIp') }}</label><input class="form-control" v-model="editingUser.static_ip" placeholder="x.x.x.x" :title="t('sstp.tips.staticIp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.disable') }}</label><input type="checkbox" v-model="editingUser.disable" :title="t('sstp.tips.disableUser')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.downloadLimit') }}</label><input class="form-control" v-model="editingUser.rate_limit.download" :title="t('sstp.tips.downloadLimit')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.uploadLimit') }}</label><input class="form-control" v-model="editingUser.rate_limit.upload" :title="t('sstp.tips.uploadLimit')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showRadiusModal" :title="editingRadiusServer && editingRadiusServer._address ? '编辑 RADIUS 服务器' : '添加 RADIUS 服务器'" @confirm="saveRadiusServer" @close="showRadiusModal = false">
-        <div class="form-row"><label class="form-label">地址</label><input class="form-control" v-model="editingRadiusServer.address" :disabled="editingRadiusServer._address" placeholder="x.x.x.x" title="RADIUS 服务器 IPv4 地址" /></div>
-        <div class="form-row"><label class="form-label">共享密钥</label><input class="form-control" v-model="editingRadiusServer.key" title="共享密钥" /></div>
-        <div class="form-row"><label class="form-label">端口</label><input class="form-control" type="number" min="1" max="65535" v-model="editingRadiusServer.port" title="端口，默认 1812" /></div>
-        <div class="form-row"><label class="form-label">源地址</label><input class="form-control" v-model="editingRadiusServer.source_address" placeholder="x.x.x.x" title="发起连接的源地址" /></div>
-        <div class="form-row"><label class="form-label">计费端口</label><input class="form-control" type="number" min="1" max="65535" v-model="editingRadiusServer.acct_port" title="计费端口，默认 1813" /></div>
-        <div class="form-row"><label class="form-label">备份</label><input type="checkbox" v-model="editingRadiusServer.backup" title="其他服务器不可用时使用备份服务器" /></div>
-        <div class="form-row"><label class="form-label">禁用计费</label><input type="checkbox" v-model="editingRadiusServer.disable_accounting" title="禁用计费" /></div>
-        <div class="form-row"><label class="form-label">故障时间</label><input class="form-control" type="number" min="0" v-model="editingRadiusServer.fail_time" title="故障后标记服务器不可用的秒数（默认 0）" /></div>
-        <div class="form-row"><label class="form-label">优先级</label><input class="form-control" v-model="editingRadiusServer.priority" title="服务器优先级" /></div>
-        <div class="form-row"><label class="form-label">超时</label><input class="form-control" type="number" min="1" max="240" v-model="editingRadiusServer.timeout" title="会话超时，默认 2" /></div>
-        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingRadiusServer.disable" title="禁用该服务器" /></div>
+      <DraggableModal v-model:visible="showRadiusModal" :title="editingRadiusServer && editingRadiusServer._address ? t('sstp.modals.editRadiusServer') : t('sstp.modals.addRadiusServer')" @confirm="saveRadiusServer" @close="showRadiusModal = false">
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.address') }}</label><input class="form-control" v-model="editingRadiusServer.address" :disabled="editingRadiusServer._address" placeholder="x.x.x.x" :title="t('sstp.tips.radiusServerAddress')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.sharedKey') }}</label><input class="form-control" v-model="editingRadiusServer.key" :title="t('sstp.tips.sharedKey')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.port') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="editingRadiusServer.port" :title="t('sstp.tips.radiusPort')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.sourceAddress') }}</label><input class="form-control" v-model="editingRadiusServer.source_address" placeholder="x.x.x.x" :title="t('sstp.tips.radiusSourceAddress')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.acctPort') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="editingRadiusServer.acct_port" :title="t('sstp.tips.acctPort')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.backup') }}</label><input type="checkbox" v-model="editingRadiusServer.backup" :title="t('sstp.tips.backup')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.disableAccounting') }}</label><input type="checkbox" v-model="editingRadiusServer.disable_accounting" :title="t('sstp.tips.disableAccounting')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.failTime') }}</label><input class="form-control" type="number" min="0" v-model="editingRadiusServer.fail_time" :title="t('sstp.tips.failTime')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.priority') }}</label><input class="form-control" v-model="editingRadiusServer.priority" :title="t('sstp.tips.priority')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.timeout') }}</label><input class="form-control" type="number" min="1" max="240" v-model="editingRadiusServer.timeout" :title="t('sstp.tips.radiusTimeout')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.disable') }}</label><input type="checkbox" v-model="editingRadiusServer.disable" :title="t('sstp.tips.disableServer')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showIpPoolModal" :title="editingIpPool && editingIpPool._name ? '编辑 IP 池' : '新建 IP 池'" @confirm="saveIpPool" @close="showIpPoolModal = false" width="600px">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingIpPool.name" :disabled="editingIpPool._name" title="IP 池名称" /></div>
-        <div class="form-row"><label class="form-label">下一个池</label><input class="form-control" v-model="editingIpPool.next_pool" title="下一个 IP 池名称" /></div>
-        <div class="form-row"><label class="form-label">范围</label><input class="form-control" v-model="editingIpPool.range" placeholder="如 192.168.1.100-192.168.1.200" title="IP 地址范围" /></div>
+      <DraggableModal v-model:visible="showIpPoolModal" :title="editingIpPool && editingIpPool._name ? t('sstp.modals.editIpPool') : t('sstp.modals.createIpPool')" @confirm="saveIpPool" @close="showIpPoolModal = false" width="600px">
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.name') }}</label><input class="form-control" v-model="editingIpPool.name" :disabled="editingIpPool._name" :title="t('sstp.tips.ipPoolName')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.nextPool') }}</label><input class="form-control" v-model="editingIpPool.next_pool" :title="t('sstp.tips.nextPool')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.range') }}</label><input class="form-control" v-model="editingIpPool.range" :placeholder="t('sstp.placeholders.ipRange')" :title="t('sstp.tips.ipRange')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showIpv6PoolModal" :title="editingIpv6Pool && editingIpv6Pool._name ? '编辑 IPv6 池' : '新建 IPv6 池'" @confirm="saveIpv6Pool" @close="showIpv6PoolModal = false" width="700px">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingIpv6Pool.name" :disabled="editingIpv6Pool._name" title="IPv6 池名称" /></div>
-        <div style="font-weight:bold;margin:12px 0 8px;">委派前缀 (DHCPv6-PD)</div>
+      <DraggableModal v-model:visible="showIpv6PoolModal" :title="editingIpv6Pool && editingIpv6Pool._name ? t('sstp.modals.editIpv6Pool') : t('sstp.modals.createIpv6Pool')" @confirm="saveIpv6Pool" @close="showIpv6PoolModal = false" width="700px">
+        <div class="form-row"><label class="form-label">{{ t('sstp.labels.name') }}</label><input class="form-control" v-model="editingIpv6Pool.name" :disabled="editingIpv6Pool._name" :title="t('sstp.tips.ipv6PoolName')" /></div>
+        <div style="font-weight:bold;margin:12px 0 8px;">{{ t('sstp.sections.delegatePrefix') }}</div>
         <div v-for="(d, i) in editingIpv6Pool.delegate" :key="'d'+i" style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
-          <input class="form-control" v-model="d.prefix" placeholder="h:h:h:h:h:h:h:h/x" title="IPv6 委派前缀" style="flex:2;" />
-          <input class="form-control" type="number" min="32" max="64" v-model="d.delegation_prefix" placeholder="32-64" title="委派前缀长度" style="flex:1;" />
-          <button @click="editingIpv6Pool.delegate.splice(i, 1)" style="padding:4px 8px;">删除</button>
+          <input class="form-control" v-model="d.prefix" placeholder="h:h:h:h:h:h:h:h/x" :title="t('sstp.tips.ipv6DelegatePrefix')" style="flex:2;" />
+          <input class="form-control" type="number" min="32" max="64" v-model="d.delegation_prefix" placeholder="32-64" :title="t('sstp.tips.delegatePrefixLength')" style="flex:1;" />
+          <button @click="editingIpv6Pool.delegate.splice(i, 1)" style="padding:4px 8px;">{{ t('sstp.buttons.delete') }}</button>
         </div>
-        <button @click="editingIpv6Pool.delegate.push({prefix:'',delegation_prefix:''})" style="margin-bottom:12px;">+ 添加委派前缀</button>
-        <div style="font-weight:bold;margin:12px 0 8px;">客户端前缀池</div>
+        <button @click="editingIpv6Pool.delegate.push({prefix:'',delegation_prefix:''})" style="margin-bottom:12px;">{{ t('sstp.buttons.addDelegatePrefix') }}</button>
+        <div style="font-weight:bold;margin:12px 0 8px;">{{ t('sstp.sections.clientPrefixPool') }}</div>
         <div v-for="(p, i) in editingIpv6Pool.prefix" :key="'p'+i" style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
-          <input class="form-control" v-model="p.prefix" placeholder="h:h:h:h:h:h:h:h/x" title="IPv6 前缀" style="flex:2;" />
-          <input class="form-control" type="number" min="48" max="128" v-model="p.mask" placeholder="48-128" title="客户端前缀长度" style="flex:1;" />
-          <button @click="editingIpv6Pool.prefix.splice(i, 1)" style="padding:4px 8px;">删除</button>
+          <input class="form-control" v-model="p.prefix" placeholder="h:h:h:h:h:h:h:h/x" :title="t('sstp.tips.ipv6Prefix')" style="flex:2;" />
+          <input class="form-control" type="number" min="48" max="128" v-model="p.mask" placeholder="48-128" :title="t('sstp.tips.clientPrefixLength')" style="flex:1;" />
+          <button @click="editingIpv6Pool.prefix.splice(i, 1)" style="padding:4px 8px;">{{ t('sstp.buttons.delete') }}</button>
         </div>
-        <button @click="editingIpv6Pool.prefix.push({prefix:'',mask:''})">+ 添加客户端前缀</button>
+        <button @click="editingIpv6Pool.prefix.push({prefix:'',mask:''})">{{ t('sstp.buttons.addClientPrefix') }}</button>
       </DraggableModal>
     </div>
   `,

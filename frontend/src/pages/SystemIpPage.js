@@ -5,15 +5,9 @@ import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
-const TABS = [
-  { key: 'basic', title: '基本设置' },
-  { key: 'arp', title: 'ARP 缓存' },
-  { key: 'multipath', title: '多路径' },
-  { key: 'nht', title: 'NHT' },
-  { key: 'protocol', title: '协议' },
-  { key: 'tcp', title: 'TCP' },
-];
+const TAB_KEYS = ['basic', 'arp', 'multipath', 'nht', 'protocol', 'tcp'];
 
 const PROTOCOLS = ['any', 'babel', 'bgp', 'eigrp', 'isis', 'ospf', 'rip', 'static'];
 const ARP_SIZES = ['1024', '2048', '4096', '8192', '16384', '32768'];
@@ -22,11 +16,13 @@ export default defineComponent({
   name: 'SystemIpPage',
   components: { TabGroup, ToolbarButton },
   setup() {
+    const { t } = useI18n();
     const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
     const activeTab = ref('basic');
+
+    const tabs = computed(() => TAB_KEYS.map(key => ({ key, title: t(`systemIp.tabs.${key}`) })));
 
     const config = ref({
       'disable-forwarding': false,
@@ -42,7 +38,6 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('system ip', true);
         const d = res.data || {};
@@ -81,15 +76,15 @@ export default defineComponent({
         }
         config.value = c;
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('systemIp.messages.loadFailed'));
       } finally {
         loading.value = false;
       }
     }
 
     function addImportTable() {
-      const num = prompt('请输入路由表编号 (1-252)');
-      if (num && !config.value['import-table'].find(t => t.number === num)) {
+      const num = prompt(t('systemIp.messages.enterRouteTableNumber'));
+      if (num && !config.value['import-table'].find(item => item.number === num)) {
         config.value['import-table'].push({ number: num, distance: '', 'route-map': '' });
       }
     }
@@ -121,15 +116,14 @@ export default defineComponent({
         if (c.tcp.mss.base) await configApi.set('system ip tcp mss base', String(c.tcp.mss.base));
         if (c.tcp.mss.floor) await configApi.set('system ip tcp mss floor', String(c.tcp.mss.floor));
         if (c.tcp.mss.probing) await configApi.set('system ip tcp mss probing', c.tcp.mss.probing);
-        for (const t of c['import-table']) {
-          if (t.distance) await configApi.set(`system ip import-table ${t.number} distance`, t.distance);
-          if (t['route-map']) await configApi.set(`system ip import-table ${t.number} route-map`, t['route-map']);
+        for (const item of c['import-table']) {
+          if (item.distance) await configApi.set(`system ip import-table ${item.number} distance`, item.distance);
+          if (item['route-map']) await configApi.set(`system ip import-table ${item.number} route-map`, item['route-map']);
         }
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('systemIp.messages.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -137,95 +131,92 @@ export default defineComponent({
 
     onMounted(() => { load(); onMenuRefresh(load); });
 
-    return {
-      loading, saving, saved, config, activeTab, commandPath,
-      TABS, PROTOCOLS, ARP_SIZES,
+    return {t,
+      
+      loading, saving, config, activeTab, commandPath,
+      tabs, PROTOCOLS, ARP_SIZES,
       load, save, addImportTable, removeImportTable,
     };
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
-      <TabGroup v-model="activeTab" :tabs="TABS">
+      <TabGroup v-model="activeTab" :tabs="tabs">
         <template #basic>
           <div class="form-row">
-            <label class="form-label">禁用 IPv4 转发</label>
+            <label class="form-label">{{ t('systemIp.labels.disableForwarding') }}</label>
             <input type="checkbox" v-model="config['disable-forwarding']" />
-            <span class="form-hint">禁用所有接口的 IPv4 转发</span>
+            <span class="form-hint">{{ t('systemIp.hints.disableForwarding') }}</span>
           </div>
         </template>
         <template #arp>
           <div class="form-row">
-            <label class="form-label">ARP 表大小</label>
+            <label class="form-label">{{ t('systemIp.labels.arpTableSize') }}</label>
             <select v-model="config.arp['table-size']" class="form-control" style="width:150px">
               <option v-for="s in ARP_SIZES" :key="s" :value="s">{{ s }}</option>
             </select>
-            <span class="form-hint">ARP 缓存最大条目数（默认: 8192）</span>
+            <span class="form-hint">{{ t('systemIp.hints.arpTableSize') }}</span>
           </div>
         </template>
         <template #multipath>
           <div class="form-row">
-            <label class="form-label">忽略不可达下一跳</label>
+            <label class="form-label">{{ t('systemIp.labels.ignoreUnreachableNexthops') }}</label>
             <input type="checkbox" v-model="config.multipath['ignore-unreachable-nexthops']" />
-            <span class="form-hint">忽略不在 ARP 表中的下一跳</span>
+            <span class="form-hint">{{ t('systemIp.hints.ignoreUnreachableNexthops') }}</span>
           </div>
           <div class="form-row">
-            <label class="form-label">Layer4 哈希</label>
+            <label class="form-label">{{ t('systemIp.labels.layer4Hashing') }}</label>
             <input type="checkbox" v-model="config.multipath['layer4-hashing']" />
-            <span class="form-hint">使用 Layer 4 信息进行 ECMP 哈希</span>
+            <span class="form-hint">{{ t('systemIp.hints.layer4Hashing') }}</span>
           </div>
         </template>
         <template #nht>
           <div class="form-row">
-            <label class="form-label">不通过默认路由解析</label>
+            <label class="form-label">{{ t('systemIp.labels.noResolveViaDefault') }}</label>
             <input type="checkbox" v-model="config.nht['no-resolve-via-default']" />
-            <span class="form-hint">不通过默认路由解析下一跳</span>
+            <span class="form-hint">{{ t('systemIp.hints.noResolveViaDefault') }}</span>
           </div>
         </template>
         <template #protocol>
           <div v-for="proto in PROTOCOLS" :key="proto" class="form-row">
             <label class="form-label">{{ proto }}</label>
-            <input class="form-control" v-model="config.protocol[proto]" placeholder="Route-map 名称" />
+            <input class="form-control" v-model="config.protocol[proto]" :placeholder="t('systemIp.placeholders.routeMapName')" />
           </div>
         </template>
         <template #tcp>
           <div class="form-row">
-            <label class="form-label">MSS Base</label>
+            <label class="form-label">{{ t('systemIp.labels.mssBase') }}</label>
             <input class="form-control" type="number" v-model.number="config.tcp.mss.base" min="48" max="1460" style="width:120px" />
-            <span class="form-hint">探测起始 MSS（默认: 1024）</span>
+            <span class="form-hint">{{ t('systemIp.hints.mssBase') }}</span>
           </div>
           <div class="form-row">
-            <label class="form-label">MSS Floor</label>
+            <label class="form-label">{{ t('systemIp.labels.mssFloor') }}</label>
             <input class="form-control" type="number" v-model.number="config.tcp.mss.floor" min="48" max="1460" style="width:120px" />
-            <span class="form-hint">探测最小 MSS（默认: 48）</span>
+            <span class="form-hint">{{ t('systemIp.hints.mssFloor') }}</span>
           </div>
           <div class="form-row">
-            <label class="form-label">MSS 探测</label>
+            <label class="form-label">{{ t('systemIp.labels.mssProbing') }}</label>
             <select v-model="config.tcp.mss.probing" class="form-control" style="width:200px">
-              <option value="">禁用</option>
-              <option value="on-icmp-black-hole">ICMP 黑洞时探测</option>
-              <option value="force">强制探测</option>
+              <option value="">{{ t('systemIp.options.disabled') }}</option>
+              <option value="on-icmp-black-hole">{{ t('systemIp.options.onIcmpBlackHole') }}</option>
+              <option value="force">{{ t('systemIp.options.force') }}</option>
             </select>
           </div>
         </template>
       </TabGroup>
       <div style="margin-top:16px">
-        <h4>导入路由表</h4>
-        <ToolbarButton icon="plus" @click="addImportTable">添加路由表</ToolbarButton>
+        <h4>{{ t('systemIp.labels.importRouteTable') }}</h4>
+        <ToolbarButton icon="plus" @click="addImportTable">{{ t('systemIp.buttons.addRouteTable') }}</ToolbarButton>
         <table class="data-table" style="margin-top:8px">
-          <thead><tr><th>表编号</th><th>Distance</th><th>Route-map</th><th>操作</th></tr></thead>
+          <thead><tr><th>{{ t('systemIp.labels.tableNumber') }}</th><th>Distance</th><th>Route-map</th><th>{{ t('systemIp.labels.actions') }}</th></tr></thead>
           <tbody>
-            <tr v-for="t in config['import-table']" :key="t.number">
-              <td>{{ t.number }}</td>
-              <td><input class="form-control" type="number" v-model.number="t.distance" min="1" max="255" style="width:80px" /></td>
-              <td><input class="form-control" v-model="t['route-map']" /></td>
-              <td><a @click="removeImportTable(t)" style="color:#ff4d4f">删除</a></td>
+            <tr v-for="item in config['import-table']" :key="item.number">
+              <td>{{ item.number }}</td>
+              <td><input class="form-control" type="number" v-model.number="item.distance" min="1" max="255" style="width:80px" /></td>
+              <td><input class="form-control" v-model="item['route-map']" /></td>
+              <td><a @click="removeImportTable(item)" style="color:#ff4d4f">{{ t('systemIp.buttons.delete') }}</a></td>
             </tr>
           </tbody>
         </table>
-      </div>
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
       </div>
     </div>
   `,

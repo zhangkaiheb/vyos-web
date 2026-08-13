@@ -1,25 +1,20 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { useConfigStore } from '/src/stores/config.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import { api, interfaceApi } from '/src/api/index.js';
-
-const COLUMNS = [
-  { key: 'name', title: '接口名称', width: 120 },
-  { key: 'description', title: '描述', width: 160 },
-  { key: 'peer_name', title: '对端接口', width: 120 },
-  { key: 'mtu', title: 'MTU', width: 80 },
-  { key: 'netns', title: '网络命名空间', width: 120 },
-  { key: 'vif_count', title: 'VIF 数量', width: 80 },
-  { key: 'disable', title: '禁用', width: 80 },
-  { key: 'actions', title: '操作', width: 100 },
-];
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { showError } from '/src/components/Layout/ErrorDisplay.js';
+import { useI18n } from '/src/i18n/index.js';
 
 export default defineComponent({
   name: 'VirtualEthernetPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const veths = ref([]);
     const modalVisible = ref(false);
@@ -27,6 +22,19 @@ export default defineComponent({
     const interfaceOptions = ref([]);
     const activeTab = ref('basic');
     const selectedVeth = ref([]);
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
+
+    const COLUMNS = computed(() => [
+      { key: 'name', title: t('veth.columns.name'), width: 120 },
+      { key: 'description', title: t('veth.columns.description'), width: 160 },
+      { key: 'peer_name', title: t('veth.columns.peerName'), width: 120 },
+      { key: 'mtu', title: t('veth.columns.mtu'), width: 80 },
+      { key: 'netns', title: t('veth.columns.netns'), width: 120 },
+      { key: 'vif_count', title: t('veth.columns.vifCount'), width: 80 },
+      { key: 'disable', title: t('veth.columns.disable'), width: 80 },
+      { key: 'actions', title: t('veth.columns.actions'), width: 100 },
+    ]);
 
     function formatJson(obj) {
       if (!obj) return '';
@@ -48,45 +56,45 @@ export default defineComponent({
 
     // Schema definitions
     const basicSchema = computed(() => [
-      { key: 'name', title: '接口名称', type: 'text', required: true, placeholder: '如 veth0, veth1', help: '格式: vethN' },
-      { key: 'description', title: '描述', type: 'text', placeholder: '接口描述' },
-      { key: 'address', title: 'IP 地址', type: 'textarea', placeholder: '每行一个 IPv4/IPv6 地址或 CIDR', help: '接口 IP 地址 (支持多行)' },
-      { key: 'peer_name', title: '对端接口', type: 'text', placeholder: '对端虚拟以太网接口名称', help: '虚拟以太网对端接口名称' },
-      { key: 'mtu', title: 'MTU', type: 'number', min: 68, max: 16000, placeholder: '68-16000', help: '最大传输单元 (默认: 1500)' },
-      { key: 'netns', title: '网络命名空间', type: 'text', placeholder: '命名空间名称', help: '网络命名空间名称' },
-      { key: 'disable', title: '禁用接口', type: 'checkbox', help: '管理性禁用接口' },
+      { key: 'name', title: t('veth.labels.name'), type: 'text', required: true, placeholder: t('veth.placeholders.name'), help: t('veth.help.name') },
+      { key: 'description', title: t('veth.labels.description'), type: 'text', placeholder: t('veth.placeholders.description') },
+      { key: 'address', title: t('veth.labels.address'), type: 'textarea', placeholder: t('veth.placeholders.address'), help: t('veth.help.address') },
+      { key: 'peer_name', title: t('veth.labels.peerName'), type: 'text', placeholder: t('veth.placeholders.peerName'), help: t('veth.help.peerName') },
+      { key: 'mtu', title: t('veth.labels.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('veth.placeholders.mtu'), help: t('veth.help.mtu') },
+      { key: 'netns', title: t('veth.labels.netns'), type: 'text', placeholder: t('veth.placeholders.netns'), help: t('veth.help.netns') },
+      { key: 'disable', title: t('veth.labels.disable'), type: 'checkbox', help: t('veth.help.disable') },
     ]);
 
     const dhcpSchema = computed(() => [
-      { key: 'dhcp_client_id', title: '客户端 ID', type: 'text', placeholder: 'DHCP 选项字符串', help: '用于向 DHCP 服务器标识客户端' },
-      { key: 'dhcp_default_route_distance', title: '默认路由距离', type: 'number', min: 1, max: 255, placeholder: '1-255', help: '默认路由的距离 (默认: 210)' },
-      { key: 'dhcp_host_name', title: '主机名', type: 'text', placeholder: '主机名', help: '覆盖系统主机名' },
-      { key: 'dhcp_mtu', title: '使用 DHCP MTU', type: 'checkbox', help: '使用 DHCP 服务器提供的 MTU' },
-      { key: 'dhcp_no_default_route', title: '不安装默认路由', type: 'checkbox', help: '不安装默认路由' },
-      { key: 'dhcp_reject', title: '拒绝地址', type: 'textarea', placeholder: '每行一个 IP 或子网', help: '拒绝 DHCP 租约的地址' },
-      { key: 'dhcp_user_class', title: '用户类别', type: 'text', placeholder: 'DHCP 选项字符串', help: '用户可配置选项' },
-      { key: 'dhcp_vendor_class_id', title: '厂商类别 ID', type: 'text', placeholder: 'DHCP 选项字符串', help: '标识厂商客户端类型' },
+      { key: 'dhcp_client_id', title: t('veth.labels.dhcpClientId'), type: 'text', placeholder: t('veth.placeholders.dhcpClientId'), help: t('veth.help.dhcpClientId') },
+      { key: 'dhcp_default_route_distance', title: t('veth.labels.dhcpDefaultRouteDistance'), type: 'number', min: 1, max: 255, placeholder: t('veth.placeholders.dhcpDefaultRouteDistance'), help: t('veth.help.dhcpDefaultRouteDistance') },
+      { key: 'dhcp_host_name', title: t('veth.labels.dhcpHostName'), type: 'text', placeholder: t('veth.placeholders.dhcpHostName'), help: t('veth.help.dhcpHostName') },
+      { key: 'dhcp_mtu', title: t('veth.labels.dhcpMtu'), type: 'checkbox', help: t('veth.help.dhcpMtu') },
+      { key: 'dhcp_no_default_route', title: t('veth.labels.dhcpNoDefaultRoute'), type: 'checkbox', help: t('veth.help.dhcpNoDefaultRoute') },
+      { key: 'dhcp_reject', title: t('veth.labels.dhcpReject'), type: 'textarea', placeholder: t('veth.placeholders.dhcpReject'), help: t('veth.help.dhcpReject') },
+      { key: 'dhcp_user_class', title: t('veth.labels.dhcpUserClass'), type: 'text', placeholder: t('veth.placeholders.dhcpUserClass'), help: t('veth.help.dhcpUserClass') },
+      { key: 'dhcp_vendor_class_id', title: t('veth.labels.dhcpVendorClassId'), type: 'text', placeholder: t('veth.placeholders.dhcpVendorClassId'), help: t('veth.help.dhcpVendorClassId') },
     ]);
 
     const dhcpv6Schema = computed(() => [
-      { key: 'dhcpv6_duid', title: 'DUID', type: 'text', placeholder: 'DHCP 唯一标识符', help: '客户端发送的 DUID' },
-      { key: 'dhcpv6_no_release', title: '不发送 Release', type: 'checkbox', help: '客户端退出时不发送 release 消息' },
-      { key: 'dhcpv6_no_request_dns', title: '不请求 DNS', type: 'checkbox', help: '不请求 DNS 服务器' },
-      { key: 'dhcpv6_no_request_domain_name', title: '不请求域名', type: 'checkbox', help: '不请求域名' },
-      { key: 'dhcpv6_parameters_only', title: '仅获取参数', type: 'checkbox', help: '仅获取配置参数，不获取地址' },
-      { key: 'dhcpv6_pd_instances', title: '前缀委派实例', type: 'textarea', placeholder: 'JSON 格式，例如 {"eth0": {"interface": "eth0", "address": "1", "sla-id": 0}}', help: 'DHCPv6 前缀委派实例配置' },
-      { key: 'dhcpv6_pd_length', title: '前缀长度', type: 'number', min: 32, max: 64, placeholder: '32-64', help: '前缀委派长度 (默认: 64)' },
-      { key: 'dhcpv6_rapid_commit', title: '快速提交', type: 'checkbox', help: '等待立即回复而非通告' },
-      { key: 'dhcpv6_temporary', title: '临时地址', type: 'checkbox', help: 'IPv6 临时地址' },
+      { key: 'dhcpv6_duid', title: t('veth.labels.dhcpv6Duid'), type: 'text', placeholder: t('veth.placeholders.dhcpv6Duid'), help: t('veth.help.dhcpv6Duid') },
+      { key: 'dhcpv6_no_release', title: t('veth.labels.dhcpv6NoRelease'), type: 'checkbox', help: t('veth.help.dhcpv6NoRelease') },
+      { key: 'dhcpv6_no_request_dns', title: t('veth.labels.dhcpv6NoRequestDns'), type: 'checkbox', help: t('veth.help.dhcpv6NoRequestDns') },
+      { key: 'dhcpv6_no_request_domain_name', title: t('veth.labels.dhcpv6NoRequestDomainName'), type: 'checkbox', help: t('veth.help.dhcpv6NoRequestDomainName') },
+      { key: 'dhcpv6_parameters_only', title: t('veth.labels.dhcpv6ParametersOnly'), type: 'checkbox', help: t('veth.help.dhcpv6ParametersOnly') },
+      { key: 'dhcpv6_pd_instances', title: t('veth.labels.dhcpv6PdInstances'), type: 'textarea', placeholder: t('veth.placeholders.dhcpv6PdInstances'), help: t('veth.help.dhcpv6PdInstances') },
+      { key: 'dhcpv6_pd_length', title: t('veth.labels.dhcpv6PdLength'), type: 'number', min: 32, max: 64, placeholder: t('veth.placeholders.dhcpv6PdLength'), help: t('veth.help.dhcpv6PdLength') },
+      { key: 'dhcpv6_rapid_commit', title: t('veth.labels.dhcpv6RapidCommit'), type: 'checkbox', help: t('veth.help.dhcpv6RapidCommit') },
+      { key: 'dhcpv6_temporary', title: t('veth.labels.dhcpv6Temporary'), type: 'checkbox', help: t('veth.help.dhcpv6Temporary') },
     ]);
 
     const vifSchema = computed(() => [
-      { key: 'vif', title: 'VIF (VLAN)', type: 'textarea', placeholder: 'JSON 格式，例如 {"10": {"address": ["192.168.10.1/24"], "description": "VLAN 10", "mtu": 1500}}', help: 'JSON 对象，键为 VLAN ID (0-4094)。每个 VIF 支持: address, description, disable, mtu, mac, dhcp-options, dhcpv6-options, ip, ipv6, mirror, redirect, vrf' },
-      { key: 'vif_s', title: 'VIF-S (QinQ)', type: 'textarea', placeholder: 'JSON 格式，例如 {"100": {"vif": {"200": {"address": ["10.0.0.1/24"]}}}}', help: 'QinQ S-VLAN 子接口，键为 S-VLAN ID (0-4094)。每个 VIF-S 支持: address, description, disable, mtu, mac, dhcp-options, dhcpv6-options, ip, ipv6, mirror, redirect, vrf, vif' },
+      { key: 'vif', title: t('veth.labels.vif'), type: 'textarea', placeholder: t('veth.placeholders.vif'), help: t('veth.help.vif') },
+      { key: 'vif_s', title: t('veth.labels.vifS'), type: 'textarea', placeholder: t('veth.placeholders.vifS'), help: t('veth.help.vifS') },
     ]);
 
     const otherSchema = computed(() => [
-      { key: 'vrf', title: 'VRF 实例', type: 'text', placeholder: 'VRF 实例名称', help: 'VRF 实例名称' },
+      { key: 'vrf', title: t('veth.labels.vrf'), type: 'text', placeholder: t('veth.placeholders.vrf'), help: t('veth.help.vrf') },
     ]);
 
     // Command text
@@ -169,16 +177,15 @@ export default defineComponent({
 
       if (v.vrf) lines.push(`set interfaces virtual-ethernet ${name} vrf ${v.vrf}`);
 
-      return lines.length ? lines.join('\n') : '# 未配置任何参数';
+      return lines.length ? lines.join('\n') : t('veth.messages.noConfig');
     });
 
     const modalTabs = computed(() => [
-      { key: 'basic', title: '基本配置' },
-      { key: 'dhcp', title: 'DHCP' },
-      { key: 'dhcpv6', title: 'DHCPv6' },
-      { key: 'vif', title: 'VLAN 子接口' },
-      { key: 'other', title: '其他' },
-      { key: 'command', title: '命令预览' },
+      { key: 'basic', title: t('veth.tabs.basic') },
+      { key: 'dhcp', title: t('veth.tabs.dhcp') },
+      { key: 'dhcpv6', title: t('veth.tabs.dhcpv6') },
+      { key: 'vif', title: t('veth.tabs.vif') },
+      { key: 'other', title: t('veth.tabs.other') },
     ]);
 
     function getDefaultForm() {
@@ -301,14 +308,14 @@ export default defineComponent({
           label: iface.name || iface,
         }));
       } catch (err) {
-        showError(err);
+        handleError(err);
       } finally {
         loading.value = false;
       }
     }
 
-    function showError(err) {
-      alert(`错误码: ${err.code || 'ERROR'}\n错误信息: ${err.message || err}`);
+    function handleError(err) {
+      showError({ message: `${t('veth.messages.errorCode', { code: err.code || 'ERROR' })}\n${t('veth.messages.errorMessage', { message: err.message || err })}` });
     }
 
     function openModal(index = -1) {
@@ -325,43 +332,53 @@ export default defineComponent({
       try {
         const form = editingVeth.value;
         const name = form.name;
-        if (!name) { alert('请输入接口名称'); return; }
+        if (!name) return showError({ message: t('veth.messages.enterName') });
 
         const config = formToVeth(form);
-        console.log('[VirtualEthernet] 保存配置:', JSON.stringify(config, null, 2));
+        console.log('[VirtualEthernet] Save config:', JSON.stringify(config, null, 2));
 
         const path = `interfaces virtual-ethernet ${name}`;
-        await api.put('/config', { path, value: config });
+        await configStore.setConfig(path, config);
+        configStore.markPending();
 
         modalVisible.value = false;
         await load();
       } catch (err) {
-        showError(err);
+        handleError(err);
       }
     }
 
-    async function remove() {
-      if (!selectedVeth.value.length) { alert('请先选择要删除的虚拟以太网接口'); return; }
-      if (!confirm(`确定删除选中的 ${selectedVeth.value.length} 个虚拟以太网接口?`)) return;
+    function remove() {
+      if (!selectedVeth.value.length) return showError({ message: t('veth.messages.selectToDelete') });
+      pendingDeleteNames.value = selectedVeth.value.map(v => v.name);
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemove() {
+      deleteModalVisible.value = false;
       try {
-        for (const v of selectedVeth.value) {
-          await api.delete('/config', { path: `interfaces virtual-ethernet ${v.name}` });
+        for (const name of pendingDeleteNames.value) {
+          await configStore.deleteConfig(`interfaces virtual-ethernet ${name}`);
+          configStore.markPending();
         }
         selectedVeth.value = [];
+        pendingDeleteNames.value = [];
         await load();
       } catch (err) {
-        showError(err);
+        handleError(err);
       }
     }
 
-    onMounted(() => { load(); });
+    onMounted(() => { load(); onMenuRefresh(load); });
 
-    return {
+    return {t,
+      
       loading, veths, selected: selectedVeth, modalVisible, editingVeth, interfaceOptions, activeTab,
+      deleteModalVisible, pendingDeleteNames,
       COLUMNS,
       basicSchema, dhcpSchema, dhcpv6Schema, vifSchema, otherSchema,
       commandText, modalTabs,
-      openModal, save, remove, load,
+      openModal, save, remove, confirmRemove, load,
     };
   },
   template: `
@@ -379,7 +396,7 @@ export default defineComponent({
         @selection-change="selected = $event"
       />
 
-      <DraggableModal v-model:visible="modalVisible" :title="editingVeth?.name ? '编辑虚拟以太网接口' : '创建虚拟以太网接口'" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingVeth?.name ? t('veth.modals.editVeth') : t('veth.modals.createVeth')" width="900px">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic>
@@ -397,15 +414,18 @@ export default defineComponent({
             <template #other>
               <ConfigForm :schema="otherSchema" :model="editingVeth" />
             </template>
-            <template #command>
-              <pre style="background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;font-size:13px;">{{ commandText }}</pre>
-            </template>
           </TabGroup>
         </template>
         <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">取消</button>
-          <button type="button" class="btn btn-primary" @click="save">确定</button>
+          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('veth.buttons.cancel') }}</button>
+          <button type="button" class="btn btn-primary" @click="save">{{ t('veth.buttons.confirm') }}</button>
         </template>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('veth.modals.confirmDelete')" width="400px" @confirm="confirmRemove">
+        <div>{{ t('veth.messages.confirmDelete') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

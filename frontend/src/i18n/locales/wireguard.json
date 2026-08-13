@@ -1,0 +1,1213 @@
+{
+  "zh-CN": {
+    "wireguard": {
+      "columns": {
+        "name": "名称",
+        "description": "描述",
+        "port": "端口",
+        "mtu": "MTU",
+        "peer_count": "对端数量",
+        "disable": "禁用",
+        "actions": "操作"
+      },
+      "peer_columns": {
+        "name": "名称",
+        "public_key": "公钥",
+        "address": "地址",
+        "port": "端口",
+        "disable": "禁用",
+        "actions": "操作"
+      },
+      "tabs": {
+        "basic": "基本配置",
+        "ipv4": "IPv4 参数",
+        "ipv6": "IPv6 参数",
+        "peer": "对端",
+        "mirror": "流量镜像",
+        "other": "其他",
+        "command": "命令预览"
+      },
+      "basic": {
+        "name": "名称",
+        "name_placeholder": "请输入 WireGuard 接口名称",
+        "name_help": "WireGuard 接口名称",
+        "description": "描述",
+        "description_placeholder": "请输入描述",
+        "private_key": "私钥",
+        "private_key_placeholder": "请输入私钥",
+        "private_key_help": "WireGuard 私钥",
+        "port": "端口",
+        "port_help": "监听端口 (1-65535)",
+        "fwmark": "防火墙标记",
+        "fwmark_help": "防火墙标记值 (0-4294967295)",
+        "max_dns_retry": "最大 DNS 重试",
+        "max_dns_retry_help": "最大 DNS 重试次数 (1-15)",
+        "mtu": "MTU",
+        "mtu_help": "MTU 值 (68-16000)",
+        "per_client_thread": "每客户端线程",
+        "per_client_thread_help": "为每个对端创建独立线程",
+        "disable": "禁用",
+        "disable_help": "禁用此接口"
+      },
+      "ip": {
+        "adjust_mss": "IP MSS 调整",
+        "adjust_mss_placeholder": "请输入 MSS 值",
+        "adjust_mss_help": "调整 TCP MSS 值",
+        "arp_cache_timeout": "ARP 缓存超时",
+        "arp_cache_timeout_help": "ARP 缓存超时时间（秒）",
+        "disable_arp_filter": "禁用 ARP 过滤",
+        "disable_arp_filter_help": "禁用 ARP 过滤",
+        "disable_forwarding": "禁用转发",
+        "disable_forwarding_help": "禁用 IP 转发",
+        "enable_arp_accept": "启用 ARP 接受",
+        "enable_arp_accept_help": "启用 ARP 接受",
+        "enable_arp_announce": "启用 ARP 宣告",
+        "enable_arp_announce_help": "启用 ARP 宣告",
+        "enable_arp_ignore": "启用 ARP 忽略",
+        "enable_arp_ignore_help": "启用 ARP 忽略",
+        "enable_directed_broadcast": "启用定向广播",
+        "enable_directed_broadcast_help": "启用定向广播",
+        "enable_proxy_arp": "启用代理 ARP",
+        "enable_proxy_arp_help": "启用代理 ARP",
+        "proxy_arp_pvlan": "代理 ARP PVLAN",
+        "proxy_arp_pvlan_help": "代理 ARP PVLAN",
+        "source_validation": "IP 源验证",
+        "source_validation_placeholder": "请选择源验证",
+        "source_validation_help": "IP 源验证"
+      },
+      "ipv6": {
+        "accept_dad": "IPv6 接受 DAD",
+        "accept_dad_help": "IPv6 DAD 接受设置",
+        "autoconf": "IPv6 地址自动配置",
+        "autoconf_help": "启用 IPv6 地址自动配置",
+        "eui64": "IPv6 EUI-64 地址",
+        "eui64_placeholder": "请输入 EUI-64 地址",
+        "eui64_help": "IPv6 EUI-64 地址",
+        "no_default_link_local": "禁用默认链路本地地址",
+        "no_default_link_local_help": "禁用默认链路本地地址",
+        "adjust_mss": "IPv6 MSS 调整",
+        "adjust_mss_placeholder": "请输入 MSS 值",
+        "adjust_mss_help": "IPv6 MSS 调整",
+        "base_reachable_time": "IPv6 基础可达时间",
+        "base_reachable_time_help": "IPv6 基础可达时间（秒）",
+        "disable_forwarding": "IPv6 禁用转发",
+        "disable_forwarding_help": "IPv6 禁用转发",
+        "dup_addr_detect_transmits": "IPv6 重复地址检测发送",
+        "dup_addr_detect_transmits_help": "IPv6 重复地址检测发送次数",
+        "source_validation": "IPv6 源验证",
+        "source_validation_placeholder": "请选择源验证",
+        "source_validation_help": "IPv6 源验证"
+      },
+      "mirror": {
+        "egress": "镜像出站",
+        "egress_help": "出站流量镜像接口",
+        "ingress": "镜像入站",
+        "ingress_help": "入站流量镜像接口",
+        "target_placeholder": "请选择镜像接口"
+      },
+      "other": {
+        "redirect": "重定向",
+        "redirect_help": "重定向接口",
+        "vrf": "VRF",
+        "vrf_placeholder": "请输入 VRF",
+        "vrf_help": "VRF 名称",
+        "target_placeholder": "请选择接口"
+      },
+      "peer": {
+        "name": "名称",
+        "name_placeholder": "请输入对端名称",
+        "public_key": "公钥",
+        "public_key_placeholder": "请输入公钥",
+        "preshared_key": "预共享密钥",
+        "preshared_key_placeholder": "请输入预共享密钥",
+        "address": "地址",
+        "address_placeholder": "请输入地址",
+        "allowed_ips": "允许的 IP",
+        "allowed_ips_placeholder": "请输入允许的 IP（每行一个）",
+        "allowed_ips_help": "允许的 IP 地址",
+        "host_name": "主机名",
+        "host_name_help": "FQDN 主机名",
+        "port": "端口",
+        "persistent_keepalive": "持久保活",
+        "persistent_keepalive_help": "持久保活间隔（秒）",
+        "description": "描述",
+        "description_placeholder": "请输入描述",
+        "disable": "禁用",
+        "disable_help": "禁用此对端",
+        "modal": {
+          "edit": "编辑对端",
+          "create": "创建对端"
+        }
+      },
+      "modal": {
+        "edit": "编辑 WireGuard 接口",
+        "create": "创建 WireGuard 接口",
+        "confirm_delete": "确认删除"
+      },
+      "delete": {
+        "confirm_interface": "确认删除所选 WireGuard 接口？",
+        "confirm_peer": "确认删除所选对端？"
+      },
+      "command": {
+        "no_config": "# 未配置参数"
+      },
+      "errors": {
+        "error_message": "错误代码: {code}, 错误信息: {detail}",
+        "name_required": "请输入 WireGuard 接口名称",
+        "select_for_delete": "请选择要删除的接口",
+        "peer_name_required": "请输入对端名称",
+        "public_key_required": "请输入公钥"
+      },
+      "options": {
+        "source_validation": {
+          "strict": "严格",
+          "loose": "宽松",
+          "disable": "禁用"
+        },
+        "accept_dad": {
+          "0": "禁用",
+          "1": "启用",
+          "2": "强制"
+        }
+      }
+    }
+  },
+  "en": {
+    "wireguard": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "port": "Port",
+        "mtu": "MTU",
+        "peer_count": "Peer Count",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "peer_columns": {
+        "name": "Name",
+        "public_key": "Public Key",
+        "address": "Address",
+        "port": "Port",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ipv4": "IPv4 Params",
+        "ipv6": "IPv6 Params",
+        "peer": "Peer",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "basic": {
+        "name": "Name",
+        "name_placeholder": "Enter WireGuard interface name",
+        "name_help": "WireGuard interface name",
+        "description": "Description",
+        "description_placeholder": "Enter description",
+        "private_key": "Private Key",
+        "private_key_placeholder": "Enter private key",
+        "private_key_help": "WireGuard private key",
+        "port": "Port",
+        "port_help": "Listen port (1-65535)",
+        "fwmark": "Firewall Mark",
+        "fwmark_help": "Firewall mark value (0-4294967295)",
+        "max_dns_retry": "Max DNS Retry",
+        "max_dns_retry_help": "Max DNS retry count (1-15)",
+        "mtu": "MTU",
+        "mtu_help": "MTU value (68-16000)",
+        "per_client_thread": "Per-Client Thread",
+        "per_client_thread_help": "Create separate thread per peer",
+        "disable": "Disable",
+        "disable_help": "Disable this interface"
+      },
+      "ip": {
+        "adjust_mss": "IP MSS Adjustment",
+        "adjust_mss_placeholder": "Enter MSS value",
+        "adjust_mss_help": "Adjust TCP MSS value",
+        "arp_cache_timeout": "ARP Cache Timeout",
+        "arp_cache_timeout_help": "ARP cache timeout (seconds)",
+        "disable_arp_filter": "Disable ARP Filter",
+        "disable_arp_filter_help": "Disable ARP filtering",
+        "disable_forwarding": "Disable Forwarding",
+        "disable_forwarding_help": "Disable IP forwarding",
+        "enable_arp_accept": "Enable ARP Accept",
+        "enable_arp_accept_help": "Enable ARP accept",
+        "enable_arp_announce": "Enable ARP Announce",
+        "enable_arp_announce_help": "Enable ARP announce",
+        "enable_arp_ignore": "Enable ARP Ignore",
+        "enable_arp_ignore_help": "Enable ARP ignore",
+        "enable_directed_broadcast": "Enable Directed Broadcast",
+        "enable_directed_broadcast_help": "Enable directed broadcast",
+        "enable_proxy_arp": "Enable Proxy ARP",
+        "enable_proxy_arp_help": "Enable proxy ARP",
+        "proxy_arp_pvlan": "Proxy ARP PVLAN",
+        "proxy_arp_pvlan_help": "Proxy ARP PVLAN",
+        "source_validation": "IP Source Validation",
+        "source_validation_placeholder": "Select source validation",
+        "source_validation_help": "IP source validation"
+      },
+      "ipv6": {
+        "accept_dad": "IPv6 Accept DAD",
+        "accept_dad_help": "IPv6 DAD accept setting",
+        "autoconf": "IPv6 Address Autoconf",
+        "autoconf_help": "Enable IPv6 address autoconfiguration",
+        "eui64": "IPv6 EUI-64 Address",
+        "eui64_placeholder": "Enter EUI-64 address",
+        "eui64_help": "IPv6 EUI-64 address",
+        "no_default_link_local": "Disable Default Link-Local",
+        "no_default_link_local_help": "Disable default link-local address",
+        "adjust_mss": "IPv6 MSS Adjustment",
+        "adjust_mss_placeholder": "Enter MSS value",
+        "adjust_mss_help": "IPv6 MSS adjustment",
+        "base_reachable_time": "IPv6 Base Reachable Time",
+        "base_reachable_time_help": "IPv6 base reachable time (seconds)",
+        "disable_forwarding": "IPv6 Disable Forwarding",
+        "disable_forwarding_help": "IPv6 disable forwarding",
+        "dup_addr_detect_transmits": "IPv6 DAD Transmits",
+        "dup_addr_detect_transmits_help": "IPv6 duplicate address detection transmits",
+        "source_validation": "IPv6 Source Validation",
+        "source_validation_placeholder": "Select source validation",
+        "source_validation_help": "IPv6 source validation"
+      },
+      "mirror": {
+        "egress": "Mirror Egress",
+        "egress_help": "Egress traffic mirror interface",
+        "ingress": "Mirror Ingress",
+        "ingress_help": "Ingress traffic mirror interface",
+        "target_placeholder": "Select mirror interface"
+      },
+      "other": {
+        "redirect": "Redirect",
+        "redirect_help": "Redirect interface",
+        "vrf": "VRF",
+        "vrf_placeholder": "Enter VRF",
+        "vrf_help": "VRF name",
+        "target_placeholder": "Select interface"
+      },
+      "peer": {
+        "name": "Name",
+        "name_placeholder": "Enter peer name",
+        "public_key": "Public Key",
+        "public_key_placeholder": "Enter public key",
+        "preshared_key": "Preshared Key",
+        "preshared_key_placeholder": "Enter preshared key",
+        "address": "Address",
+        "address_placeholder": "Enter address",
+        "allowed_ips": "Allowed IPs",
+        "allowed_ips_placeholder": "Enter allowed IPs (one per line)",
+        "allowed_ips_help": "Allowed IP addresses",
+        "host_name": "Host Name",
+        "host_name_help": "FQDN host name",
+        "port": "Port",
+        "persistent_keepalive": "Persistent Keepalive",
+        "persistent_keepalive_help": "Persistent keepalive interval (seconds)",
+        "description": "Description",
+        "description_placeholder": "Enter description",
+        "disable": "Disable",
+        "disable_help": "Disable this peer",
+        "modal": {
+          "edit": "Edit Peer",
+          "create": "Create Peer"
+        }
+      },
+      "modal": {
+        "edit": "Edit WireGuard Interface",
+        "create": "Create WireGuard Interface",
+        "confirm_delete": "Confirm Delete"
+      },
+      "delete": {
+        "confirm_interface": "Confirm delete selected WireGuard interfaces?",
+        "confirm_peer": "Confirm delete selected peers?"
+      },
+      "command": {
+        "no_config": "# No parameters configured"
+      },
+      "errors": {
+        "error_message": "Error code: {code}, Error message: {detail}",
+        "name_required": "Please enter WireGuard interface name",
+        "select_for_delete": "Please select interfaces to delete",
+        "peer_name_required": "Please enter peer name",
+        "public_key_required": "Please enter public key"
+      },
+      "options": {
+        "source_validation": {
+          "strict": "Strict",
+          "loose": "Loose",
+          "disable": "Disable"
+        },
+        "accept_dad": {
+          "0": "Disable",
+          "1": "Enable",
+          "2": "Force"
+        }
+      }
+    }
+  },
+  "zh-TW": {
+    "wireguard": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "port": "Port",
+        "mtu": "MTU",
+        "peer_count": "Peer Count",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "peer_columns": {
+        "name": "Name",
+        "public_key": "Public Key",
+        "address": "Address",
+        "port": "Port",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ipv4": "IPv4 Params",
+        "ipv6": "IPv6 Params",
+        "peer": "Peer",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "basic": {
+        "name": "Name",
+        "name_placeholder": "Enter WireGuard interface name",
+        "name_help": "WireGuard interface name",
+        "description": "Description",
+        "description_placeholder": "Enter description",
+        "private_key": "Private Key",
+        "private_key_placeholder": "Enter private key",
+        "private_key_help": "WireGuard private key",
+        "port": "Port",
+        "port_help": "Listen port (1-65535)",
+        "fwmark": "Firewall Mark",
+        "fwmark_help": "Firewall mark value (0-4294967295)",
+        "max_dns_retry": "Max DNS Retry",
+        "max_dns_retry_help": "Max DNS retry count (1-15)",
+        "mtu": "MTU",
+        "mtu_help": "MTU value (68-16000)",
+        "per_client_thread": "Per-Client Thread",
+        "per_client_thread_help": "Create separate thread per peer",
+        "disable": "Disable",
+        "disable_help": "Disable this interface"
+      },
+      "ip": {
+        "adjust_mss": "IP MSS Adjustment",
+        "adjust_mss_placeholder": "Enter MSS value",
+        "adjust_mss_help": "Adjust TCP MSS value",
+        "arp_cache_timeout": "ARP Cache Timeout",
+        "arp_cache_timeout_help": "ARP cache timeout (seconds)",
+        "disable_arp_filter": "Disable ARP Filter",
+        "disable_arp_filter_help": "Disable ARP filtering",
+        "disable_forwarding": "Disable Forwarding",
+        "disable_forwarding_help": "Disable IP forwarding",
+        "enable_arp_accept": "Enable ARP Accept",
+        "enable_arp_accept_help": "Enable ARP accept",
+        "enable_arp_announce": "Enable ARP Announce",
+        "enable_arp_announce_help": "Enable ARP announce",
+        "enable_arp_ignore": "Enable ARP Ignore",
+        "enable_arp_ignore_help": "Enable ARP ignore",
+        "enable_directed_broadcast": "Enable Directed Broadcast",
+        "enable_directed_broadcast_help": "Enable directed broadcast",
+        "enable_proxy_arp": "Enable Proxy ARP",
+        "enable_proxy_arp_help": "Enable proxy ARP",
+        "proxy_arp_pvlan": "Proxy ARP PVLAN",
+        "proxy_arp_pvlan_help": "Proxy ARP PVLAN",
+        "source_validation": "IP Source Validation",
+        "source_validation_placeholder": "Select source validation",
+        "source_validation_help": "IP source validation"
+      },
+      "ipv6": {
+        "accept_dad": "IPv6 Accept DAD",
+        "accept_dad_help": "IPv6 DAD accept setting",
+        "autoconf": "IPv6 Address Autoconf",
+        "autoconf_help": "Enable IPv6 address autoconfiguration",
+        "eui64": "IPv6 EUI-64 Address",
+        "eui64_placeholder": "Enter EUI-64 address",
+        "eui64_help": "IPv6 EUI-64 address",
+        "no_default_link_local": "Disable Default Link-Local",
+        "no_default_link_local_help": "Disable default link-local address",
+        "adjust_mss": "IPv6 MSS Adjustment",
+        "adjust_mss_placeholder": "Enter MSS value",
+        "adjust_mss_help": "IPv6 MSS adjustment",
+        "base_reachable_time": "IPv6 Base Reachable Time",
+        "base_reachable_time_help": "IPv6 base reachable time (seconds)",
+        "disable_forwarding": "IPv6 Disable Forwarding",
+        "disable_forwarding_help": "IPv6 disable forwarding",
+        "dup_addr_detect_transmits": "IPv6 DAD Transmits",
+        "dup_addr_detect_transmits_help": "IPv6 duplicate address detection transmits",
+        "source_validation": "IPv6 Source Validation",
+        "source_validation_placeholder": "Select source validation",
+        "source_validation_help": "IPv6 source validation"
+      },
+      "mirror": {
+        "egress": "Mirror Egress",
+        "egress_help": "Egress traffic mirror interface",
+        "ingress": "Mirror Ingress",
+        "ingress_help": "Ingress traffic mirror interface",
+        "target_placeholder": "Select mirror interface"
+      },
+      "other": {
+        "redirect": "Redirect",
+        "redirect_help": "Redirect interface",
+        "vrf": "VRF",
+        "vrf_placeholder": "Enter VRF",
+        "vrf_help": "VRF name",
+        "target_placeholder": "Select interface"
+      },
+      "peer": {
+        "name": "Name",
+        "name_placeholder": "Enter peer name",
+        "public_key": "Public Key",
+        "public_key_placeholder": "Enter public key",
+        "preshared_key": "Preshared Key",
+        "preshared_key_placeholder": "Enter preshared key",
+        "address": "Address",
+        "address_placeholder": "Enter address",
+        "allowed_ips": "Allowed IPs",
+        "allowed_ips_placeholder": "Enter allowed IPs (one per line)",
+        "allowed_ips_help": "Allowed IP addresses",
+        "host_name": "Host Name",
+        "host_name_help": "FQDN host name",
+        "port": "Port",
+        "persistent_keepalive": "Persistent Keepalive",
+        "persistent_keepalive_help": "Persistent keepalive interval (seconds)",
+        "description": "Description",
+        "description_placeholder": "Enter description",
+        "disable": "Disable",
+        "disable_help": "Disable this peer",
+        "modal": {
+          "edit": "Edit Peer",
+          "create": "Create Peer"
+        }
+      },
+      "modal": {
+        "edit": "Edit WireGuard Interface",
+        "create": "Create WireGuard Interface",
+        "confirm_delete": "Confirm Delete"
+      },
+      "delete": {
+        "confirm_interface": "Confirm delete selected WireGuard interfaces?",
+        "confirm_peer": "Confirm delete selected peers?"
+      },
+      "command": {
+        "no_config": "# No parameters configured"
+      },
+      "errors": {
+        "error_message": "Error code: {code}, Error message: {detail}",
+        "name_required": "Please enter WireGuard interface name",
+        "select_for_delete": "Please select interfaces to delete",
+        "peer_name_required": "Please enter peer name",
+        "public_key_required": "Please enter public key"
+      },
+      "options": {
+        "source_validation": {
+          "strict": "Strict",
+          "loose": "Loose",
+          "disable": "Disable"
+        },
+        "accept_dad": {
+          "0": "Disable",
+          "1": "Enable",
+          "2": "Force"
+        }
+      }
+    }
+  },
+  "ru": {
+    "wireguard": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "port": "Port",
+        "mtu": "MTU",
+        "peer_count": "Peer Count",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "peer_columns": {
+        "name": "Name",
+        "public_key": "Public Key",
+        "address": "Address",
+        "port": "Port",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ipv4": "IPv4 Params",
+        "ipv6": "IPv6 Params",
+        "peer": "Peer",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "basic": {
+        "name": "Name",
+        "name_placeholder": "Enter WireGuard interface name",
+        "name_help": "WireGuard interface name",
+        "description": "Description",
+        "description_placeholder": "Enter description",
+        "private_key": "Private Key",
+        "private_key_placeholder": "Enter private key",
+        "private_key_help": "WireGuard private key",
+        "port": "Port",
+        "port_help": "Listen port (1-65535)",
+        "fwmark": "Firewall Mark",
+        "fwmark_help": "Firewall mark value (0-4294967295)",
+        "max_dns_retry": "Max DNS Retry",
+        "max_dns_retry_help": "Max DNS retry count (1-15)",
+        "mtu": "MTU",
+        "mtu_help": "MTU value (68-16000)",
+        "per_client_thread": "Per-Client Thread",
+        "per_client_thread_help": "Create separate thread per peer",
+        "disable": "Disable",
+        "disable_help": "Disable this interface"
+      },
+      "ip": {
+        "adjust_mss": "IP MSS Adjustment",
+        "adjust_mss_placeholder": "Enter MSS value",
+        "adjust_mss_help": "Adjust TCP MSS value",
+        "arp_cache_timeout": "ARP Cache Timeout",
+        "arp_cache_timeout_help": "ARP cache timeout (seconds)",
+        "disable_arp_filter": "Disable ARP Filter",
+        "disable_arp_filter_help": "Disable ARP filtering",
+        "disable_forwarding": "Disable Forwarding",
+        "disable_forwarding_help": "Disable IP forwarding",
+        "enable_arp_accept": "Enable ARP Accept",
+        "enable_arp_accept_help": "Enable ARP accept",
+        "enable_arp_announce": "Enable ARP Announce",
+        "enable_arp_announce_help": "Enable ARP announce",
+        "enable_arp_ignore": "Enable ARP Ignore",
+        "enable_arp_ignore_help": "Enable ARP ignore",
+        "enable_directed_broadcast": "Enable Directed Broadcast",
+        "enable_directed_broadcast_help": "Enable directed broadcast",
+        "enable_proxy_arp": "Enable Proxy ARP",
+        "enable_proxy_arp_help": "Enable proxy ARP",
+        "proxy_arp_pvlan": "Proxy ARP PVLAN",
+        "proxy_arp_pvlan_help": "Proxy ARP PVLAN",
+        "source_validation": "IP Source Validation",
+        "source_validation_placeholder": "Select source validation",
+        "source_validation_help": "IP source validation"
+      },
+      "ipv6": {
+        "accept_dad": "IPv6 Accept DAD",
+        "accept_dad_help": "IPv6 DAD accept setting",
+        "autoconf": "IPv6 Address Autoconf",
+        "autoconf_help": "Enable IPv6 address autoconfiguration",
+        "eui64": "IPv6 EUI-64 Address",
+        "eui64_placeholder": "Enter EUI-64 address",
+        "eui64_help": "IPv6 EUI-64 address",
+        "no_default_link_local": "Disable Default Link-Local",
+        "no_default_link_local_help": "Disable default link-local address",
+        "adjust_mss": "IPv6 MSS Adjustment",
+        "adjust_mss_placeholder": "Enter MSS value",
+        "adjust_mss_help": "IPv6 MSS adjustment",
+        "base_reachable_time": "IPv6 Base Reachable Time",
+        "base_reachable_time_help": "IPv6 base reachable time (seconds)",
+        "disable_forwarding": "IPv6 Disable Forwarding",
+        "disable_forwarding_help": "IPv6 disable forwarding",
+        "dup_addr_detect_transmits": "IPv6 DAD Transmits",
+        "dup_addr_detect_transmits_help": "IPv6 duplicate address detection transmits",
+        "source_validation": "IPv6 Source Validation",
+        "source_validation_placeholder": "Select source validation",
+        "source_validation_help": "IPv6 source validation"
+      },
+      "mirror": {
+        "egress": "Mirror Egress",
+        "egress_help": "Egress traffic mirror interface",
+        "ingress": "Mirror Ingress",
+        "ingress_help": "Ingress traffic mirror interface",
+        "target_placeholder": "Select mirror interface"
+      },
+      "other": {
+        "redirect": "Redirect",
+        "redirect_help": "Redirect interface",
+        "vrf": "VRF",
+        "vrf_placeholder": "Enter VRF",
+        "vrf_help": "VRF name",
+        "target_placeholder": "Select interface"
+      },
+      "peer": {
+        "name": "Name",
+        "name_placeholder": "Enter peer name",
+        "public_key": "Public Key",
+        "public_key_placeholder": "Enter public key",
+        "preshared_key": "Preshared Key",
+        "preshared_key_placeholder": "Enter preshared key",
+        "address": "Address",
+        "address_placeholder": "Enter address",
+        "allowed_ips": "Allowed IPs",
+        "allowed_ips_placeholder": "Enter allowed IPs (one per line)",
+        "allowed_ips_help": "Allowed IP addresses",
+        "host_name": "Host Name",
+        "host_name_help": "FQDN host name",
+        "port": "Port",
+        "persistent_keepalive": "Persistent Keepalive",
+        "persistent_keepalive_help": "Persistent keepalive interval (seconds)",
+        "description": "Description",
+        "description_placeholder": "Enter description",
+        "disable": "Disable",
+        "disable_help": "Disable this peer",
+        "modal": {
+          "edit": "Edit Peer",
+          "create": "Create Peer"
+        }
+      },
+      "modal": {
+        "edit": "Edit WireGuard Interface",
+        "create": "Create WireGuard Interface",
+        "confirm_delete": "Confirm Delete"
+      },
+      "delete": {
+        "confirm_interface": "Confirm delete selected WireGuard interfaces?",
+        "confirm_peer": "Confirm delete selected peers?"
+      },
+      "command": {
+        "no_config": "# No parameters configured"
+      },
+      "errors": {
+        "error_message": "Error code: {code}, Error message: {detail}",
+        "name_required": "Please enter WireGuard interface name",
+        "select_for_delete": "Please select interfaces to delete",
+        "peer_name_required": "Please enter peer name",
+        "public_key_required": "Please enter public key"
+      },
+      "options": {
+        "source_validation": {
+          "strict": "Strict",
+          "loose": "Loose",
+          "disable": "Disable"
+        },
+        "accept_dad": {
+          "0": "Disable",
+          "1": "Enable",
+          "2": "Force"
+        }
+      }
+    }
+  },
+  "de": {
+    "wireguard": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "port": "Port",
+        "mtu": "MTU",
+        "peer_count": "Peer Count",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "peer_columns": {
+        "name": "Name",
+        "public_key": "Public Key",
+        "address": "Address",
+        "port": "Port",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ipv4": "IPv4 Params",
+        "ipv6": "IPv6 Params",
+        "peer": "Peer",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "basic": {
+        "name": "Name",
+        "name_placeholder": "Enter WireGuard interface name",
+        "name_help": "WireGuard interface name",
+        "description": "Description",
+        "description_placeholder": "Enter description",
+        "private_key": "Private Key",
+        "private_key_placeholder": "Enter private key",
+        "private_key_help": "WireGuard private key",
+        "port": "Port",
+        "port_help": "Listen port (1-65535)",
+        "fwmark": "Firewall Mark",
+        "fwmark_help": "Firewall mark value (0-4294967295)",
+        "max_dns_retry": "Max DNS Retry",
+        "max_dns_retry_help": "Max DNS retry count (1-15)",
+        "mtu": "MTU",
+        "mtu_help": "MTU value (68-16000)",
+        "per_client_thread": "Per-Client Thread",
+        "per_client_thread_help": "Create separate thread per peer",
+        "disable": "Disable",
+        "disable_help": "Disable this interface"
+      },
+      "ip": {
+        "adjust_mss": "IP MSS Adjustment",
+        "adjust_mss_placeholder": "Enter MSS value",
+        "adjust_mss_help": "Adjust TCP MSS value",
+        "arp_cache_timeout": "ARP Cache Timeout",
+        "arp_cache_timeout_help": "ARP cache timeout (seconds)",
+        "disable_arp_filter": "Disable ARP Filter",
+        "disable_arp_filter_help": "Disable ARP filtering",
+        "disable_forwarding": "Disable Forwarding",
+        "disable_forwarding_help": "Disable IP forwarding",
+        "enable_arp_accept": "Enable ARP Accept",
+        "enable_arp_accept_help": "Enable ARP accept",
+        "enable_arp_announce": "Enable ARP Announce",
+        "enable_arp_announce_help": "Enable ARP announce",
+        "enable_arp_ignore": "Enable ARP Ignore",
+        "enable_arp_ignore_help": "Enable ARP ignore",
+        "enable_directed_broadcast": "Enable Directed Broadcast",
+        "enable_directed_broadcast_help": "Enable directed broadcast",
+        "enable_proxy_arp": "Enable Proxy ARP",
+        "enable_proxy_arp_help": "Enable proxy ARP",
+        "proxy_arp_pvlan": "Proxy ARP PVLAN",
+        "proxy_arp_pvlan_help": "Proxy ARP PVLAN",
+        "source_validation": "IP Source Validation",
+        "source_validation_placeholder": "Select source validation",
+        "source_validation_help": "IP source validation"
+      },
+      "ipv6": {
+        "accept_dad": "IPv6 Accept DAD",
+        "accept_dad_help": "IPv6 DAD accept setting",
+        "autoconf": "IPv6 Address Autoconf",
+        "autoconf_help": "Enable IPv6 address autoconfiguration",
+        "eui64": "IPv6 EUI-64 Address",
+        "eui64_placeholder": "Enter EUI-64 address",
+        "eui64_help": "IPv6 EUI-64 address",
+        "no_default_link_local": "Disable Default Link-Local",
+        "no_default_link_local_help": "Disable default link-local address",
+        "adjust_mss": "IPv6 MSS Adjustment",
+        "adjust_mss_placeholder": "Enter MSS value",
+        "adjust_mss_help": "IPv6 MSS adjustment",
+        "base_reachable_time": "IPv6 Base Reachable Time",
+        "base_reachable_time_help": "IPv6 base reachable time (seconds)",
+        "disable_forwarding": "IPv6 Disable Forwarding",
+        "disable_forwarding_help": "IPv6 disable forwarding",
+        "dup_addr_detect_transmits": "IPv6 DAD Transmits",
+        "dup_addr_detect_transmits_help": "IPv6 duplicate address detection transmits",
+        "source_validation": "IPv6 Source Validation",
+        "source_validation_placeholder": "Select source validation",
+        "source_validation_help": "IPv6 source validation"
+      },
+      "mirror": {
+        "egress": "Mirror Egress",
+        "egress_help": "Egress traffic mirror interface",
+        "ingress": "Mirror Ingress",
+        "ingress_help": "Ingress traffic mirror interface",
+        "target_placeholder": "Select mirror interface"
+      },
+      "other": {
+        "redirect": "Redirect",
+        "redirect_help": "Redirect interface",
+        "vrf": "VRF",
+        "vrf_placeholder": "Enter VRF",
+        "vrf_help": "VRF name",
+        "target_placeholder": "Select interface"
+      },
+      "peer": {
+        "name": "Name",
+        "name_placeholder": "Enter peer name",
+        "public_key": "Public Key",
+        "public_key_placeholder": "Enter public key",
+        "preshared_key": "Preshared Key",
+        "preshared_key_placeholder": "Enter preshared key",
+        "address": "Address",
+        "address_placeholder": "Enter address",
+        "allowed_ips": "Allowed IPs",
+        "allowed_ips_placeholder": "Enter allowed IPs (one per line)",
+        "allowed_ips_help": "Allowed IP addresses",
+        "host_name": "Host Name",
+        "host_name_help": "FQDN host name",
+        "port": "Port",
+        "persistent_keepalive": "Persistent Keepalive",
+        "persistent_keepalive_help": "Persistent keepalive interval (seconds)",
+        "description": "Description",
+        "description_placeholder": "Enter description",
+        "disable": "Disable",
+        "disable_help": "Disable this peer",
+        "modal": {
+          "edit": "Edit Peer",
+          "create": "Create Peer"
+        }
+      },
+      "modal": {
+        "edit": "Edit WireGuard Interface",
+        "create": "Create WireGuard Interface",
+        "confirm_delete": "Confirm Delete"
+      },
+      "delete": {
+        "confirm_interface": "Confirm delete selected WireGuard interfaces?",
+        "confirm_peer": "Confirm delete selected peers?"
+      },
+      "command": {
+        "no_config": "# No parameters configured"
+      },
+      "errors": {
+        "error_message": "Error code: {code}, Error message: {detail}",
+        "name_required": "Please enter WireGuard interface name",
+        "select_for_delete": "Please select interfaces to delete",
+        "peer_name_required": "Please enter peer name",
+        "public_key_required": "Please enter public key"
+      },
+      "options": {
+        "source_validation": {
+          "strict": "Strict",
+          "loose": "Loose",
+          "disable": "Disable"
+        },
+        "accept_dad": {
+          "0": "Disable",
+          "1": "Enable",
+          "2": "Force"
+        }
+      }
+    }
+  },
+  "fr": {
+    "wireguard": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "port": "Port",
+        "mtu": "MTU",
+        "peer_count": "Peer Count",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "peer_columns": {
+        "name": "Name",
+        "public_key": "Public Key",
+        "address": "Address",
+        "port": "Port",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ipv4": "IPv4 Params",
+        "ipv6": "IPv6 Params",
+        "peer": "Peer",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "basic": {
+        "name": "Name",
+        "name_placeholder": "Enter WireGuard interface name",
+        "name_help": "WireGuard interface name",
+        "description": "Description",
+        "description_placeholder": "Enter description",
+        "private_key": "Private Key",
+        "private_key_placeholder": "Enter private key",
+        "private_key_help": "WireGuard private key",
+        "port": "Port",
+        "port_help": "Listen port (1-65535)",
+        "fwmark": "Firewall Mark",
+        "fwmark_help": "Firewall mark value (0-4294967295)",
+        "max_dns_retry": "Max DNS Retry",
+        "max_dns_retry_help": "Max DNS retry count (1-15)",
+        "mtu": "MTU",
+        "mtu_help": "MTU value (68-16000)",
+        "per_client_thread": "Per-Client Thread",
+        "per_client_thread_help": "Create separate thread per peer",
+        "disable": "Disable",
+        "disable_help": "Disable this interface"
+      },
+      "ip": {
+        "adjust_mss": "IP MSS Adjustment",
+        "adjust_mss_placeholder": "Enter MSS value",
+        "adjust_mss_help": "Adjust TCP MSS value",
+        "arp_cache_timeout": "ARP Cache Timeout",
+        "arp_cache_timeout_help": "ARP cache timeout (seconds)",
+        "disable_arp_filter": "Disable ARP Filter",
+        "disable_arp_filter_help": "Disable ARP filtering",
+        "disable_forwarding": "Disable Forwarding",
+        "disable_forwarding_help": "Disable IP forwarding",
+        "enable_arp_accept": "Enable ARP Accept",
+        "enable_arp_accept_help": "Enable ARP accept",
+        "enable_arp_announce": "Enable ARP Announce",
+        "enable_arp_announce_help": "Enable ARP announce",
+        "enable_arp_ignore": "Enable ARP Ignore",
+        "enable_arp_ignore_help": "Enable ARP ignore",
+        "enable_directed_broadcast": "Enable Directed Broadcast",
+        "enable_directed_broadcast_help": "Enable directed broadcast",
+        "enable_proxy_arp": "Enable Proxy ARP",
+        "enable_proxy_arp_help": "Enable proxy ARP",
+        "proxy_arp_pvlan": "Proxy ARP PVLAN",
+        "proxy_arp_pvlan_help": "Proxy ARP PVLAN",
+        "source_validation": "IP Source Validation",
+        "source_validation_placeholder": "Select source validation",
+        "source_validation_help": "IP source validation"
+      },
+      "ipv6": {
+        "accept_dad": "IPv6 Accept DAD",
+        "accept_dad_help": "IPv6 DAD accept setting",
+        "autoconf": "IPv6 Address Autoconf",
+        "autoconf_help": "Enable IPv6 address autoconfiguration",
+        "eui64": "IPv6 EUI-64 Address",
+        "eui64_placeholder": "Enter EUI-64 address",
+        "eui64_help": "IPv6 EUI-64 address",
+        "no_default_link_local": "Disable Default Link-Local",
+        "no_default_link_local_help": "Disable default link-local address",
+        "adjust_mss": "IPv6 MSS Adjustment",
+        "adjust_mss_placeholder": "Enter MSS value",
+        "adjust_mss_help": "IPv6 MSS adjustment",
+        "base_reachable_time": "IPv6 Base Reachable Time",
+        "base_reachable_time_help": "IPv6 base reachable time (seconds)",
+        "disable_forwarding": "IPv6 Disable Forwarding",
+        "disable_forwarding_help": "IPv6 disable forwarding",
+        "dup_addr_detect_transmits": "IPv6 DAD Transmits",
+        "dup_addr_detect_transmits_help": "IPv6 duplicate address detection transmits",
+        "source_validation": "IPv6 Source Validation",
+        "source_validation_placeholder": "Select source validation",
+        "source_validation_help": "IPv6 source validation"
+      },
+      "mirror": {
+        "egress": "Mirror Egress",
+        "egress_help": "Egress traffic mirror interface",
+        "ingress": "Mirror Ingress",
+        "ingress_help": "Ingress traffic mirror interface",
+        "target_placeholder": "Select mirror interface"
+      },
+      "other": {
+        "redirect": "Redirect",
+        "redirect_help": "Redirect interface",
+        "vrf": "VRF",
+        "vrf_placeholder": "Enter VRF",
+        "vrf_help": "VRF name",
+        "target_placeholder": "Select interface"
+      },
+      "peer": {
+        "name": "Name",
+        "name_placeholder": "Enter peer name",
+        "public_key": "Public Key",
+        "public_key_placeholder": "Enter public key",
+        "preshared_key": "Preshared Key",
+        "preshared_key_placeholder": "Enter preshared key",
+        "address": "Address",
+        "address_placeholder": "Enter address",
+        "allowed_ips": "Allowed IPs",
+        "allowed_ips_placeholder": "Enter allowed IPs (one per line)",
+        "allowed_ips_help": "Allowed IP addresses",
+        "host_name": "Host Name",
+        "host_name_help": "FQDN host name",
+        "port": "Port",
+        "persistent_keepalive": "Persistent Keepalive",
+        "persistent_keepalive_help": "Persistent keepalive interval (seconds)",
+        "description": "Description",
+        "description_placeholder": "Enter description",
+        "disable": "Disable",
+        "disable_help": "Disable this peer",
+        "modal": {
+          "edit": "Edit Peer",
+          "create": "Create Peer"
+        }
+      },
+      "modal": {
+        "edit": "Edit WireGuard Interface",
+        "create": "Create WireGuard Interface",
+        "confirm_delete": "Confirm Delete"
+      },
+      "delete": {
+        "confirm_interface": "Confirm delete selected WireGuard interfaces?",
+        "confirm_peer": "Confirm delete selected peers?"
+      },
+      "command": {
+        "no_config": "# No parameters configured"
+      },
+      "errors": {
+        "error_message": "Error code: {code}, Error message: {detail}",
+        "name_required": "Please enter WireGuard interface name",
+        "select_for_delete": "Please select interfaces to delete",
+        "peer_name_required": "Please enter peer name",
+        "public_key_required": "Please enter public key"
+      },
+      "options": {
+        "source_validation": {
+          "strict": "Strict",
+          "loose": "Loose",
+          "disable": "Disable"
+        },
+        "accept_dad": {
+          "0": "Disable",
+          "1": "Enable",
+          "2": "Force"
+        }
+      }
+    }
+  },
+  "ko": {
+    "wireguard": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "port": "Port",
+        "mtu": "MTU",
+        "peer_count": "Peer Count",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "peer_columns": {
+        "name": "Name",
+        "public_key": "Public Key",
+        "address": "Address",
+        "port": "Port",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ipv4": "IPv4 Params",
+        "ipv6": "IPv6 Params",
+        "peer": "Peer",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "basic": {
+        "name": "Name",
+        "name_placeholder": "Enter WireGuard interface name",
+        "name_help": "WireGuard interface name",
+        "description": "Description",
+        "description_placeholder": "Enter description",
+        "private_key": "Private Key",
+        "private_key_placeholder": "Enter private key",
+        "private_key_help": "WireGuard private key",
+        "port": "Port",
+        "port_help": "Listen port (1-65535)",
+        "fwmark": "Firewall Mark",
+        "fwmark_help": "Firewall mark value (0-4294967295)",
+        "max_dns_retry": "Max DNS Retry",
+        "max_dns_retry_help": "Max DNS retry count (1-15)",
+        "mtu": "MTU",
+        "mtu_help": "MTU value (68-16000)",
+        "per_client_thread": "Per-Client Thread",
+        "per_client_thread_help": "Create separate thread per peer",
+        "disable": "Disable",
+        "disable_help": "Disable this interface"
+      },
+      "ip": {
+        "adjust_mss": "IP MSS Adjustment",
+        "adjust_mss_placeholder": "Enter MSS value",
+        "adjust_mss_help": "Adjust TCP MSS value",
+        "arp_cache_timeout": "ARP Cache Timeout",
+        "arp_cache_timeout_help": "ARP cache timeout (seconds)",
+        "disable_arp_filter": "Disable ARP Filter",
+        "disable_arp_filter_help": "Disable ARP filtering",
+        "disable_forwarding": "Disable Forwarding",
+        "disable_forwarding_help": "Disable IP forwarding",
+        "enable_arp_accept": "Enable ARP Accept",
+        "enable_arp_accept_help": "Enable ARP accept",
+        "enable_arp_announce": "Enable ARP Announce",
+        "enable_arp_announce_help": "Enable ARP announce",
+        "enable_arp_ignore": "Enable ARP Ignore",
+        "enable_arp_ignore_help": "Enable ARP ignore",
+        "enable_directed_broadcast": "Enable Directed Broadcast",
+        "enable_directed_broadcast_help": "Enable directed broadcast",
+        "enable_proxy_arp": "Enable Proxy ARP",
+        "enable_proxy_arp_help": "Enable proxy ARP",
+        "proxy_arp_pvlan": "Proxy ARP PVLAN",
+        "proxy_arp_pvlan_help": "Proxy ARP PVLAN",
+        "source_validation": "IP Source Validation",
+        "source_validation_placeholder": "Select source validation",
+        "source_validation_help": "IP source validation"
+      },
+      "ipv6": {
+        "accept_dad": "IPv6 Accept DAD",
+        "accept_dad_help": "IPv6 DAD accept setting",
+        "autoconf": "IPv6 Address Autoconf",
+        "autoconf_help": "Enable IPv6 address autoconfiguration",
+        "eui64": "IPv6 EUI-64 Address",
+        "eui64_placeholder": "Enter EUI-64 address",
+        "eui64_help": "IPv6 EUI-64 address",
+        "no_default_link_local": "Disable Default Link-Local",
+        "no_default_link_local_help": "Disable default link-local address",
+        "adjust_mss": "IPv6 MSS Adjustment",
+        "adjust_mss_placeholder": "Enter MSS value",
+        "adjust_mss_help": "IPv6 MSS adjustment",
+        "base_reachable_time": "IPv6 Base Reachable Time",
+        "base_reachable_time_help": "IPv6 base reachable time (seconds)",
+        "disable_forwarding": "IPv6 Disable Forwarding",
+        "disable_forwarding_help": "IPv6 disable forwarding",
+        "dup_addr_detect_transmits": "IPv6 DAD Transmits",
+        "dup_addr_detect_transmits_help": "IPv6 duplicate address detection transmits",
+        "source_validation": "IPv6 Source Validation",
+        "source_validation_placeholder": "Select source validation",
+        "source_validation_help": "IPv6 source validation"
+      },
+      "mirror": {
+        "egress": "Mirror Egress",
+        "egress_help": "Egress traffic mirror interface",
+        "ingress": "Mirror Ingress",
+        "ingress_help": "Ingress traffic mirror interface",
+        "target_placeholder": "Select mirror interface"
+      },
+      "other": {
+        "redirect": "Redirect",
+        "redirect_help": "Redirect interface",
+        "vrf": "VRF",
+        "vrf_placeholder": "Enter VRF",
+        "vrf_help": "VRF name",
+        "target_placeholder": "Select interface"
+      },
+      "peer": {
+        "name": "Name",
+        "name_placeholder": "Enter peer name",
+        "public_key": "Public Key",
+        "public_key_placeholder": "Enter public key",
+        "preshared_key": "Preshared Key",
+        "preshared_key_placeholder": "Enter preshared key",
+        "address": "Address",
+        "address_placeholder": "Enter address",
+        "allowed_ips": "Allowed IPs",
+        "allowed_ips_placeholder": "Enter allowed IPs (one per line)",
+        "allowed_ips_help": "Allowed IP addresses",
+        "host_name": "Host Name",
+        "host_name_help": "FQDN host name",
+        "port": "Port",
+        "persistent_keepalive": "Persistent Keepalive",
+        "persistent_keepalive_help": "Persistent keepalive interval (seconds)",
+        "description": "Description",
+        "description_placeholder": "Enter description",
+        "disable": "Disable",
+        "disable_help": "Disable this peer",
+        "modal": {
+          "edit": "Edit Peer",
+          "create": "Create Peer"
+        }
+      },
+      "modal": {
+        "edit": "Edit WireGuard Interface",
+        "create": "Create WireGuard Interface",
+        "confirm_delete": "Confirm Delete"
+      },
+      "delete": {
+        "confirm_interface": "Confirm delete selected WireGuard interfaces?",
+        "confirm_peer": "Confirm delete selected peers?"
+      },
+      "command": {
+        "no_config": "# No parameters configured"
+      },
+      "errors": {
+        "error_message": "Error code: {code}, Error message: {detail}",
+        "name_required": "Please enter WireGuard interface name",
+        "select_for_delete": "Please select interfaces to delete",
+        "peer_name_required": "Please enter peer name",
+        "public_key_required": "Please enter public key"
+      },
+      "options": {
+        "source_validation": {
+          "strict": "Strict",
+          "loose": "Loose",
+          "disable": "Disable"
+        },
+        "accept_dad": {
+          "0": "Disable",
+          "1": "Enable",
+          "2": "Force"
+        }
+      }
+    }
+  }
+}

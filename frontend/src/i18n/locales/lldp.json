@@ -1,0 +1,429 @@
+{
+  "zh-CN": {
+    "lldp": {
+      "buttons": {
+        "create": "创建",
+        "delete": "删除",
+        "edit": "编辑"
+      },
+      "columns": {
+        "disable": "禁用",
+        "interface": "接口",
+        "location": "位置"
+      },
+      "errors": {
+        "interfaceEmpty": "接口不能为空",
+        "notFound": "未找到",
+        "selectDelete": "请选择要删除的接口",
+        "selectEdit": "请选择要编辑的接口",
+        "selectInterface": "请选择接口"
+      },
+      "labels": {
+        "disable": "禁用",
+        "interface": "接口",
+        "legacyProtocols": "遗留协议",
+        "location": "位置",
+        "managementAddress": "管理地址",
+        "snmp": "SNMP"
+      },
+      "messages": {
+        "saved": "已保存"
+      },
+      "modal": {
+        "interface": {
+          "title": "接口配置"
+        }
+      },
+      "options": {
+        "notSelected": "未选择",
+        "selectInterface": "请选择接口"
+      },
+      "placeholders": {
+        "managementAddress": "管理地址"
+      },
+      "tabs": {
+        "basic": "基本设置",
+        "interface": "接口"
+      },
+      "titles": {
+        "disable": "禁用",
+        "interface": "接口",
+        "legacyProtocols": "遗留协议",
+        "location": "位置",
+        "managementAddress": "管理地址",
+        "snmp": "SNMP"
+      },
+      "validation": {
+        "ip": "IP 地址格式不正确",
+        "ipv4": "IPv4 地址格式不正确",
+        "ipv6": "IPv6 地址格式不正确"
+      }
+    }
+  },
+  "en": {
+    "lldp": {
+      "buttons": {
+        "create": "Create",
+        "delete": "Delete",
+        "edit": "Edit"
+      },
+      "columns": {
+        "disable": "Disable",
+        "interface": "Interface",
+        "location": "Location"
+      },
+      "errors": {
+        "interfaceEmpty": "Interface cannot be empty",
+        "notFound": "Not Found",
+        "selectDelete": "Please select an interface to delete",
+        "selectEdit": "Please select an interface to edit",
+        "selectInterface": "Please select an interface"
+      },
+      "labels": {
+        "disable": "Disable",
+        "interface": "Interface",
+        "legacyProtocols": "Legacy Protocols",
+        "location": "Location",
+        "managementAddress": "Management Address",
+        "snmp": "SNMP"
+      },
+      "messages": {
+        "saved": "Saved"
+      },
+      "modal": {
+        "interface": {
+          "title": "Interface Configuration"
+        }
+      },
+      "options": {
+        "notSelected": "Not Selected",
+        "selectInterface": "Please select an interface"
+      },
+      "placeholders": {
+        "managementAddress": "Management Address"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "interface": "Interface"
+      },
+      "titles": {
+        "disable": "Disable",
+        "interface": "Interface",
+        "legacyProtocols": "Legacy Protocols",
+        "location": "Location",
+        "managementAddress": "Management Address",
+        "snmp": "SNMP"
+      },
+      "validation": {
+        "ip": "Invalid IP address format",
+        "ipv4": "Invalid IPv4 address format",
+        "ipv6": "Invalid IPv6 address format"
+      }
+    }
+  },
+  "zh-TW": {
+    "lldp": {
+      "buttons": {
+        "create": "創建",
+        "delete": "刪除",
+        "edit": "編輯"
+      },
+      "columns": {
+        "disable": "禁用",
+        "interface": "接口",
+        "location": "位置"
+      },
+      "errors": {
+        "interfaceEmpty": "接口不能為空",
+        "notFound": "未找到",
+        "selectDelete": "請選擇要刪除的接口",
+        "selectEdit": "請選擇要編輯的接口",
+        "selectInterface": "請選擇接口"
+      },
+      "labels": {
+        "disable": "禁用",
+        "interface": "接口",
+        "legacyProtocols": "遺留協議",
+        "location": "位置",
+        "managementAddress": "管理地址",
+        "snmp": "SNMP"
+      },
+      "messages": {
+        "saved": "已保存"
+      },
+      "modal": {
+        "interface": {
+          "title": "接口配置"
+        }
+      },
+      "options": {
+        "notSelected": "未選擇",
+        "selectInterface": "請選擇接口"
+      },
+      "placeholders": {
+        "managementAddress": "管理地址"
+      },
+      "tabs": {
+        "basic": "基本設置",
+        "interface": "接口"
+      },
+      "titles": {
+        "disable": "禁用",
+        "interface": "接口",
+        "legacyProtocols": "遺留協議",
+        "location": "位置",
+        "managementAddress": "管理地址",
+        "snmp": "SNMP"
+      },
+      "validation": {
+        "ip": "IP 地址格式不正確",
+        "ipv4": "IPv4 地址格式不正確",
+        "ipv6": "IPv6 地址格式不正確"
+      }
+    }
+  },
+  "ru": {
+    "lldp": {
+      "buttons": {
+        "create": "Создать",
+        "delete": "Удалить",
+        "edit": "Редактировать"
+      },
+      "columns": {
+        "disable": "Отключено",
+        "interface": "Интерфейс",
+        "location": "Расположение"
+      },
+      "errors": {
+        "interfaceEmpty": "Интерфейс не может быть пустым",
+        "notFound": "Не найдено",
+        "selectDelete": "Выберите интерфейс для удаления",
+        "selectEdit": "Выберите интерфейс для редактирования",
+        "selectInterface": "Выберите интерфейс"
+      },
+      "labels": {
+        "disable": "Отключено",
+        "interface": "Интерфейс",
+        "legacyProtocols": "Устаревшие протоколы",
+        "location": "Расположение",
+        "managementAddress": "Адрес управления",
+        "snmp": "SNMP"
+      },
+      "messages": {
+        "saved": "Сохранено"
+      },
+      "modal": {
+        "interface": {
+          "title": "Настройка интерфейса"
+        }
+      },
+      "options": {
+        "notSelected": "Не выбрано",
+        "selectInterface": "Выберите интерфейс"
+      },
+      "placeholders": {
+        "managementAddress": "Адрес управления"
+      },
+      "tabs": {
+        "basic": "Основные",
+        "interface": "Интерфейс"
+      },
+      "titles": {
+        "disable": "Отключено",
+        "interface": "Интерфейс",
+        "legacyProtocols": "Устаревшие протоколы",
+        "location": "Расположение",
+        "managementAddress": "Адрес управления",
+        "snmp": "SNMP"
+      },
+      "validation": {
+        "ip": "Неверный формат IP-адреса",
+        "ipv4": "Неверный формат IPv4-адреса",
+        "ipv6": "Неверный формат IPv6-адреса"
+      }
+    }
+  },
+  "de": {
+    "lldp": {
+      "buttons": {
+        "create": "Erstellen",
+        "delete": "Löschen",
+        "edit": "Bearbeiten"
+      },
+      "columns": {
+        "disable": "Deaktiviert",
+        "interface": "Schnittstelle",
+        "location": "Standort"
+      },
+      "errors": {
+        "interfaceEmpty": "Schnittstelle darf nicht leer sein",
+        "notFound": "Nicht gefunden",
+        "selectDelete": "Bitte Schnittstelle zum Löschen auswählen",
+        "selectEdit": "Bitte Schnittstelle zum Bearbeiten auswählen",
+        "selectInterface": "Bitte Schnittstelle auswählen"
+      },
+      "labels": {
+        "disable": "Deaktiviert",
+        "interface": "Schnittstelle",
+        "legacyProtocols": "Legacy-Protokolle",
+        "location": "Standort",
+        "managementAddress": "Verwaltungsadresse",
+        "snmp": "SNMP"
+      },
+      "messages": {
+        "saved": "Gespeichert"
+      },
+      "modal": {
+        "interface": {
+          "title": "Schnittstellenkonfiguration"
+        }
+      },
+      "options": {
+        "notSelected": "Nicht ausgewählt",
+        "selectInterface": "Bitte Schnittstelle auswählen"
+      },
+      "placeholders": {
+        "managementAddress": "Verwaltungsadresse"
+      },
+      "tabs": {
+        "basic": "Allgemein",
+        "interface": "Schnittstelle"
+      },
+      "titles": {
+        "disable": "Deaktiviert",
+        "interface": "Schnittstelle",
+        "legacyProtocols": "Legacy-Protokolle",
+        "location": "Standort",
+        "managementAddress": "Verwaltungsadresse",
+        "snmp": "SNMP"
+      },
+      "validation": {
+        "ip": "Ungültiges IP-Adressformat",
+        "ipv4": "Ungültiges IPv4-Adressformat",
+        "ipv6": "Ungültiges IPv6-Adressformat"
+      }
+    }
+  },
+  "fr": {
+    "lldp": {
+      "buttons": {
+        "create": "Créer",
+        "delete": "Supprimer",
+        "edit": "Modifier"
+      },
+      "columns": {
+        "disable": "Désactivé",
+        "interface": "Interface",
+        "location": "Emplacement"
+      },
+      "errors": {
+        "interfaceEmpty": "L'interface ne peut pas être vide",
+        "notFound": "Introuvable",
+        "selectDelete": "Veuillez sélectionner une interface à supprimer",
+        "selectEdit": "Veuillez sélectionner une interface à modifier",
+        "selectInterface": "Veuillez sélectionner une interface"
+      },
+      "labels": {
+        "disable": "Désactivé",
+        "interface": "Interface",
+        "legacyProtocols": "Protocoles hérités",
+        "location": "Emplacement",
+        "managementAddress": "Adresse de gestion",
+        "snmp": "SNMP"
+      },
+      "messages": {
+        "saved": "Enregistré"
+      },
+      "modal": {
+        "interface": {
+          "title": "Configuration de l'interface"
+        }
+      },
+      "options": {
+        "notSelected": "Non sélectionné",
+        "selectInterface": "Veuillez sélectionner une interface"
+      },
+      "placeholders": {
+        "managementAddress": "Adresse de gestion"
+      },
+      "tabs": {
+        "basic": "Paramètres de base",
+        "interface": "Interface"
+      },
+      "titles": {
+        "disable": "Désactivé",
+        "interface": "Interface",
+        "legacyProtocols": "Protocoles hérités",
+        "location": "Emplacement",
+        "managementAddress": "Adresse de gestion",
+        "snmp": "SNMP"
+      },
+      "validation": {
+        "ip": "Format d'adresse IP invalide",
+        "ipv4": "Format d'adresse IPv4 invalide",
+        "ipv6": "Format d'adresse IPv6 invalide"
+      }
+    }
+  },
+  "ko": {
+    "lldp": {
+      "buttons": {
+        "create": "생성",
+        "delete": "삭제",
+        "edit": "편집"
+      },
+      "columns": {
+        "disable": "비활성화",
+        "interface": "인터페이스",
+        "location": "위치"
+      },
+      "errors": {
+        "interfaceEmpty": "인터페이스는 비워둘 수 없습니다",
+        "notFound": "찾을 수 없음",
+        "selectDelete": "삭제할 인터페이스를 선하세요",
+        "selectEdit": "편집할 인터페이스를 선택하세요",
+        "selectInterface": "인터페이스를 선택하세요"
+      },
+      "labels": {
+        "disable": "비활성화",
+        "interface": "인터페이스",
+        "legacyProtocols": "레거시 프로토콜",
+        "location": "위치",
+        "managementAddress": "관리 주소",
+        "snmp": "SNMP"
+      },
+      "messages": {
+        "saved": "저장됨"
+      },
+      "modal": {
+        "interface": {
+          "title": "인터페이스 구성"
+        }
+      },
+      "options": {
+        "notSelected": "선택되지 않음",
+        "selectInterface": "인터페이스를 선하세요"
+      },
+      "placeholders": {
+        "managementAddress": "관리 주소"
+      },
+      "tabs": {
+        "basic": "기본 설정",
+        "interface": "인터페이스"
+      },
+      "titles": {
+        "disable": "비활성화",
+        "interface": "인터페이스",
+        "legacyProtocols": "레거시 프로토콜",
+        "location": "위치",
+        "managementAddress": "관리 주소",
+        "snmp": "SNMP"
+      },
+      "validation": {
+        "ip": "잘못된 IP 주소 형식",
+        "ipv4": "잘못된 IPv4 주소 형식",
+        "ipv6": "잘못된 IPv6 주소 형식"
+      }
+    }
+  }
+}

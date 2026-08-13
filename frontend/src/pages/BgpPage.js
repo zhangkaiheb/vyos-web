@@ -1,10 +1,13 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -21,147 +24,11 @@ function isPresent(value) {
   return true;
 }
 
-function validateIPv4(value) {
-  if (!value) return '';
-  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return 'IPv4 地址格式错误';
-  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return 'IPv4 地址格式错误';
-  return '';
-}
+// Validation functions moved inside setup() for i18n access
 
-function validateIPv6(value) {
-  if (!value) return '';
-  const re = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}$|^(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}$|^(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}$|^:(?::[0-9a-fA-F]{1,4}){1,7}$|^::$/;
-  if (!re.test(value)) return 'IPv6 地址格式错误';
-  return '';
-}
-
-function validateIP(value) {
-  if (!value) return '';
-  if (!validateIPv4(value)) return '';
-  if (!validateIPv6(value)) return '';
-  return 'IP 地址格式错误';
-}
-
-function validateASN(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 4294967294) return 'ASN 必须在 1-4294967294 之间';
-  return '';
-}
-
-function validatePort(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 65535) return '端口必须在 1-65535 之间';
-  return '';
-}
-
-function validateEbgpMultihop(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 255) return 'EBGP 多跳必须在 1-255 之间';
-  return '';
-}
-
-function validateAdvertInterval(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 0 || n > 600) return '广告间隔必须在 0-600 秒之间';
-  return '';
-}
-
-function validateTtlHops(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 254) return 'TTL 安全跳数必须在 1-254 之间';
-  return '';
-}
-
-function validateTimer(value, allowZero) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < (allowZero ? 0 : 1) || n > 65535) return `定时器必须在 ${allowZero ? '0' : '1'}-65535 秒之间`;
-  return '';
-}
-
-function validateBmpMaxRetry(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 100 || n > 4294967295) return '最大重试间隔必须在 100-4294967295 毫秒之间';
-  return '';
-}
-
-function validateBmpMinRetry(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1) return '最小重试间隔必须为正整数 (毫秒)';
-  return '';
-}
-
-function validateVni(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 16777215) return 'VNI 必须在 1-16777215 之间';
-  return '';
-}
-
-function validateDistance(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 255) return '管理距离必须在 1-255 之间';
-  return '';
-}
-
-function validateMaxPaths(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 64) return '最大路径数必须在 1-64 之间';
-  return '';
-}
-
-function validateDampeningHalfLife(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 45) return 'Dampening half-life 必须在 1-45 分钟之间';
-  return '';
-}
-
-function validateDampeningValue(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 20000) return '值必须在 1-20000 之间';
-  return '';
-}
-
-function validateGracefulRestart(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 4095) return '优雅重启时间必须在 1-4095 秒之间';
-  return '';
-}
-
-function validateNetworkCIDR(value) {
-  if (!value) return '';
-  if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/.test(value)) return '网络格式错误，应为 x.x.x.x/x';
-  return '';
-}
-
-function validateConfedId(value) {
-  if (!value) return '';
-  if (/^\d+$/.test(value)) {
-    const n = parseInt(value, 10);
-    if (n < 1 || n > 4294967294) return 'Confederation ID 必须在 1-4294967294 之间';
-  } else if (!validateIPv4(value)) {
-    // valid IPv4 is OK
-  } else {
-    return 'Confederation ID 必须是 ASN 或 IPv4 地址';
-  }
-  return '';
-}
-
-// BGP 配置转换
+// BGP configuration conversion
 function configToForm(data = {}) {
-  // 邻居列表
+  // Neighbor list
   const neighbors = [];
   const neighborData = data.neighbor || {};
   for (const [ip, attrs] of Object.entries(neighborData)) {
@@ -214,7 +81,7 @@ function configToForm(data = {}) {
     });
   }
 
-  // Peer-group 列表
+  // Peer-group list
   const peerGroups = [];
   const peerGroupData = data['peer-group'] || {};
   for (const [name, attrs] of Object.entries(peerGroupData)) {
@@ -1780,6 +1647,148 @@ function configToConfig(form) {
 export default defineComponent({
   name: 'BgpPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
+
+    // Validation functions with i18n
+    function validateIPv4(value) {
+      if (!value) return '';
+      if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return t('bgp.validation.ipv4Format');
+      if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return t('bgp.validation.ipv4Format');
+      return '';
+    }
+
+    function validateIPv6(value) {
+      if (!value) return '';
+      const re = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}$|^(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}$|^(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}$|^:(?::[0-9a-fA-F]{1,4}){1,7}$|^::$/;
+      if (!re.test(value)) return t('bgp.validation.ipv6Format');
+      return '';
+    }
+
+    function validateIP(value) {
+      if (!value) return '';
+      if (!validateIPv4(value)) return '';
+      if (!validateIPv6(value)) return '';
+      return t('bgp.validation.ipFormat');
+    }
+
+    function validateASN(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 4294967294) return t('bgp.validation.asnRange');
+      return '';
+    }
+
+    function validatePort(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 65535) return t('bgp.validation.portRange');
+      return '';
+    }
+
+    function validateEbgpMultihop(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 255) return t('bgp.validation.ebgpMultihopRange');
+      return '';
+    }
+
+    function validateAdvertInterval(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 0 || n > 600) return t('bgp.validation.advertIntervalRange');
+      return '';
+    }
+
+    function validateTtlHops(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 254) return t('bgp.validation.ttlHopsRange');
+      return '';
+    }
+
+    function validateTimer(value, allowZero) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < (allowZero ? 0 : 1) || n > 65535) return t('bgp.validation.timerRange');
+      return '';
+    }
+
+    function validateBmpMaxRetry(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 100 || n > 4294967295) return t('bgp.validation.bmpMaxRetryRange');
+      return '';
+    }
+
+    function validateBmpMinRetry(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1) return t('bgp.validation.bmpMinRetryRange');
+      return '';
+    }
+
+    function validateVni(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 16777215) return t('bgp.validation.vniRange');
+      return '';
+    }
+
+    function validateDistance(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 255) return t('bgp.validation.distanceRange');
+      return '';
+    }
+
+    function validateMaxPaths(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 64) return t('bgp.validation.maxPathsRange');
+      return '';
+    }
+
+    function validateDampeningHalfLife(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 45) return t('bgp.validation.dampeningHalfLifeRange');
+      return '';
+    }
+
+    function validateDampeningValue(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 20000) return t('bgp.validation.dampeningValueRange');
+      return '';
+    }
+
+    function validateGracefulRestart(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 4095) return t('bgp.validation.gracefulRestartRange');
+      return '';
+    }
+
+    function validateNetworkCIDR(value) {
+      if (!value) return '';
+      if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/.test(value)) return t('bgp.validation.networkCidrFormat');
+      return '';
+    }
+
+    function validateConfedId(value) {
+      if (!value) return '';
+      if (/^\d+$/.test(value)) {
+        const n = parseInt(value, 10);
+        if (n < 1 || n > 4294967294) return t('bgp.validation.confedIdRange');
+      } else if (!validateIPv4(value)) {
+        // valid IPv4 is OK
+      } else {
+        return t('bgp.validation.confedIdFormat');
+      }
+      return '';
+    }
+
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -1868,6 +1877,46 @@ export default defineComponent({
     const editingIpv6RedistributeIndex = ref(-1);
     const ipv6RedistributeForm = ref({ protocol: '', metric: '', 'route-map': '' });
 
+    // Delete confirmation modals
+    const deleteNeighborModalVisible = ref(false);
+    const pendingDeleteNeighborNames = ref([]);
+    const deletePeerGroupModalVisible = ref(false);
+    const pendingDeletePeerGroupNames = ref([]);
+    const deleteBmpModalVisible = ref(false);
+    const pendingDeleteBmpNames = ref([]);
+    const deleteListenModalVisible = ref(false);
+    const pendingDeleteListenNames = ref([]);
+    const deleteNetworkModalVisible = ref(false);
+    const pendingDeleteNetworkNames = ref([]);
+    const deleteAggregateModalVisible = ref(false);
+    const pendingDeleteAggregateNames = ref([]);
+    const deleteInterfaceModalVisible = ref(false);
+    const pendingDeleteInterfaceNames = ref([]);
+    const deleteRedistributeModalVisible = ref(false);
+    const pendingDeleteRedistributeNames = ref([]);
+    const deleteIpv6NetworkModalVisible = ref(false);
+    const pendingDeleteIpv6NetworkNames = ref([]);
+    const deleteIpv6AggregateModalVisible = ref(false);
+    const pendingDeleteIpv6AggregateNames = ref([]);
+    const deleteIpv6RedistributeModalVisible = ref(false);
+    const pendingDeleteIpv6RedistributeNames = ref([]);
+    const deleteIpv6DistancePrefixModalVisible = ref(false);
+    const pendingDeleteIpv6DistancePrefixNames = ref([]);
+    const deleteIpv4MulticastDistancePrefixModalVisible = ref(false);
+    const pendingDeleteIpv4MulticastDistancePrefixNames = ref([]);
+    const deleteIpv6MulticastDistancePrefixModalVisible = ref(false);
+    const pendingDeleteIpv6MulticastDistancePrefixNames = ref([]);
+    const deleteIpv4VpnNetworkModalVisible = ref(false);
+    const pendingDeleteIpv4VpnNetworkNames = ref([]);
+    const deleteIpv6VpnNetworkModalVisible = ref(false);
+    const pendingDeleteIpv6VpnNetworkNames = ref([]);
+    const deleteEvpnRtModalVisible = ref(false);
+    const pendingDeleteEvpnRtNames = ref([]);
+    const deleteEvpnVniModalVisible = ref(false);
+    const pendingDeleteEvpnVniNames = ref([]);
+    const deleteEvpnVniRtModalVisible = ref(false);
+    const pendingDeleteEvpnVniRtNames = ref([]);
+
     // Helper function to create address family data structures
     function createAddressFamilyData(prefix, isIPv6 = false) {
       const data = {
@@ -1880,22 +1929,22 @@ export default defineComponent({
         [`${prefix}RedistributeModalVisible`]: ref(false),
         [`editing${prefix.charAt(0).toUpperCase()}${prefix.slice(1)}RedistributeIndex`]: ref(-1),
         [`${prefix}RedistributeForm`]: ref({ protocol: '', metric: '', 'route-map': '' }),
-        [`${prefix}NetworkColumns`]: [
-          { key: 'network', title: isIPv6 ? 'IPv6 网络' : '网络' },
-          { key: 'backdoor', title: '后门' },
-          { key: 'route-map', title: '路由映射' },
-        ],
-        [`${prefix}AggregateColumns`]: [
-          { key: 'aggregate', title: isIPv6 ? 'IPv6 聚合网络' : '聚合网络' },
-          { key: 'as-set', title: 'AS Set' },
-          { key: 'summary-only', title: '仅汇总' },
-          { key: 'route-map', title: '路由映射' },
-        ],
-        [`${prefix}RedistributeColumns`]: [
-          { key: 'protocol', title: '协议' },
-          { key: 'metric', title: '度量值' },
-          { key: 'route-map', title: '路由映射' },
-        ],
+        [`${prefix}NetworkColumns`]: computed(() => [
+          { key: 'network', title: isIPv6 ? t('routing.bgp.col.ipv6Network') : t('routing.bgp.col.network') },
+          { key: 'backdoor', title: t('routing.bgp.col.backdoor') },
+          { key: 'route-map', title: t('routing.bgp.col.routeMap') },
+        ]),
+        [`${prefix}AggregateColumns`]: computed(() => [
+          { key: 'aggregate', title: isIPv6 ? t('routing.bgp.col.ipv6AggregateNetwork') : t('routing.bgp.col.aggregateNetwork') },
+          { key: 'as-set', title: t('routing.bgp.col.asSet') },
+          { key: 'summary-only', title: t('routing.bgp.col.summaryOnly') },
+          { key: 'route-map', title: t('routing.bgp.col.routeMap') },
+        ]),
+        [`${prefix}RedistributeColumns`]: computed(() => [
+          { key: 'protocol', title: t('routing.bgp.col.protocol') },
+          { key: 'metric', title: t('routing.bgp.col.metric') },
+          { key: 'route-map', title: t('routing.bgp.col.routeMap') },
+        ]),
       };
       return data;
     }
@@ -1909,10 +1958,10 @@ export default defineComponent({
     const ipv4MulticastDistancePrefixModalVisible = ref(false);
     const editingIpv4MulticastDistancePrefixIndex = ref(-1);
     const ipv4MulticastDistancePrefixForm = ref({ prefix: '', distance: '' });
-    const ipv4MulticastDistancePrefixColumns = [
-      { key: 'prefix', title: '前缀' },
-      { key: 'distance', title: '管理距离 (1-255)' },
-    ];
+    const ipv4MulticastDistancePrefixColumns = computed(() => [
+      { key: 'prefix', title: t('routing.bgp.col.prefix') },
+      { key: 'distance', title: t('routing.bgp.col.administrativeDistance') },
+    ]);
 
     function createDistancePrefixIpv4Multicast() {
       editingIpv4MulticastDistancePrefixIndex.value = -1;
@@ -1935,9 +1984,9 @@ export default defineComponent({
 
     function saveDistancePrefixIpv4Multicast() {
       const form = ipv4MulticastDistancePrefixForm.value;
-      if (!form.prefix) { alert('请填写前缀'); return; }
-      if (!/^\d+\.\d+\.\d+\.\d+\/\d+$/.test(form.prefix)) { alert('前缀格式无效，应为 x.x.x.x/x'); return; }
-      if (!form.distance || form.distance < 1 || form.distance > 255) { alert('管理距离应为 1-255'); return; }
+      if (!form.prefix) return showError({ message: t('routing.bgp.error.prefixRequired') })
+      if (!/^\d+\.\d+\.\d+\.\d+\/\d+$/.test(form.prefix)) { showError({ message: t('routing.bgp.error.prefixFormatInvalid') }); return; }
+      if (!form.distance || form.distance < 1 || form.distance > 255) return showError({ message: t('routing.bgp.error.distanceRange') })
 
       const idx = editingIpv4MulticastDistancePrefixIndex.value;
       if (idx >= 0) {
@@ -1952,10 +2001,10 @@ export default defineComponent({
     const ipv6MulticastDistancePrefixModalVisible = ref(false);
     const editingIpv6MulticastDistancePrefixIndex = ref(-1);
     const ipv6MulticastDistancePrefixForm = ref({ prefix: '', distance: '' });
-    const ipv6MulticastDistancePrefixColumns = [
-      { key: 'prefix', title: '前缀' },
-      { key: 'distance', title: '管理距离 (1-255)' },
-    ];
+    const ipv6MulticastDistancePrefixColumns = computed(() => [
+      { key: 'prefix', title: t('routing.bgp.col.prefix') },
+      { key: 'distance', title: t('routing.bgp.col.administrativeDistance') },
+    ]);
 
     function createDistancePrefixIpv6Multicast() {
       editingIpv6MulticastDistancePrefixIndex.value = -1;
@@ -1978,9 +2027,9 @@ export default defineComponent({
 
     function saveDistancePrefixIpv6Multicast() {
       const form = ipv6MulticastDistancePrefixForm.value;
-      if (!form.prefix) { alert('请填写前缀'); return; }
-      if (!/^[0-9a-fA-F:]+\/\d+$/.test(form.prefix)) { alert('前缀格式无效，应为 IPv6 前缀'); return; }
-      if (!form.distance || form.distance < 1 || form.distance > 255) { alert('管理距离应为 1-255'); return; }
+      if (!form.prefix) return showError({ message: t('routing.bgp.error.prefixRequired') })
+      if (!/^[0-9a-fA-F:]+\/\d+$/.test(form.prefix)) { showError({ message: t('routing.bgp.error.ipv6PrefixFormatInvalid') }); return; }
+      if (!form.distance || form.distance < 1 || form.distance > 255) return showError({ message: t('routing.bgp.error.distanceRange') })
 
       const idx = editingIpv6MulticastDistancePrefixIndex.value;
       if (idx >= 0) {
@@ -1993,11 +2042,11 @@ export default defineComponent({
 
     const ipv4VpnData = createAddressFamilyData('ipv4Vpn', false);
     // Override ipv4-vpn network columns and form for label and rd
-    ipv4VpnData.ipv4VpnNetworkColumns = [
-      { key: 'network', title: '网络' },
-      { key: 'label', title: 'MPLS 标签 (0-1048575)' },
-      { key: 'rd', title: '路由区分器 (ASN:NN 或 IP:NN)' },
-    ];
+    ipv4VpnData.ipv4VpnNetworkColumns = computed(() => [
+      { key: 'network', title: t('routing.bgp.col.network') },
+      { key: 'label', title: t('routing.bgp.col.mplsLabel') },
+      { key: 'rd', title: t('routing.bgp.col.routeDistinguisher') },
+    ]);
     ipv4VpnData.ipv4VpnNetworkForm = ref({ network: '', label: '', rd: '' });
 
     // Custom ipv4-vpn network operations (data stored in address-family)
@@ -2016,30 +2065,36 @@ export default defineComponent({
 
     function deleteNetworksIpv4Vpn(rows) {
       if (!rows.length) return;
-      if (!confirm('确认删除选中的网络？')) return;
-      const toDelete = new Set(rows.map(r => r.network));
+      pendingDeleteIpv4VpnNetworkNames.value = rows.map(r => r.network);
+      deleteIpv4VpnNetworkModalVisible.value = true;
+    }
+
+    function confirmRemoveIpv4VpnNetwork() {
+      deleteIpv4VpnNetworkModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteIpv4VpnNetworkNames.value);
       config['address-family']['ipv4-vpn'].networks =
         config['address-family']['ipv4-vpn'].networks.filter(n => !toDelete.has(n.network));
+      pendingDeleteIpv4VpnNetworkNames.value = [];
     }
 
     function saveNetworkIpv4Vpn() {
       const form = ipv4VpnNetworkForm.value;
       const network = String(form.network || '').trim();
-      if (!network) return alert('请输入网络地址');
+      if (!network) return showError({ message: t('routing.bgp.error.networkRequired') });
       if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/.test(network)) {
-        return alert('网络格式错误，应为 x.x.x.x/x');
+        return showError({ message: t('routing.bgp.error.networkFormatInvalid') });
       }
       if (form.label !== '' && form.label !== undefined) {
         const label = parseInt(form.label);
         if (isNaN(label) || label < 0 || label > 1048575) {
-          return alert('MPLS 标签值应为 0-1048575');
+          return showError({ message: t('routing.bgp.error.mplsLabelRange') });
         }
       }
 
       const duplicate = config['address-family']['ipv4-vpn'].networks.find(
         (n, i) => n.network === network && i !== editingIpv4VpnNetworkIndex.value
       );
-      if (duplicate) return alert('该网络已存在');
+      if (duplicate) return showError({ message: t('routing.bgp.error.networkExists') });
 
       const newNet = { network, label: form.label || '', rd: form.rd || '' };
       if (editingIpv4VpnNetworkIndex.value >= 0) {
@@ -2055,11 +2110,11 @@ export default defineComponent({
     const ipv6MulticastData = createAddressFamilyData('ipv6Multicast', true);
     const ipv6VpnData = createAddressFamilyData('ipv6Vpn', true);
     // Override ipv6-vpn network columns and form for label and rd
-    ipv6VpnData.ipv6VpnNetworkColumns = [
-      { key: 'network', title: '网络' },
-      { key: 'label', title: 'MPLS 标签 (0-1048575)' },
-      { key: 'rd', title: '路由区分器 (ASN:NN 或 IP:NN)' },
-    ];
+    ipv6VpnData.ipv6VpnNetworkColumns = computed(() => [
+      { key: 'network', title: t('routing.bgp.col.network') },
+      { key: 'label', title: t('routing.bgp.col.mplsLabel') },
+      { key: 'rd', title: t('routing.bgp.col.routeDistinguisher') },
+    ]);
     ipv6VpnData.ipv6VpnNetworkForm = ref({ network: '', label: '', rd: '' });
 
     // Custom ipv6-vpn network operations (data stored in address-family)
@@ -2078,30 +2133,36 @@ export default defineComponent({
 
     function deleteNetworksIpv6Vpn(rows) {
       if (!rows.length) return;
-      if (!confirm('确认删除选中的网络？')) return;
-      const toDelete = new Set(rows.map(r => r.network));
+      pendingDeleteIpv6VpnNetworkNames.value = rows.map(r => r.network);
+      deleteIpv6VpnNetworkModalVisible.value = true;
+    }
+
+    function confirmRemoveIpv6VpnNetwork() {
+      deleteIpv6VpnNetworkModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteIpv6VpnNetworkNames.value);
       config['address-family']['ipv6-vpn'].networks =
         config['address-family']['ipv6-vpn'].networks.filter(n => !toDelete.has(n.network));
+      pendingDeleteIpv6VpnNetworkNames.value = [];
     }
 
     function saveNetworkIpv6Vpn() {
       const form = ipv6VpnNetworkForm.value;
       const network = String(form.network || '').trim();
-      if (!network) return alert('请输入网络地址');
+      if (!network) return showError({ message: t('routing.bgp.error.networkRequired') });
       if (!/^[0-9a-fA-F:]+\/\d+$/.test(network)) {
-        return alert('IPv6 网络格式错误，应为 h:h:h:h:h:h:h:h/x');
+        return showError({ message: t('routing.bgp.error.ipv6NetworkFormatInvalid') });
       }
       if (form.label !== '' && form.label !== undefined) {
         const label = parseInt(form.label);
         if (isNaN(label) || label < 0 || label > 1048575) {
-          return alert('MPLS 标签值应为 0-1048575');
+          return showError({ message: t('routing.bgp.error.mplsLabelRange') });
         }
       }
 
       const duplicate = config['address-family']['ipv6-vpn'].networks.find(
         (n, i) => n.network === network && i !== editingIpv6VpnNetworkIndex.value
       );
-      if (duplicate) return alert('该网络已存在');
+      if (duplicate) return showError({ message: t('routing.bgp.error.networkExists') });
 
       const newNet = { network, label: form.label || '', rd: form.rd || '' };
       if (editingIpv6VpnNetworkIndex.value >= 0) {
@@ -2178,97 +2239,97 @@ export default defineComponent({
     const evpnVniRtForm = ref({ direction: 'both', 'route-target': '' });
     const currentVniIndex = ref(-1);
 
-    const neighborColumns = [
-      { key: 'address', title: '邻居地址' },
-      { key: 'remote-as', title: '远程 ASN' },
-      { key: 'description', title: '描述' },
-      { key: 'peer-group', title: 'Peer Group' },
-      { key: 'state', title: '状态' },
-    ];
+    const neighborColumns = computed(() => [
+      { key: 'address', title: t('routing.bgp.col.neighborAddress') },
+      { key: 'remote-as', title: t('routing.bgp.col.remoteAsn') },
+      { key: 'description', title: t('routing.bgp.col.description') },
+      { key: 'peer-group', title: t('routing.bgp.col.peerGroup') },
+      { key: 'state', title: t('routing.bgp.col.state') },
+    ]);
 
-    const peerGroupColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'remote-as', title: '远程 ASN' },
-      { key: 'description', title: '描述' },
-    ];
+    const peerGroupColumns = computed(() => [
+      { key: 'name', title: t('routing.bgp.col.name') },
+      { key: 'remote-as', title: t('routing.bgp.col.remoteAsn') },
+      { key: 'description', title: t('routing.bgp.col.description') },
+    ]);
 
-    const bmpColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'address', title: '地址' },
-      { key: 'port', title: '端口' },
-    ];
+    const bmpColumns = computed(() => [
+      { key: 'name', title: t('routing.bgp.col.name') },
+      { key: 'address', title: t('routing.bgp.col.address') },
+      { key: 'port', title: t('routing.bgp.col.port') },
+    ]);
 
-    const listenColumns = [
-      { key: 'range', title: '范围' },
-      { key: 'peer-group', title: 'Peer Group' },
-    ];
+    const listenColumns = computed(() => [
+      { key: 'range', title: t('routing.bgp.col.range') },
+      { key: 'peer-group', title: t('routing.bgp.col.peerGroup') },
+    ]);
 
-    const networkColumns = [
-      { key: 'network', title: '网络' },
-      { key: 'backdoor', title: '后门' },
-      { key: 'route-map', title: '路由映射' },
-    ];
+    const networkColumns = computed(() => [
+      { key: 'network', title: t('routing.bgp.col.network') },
+      { key: 'backdoor', title: t('routing.bgp.col.backdoor') },
+      { key: 'route-map', title: t('routing.bgp.col.routeMap') },
+    ]);
 
-    const aggregateColumns = [
-      { key: 'aggregate', title: '聚合网络' },
-      { key: 'as-set', title: 'AS Set' },
-      { key: 'summary-only', title: '仅汇总' },
-      { key: 'route-map', title: '路由映射' },
-    ];
+    const aggregateColumns = computed(() => [
+      { key: 'aggregate', title: t('routing.bgp.col.aggregateNetwork') },
+      { key: 'as-set', title: t('routing.bgp.col.asSet') },
+      { key: 'summary-only', title: t('routing.bgp.col.summaryOnly') },
+      { key: 'route-map', title: t('routing.bgp.col.routeMap') },
+    ]);
 
-    const interfaceColumns = [
-      { key: 'name', title: '接口' },
-      { key: 'mpls-forwarding', title: 'MPLS 转发' },
-    ];
+    const interfaceColumns = computed(() => [
+      { key: 'name', title: t('routing.bgp.col.interface') },
+      { key: 'mpls-forwarding', title: t('routing.bgp.col.mplsForwarding') },
+    ]);
 
-    const ipv6NetworkColumns = [
-      { key: 'network', title: 'IPv6 网络' },
-      { key: 'path-limit', title: '路径限制 (0-255)' },
-      { key: 'route-map', title: '路由映射' },
-    ];
+    const ipv6NetworkColumns = computed(() => [
+      { key: 'network', title: t('routing.bgp.col.ipv6Network') },
+      { key: 'path-limit', title: t('routing.bgp.col.pathLimit') },
+      { key: 'route-map', title: t('routing.bgp.col.routeMap') },
+    ]);
 
-    const ipv6AggregateColumns = [
-      { key: 'aggregate', title: 'IPv6 聚合网络' },
-      { key: 'as-set', title: 'AS Set' },
-      { key: 'summary-only', title: '仅汇总' },
-      { key: 'route-map', title: '路由映射' },
-    ];
+    const ipv6AggregateColumns = computed(() => [
+      { key: 'aggregate', title: t('routing.bgp.col.ipv6AggregateNetwork') },
+      { key: 'as-set', title: t('routing.bgp.col.asSet') },
+      { key: 'summary-only', title: t('routing.bgp.col.summaryOnly') },
+      { key: 'route-map', title: t('routing.bgp.col.routeMap') },
+    ]);
 
-    const ipv6RedistributeColumns = [
-      { key: 'protocol', title: '协议' },
-      { key: 'metric', title: '度量值' },
-      { key: 'route-map', title: '路由映射' },
-    ];
+    const ipv6RedistributeColumns = computed(() => [
+      { key: 'protocol', title: t('routing.bgp.col.protocol') },
+      { key: 'metric', title: t('routing.bgp.col.metric') },
+      { key: 'route-map', title: t('routing.bgp.col.routeMap') },
+    ]);
 
-    const ipv6DistancePrefixColumns = [
-      { key: 'prefix', title: '前缀' },
-      { key: 'distance', title: '管理距离 (1-255)' },
-    ];
+    const ipv6DistancePrefixColumns = computed(() => [
+      { key: 'prefix', title: t('routing.bgp.col.prefix') },
+      { key: 'distance', title: t('routing.bgp.col.administrativeDistance') },
+    ]);
 
-    const evpnRtColumns = [
-      { key: 'direction', title: '方向' },
-      { key: 'route-target', title: 'Route Target' },
-    ];
+    const evpnRtColumns = computed(() => [
+      { key: 'direction', title: t('routing.bgp.col.direction') },
+      { key: 'route-target', title: t('routing.bgp.col.routeTarget') },
+    ]);
 
-    const evpnVniColumns = [
-      { key: 'vni', title: 'VNI' },
-      { key: 'route-targets', title: 'Route Targets' },
-    ];
+    const evpnVniColumns = computed(() => [
+      { key: 'vni', title: t('routing.bgp.col.vni') },
+      { key: 'route-targets', title: t('routing.bgp.col.routeTargets') },
+    ]);
 
-    const EVPN_RT_DIRECTIONS = [
-      { value: 'both', label: 'Both (双向)' },
-      { value: 'export', label: 'Export (导出)' },
-      { value: 'import', label: 'Import (导入)' },
-    ];
+    const EVPN_RT_DIRECTIONS = computed(() => [
+      { value: 'both', label: t('routing.bgp.option.directionBoth') },
+      { value: 'export', label: t('routing.bgp.option.directionExport') },
+      { value: 'import', label: t('routing.bgp.option.directionImport') },
+    ]);
 
-    const LOCAL_ROLE_OPTIONS = [
-      { value: '', label: '-- 无 --' },
-      { value: 'customer', label: 'Customer (Transit)' },
-      { value: 'peer', label: 'Peer (Peering)' },
-      { value: 'provider', label: 'Provider (Transit)' },
-      { value: 'rs-client', label: 'RS Client' },
-      { value: 'rs-server', label: 'Route Server' },
-    ];
+    const LOCAL_ROLE_OPTIONS = computed(() => [
+      { value: '', label: t('routing.bgp.option.localRoleNone') },
+      { value: 'customer', label: t('routing.bgp.option.localRoleCustomer') },
+      { value: 'peer', label: t('routing.bgp.option.localRolePeer') },
+      { value: 'provider', label: t('routing.bgp.option.localRoleProvider') },
+      { value: 'rs-client', label: t('routing.bgp.option.localRoleRsClient') },
+      { value: 'rs-server', label: t('routing.bgp.option.localRoleRsServer') },
+    ]);
 
     const commandPath = computed(() => {
       if (activeTab.value === 'neighbors') return 'protocols bgp neighbor';
@@ -2311,18 +2372,18 @@ export default defineComponent({
       // Validate system-as
       if (config.value['system-as']) {
         const err = validateASN(config.value['system-as']);
-        if (err) return alert(`系统 ASN：${err}`);
+        if (err) return showError({ message: t('bgp.error.systemAsn', { error: err }) });
       }
 
       // Validate global timers
       if (config.value.timers) {
         if (config.value.timers.holdtime) {
           const err = validateTimer(config.value.timers.holdtime, true);
-          if (err) return alert(`全局保持定时器：${err}`);
+          if (err) return showError({ message: t('bgp.error.globalHoldtime', { error: err }) });
         }
         if (config.value.timers.keepalive) {
           const err = validateTimer(config.value.timers.keepalive, false);
-          if (err) return alert(`全局 Keepalive 定时器：${err}`);
+          if (err) return showError({ message: t('bgp.error.globalKeepalive', { error: err }) });
         }
       }
 
@@ -2330,11 +2391,11 @@ export default defineComponent({
       if (config.value.maxPaths) {
         if (config.value.maxPaths.ebgp) {
           const err = validateMaxPaths(config.value.maxPaths.ebgp);
-          if (err) return alert(`eBGP 最大路径数：${err}`);
+          if (err) return showError({ message: t('bgp.error.ebgpMaxPaths', { error: err }) });
         }
         if (config.value.maxPaths.ibgp) {
           const err = validateMaxPaths(config.value.maxPaths.ibgp);
-          if (err) return alert(`iBGP 最大路径数：${err}`);
+          if (err) return showError({ message: t('bgp.error.ibgpMaxPaths', { error: err }) });
         }
       }
 
@@ -2342,15 +2403,15 @@ export default defineComponent({
       if (config.value.distance) {
         if (config.value.distance.external) {
           const err = validateDistance(config.value.distance.external);
-          if (err) return alert(`eBGP 管理距离：${err}`);
+          if (err) return showError({ message: t('bgp.error.ebgpDistance', { error: err }) });
         }
         if (config.value.distance.internal) {
           const err = validateDistance(config.value.distance.internal);
-          if (err) return alert(`iBGP 管理距离：${err}`);
+          if (err) return showError({ message: t('bgp.error.ibgpDistance', { error: err }) });
         }
         if (config.value.distance.local) {
           const err = validateDistance(config.value.distance.local);
-          if (err) return alert(`本地路由管理距离：${err}`);
+          if (err) return showError({ message: t('bgp.error.localDistance', { error: err }) });
         }
       }
 
@@ -2358,71 +2419,71 @@ export default defineComponent({
       for (const n of config.value.neighbors || []) {
         if (!n.address) continue;
         const ipErr = validateIP(n.address);
-        if (ipErr) return alert(`邻居 ${n.address}：${ipErr}`);
+        if (ipErr) return showError({ message: t('bgp.error.neighborIp', { address: n.address, error: ipErr }) });
         if (n['remote-as']) {
           const asnErr = validateASN(n['remote-as']);
-          if (asnErr) return alert(`邻居 ${n.address} 远程 ASN：${asnErr}`);
+          if (asnErr) return showError({ message: t('bgp.error.neighborRemoteAsn', { address: n.address, error: asnErr }) });
         }
         const ebgpErr = validateEbgpMultihop(n['ebgp-multihop']);
-        if (ebgpErr) return alert(`邻居 ${n.address} EBGP 多跳：${ebgpErr}`);
+        if (ebgpErr) return showError({ message: t('bgp.error.neighborEbgpMultihop', { address: n.address, error: ebgpErr }) });
         const advErr = validateAdvertInterval(n['advertisement-interval']);
-        if (advErr) return alert(`邻居 ${n.address} 广告间隔：${advErr}`);
+        if (advErr) return showError({ message: t('bgp.error.neighborAdvertInterval', { address: n.address, error: advErr }) });
         const portErr = validatePort(n.port);
-        if (portErr) return alert(`邻居 ${n.address} 端口：${portErr}`);
+        if (portErr) return showError({ message: t('bgp.error.neighborPort', { address: n.address, error: portErr }) });
         const localAsErr = validateASN(n['local-as']);
-        if (localAsErr) return alert(`邻居 ${n.address} 本地 ASN：${localAsErr}`);
+        if (localAsErr) return showError({ message: t('bgp.error.neighborLocalAsn', { address: n.address, error: localAsErr }) });
         if (n.timers) {
           const connErr = validateTimer(n.timers.connect, true);
-          if (connErr) return alert(`邻居 ${n.address} 连接定时器：${connErr}`);
+          if (connErr) return showError({ message: t('bgp.error.neighborConnectTimer', { address: n.address, error: connErr }) });
           const holdErr = validateTimer(n.timers.holdtime, true);
-          if (holdErr) return alert(`邻居 ${n.address} 保持定时器：${holdErr}`);
+          if (holdErr) return showError({ message: t('bgp.error.neighborHoldTimer', { address: n.address, error: holdErr }) });
           const kaErr = validateTimer(n.timers.keepalive, false);
-          if (kaErr) return alert(`邻居 ${n.address} Keepalive 定时器：${kaErr}`);
+          if (kaErr) return showError({ message: t('bgp.error.neighborKeepaliveTimer', { address: n.address, error: kaErr }) });
         }
         const ttlErr = validateTtlHops(n['ttl-security']?.hops);
-        if (ttlErr) return alert(`邻居 ${n.address} TTL 安全跳数：${ttlErr}`);
+        if (ttlErr) return showError({ message: t('bgp.error.neighborTtlHops', { address: n.address, error: ttlErr }) });
       }
 
       // Validate peer groups
       for (const pg of config.value.peerGroups || []) {
         if (!pg.name) continue;
         const asnErr = validateASN(pg['remote-as']);
-        if (asnErr) return alert(`Peer Group ${pg.name} 远程 ASN：${asnErr}`);
+        if (asnErr) return showError({ message: t('bgp.error.peerGroupRemoteAsn', { name: pg.name, error: asnErr }) });
         const ebgpErr = validateEbgpMultihop(pg['ebgp-multihop']);
-        if (ebgpErr) return alert(`Peer Group ${pg.name} EBGP 多跳：${ebgpErr}`);
+        if (ebgpErr) return showError({ message: t('bgp.error.peerGroupEbgpMultihop', { name: pg.name, error: ebgpErr }) });
         const advErr = validateAdvertInterval(pg['advertisement-interval']);
-        if (advErr) return alert(`Peer Group ${pg.name} 广告间隔：${advErr}`);
+        if (advErr) return showError({ message: t('bgp.error.peerGroupAdvertInterval', { name: pg.name, error: advErr }) });
         const localAsErr = validateASN(pg['local-as']);
-        if (localAsErr) return alert(`Peer Group ${pg.name} 本地 ASN：${localAsErr}`);
+        if (localAsErr) return showError({ message: t('bgp.error.peerGroupLocalAsn', { name: pg.name, error: localAsErr }) });
       }
 
       // Validate BMP targets
-      for (const t of config.value.bmpTargets || []) {
-        if (!t.name) continue;
-        if (t.address) {
-          const ipErr = validateIP(t.address);
-          if (ipErr) return alert(`BMP ${t.name} 地址：${ipErr}`);
+      for (const bmp of config.value.bmpTargets || []) {
+        if (!bmp.name) continue;
+        if (bmp.address) {
+          const ipErr = validateIP(bmp.address);
+          if (ipErr) return showError({ message: t('bgp.error.bmpAddress', { name: bmp.name, error: ipErr }) });
         }
-        const portErr = validatePort(t.port);
-        if (portErr) return alert(`BMP ${t.name} 端口：${portErr}`);
-        const maxErr = validateBmpMaxRetry(t['max-retry']);
-        if (maxErr) return alert(`BMP ${t.name} 最大重试：${maxErr}`);
-        const minErr = validateBmpMinRetry(t['min-retry']);
-        if (minErr) return alert(`BMP ${t.name} 最小重试：${minErr}`);
+        const portErr = validatePort(bmp.port);
+        if (portErr) return showError({ message: t('bgp.error.bmpPort', { name: bmp.name, error: portErr }) });
+        const maxErr = validateBmpMaxRetry(bmp['max-retry']);
+        if (maxErr) return showError({ message: t('bgp.error.bmpMaxRetry', { name: bmp.name, error: maxErr }) });
+        const minErr = validateBmpMinRetry(bmp['min-retry']);
+        if (minErr) return showError({ message: t('bgp.error.bmpMinRetry', { name: bmp.name, error: minErr }) });
       }
 
       // Validate listen ranges
       for (const lr of config.value.listenRanges || []) {
         if (!lr.range) continue;
         const ipErr = validateIP(lr.range.split('/')[0]);
-        if (ipErr) return alert(`监听范围 ${lr.range}：${ipErr}`);
+        if (ipErr) return showError({ message: t('bgp.error.listenRange', { range: lr.range, error: ipErr }) });
       }
 
       // Validate networks
       for (const net of config.value.networks || []) {
         if (!net.network) continue;
         if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/.test(net.network)) {
-          return alert(`网络 ${net.network}：格式错误，应为 x.x.x.x/x`);
+          return showError({ message: t('bgp.error.networkFormat', { network: net.network }) });
         }
       }
 
@@ -2432,33 +2493,34 @@ export default defineComponent({
         // Validate confederation identifier
         if (p.confederation?.identifier) {
           const confErr = validateConfedId(p.confederation.identifier);
-          if (confErr) return alert(`Confederation Identifier：${confErr}`);
+          if (confErr) return showError({ message: t('bgp.error.confederationId', { error: confErr }) });
         }
 
         // Validate dampening
         if (p.dampening?.enable) {
           const halfLifeErr = validateDampeningHalfLife(p.dampening['half-life']);
-          if (halfLifeErr) return alert(`Dampening Half-Life：${halfLifeErr}`);
+          if (halfLifeErr) return showError({ message: t('bgp.error.dampeningHalfLife', { error: halfLifeErr }) });
           const reuseErr = validateDampeningValue(p.dampening.reuse);
-          if (reuseErr) return alert(`Dampening Reuse：${reuseErr}`);
+          if (reuseErr) return showError({ message: t('bgp.error.dampeningReuse', { error: reuseErr }) });
           const startSuppressErr = validateDampeningValue(p.dampening['start-suppress-time']);
-          if (startSuppressErr) return alert(`Dampening Start Suppress：${startSuppressErr}`);
+          if (startSuppressErr) return showError({ message: t('bgp.error.dampeningStartSuppress', { error: startSuppressErr }) });
           const maxSuppressErr = validateDampeningValue(p.dampening['max-suppress-time']);
-          if (maxSuppressErr) return alert(`Dampening Max Suppress：${maxSuppressErr}`);
+          if (maxSuppressErr) return showError({ message: t('bgp.error.dampeningMaxSuppress', { error: maxSuppressErr }) });
         }
 
         // Validate graceful-restart
         if (p['graceful-restart']?.enable) {
           const restartErr = validateGracefulRestart(p['graceful-restart'].restart);
-          if (restartErr) return alert(`优雅重启时间：${restartErr}`);
+          if (restartErr) return showError({ message: t('bgp.error.gracefulRestartTime', { error: restartErr }) });
           const stalepathErr = validateGracefulRestart(p['graceful-restart'].stalepath);
-          if (stalepathErr) return alert(`陈旧路径时间：${stalepathErr}`);
+          if (stalepathErr) return showError({ message: t('bgp.error.stalepathTime', { error: stalepathErr }) });
         }
       }
 
       saving.value = true;
       try {
         await configApi.set('protocols bgp', configToConfig(config.value));
+        configStore.markPending();
         saved.value = true;
         await load();
       } catch (e) {
@@ -2506,25 +2568,31 @@ export default defineComponent({
 
     function deleteNeighbors(selectedAddresses) {
       if (!selectedAddresses.length) return;
-      if (!confirm('确认删除选中的 BGP 邻居？')) return;
-      const toDelete = new Set(selectedAddresses);
+      pendingDeleteNeighborNames.value = selectedAddresses;
+      deleteNeighborModalVisible.value = true;
+    }
+
+    function confirmRemoveNeighbor() {
+      deleteNeighborModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteNeighborNames.value);
       config.value.neighbors = config.value.neighbors.filter(n => !toDelete.has(n.address));
+      pendingDeleteNeighborNames.value = [];
     }
 
     function saveNeighbor() {
       const addr = String(neighborForm.value.address || '').trim();
-      if (!addr) return alert('请输入邻居地址');
+      if (!addr) return showError({ message: t('routing.bgp.error.neighborAddressRequired') });
 
       const ipErr = validateIP(addr);
-      if (ipErr) return alert(ipErr);
+      if (ipErr) return showError({ message: ipErr });
 
       if (neighborForm.value['remote-as']) {
         const asnErr = validateASN(neighborForm.value['remote-as']);
-        if (asnErr) return alert(asnErr);
+        if (asnErr) return showError({ message: asnErr });
       }
 
       const duplicate = config.value.neighbors.find((n, i) => n.address === addr && i !== editingNeighborIndex.value);
-      if (duplicate) return alert('该邻居地址已存在');
+      if (duplicate) return showError({ message: t('routing.bgp.error.neighborExists') });
 
       const newNeighbor = { ...neighborForm.value, address: addr };
 
@@ -2573,22 +2641,28 @@ export default defineComponent({
 
     function deletePeerGroups(selectedNames) {
       if (!selectedNames.length) return;
-      if (!confirm('确认删除选中的 Peer Group？')) return;
-      const toDelete = new Set(selectedNames);
+      pendingDeletePeerGroupNames.value = selectedNames;
+      deletePeerGroupModalVisible.value = true;
+    }
+
+    function confirmRemovePeerGroup() {
+      deletePeerGroupModalVisible.value = false;
+      const toDelete = new Set(pendingDeletePeerGroupNames.value);
       config.value.peerGroups = config.value.peerGroups.filter(pg => !toDelete.has(pg.name));
+      pendingDeletePeerGroupNames.value = [];
     }
 
     function savePeerGroup() {
       const name = String(peerGroupForm.value.name || '').trim();
-      if (!name) return alert('请输入 Peer Group 名称');
+      if (!name) return showError({ message: t('routing.bgp.error.peerGroupNameRequired') });
 
       if (peerGroupForm.value['remote-as']) {
         const asnErr = validateASN(peerGroupForm.value['remote-as']);
-        if (asnErr) return alert(asnErr);
+        if (asnErr) return showError({ message: asnErr });
       }
 
       const duplicate = config.value.peerGroups.find((pg, i) => pg.name === name && i !== editingPeerGroupIndex.value);
-      if (duplicate) return alert('该 Peer Group 名称已存在');
+      if (duplicate) return showError({ message: t('routing.bgp.error.peerGroupExists') });
 
       const newPg = { ...peerGroupForm.value, name };
 
@@ -2616,22 +2690,28 @@ export default defineComponent({
 
     function deleteBmpTargets(selectedNames) {
       if (!selectedNames.length) return;
-      if (!confirm('确认删除选中的 BMP 目标？')) return;
-      const toDelete = new Set(selectedNames);
+      pendingDeleteBmpNames.value = selectedNames;
+      deleteBmpModalVisible.value = true;
+    }
+
+    function confirmRemoveBmp() {
+      deleteBmpModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteBmpNames.value);
       config.value.bmpTargets = config.value.bmpTargets.filter(t => !toDelete.has(t.name));
+      pendingDeleteBmpNames.value = [];
     }
 
     function saveBmp() {
       const name = String(bmpForm.value.name || '').trim();
-      if (!name) return alert('请输入 BMP 目标名称');
+      if (!name) return showError({ message: t('routing.bgp.error.bmpNameRequired') });
 
       if (bmpForm.value.address) {
         const ipErr = validateIP(bmpForm.value.address);
-        if (ipErr) return alert(ipErr);
+        if (ipErr) return showError({ message: ipErr });
       }
 
       const duplicate = config.value.bmpTargets.find((t, i) => t.name === name && i !== editingBmpIndex.value);
-      if (duplicate) return alert('该 BMP 目标名称已存在');
+      if (duplicate) return showError({ message: t('routing.bgp.error.bmpExists') });
 
       const newTarget = { ...bmpForm.value, name };
 
@@ -2658,20 +2738,26 @@ export default defineComponent({
 
     function deleteListenRanges(selectedRanges) {
       if (!selectedRanges.length) return;
-      if (!confirm('确认删除选中的监听范围？')) return;
-      const toDelete = new Set(selectedRanges);
+      pendingDeleteListenNames.value = selectedRanges;
+      deleteListenModalVisible.value = true;
+    }
+
+    function confirmRemoveListen() {
+      deleteListenModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteListenNames.value);
       config.value.listenRanges = config.value.listenRanges.filter(lr => !toDelete.has(lr.range));
+      pendingDeleteListenNames.value = [];
     }
 
     function saveListen() {
       const range = String(listenForm.value.range || '').trim();
-      if (!range) return alert('请输入监听范围');
+      if (!range) return showError({ message: t('routing.bgp.error.listenRangeRequired') });
 
       const ipErr = validateIP(range.split('/')[0]);
-      if (ipErr) return alert(ipErr);
+      if (ipErr) return showError({ message: ipErr });
 
       const duplicate = config.value.listenRanges.find((lr, i) => lr.range === range && i !== editingListenIndex.value);
-      if (duplicate) return alert('该监听范围已存在');
+      if (duplicate) return showError({ message: t('routing.bgp.error.listenRangeExists') });
 
       const newLr = { ...listenForm.value, range };
 
@@ -2698,21 +2784,27 @@ export default defineComponent({
 
     function deleteNetworks(selectedNetworks) {
       if (!selectedNetworks.length) return;
-      if (!confirm('确认删除选中的网络？')) return;
-      const toDelete = new Set(selectedNetworks);
+      pendingDeleteNetworkNames.value = selectedNetworks;
+      deleteNetworkModalVisible.value = true;
+    }
+
+    function confirmRemoveNetwork() {
+      deleteNetworkModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteNetworkNames.value);
       config.value.networks = config.value.networks.filter(n => !toDelete.has(n.network));
+      pendingDeleteNetworkNames.value = [];
     }
 
     function saveNetwork() {
       const network = String(networkForm.value.network || '').trim();
-      if (!network) return alert('请输入网络地址');
+      if (!network) return showError({ message: t('routing.bgp.error.networkRequired') });
 
       if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/.test(network)) {
-        return alert('网络格式错误，应为 x.x.x.x/x');
+        return showError({ message: t('routing.bgp.error.networkFormatInvalid') });
       }
 
       const duplicate = config.value.networks.find((n, i) => n.network === network && i !== editingNetworkIndex.value);
-      if (duplicate) return alert('该网络已存在');
+      if (duplicate) return showError({ message: t('routing.bgp.error.networkExists') });
 
       const newNet = { ...networkForm.value, network };
 
@@ -2739,21 +2831,27 @@ export default defineComponent({
 
     function deleteAggregates(selectedAggregates) {
       if (!selectedAggregates.length) return;
-      if (!confirm('确认删除选中的聚合网络？')) return;
-      const toDelete = new Set(selectedAggregates);
+      pendingDeleteAggregateNames.value = selectedAggregates;
+      deleteAggregateModalVisible.value = true;
+    }
+
+    function confirmRemoveAggregate() {
+      deleteAggregateModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteAggregateNames.value);
       config.value.aggregates = config.value.aggregates.filter(a => !toDelete.has(a.aggregate));
+      pendingDeleteAggregateNames.value = [];
     }
 
     function saveAggregate() {
       const aggregate = String(aggregateForm.value.aggregate || '').trim();
-      if (!aggregate) return alert('请输入聚合网络地址');
+      if (!aggregate) return showError({ message: t('routing.bgp.error.aggregateRequired') });
 
       if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/.test(aggregate)) {
-        return alert('聚合网络格式错误，应为 x.x.x.x/x');
+        return showError({ message: t('routing.bgp.error.aggregateFormatInvalid') });
       }
 
       const duplicate = config.value.aggregates.find((a, i) => a.aggregate === aggregate && i !== editingAggregateIndex.value);
-      if (duplicate) return alert('该聚合网络已存在');
+      if (duplicate) return showError({ message: t('routing.bgp.error.aggregateExists') });
 
       const newAgg = { ...aggregateForm.value, aggregate };
 
@@ -2780,17 +2878,23 @@ export default defineComponent({
 
     function deleteInterfaces(selectedNames) {
       if (!selectedNames.length) return;
-      if (!confirm('确认删除选中的接口？')) return;
-      const toDelete = new Set(selectedNames);
+      pendingDeleteInterfaceNames.value = selectedNames;
+      deleteInterfaceModalVisible.value = true;
+    }
+
+    function confirmRemoveInterface() {
+      deleteInterfaceModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteInterfaceNames.value);
       config.value.interfaces = config.value.interfaces.filter(i => !toDelete.has(i.name));
+      pendingDeleteInterfaceNames.value = [];
     }
 
     function saveInterface() {
       const name = String(interfaceForm.value.name || '').trim();
-      if (!name) return alert('请输入接口名称');
+      if (!name) return showError({ message: t('routing.bgp.error.interfaceRequired') });
 
       const duplicate = config.value.interfaces.find((i, idx) => i.name === name && idx !== editingInterfaceIndex.value);
-      if (duplicate) return alert('该接口已存在');
+      if (duplicate) return showError({ message: t('routing.bgp.error.interfaceExists') });
 
       const newIface = { ...interfaceForm.value, name };
 
@@ -2807,33 +2911,33 @@ export default defineComponent({
     const editingRedistributeIndex = ref(-1);
     const redistributeForm = ref({ protocol: '', metric: '', 'route-map': '' });
 
-    const redistributeColumns = [
-      { key: 'protocol', title: '协议' },
-      { key: 'metric', title: '度量值' },
-      { key: 'route-map', title: '路由映射' },
-    ];
+    const redistributeColumns = computed(() => [
+      { key: 'protocol', title: t('routing.bgp.col.protocol') },
+      { key: 'metric', title: t('routing.bgp.col.metric') },
+      { key: 'route-map', title: t('routing.bgp.col.routeMap') },
+    ]);
 
-    const REDISTRIBUTE_PROTOCOLS = [
-      { value: '', label: '-- 选择协议 --' },
+    const REDISTRIBUTE_PROTOCOLS = computed(() => [
+      { value: '', label: t('routing.bgp.option.selectProtocol') },
       { value: 'babel', label: 'Babel' },
-      { value: 'connected', label: 'Connected (直连)' },
+      { value: 'connected', label: t('routing.bgp.option.connected') },
       { value: 'isis', label: 'IS-IS' },
-      { value: 'kernel', label: 'Kernel (内核)' },
+      { value: 'kernel', label: t('routing.bgp.option.kernel') },
       { value: 'ospf', label: 'OSPF' },
       { value: 'rip', label: 'RIP' },
-      { value: 'static', label: 'Static (静态)' },
-    ];
+      { value: 'static', label: t('routing.bgp.option.static') },
+    ]);
 
-    const IPV6_REDISTRIBUTE_PROTOCOLS = [
-      { value: '', label: '-- 选择协议 --' },
+    const IPV6_REDISTRIBUTE_PROTOCOLS = computed(() => [
+      { value: '', label: t('routing.bgp.option.selectProtocol') },
       { value: 'babel', label: 'Babel' },
-      { value: 'connected', label: 'Connected (直连)' },
-      { value: 'kernel', label: 'Kernel (内核)' },
+      { value: 'connected', label: t('routing.bgp.option.connected') },
+      { value: 'kernel', label: t('routing.bgp.option.kernel') },
       { value: 'ospfv3', label: 'OSPFv3' },
       { value: 'ripng', label: 'RIPng' },
-      { value: 'static', label: 'Static (静态)' },
-      { value: 'table', label: 'Table (路由表)' },
-    ];
+      { value: 'static', label: t('routing.bgp.option.static') },
+      { value: 'table', label: t('routing.bgp.option.table') },
+    ]);
 
     // Redistribute operations
     function createRedistribute() {
@@ -2850,17 +2954,23 @@ export default defineComponent({
 
     function deleteRedistributes(selectedProtocols) {
       if (!selectedProtocols.length) return;
-      if (!confirm('确认删除选中的重分发？')) return;
-      const toDelete = new Set(selectedProtocols);
+      pendingDeleteRedistributeNames.value = selectedProtocols;
+      deleteRedistributeModalVisible.value = true;
+    }
+
+    function confirmRemoveRedistribute() {
+      deleteRedistributeModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteRedistributeNames.value);
       config.value.redistributes = config.value.redistributes.filter(r => !toDelete.has(r.protocol));
+      pendingDeleteRedistributeNames.value = [];
     }
 
     function saveRedistribute() {
       const protocol = String(redistributeForm.value.protocol || '').trim();
-      if (!protocol) return alert('请选择协议');
+      if (!protocol) return showError({ message: t('routing.bgp.error.protocolRequired') });
 
       const duplicate = config.value.redistributes.find((r, i) => r.protocol === protocol && i !== editingRedistributeIndex.value);
-      if (duplicate) return alert('该协议已存在');
+      if (duplicate) return showError({ message: t('routing.bgp.error.protocolExists') });
 
       const newRedist = { ...redistributeForm.value, protocol };
 
@@ -2887,28 +2997,34 @@ export default defineComponent({
 
     function deleteIpv6Networks(selectedNetworks) {
       if (!selectedNetworks.length) return;
-      if (!confirm('确认删除选中的 IPv6 网络？')) return;
-      const toDelete = new Set(selectedNetworks);
+      pendingDeleteIpv6NetworkNames.value = selectedNetworks;
+      deleteIpv6NetworkModalVisible.value = true;
+    }
+
+    function confirmRemoveIpv6Network() {
+      deleteIpv6NetworkModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteIpv6NetworkNames.value);
       config.value.ipv6Networks = config.value.ipv6Networks.filter(n => !toDelete.has(n.network));
+      pendingDeleteIpv6NetworkNames.value = [];
     }
 
     function saveIpv6Network() {
       const network = String(ipv6NetworkForm.value.network || '').trim();
-      if (!network) return alert('请输入 IPv6 网络地址');
+      if (!network) return showError({ message: t('routing.bgp.error.ipv6NetworkRequired') });
 
       const parts = network.split('/');
       if (parts.length !== 2) {
-        return alert('IPv6 网络格式错误，应为 xxxx:xxxx::xxxx/prefix');
+        return showError({ message: t('routing.bgp.error.ipv6NetworkFormatInvalid') });
       }
       const prefix = parseInt(parts[1], 10);
       if (isNaN(prefix) || prefix < 0 || prefix > 128) {
-        return alert('IPv6 前缀长度必须在 0-128 之间');
+        return showError({ message: t('routing.bgp.error.ipv6PrefixLengthRange') });
       }
       const ipErr = validateIPv6(parts[0]);
-      if (ipErr) return alert('IPv6 地址格式错误');
+      if (ipErr) return showError({ message: t('routing.bgp.error.ipv6AddressFormatInvalid') });
 
       const duplicate = config.value.ipv6Networks.find((n, i) => n.network === network && i !== editingIpv6NetworkIndex.value);
-      if (duplicate) return alert('该 IPv6 网络已存在');
+      if (duplicate) return showError({ message: t('routing.bgp.error.ipv6NetworkExists') });
 
       const newNet = { ...ipv6NetworkForm.value, network };
       if (editingIpv6NetworkIndex.value >= 0) {
@@ -2934,28 +3050,34 @@ export default defineComponent({
 
     function deleteIpv6Aggregates(selectedAggregates) {
       if (!selectedAggregates.length) return;
-      if (!confirm('确认删除选中的 IPv6 聚合网络？')) return;
-      const toDelete = new Set(selectedAggregates);
+      pendingDeleteIpv6AggregateNames.value = selectedAggregates;
+      deleteIpv6AggregateModalVisible.value = true;
+    }
+
+    function confirmRemoveIpv6Aggregate() {
+      deleteIpv6AggregateModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteIpv6AggregateNames.value);
       config.value.ipv6Aggregates = config.value.ipv6Aggregates.filter(a => !toDelete.has(a.aggregate));
+      pendingDeleteIpv6AggregateNames.value = [];
     }
 
     function saveIpv6Aggregate() {
       const aggregate = String(ipv6AggregateForm.value.aggregate || '').trim();
-      if (!aggregate) return alert('请输入 IPv6 聚合网络地址');
+      if (!aggregate) return showError({ message: t('routing.bgp.error.ipv6AggregateRequired') });
 
       const parts = aggregate.split('/');
       if (parts.length !== 2) {
-        return alert('IPv6 聚合网络格式错误，应为 xxxx:xxxx::xxxx/prefix');
+        return showError({ message: t('routing.bgp.error.ipv6AggregateFormatInvalid') });
       }
       const prefix = parseInt(parts[1], 10);
       if (isNaN(prefix) || prefix < 0 || prefix > 128) {
-        return alert('IPv6 前缀长度必须在 0-128 之间');
+        return showError({ message: t('routing.bgp.error.ipv6PrefixLengthRange') });
       }
       const ipErr = validateIPv6(parts[0]);
-      if (ipErr) return alert('IPv6 地址格式错误');
+      if (ipErr) return showError({ message: t('routing.bgp.error.ipv6AddressFormatInvalid') });
 
       const duplicate = config.value.ipv6Aggregates.find((a, i) => a.aggregate === aggregate && i !== editingIpv6AggregateIndex.value);
-      if (duplicate) return alert('该 IPv6 聚合网络已存在');
+      if (duplicate) return showError({ message: t('routing.bgp.error.ipv6AggregateExists') });
 
       const newAgg = { ...ipv6AggregateForm.value, aggregate };
       if (editingIpv6AggregateIndex.value >= 0) {
@@ -2981,17 +3103,23 @@ export default defineComponent({
 
     function deleteIpv6Redistributes(selectedProtocols) {
       if (!selectedProtocols.length) return;
-      if (!confirm('确认删除选中的 IPv6 重分发？')) return;
-      const toDelete = new Set(selectedProtocols);
+      pendingDeleteIpv6RedistributeNames.value = selectedProtocols;
+      deleteIpv6RedistributeModalVisible.value = true;
+    }
+
+    function confirmRemoveIpv6Redistribute() {
+      deleteIpv6RedistributeModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteIpv6RedistributeNames.value);
       config.value.ipv6Redistributes = config.value.ipv6Redistributes.filter(r => !toDelete.has(r.protocol));
+      pendingDeleteIpv6RedistributeNames.value = [];
     }
 
     function saveIpv6Redistribute() {
       const protocol = String(ipv6RedistributeForm.value.protocol || '').trim();
-      if (!protocol) return alert('请选择协议');
+      if (!protocol) return showError({ message: t('routing.bgp.error.protocolRequired') });
 
       const duplicate = config.value.ipv6Redistributes.find((r, i) => r.protocol === protocol && i !== editingIpv6RedistributeIndex.value);
-      if (duplicate) return alert('该协议已存在');
+      if (duplicate) return showError({ message: t('routing.bgp.error.protocolExists') });
 
       const newRedist = { ...ipv6RedistributeForm.value, protocol };
       if (editingIpv6RedistributeIndex.value >= 0) {
@@ -3022,16 +3150,23 @@ export default defineComponent({
 
     function deleteDistancePrefixesIpv6Unicast(rows) {
       if (!rows.length) return;
-      if (!confirm('确认删除选中的前缀管理距离？')) return;
-      const prefixes = new Set(rows.map(r => r.prefix));
+      const prefixes = rows.map(r => r.prefix);
+      pendingDeleteIpv6DistancePrefixNames.value = prefixes;
+      deleteIpv6DistancePrefixModalVisible.value = true;
+    }
+
+    function confirmRemoveIpv6DistancePrefix() {
+      deleteIpv6DistancePrefixModalVisible.value = false;
+      const prefixes = new Set(pendingDeleteIpv6DistancePrefixNames.value);
       config.value.ipv6DistancePrefixes = config.value.ipv6DistancePrefixes.filter(d => !prefixes.has(d.prefix));
+      pendingDeleteIpv6DistancePrefixNames.value = [];
     }
 
     function saveDistancePrefixIpv6Unicast() {
       const form = ipv6DistancePrefixForm.value;
-      if (!form.prefix) { alert('请填写前缀'); return; }
-      if (!/^[0-9a-fA-F:]+\/\d+$/.test(form.prefix)) { alert('前缀格式无效，应为 IPv6 前缀'); return; }
-      if (!form.distance || form.distance < 1 || form.distance > 255) { alert('管理距离应为 1-255'); return; }
+      if (!form.prefix) return showError({ message: t('bgp.error.prefixRequired') })
+      if (!/^[0-9a-fA-F:]+\/\d+$/.test(form.prefix)) { showError({ message: t('bgp.error.ipv6PrefixFormatInvalid') }); return; }
+      if (!form.distance || form.distance < 1 || form.distance > 255) return showError({ message: t('bgp.error.distanceRange') })
 
       const idx = editingIpv6DistancePrefixIndex.value;
       if (idx >= 0) {
@@ -3065,34 +3200,33 @@ export default defineComponent({
 
       function deleteNetworks(selectedNetworks) {
         if (!selectedNetworks.length) return;
-        if (!confirm(`确认删除选中的${isIPv6 ? ' IPv6' : ''}网络？`)) return;
-        const toDelete = new Set(selectedNetworks);
-        config.value[configKey + 'Networks'] = config.value[configKey + 'Networks'].filter(n => !toDelete.has(n.network));
+        pendingDeleteNetworkNames.value = selectedNetworks;
+        deleteNetworkModalVisible.value = true;
       }
 
       function saveNetwork() {
         const network = String(networkForm.value.network || '').trim();
-        if (!network) return alert(`请输入${isIPv6 ? ' IPv6' : ''}网络地址`);
+        if (!network) return showError({ message: isIPv6 ? t('bgp.error.ipv6NetworkRequired') : t('bgp.error.networkRequired') });
 
         if (isIPv6) {
           const parts = network.split('/');
           if (parts.length !== 2) {
-            return alert('IPv6 网络格式错误，应为 xxxx:xxxx::xxxx/prefix');
+            return showError({ message: t('bgp.error.ipv6NetworkFormatInvalid') });
           }
           const prefixLen = parseInt(parts[1], 10);
           if (isNaN(prefixLen) || prefixLen < 0 || prefixLen > 128) {
-            return alert('IPv6 前缀长度必须在 0-128 之间');
+            return showError({ message: t('bgp.error.ipv6PrefixLengthInvalid') });
           }
           const ipErr = validateIPv6(parts[0]);
-          if (ipErr) return alert('IPv6 地址格式错误');
+          if (ipErr) return showError({ message: t('bgp.error.ipv6AddressInvalid') });
         } else {
           if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/.test(network)) {
-            return alert('网络格式错误，应为 x.x.x.x/x');
+            return showError({ message: t('bgp.error.networkFormatInvalid') });
           }
         }
 
         const duplicate = config.value[configKey + 'Networks'].find((n, i) => n.network === network && i !== editingNetworkIndex.value);
-        if (duplicate) return alert('该网络已存在');
+        if (duplicate) return showError({ message: t('bgp.error.networkExists') });
 
         const newNet = { ...networkForm.value, network };
         if (editingNetworkIndex.value >= 0) {
@@ -3118,34 +3252,33 @@ export default defineComponent({
 
       function deleteAggregates(selectedAggregates) {
         if (!selectedAggregates.length) return;
-        if (!confirm(`确认删除选中的${isIPv6 ? ' IPv6' : ''}聚合网络？`)) return;
-        const toDelete = new Set(selectedAggregates);
-        config.value[configKey + 'Aggregates'] = config.value[configKey + 'Aggregates'].filter(a => !toDelete.has(a.aggregate));
+        pendingDeleteAggregateNames.value = selectedAggregates;
+        deleteAggregateModalVisible.value = true;
       }
 
       function saveAggregate() {
         const aggregate = String(aggregateForm.value.aggregate || '').trim();
-        if (!aggregate) return alert(`请输入${isIPv6 ? ' IPv6' : ''}聚合网络地址`);
+        if (!aggregate) return showError({ message: isIPv6 ? t('bgp.error.ipv6AggregateRequired') : t('bgp.error.aggregateRequired') });
 
         if (isIPv6) {
           const parts = aggregate.split('/');
           if (parts.length !== 2) {
-            return alert('IPv6 聚合网络格式错误，应为 xxxx:xxxx::xxxx/prefix');
+            return showError({ message: t('bgp.error.ipv6AggregateFormatInvalid') });
           }
           const prefixLen = parseInt(parts[1], 10);
           if (isNaN(prefixLen) || prefixLen < 0 || prefixLen > 128) {
-            return alert('IPv6 前缀长度必须在 0-128 之间');
+            return showError({ message: t('bgp.error.ipv6PrefixLengthInvalid') });
           }
           const ipErr = validateIPv6(parts[0]);
-          if (ipErr) return alert('IPv6 地址格式错误');
+          if (ipErr) return showError({ message: t('bgp.error.ipv6AddressInvalid') });
         } else {
           if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/.test(aggregate)) {
-            return alert('聚合网络格式错误，应为 x.x.x.x/x');
+            return showError({ message: t('bgp.error.aggregateFormatInvalid') });
           }
         }
 
         const duplicate = config.value[configKey + 'Aggregates'].find((a, i) => a.aggregate === aggregate && i !== editingAggregateIndex.value);
-        if (duplicate) return alert('该聚合网络已存在');
+        if (duplicate) return showError({ message: t('bgp.error.aggregateExists') });
 
         const newAgg = { ...aggregateForm.value, aggregate };
         if (editingAggregateIndex.value >= 0) {
@@ -3171,17 +3304,16 @@ export default defineComponent({
 
       function deleteRedistributes(selectedProtocols) {
         if (!selectedProtocols.length) return;
-        if (!confirm(`确认删除选中的${isIPv6 ? ' IPv6' : ''}重分发？`)) return;
-        const toDelete = new Set(selectedProtocols);
-        config.value[configKey + 'Redistributes'] = config.value[configKey + 'Redistributes'].filter(r => !toDelete.has(r.protocol));
+        pendingDeleteRedistributeNames.value = selectedProtocols;
+        deleteRedistributeModalVisible.value = true;
       }
 
       function saveRedistribute() {
         const protocol = String(redistributeForm.value.protocol || '').trim();
-        if (!protocol) return alert('请选择协议');
+        if (!protocol) return showError({ message: t('bgp.error.protocolRequired') });
 
         const duplicate = config.value[configKey + 'Redistributes'].find((r, i) => r.protocol === protocol && i !== editingRedistributeIndex.value);
-        if (duplicate) return alert('该协议已存在');
+        if (duplicate) return showError({ message: t('bgp.error.protocolExists') });
 
         const newRedist = { ...redistributeForm.value, protocol };
         if (editingRedistributeIndex.value >= 0) {
@@ -3268,18 +3400,24 @@ export default defineComponent({
 
     function deleteEvpnRts(selected) {
       if (!selected.length) return;
-      if (!confirm('确认删除选中的 Route Target？')) return;
-      const toDelete = new Set(selected.map(s => `${s.direction}::${s['route-target']}`));
+      pendingDeleteEvpnRtNames.value = selected;
+      deleteEvpnRtModalVisible.value = true;
+    }
+
+    function confirmRemoveEvpnRt() {
+      deleteEvpnRtModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteEvpnRtNames.value.map(s => `${s.direction}::${s['route-target']}`));
       config.value['address-family']['l2vpn-evpn']['route-targets'] = config.value['address-family']['l2vpn-evpn']['route-targets'].filter(rt => !toDelete.has(`${rt.direction}::${rt['route-target']}`));
+      pendingDeleteEvpnRtNames.value = [];
     }
 
     function saveEvpnRt() {
       const rt = String(evpnRtForm.value['route-target'] || '').trim();
-      if (!rt) return alert('请输入 Route Target');
+      if (!rt) return showError({ message: t('bgp.error.routeTargetRequired') });
       const direction = evpnRtForm.value.direction || 'both';
 
       const duplicate = config.value['address-family']['l2vpn-evpn']['route-targets'].find((r, i) => r['route-target'] === rt && r.direction === direction && i !== editingEvpnRtIndex.value);
-      if (duplicate) return alert('该 Route Target 已存在');
+      if (duplicate) return showError({ message: t('bgp.error.routeTargetExists') });
 
       const newRt = { direction, 'route-target': rt };
       if (editingEvpnRtIndex.value >= 0) {
@@ -3305,19 +3443,25 @@ export default defineComponent({
 
     function deleteEvpnVnis(selected) {
       if (!selected.length) return;
-      if (!confirm('确认删除选中的 VNI？')) return;
-      const toDelete = new Set(selected.map(s => String(s.vni)));
+      pendingDeleteEvpnVniNames.value = selected;
+      deleteEvpnVniModalVisible.value = true;
+    }
+
+    function confirmRemoveEvpnVni() {
+      deleteEvpnVniModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteEvpnVniNames.value.map(s => String(s.vni)));
       config.value['address-family']['l2vpn-evpn'].vnis = config.value['address-family']['l2vpn-evpn'].vnis.filter(v => !toDelete.has(String(v.vni)));
+      pendingDeleteEvpnVniNames.value = [];
     }
 
     function saveEvpnVni() {
       const vni = String(evpnVniForm.value.vni || '').trim();
-      if (!vni) return alert('请输入 VNI');
+      if (!vni) return showError({ message: t('bgp.error.vniRequired') });
       const vniErr = validateVni(vni);
-      if (vniErr) return alert(`VNI：${vniErr}`);
+      if (vniErr) return showError({ message: t('bgp.error.vniInvalid', { error: vniErr }) });
 
       const duplicate = config.value['address-family']['l2vpn-evpn'].vnis.find((v, i) => v.vni === vni && i !== editingEvpnVniIndex.value);
-      if (duplicate) return alert('该 VNI 已存在');
+      if (duplicate) return showError({ message: t('bgp.error.vniExists') });
 
       const newVni = { vni, 'route-targets': [...evpnVniForm.value['route-targets']] };
       if (editingEvpnVniIndex.value >= 0) {
@@ -3343,18 +3487,24 @@ export default defineComponent({
 
     function deleteEvpnVniRts(selected) {
       if (!selected.length) return;
-      if (!confirm('确认删除选中的 Route Target？')) return;
-      const toDelete = new Set(selected.map(s => `${s.direction}::${s['route-target']}`));
+      pendingDeleteEvpnVniRtNames.value = selected;
+      deleteEvpnVniRtModalVisible.value = true;
+    }
+
+    function confirmRemoveEvpnVniRt() {
+      deleteEvpnVniRtModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteEvpnVniRtNames.value.map(s => `${s.direction}::${s['route-target']}`));
       evpnVniForm.value['route-targets'] = evpnVniForm.value['route-targets'].filter(rt => !toDelete.has(`${rt.direction}::${rt['route-target']}`));
+      pendingDeleteEvpnVniRtNames.value = [];
     }
 
     function saveEvpnVniRt() {
       const rt = String(evpnVniRtForm.value['route-target'] || '').trim();
-      if (!rt) return alert('请输入 Route Target');
+      if (!rt) return showError({ message: t('bgp.error.routeTargetRequired') });
       const direction = evpnVniRtForm.value.direction || 'both';
 
       const duplicate = evpnVniForm.value['route-targets'].find((r, i) => r['route-target'] === rt && r.direction === direction && i !== editingEvpnVniRtIndex.value);
-      if (duplicate) return alert('该 Route Target 已存在');
+      if (duplicate) return showError({ message: t('bgp.error.routeTargetExists') });
 
       const newRt = { direction, 'route-target': rt };
       if (editingEvpnVniRtIndex.value >= 0) {
@@ -3383,6 +3533,7 @@ export default defineComponent({
     onMounted(() => {
       load();
       loadInterfaces();
+      onMenuRefresh(load);
     });
 
     // Parameters section
@@ -3414,11 +3565,11 @@ export default defineComponent({
     });
 
     function addConfederationPeer() {
-      const peer = prompt('请输入 Confederation Peer ASN:');
+      const peer = prompt(t('bgp.prompt.enterConfederationPeerAsn'));
       if (!peer) return;
       const asnErr = validateASN(peer);
-      if (asnErr) return alert(asnErr);
-      if (confederationPeers.value.includes(peer)) return alert('该 Peer 已存在');
+      if (asnErr) return showError({ message: asnErr });
+      if (confederationPeers.value.includes(peer)) return showError({ message: t('bgp.error.peerExists') });
       confederationPeers.value = [...confederationPeers.value, peer];
     }
 
@@ -3426,7 +3577,8 @@ export default defineComponent({
       confederationPeers.value = confederationPeers.value.filter((_, i) => i !== index);
     }
 
-    return {
+    return {t,
+      
       loading, saving, saved, config, activeTab, activeAfTab, writeDisabled,
       interfaces,
       neighborColumns, peerGroupColumns, bmpColumns, listenColumns, networkColumns, aggregateColumns, interfaceColumns, redistributeColumns,
@@ -3523,39 +3675,39 @@ export default defineComponent({
   components: { TabGroup, ToolbarButton, DataTable, DraggableModal },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('bgp.alert.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本设置' },
-        { key: 'neighbors', title: '邻居' },
-        { key: 'peer-groups', title: 'Peer Group' },
-        { key: 'interfaces', title: '接口' },
-        { key: 'bmp', title: 'BMP' },
-        { key: 'listen', title: '监听' },
-        { key: 'parameters', title: '参数' },
-        { key: 'address-family', title: '地址族' },
-        { key: 'sid', title: 'SID' },
-        { key: 'srv6', title: 'SRv6' }
+        { key: 'basic', title: t('bgp.tab.basic') },
+        { key: 'neighbors', title: t('bgp.tab.neighbors') },
+        { key: 'peer-groups', title: t('bgp.tab.peerGroups') },
+        { key: 'interfaces', title: t('bgp.tab.interfaces') },
+        { key: 'bmp', title: t('bgp.tab.bmp') },
+        { key: 'listen', title: t('bgp.tab.listen') },
+        { key: 'parameters', title: t('bgp.tab.parameters') },
+        { key: 'address-family', title: t('bgp.tab.addressFamily') },
+        { key: 'sid', title: t('bgp.tab.sid') },
+        { key: 'srv6', title: t('bgp.tab.srv6') }
       ]">
 
         <template #basic>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">系统 ASN *</label>
+              <label class="form-label">{{ t('bgp.label.systemAsn') }} *</label>
               <input type="number" class="form-control" v-model="config['system-as']"
-                     min="1" max="4294967294" placeholder="例如: 300" style="width:200px !important; flex:none !important;"
-                     title="自治系统号 (1-4294967294)" />
+                     min="1" max="4294967294" :placeholder="t('bgp.placeholder.systemAsn')" style="width:200px !important; flex:none !important;"
+                     :title="t('bgp.title.systemAsn')" />
             </div>
             <div class="form-row">
-              <label class="form-label">保持定时器</label>
+              <label class="form-label">{{ t('bgp.label.holdtime') }}</label>
               <input type="number" class="form-control" v-model="config.timers.holdtime"
-                     min="0" max="65535" placeholder="0=禁用, 1-65535 秒" style="width:200px !important; flex:none !important;"
-                     title="BGP 保持定时器 (0=禁用, 1-65535 秒)" />
+                     min="0" max="65535" :placeholder="t('bgp.placeholder.holdtime')" style="width:200px !important; flex:none !important;"
+                     :title="t('bgp.title.holdtime')" />
             </div>
             <div class="form-row">
-              <label class="form-label">Keepalive 定时器</label>
+              <label class="form-label">{{ t('bgp.label.keepalive') }}</label>
               <input type="number" class="form-control" v-model="config.timers.keepalive"
-                     min="1" max="65535" placeholder="1-65535 秒" style="width:200px !important; flex:none !important;"
-                     title="BGP Keepalive 定时器 (1-65535 秒)" />
+                     min="1" max="65535" :placeholder="t('bgp.placeholder.keepalive')" style="width:200px !important; flex:none !important;"
+                     :title="t('bgp.title.keepalive')" />
             </div>
           </div>
         </template>
@@ -3581,10 +3733,10 @@ export default defineComponent({
         <template #bmp>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">镜像缓冲区限制</label>
+              <label class="form-label">{{ t('bgp.label.mirrorBufferLimit') }}</label>
               <input type="number" class="form-control" v-model="config['mirror-buffer-limit']"
-                     min="0" max="4294967294" placeholder="0-4294967294 字节" style="width:200px !important; flex:none !important;"
-                     title="最大镜像缓冲区内存限制 (字节)" />
+                     min="0" max="4294967294" :placeholder="t('bgp.placeholder.mirrorBufferLimit')" style="width:200px !important; flex:none !important;"
+                     :title="t('bgp.title.mirrorBufferLimit')" />
             </div>
           </div>
           <DataTable :columns="bmpColumns" :data="config.bmpTargets" :loading="loading" :disabled="writeDisabled"
@@ -3595,10 +3747,10 @@ export default defineComponent({
         <template #listen>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">最大动态邻居数</label>
+              <label class="form-label">{{ t('bgp.label.maxDynamicNeighbors') }}</label>
               <input type="number" class="form-control" v-model="config['listen-limit']"
                      min="1" max="65535" placeholder="1-65535" style="width:200px !important; flex:none !important;"
-                     title="最大动态邻居数 (1-65535)" />
+                     :title="t('bgp.title.maxDynamicNeighbors')" />
             </div>
           </div>
           <DataTable :columns="listenColumns" :data="config.listenRanges" :loading="loading" :disabled="writeDisabled"
@@ -3609,144 +3761,144 @@ export default defineComponent({
         <template #parameters>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden; margin-bottom:16px;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">参数配置</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.parameterConfig') }}</div>
               <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">Cluster ID</label>
+              <label class="form-label">{{ t('bgp.label.clusterId') }}</label>
               <input type="text" class="form-control" v-model="config.parameters['cluster-id']"
-                     placeholder="例如: 1.1.1.1 或 ASN" style="width:200px !important; flex:none !important;"
-                     title="Route-reflector cluster-id" />
+                     :placeholder="t('bgp.placeholder.clusterId')" style="width:200px !important; flex:none !important;"
+                     :title="t('bgp.title.clusterId')" />
             </div>
             <div class="form-row">
-              <label class="form-label">Router ID</label>
+              <label class="form-label">{{ t('bgp.label.routerId') }}</label>
               <input type="text" class="form-control" v-model="config.parameters['router-id']"
-                     placeholder="例如: 1.1.1.1" style="width:200px !important; flex:none !important;"
-                     title="BGP Router ID" />
+                     :placeholder="t('bgp.placeholder.routerId')" style="width:200px !important; flex:none !important;"
+                     :title="t('bgp.title.routerId')" />
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters['log-neighbor-changes']" /> 记录邻居状态变化</label>
+              <label><input type="checkbox" v-model="config.parameters['log-neighbor-changes']" /> {{ t('bgp.label.logNeighborChanges') }}</label>
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters['always-compare-med']" /> 总是比较 MED</label>
+              <label><input type="checkbox" v-model="config.parameters['always-compare-med']" /> {{ t('bgp.label.alwaysCompareMed') }}</label>
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters['deterministic-med']" /> 确定性 MED 比较</label>
+              <label><input type="checkbox" v-model="config.parameters['deterministic-med']" /> {{ t('bgp.label.deterministicMed') }}</label>
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters['ebgp-requires-policy']" /> eBGP 需要策略 (RFC8212)</label>
+              <label><input type="checkbox" v-model="config.parameters['ebgp-requires-policy']" /> {{ t('bgp.label.ebgpRequiresPolicy') }}</label>
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters['fast-convergence']" /> 快速收敛</label>
+              <label><input type="checkbox" v-model="config.parameters['fast-convergence']" /> {{ t('bgp.label.fastConvergence') }}</label>
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters['graceful-shutdown']" /> 优雅关闭</label>
+              <label><input type="checkbox" v-model="config.parameters['graceful-shutdown']" /> {{ t('bgp.label.gracefulShutdown') }}</label>
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters['network-import-check']" /> 网络导入检查</label>
+              <label><input type="checkbox" v-model="config.parameters['network-import-check']" /> {{ t('bgp.label.networkImportCheck') }}</label>
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters['disable-ebgp-connected-route-check']" /> 禁用 eBGP 直连检查</label>
+              <label><input type="checkbox" v-model="config.parameters['disable-ebgp-connected-route-check']" /> {{ t('bgp.label.disableEbgpConnectedCheck') }}</label>
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters['allow-martian-nexthop']" /> 允许火星下一跳</label>
+              <label><input type="checkbox" v-model="config.parameters['allow-martian-nexthop']" /> {{ t('bgp.label.allowMartianNexthop') }}</label>
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters.bestpath['compare-routerid']" /> 比较 Router ID</label>
+              <label><input type="checkbox" v-model="config.parameters.bestpath['compare-routerid']" /> {{ t('bgp.label.compareRouterId') }}</label>
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters.bestpath['skip-mp']" /> 跳过多路径</label>
+              <label><input type="checkbox" v-model="config.parameters.bestpath['skip-mp']" /> {{ t('bgp.label.skipMultipath') }}</label>
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters.bestpath['as-path']['multipath-relax']" /> AS 路径多路径放松</label>
+              <label><input type="checkbox" v-model="config.parameters.bestpath['as-path']['multipath-relax']" /> {{ t('bgp.label.asPathMultipathRelax') }}</label>
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters.bestpath['as-path']['ignore']" /> 忽略 AS 路径</label>
+              <label><input type="checkbox" v-model="config.parameters.bestpath['as-path']['ignore']" /> {{ t('bgp.label.ignoreAsPath') }}</label>
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters.bestpath.med.confed" /> MED Confederation</label>
+              <label><input type="checkbox" v-model="config.parameters.bestpath.med.confed" /> {{ t('bgp.label.medConfederation') }}</label>
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters.bestpath.med['missing-as-worst']" /> 缺失 MED 视为最差</label>
+              <label><input type="checkbox" v-model="config.parameters.bestpath.med['missing-as-worst']" /> {{ t('bgp.label.missingMedAsWorst') }}</label>
             </div>
             <div class="form-row">
-              <label class="form-label"> Confederation Identifier</label>
+              <label class="form-label">{{ t('bgp.label.confederationIdentifier') }}</label>
               <input type="text" class="form-control" v-model="config.parameters.confederation.identifier"
                      placeholder="ASN" style="width:200px !important; flex:none !important;"
-                     title=" Confederation Identifier (ASN)" />
+                     :title="t('bgp.title.confederationIdentifier')" />
             </div>
             <div class="form-row">
-              <label class="form-label">Confederation Peers</label>
+              <label class="form-label">{{ t('bgp.label.confederationPeers') }}</label>
               <div>
-                <button class="btn btn-sm btn-primary" @click="addConfederationPeer">添加 Peer</button>
+                <button class="btn btn-sm btn-primary" @click="addConfederationPeer">{{ t('bgp.button.addPeer') }}</button>
               </div>
             </div>
             <div v-if="confederationPeers.length > 0">
               <div v-for="(peer, index) in confederationPeers" :key="index" class="form-row" style="padding-left: 20px;">
-                <label class="form-label">Peer {{ index + 1 }}</label>
+                <label class="form-label">{{ t('bgp.label.peer') }} {{ index + 1 }}</label>
                 <div style="display: flex; gap: 10px; align-items: center;">
                   <span>{{ peer }}</span>
-                  <button class="btn btn-sm btn-danger" @click="removeConfederationPeer(index)">删除</button>
+                  <button class="btn btn-sm btn-danger" @click="removeConfederationPeer(index)">{{ t('bgp.button.delete') }}</button>
                 </div>
               </div>
             </div>
             <div class="form-row">
-              <label class="form-label">Dampening Half-Life</label>
+              <label class="form-label">{{ t('bgp.label.dampeningHalfLife') }}</label>
               <input type="number" class="form-control" v-model="config.parameters.dampening['half-life']"
-                     min="1" max="45" placeholder="1-45 分钟" style="width:200px !important; flex:none !important;"
-                     title="路由抖动抑制半衰期 (1-45 分钟)" />
+                     min="1" max="45" :placeholder="t('bgp.placeholder.dampeningHalfLife')" style="width:200px !important; flex:none !important;"
+                     :title="t('bgp.title.dampeningHalfLife')" />
             </div>
             <div class="form-row">
-              <label class="form-label">Dampening Reuse</label>
+              <label class="form-label">{{ t('bgp.label.dampeningReuse') }}</label>
               <input type="number" class="form-control" v-model="config.parameters.dampening.reuse"
                      min="1" max="20000" placeholder="1-20000" style="width:200px !important; flex:none !important;"
-                     title="路由抖动抑制重用值 (1-20000)" />
+                     :title="t('bgp.title.dampeningReuse')" />
             </div>
             <div class="form-row">
-              <label class="form-label">Dampening Start Suppress</label>
+              <label class="form-label">{{ t('bgp.label.dampeningStartSuppress') }}</label>
               <input type="number" class="form-control" v-model="config.parameters.dampening['start-suppress-time']"
                      min="1" max="20000" placeholder="1-20000" style="width:200px !important; flex:none !important;"
-                     title="路由抖动抑制开始抑制时间 (1-20000)" />
+                     :title="t('bgp.title.dampeningStartSuppress')" />
             </div>
             <div class="form-row">
-              <label class="form-label">Dampening Max Suppress</label>
+              <label class="form-label">{{ t('bgp.label.dampeningMaxSuppress') }}</label>
               <input type="number" class="form-control" v-model="config.parameters.dampening['max-suppress-time']"
                      min="1" max="20000" placeholder="1-20000" style="width:200px !important; flex:none !important;"
-                     title="路由抖动抑制最大抑制时间 (1-20000)" />
+                     :title="t('bgp.title.dampeningMaxSuppress')" />
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters.dampening.enable" /> 启用路由抖动抑制</label>
+              <label><input type="checkbox" v-model="config.parameters.dampening.enable" /> {{ t('bgp.label.enableDampening') }}</label>
             </div>
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.parameters['graceful-restart'].enable" /> 启用优雅重启</label>
+              <label><input type="checkbox" v-model="config.parameters['graceful-restart'].enable" /> {{ t('bgp.label.enableGracefulRestart') }}</label>
             </div>
             <div class="form-row">
-              <label class="form-label">优雅重启时间</label>
+              <label class="form-label">{{ t('bgp.label.gracefulRestartTime') }}</label>
               <input type="number" class="form-control" v-model="config.parameters['graceful-restart'].restart"
-                     min="1" max="4095" placeholder="1-4095 秒" style="width:200px !important; flex:none !important;"
-                     title="优雅重启时间 (1-4095 秒)" />
+                     min="1" max="4095" :placeholder="t('bgp.placeholder.gracefulRestartTime')" style="width:200px !important; flex:none !important;"
+                     :title="t('bgp.title.gracefulRestartTime')" />
             </div>
             <div class="form-row">
-              <label class="form-label">陈旧路径时间</label>
+              <label class="form-label">{{ t('bgp.label.stalepathTime') }}</label>
               <input type="number" class="form-control" v-model="config.parameters['graceful-restart'].stalepath"
-                     min="1" max="4095" placeholder="1-4095 秒" style="width:200px !important; flex:none !important;"
-                     title="陈旧路径保留时间 (1-4095 秒)" />
+                     min="1" max="4095" :placeholder="t('bgp.placeholder.stalepathTime')" style="width:200px !important; flex:none !important;"
+                     :title="t('bgp.title.stalepathTime')" />
             </div>
               </div>
             </div>
@@ -3756,26 +3908,26 @@ export default defineComponent({
         <template #address-family>
           <TabGroup v-model="activeAfTab" :tabs="[
             { key: 'ipv4-flowspec', title: 'IPv4 Flowspec' },
-            { key: 'ipv4-labeled-unicast', title: 'IPv4 标签单播' },
-            { key: 'ipv4-multicast', title: 'IPv4 组播' },
-            { key: 'ipv4-unicast', title: 'IPv4 单播' },
+            { key: 'ipv4-labeled-unicast', title: t('bgp.tab.ipv4LabeledUnicast') },
+            { key: 'ipv4-multicast', title: t('bgp.tab.ipv4Multicast') },
+            { key: 'ipv4-unicast', title: t('bgp.tab.ipv4Unicast') },
             { key: 'ipv4-vpn', title: 'IPv4 VPN' },
             { key: 'ipv6-flowspec', title: 'IPv6 Flowspec' },
-            { key: 'ipv6-labeled-unicast', title: 'IPv6 标签单播' },
-            { key: 'ipv6-multicast', title: 'IPv6 组播' },
-            { key: 'ipv6-unicast', title: 'IPv6 单播' },
+            { key: 'ipv6-labeled-unicast', title: t('bgp.tab.ipv6LabeledUnicast') },
+            { key: 'ipv6-multicast', title: t('bgp.tab.ipv6Multicast') },
+            { key: 'ipv6-unicast', title: t('bgp.tab.ipv6Unicast') },
             { key: 'ipv6-vpn', title: 'IPv6 VPN' },
             { key: 'l2vpn-evpn', title: 'L2VPN EVPN' }
           ]">
             <template #ipv4-flowspec>
               <div style="padding:16px;">
                 <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden; margin-bottom:16px;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">本地安装 (Local Install)</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.localInstall') }}</div>
                   <div style="padding:16px;">
                     <div class="form-row">
-                      <label class="form-label">接口</label>
+                      <label class="form-label">{{ t('bgp.label.interface') }}</label>
                       <select class="form-control" v-model="config['address-family']['ipv4-flowspec']['local-install'].interface" style="width:300px;">
-                        <option value="">-- 请选择 --</option>
+                        <option value="">{{ t('bgp.option.selectInterface') }}</option>
                         <option value="eth0">eth0</option>
                         <option value="eth1">eth1</option>
                         <option value="eth1.10">eth1.10</option>
@@ -3792,7 +3944,7 @@ export default defineComponent({
             <template #ipv4-labeled-unicast>
               <div style="padding:16px;">
                 <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">网络</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.network') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv4LabeledUnicastNetworkColumns" :data="config['address-family']['ipv4-labeled-unicast'].networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
@@ -3801,7 +3953,7 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">聚合地址</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.aggregateAddress') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv4LabeledUnicastAggregateColumns" :data="config['address-family']['ipv4-labeled-unicast'].aggregates" :loading="loading" :disabled="writeDisabled"
                            rowKey="aggregate" :actions="['create', 'edit', 'delete']"
@@ -3810,15 +3962,15 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">最大路径数</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.maxPaths') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">eBGP 最大路径数</label>
+                  <label class="form-label">{{ t('bgp.label.ebgpMaxPaths') }}</label>
                   <input type="number" class="form-control" v-model="config['address-family']['ipv4-labeled-unicast'].maxPaths.ebgp"
                          min="1" max="256" placeholder="1-256" style="width:200px !important; flex:none !important;" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">iBGP 最大路径数</label>
+                  <label class="form-label">{{ t('bgp.label.ibgpMaxPaths') }}</label>
                   <input type="number" class="form-control" v-model="config['address-family']['ipv4-labeled-unicast'].maxPaths.ibgp"
                          min="1" max="256" placeholder="1-256" style="width:200px !important; flex:none !important;" />
                 </div>
@@ -3830,7 +3982,7 @@ export default defineComponent({
             <template #ipv4-multicast>
               <div style="padding:16px;">
                 <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">网络</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.network') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv4MulticastNetworkColumns" :data="config['address-family']['ipv4-multicast'].networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
@@ -3839,7 +3991,7 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">聚合地址</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.aggregateAddress') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv4MulticastAggregateColumns" :data="config['address-family']['ipv4-multicast'].aggregates" :loading="loading" :disabled="writeDisabled"
                            rowKey="aggregate" :actions="['create', 'edit', 'delete']"
@@ -3848,31 +4000,31 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">管理距离</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.adminDistance') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">eBGP 距离</label>
+                  <label class="form-label">{{ t('bgp.label.ebgpDistance') }}</label>
                   <input type="number" class="form-control" v-model="config['address-family']['ipv4-multicast'].distance.external"
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
-                         title="eBGP 路由管理距离 (1-255)" />
+                         :title="t('bgp.title.ebgpDistance')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">iBGP 距离</label>
+                  <label class="form-label">{{ t('bgp.label.ibgpDistance') }}</label>
                   <input type="number" class="form-control" v-model="config['address-family']['ipv4-multicast'].distance.internal"
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
-                         title="iBGP 路由管理距离 (1-255)" />
+                         :title="t('bgp.title.ibgpDistance')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">本地距离</label>
+                  <label class="form-label">{{ t('bgp.label.localDistance') }}</label>
                   <input type="number" class="form-control" v-model="config['address-family']['ipv4-multicast'].distance.local"
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
-                         title="本地 BGP 路由管理距离 (1-255)" />
+                         :title="t('bgp.title.localDistance')" />
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">前缀管理距离</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.prefixAdminDistance') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv4MulticastDistancePrefixColumns" :data="config['address-family']['ipv4-multicast'].distancePrefixes" :loading="loading" :disabled="writeDisabled"
                            rowKey="prefix" :actions="['create', 'edit', 'delete']"
@@ -3885,7 +4037,7 @@ export default defineComponent({
             <template #ipv4-unicast>
               <div style="padding:16px;">
                 <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">网络</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.network') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="networkColumns" :data="config.networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
@@ -3894,7 +4046,7 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">聚合地址</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.aggregateAddress') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="aggregateColumns" :data="config.aggregates" :loading="loading" :disabled="writeDisabled"
                            rowKey="aggregate" :actions="['create', 'edit', 'delete']"
@@ -3903,7 +4055,7 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">重分发</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.redistribute') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="redistributeColumns" :data="config.redistributes" :loading="loading" :disabled="writeDisabled"
                            rowKey="protocol" :actions="['create', 'edit', 'delete']"
@@ -3912,74 +4064,74 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">管理距离</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.adminDistance') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">eBGP 距离</label>
+                  <label class="form-label">{{ t('bgp.label.ebgpDistance') }}</label>
                   <input type="number" class="form-control" v-model="config.distance.external"
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
-                         title="eBGP 路由管理距离 (1-255)" />
+                         :title="t('bgp.title.ebgpDistance')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">iBGP 距离</label>
+                  <label class="form-label">{{ t('bgp.label.ibgpDistance') }}</label>
                   <input type="number" class="form-control" v-model="config.distance.internal"
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
-                         title="iBGP 路由管理距离 (1-255)" />
+                         :title="t('bgp.title.ibgpDistance')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">本地距离</label>
+                  <label class="form-label">{{ t('bgp.label.localDistance') }}</label>
                   <input type="number" class="form-control" v-model="config.distance.local"
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
-                         title="本地 BGP 路由管理距离 (1-255)" />
+                         :title="t('bgp.title.localDistance')" />
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">最大路径数</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.maxPaths') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">eBGP 最大路径</label>
+                  <label class="form-label">{{ t('bgp.label.ebgpMaxPaths') }}</label>
                   <input type="number" class="form-control" v-model="config.maxPaths.ebgp"
                          min="1" max="64" placeholder="1-64" style="width:200px !important; flex:none !important;"
-                         title="eBGP 最大路径数 (1-64)" />
+                         :title="t('bgp.title.ebgpMaxPaths')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">iBGP 最大路径</label>
+                  <label class="form-label">{{ t('bgp.label.ibgpMaxPaths') }}</label>
                   <input type="number" class="form-control" v-model="config.maxPaths.ibgp"
                          min="1" max="64" placeholder="1-64" style="width:200px !important; flex:none !important;"
-                         title="iBGP 最大路径数 (1-64)" />
+                         :title="t('bgp.title.ibgpMaxPaths')" />
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">VPN 导出/导入</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.vpnExportImport') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label"></label>
-                  <label><input type="checkbox" v-model="config.exportConfig.vpn" /> 导出到 VPN</label>
+                  <label><input type="checkbox" v-model="config.exportConfig.vpn" /> {{ t('bgp.label.exportToVpn') }}</label>
                 </div>
                 <div class="form-row">
                   <label class="form-label"></label>
-                  <label><input type="checkbox" v-model="config.importConfig.vpn" /> 从 VPN 导入</label>
+                  <label><input type="checkbox" v-model="config.importConfig.vpn" /> {{ t('bgp.label.importFromVpn') }}</label>
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">标签配置</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.labelConfig') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">VPN 标签导出</label>
+                  <label class="form-label">{{ t('bgp.label.vpnLabelExport') }}</label>
                   <input type="text" class="form-control" v-model="config.labelConfig.vpn.export"
-                         placeholder="标签值" style="width:200px !important; flex:none !important;"
-                         title="VPN 标签导出值" />
+                         :placeholder="t('bgp.placeholder.labelValue')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnLabelExport')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">标签分配模式</label>
+                  <label class="form-label">{{ t('bgp.label.labelAllocationMode') }}</label>
                   <select class="form-control" v-model="config.labelConfig.vpn['allocation-mode']" style="width:200px !important; flex:none !important;">
-                    <option value="">-- 选择 --</option>
+                    <option value="">{{ t('bgp.option.select') }}</option>
                     <option value="per-nexthop">per-nexthop</option>
                   </select>
                 </div>
@@ -3987,79 +4139,79 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">下一跳配置</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.nexthopConfig') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">VPN 下一跳导出</label>
+                  <label class="form-label">{{ t('bgp.label.vpnNexthopExport') }}</label>
                   <input type="text" class="form-control" v-model="config.nexthopConfig.vpn.export"
-                         placeholder="下一跳地址" style="width:200px !important; flex:none !important;"
-                         title="VPN 下一跳导出地址" />
+                         :placeholder="t('bgp.placeholder.nexthopAddress')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnNexthopExport')" />
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">路由区分器 (RD)</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.routeDistinguisher') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">VPN RD 导出</label>
+                  <label class="form-label">{{ t('bgp.label.vpnRdExport') }}</label>
                   <input type="text" class="form-control" v-model="config.rdConfig.vpn.export"
-                         placeholder="路由区分器" style="width:200px !important; flex:none !important;"
-                         title="VPN 路由区分器导出值" />
+                         :placeholder="t('bgp.placeholder.routeDistinguisher')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnRdExport')" />
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">路由映射</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.routeMap') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">VPN 导出路由映射</label>
+                  <label class="form-label">{{ t('bgp.label.vpnExportRouteMap') }}</label>
                   <input type="text" class="form-control" v-model="config.routeMapConfig.vpn.export"
-                         placeholder="路由映射名称" style="width:200px !important; flex:none !important;"
-                         title="VPN 导出路由映射名称" />
+                         :placeholder="t('bgp.placeholder.routeMapName')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnExportRouteMap')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">VPN 导入路由映射</label>
+                  <label class="form-label">{{ t('bgp.label.vpnImportRouteMap') }}</label>
                   <input type="text" class="form-control" v-model="config.routeMapConfig.vpn.import"
-                         placeholder="路由映射名称" style="width:200px !important; flex:none !important;"
-                         title="VPN 导入路由映射名称" />
+                         :placeholder="t('bgp.placeholder.routeMapName')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnImportRouteMap')" />
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">路由目标</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.routeTarget') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">VPN 双向路由目标</label>
+                  <label class="form-label">{{ t('bgp.label.vpnBothRouteTarget') }}</label>
                   <input type="text" class="form-control" v-model="config.routeTargetConfig.vpn.both"
-                         placeholder="路由目标" style="width:200px !important; flex:none !important;"
-                         title="VPN 双向路由目标（导入和导出）" />
+                         :placeholder="t('bgp.placeholder.routeTarget')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnBothRouteTarget')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">VPN 导出路由目标</label>
+                  <label class="form-label">{{ t('bgp.label.vpnExportRouteTarget') }}</label>
                   <input type="text" class="form-control" v-model="config.routeTargetConfig.vpn.export"
-                         placeholder="路由目标" style="width:200px !important; flex:none !important;"
-                         title="VPN 导出路由目标" />
+                         :placeholder="t('bgp.placeholder.routeTarget')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnExportRouteTarget')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">VPN 导入路由目标</label>
+                  <label class="form-label">{{ t('bgp.label.vpnImportRouteTarget') }}</label>
                   <input type="text" class="form-control" v-model="config.routeTargetConfig.vpn.import"
-                         placeholder="路由目标" style="width:200px !important; flex:none !important;"
-                         title="VPN 导入路由目标" />
+                         :placeholder="t('bgp.placeholder.routeTarget')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnImportRouteTarget')" />
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">SID 配置</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.sidConfig') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">VPN SID 导出</label>
+                  <label class="form-label">{{ t('bgp.label.vpnSidExport') }}</label>
                   <input type="text" class="form-control" v-model="config.sidConfig.vpn.export"
-                         placeholder="SID 值" style="width:200px !important; flex:none !important;"
-                         title="VPN SID 导出值" />
+                         :placeholder="t('bgp.placeholder.sidValue')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnSidExport')" />
                 </div>
                   </div>
                 </div>
@@ -4069,7 +4221,7 @@ export default defineComponent({
             <template #ipv4-vpn>
               <div style="padding:16px;">
                 <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">网络</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.network') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv4VpnNetworkColumns" :data="config['address-family']['ipv4-vpn'].networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
@@ -4082,12 +4234,12 @@ export default defineComponent({
             <template #ipv6-flowspec>
               <div style="padding:16px;">
                 <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">本地安装接口</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.localInstallInterface') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">接口</label>
+                  <label class="form-label">{{ t('bgp.label.interface') }}</label>
                   <select class="form-control" v-model="config['address-family']['ipv6-flowspec']['local-install'].interface" style="width:200px !important; flex:none !important;">
-                    <option value="">-- 选择 --</option>
+                    <option value="">{{ t('bgp.option.select') }}</option>
                     <option value="eth1">eth1</option>
                     <option value="eth1.10">eth1.10</option>
                     <option value="eth1.20">eth1.20</option>
@@ -4103,7 +4255,7 @@ export default defineComponent({
             <template #ipv6-labeled-unicast>
               <div style="padding:16px;">
                 <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">网络</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.network') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv6LabeledUnicastNetworkColumns" :data="config['address-family']['ipv6-labeled-unicast'].networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
@@ -4112,7 +4264,7 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">聚合地址</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.aggregateAddress') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv6LabeledUnicastAggregateColumns" :data="config['address-family']['ipv6-labeled-unicast'].aggregates" :loading="loading" :disabled="writeDisabled"
                            rowKey="aggregate" :actions="['create', 'edit', 'delete']"
@@ -4125,7 +4277,7 @@ export default defineComponent({
             <template #ipv6-multicast>
               <div style="padding:16px;">
                 <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">网络</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.network') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv6MulticastNetworkColumns" :data="config['address-family']['ipv6-multicast'].networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
@@ -4134,7 +4286,7 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">聚合地址</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.aggregateAddress') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv6MulticastAggregateColumns" :data="config['address-family']['ipv6-multicast'].aggregates" :loading="loading" :disabled="writeDisabled"
                            rowKey="aggregate" :actions="['create', 'edit', 'delete']"
@@ -4143,31 +4295,31 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">管理距离</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.adminDistance') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">eBGP 距离</label>
+                  <label class="form-label">{{ t('bgp.label.ebgpDistance') }}</label>
                   <input type="number" class="form-control" v-model="config['address-family']['ipv6-multicast'].distance.external"
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
-                         title="eBGP 路由管理距离 (1-255)" />
+                         :title="t('bgp.title.ebgpDistance')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">iBGP 距离</label>
+                  <label class="form-label">{{ t('bgp.label.ibgpDistance') }}</label>
                   <input type="number" class="form-control" v-model="config['address-family']['ipv6-multicast'].distance.internal"
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
-                         title="iBGP 路由管理距离 (1-255)" />
+                         :title="t('bgp.title.ibgpDistance')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">本地距离</label>
+                  <label class="form-label">{{ t('bgp.label.localDistance') }}</label>
                   <input type="number" class="form-control" v-model="config['address-family']['ipv6-multicast'].distance.local"
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
-                         title="本地 BGP 路由管理距离 (1-255)" />
+                         :title="t('bgp.title.localDistance')" />
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">前缀管理距离</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.prefixAdminDistance') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv6MulticastDistancePrefixColumns" :data="config['address-family']['ipv6-multicast'].distancePrefixes" :loading="loading" :disabled="writeDisabled"
                            rowKey="prefix" :actions="['create', 'edit', 'delete']"
@@ -4179,7 +4331,7 @@ export default defineComponent({
             <template #ipv6-unicast>
               <div style="padding:16px;">
                 <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">IPv6 网络</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.ipv6Network') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv6NetworkColumns" :data="config.ipv6Networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
@@ -4188,7 +4340,7 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">IPv6 聚合地址</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.ipv6AggregateAddress') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv6AggregateColumns" :data="config.ipv6Aggregates" :loading="loading" :disabled="writeDisabled"
                            rowKey="aggregate" :actions="['create', 'edit', 'delete']"
@@ -4197,7 +4349,7 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">IPv6 重分发</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.ipv6Redistribute') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv6RedistributeColumns" :data="config.ipv6Redistributes" :loading="loading" :disabled="writeDisabled"
                            rowKey="protocol" :actions="['create', 'edit', 'delete']"
@@ -4206,49 +4358,49 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">管理距离</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.adminDistance') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">eBGP 距离</label>
+                  <label class="form-label">{{ t('bgp.label.ebgpDistance') }}</label>
                   <input type="number" class="form-control" v-model="config.ipv6Distance.external"
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
-                         title="eBGP 路由管理距离 (1-255)" />
+                         :title="t('bgp.title.ebgpDistance')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">iBGP 距离</label>
+                  <label class="form-label">{{ t('bgp.label.ibgpDistance') }}</label>
                   <input type="number" class="form-control" v-model="config.ipv6Distance.internal"
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
-                         title="iBGP 路由管理距离 (1-255)" />
+                         :title="t('bgp.title.ibgpDistance')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">本地距离</label>
+                  <label class="form-label">{{ t('bgp.label.localDistance') }}</label>
                   <input type="number" class="form-control" v-model="config.ipv6Distance.local"
                          min="1" max="255" placeholder="1-255" style="width:200px !important; flex:none !important;"
-                         title="本地 BGP 路由管理距离 (1-255)" />
+                         :title="t('bgp.title.localDistance')" />
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">最大路径数</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.maxPaths') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">eBGP 最大路径</label>
+                  <label class="form-label">{{ t('bgp.label.ebgpMaxPaths') }}</label>
                   <input type="number" class="form-control" v-model="config.ipv6MaxPaths.ebgp"
                          min="1" max="256" placeholder="1-256" style="width:200px !important; flex:none !important;"
-                         title="eBGP 最大路径数 (1-256)" />
+                         :title="t('bgp.title.ebgpMaxPaths')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">iBGP 最大路径</label>
+                  <label class="form-label">{{ t('bgp.label.ibgpMaxPaths') }}</label>
                   <input type="number" class="form-control" v-model="config.ipv6MaxPaths.ibgp"
                          min="1" max="256" placeholder="1-256" style="width:200px !important; flex:none !important;"
-                         title="iBGP 最大路径数 (1-256)" />
+                         :title="t('bgp.title.ibgpMaxPaths')" />
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">前缀管理距离</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.prefixAdminDistance') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv6DistancePrefixColumns" :data="config.ipv6DistancePrefixes" :loading="loading" :disabled="writeDisabled"
                            rowKey="prefix" :actions="['create', 'edit', 'delete']"
@@ -4257,32 +4409,32 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">VPN 导出/导入</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.vpnExportImport') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label"></label>
-                  <label><input type="checkbox" v-model="config.ipv6ExportConfig.vpn" /> 导出到 VPN</label>
+                  <label><input type="checkbox" v-model="config.ipv6ExportConfig.vpn" /> {{ t('bgp.label.exportToVpn') }}</label>
                 </div>
                 <div class="form-row">
                   <label class="form-label"></label>
-                  <label><input type="checkbox" v-model="config.ipv6ImportConfig.vpn" /> 从 VPN 导入</label>
+                  <label><input type="checkbox" v-model="config.ipv6ImportConfig.vpn" /> {{ t('bgp.label.importFromVpn') }}</label>
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">标签配置</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.labelConfig') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">VPN 标签导出</label>
+                  <label class="form-label">{{ t('bgp.label.vpnLabelExport') }}</label>
                   <input type="text" class="form-control" v-model="config.ipv6LabelConfig.vpn.export"
-                         placeholder="标签值" style="width:200px !important; flex:none !important;"
-                         title="VPN 标签导出值" />
+                         :placeholder="t('bgp.placeholder.labelValue')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnLabelExport')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">标签分配模式</label>
+                  <label class="form-label">{{ t('bgp.label.labelAllocationMode') }}</label>
                   <select class="form-control" v-model="config.ipv6LabelConfig.vpn['allocation-mode']" style="width:200px !important; flex:none !important;">
-                    <option value="">-- 选择 --</option>
+                    <option value="">{{ t('bgp.option.select') }}</option>
                     <option value="per-nexthop">per-nexthop</option>
                   </select>
                 </div>
@@ -4290,79 +4442,79 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">下一跳配置</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.nexthopConfig') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">VPN 下一跳导出</label>
+                  <label class="form-label">{{ t('bgp.label.vpnNexthopExport') }}</label>
                   <input type="text" class="form-control" v-model="config.ipv6NexthopConfig.vpn.export"
-                         placeholder="下一跳地址" style="width:200px !important; flex:none !important;"
-                         title="VPN 下一跳导出地址" />
+                         :placeholder="t('bgp.placeholder.nexthopAddress')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnNexthopExport')" />
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">路由区分器 (RD)</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.routeDistinguisher') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">VPN RD 导出</label>
+                  <label class="form-label">{{ t('bgp.label.vpnRdExport') }}</label>
                   <input type="text" class="form-control" v-model="config.ipv6RdConfig.vpn.export"
-                         placeholder="路由区分器" style="width:200px !important; flex:none !important;"
-                         title="VPN 路由区分器导出值" />
+                         :placeholder="t('bgp.placeholder.routeDistinguisher')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnRdExport')" />
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">路由映射</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.routeMap') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">VPN 导出路由映射</label>
+                  <label class="form-label">{{ t('bgp.label.vpnExportRouteMap') }}</label>
                   <input type="text" class="form-control" v-model="config.ipv6RouteMapConfig.vpn.export"
-                         placeholder="路由映射名称" style="width:200px !important; flex:none !important;"
-                         title="VPN 导出路由映射名称" />
+                         :placeholder="t('bgp.placeholder.routeMapName')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnExportRouteMap')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">VPN 导入路由映射</label>
+                  <label class="form-label">{{ t('bgp.label.vpnImportRouteMap') }}</label>
                   <input type="text" class="form-control" v-model="config.ipv6RouteMapConfig.vpn.import"
-                         placeholder="路由映射名称" style="width:200px !important; flex:none !important;"
-                         title="VPN 导入路由映射名称" />
+                         :placeholder="t('bgp.placeholder.routeMapName')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnImportRouteMap')" />
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">路由目标</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.routeTarget') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">VPN 双向路由目标</label>
+                  <label class="form-label">{{ t('bgp.label.vpnBothRouteTarget') }}</label>
                   <input type="text" class="form-control" v-model="config.ipv6RouteTargetConfig.vpn.both"
-                         placeholder="路由目标" style="width:200px !important; flex:none !important;"
-                         title="VPN 双向路由目标（导入和导出）" />
+                         :placeholder="t('bgp.placeholder.routeTarget')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnBothRouteTarget')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">VPN 导出路由目标</label>
+                  <label class="form-label">{{ t('bgp.label.vpnExportRouteTarget') }}</label>
                   <input type="text" class="form-control" v-model="config.ipv6RouteTargetConfig.vpn.export"
-                         placeholder="路由目标" style="width:200px !important; flex:none !important;"
-                         title="VPN 导出路由目标" />
+                         :placeholder="t('bgp.placeholder.routeTarget')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnExportRouteTarget')" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">VPN 导入路由目标</label>
+                  <label class="form-label">{{ t('bgp.label.vpnImportRouteTarget') }}</label>
                   <input type="text" class="form-control" v-model="config.ipv6RouteTargetConfig.vpn.import"
-                         placeholder="路由目标" style="width:200px !important; flex:none !important;"
-                         title="VPN 导入路由目标" />
+                         :placeholder="t('bgp.placeholder.routeTarget')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnImportRouteTarget')" />
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">SID 配置</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.sidConfig') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">VPN SID 导出</label>
+                  <label class="form-label">{{ t('bgp.label.vpnSidExport') }}</label>
                   <input type="text" class="form-control" v-model="config.ipv6SidConfig.vpn.export"
-                         placeholder="SID 值" style="width:200px !important; flex:none !important;"
-                         title="VPN SID 导出值" />
+                         :placeholder="t('bgp.placeholder.sidValue')" style="width:200px !important; flex:none !important;"
+                         :title="t('bgp.title.vpnSidExport')" />
                 </div>
                   </div>
                 </div>
@@ -4372,7 +4524,7 @@ export default defineComponent({
             <template #ipv6-vpn>
               <div style="padding:16px;">
                 <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">网络</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.network') }}</div>
                   <div style="padding:16px;">
                 <DataTable :columns="ipv6VpnNetworkColumns" :data="config['address-family']['ipv6-vpn'].networks" :loading="loading" :disabled="writeDisabled"
                            rowKey="network" :actions="['create', 'edit', 'delete']"
@@ -4385,47 +4537,47 @@ export default defineComponent({
             <template #l2vpn-evpn>
               <div style="padding:16px;">
                 <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">基本设置</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.basicSettings') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label"></label>
-                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn']['advertise-pip']" /> 通告 PIP (advertise-pip)</label>
+                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn']['advertise-pip']" /> {{ t('bgp.label.advertisePip') }}</label>
                 </div>
                 <div class="form-row">
                   <label class="form-label"></label>
-                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn']['advertise-svi-ip']" /> 通告 SVI IP (advertise-svi-ip)</label>
+                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn']['advertise-svi-ip']" /> {{ t('bgp.label.advertiseSviIp') }}</label>
                 </div>
                 <div class="form-row">
                   <label class="form-label"></label>
-                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn']['disable-ead-evi-rx']" /> 禁用 EAD EVI 接收 (disable-ead-evi-rx)</label>
+                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn']['disable-ead-evi-rx']" /> {{ t('bgp.label.disableEadEviRx') }}</label>
                 </div>
                 <div class="form-row">
                   <label class="form-label"></label>
-                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn']['disable-ead-evi-tx']" /> 禁用 EAD EVI 发送 (disable-ead-evi-tx)</label>
+                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn']['disable-ead-evi-tx']" /> {{ t('bgp.label.disableEadEviTx') }}</label>
                 </div>
                 <div class="form-row">
                   <label class="form-label"></label>
-                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn']['rt-auto-derive']" /> 自动推导 RT (rt-auto-derive)</label>
+                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn']['rt-auto-derive']" /> {{ t('bgp.label.rtAutoDerive') }}</label>
                 </div>
                 <div class="form-row">
                   <label class="form-label"></label>
-                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn']['flooding']" /> 禁用泛洪 (flooding disable)</label>
+                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn']['flooding']" /> {{ t('bgp.label.floodingDisable') }}</label>
                 </div>
                 <div class="form-row">
                   <label class="form-label">Route Distinguisher (RD)</label>
                   <input type="text" class="form-control" v-model="config['address-family']['l2vpn-evpn'].rd"
-                         placeholder="例如: 1:1 或 1.1.1.1:100" style="width:300px;" />
+                         :placeholder="t('bgp.placeholder.routeDistinguisher')" style="width:300px;" />
                 </div>
                 <div class="form-row">
                   <label class="form-label">MAC VRF SOO</label>
                   <input type="text" class="form-control" v-model="config['address-family']['l2vpn-evpn']['mac-vrf'].soo"
-                         placeholder="例如: 1:1 或 1.1.1.1:100" style="width:300px;" />
+                         :placeholder="t('bgp.placeholder.macVrfSoo')" style="width:300px;" />
                 </div>
                   </div>
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">EAD-ES 配置</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.eadEsConfig') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label">EAD-ES Route Target Export</label>
@@ -4441,25 +4593,25 @@ export default defineComponent({
                 </div>
 
                 <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">Advertise 配置</div>
+                  <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.section.advertiseConfig') }}</div>
                   <div style="padding:16px;">
                 <div class="form-row">
                   <label class="form-label"></label>
-                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn'].advertise['ipv4-unicast'].enable" /> 通告 IPv4 Unicast</label>
+                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn'].advertise['ipv4-unicast'].enable" /> {{ t('bgp.label.advertiseIpv4Unicast') }}</label>
                 </div>
                 <div v-if="config['address-family']['l2vpn-evpn'].advertise['ipv4-unicast'].enable" class="form-row">
                   <label class="form-label">IPv4 Unicast Route-Map</label>
                   <input type="text" class="form-control" v-model="config['address-family']['l2vpn-evpn'].advertise['ipv4-unicast']['route-map']"
-                         placeholder="Route-map 名称" style="width:300px;" />
+                         :placeholder="t('bgp.placeholder.routeMapName')" style="width:300px;" />
                 </div>
                 <div class="form-row">
                   <label class="form-label"></label>
-                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn'].advertise['ipv6-unicast'].enable" /> 通告 IPv6 Unicast</label>
+                  <label><input type="checkbox" v-model="config['address-family']['l2vpn-evpn'].advertise['ipv6-unicast'].enable" /> {{ t('bgp.label.advertiseIpv6Unicast') }}</label>
                 </div>
                 <div v-if="config['address-family']['l2vpn-evpn'].advertise['ipv6-unicast'].enable" class="form-row">
                   <label class="form-label">IPv6 Unicast Route-Map</label>
                   <input type="text" class="form-control" v-model="config['address-family']['l2vpn-evpn'].advertise['ipv6-unicast']['route-map']"
-                         placeholder="Route-map 名称" style="width:300px;" />
+                         :placeholder="t('bgp.placeholder.routeMapName')" style="width:300px;" />
                 </div>
                   </div>
                 </div>
@@ -4494,8 +4646,8 @@ export default defineComponent({
                            rowKey="vni" :actions="['create', 'edit', 'delete']"
                            @create="createEvpnVni" @edit="editEvpnVni" @delete="deleteEvpnVnis">
                   <template #cell-route-targets="{ row }">
-                    <span>{{ (row['route-targets'] || []).length }} 个 RT</span>
-                    <button class="btn btn-sm btn-link" @click.stop="openVniRtManager(row)" style="margin-left:8px;">管理</button>
+                    <span>{{ (row['route-targets'] || []).length }} {{ t('bgp.label.rtCount') }}</span>
+                    <button class="btn btn-sm btn-link" @click.stop="openVniRtManager(row)" style="margin-left:8px;">{{ t('bgp.button.manage') }}</button>
                   </template>
                 </DataTable>
                   </div>
@@ -4509,7 +4661,7 @@ export default defineComponent({
           <div style="padding:16px;">
             <div class="form-row">
               <label class="form-label"></label>
-              <label><input type="checkbox" v-model="config.sid.vpn" /> 启用 VPN SID (当前 VRF 与 VPN 之间)</label>
+              <label><input type="checkbox" v-model="config.sid.vpn" /> {{ t('bgp.label.enableVpnSid') }}</label>
             </div>
           </div>
         </template>
@@ -4519,32 +4671,28 @@ export default defineComponent({
             <div class="form-row">
               <label class="form-label">SRv6 Locator</label>
               <input type="text" class="form-control" v-model="config.srv6.locator"
-                     placeholder="例如: MYLOCATOR" style="width:300px;"
-                     title="SRv6 Locator 名称" />
+                     :placeholder="t('bgp.placeholder.srv6Locator')" style="width:300px;"
+                     :title="t('bgp.title.srv6Locator')" />
             </div>
           </div>
         </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
-
       <!-- Neighbor Modal -->
-      <DraggableModal v-model:visible="neighborModalVisible" :title="editingNeighborIndex >= 0 ? '编辑 BGP 邻居' : '添加 BGP 邻居'" width="600px" @confirm="saveNeighbor">
+      <DraggableModal v-model:visible="neighborModalVisible" :title="editingNeighborIndex >= 0 ? t('bgp.modal.editNeighbor') : t('bgp.modal.addNeighbor')" width="600px" @confirm="saveNeighbor">
         <div class="form-row">
-          <label class="form-label">邻居地址 *</label>
+          <label class="form-label">{{ t('bgp.label.neighborAddress') }} *</label>
           <input type="text" class="form-control" v-model="neighborForm.address"
-                 placeholder="IPv4 或 IPv6 地址" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.ipv4OrIpv6Address')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">远程 ASN</label>
+          <label class="form-label">{{ t('bgp.label.remoteAsn') }}</label>
           <input type="number" class="form-control" v-model="neighborForm['remote-as']"
                  min="1" max="4294967294" placeholder="1-4294967294" style="width:100%;"
-                 title="邻居 AS 号 (1-4294967294)" />
+                 :title="t('bgp.title.neighborAsn')" />
         </div>
         <div class="form-row">
-          <label class="form-label">描述</label>
+          <label class="form-label">{{ t('bgp.label.description') }}</label>
           <input type="text" class="form-control" v-model="neighborForm.description"
                  style="width:100%;" />
         </div>
@@ -4554,359 +4702,359 @@ export default defineComponent({
                  style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">本地角色</label>
+          <label class="form-label">{{ t('bgp.label.localRole') }}</label>
           <select class="form-control" v-model="neighborForm['local-role']" style="width:100%;">
             <option v-for="opt in LOCAL_ROLE_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">EBGP 多跳</label>
+          <label class="form-label">{{ t('bgp.label.ebgpMultihop') }}</label>
           <input type="number" class="form-control" v-model="neighborForm['ebgp-multihop']"
                  min="1" max="255" placeholder="1-255" style="width:100%;"
-                 title="EBGP 多跳数 (1-255)" />
+                 :title="t('bgp.title.ebgpMultihop')" />
         </div>
         <div class="form-row">
-          <label class="form-label">广告间隔</label>
+          <label class="form-label">{{ t('bgp.label.advertisementInterval') }}</label>
           <input type="number" class="form-control" v-model="neighborForm['advertisement-interval']"
-                 min="0" max="600" placeholder="0-600 秒" style="width:100%;"
-                 title="最小路由更新广告间隔 (0-600 秒)" />
+                 min="0" max="600" :placeholder="t('bgp.placeholder.secondsRange', {min: 0, max: 600})" style="width:100%;"
+                 :title="t('bgp.title.advertisementInterval')" />
         </div>
         <div class="form-row">
-          <label class="form-label">更新源</label>
+          <label class="form-label">{{ t('bgp.label.updateSource') }}</label>
           <input type="text" class="form-control" v-model="neighborForm['update-source']"
-                 placeholder="接口名或 IP 地址" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.interfaceOrIp')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">端口</label>
+          <label class="form-label">{{ t('bgp.label.port') }}</label>
           <input type="number" class="form-control" v-model="neighborForm.port"
                  min="1" max="65535" placeholder="1-65535" style="width:100%;"
-                 title="BGP 端口 (1-65535)" />
+                 :title="t('bgp.title.bgpPort')" />
         </div>
         <div class="form-row">
-          <label class="form-label">本地 ASN</label>
+          <label class="form-label">{{ t('bgp.label.localAsn') }}</label>
           <input type="number" class="form-control" v-model="neighborForm['local-as']"
                  min="1" max="4294967294" placeholder="1-4294967294" style="width:100%;"
-                 title="本地 AS 号 (1-4294967294)" />
+                 :title="t('bgp.title.localAsn')" />
         </div>
         <div class="form-row">
-          <label class="form-label">密码</label>
+          <label class="form-label">{{ t('bgp.label.password') }}</label>
           <input type="password" class="form-control" v-model="neighborForm.password"
                  style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">连接定时器</label>
+          <label class="form-label">{{ t('bgp.label.connectTimer') }}</label>
           <input type="number" class="form-control" v-model="neighborForm.timers.connect"
-                 min="0" max="65535" placeholder="0=禁用, 1-65535 秒" style="width:100%;"
-                 title="BGP 连接定时器 (0=禁用, 1-65535 秒)" />
+                 min="0" max="65535" :placeholder="t('bgp.placeholder.timerRange', {min: 0, max: 65535})" style="width:100%;"
+                 :title="t('bgp.title.connectTimer')" />
         </div>
         <div class="form-row">
-          <label class="form-label">保持定时器</label>
+          <label class="form-label">{{ t('bgp.label.holdTimer') }}</label>
           <input type="number" class="form-control" v-model="neighborForm.timers.holdtime"
-                 min="0" max="65535" placeholder="0=禁用, 1-65535 秒" style="width:100%;"
-                 title="BGP 保持定时器 (0=禁用, 1-65535 秒)" />
+                 min="0" max="65535" :placeholder="t('bgp.placeholder.timerRange', {min: 0, max: 65535})" style="width:100%;"
+                 :title="t('bgp.title.holdTimer')" />
         </div>
         <div class="form-row">
-          <label class="form-label">Keepalive 定时器</label>
+          <label class="form-label">{{ t('bgp.label.keepaliveTimer') }}</label>
           <input type="number" class="form-control" v-model="neighborForm.timers.keepalive"
-                 min="1" max="65535" placeholder="1-65535 秒" style="width:100%;"
-                 title="BGP Keepalive 定时器 (1-65535 秒)" />
+                 min="1" max="65535" :placeholder="t('bgp.placeholder.timerRange', {min: 1, max: 65535})" style="width:100%;"
+                 :title="t('bgp.title.keepaliveTimer')" />
         </div>
         <div class="form-row">
-          <label class="form-label">TTL 安全跳数</label>
+          <label class="form-label">{{ t('bgp.label.ttlSecurityHops') }}</label>
           <input type="number" class="form-control" v-model="neighborForm['ttl-security'].hops"
                  min="1" max="254" placeholder="1-254" style="width:100%;"
-                 title="TTL 安全机制最大跳数 (1-254)" />
+                 :title="t('bgp.title.ttlSecurityHops')" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="neighborForm.shutdown" /> 关闭 (Shutdown)</label>
+          <label><input type="checkbox" v-model="neighborForm.shutdown" /> {{ t('bgp.label.shutdownCheckbox') }}</label>
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="neighborForm.passive" /> 被动模式 (Passive)</label>
+          <label><input type="checkbox" v-model="neighborForm.passive" /> {{ t('bgp.label.passiveMode') }}</label>
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="neighborForm['enforce-first-as']" /> 强制首 AS (Enforce First AS)</label>
+          <label><input type="checkbox" v-model="neighborForm['enforce-first-as']" /> {{ t('bgp.label.enforceFirstAsCheckbox') }}</label>
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="neighborForm['override-capability']" /> 覆盖能力协商</label>
+          <label><input type="checkbox" v-model="neighborForm['override-capability']" /> {{ t('bgp.label.overrideCapability') }}</label>
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="neighborForm['disable-connected-check']" /> 禁用直连检查</label>
+          <label><input type="checkbox" v-model="neighborForm['disable-connected-check']" /> {{ t('bgp.label.disableConnectedCheckbox') }}</label>
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="neighborForm['disable-capability-negotiation']" /> 禁用能力协商</label>
+          <label><input type="checkbox" v-model="neighborForm['disable-capability-negotiation']" /> {{ t('bgp.label.disableCapabilityNegCheckbox') }}</label>
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="neighborForm['graceful-restart'].enable" /> 优雅重启 (Graceful Restart)</label>
+          <label><input type="checkbox" v-model="neighborForm['graceful-restart'].enable" /> {{ t('bgp.label.gracefulRestart') }}</label>
         </div>
         <div v-if="neighborForm['graceful-restart'].enable">
           <div class="form-row">
-            <label class="form-label">优雅重启时间</label>
+            <label class="form-label">{{ t('bgp.label.restartTimer') }}</label>
             <input type="number" class="form-control" v-model="neighborForm['graceful-restart']['restart-time']"
-                   min="1" max="4095" placeholder="1-4095 秒" style="width:100%;"
-                   title="优雅重启时间 (1-4095 秒)" />
+                   min="1" max="4095" :placeholder="t('bgp.placeholder.timerRange', {min: 1, max: 4095})" style="width:100%;"
+                   :title="t('bgp.title.restartTimer')" />
           </div>
           <div class="form-row">
-            <label class="form-label">陈旧路径时间</label>
+            <label class="form-label">{{ t('bgp.label.stalepathTimer') }}</label>
             <input type="number" class="form-control" v-model="neighborForm['graceful-restart']['stalepath-time']"
-                   min="1" max="4095" placeholder="1-4095 秒" style="width:100%;"
-                   title="陈旧路径保留时间 (1-4095 秒)" />
+                   min="1" max="4095" :placeholder="t('bgp.placeholder.timerRange', {min: 1, max: 4095})" style="width:100%;"
+                   :title="t('bgp.title.stalepathTimer')" />
           </div>
           <div class="form-row">
             <label class="form-label"></label>
-            <label><input type="checkbox" v-model="neighborForm['graceful-restart']['preserve-fw-state']" /> 保留防火墙状态</label>
+            <label><input type="checkbox" v-model="neighborForm['graceful-restart']['preserve-fw-state']" /> {{ t('bgp.label.preserveFwState') }}</label>
           </div>
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="neighborForm.bfd.enable" /> 启用 BFD</label>
+          <label><input type="checkbox" v-model="neighborForm.bfd.enable" /> {{ t('bgp.label.enableBfdCheckbox') }}</label>
         </div>
         <div v-if="neighborForm.bfd.enable">
           <div class="form-row">
             <label class="form-label"></label>
-            <label><input type="checkbox" v-model="neighborForm.bfd['check-control-plane-failure']" /> 检查控制平面故障</label>
+            <label><input type="checkbox" v-model="neighborForm.bfd['check-control-plane-failure']" /> {{ t('bgp.label.checkControlPlaneFailure') }}</label>
           </div>
           <div class="form-row">
             <label class="form-label">BFD Profile</label>
             <input type="text" class="form-control" v-model="neighborForm.bfd.profile"
-                   placeholder="BFD 配置文件名称" style="width:100%;" />
+                   :placeholder="t('bgp.placeholder.bfdProfileName')" style="width:100%;" />
           </div>
         </div>
         <div class="form-row">
-          <label class="form-label">能力协商</label>
+          <label class="form-label">{{ t('bgp.label.capabilityNegotiation') }}</label>
         </div>
         <div class="form-row" style="padding-left: 20px;">
-          <label><input type="checkbox" v-model="neighborForm.capability.dynamic" /> 动态能力</label>
+          <label><input type="checkbox" v-model="neighborForm.capability.dynamic" /> {{ t('bgp.label.dynamicCapability') }}</label>
         </div>
         <div class="form-row" style="padding-left: 20px;">
-          <label><input type="checkbox" v-model="neighborForm.capability['extended-nexthop']" /> 扩展下一跳</label>
+          <label><input type="checkbox" v-model="neighborForm.capability['extended-nexthop']" /> {{ t('bgp.label.extendedNexthop') }}</label>
         </div>
         <div class="form-row" style="padding-left: 20px;">
-          <label><input type="checkbox" v-model="neighborForm.capability['software-version']" /> 软件版本</label>
+          <label><input type="checkbox" v-model="neighborForm.capability['software-version']" /> {{ t('bgp.label.softwareVersion') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路径属性</label>
+          <label class="form-label">{{ t('bgp.label.pathAttribute') }}</label>
         </div>
         <div class="form-row" style="padding-left: 20px;">
-          <label class="form-label">丢弃</label>
+          <label class="form-label">{{ t('bgp.label.discard') }}</label>
           <input type="text" class="form-control" v-model="neighborForm['path-attribute'].discard"
-                 placeholder="逗号分隔的属性列表" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.commaSeparatedList')" style="width:100%;" />
         </div>
         <div class="form-row" style="padding-left: 20px;">
-          <label class="form-label">视为撤回</label>
+          <label class="form-label">{{ t('bgp.label.treatAsWithdraw') }}</label>
           <input type="text" class="form-control" v-model="neighborForm['path-attribute']['treat-as-withdraw']"
-                 placeholder="逗号分隔的属性列表" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.commaSeparatedList')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- Peer Group Modal -->
-      <DraggableModal v-model:visible="peerGroupModalVisible" :title="editingPeerGroupIndex >= 0 ? '编辑 Peer Group' : '添加 Peer Group'" width="600px" @confirm="savePeerGroup">
+      <DraggableModal v-model:visible="peerGroupModalVisible" :title="editingPeerGroupIndex >= 0 ? t('bgp.modal.editPeerGroup') : t('bgp.modal.addPeerGroup')" width="600px" @confirm="savePeerGroup">
         <div class="form-row">
-          <label class="form-label">名称 *</label>
+          <label class="form-label">{{ t('bgp.label.name') }} *</label>
           <input type="text" class="form-control" v-model="peerGroupForm.name"
                  style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">远程 ASN</label>
+          <label class="form-label">{{ t('bgp.label.remoteAsn') }}</label>
           <input type="number" class="form-control" v-model="peerGroupForm['remote-as']"
                  min="1" max="4294967294" placeholder="1-4294967294" style="width:100%;"
-                 title="邻居 AS 号 (1-4294967294)" />
+                 :title="t('bgp.title.neighborAsn')" />
         </div>
         <div class="form-row">
-          <label class="form-label">描述</label>
+          <label class="form-label">{{ t('bgp.label.description') }}</label>
           <input type="text" class="form-control" v-model="peerGroupForm.description"
                  style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">本地角色</label>
+          <label class="form-label">{{ t('bgp.label.localRole') }}</label>
           <select class="form-control" v-model="peerGroupForm['local-role']" style="width:100%;">
             <option v-for="opt in LOCAL_ROLE_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">EBGP 多跳</label>
+          <label class="form-label">{{ t('bgp.label.ebgpMultihop') }}</label>
           <input type="number" class="form-control" v-model="peerGroupForm['ebgp-multihop']"
                  min="1" max="255" placeholder="1-255" style="width:100%;"
-                 title="EBGP 多跳数 (1-255)" />
+                 :title="t('bgp.title.ebgpMultihop')" />
         </div>
         <div class="form-row">
-          <label class="form-label">广告间隔</label>
+          <label class="form-label">{{ t('bgp.label.advertisementInterval') }}</label>
           <input type="number" class="form-control" v-model="peerGroupForm['advertisement-interval']"
-                 min="0" max="600" placeholder="0-600 秒" style="width:100%;"
-                 title="最小路由更新广告间隔 (0-600 秒)" />
+                 min="0" max="600" :placeholder="t('bgp.placeholder.secondsRange', {min: 0, max: 600})" style="width:100%;"
+                 :title="t('bgp.title.advertisementInterval')" />
         </div>
         <div class="form-row">
-          <label class="form-label">端口</label>
+          <label class="form-label">{{ t('bgp.label.port') }}</label>
           <input type="number" class="form-control" v-model="peerGroupForm.port"
                  min="1" max="65535" placeholder="1-65535" style="width:100%;"
-                 title="BGP 端口 (1-65535)" />
+                 :title="t('bgp.title.bgpPort')" />
         </div>
         <div class="form-row">
-          <label class="form-label">本地 ASN</label>
+          <label class="form-label">{{ t('bgp.label.localAsn') }}</label>
           <input type="number" class="form-control" v-model="peerGroupForm['local-as']"
                  min="1" max="4294967294" placeholder="1-4294967294" style="width:100%;"
-                 title="本地 AS 号 (1-4294967294)" />
+                 :title="t('bgp.title.localAsn')" />
         </div>
         <div class="form-row">
-          <label class="form-label">密码</label>
+          <label class="form-label">{{ t('bgp.label.password') }}</label>
           <input type="password" class="form-control" v-model="peerGroupForm.password"
                  style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">连接定时器</label>
+          <label class="form-label">{{ t('bgp.label.connectTimer') }}</label>
           <input type="number" class="form-control" v-model="peerGroupForm.timers.connect"
-                 min="0" max="65535" placeholder="0=禁用, 1-65535 秒" style="width:100%;"
-                 title="BGP 连接定时器 (0=禁用, 1-65535 秒)" />
+                 min="0" max="65535" :placeholder="t('bgp.placeholder.timerRange', {min: 0, max: 65535})" style="width:100%;"
+                 :title="t('bgp.title.connectTimer')" />
         </div>
         <div class="form-row">
-          <label class="form-label">保持定时器</label>
+          <label class="form-label">{{ t('bgp.label.holdTimer') }}</label>
           <input type="number" class="form-control" v-model="peerGroupForm.timers.holdtime"
-                 min="0" max="65535" placeholder="0=禁用, 1-65535 秒" style="width:100%;"
-                 title="BGP 保持定时器 (0=禁用, 1-65535 秒)" />
+                 min="0" max="65535" :placeholder="t('bgp.placeholder.timerRange', {min: 0, max: 65535})" style="width:100%;"
+                 :title="t('bgp.title.holdTimer')" />
         </div>
         <div class="form-row">
-          <label class="form-label">Keepalive 定时器</label>
+          <label class="form-label">{{ t('bgp.label.keepaliveTimer') }}</label>
           <input type="number" class="form-control" v-model="peerGroupForm.timers.keepalive"
-                 min="1" max="65535" placeholder="1-65535 秒" style="width:100%;"
-                 title="BGP Keepalive 定时器 (1-65535 秒)" />
+                 min="1" max="65535" :placeholder="t('bgp.placeholder.timerRange', {min: 1, max: 65535})" style="width:100%;"
+                 :title="t('bgp.title.keepaliveTimer')" />
         </div>
         <div class="form-row">
-          <label class="form-label">TTL 安全跳数</label>
+          <label class="form-label">{{ t('bgp.label.ttlSecurityHops') }}</label>
           <input type="number" class="form-control" v-model="peerGroupForm['ttl-security'].hops"
                  min="1" max="254" placeholder="1-254" style="width:100%;"
-                 title="TTL 安全机制最大跳数 (1-254)" />
+                 :title="t('bgp.title.ttlSecurityHops')" />
         </div>
         <div class="form-row">
-          <label class="form-label">更新源接口</label>
+          <label class="form-label">{{ t('bgp.label.updateSourceInterface') }}</label>
           <input type="text" class="form-control" v-model="peerGroupForm['update-source']"
-                 placeholder="例如: eth0" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.exampleInterface')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="peerGroupForm.shutdown" /> 关闭 (Shutdown)</label>
+          <label><input type="checkbox" v-model="peerGroupForm.shutdown" /> {{ t('bgp.label.shutdownCheckbox') }}</label>
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="peerGroupForm['enforce-first-as']" /> 强制首 AS</label>
+          <label><input type="checkbox" v-model="peerGroupForm['enforce-first-as']" /> {{ t('bgp.label.enforceFirstAsShortCheckbox') }}</label>
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="peerGroupForm['override-capability']" /> 覆盖能力协商</label>
+          <label><input type="checkbox" v-model="peerGroupForm['override-capability']" /> {{ t('bgp.label.overrideCapability') }}</label>
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="peerGroupForm['disable-connected-check']" /> 禁用直连检查</label>
+          <label><input type="checkbox" v-model="peerGroupForm['disable-connected-check']" /> {{ t('bgp.label.disableConnectedCheckbox') }}</label>
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="peerGroupForm['disable-capability-negotiation']" /> 禁用能力协商</label>
+          <label><input type="checkbox" v-model="peerGroupForm['disable-capability-negotiation']" /> {{ t('bgp.label.disableCapabilityNegotiation') }}</label>
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="peerGroupForm['graceful-restart'].enable" /> 优雅重启 (Graceful Restart)</label>
+          <label><input type="checkbox" v-model="peerGroupForm['graceful-restart'].enable" /> {{ t('bgp.label.gracefulRestart') }}</label>
         </div>
         <div v-if="peerGroupForm['graceful-restart'].enable">
           <div class="form-row">
-            <label class="form-label">优雅重启时间</label>
+            <label class="form-label">{{ t('bgp.label.restartTimer') }}</label>
             <input type="number" class="form-control" v-model="peerGroupForm['graceful-restart']['restart-time']"
-                   min="1" max="4095" placeholder="1-4095 秒" style="width:100%;"
-                   title="优雅重启时间 (1-4095 秒)" />
+                   min="1" max="4095" :placeholder="t('bgp.placeholder.timerRange', {min: 1, max: 4095})" style="width:100%;"
+                   :title="t('bgp.title.restartTimer')" />
           </div>
           <div class="form-row">
-            <label class="form-label">陈旧路径时间</label>
+            <label class="form-label">{{ t('bgp.label.stalepathTimer') }}</label>
             <input type="number" class="form-control" v-model="peerGroupForm['graceful-restart']['stalepath-time']"
-                   min="1" max="4095" placeholder="1-4095 秒" style="width:100%;"
-                   title="陈旧路径保留时间 (1-4095 秒)" />
+                   min="1" max="4095" :placeholder="t('bgp.placeholder.timerRange', {min: 1, max: 4095})" style="width:100%;"
+                   :title="t('bgp.title.stalepathTimer')" />
           </div>
           <div class="form-row">
             <label class="form-label"></label>
-            <label><input type="checkbox" v-model="peerGroupForm['graceful-restart']['preserve-fw-state']" /> 保留防火墙状态</label>
+            <label><input type="checkbox" v-model="peerGroupForm['graceful-restart']['preserve-fw-state']" /> {{ t('bgp.label.preserveFwState') }}</label>
           </div>
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="peerGroupForm.bfd.enable" /> 启用 BFD</label>
+          <label><input type="checkbox" v-model="peerGroupForm.bfd.enable" /> {{ t('bgp.label.enableBfd') }}</label>
         </div>
         <div v-if="peerGroupForm.bfd.enable">
           <div class="form-row">
             <label class="form-label"></label>
-            <label><input type="checkbox" v-model="peerGroupForm.bfd['check-control-plane-failure']" /> 检查控制平面故障</label>
+            <label><input type="checkbox" v-model="peerGroupForm.bfd['check-control-plane-failure']" /> {{ t('bgp.label.checkCtrlPlaneFailureCheckbox') }}</label>
           </div>
           <div class="form-row">
             <label class="form-label">BFD Profile</label>
             <input type="text" class="form-control" v-model="peerGroupForm.bfd.profile"
-                   placeholder="BFD 配置文件名称" style="width:100%;" />
+                   :placeholder="t('bgp.placeholder.bfdProfileName')" style="width:100%;" />
           </div>
         </div>
         <div class="form-row">
-          <label class="form-label">能力协商</label>
+          <label class="form-label">{{ t('bgp.label.capabilityNegotiation') }}</label>
         </div>
         <div class="form-row" style="padding-left: 20px;">
-          <label><input type="checkbox" v-model="peerGroupForm.capability.dynamic" /> 动态能力</label>
+          <label><input type="checkbox" v-model="peerGroupForm.capability.dynamic" /> {{ t('bgp.label.dynamicCapability') }}</label>
         </div>
         <div class="form-row" style="padding-left: 20px;">
-          <label><input type="checkbox" v-model="peerGroupForm.capability['extended-nexthop']" /> 扩展下一跳</label>
+          <label><input type="checkbox" v-model="peerGroupForm.capability['extended-nexthop']" /> {{ t('bgp.label.extendedNexthop') }}</label>
         </div>
         <div class="form-row" style="padding-left: 20px;">
-          <label><input type="checkbox" v-model="peerGroupForm.capability['software-version']" /> 软件版本</label>
+          <label><input type="checkbox" v-model="peerGroupForm.capability['software-version']" /> {{ t('bgp.label.softwareVersion') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路径属性</label>
+          <label class="form-label">{{ t('bgp.label.pathAttribute') }}</label>
         </div>
         <div class="form-row" style="padding-left: 20px;">
-          <label class="form-label">丢弃</label>
+          <label class="form-label">{{ t('bgp.label.discard') }}</label>
           <input type="text" class="form-control" v-model="peerGroupForm['path-attribute'].discard"
-                 placeholder="逗号分隔的属性列表" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.commaSeparatedList')" style="width:100%;" />
         </div>
         <div class="form-row" style="padding-left: 20px;">
-          <label class="form-label">视为撤回</label>
+          <label class="form-label">{{ t('bgp.label.treatAsWithdraw') }}</label>
           <input type="text" class="form-control" v-model="peerGroupForm['path-attribute']['treat-as-withdraw']"
-                 placeholder="逗号分隔的属性列表" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.commaSeparatedList')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- BMP Modal -->
-      <DraggableModal v-model:visible="bmpModalVisible" :title="editingBmpIndex >= 0 ? '编辑 BMP 目标' : '添加 BMP 目标'" width="500px" @confirm="saveBmp">
+      <DraggableModal v-model:visible="bmpModalVisible" :title="editingBmpIndex >= 0 ? t('bgp.modal.editBmp') : t('bgp.modal.addBmp')" width="500px" @confirm="saveBmp">
         <div class="form-row">
-          <label class="form-label">名称 *</label>
+          <label class="form-label">{{ t('bgp.label.name') }} *</label>
           <input type="text" class="form-control" v-model="bmpForm.name"
                  style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">地址</label>
+          <label class="form-label">{{ t('bgp.label.address') }}</label>
           <input type="text" class="form-control" v-model="bmpForm.address"
-                 placeholder="IPv4 或 IPv6 地址" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.ipv4OrIpv6Address')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">端口</label>
+          <label class="form-label">{{ t('bgp.label.port') }}</label>
           <input type="number" class="form-control" v-model="bmpForm.port"
-                 min="1" max="65535" placeholder="1-65535 (默认: 5000)" style="width:100%;"
-                 title="BMP 连接端口 (1-65535, 默认: 5000)" />
+                 min="1" max="65535" :placeholder="t('bgp.placeholder.defaultPort')" style="width:100%;"
+                 :title="t('bgp.title.bmpPort')" />
         </div>
         <div class="form-row">
-          <label class="form-label">最大重试间隔 (ms)</label>
+          <label class="form-label">{{ t('bgp.label.maxRetryInterval') }}</label>
           <input type="number" class="form-control" v-model="bmpForm['max-retry']"
-                 min="100" max="4294967295" placeholder="100-4294967295 (默认: 2000)" style="width:100%;"
-                 title="最大连接重试间隔 (100-4294967295 ms, 默认: 2000)" />
+                 min="100" max="4294967295" :placeholder="t('bgp.placeholder.defaultMaxRetry')" style="width:100%;"
+                 :title="t('bgp.title.bmpMaxRetry')" />
         </div>
         <div class="form-row">
-          <label class="form-label">最小重试间隔 (ms)</label>
+          <label class="form-label">{{ t('bgp.label.minRetryInterval') }}</label>
           <input type="number" class="form-control" v-model="bmpForm['min-retry']"
-                 min="1" placeholder="正整数 (默认: 1000)" style="width:100%;"
-                 title="最小连接重试间隔 (毫秒, 默认: 1000)" />
+                 min="1" :placeholder="t('bgp.placeholder.defaultMinRetry')" style="width:100%;"
+                 :title="t('bgp.title.bmpMinRetry')" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="bmpForm.mirror" /> 启用镜像 (Mirror)</label>
+          <label><input type="checkbox" v-model="bmpForm.mirror" /> {{ t('bgp.label.enableMirror') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">监控配置</label>
+          <label class="form-label">{{ t('bgp.label.monitorConfig') }}</label>
         </div>
         <div class="form-row" style="padding-left: 20px;">
           <label class="form-label">IPv4 Unicast</label>
@@ -4925,11 +5073,11 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Listen Modal -->
-      <DraggableModal v-model:visible="listenModalVisible" :title="editingListenIndex >= 0 ? '编辑监听范围' : '添加监听范围'" width="500px" @confirm="saveListen">
+      <DraggableModal v-model:visible="listenModalVisible" :title="editingListenIndex >= 0 ? t('bgp.modal.editListen') : t('bgp.modal.addListen')" width="500px" @confirm="saveListen">
         <div class="form-row">
-          <label class="form-label">范围 *</label>
+          <label class="form-label">{{ t('bgp.label.range') }} *</label>
           <input type="text" class="form-control" v-model="listenForm.range"
-                 placeholder="例如: 3.3.3.0/24" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.exampleNetwork')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label">Peer Group</label>
@@ -4939,29 +5087,29 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Network Modal -->
-      <DraggableModal v-model:visible="networkModalVisible" :title="editingNetworkIndex >= 0 ? '编辑网络' : '添加网络'" width="500px" @confirm="saveNetwork">
+      <DraggableModal v-model:visible="networkModalVisible" :title="editingNetworkIndex >= 0 ? t('bgp.modal.editNetwork') : t('bgp.modal.addNetwork')" width="500px" @confirm="saveNetwork">
         <div class="form-row">
-          <label class="form-label">网络 *</label>
+          <label class="form-label">{{ t('bgp.label.networkLabel') }} *</label>
           <input type="text" class="form-control" v-model="networkForm.network"
-                 placeholder="例如: 2.2.2.0/24" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.exampleNetwork')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="networkForm.backdoor" /> 后门路由 (Backdoor)</label>
+          <label><input type="checkbox" v-model="networkForm.backdoor" /> {{ t('bgp.label.backdoorRoute') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
+          <label class="form-label">{{ t('bgp.label.routeMap') }}</label>
           <input type="text" class="form-control" v-model="networkForm['route-map']"
-                 placeholder="路由映射名称" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- Aggregate Modal -->
-      <DraggableModal v-model:visible="aggregateModalVisible" :title="editingAggregateIndex >= 0 ? '编辑聚合' : '添加聚合'" width="500px" @confirm="saveAggregate">
+      <DraggableModal v-model:visible="aggregateModalVisible" :title="editingAggregateIndex >= 0 ? t('bgp.modal.editAggregate') : t('bgp.modal.addAggregate')" width="500px" @confirm="saveAggregate">
         <div class="form-row">
-          <label class="form-label">聚合网络 *</label>
+          <label class="form-label">{{ t('bgp.label.aggregateNetwork') }} *</label>
           <input type="text" class="form-control" v-model="aggregateForm.aggregate"
-                 placeholder="例如: 2.2.2.0/24" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.exampleNetwork')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
@@ -4969,82 +5117,82 @@ export default defineComponent({
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="aggregateForm['summary-only']" /> 仅汇总 (Summary Only)</label>
+          <label><input type="checkbox" v-model="aggregateForm['summary-only']" /> {{ t('bgp.label.summaryOnly') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
+          <label class="form-label">{{ t('bgp.label.routeMap') }}</label>
           <input type="text" class="form-control" v-model="aggregateForm['route-map']"
-                 placeholder="路由映射名称" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- Interface Modal -->
-      <DraggableModal v-model:visible="interfaceModalVisible" :title="editingInterfaceIndex >= 0 ? '编辑接口' : '添加接口'" width="500px" @confirm="saveInterface">
+      <DraggableModal v-model:visible="interfaceModalVisible" :title="editingInterfaceIndex >= 0 ? t('bgp.modal.editInterface') : t('bgp.modal.addInterface')" width="500px" @confirm="saveInterface">
         <div class="form-row">
-          <label class="form-label">接口名称 *</label>
+          <label class="form-label">{{ t('bgp.label.interfaceName') }} *</label>
           <template v-if="editingInterfaceIndex >= 0">
             <input type="text" class="form-control" v-model="interfaceForm.name"
                    style="width:100%;" disabled />
           </template>
           <template v-else>
             <select class="form-control" v-model="interfaceForm.name" style="width:100%;">
-              <option value="">请选择接口</option>
+              <option value="">{{ t('bgp.placeholder.selectInterface') }}</option>
               <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
             </select>
           </template>
         </div>
         <div class="form-row">
-          <label class="form-label">启用 MPLS 转发</label>
+          <label class="form-label">{{ t('bgp.label.enableMplsForwarding') }}</label>
           <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="interfaceForm['mpls-forwarding']" /></label>
         </div>
       </DraggableModal>
 
       <!-- Redistribute Modal -->
-      <DraggableModal v-model:visible="redistributeModalVisible" :title="editingRedistributeIndex >= 0 ? '编辑重分发' : '添加重分发'" width="500px" @confirm="saveRedistribute">
+      <DraggableModal v-model:visible="redistributeModalVisible" :title="editingRedistributeIndex >= 0 ? t('bgp.modal.editRedistribute') : t('bgp.modal.addRedistribute')" width="500px" @confirm="saveRedistribute">
         <div class="form-row">
-          <label class="form-label">协议 *</label>
+          <label class="form-label">{{ t('bgp.label.protocol') }} *</label>
           <select class="form-control" v-model="redistributeForm.protocol" style="width:100%;">
             <option v-for="opt in REDISTRIBUTE_PROTOCOLS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">度量值</label>
+          <label class="form-label">{{ t('bgp.label.metric') }}</label>
           <input type="number" class="form-control" v-model="redistributeForm.metric"
                  min="0" max="16777214" placeholder="0-16777214" style="width:100%;"
-                 title="重分发路由的度量值 (0-16777214)" />
+                 :title="t('bgp.title.metric')" />
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
+          <label class="form-label">{{ t('bgp.label.routeMap') }}</label>
           <input type="text" class="form-control" v-model="redistributeForm['route-map']"
-                 placeholder="路由映射名称" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- IPv6 Network Modal -->
-      <DraggableModal v-model:visible="ipv6NetworkModalVisible" :title="editingIpv6NetworkIndex >= 0 ? '编辑 IPv6 网络' : '添加 IPv6 网络'" width="500px" @confirm="saveIpv6Network">
+      <DraggableModal v-model:visible="ipv6NetworkModalVisible" :title="editingIpv6NetworkIndex >= 0 ? t('bgp.modal.editIpv6Network') : t('bgp.modal.addIpv6Network')" width="500px" @confirm="saveIpv6Network">
         <div class="form-row">
-          <label class="form-label">IPv6 网络 *</label>
+          <label class="form-label">{{ t('bgp.label.ipv6NetworkLabel') }} *</label>
           <input type="text" class="form-control" v-model="ipv6NetworkForm.network"
-                 placeholder="例如: 2001:db8::/32" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.exampleIpv6Network')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">路径限制 (0-255)</label>
+          <label class="form-label">{{ t('bgp.label.pathLimit') }}</label>
           <input type="number" class="form-control" v-model="ipv6NetworkForm['path-limit']"
                  min="0" max="255" placeholder="0-255" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
+          <label class="form-label">{{ t('bgp.label.routeMap') }}</label>
           <input type="text" class="form-control" v-model="ipv6NetworkForm['route-map']"
-                 placeholder="路由映射名称" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- IPv6 Aggregate Modal -->
-      <DraggableModal v-model:visible="ipv6AggregateModalVisible" :title="editingIpv6AggregateIndex >= 0 ? '编辑 IPv6 聚合' : '添加 IPv6 聚合'" width="500px" @confirm="saveIpv6Aggregate">
+      <DraggableModal v-model:visible="ipv6AggregateModalVisible" :title="editingIpv6AggregateIndex >= 0 ? t('bgp.modal.editIpv6Aggregate') : t('bgp.modal.addIpv6Aggregate')" width="500px" @confirm="saveIpv6Aggregate">
         <div class="form-row">
-          <label class="form-label">IPv6 聚合网络 *</label>
+          <label class="form-label">{{ t('bgp.label.ipv6AggregateNetwork') }} *</label>
           <input type="text" class="form-control" v-model="ipv6AggregateForm.aggregate"
-                 placeholder="例如: 2001:db8::/32" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.exampleIpv6Network')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
@@ -5052,67 +5200,67 @@ export default defineComponent({
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="ipv6AggregateForm['summary-only']" /> 仅汇总 (Summary Only)</label>
+          <label><input type="checkbox" v-model="ipv6AggregateForm['summary-only']" /> {{ t('bgp.label.summaryOnly') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
+          <label class="form-label">{{ t('bgp.label.routeMap') }}</label>
           <input type="text" class="form-control" v-model="ipv6AggregateForm['route-map']"
-                 placeholder="路由映射名称" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- IPv6 Redistribute Modal -->
-      <DraggableModal v-model:visible="ipv6RedistributeModalVisible" :title="editingIpv6RedistributeIndex >= 0 ? '编辑 IPv6 重分发' : '添加 IPv6 重分发'" width="500px" @confirm="saveIpv6Redistribute">
+      <DraggableModal v-model:visible="ipv6RedistributeModalVisible" :title="editingIpv6RedistributeIndex >= 0 ? t('bgp.modal.editIpv6Redistribute') : t('bgp.modal.addIpv6Redistribute')" width="500px" @confirm="saveIpv6Redistribute">
         <div class="form-row">
-          <label class="form-label">协议 *</label>
+          <label class="form-label">{{ t('bgp.label.protocol') }} *</label>
           <select class="form-control" v-model="ipv6RedistributeForm.protocol" style="width:100%;">
             <option v-for="opt in IPV6_REDISTRIBUTE_PROTOCOLS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">度量值</label>
+          <label class="form-label">{{ t('bgp.label.metric') }}</label>
           <input type="number" class="form-control" v-model="ipv6RedistributeForm.metric"
                  min="0" max="16777214" placeholder="0-16777214" style="width:100%;"
-                 title="重分发路由的度量值 (0-16777214)" />
+                 :title="t('bgp.title.metric')" />
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
+          <label class="form-label">{{ t('bgp.label.routeMap') }}</label>
           <input type="text" class="form-control" v-model="ipv6RedistributeForm['route-map']"
-                 placeholder="路由映射名称" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- IPv6 Distance Prefix Modal -->
-      <DraggableModal v-model:visible="ipv6DistancePrefixModalVisible" :title="editingIpv6DistancePrefixIndex >= 0 ? '编辑前缀管理距离' : '添加前缀管理距离'" width="500px" @confirm="saveDistancePrefixIpv6Unicast">
+      <DraggableModal v-model:visible="ipv6DistancePrefixModalVisible" :title="editingIpv6DistancePrefixIndex >= 0 ? t('bgp.modal.editDistancePrefix') : t('bgp.modal.addDistancePrefix')" width="500px" @confirm="saveDistancePrefixIpv6Unicast">
         <div class="form-row">
-          <label class="form-label">前缀 *</label>
-          <input type="text" class="form-control" v-model="ipv6DistancePrefixForm.prefix" placeholder="例如: 2002::00/64" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.prefix') }} *</label>
+          <input type="text" class="form-control" v-model="ipv6DistancePrefixForm.prefix" :placeholder="t('bgp.placeholder.examplePrefix')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">管理距离 * (1-255)</label>
+          <label class="form-label">{{ t('bgp.label.adminDistance') }}</label>
           <input type="number" class="form-control" v-model="ipv6DistancePrefixForm.distance" min="1" max="255" placeholder="1-255" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- IPv4 Flowspec Modals -->
-      <DraggableModal v-model:visible="ipv4FlowspecNetworkModalVisible" :title="editingIpv4FlowspecNetworkIndex >= 0 ? '编辑网络' : '添加网络'" width="500px" @confirm="saveNetworkIpv4Flowspec">
+      <DraggableModal v-model:visible="ipv4FlowspecNetworkModalVisible" :title="editingIpv4FlowspecNetworkIndex >= 0 ? t('bgp.modal.editNetwork') : t('bgp.modal.addNetwork')" width="500px" @confirm="saveNetworkIpv4Flowspec">
         <div class="form-row">
-          <label class="form-label">网络 *</label>
-          <input type="text" class="form-control" v-model="ipv4FlowspecNetworkForm.network" placeholder="例如: 2.2.2.0/24" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.networkLabel') }} *</label>
+          <input type="text" class="form-control" v-model="ipv4FlowspecNetworkForm.network" :placeholder="t('bgp.placeholder.exampleNetwork')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="ipv4FlowspecNetworkForm.backdoor" /> 后门路由 (Backdoor)</label>
+          <label><input type="checkbox" v-model="ipv4FlowspecNetworkForm.backdoor" /> {{ t('bgp.label.backdoorRoute') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv4FlowspecNetworkForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMap') }}</label>
+          <input type="text" class="form-control" v-model="ipv4FlowspecNetworkForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv4FlowspecAggregateModalVisible" :title="editingIpv4FlowspecAggregateIndex >= 0 ? '编辑聚合' : '添加聚合'" width="500px" @confirm="saveAggregateIpv4Flowspec">
+      <DraggableModal v-model:visible="ipv4FlowspecAggregateModalVisible" :title="editingIpv4FlowspecAggregateIndex >= 0 ? t('bgp.modal.editAggregate') : t('bgp.modal.addAggregate')" width="500px" @confirm="saveAggregateIpv4Flowspec">
         <div class="form-row">
-          <label class="form-label">聚合网络 *</label>
-          <input type="text" class="form-control" v-model="ipv4FlowspecAggregateForm.aggregate" placeholder="例如: 2.2.2.0/24" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.aggregateNetwork') }} *</label>
+          <input type="text" class="form-control" v-model="ipv4FlowspecAggregateForm.aggregate" :placeholder="t('bgp.placeholder.exampleNetwork')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
@@ -5120,49 +5268,49 @@ export default defineComponent({
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="ipv4FlowspecAggregateForm['summary-only']" /> 仅汇总 (Summary Only)</label>
+          <label><input type="checkbox" v-model="ipv4FlowspecAggregateForm['summary-only']" /> {{ t('bgp.label.summaryOnly') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv4FlowspecAggregateForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMap') }}</label>
+          <input type="text" class="form-control" v-model="ipv4FlowspecAggregateForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv4FlowspecRedistributeModalVisible" :title="editingIpv4FlowspecRedistributeIndex >= 0 ? '编辑重分发' : '添加重分发'" width="500px" @confirm="saveRedistributeIpv4Flowspec">
+      <DraggableModal v-model:visible="ipv4FlowspecRedistributeModalVisible" :title="editingIpv4FlowspecRedistributeIndex >= 0 ? t('bgp.modal.editRedistribute') : t('bgp.modal.addRedistribute')" width="500px" @confirm="saveRedistributeIpv4Flowspec">
         <div class="form-row">
-          <label class="form-label">协议 *</label>
+          <label class="form-label">{{ t('bgp.label.protocol') }} *</label>
           <select class="form-control" v-model="ipv4FlowspecRedistributeForm.protocol" style="width:100%;">
             <option v-for="opt in REDISTRIBUTE_PROTOCOLS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">度量值</label>
+          <label class="form-label">{{ t('bgp.label.metric') }}</label>
           <input type="number" class="form-control" v-model="ipv4FlowspecRedistributeForm.metric" min="0" max="16777214" placeholder="0-16777214" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv4FlowspecRedistributeForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMap') }}</label>
+          <input type="text" class="form-control" v-model="ipv4FlowspecRedistributeForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- IPv4 Labeled Unicast Modals -->
-      <DraggableModal v-model:visible="ipv4LabeledUnicastNetworkModalVisible" :title="editingIpv4LabeledUnicastNetworkIndex >= 0 ? '编辑网络' : '添加网络'" width="500px" @confirm="saveNetworkIpv4LabeledUnicast">
+      <DraggableModal v-model:visible="ipv4LabeledUnicastNetworkModalVisible" :title="editingIpv4LabeledUnicastNetworkIndex >= 0 ? t('bgp.modal.editNetwork') : t('bgp.modal.addNetwork')" width="500px" @confirm="saveNetworkIpv4LabeledUnicast">
         <div class="form-row">
-          <label class="form-label">网络 *</label>
-          <input type="text" class="form-control" v-model="ipv4LabeledUnicastNetworkForm.network" placeholder="例如: 2.2.2.0/24" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.networkLabel') }} *</label>
+          <input type="text" class="form-control" v-model="ipv4LabeledUnicastNetworkForm.network" :placeholder="t('bgp.placeholder.exampleNetwork')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="ipv4LabeledUnicastNetworkForm.backdoor" /> 后门路由 (Backdoor)</label>
+          <label><input type="checkbox" v-model="ipv4LabeledUnicastNetworkForm.backdoor" /> {{ t('bgp.label.backdoorRoute') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv4LabeledUnicastNetworkForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMap') }}</label>
+          <input type="text" class="form-control" v-model="ipv4LabeledUnicastNetworkForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv4LabeledUnicastAggregateModalVisible" :title="editingIpv4LabeledUnicastAggregateIndex >= 0 ? '编辑聚合' : '添加聚合'" width="500px" @confirm="saveAggregateIpv4LabeledUnicast">
+      <DraggableModal v-model:visible="ipv4LabeledUnicastAggregateModalVisible" :title="editingIpv4LabeledUnicastAggregateIndex >= 0 ? t('bgp.modal.editAggregate') : t('bgp.modal.addAggregate')" width="500px" @confirm="saveAggregateIpv4LabeledUnicast">
         <div class="form-row">
-          <label class="form-label">聚合网络 *</label>
-          <input type="text" class="form-control" v-model="ipv4LabeledUnicastAggregateForm.aggregate" placeholder="例如: 2.2.2.0/24" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.aggregateNetwork') }} *</label>
+          <input type="text" class="form-control" v-model="ipv4LabeledUnicastAggregateForm.aggregate" :placeholder="t('bgp.placeholder.exampleNetwork')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
@@ -5170,49 +5318,49 @@ export default defineComponent({
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="ipv4LabeledUnicastAggregateForm['summary-only']" /> 仅汇总 (Summary Only)</label>
+          <label><input type="checkbox" v-model="ipv4LabeledUnicastAggregateForm['summary-only']" /> {{ t('bgp.label.summaryOnlyCheckbox') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv4LabeledUnicastAggregateForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv4LabeledUnicastAggregateForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv4LabeledUnicastRedistributeModalVisible" :title="editingIpv4LabeledUnicastRedistributeIndex >= 0 ? '编辑重分发' : '添加重分发'" width="500px" @confirm="saveRedistributeIpv4LabeledUnicast">
+      <DraggableModal v-model:visible="ipv4LabeledUnicastRedistributeModalVisible" :title="editingIpv4LabeledUnicastRedistributeIndex >= 0 ? t('bgp.modal.editRedistribute') : t('bgp.modal.addRedistribute')" width="500px" @confirm="saveRedistributeIpv4LabeledUnicast">
         <div class="form-row">
-          <label class="form-label">协议 *</label>
+          <label class="form-label">{{ t('bgp.label.protocolFormLabel') }}</label>
           <select class="form-control" v-model="ipv4LabeledUnicastRedistributeForm.protocol" style="width:100%;">
             <option v-for="opt in REDISTRIBUTE_PROTOCOLS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">度量值</label>
+          <label class="form-label">{{ t('bgp.label.metricFormLabel') }}</label>
           <input type="number" class="form-control" v-model="ipv4LabeledUnicastRedistributeForm.metric" min="0" max="16777214" placeholder="0-16777214" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv4LabeledUnicastRedistributeForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv4LabeledUnicastRedistributeForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- IPv4 Multicast Modals -->
-      <DraggableModal v-model:visible="ipv4MulticastNetworkModalVisible" :title="editingIpv4MulticastNetworkIndex >= 0 ? '编辑网络' : '添加网络'" width="500px" @confirm="saveNetworkIpv4Multicast">
+      <DraggableModal v-model:visible="ipv4MulticastNetworkModalVisible" :title="editingIpv4MulticastNetworkIndex >= 0 ? t('bgp.modal.editNetwork') : t('bgp.modal.addNetwork')" width="500px" @confirm="saveNetworkIpv4Multicast">
         <div class="form-row">
-          <label class="form-label">网络 *</label>
-          <input type="text" class="form-control" v-model="ipv4MulticastNetworkForm.network" placeholder="例如: 2.2.2.0/24" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.networkFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv4MulticastNetworkForm.network" :placeholder="t('bgp.placeholder.exampleNetwork')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="ipv4MulticastNetworkForm.backdoor" /> 后门路由 (Backdoor)</label>
+          <label><input type="checkbox" v-model="ipv4MulticastNetworkForm.backdoor" /> {{ t('bgp.label.backdoorCheckbox') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv4MulticastNetworkForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv4MulticastNetworkForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv4MulticastAggregateModalVisible" :title="editingIpv4MulticastAggregateIndex >= 0 ? '编辑聚合' : '添加聚合'" width="500px" @confirm="saveAggregateIpv4Multicast">
+      <DraggableModal v-model:visible="ipv4MulticastAggregateModalVisible" :title="editingIpv4MulticastAggregateIndex >= 0 ? t('bgp.modal.editAggregate') : t('bgp.modal.addAggregate')" width="500px" @confirm="saveAggregateIpv4Multicast">
         <div class="form-row">
-          <label class="form-label">聚合网络 *</label>
-          <input type="text" class="form-control" v-model="ipv4MulticastAggregateForm.aggregate" placeholder="例如: 2.2.2.0/24" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.aggregateNetworkFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv4MulticastAggregateForm.aggregate" :placeholder="t('bgp.placeholder.exampleNetwork')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
@@ -5220,69 +5368,69 @@ export default defineComponent({
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="ipv4MulticastAggregateForm['summary-only']" /> 仅汇总 (Summary Only)</label>
+          <label><input type="checkbox" v-model="ipv4MulticastAggregateForm['summary-only']" /> {{ t('bgp.label.summaryOnlyCheckbox') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv4MulticastAggregateForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv4MulticastAggregateForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv4MulticastDistancePrefixModalVisible" :title="editingIpv4MulticastDistancePrefixIndex >= 0 ? '编辑前缀管理距离' : '添加前缀管理距离'" width="500px" @confirm="saveDistancePrefixIpv4Multicast">
+      <DraggableModal v-model:visible="ipv4MulticastDistancePrefixModalVisible" :title="editingIpv4MulticastDistancePrefixIndex >= 0 ? t('bgp.modal.editDistancePrefix') : t('bgp.modal.addDistancePrefix')" width="500px" @confirm="saveDistancePrefixIpv4Multicast">
         <div class="form-row">
-          <label class="form-label">前缀 *</label>
-          <input type="text" class="form-control" v-model="ipv4MulticastDistancePrefixForm.prefix" placeholder="例如: 2.2.2.0/24" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.prefixFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv4MulticastDistancePrefixForm.prefix" :placeholder="t('bgp.placeholder.exampleNetwork')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">管理距离 * (1-255)</label>
+          <label class="form-label">{{ t('bgp.label.adminDistanceFormLabel') }}</label>
           <input type="number" class="form-control" v-model="ipv4MulticastDistancePrefixForm.distance" min="1" max="255" placeholder="1-255" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv6MulticastDistancePrefixModalVisible" :title="editingIpv6MulticastDistancePrefixIndex >= 0 ? '编辑前缀管理距离' : '添加前缀管理距离'" width="500px" @confirm="saveDistancePrefixIpv6Multicast">
+      <DraggableModal v-model:visible="ipv6MulticastDistancePrefixModalVisible" :title="editingIpv6MulticastDistancePrefixIndex >= 0 ? t('bgp.modal.editDistancePrefix') : t('bgp.modal.addDistancePrefix')" width="500px" @confirm="saveDistancePrefixIpv6Multicast">
         <div class="form-row">
-          <label class="form-label">前缀 *</label>
-          <input type="text" class="form-control" v-model="ipv6MulticastDistancePrefixForm.prefix" placeholder="例如: 2002::00/64" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.prefixFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6MulticastDistancePrefixForm.prefix" :placeholder="t('bgp.placeholder.examplePrefix')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">管理距离 * (1-255)</label>
+          <label class="form-label">{{ t('bgp.label.adminDistanceFormLabel') }}</label>
           <input type="number" class="form-control" v-model="ipv6MulticastDistancePrefixForm.distance" min="1" max="255" placeholder="1-255" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv4MulticastRedistributeModalVisible" :title="editingIpv4MulticastRedistributeIndex >= 0 ? '编辑重分发' : '添加重分发'" width="500px" @confirm="saveRedistributeIpv4Multicast">
+      <DraggableModal v-model:visible="ipv4MulticastRedistributeModalVisible" :title="editingIpv4MulticastRedistributeIndex >= 0 ? t('bgp.modal.editRedistribute') : t('bgp.modal.addRedistribute')" width="500px" @confirm="saveRedistributeIpv4Multicast">
         <div class="form-row">
-          <label class="form-label">协议 *</label>
+          <label class="form-label">{{ t('bgp.label.protocolFormLabel') }}</label>
           <select class="form-control" v-model="ipv4MulticastRedistributeForm.protocol" style="width:100%;">
             <option v-for="opt in REDISTRIBUTE_PROTOCOLS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">度量值</label>
+          <label class="form-label">{{ t('bgp.label.metricFormLabel') }}</label>
           <input type="number" class="form-control" v-model="ipv4MulticastRedistributeForm.metric" min="0" max="16777214" placeholder="0-16777214" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv4MulticastRedistributeForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv4MulticastRedistributeForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- IPv4 VPN Modals -->
-      <DraggableModal v-model:visible="ipv4VpnNetworkModalVisible" :title="editingIpv4VpnNetworkIndex >= 0 ? '编辑网络' : '添加网络'" width="500px" @confirm="saveNetworkIpv4Vpn">
+      <DraggableModal v-model:visible="ipv4VpnNetworkModalVisible" :title="editingIpv4VpnNetworkIndex >= 0 ? t('bgp.modal.editNetwork') : t('bgp.modal.addNetwork')" width="500px" @confirm="saveNetworkIpv4Vpn">
         <div class="form-row">
-          <label class="form-label">网络 *</label>
-          <input type="text" class="form-control" v-model="ipv4VpnNetworkForm.network" placeholder="例如: 5.5.5.0/24" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.networkFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv4VpnNetworkForm.network" :placeholder="t('bgp.placeholder.exampleNetwork')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">MPLS 标签 (0-1048575)</label>
+          <label class="form-label">{{ t('bgp.label.mplsLabelFormLabel') }}</label>
           <input type="number" class="form-control" v-model="ipv4VpnNetworkForm.label" min="0" max="1048575" placeholder="0-1048575" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">路由区分器 (ASN:NN 或 IP:NN)</label>
-          <input type="text" class="form-control" v-model="ipv4VpnNetworkForm.rd" placeholder="例如: 6.6.6.6:235" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.rdFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv4VpnNetworkForm.rd" :placeholder="t('bgp.placeholder.routeDistinguisher')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv4VpnAggregateModalVisible" :title="editingIpv4VpnAggregateIndex >= 0 ? '编辑聚合' : '添加聚合'" width="500px" @confirm="saveAggregateIpv4Vpn">
+      <DraggableModal v-model:visible="ipv4VpnAggregateModalVisible" :title="editingIpv4VpnAggregateIndex >= 0 ? t('bgp.modal.editAggregate') : t('bgp.modal.addAggregate')" width="500px" @confirm="saveAggregateIpv4Vpn">
         <div class="form-row">
-          <label class="form-label">聚合网络 *</label>
-          <input type="text" class="form-control" v-model="ipv4VpnAggregateForm.aggregate" placeholder="例如: 2.2.2.0/24" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.aggregateNetworkFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv4VpnAggregateForm.aggregate" :placeholder="t('bgp.placeholder.exampleNetwork')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
@@ -5290,49 +5438,49 @@ export default defineComponent({
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="ipv4VpnAggregateForm['summary-only']" /> 仅汇总 (Summary Only)</label>
+          <label><input type="checkbox" v-model="ipv4VpnAggregateForm['summary-only']" /> {{ t('bgp.label.summaryOnlyCheckbox') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv4VpnAggregateForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv4VpnAggregateForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv4VpnRedistributeModalVisible" :title="editingIpv4VpnRedistributeIndex >= 0 ? '编辑重分发' : '添加重分发'" width="500px" @confirm="saveRedistributeIpv4Vpn">
+      <DraggableModal v-model:visible="ipv4VpnRedistributeModalVisible" :title="editingIpv4VpnRedistributeIndex >= 0 ? t('bgp.modal.editRedistribute') : t('bgp.modal.addRedistribute')" width="500px" @confirm="saveRedistributeIpv4Vpn">
         <div class="form-row">
-          <label class="form-label">协议 *</label>
+          <label class="form-label">{{ t('bgp.label.protocolFormLabel') }}</label>
           <select class="form-control" v-model="ipv4VpnRedistributeForm.protocol" style="width:100%;">
             <option v-for="opt in REDISTRIBUTE_PROTOCOLS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">度量值</label>
+          <label class="form-label">{{ t('bgp.label.metricFormLabel') }}</label>
           <input type="number" class="form-control" v-model="ipv4VpnRedistributeForm.metric" min="0" max="16777214" placeholder="0-16777214" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv4VpnRedistributeForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv4VpnRedistributeForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- IPv6 Flowspec Modals -->
-      <DraggableModal v-model:visible="ipv6FlowspecNetworkModalVisible" :title="editingIpv6FlowspecNetworkIndex >= 0 ? '编辑 IPv6 网络' : '添加 IPv6 网络'" width="500px" @confirm="saveNetworkIpv6Flowspec">
+      <DraggableModal v-model:visible="ipv6FlowspecNetworkModalVisible" :title="editingIpv6FlowspecNetworkIndex >= 0 ? t('bgp.modal.editIpv6Network') : t('bgp.modal.addIpv6Network')" width="500px" @confirm="saveNetworkIpv6Flowspec">
         <div class="form-row">
-          <label class="form-label">IPv6 网络 *</label>
-          <input type="text" class="form-control" v-model="ipv6FlowspecNetworkForm.network" placeholder="例如: 2001:db8::/32" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.ipv6NetworkLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6FlowspecNetworkForm.network" :placeholder="t('bgp.placeholder.exampleIpv6Network')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="ipv6FlowspecNetworkForm.backdoor" /> 后门路由 (Backdoor)</label>
+          <label><input type="checkbox" v-model="ipv6FlowspecNetworkForm.backdoor" /> {{ t('bgp.label.backdoorCheckbox') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv6FlowspecNetworkForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6FlowspecNetworkForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv6FlowspecAggregateModalVisible" :title="editingIpv6FlowspecAggregateIndex >= 0 ? '编辑 IPv6 聚合' : '添加 IPv6 聚合'" width="500px" @confirm="saveAggregateIpv6Flowspec">
+      <DraggableModal v-model:visible="ipv6FlowspecAggregateModalVisible" :title="editingIpv6FlowspecAggregateIndex >= 0 ? t('bgp.modal.editIpv6Aggregate') : t('bgp.modal.addIpv6Aggregate')" width="500px" @confirm="saveAggregateIpv6Flowspec">
         <div class="form-row">
-          <label class="form-label">IPv6 聚合网络 *</label>
-          <input type="text" class="form-control" v-model="ipv6FlowspecAggregateForm.aggregate" placeholder="例如: 2001:db8::/32" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.ipv6AggregateNetwork') }}</label>
+          <input type="text" class="form-control" v-model="ipv6FlowspecAggregateForm.aggregate" :placeholder="t('bgp.placeholder.exampleIpv6Network')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
@@ -5340,49 +5488,49 @@ export default defineComponent({
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="ipv6FlowspecAggregateForm['summary-only']" /> 仅汇总 (Summary Only)</label>
+          <label><input type="checkbox" v-model="ipv6FlowspecAggregateForm['summary-only']" /> {{ t('bgp.label.summaryOnlyCheckbox') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv6FlowspecAggregateForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6FlowspecAggregateForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv6FlowspecRedistributeModalVisible" :title="editingIpv6FlowspecRedistributeIndex >= 0 ? '编辑 IPv6 重分发' : '添加 IPv6 重分发'" width="500px" @confirm="saveRedistributeIpv6Flowspec">
+      <DraggableModal v-model:visible="ipv6FlowspecRedistributeModalVisible" :title="editingIpv6FlowspecRedistributeIndex >= 0 ? t('bgp.modal.editIpv6Redistribute') : t('bgp.modal.addIpv6Redistribute')" width="500px" @confirm="saveRedistributeIpv6Flowspec">
         <div class="form-row">
-          <label class="form-label">协议 *</label>
+          <label class="form-label">{{ t('bgp.label.protocolFormLabel') }}</label>
           <select class="form-control" v-model="ipv6FlowspecRedistributeForm.protocol" style="width:100%;">
             <option v-for="opt in IPV6_REDISTRIBUTE_PROTOCOLS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">度量值</label>
+          <label class="form-label">{{ t('bgp.label.metricFormLabel') }}</label>
           <input type="number" class="form-control" v-model="ipv6FlowspecRedistributeForm.metric" min="0" max="16777214" placeholder="0-16777214" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv6FlowspecRedistributeForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6FlowspecRedistributeForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- IPv6 Labeled Unicast Modals -->
-      <DraggableModal v-model:visible="ipv6LabeledUnicastNetworkModalVisible" :title="editingIpv6LabeledUnicastNetworkIndex >= 0 ? '编辑 IPv6 网络' : '添加 IPv6 网络'" width="500px" @confirm="saveNetworkIpv6LabeledUnicast">
+      <DraggableModal v-model:visible="ipv6LabeledUnicastNetworkModalVisible" :title="editingIpv6LabeledUnicastNetworkIndex >= 0 ? t('bgp.modal.editIpv6Network') : t('bgp.modal.addIpv6Network')" width="500px" @confirm="saveNetworkIpv6LabeledUnicast">
         <div class="form-row">
-          <label class="form-label">IPv6 网络 *</label>
-          <input type="text" class="form-control" v-model="ipv6LabeledUnicastNetworkForm.network" placeholder="例如: 2001:db8::/32" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.ipv6NetworkLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6LabeledUnicastNetworkForm.network" :placeholder="t('bgp.placeholder.exampleIpv6Network')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="ipv6LabeledUnicastNetworkForm.backdoor" /> 后门路由 (Backdoor)</label>
+          <label><input type="checkbox" v-model="ipv6LabeledUnicastNetworkForm.backdoor" /> {{ t('bgp.label.backdoorCheckbox') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv6LabeledUnicastNetworkForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6LabeledUnicastNetworkForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv6LabeledUnicastAggregateModalVisible" :title="editingIpv6LabeledUnicastAggregateIndex >= 0 ? '编辑 IPv6 聚合' : '添加 IPv6 聚合'" width="500px" @confirm="saveAggregateIpv6LabeledUnicast">
+      <DraggableModal v-model:visible="ipv6LabeledUnicastAggregateModalVisible" :title="editingIpv6LabeledUnicastAggregateIndex >= 0 ? t('bgp.modal.editIpv6Aggregate') : t('bgp.modal.addIpv6Aggregate')" width="500px" @confirm="saveAggregateIpv6LabeledUnicast">
         <div class="form-row">
-          <label class="form-label">IPv6 聚合网络 *</label>
-          <input type="text" class="form-control" v-model="ipv6LabeledUnicastAggregateForm.aggregate" placeholder="例如: 2001:db8::/32" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.ipv6AggregateNetwork') }}</label>
+          <input type="text" class="form-control" v-model="ipv6LabeledUnicastAggregateForm.aggregate" :placeholder="t('bgp.placeholder.exampleIpv6Network')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
@@ -5390,49 +5538,49 @@ export default defineComponent({
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="ipv6LabeledUnicastAggregateForm['summary-only']" /> 仅汇总 (Summary Only)</label>
+          <label><input type="checkbox" v-model="ipv6LabeledUnicastAggregateForm['summary-only']" /> {{ t('bgp.label.summaryOnlyCheckbox') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv6LabeledUnicastAggregateForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6LabeledUnicastAggregateForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv6LabeledUnicastRedistributeModalVisible" :title="editingIpv6LabeledUnicastRedistributeIndex >= 0 ? '编辑 IPv6 重分发' : '添加 IPv6 重分发'" width="500px" @confirm="saveRedistributeIpv6LabeledUnicast">
+      <DraggableModal v-model:visible="ipv6LabeledUnicastRedistributeModalVisible" :title="editingIpv6LabeledUnicastRedistributeIndex >= 0 ? t('bgp.modal.editIpv6Redistribute') : t('bgp.modal.addIpv6Redistribute')" width="500px" @confirm="saveRedistributeIpv6LabeledUnicast">
         <div class="form-row">
-          <label class="form-label">协议 *</label>
+          <label class="form-label">{{ t('bgp.label.protocolFormLabel') }}</label>
           <select class="form-control" v-model="ipv6LabeledUnicastRedistributeForm.protocol" style="width:100%;">
             <option v-for="opt in IPV6_REDISTRIBUTE_PROTOCOLS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">度量值</label>
+          <label class="form-label">{{ t('bgp.label.metricFormLabel') }}</label>
           <input type="number" class="form-control" v-model="ipv6LabeledUnicastRedistributeForm.metric" min="0" max="16777214" placeholder="0-16777214" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv6LabeledUnicastRedistributeForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6LabeledUnicastRedistributeForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- IPv6 Multicast Modals -->
-      <DraggableModal v-model:visible="ipv6MulticastNetworkModalVisible" :title="editingIpv6MulticastNetworkIndex >= 0 ? '编辑 IPv6 网络' : '添加 IPv6 网络'" width="500px" @confirm="saveNetworkIpv6Multicast">
+      <DraggableModal v-model:visible="ipv6MulticastNetworkModalVisible" :title="editingIpv6MulticastNetworkIndex >= 0 ? t('bgp.modal.editIpv6Network') : t('bgp.modal.addIpv6Network')" width="500px" @confirm="saveNetworkIpv6Multicast">
         <div class="form-row">
-          <label class="form-label">IPv6 网络 *</label>
-          <input type="text" class="form-control" v-model="ipv6MulticastNetworkForm.network" placeholder="例如: 2001:db8::/32" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.ipv6NetworkLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6MulticastNetworkForm.network" :placeholder="t('bgp.placeholder.exampleIpv6Network')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="ipv6MulticastNetworkForm.backdoor" /> 后门路由 (Backdoor)</label>
+          <label><input type="checkbox" v-model="ipv6MulticastNetworkForm.backdoor" /> {{ t('bgp.label.backdoorCheckbox') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv6MulticastNetworkForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6MulticastNetworkForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv6MulticastAggregateModalVisible" :title="editingIpv6MulticastAggregateIndex >= 0 ? '编辑 IPv6 聚合' : '添加 IPv6 聚合'" width="500px" @confirm="saveAggregateIpv6Multicast">
+      <DraggableModal v-model:visible="ipv6MulticastAggregateModalVisible" :title="editingIpv6MulticastAggregateIndex >= 0 ? t('bgp.modal.editIpv6Aggregate') : t('bgp.modal.addIpv6Aggregate')" width="500px" @confirm="saveAggregateIpv6Multicast">
         <div class="form-row">
-          <label class="form-label">IPv6 聚合网络 *</label>
-          <input type="text" class="form-control" v-model="ipv6MulticastAggregateForm.aggregate" placeholder="例如: 2001:db8::/32" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.ipv6AggregateNetwork') }}</label>
+          <input type="text" class="form-control" v-model="ipv6MulticastAggregateForm.aggregate" :placeholder="t('bgp.placeholder.exampleIpv6Network')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
@@ -5440,49 +5588,49 @@ export default defineComponent({
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="ipv6MulticastAggregateForm['summary-only']" /> 仅汇总 (Summary Only)</label>
+          <label><input type="checkbox" v-model="ipv6MulticastAggregateForm['summary-only']" /> {{ t('bgp.label.summaryOnlyCheckbox') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv6MulticastAggregateForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6MulticastAggregateForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv6MulticastRedistributeModalVisible" :title="editingIpv6MulticastRedistributeIndex >= 0 ? '编辑 IPv6 重分发' : '添加 IPv6 重分发'" width="500px" @confirm="saveRedistributeIpv6Multicast">
+      <DraggableModal v-model:visible="ipv6MulticastRedistributeModalVisible" :title="editingIpv6MulticastRedistributeIndex >= 0 ? t('bgp.modal.editIpv6Redistribute') : t('bgp.modal.addIpv6Redistribute')" width="500px" @confirm="saveRedistributeIpv6Multicast">
         <div class="form-row">
-          <label class="form-label">协议 *</label>
+          <label class="form-label">{{ t('bgp.label.protocolFormLabel') }}</label>
           <select class="form-control" v-model="ipv6MulticastRedistributeForm.protocol" style="width:100%;">
             <option v-for="opt in IPV6_REDISTRIBUTE_PROTOCOLS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">度量值</label>
+          <label class="form-label">{{ t('bgp.label.metricFormLabel') }}</label>
           <input type="number" class="form-control" v-model="ipv6MulticastRedistributeForm.metric" min="0" max="16777214" placeholder="0-16777214" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv6MulticastRedistributeForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6MulticastRedistributeForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- IPv6 VPN Modals -->
-      <DraggableModal v-model:visible="ipv6VpnNetworkModalVisible" :title="editingIpv6VpnNetworkIndex >= 0 ? '编辑 IPv6 网络' : '添加 IPv6 网络'" width="500px" @confirm="saveNetworkIpv6Vpn">
+      <DraggableModal v-model:visible="ipv6VpnNetworkModalVisible" :title="editingIpv6VpnNetworkIndex >= 0 ? t('bgp.modal.editIpv6Network') : t('bgp.modal.addIpv6Network')" width="500px" @confirm="saveNetworkIpv6Vpn">
         <div class="form-row">
-          <label class="form-label">IPv6 网络 *</label>
-          <input type="text" class="form-control" v-model="ipv6VpnNetworkForm.network" placeholder="例如: 2011::0/64" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.ipv6NetworkLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6VpnNetworkForm.network" :placeholder="t('bgp.placeholder.exampleIpv6Network')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">MPLS 标签 (0-1048575)</label>
+          <label class="form-label">{{ t('bgp.label.mplsLabelFormLabel') }}</label>
           <input type="number" class="form-control" v-model="ipv6VpnNetworkForm.label" min="0" max="1048575" placeholder="0-1048575" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">路由区分器 (ASN:NN 或 IP:NN)</label>
-          <input type="text" class="form-control" v-model="ipv6VpnNetworkForm.rd" placeholder="例如: 7.7.7.7:911" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.rdFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6VpnNetworkForm.rd" :placeholder="t('bgp.placeholder.routeDistinguisher')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv6VpnAggregateModalVisible" :title="editingIpv6VpnAggregateIndex >= 0 ? '编辑 IPv6 聚合' : '添加 IPv6 聚合'" width="500px" @confirm="saveAggregateIpv6Vpn">
+      <DraggableModal v-model:visible="ipv6VpnAggregateModalVisible" :title="editingIpv6VpnAggregateIndex >= 0 ? t('bgp.modal.editIpv6Aggregate') : t('bgp.modal.addIpv6Aggregate')" width="500px" @confirm="saveAggregateIpv6Vpn">
         <div class="form-row">
-          <label class="form-label">IPv6 聚合网络 *</label>
-          <input type="text" class="form-control" v-model="ipv6VpnAggregateForm.aggregate" placeholder="例如: 2001:db8::/32" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.ipv6AggregateNetwork') }}</label>
+          <input type="text" class="form-control" v-model="ipv6VpnAggregateForm.aggregate" :placeholder="t('bgp.placeholder.exampleIpv6Network')" style="width:100%;" />
         </div>
         <div class="form-row">
           <label class="form-label"></label>
@@ -5490,34 +5638,34 @@ export default defineComponent({
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <label><input type="checkbox" v-model="ipv6VpnAggregateForm['summary-only']" /> 仅汇总 (Summary Only)</label>
+          <label><input type="checkbox" v-model="ipv6VpnAggregateForm['summary-only']" /> {{ t('bgp.label.summaryOnlyCheckbox') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv6VpnAggregateForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6VpnAggregateForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ipv6VpnRedistributeModalVisible" :title="editingIpv6VpnRedistributeIndex >= 0 ? '编辑 IPv6 重分发' : '添加 IPv6 重分发'" width="500px" @confirm="saveRedistributeIpv6Vpn">
+      <DraggableModal v-model:visible="ipv6VpnRedistributeModalVisible" :title="editingIpv6VpnRedistributeIndex >= 0 ? t('bgp.modal.editIpv6Redistribute') : t('bgp.modal.addIpv6Redistribute')" width="500px" @confirm="saveRedistributeIpv6Vpn">
         <div class="form-row">
-          <label class="form-label">协议 *</label>
+          <label class="form-label">{{ t('bgp.label.protocolFormLabel') }}</label>
           <select class="form-control" v-model="ipv6VpnRedistributeForm.protocol" style="width:100%;">
             <option v-for="opt in IPV6_REDISTRIBUTE_PROTOCOLS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">度量值</label>
+          <label class="form-label">{{ t('bgp.label.metricFormLabel') }}</label>
           <input type="number" class="form-control" v-model="ipv6VpnRedistributeForm.metric" min="0" max="16777214" placeholder="0-16777214" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="ipv6VpnRedistributeForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('bgp.label.routeMapFormLabel') }}</label>
+          <input type="text" class="form-control" v-model="ipv6VpnRedistributeForm['route-map']" :placeholder="t('bgp.placeholder.routeMapName')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- EVPN Route Target Modal -->
-      <DraggableModal v-model:visible="evpnRtModalVisible" :title="editingEvpnRtIndex >= 0 ? '编辑 EVPN Route Target' : '添加 EVPN Route Target'" width="500px" @confirm="saveEvpnRt">
+      <DraggableModal v-model:visible="evpnRtModalVisible" :title="editingEvpnRtIndex >= 0 ? t('bgp.modal.editEvpnRt') : t('bgp.modal.addEvpnRt')" width="500px" @confirm="saveEvpnRt">
         <div class="form-row">
-          <label class="form-label">方向 *</label>
+          <label class="form-label">{{ t('bgp.label.directionFormLabel') }}</label>
           <select class="form-control" v-model="evpnRtForm.direction" style="width:100%;">
             <option v-for="opt in EVPN_RT_DIRECTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
@@ -5525,12 +5673,12 @@ export default defineComponent({
         <div class="form-row">
           <label class="form-label">Route Target *</label>
           <input type="text" class="form-control" v-model="evpnRtForm['route-target']"
-                 placeholder="例如: 1:1 或 1.1.1.1:100" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.routeDistinguisher')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- EVPN VNI Modal -->
-      <DraggableModal v-model:visible="evpnVniModalVisible" :title="editingEvpnVniIndex >= 0 ? '编辑 EVPN VNI' : '添加 EVPN VNI'" width="500px" @confirm="saveEvpnVni">
+      <DraggableModal v-model:visible="evpnVniModalVisible" :title="editingEvpnVniIndex >= 0 ? t('bgp.modal.editEvpnVni') : t('bgp.modal.addEvpnVni')" width="500px" @confirm="saveEvpnVni">
         <div class="form-row">
           <label class="form-label">VNI *</label>
           <input type="number" class="form-control" v-model="evpnVniForm.vni"
@@ -5540,9 +5688,9 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- EVPN VNI Route Target Modal -->
-      <DraggableModal v-model:visible="evpnVniRtModalVisible" :title="editingEvpnVniRtIndex >= 0 ? '编辑 VNI Route Target' : '添加 VNI Route Target'" width="600px" @confirm="saveEvpnVniRtManager">
+      <DraggableModal v-model:visible="evpnVniRtModalVisible" :title="editingEvpnVniRtIndex >= 0 ? t('bgp.modal.editVniRt') : t('bgp.modal.addVniRt')" width="600px" @confirm="saveEvpnVniRtManager">
         <div class="form-row">
-          <label class="form-label">方向 *</label>
+          <label class="form-label">{{ t('bgp.label.directionFormLabel') }}</label>
           <select class="form-control" v-model="evpnVniRtForm.direction" style="width:100%;">
             <option v-for="opt in EVPN_RT_DIRECTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
@@ -5550,21 +5698,21 @@ export default defineComponent({
         <div class="form-row">
           <label class="form-label">Route Target *</label>
           <input type="text" class="form-control" v-model="evpnVniRtForm['route-target']"
-                 placeholder="例如: 1:1 或 1.1.1.1:100" style="width:100%;" />
+                 :placeholder="t('bgp.placeholder.routeDistinguisher')" style="width:100%;" />
         </div>
         <div class="form-row" style="margin-top:20px;">
-          <button class="btn btn-sm btn-primary" @click="saveEvpnVniRt">添加 Route Target</button>
+          <button class="btn btn-sm btn-primary" @click="saveEvpnVniRt">{{ t('bgp.label.addRouteTargetBtn') }}</button>
         </div>
         <div style="margin-top:16px;">
           <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden; margin-bottom:16px;">
-            <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">已配置的 Route Targets</div>
+            <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('bgp.label.configuredRtsHeader') }}</div>
             <div style="padding:16px;">
-          <div v-if="evpnVniForm['route-targets'].length === 0" style="color:#999;padding:8px;">暂无配置</div>
+          <div v-if="evpnVniForm['route-targets'].length === 0" style="color:#999;padding:8px;">{{ t('bgp.label.noConfigText') }}</div>
           <div v-for="(rt, idx) in evpnVniForm['route-targets']" :key="idx" style="display:flex;gap:8px;align-items:center;padding:8px;border:1px solid #ddd;margin:4px 0;">
             </div>
           </div>
             <span style="flex:1;">{{ rt.direction }}: {{ rt['route-target'] }}</span>
-            <button class="btn btn-sm btn-danger" @click="evpnVniForm['route-targets'].splice(idx, 1)">删除</button>
+            <button class="btn btn-sm btn-danger" @click="evpnVniForm['route-targets'].splice(idx, 1)">{{ t('bgp.label.deleteBtn') }}</button>
           </div>
         </div>
       </DraggableModal>

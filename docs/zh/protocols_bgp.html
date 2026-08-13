@@ -1,0 +1,1745 @@
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="bgp">
+<h1>BGP</h1>
+<p><abbr title="Border Gateway Protocol">BGP</abbr> is one of the Exterior 网关 协议s
+and the de facto standard interdomain routing protocol. The latest BGP version
+is 4. BGP-4 is described in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1771.html"><strong>RFC 1771</strong></a> and updated by <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4271.html"><strong>RFC 4271</strong></a>. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2858.html"><strong>RFC 2858</strong></a>
+adds multiprotocol support to BGP.</p>
+<p>VyOS makes use of <abbr title="Free Range Routing">FRR</abbr> and we would like to thank
+them for their effort!</p>
+<section id="basic-concepts">
+<h2>Basic Concepts</h2>
+<section id="autonomous-systems">
+<h3>Autonomous 系统s</h3>
+<p>From <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1930.html"><strong>RFC 1930</strong></a>:</p>
+<blockquote>
+<div><p>An AS is a connected group of one or more IP prefixes run by one or more
+network operators which has a SINGLE and CLEARLY DEFINED routing policy.</p>
+</div></blockquote>
+<p>Each <abbr title="Autonomous System">AS</abbr> has an identifying number associated with it
+called an <abbr title="Autonomous System Number">ASN</abbr>. This is a two octet value
+ranging in value from 1 to 65535. The AS numbers 64512 through 65535 are defined
+as private AS numbers. Private AS numbers must not be advertised on the global
+Internet. The 2-byte AS number range has been exhausted. 4-byte AS numbers are
+specified in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6793.html"><strong>RFC 6793</strong></a>, and provide a pool of 4294967296 AS numbers.</p>
+<p>The <abbr title="Autonomous System Number">ASN</abbr> is one of the essential elements of
+BGP. BGP is a distance vector routing protocol, and the AS-路径 framework
+provides distance vector metric and loop detection to BGP.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp system-as <asn>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-system-as-asn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 local <abbr title="Autonomous System Number">ASN</abbr> that this router represents.
+This is a a mandatory option!</p>
+</div>
+</div>
+</section>
+<section id="address-families">
+<h3>地址 Families</h3>
+<p>Multiprotocol extensions enable BGP to carry routing information for multiple
+network layer protocols. BGP supports an 地址 Family Identifier (AFI) for
+IPv4 and IPv6.</p>
+</section>
+<section id="route-selection">
+<h3>路由 Selection</h3>
+<p>The route selection process used by FRR’s BGP implementation uses the following
+decision criterion, starting at the top of the list and going towards the
+bottom until one of the factors 可以 used.</p>
+<ol class="arabic">
+<li><p><strong>权重 check</strong></p>
+<p>Prefer higher local weight routes to lower routes.</p>
+</li>
+<li><p><strong>Local preference check</strong></p>
+<p>Prefer higher local preference routes to lower.</p>
+</li>
+<li><p><strong>Local route check</strong></p>
+<p>Prefer local routes (statics, aggregates, redistributed) to received routes.</p>
+</li>
+<li><p><strong>AS path length check</strong></p>
+<p>Prefer shortest hop-count AS_PATHs.</p>
+</li>
+<li><p><strong>源 check</strong></p>
+<p>Prefer the lowest origin type route. That is, prefer IGP origin routes to
+EGP, to Incomplete routes.</p>
+</li>
+<li><p><strong>MED check</strong></p>
+<p>Where routes with a MED were received from the same AS, prefer the route
+with the lowest MED.</p>
+</li>
+<li><p><strong>External check</strong></p>
+<p>Prefer the route received from an external, eBGP peer over routes received
+from other types of peers.</p>
+</li>
+<li><p><strong>IGP cost check</strong></p>
+<p>Prefer the route with the lower IGP cost.</p>
+</li>
+<li><p><strong>Multi-path check</strong></p>
+<p>If multi-pathing is enabled, then check whether the routes not yet
+distinguished in preference 可能 considered equal. If
+<code class="docutils literal notranslate">bgp bestpath as-path multipath-relax</code> is set, all such routes are
+considered equal, otherwise routes received via iBGP with identical AS_PATHs
+or routes received from eBGP neighbours in the same AS are considered equal.</p>
+</li>
+<li><p><strong>Already-selected external check</strong></p>
+<p>Where both routes were received from eBGP peers, then prefer the route
+which is already selected. 注意 that this check is not applied if
+<code class="docutils literal notranslate">bgp bestpath compare-routerid</code> is configured. This check can
+prevent some cases of oscillation.</p>
+</li>
+<li><p><strong>路由r-ID check</strong></p>
+<p>Prefer the route with the lowest router-ID. If the route has an
+ORIGINATOR_ID attribute, through iBGP reflection, then that router ID is
+used, otherwise the router-ID of the peer the route was received from is
+used.</p>
+</li>
+<li><p><strong>Cluster-List length check</strong></p>
+<p>The route with the shortest cluster-list length is used. The cluster-list
+reflects the iBGP reflection path the route has taken.</p>
+</li>
+<li><p><strong>Peer address</strong></p>
+<p>Prefer the route received from the peer with the higher transport layer
+address, as a last-resort tie-breaker.</p>
+</li>
+</ol>
+</section>
+<section id="capability-negotiation">
+<h3>Capability Negotiation</h3>
+<p>When adding IPv6 routing information exchange feature to BGP. There were some
+proposals. <abbr title="Internet Engineering Task Force">IETF</abbr>
+<abbr title="Inter Domain Routing">IDR</abbr> adopted a proposal called Multiprotocol
+Extension for BGP. The specification is described in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2283.html"><strong>RFC 2283</strong></a>. The protocol
+does not define new protocols. It defines new attributes to existing BGP. When
+it is used exchanging IPv6 routing information it is called BGP-4+. When it is
+used for exchanging multicast routing information it is called MBGP.</p>
+<p><em>bgpd</em> supports Multiprotocol Extension for BGP. So if a remote peer supports
+the protocol, <em>bgpd</em> can exchange IPv6 and/or multicast routing information.</p>
+<p>Traditional BGP did not have the feature to detect a remote peer’s
+capabilities, e.g. whether it can handle prefix types other than IPv4 unicast
+routes. This was a big problem using Multiprotocol Extension for BGP in an
+operational network. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2842.html"><strong>RFC 2842</strong></a> adopted a feature called Capability
+Negotiation. <em>bgpd</em> use this Capability Negotiation to detect the remote peer’s
+capabilities. If a peer is only configured as an IPv4 unicast neighbor, <em>bgpd</em>
+does not send these Capability Negotiation packets (at least not unless other
+optional BGP features require capability negotiation).</p>
+<p>By default, FRR will bring up peering with minimal common capability for the
+both sides. For example, if the local router has unicast and multicast
+capabilities and the remote router only has unicast capability the local router
+will establish the connection with unicast only capability. When there are no
+common capabilities, FRR sends Unsupported Capability error and then resets the
+connection.</p>
+</section>
+</section>
+<section id="configuration">
+<h2>配置</h2>
+<section id="bgp-router-configuration">
+<h3>BGP 路由r 配置</h3>
+<p>First of all you must configure BGP router with the <abbr title="Autonomous System Number">ASN</abbr>. The AS number is an identifier for the autonomous system.
+The BGP protocol uses the AS number for detecting whether the BGP connection
+is internal or external. VyOS does not have a special command to start the BGP
+process. The BGP process starts when the first neighbor is configured.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp system-as <asn>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-system-as-asn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 local autonomous system number that this router represents. This is a
+mandatory option!</p>
+</div>
+</div>
+<section id="peers-configuration">
+<h4>Peers 配置</h4>
+<section id="defining-peers">
+<h5>Defining Peers</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> remote-as <asn>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-remote-as-asn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command creates a new neighbor whose remote-as is <asn>. The neighbor
+address 可以 an IPv4 address or an IPv6 address or an interface to use
+for the connection. The command is applicable for peer and peer group.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> remote-as internal
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-remote-as-internal" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>创建 a peer as you would when you specify an ASN, except that if the
+peers ASN is different than mine as specified under the <code class="docutils literal notranslate">protocols bgp <asn></code> command the connection 将 denied.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> remote-as external
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-remote-as-external" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>创建 a peer as you would when you specify an ASN, except that if the
+peers ASN is the same as mine as specified under the <code class="docutils literal notranslate">protocols bgp <asn></code> command the connection 将 denied.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> remote-as auto
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-remote-as-auto" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>创建 a peer as you would when you specify an ASN, except that the peers
+remote ASN is detected automatically from the OPEN message.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> local-role <role> [strict]
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-local-role-role-strict" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>BGP roles are defined in RFC <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> and provide an easy way to
+add route leak prevention, detection and mitigation. The local Role
+value is negotiated with the new BGP Role capability which has a
+built-in check of the corresponding value. In case of a mismatch the
+new OPEN Roles Mismatch Notification <2, 11> 将 sent.
+The correct Role pairs are:</p>
+<p>Provider - Customer</p>
+<p>Peer - Peer</p>
+<p>RS-服务器 - RS-客户端</p>
+<p>If <code class="docutils literal notranslate">strict</code> is set the BGP session won’t become established
+until the BGP neighbor sets local Role on its side. This
+configuration parameter is defined in RFC <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> and 用于
+enforce the corresponding configuration at your counter-parts side.</p>
+<p>路由s that are sent from provider, rs-server, or the peer local-role
+(or if received by customer, rs-client, or the peer local-role) will
+be marked with a new Only to Customer (OTC) attribute.</p>
+<p>路由s with this attribute can only be sent to your neighbor if your
+local-role is provider or rs-server. 路由s with this attribute can
+be received only if your local-role is customer or rs-client.</p>
+<p>In case of peer-peer relationship routes 可以 received only if OTC
+value is equal to your neighbor AS number.</p>
+<p>All these rules with OTC will help to detect and mitigate route leaks
+and happen automatically if local-role is set.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> shutdown
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-shutdown" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command disables the peer or peer group. To re-enable the peer, use
+the delete form of this command.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> description <text>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 description of the peer or peer group.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> update-source <address|interface>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-update-source-address-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specify the IPv4 source address to use for the BGP session to this neighbor,
+可能 specified as either an IPv4 address directly or as an interface name.</p>
+</div>
+</div>
+</section>
+<section id="bgp-capability-negotiation-1">
+<h5>Capability Negotiation</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> capability dynamic
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-capability-dynamic" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command would allow the dynamic update of capabilities over an
+established BGP session.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> capability extended-nexthop
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-capability-extended-nexthop" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>允许 bgp to negotiate the extended-nexthop capability with it’s peer.
+If you are peering over a IPv6 Link-Local address then this capability
+is turned on automatically. If you are peering over a IPv6 Global 地址
+then turning on this command will allow BGP to install IPv4 routes with
+IPv6 nexthops if you do not have IPv4 configured on interfaces.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> disable-capability-negotiation
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-disable-capability-negotiation" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Suppress sending Capability Negotiation as OPEN message optional
+parameter to the peer. This command only affects the peer is
+configured other than IPv4 unicast configuration.</p>
+<p>When remote peer does not have capability negotiation feature,
+remote peer will not send any capabilities at all. In that case,
+bgp configures the peer with configured capabilities.</p>
+<p>You may prefer locally configured capabilities more than the negotiated
+capabilities even though remote peer sends capabilities. If the peer is
+configured by <code class="docutils literal notranslate">override-capability</code>, VyOS ignores received
+capabilities then override negotiated capabilities with configured values.</p>
+<p>添加itionally you should keep in mind that this feature fundamentally
+disables the ability to use widely deployed BGP features. BGP unnumbered,
+hostname support, AS4, 添加path, 路由 Refresh, ORF, Dynamic Capabilities,
+and graceful restart.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> override-capability
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-override-capability" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command allow override the result of Capability Negotiation with
+local configuration. Ignore remote peer’s capability value.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> strict-capability-match
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-strict-capability-match" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command forces strictly compare remote capabilities and local
+capabilities. If capabilities are different, send Unsupported Capability
+error then reset connection.</p>
+<p>You may want to disable sending Capability Negotiation OPEN message
+optional parameter to the peer when remote peer does not implement
+Capability Negotiation. Please use <code class="docutils literal notranslate">disable-capability-negotiation</code>
+command to disable the feature.</p>
+</div>
+</div>
+</section>
+<section id="peer-parameters">
+<h5>Peer 参数</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> allowas-in number <number>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-allowas-in-number-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command accept incoming routes with AS path containing AS
+number with the same value as the current system AS. This is
+used when you want to use the same AS number in your sites,
+but you can’t connect them directly.</p>
+<p>The number parameter (1-10) configures the amount of accepted
+occurrences of the system AS number in AS path.</p>
+<p>This command is only allowed for eBGP peers. It is not applicable
+for peer groups.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> as-override
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-as-override" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command override AS number of the originating router with
+the local AS number.</p>
+<p>Usually this configuration is used in PEs (Provider Edge) to
+replace the incoming customer AS number so the connected CE (
+Customer Edge) can use the same AS number as the other customer
+sites. This allows customers of the provider network to use the
+same AS number across their sites.</p>
+<p>This command is only allowed for eBGP peers.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> attribute-unchanged <as-path|med|next-hop>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-attribute-unchanged-as-path-med-next-hop" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies attributes to be left unchanged for
+advertisements sent to a peer or peer group.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> maximum-prefix <number>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-maximum-prefix-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies a maximum number of prefixes we can receive
+from a given peer. If this number is exceeded, the BGP session
+将 destroyed. The number range is 1 to 4294967295.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> nexthop-self
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-nexthop-self" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command forces the BGP speaker to report itself as the
+next hop for an advertised route it advertised to a neighbor.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> remove-private-as
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-remove-private-as" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command removes the private ASN of routes that are advertised
+to the configured peer. It removes only private ASNs on routes
+advertised to EBGP peers.</p>
+<p>If the AS-路径 for the route has only private ASNs, the private
+ASNs are removed.</p>
+<p>If the AS-路径 for the route has a private ASN between public
+ASNs, it is assumed that this is a design choice, and the
+private ASN is not removed.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> soft-reconfiguration inbound
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-soft-reconfiguration-inbound" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Changes in BGP policies require the BGP session to be cleared. 清除ing has a
+large negative impact on network operations. Soft reconfiguration enables you
+to generate inbound updates from a neighbor, change and activate BGP policies
+without clearing the BGP session.</p>
+<p>This command specifies that route updates received from this neighbor 将
+stored unmodified, regardless of the inbound policy. When inbound soft
+reconfiguration is enabled, the stored updates are processed by the new
+policy configuration to create new inbound updates.</p>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>Storage of route updates uses memory. If you enable soft
+reconfiguration inbound for multiple neighbors, the amount of memory used
+可以come significant.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> weight <number>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-weight-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies a default weight value for the neighbor’s
+routes. The number range is 1 to 65535.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> advertisement-interval <seconds>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-advertisement-interval-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies the minimum route advertisement interval for
+the peer. The interval value is 0 to 600 seconds, with the default
+advertisement interval being 0.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> disable-connected-check
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-disable-connected-check" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command allows peerings between directly connected eBGP peers
+using loopback addresses without adjusting the default TTL of 1.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> disable-send-community <extended|standard>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-disable-send-community-extended-standard" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies that the community attribute should not be sent
+in route updates to a peer. By default community attribute is sent.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> ebgp-multihop <number>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-ebgp-multihop-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command allows sessions to be established with eBGP neighbors
+when they are multiple hops away. When the neighbor is not directly
+connected and this knob is not enabled, the session will not establish.
+The number of hops range is 1 to 255. This command is mutually
+exclusive with <code class="docutils literal notranslate">ttl-security hops</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> local-as <asn> [no-prepend] [replace-as]
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-local-as-asn-no-prepend-replace-as" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specify an alternate AS for this BGP process when interacting with
+the specified peer or peer group. With no modifiers, the specified
+local-as is prepended to the received AS_PATH when receiving routing
+updates from the peer, and prepended to the outgoing AS_PATH (after
+the process local AS) when transmitting local routes to the peer.</p>
+<p>If the <code class="docutils literal notranslate">no-prepend</code> attribute is specified, then the supplied
+local-as is not prepended to the received AS_PATH.</p>
+<p>If the <code class="docutils literal notranslate">replace-as</code> attribute is specified, then only the supplied
+local-as is prepended to the AS_PATH when transmitting local-route
+updates to this peer.</p>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>This command is only allowed for eBGP peers.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> passive
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-passive" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configures the BGP speaker so that it only accepts inbound connections
+from, but does not initiate outbound connections to the peer or peer group.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> password <text>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-password-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies a MD5 password to be used with the tcp socket that
+is being used to connect to the remote peer.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> ttl-security hops <number>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-ttl-security-hops-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command enforces Generalized TTL Security Mechanism (GTSM),
+as specified in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5082.html"><strong>RFC 5082</strong></a>. With this command, only neighbors
+that are specified number of hops away 将 allowed to
+become neighbors. The number of hops range is 1 to 254. This
+command is mutually exclusive with <code class="docutils literal notranslate">ebgp-multihop</code>.</p>
+</div>
+</div>
+</section>
+<section id="peer-groups">
+<h5>Peer 组s</h5>
+<p>Peer groups are used to help improve scaling by generating the same update
+information to all members of a peer group. 注意 that this means that the
+routes generated by a member of a peer group 将 sent back to that
+originating peer with the originator identifier attribute set to indicated
+the originating peer. All peers not associated with a specific peer group
+are treated as belonging to a default peer group, and will share updates.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp peer-group <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-peer-group-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command defines a new peer group. You can specify to the group the same
+parameters that you can specify for specific neighbors.</p>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>If you apply a parameter to an individual neighbor IP address, you
+override the action defined for a peer group that includes that IP
+address.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> peer-group <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-peer-group-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command bind specific peer to peer group with a given name.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="network-advertisement-configuration">
+<h4>网络 Advertisement 配置</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp address-family <ipv4-unicast|ipv6-unicast> network <prefix>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-network-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command is used for advertising IPv4 or IPv6 networks.</p>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>By default, the BGP prefix is advertised even if it’s not present
+in the routing table. This behaviour differs from the implementation of
+some vendors.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters network-import-check
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-network-import-check" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This configuration modifies the behavior of the network statement. If you
+have this configured the underlying network must exist in the routing table.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> default-originate [route-map <name>]
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-default-originate-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>By default, VyOS does not advertise a default route (0.0.0.0/0) even if it is
+in routing table. When you want to announce default routes to the peer, use
+this command. Using optional argument <code class="docutils literal notranslate">route-map</code> you can inject the
+default route to given neighbor only if the conditions in the route map are
+met.</p>
+</div>
+</div>
+</section>
+<section id="route-aggregation-configuration">
+<h4>路由 Aggregation 配置</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp address-family <ipv4-unicast|ipv6-unicast> aggregate-address <prefix>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-aggregate-address-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies an aggregate address. The router will also
+announce longer-prefixes inside of the aggregate address.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp address-family <ipv4-unicast|ipv6-unicast> aggregate-address <prefix> as-set
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-aggregate-address-prefix-as-set" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies an aggregate address with a mathematical set of
+autonomous systems. This command summarizes the AS_PATH attributes of
+all the individual routes.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp address-family <ipv4-unicast|ipv6-unicast> aggregate-address <prefix> summary-only
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-aggregate-address-prefix-summary-only" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies an aggregate address and provides that
+longer-prefixes inside of the aggregate address are suppressed
+before sending BGP updates out to peers.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> unsuppress-map <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-unsuppress-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command applies route-map to selectively unsuppress prefixes
+suppressed by summarisation.</p>
+</div>
+</div>
+</section>
+<section id="redistribution-configuration">
+<h4>Redistribution 配置</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp address-family <ipv4-unicast|ipv6-unicast> redistribute <route source>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-redistribute-route-source" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command redistributes routing information from the given route source
+to the BGP process. There are six modes available for route source:
+connected, kernel, ospf, rip, static, table.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp address-family <ipv4-unicast|ipv6-unicast> redistribute <route source> metric <number>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-redistribute-route-source-metric-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies metric (MED) for redistributed routes. The
+metric range is 0 to 4294967295. There are six modes available for
+route source: connected, kernel, ospf, rip, static, table.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp address-family <ipv4-unicast|ipv6-unicast> redistribute <route source> route-map <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-redistribute-route-source-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command allows to use route map to filter redistributed routes.
+There are six modes available for route source: connected, kernel,
+ospf, rip, static, table.</p>
+</div>
+</div>
+</section>
+<section id="general-configuration">
+<h4>General 配置</h4>
+<section id="common-parameters">
+<h5>Common parameters</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters allow-martian-nexthop
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-allow-martian-nexthop" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>When a peer receives a martian nexthop as part of the NLRI for a route
+permit the nexthop to be used as such, instead of rejecting and resetting
+the connection.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters router-id <id>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-router-id-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies the router-ID. If router ID is not specified it will
+use the highest interface IP address.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp address-family <ipv4-unicast|ipv6-unicast> maximum-paths <ebgp|ibgp> <number>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-maximum-paths-ebgp-ibgp-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command defines the maximum number of parallel routes that
+the BGP can support. In order for BGP to use the second path, the
+following attributes have to match: 权重, Local Preference, AS
+路径 (both AS number and AS path length), 源 code, MED, IGP
+metric. Also, the next hop address for each path 必须 different.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters no-hard-administrative-reset
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-no-hard-administrative-reset" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Do not send Hard 重置 CEASE Notification for “Administrative 重置”
+events. When set and Graceful Restart Notification capability is exchanged
+between the peers, Graceful Restart procedures apply, and routes 将 retained.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters log-neighbor-changes
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-log-neighbor-changes" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command enable logging neighbor up/down changes and reset reason.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters no-client-to-client-reflection
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-no-client-to-client-reflection" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command disables route reflection between route reflector clients.
+By default, the clients of a route reflector are not required to be
+fully meshed and the routes from a client are reflected to other clients.
+However, if the clients are fully meshed, route reflection is not required.
+In this case, use the <code class="docutils literal notranslate">no-client-to-client-reflection</code> command
+to disable client-to-client reflection.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters no-fast-external-failover
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-no-fast-external-failover" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Disable immediate session reset if peer’s connected link goes down.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters no-ipv6-auto-ra
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-no-ipv6-auto-ra" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>By default, FRR sends router advertisement packets when Extended Next Hop is
+on or when a connection is established directly using the device name (Unnumbered BGP).
+设置ting this option prevents FRR from sending router advertisement packets, but could break Unnumbered BGP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp listen range <prefix> peer-group <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-listen-range-prefix-peer-group-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command is useful if one desires to loosen the requirement for BGP
+to have strictly defined neighbors. Specifically what is allowed is for
+the local router to listen to a range of IPv4 or IPv6 addresses defined
+by a prefix and to accept BGP open messages. When a TCP connection
+(and subsequently a BGP open message) from within this range tries to
+connect the local router then the local router will respond and connect
+with the parameters that are defined within the peer group. One must define
+a peer-group for each range that is listed. If no peer-group is defined
+then an error will keep you from committing the configuration.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp listen limit <number>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-listen-limit-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command goes hand in hand with the listen range command to limit the
+amount of BGP neighbors that are allowed to connect to the local router.
+The limit range is 1 to 5000.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters ebgp-requires-policy
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-ebgp-requires-policy" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command changes the eBGP behavior of FRR. By default FRR enables
+<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc8212.html"><strong>RFC 8212</strong></a> functionality which affects how eBGP routes are advertised,
+namely no routes are advertised across eBGP sessions without some
+sort of egress route-map/policy in place. In VyOS however we have this
+RFC functionality disabled by default so that we can preserve backwards
+compatibility with older versions of VyOS. With this option one can
+enable <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc8212.html"><strong>RFC 8212</strong></a> functionality to operate.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters labeled-unicast <explicit-null | ipv4-explicit-null | ipv6-explicit-null>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-labeled-unicast-explicit-null-ipv4-explicit-null-ipv6-explicit-null" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>By default, locally advertised prefixes use the implicit-null label to
+encode in the outgoing NLRI.</p>
+<p>The following command uses the explicit-null label value for all the
+BGP instances.</p>
+</div>
+</div>
+</section>
+<section id="administrative-distance">
+<h5>Administrative Distance</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters distance global <external|internal|local> <distance>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-distance-global-external-internal-local-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command change distance value of BGP. The arguments are the distance
+values for external routes, internal routes and local routes respectively.
+The distance range is 1 to 255.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters distance prefix <subnet> distance <distance>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-distance-prefix-subnet-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command sets the administrative distance for a particular route. The
+distance range is 1 to 255.</p>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>路由s with a distance of 255 are effectively disabled and not
+installed into the kernel.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="bgp-message-queue-limits">
+<h5>BGP message queue limits</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters input-queue-limit <messages>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-input-queue-limit-messages" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 the BGP Input Queue limit for all peers during message parsing.
+Increase this only if you have the memory to handle large queues of
+messages at once.</p>
+<p>The default is 10000.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters output-queue-limit <messages>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-output-queue-limit-messages" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 the BGP Output Queue limit for all peers during message parsing.
+Increase this only if you have the memory to handle large queues of
+messages at once.</p>
+<p>The default is 10000.</p>
+</div>
+</div>
+</section>
+<section id="timers">
+<h5>Timers</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp timers holdtime <seconds>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-timers-holdtime-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies hold-time （以秒为单位）。 The timer range is
+4 to 65535. The default value is 180 second. If you set value to 0
+VyOS will not hold routes.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp timers keepalive <seconds>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-timers-keepalive-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies keep-alive time （以秒为单位）。 The timer
+can range from 4 to 65535. The default value is 60 second.</p>
+</div>
+</div>
+</section>
+<section id="bgp-read-only-mode">
+<h5>BGP read-only mode</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters update-delay max-delay <seconds>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-update-delay-max-delay-seconds" title="Permalink to this Command"></a></div></div>
+<p><strong>Enable BGP read-only mode after a BGP process restart or clearing all BGP sessions, and configure the mode’s maximum delay.</strong></p>
+<p>In read-only mode, BGP suspends best-path selection and does not send routing
+updates to peers. The mode ends when the router receives all expected
+End-of-RIB (EOR) messages from BGP peers or when the maximum delay is
+reached, whichever occurs first.</p>
+<p>The router expects EOR messages from all configured BGP peers except those
+that are administratively shut down. If the <code class="docutils literal notranslate">establish-wait</code> parameter is
+configured, the router waits for EOR messages only from BGP peers that reach
+the Established state within the <code class="docutils literal notranslate">establish-wait</code> window.</p>
+<p>The allowed range is 0 to 3600 seconds. By default, this feature is disabled.</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bgp parameters update-delay max-delay 120
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters update-delay establish-wait <seconds>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-update-delay-establish-wait-seconds" title="Permalink to this Command"></a></div></div>
+<p><strong>Configure how long the router waits for BGP peers to reach the Established state after read-only mode begins.</strong></p>
+<p>The router waits for EOR messages only from BGP peers that reach the
+Established state within the <code class="docutils literal notranslate">establish-wait</code> window. The <code class="docutils literal notranslate">establish-wait</code>
+value must not exceed the <code class="docutils literal notranslate">max-delay</code> value.</p>
+<p>The allowed range is 1 to 3600 seconds. This parameter requires <code class="docutils literal notranslate">max-delay</code> to
+be configured.</p>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bgp parameters update-delay establish-wait 90
+</pre></div>
+</div>
+</section>
+<section id="route-dampening">
+<h5>路由 Dampening</h5>
+<p>When a route fails, a routing update is sent to withdraw the route from the
+network’s routing tables. When the route is re-enabled, the change in
+availability is also advertised. A route that continually fails and returns
+requires a great deal of network traffic to update the network about the
+route’s status.</p>
+<p>路由 dampening, described in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2439.html"><strong>RFC 2439</strong></a>, 使您能够 identify routes
+that repeatedly fail and return. If route dampening is enabled, an unstable
+route accumulates penalties each time the route fails and returns. If the
+accumulated penalties exceed a threshold, the route is no longer advertised.
+This is route suppression. 路由s that have been suppressed are re-entered
+into the routing table only when the amount of their penalty falls below a
+threshold.</p>
+<p>A penalty of 1000 is assessed each time the route fails. When the penalties
+reach a predefined threshold (suppress-value), the router stops advertising
+the route.</p>
+<p>Once a route is assessed a penalty, the penalty is decreased by half each time
+a predefined amount of time elapses (half-life-time). When the accumulated
+penalties fall below a predefined threshold (reuse-value), the route is
+unsuppressed and added back into the BGP routing table.</p>
+<p>No route is suppressed indefinitely. Maximum-suppress-time defines the maximum
+time a route 可以 suppressed before it is re-advertised.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters dampening half-life <minutes>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-dampening-half-life-minutes" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command defines the amount of time in minutes after
+which a penalty is reduced by half. The timer range is
+10 to 45 minutes.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters dampening re-use <seconds>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-dampening-re-use-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command defines the accumulated penalty amount at which the
+route is re-advertised. The penalty range is 1 to 20000.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters dampening start-suppress-time <seconds>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-dampening-start-suppress-time-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command defines the accumulated penalty amount at which the
+route is suppressed. The penalty range is 1 to 20000.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters dampening max-suppress-time <seconds>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-dampening-max-suppress-time-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command defines the maximum time in minutes that a route is
+suppressed. The timer range is 1 to 255 minutes.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="route-selection-configuration">
+<h4>路由 Selection 配置</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters always-compare-med
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-always-compare-med" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command provides to compare the MED on routes, even when they were
+received from different neighbouring ASes. 设置ting this option makes the
+order of preference of routes more defined, and should eliminate MED
+induced oscillations.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters bestpath as-path confed
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-bestpath-as-path-confed" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies that the length of confederation path sets and
+sequences 应该 taken into account during the BGP best path
+decision process.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters bestpath as-path multipath-relax
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-bestpath-as-path-multipath-relax" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies that BGP decision process should consider paths
+of equal AS_PATH length candidates for multipath computation. Without
+the knob, the entire AS_PATH must match for multipath computation.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters bestpath as-path ignore
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-bestpath-as-path-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Ignore AS_PATH length when selecting a route</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters bestpath compare-routerid
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-bestpath-compare-routerid" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Ensure that when comparing routes where both are equal on most metrics,
+including local-pref, AS_PATH length, IGP cost, MED, that the tie is
+broken based on router-ID.</p>
+<p>If this option is enabled, then the already-selected check, where
+already selected eBGP routes are preferred, is skipped.</p>
+<p>If a route has an ORIGINATOR_ID attribute because it has been reflected,
+that ORIGINATOR_ID 将 used. Otherwise, the router-ID of the peer
+the route was received from 将 used.</p>
+<p>The advantage of this is that the route-selection (at this point) will
+be more deterministic. The disadvantage is that a few or even one lowest-ID
+router may attract all traffic to otherwise-equal paths because of this
+check. It may increase the possibility of MED or IGP oscillation, unless
+other measures were taken to avoid these. The exact behaviour 将
+sensitive to the iBGP and reflection topology.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters bestpath med confed
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-bestpath-med-confed" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies that BGP considers the MED when comparing routes
+originated from different sub-ASs within the confederation to which this
+BGP speaker belongs. The default state, where the MED attribute is not
+considered.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters bestpath med missing-as-worst
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-bestpath-med-missing-as-worst" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies that a route with a MED is always considered to be
+better than a route without a MED by causing the missing MED attribute to
+have a value of infinity. The default state, where the missing MED
+attribute is considered to have a value of zero.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters default local-pref <local-pref value>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-default-local-pref-local-pref-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies the default local preference value. The local
+preference range is 0 to 4294967295.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters deterministic-med
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-deterministic-med" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command provides to compare different MED values that advertised by
+neighbours in the same AS for routes selection. When this command is
+enabled, routes from the same autonomous system are grouped together, and
+the best entries of each group are compared.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp address-family ipv4-unicast network <prefix> backdoor
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-address-family-ipv4-unicast-network-prefix-backdoor" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command allows the router to prefer route to specified prefix learned
+via IGP through backdoor link instead of a route to the same prefix learned
+via EBGP.</p>
+</div>
+</div>
+</section>
+<section id="route-filtering-configuration">
+<h4>路由 过滤器ing 配置</h4>
+<p>In order to control and modify routing information that is exchanged between
+peers you can use route-map, filter-list, prefix-list, distribute-list.</p>
+<p>For inbound updates the order of preference is:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>route-map</p></li>
+<li><p>filter-list</p></li>
+<li><p>prefix-list, distribute-list</p></li>
+</ul>
+</div></blockquote>
+<p>For outbound updates the order of preference is:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>prefix-list, distribute-list</p></li>
+<li><p>filter-list</p></li>
+<li><p>route-map</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>The attributes <code class="docutils literal notranslate">prefix-list</code> and <code class="docutils literal notranslate">distribute-list</code>
+are mutually exclusive, and only one command (distribute-list or
+prefix-list) 可以 applied to each inbound or outbound direction for a
+particular neighbor.</p>
+</div>
+</div></blockquote>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> distribute-list <export|import> <number>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-distribute-list-export-import-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command applies the access list filters named in <number> to the
+specified BGP neighbor to restrict the routing information that BGP learns
+and/or advertises. The arguments <code class="docutils literal notranslate">export</code> and <code class="docutils literal notranslate">import</code>
+specify the direction in which the access list are applied.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> prefix-list <export|import> <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-prefix-list-export-import-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command applies the prfefix list filters named in <name> to the
+specified BGP neighbor to restrict the routing information that BGP learns
+and/or advertises. The arguments <code class="docutils literal notranslate">export</code> and <code class="docutils literal notranslate">import</code>
+specify the direction in which the prefix list are applied.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> route-map <export|import> <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-route-map-export-import-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command applies the route map named in <name> to the specified BGP
+neighbor to control and modify routing information that is exchanged
+between peers. The arguments <code class="docutils literal notranslate">export</code> and <code class="docutils literal notranslate">import</code>
+specify the direction in which the route map are applied.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> filter-list <export|import> <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-filter-list-export-import-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command applies the AS path access list filters named in <name> to the
+specified BGP neighbor to restrict the routing information that BGP learns
+and/or advertises. The arguments <code class="docutils literal notranslate">export</code> and <code class="docutils literal notranslate">import</code>
+specify the direction in which the AS path access list are applied.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> capability orf <receive|send>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-capability-orf-receive-send" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command enables the ORF capability (described in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5291.html"><strong>RFC 5291</strong></a>) on the
+local router, and enables ORF capability advertisement to the specified BGP
+peer. The <code class="docutils literal notranslate">receive</code> keyword configures a router to advertise ORF
+receive capabilities. The <code class="docutils literal notranslate">send</code> keyword configures a router to
+advertise ORF send capabilities. To advertise a filter from a sender, you
+must create an IP prefix list for the specified BGP peer applied in inbound
+direction.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address|interface> solo
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-solo" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command prevents from sending back prefixes learned from the neighbor.</p>
+</div>
+</div>
+</section>
+<section id="bgp-scaling-configuration">
+<h4>BGP Scaling 配置</h4>
+<p>BGP routers connected inside the same AS through BGP belong to an internal BGP
+session, or IBGP. In order to prevent routing table loops, IBGP speaker does
+not advertise IBGP-learned routes to other IBGP speaker (拆分 Horizon
+mechanism). As such, IBGP requires a full mesh of all peers. For large
+networks, this quickly becomes unscalable.</p>
+<p>There are two ways that help us to mitigate the BGPs full-mesh requirement in
+a network:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Using BGP route-reflectors</p></li>
+<li><p>Using BGP confederation</p></li>
+</ul>
+</div></blockquote>
+<section id="route-reflector-configuration">
+<h5>路由 Reflector 配置</h5>
+<p>Introducing route reflectors removes the need for the full-mesh. When you
+configure a route reflector you have to tell the router whether the other IBGP
+router is a client or non-client. A client is an IBGP router that the route
+reflector will “reflect” routes to, the non-client is just a regular IBGP
+neighbor. 路由 reflectors mechanism is described in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4456.html"><strong>RFC 4456</strong></a> and updated
+by <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc7606.html"><strong>RFC 7606</strong></a>.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <address> address-family <ipv4-unicast|ipv6-unicast> route-reflector-client
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-address-family-ipv4-unicast-ipv6-unicast-route-reflector-client" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies the given neighbor as route reflector client.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters cluster-id <id>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-cluster-id-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies cluster ID which identifies a collection of route
+reflectors and their clients, and is used by route reflectors to avoid
+looping. By default cluster ID is set to the BGP router id value, but can be
+set to an arbitrary 32-bit value.</p>
+</div>
+</div>
+</section>
+<section id="confederation-configuration">
+<h5>Confederation 配置</h5>
+<p>A BGP confederation divides our AS into sub-ASes to reduce the number of
+required IBGP peerings. Within a sub-AS we still require full-mesh IBGP but
+between these sub-ASes we use something that looks like EBGP but behaves like
+IBGP (called confederation BGP). Confederation mechanism is described in
+<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5065.html"><strong>RFC 5065</strong></a></p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters confederation identifier <asn>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-confederation-identifier-asn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command specifies a BGP confederation identifier. <asn> is the number
+of the autonomous system that internally includes multiple sub-autonomous
+systems (a confederation).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp parameters confederation peers <nsubasn>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-confederation-peers-nsubasn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This command sets other confederations <nsubasn> as members of autonomous
+system specified by <code class="docutils literal notranslate">confederation identifier <asn></code>.</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+</section>
+<section id="operational-mode-commands">
+<h2>Operational 模式 Commands</h2>
+<section id="show">
+<h3>显示</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp <ipv4|ipv6>
+<a class="cmdlink" href="#opcmd-show-bgp-ipv4-ipv6" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command displays all entries in BGP routing table.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>BGP table version is 10, local router ID is 10.0.35.3, vrf id 0
+Default local pref 100, local AS 65000
+Status codes:  s suppressed, d damped, h history, * valid, > best, = multipath,
+               i internal, r RIB-failure, S Stale, R Removed
+Nexthop codes: @NNN nexthop's vrf id, < announce-nh-self
+Origin codes:  i - IGP, e - EGP, ? - incomplete
+RPKI validation codes: V valid, I invalid, N Not found
+
+   Network          Next Hop            Metric LocPrf Weight Path
+*> 198.51.100.0/24  10.0.34.4                0             0 65004 i
+*> 203.0.113.0/24   10.0.35.5                0             0 65005 i
+
+Displayed  2 routes and 2 total paths
+</pre></div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp <ipv4|ipv6> <address|prefix>
+<a class="cmdlink" href="#opcmd-show-bgp-ipv4-ipv6-address-prefix" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command displays information about the particular entry in the BGP
+routing table.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>BGP routing table entry for 198.51.100.0/24
+Paths: (1 available, best #1, table default)
+  Advertised to non peer-group peers:
+  10.0.13.1 10.0.23.2 10.0.34.4 10.0.35.5
+  65004
+    10.0.34.4 from 10.0.34.4 (10.0.34.4)
+      Origin IGP, metric 0, valid, external, best (First path received)
+      Last update: Wed Jan  6 12:18:53 2021
+</pre></div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp cidr-only
+<a class="cmdlink" href="#opcmd-show-bgp-cidr-only" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command displays routes with classless interdomain routing (CIDR).</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp <ipv4|ipv6> community <value>
+<a class="cmdlink" href="#opcmd-show-bgp-ipv4-ipv6-community-value" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command displays routes that belong to specified BGP communities.
+有效 value is a community number in the range from 1 to 4294967200,
+or AA:NN (autonomous system-community number/2-byte number), no-export,
+local-as, or no-advertise.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp <ipv4|ipv6> community-list <name>
+<a class="cmdlink" href="#opcmd-show-bgp-ipv4-ipv6-community-list-name" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command displays routes that are permitted by the BGP
+community list.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp <ipv4|ipv6> dampening dampened-paths
+<a class="cmdlink" href="#opcmd-show-bgp-ipv4-ipv6-dampening-dampened-paths" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command displays BGP dampened routes.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp <ipv4|ipv6> dampening flap-statistics
+<a class="cmdlink" href="#opcmd-show-bgp-ipv4-ipv6-dampening-flap-statistics" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command displays information about flapping BGP routes.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp <ipv4|ipv6> filter-list <name>
+<a class="cmdlink" href="#opcmd-show-bgp-ipv4-ipv6-filter-list-name" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command displays BGP routes allowed by the specified AS 路径
+access list.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp <ipv4|ipv6> neighbors <address> advertised-routes
+<a class="cmdlink" href="#opcmd-show-bgp-ipv4-ipv6-neighbors-address-advertised-routes" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command displays BGP routes advertised to a neighbor.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp <ipv4|ipv6> neighbors <address> received-routes
+<a class="cmdlink" href="#opcmd-show-bgp-ipv4-ipv6-neighbors-address-received-routes" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command displays BGP routes originating from the specified BGP
+neighbor before inbound policy is applied. To use this command inbound
+soft reconfiguration 必须 enabled.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp <ipv4|ipv6> neighbors <address> routes
+<a class="cmdlink" href="#opcmd-show-bgp-ipv4-ipv6-neighbors-address-routes" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command displays BGP received-routes that are accepted after filtering.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp <ipv4|ipv6> neighbors <address> dampened-routes
+<a class="cmdlink" href="#opcmd-show-bgp-ipv4-ipv6-neighbors-address-dampened-routes" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command displays dampened routes received from BGP neighbor.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp <ipv4|ipv6> regexp <text>
+<a class="cmdlink" href="#opcmd-show-bgp-ipv4-ipv6-regexp-text" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command displays information about BGP routes whose AS path
+matches the specified regular expression.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp <ipv4|ipv6> summary
+<a class="cmdlink" href="#opcmd-show-bgp-ipv4-ipv6-summary" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command displays the status of all BGP connections.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>IPv4 Unicast Summary:
+BGP router identifier 10.0.35.3, local AS number 65000 vrf-id 0
+BGP table version 11
+RIB entries 5, using 920 bytes of memory
+Peers 4, using 82 KiB of memory
+
+Neighbor        V         AS MsgRcvd MsgSent   TblVer  InQ OutQ  Up/Down State/PfxRcd
+10.0.13.1       4      65000     148     159        0    0    0 02:16:01            0
+10.0.23.2       4      65000     136     143        0    0    0 02:13:21            0
+10.0.34.4       4      65004     161     163        0    0    0 02:16:01            1
+10.0.35.5       4      65005     162     166        0    0    0 02:16:01            1
+
+Total number of neighbors 4
+</pre></div>
+</div>
+</section>
+<section id="reset">
+<h3>重置</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+reset bgp <ipv4|ipv6> <address> [soft [in|out]]
+<a class="cmdlink" href="#opcmd-reset-bgp-ipv4-ipv6-address-soft-in-out" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command resets BGP connections to the specified neighbor IP address.
+With argument <code class="docutils literal notranslate">soft</code> this command initiates a soft reset. If
+you do not specify the <code class="docutils literal notranslate">in</code> or <code class="docutils literal notranslate">out</code> options, both
+inbound and outbound soft reconfiguration are triggered.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+reset bgp all
+<a class="cmdlink" href="#opcmd-reset-bgp-all" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command resets all BGP connections of given router.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+reset bgp <ipv4|ipv6> external
+<a class="cmdlink" href="#opcmd-reset-bgp-ipv4-ipv6-external" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command resets all external BGP peers of given router.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+reset bgp <ipv4|ipv6> peer-group <name> [soft [in|out]]
+<a class="cmdlink" href="#opcmd-reset-bgp-ipv4-ipv6-peer-group-name-soft-in-out" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command resets BGP connections to the specified peer group.
+With argument <code class="docutils literal notranslate">soft</code> this command initiates a soft reset. If
+you do not specify the <code class="docutils literal notranslate">in</code> or <code class="docutils literal notranslate">out</code> options, both
+inbound and outbound soft reconfiguration are triggered.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="examples">
+<h2>示例</h2>
+<section id="ipv4-peering">
+<h3>IPv4 peering</h3>
+<p>A simple eBGP configuration:</p>
+<p><strong>Node 1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bgp system-as 65534
+set protocols bgp neighbor 192.168.0.2 ebgp-multihop '2'
+set protocols bgp neighbor 192.168.0.2 remote-as '65535'
+set protocols bgp neighbor 192.168.0.2 update-source '192.168.0.1'
+set protocols bgp neighbor 192.168.0.2 address-family ipv4-unicast
+set protocols bgp address-family ipv4-unicast network '172.16.0.0/16'
+set protocols bgp parameters router-id '192.168.0.1'
+</pre></div>
+</div>
+<p><strong>Node 2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bgp system-as 65535
+set protocols bgp neighbor 192.168.0.1 ebgp-multihop '2'
+set protocols bgp neighbor 192.168.0.1 remote-as '65534'
+set protocols bgp neighbor 192.168.0.1 update-source '192.168.0.2'
+set protocols bgp neighbor 192.168.0.1 address-family ipv4-unicast
+set protocols bgp address-family ipv4-unicast network '172.17.0.0/16'
+set protocols bgp parameters router-id '192.168.0.2'
+</pre></div>
+</div>
+<p>Don’t forget, the CIDR declared in the network statement MUST <strong>exist in your
+routing table (dynamic or static), the best way to make sure that is true is
+creating a static route:</strong></p>
+<p><strong>Node 1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 172.16.0.0/16 blackhole distance '254'
+</pre></div>
+</div>
+<p><strong>Node 2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 172.17.0.0/16 blackhole distance '254'
+</pre></div>
+</div>
+</section>
+<section id="ipv6-peering">
+<h3>IPv6 peering</h3>
+<p>A simple BGP configuration via IPv6.</p>
+<p><strong>Node 1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bgp system-as 65534
+set protocols bgp neighbor 2001:db8::2 ebgp-multihop '2'
+set protocols bgp neighbor 2001:db8::2 remote-as '65535'
+set protocols bgp neighbor 2001:db8::2 update-source '2001:db8::1'
+set protocols bgp neighbor 2001:db8::2 address-family ipv6-unicast
+set protocols bgp address-family ipv6-unicast network '2001:db8:1::/48'
+set protocols bgp parameters router-id '10.1.1.1'
+</pre></div>
+</div>
+<p><strong>Node 2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bgp system-as 65535
+set protocols bgp neighbor 2001:db8::1 ebgp-multihop '2'
+set protocols bgp neighbor 2001:db8::1 remote-as '65534'
+set protocols bgp neighbor 2001:db8::1 update-source '2001:db8::2'
+set protocols bgp neighbor 2001:db8::1 address-family ipv6-unicast
+set protocols bgp address-family ipv6-unicast network '2001:db8:2::/48'
+set protocols bgp parameters router-id '10.1.1.2'
+</pre></div>
+</div>
+<p>Don’t forget, the CIDR declared in the network statement <strong>MUST exist in your
+routing table (dynamic or static), the best way to make sure that is true is
+creating a static route:</strong></p>
+<p><strong>Node 1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/48 blackhole distance '254'
+</pre></div>
+</div>
+<p><strong>Node 2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:2::/48 blackhole distance '254'
+</pre></div>
+</div>
+</section>
+<section id="route-filtering">
+<h3>路由 过滤器ing</h3>
+<p>路由 filter 可以 applied using a route-map:</p>
+<p><strong>Node1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set policy prefix-list AS65535-IN rule 10 action 'permit'
+set policy prefix-list AS65535-IN rule 10 prefix '172.16.0.0/16'
+set policy prefix-list AS65535-OUT rule 10 action 'deny'
+set policy prefix-list AS65535-OUT rule 10 prefix '172.16.0.0/16'
+set policy prefix-list6 AS65535-IN rule 10 action 'permit'
+set policy prefix-list6 AS65535-IN rule 10 prefix '2001:db8:2::/48'
+set policy prefix-list6 AS65535-OUT rule 10 action 'deny'
+set policy prefix-list6 AS65535-OUT rule 10 prefix '2001:db8:2::/48'
+
+set policy route-map AS65535-IN rule 10 action 'permit'
+set policy route-map AS65535-IN rule 10 match ip address prefix-list 'AS65535-IN'
+set policy route-map AS65535-IN rule 10 match ipv6 address prefix-list 'AS65535-IN'
+set policy route-map AS65535-IN rule 20 action 'deny'
+set policy route-map AS65535-OUT rule 10 action 'deny'
+set policy route-map AS65535-OUT rule 10 match ip address prefix-list 'AS65535-OUT'
+set policy route-map AS65535-OUT rule 10 match ipv6 address prefix-list 'AS65535-OUT'
+set policy route-map AS65535-OUT rule 20 action 'permit'
+
+set protocols bgp system-as 65534
+set protocols bgp neighbor 2001:db8::2 address-family ipv4-unicast route-map export 'AS65535-OUT'
+set protocols bgp neighbor 2001:db8::2 address-family ipv4-unicast route-map import 'AS65535-IN'
+set protocols bgp neighbor 2001:db8::2 address-family ipv6-unicast route-map export 'AS65535-OUT'
+set protocols bgp neighbor 2001:db8::2 address-family ipv6-unicast route-map import 'AS65535-IN'
+</pre></div>
+</div>
+<p><strong>Node2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set policy prefix-list AS65534-IN rule 10 action 'permit'
+set policy prefix-list AS65534-IN rule 10 prefix '172.17.0.0/16'
+set policy prefix-list AS65534-OUT rule 10 action 'deny'
+set policy prefix-list AS65534-OUT rule 10 prefix '172.17.0.0/16'
+set policy prefix-list6 AS65534-IN rule 10 action 'permit'
+set policy prefix-list6 AS65534-IN rule 10 prefix '2001:db8:1::/48'
+set policy prefix-list6 AS65534-OUT rule 10 action 'deny'
+set policy prefix-list6 AS65534-OUT rule 10 prefix '2001:db8:1::/48'
+
+set policy route-map AS65534-IN rule 10 action 'permit'
+set policy route-map AS65534-IN rule 10 match ip address prefix-list 'AS65534-IN'
+set policy route-map AS65534-IN rule 10 match ipv6 address prefix-list 'AS65534-IN'
+set policy route-map AS65534-IN rule 20 action 'deny'
+set policy route-map AS65534-OUT rule 10 action 'deny'
+set policy route-map AS65534-OUT rule 10 match ip address prefix-list 'AS65534-OUT'
+set policy route-map AS65534-OUT rule 10 match ipv6 address prefix-list 'AS65534-OUT'
+set policy route-map AS65534-OUT rule 20 action 'permit'
+
+set protocols bgp system-as 65535
+set protocols bgp neighbor 2001:db8::1 address-family ipv4-unicast route-map export 'AS65534-OUT'
+set protocols bgp neighbor 2001:db8::1 address-family ipv4-unicast route-map import 'AS65534-IN'
+set protocols bgp neighbor 2001:db8::1 address-family ipv6-unicast route-map export 'AS65534-OUT'
+set protocols bgp neighbor 2001:db8::1 address-family ipv6-unicast route-map import 'AS65534-IN'
+</pre></div>
+</div>
+<p>We could expand on this and also deny link local and multicast in the rule 20
+action deny.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

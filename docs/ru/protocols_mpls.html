@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="mpls">
+<h1>MPLS</h1>
+<p><abbr title="Мультипротокольный переключатель меток">MPLS</abbr> — это метод передачи пакетов,
+который отличается от традиционной передачи по IP. Вместо выполнения поиска по IP-адресам
+маршрутизаторы MPLS передают трафик с использованием точных совпадений при поиске по меткам MPLS,
+вставленным между заголовками уровня 2 (Ethernet) и уровня 3 (IP).</p>
+<p>Метки MPLS могут быть присвоены статически или динамически. Этот раздел фокусируется на
+динамическом распределении меток с использованием протоколов распределения меток, таких как
+<abbr title="Протокол распределения меток">LDP</abbr> и
+<abbr title="Протокол резервирования ресурсов для инженерии трафика">RSVP-TE</abbr>, или
+через расширения <abbr title="Сегментное маршрутирование">SR</abbr> для OSPF или IS-IS.</p>
+<p>Эти протоколы устанавливают односторонний путь, называемый
+<abbr title="Путь с переключением меток">LSP</abbr> в сети. Когда пакет попадает в сеть MPLS, входной маршрутизатор добавляет
+метку MPLS к нему на основе назначения и передает пакет по LSP. Каждый промежуточный
+маршрутизатор использует входную метку для поиска исходящего интерфейса и следующей
+значения метки, меняет метку и передает пакет на этом интерфейсе. Выходной маршрутизатор удаляет
+метку и передает исходный пакет с помощью обычного IP-маршрутизации.</p>
+<section id="mpls-support-in-vyos">
+<h2>Поддержка MPLS в VyOS</h2>
+<p>Поддержка MPLS в VyOS находится в разработке, поэтому ее функциональные возможности сейчас
+ограничены. Базовая передача MPLS работает, так как лежащая в основе стек маршрутизации FRR поддерживает
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc3031">RFC 3031</a>.</p>
+<p>Поддерживаемые функции:</p>
+<ul class="simple">
+<li><p><strong>LDP</strong>: Реализовано в соответствии с
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5036">RFC 5036</a>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Другие связанные стандарты LDP включают RFCs
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6720">6720</a>,
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6667">6667</a>,
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5919">5919</a>,
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5561">5561</a>, и
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7552">7552</a>.</p>
+</div>
+<p>Текущие ограничения:</p>
+<ul class="simple">
+<li><p><strong>MPLS VPNs</strong>: Пока нет поддержки MPLS-активных служб VPN, таких как
+L2VPNs и mVPNs.</p></li>
+<li><p><strong>RSVP-TE</strong>: Не поддерживается, поскольку лежащий в основе стек FRR в настоящее время
+не реализует его.</p></li>
+</ul>
+</section>
+<section id="label-distribution-protocol-ldp">
+<h2>Протокол распределения меток (LDP)</h2>
+<p>MPLS поддерживает различные протоколы для создания путей. VyOS реализует LDP через
+лежащий в основе стек маршрутизации FRR, согласно
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5036">RFC 5036</a>.</p>
+<p>LDP — это TCP-основанный протокол сигнализации MPLS, который динамически распределяет
+метки для создания маршрутов с переключением меток. Это не протокол маршрутизации и
+зависит от существующих протоколов маршрутизации для принятия решений о передаче и
+общения с другими маршрутами, поддерживающими LDP.</p>
+<p>Для обмена объявлениями о метках LDP устанавливает TCP-сессии с автоматически обнаруженными
+или статически настроенными соседями. Каждая сессия формируется с использованием транспортного адреса
+пира, который должен присутствовать в таблице маршрутизации и постоянно достижим.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Рекомендуется использовать один и тот же адрес для идентификатора маршрутизатора LDP
+и транспортного адреса обнаружения. Для работы LDP в VyOS оба параметра должны быть явно настроены.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>LDP не имеет механизма для обновления существующей сессии. Чтобы применить
+изменение конфигурации или изменение согласованных возможностей сессии, необходимо
+перезапустить соседа LDP на локальном маршрутизаторе.</p>
+</div>
+</section>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-interface-interface" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить MPLS на указанном интерфейсе.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls interface eth1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls parameters no-propagate-ttl
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-parameters-no-propagate-ttl" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Отключить распространение TTL IP в заголовок MPLS при установке метки.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls parameters no-propagate-ttl
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls parameters maximum-ttl &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-parameters-maximum-ttl-1-255" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить максимальное значение TTL для пакетов MPLS.</strong></p>
+<p>Это значение используется, когда TTL не распространяется из заголовка IP.
+По умолчанию 255.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls parameters maximum-ttl 15
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-interface-interface" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить LDP на указанном интерфейсе.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp interface eth1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp interface &lt;interface&gt; disable-establish-hello
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-interface-interface-disable-establish-hello" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Отключить запускаемое сообщение Hello, которое маршрутизатор отправляет на указанном
+интерфейсе в ответ на получение LDP Hello от пира.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp interface eth0 disable-establish-hello
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp router-id &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-router-id-address" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить IP-адрес, используемый как идентификатор маршрутизатора LDP для локального устройства.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp router-id 192.0.2.1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery transport-ipv4-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-transport-ipv4-address-address" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить IPv4-транспортный адрес для соединений LDP IPv4.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery transport-ipv4-address 192.0.2.1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery transport-ipv6-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-transport-ipv6-address-address" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить IPv6-транспортный адрес для соединений LDP IPv6.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery transport-ipv6-address 2001:db8::1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp neighbor &lt;ipv4-address&gt; password &lt;password&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-neighbor-ipv4-address-password-password" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить аутентификацию для сессии LDP с указанным
+пиром.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Для успешной установки сессии оба пира должны быть настроены
+с тем же паролем.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp neighbor 192.0.2.2 password mysharedsecret
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp neighbor &lt;ipv4-address&gt; session-holdtime &lt;15-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-neighbor-ipv4-address-session-holdtime-15-65535" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить время удержания сессии LDP, в секундах,advertised to the
+specified neighbor.</strong></p>
+<p>Пир должен быть перезагружен, чтобы это изменение вступило в силу.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp neighbor 192.0.2.2 session-holdtime 180
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp neighbor &lt;ipv4-address&gt; ttl-security &lt;disable | 1-254&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-neighbor-ipv4-address-ttl-security-disable-1-254" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить безопасность TTL (<abbr title="Общая безопасность TTL">GTSM</abbr>)
+для сессии LDP с указанным пиром.</strong></p>
+<p>Используйте <code class="docutils literal notranslate">disable</code>, чтобы отключить безопасность TTL, или установите значение количества хопов (1-254), чтобы
+ограничить принимаемые входящие пакеты на основе их TTL.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp neighbor 192.0.2.2 ttl-security 5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery hello-ipv4-interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv4-interval-1-65535" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить интервал, в секундах, с которым маршрутизатор отправляет сообщения Hello IPv4 LDP.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery hello-ipv4-interval 5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery hello-ipv4-holdtime &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv4-holdtime-1-65535" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить время удержания, в секундах,advertised в сообщениях Hello IPv4 LDP.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery hello-ipv4-holdtime 15
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery hello-ipv6-interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv6-interval-1-65535" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить интервал, в секундах, с которым маршрутизатор отправляет сообщения Hello IPv6 LDP.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery hello-ipv6-interval 5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery hello-ipv6-holdtime &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv6-holdtime-1-65535" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить время удержания, в секундах,advertised в сообщениях Hello IPv6 LDP.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery hello-ipv6-holdtime 15
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery session-ipv4-holdtime &lt;15-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-session-ipv4-holdtime-15-65535" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить время удержания сессии LDP, в секундах,advertised в сообщениях Initialization IPv4 LDP.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery session-ipv4-holdtime 180
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery session-ipv6-holdtime &lt;15-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-session-ipv6-holdtime-15-65535" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить время удержания сессии LDP, в секундах,advertised в сообщениях Initialization IPv6 LDP.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery session-ipv6-holdtime 180
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp import ipv4 import-filter filter-access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv4-import-filter-filter-access-list-1-2699" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Фильтровать метки IPv4 (ассоциации между префиксом IPv4 и
+меткой MPLS) от LDP-пиров с использованием указанного списка доступа.</strong></p>
+<p>Принимаются только метки, чей префикс разрешен списком доступа.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp import ipv4 import-filter filter-access-list 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp import ipv4 import-filter neighbor-access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv4-import-filter-neighbor-access-list-1-2699" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Фильтровать метки IPv4 (ассоциации между префиксом IPv4 и
+меткой MPLS) от LDP-пиров с использованием указанного списка доступа.</strong></p>
+<p>Принимаются только метки, полученные от пира, чей IPv4-адрес разрешен списком доступа.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp import ipv4 import-filter neighbor-access-list 20
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp import ipv6 import-filter filter-access-list6 &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv6-import-filter-filter-access-list6-1-2699" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Фильтровать метки IPv6 (ассоциации между префиксом IPv6 и
+меткой MPLS) от LDP-пиров с использованием указанного списка доступа.</strong></p>
+<p>Принимаются только метки, чей префикс разрешен списком доступа.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp import ipv6 import-filter filter-access-list6 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp import ipv6 import-filter neighbor-access-list6 &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv6-import-filter-neighbor-access-list6-1-2699" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Фильтровать метки IPv6 (ассоциации между префиксом IPv6 и
+меткой MPLS) от LDP-пиров с использованием указанного списка доступа.</strong></p>
+<p>Принимаются только метки, полученные от пира, чей IPv6-адрес разрешен списком доступа.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp import ipv6 import-filter neighbor-access-list6 20
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp export ipv4 export-filter filter-access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv4-export-filter-filter-access-list-1-2699" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Фильтровать метки IPv4 (ассоциации между префиксом IPv4 и
+меткой MPLS) для рекламы LDP-пиров с использованием указанного списка доступа.</strong></p>
+<p>Принимаются только метки, чей префикс разрешен списком доступа.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv4 export-filter filter-access-list 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp export ipv4 export-filter neighbor-access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv4-export-filter-neighbor-access-list-1-2699" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Фильтровать метки IPv4 (ассоциации между префиксом IPv4 и
+меткой MPLS) для рекламы LDP-пиров с использованием указанного списка доступа.</strong></p>
+<p>Метки рекламируются только пиром, чей IPv4-адрес разрешен списком доступа.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv4 export-filter neighbor-access-list 20
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp export ipv6 export-filter filter-access-list6 &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv6-export-filter-filter-access-list6-1-2699" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Фильтровать метки IPv6 (ассоциации между префиксом IPv6 и
+меткой MPLS) для рекламы LDP-пиров с использованием указанного списка доступа.</strong></p>
+<p>Принимаются только метки, чей префикс разрешен списком доступа.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv6 export-filter filter-access-list6 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp export ipv6 export-filter neighbor-access-list6 &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv6-export-filter-neighbor-access-list6-1-2699" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Фильтровать метки IPv6 (ассоциации между префиксом IPv6 и
+меткой MPLS) для рекламы LDP-пиров с использованием указанного списка доступа.</strong></p>
+<p>Метки рекламируются только пиром, чей IPv6-адрес разрешен списком доступа.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv6 export-filter neighbor-access-list6 20
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp export ipv4 explicit-null
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv4-explicit-null" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить маршрутизатор на рекламу явной нулевой метки для его
+непосредственно подключенных префиксов IPv4 LDP-пиров.</strong></p>
+<p>Это указывает последнему маршрутизатору передавать помеченные пакеты
+без изменения без удаления метки MPLS.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv4 explicit-null
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp export ipv6 explicit-null
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv6-explicit-null" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить маршрутизатор на рекламу явной нулевой метки для его
+непосредственно подключенных префиксов IPv6 LDP-пиров.</strong></p>
+<p>Это указывает последнему маршрутизатору передавать помеченные пакеты
+без изменения без удаления метки MPLS.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv6 explicit-null
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp allocation ipv4 access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-allocation-ipv4-access-list-1-2699" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Ограничить распределение меток MPLS для IPv4-префиксов, разрешенных
+указанным списком доступа.</strong></p>
+<p>По умолчанию LDP выделяет метку для каждого IPv4-префикса в таблице маршрутизации.
+Обычная практика — ограничить распределение циклическими адресами.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp allocation ipv4 access-list 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp allocation ipv6 access-list6 &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-allocation-ipv6-access-list6-1-2699" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Ограничить распределение меток MPLS для IPv6-префиксов, разрешенных
+указанным списком доступа.</strong></p>
+<p>По умолчанию LDP выделяет метку для каждого IPv6-префикса в таблице маршрутизации.
+Обычная практика — ограничить распределение циклическими адресами.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp allocation ipv6 access-list6 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp parameters cisco-interop-tlv
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-parameters-cisco-interop-tlv" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить маршрутизатор на согласование функции двойной стековой способности
+<abbr title="Тип-длина-значение">TLV</abbr>
+(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7552">RFC 7552</a>) с использованием несоответствующего Cisco формата для двойных стековых сессий LDP.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp parameters cisco-interop-tlv
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp parameters ordered-control
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-parameters-ordered-control" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить режим управления распределением меток LDP
+(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5036">RFC 5036</a>) для
+маршрутизатора.</strong></p>
+<p>По умолчанию маршрутизатор работает в режиме независимого управления распределением меток.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp parameters ordered-control
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp parameters transport-prefer-ipv4
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-parameters-transport-prefer-ipv4" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить маршрутизатор на предпочтение IPv4-соединения TCP для LDP
+при настройке двойного стека (включены как IPv4, так и IPv6-семейства адресов).</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp parameters transport-prefer-ipv4
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv4 enable
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-enable" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить маршрутизатор для приема целевых IPv4 LDP-сессий.</strong></p>
+<p>Это позволяет маршрутизатору устанавливать LDP-связи с непрямыми пирами, отвечая на входящие целевые (unicast) сообщения LDP Hello.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv4 enable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv6 enable
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-enable" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить маршрутизатор для приема целевых IPv6 LDP-сессий.</strong></p>
+<p>Это позволяет маршрутизатору устанавливать LDP-связи с непрямыми пирами, отвечая на входящие целевые (unicast) сообщения LDP Hello.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv6 enable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv4 address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-address-address" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить маршрутизатор на запуск целевой IPv4 LDP-сессии с указанным удаленным
+<abbr title="Маршрутизатор с переключением меток">LSR</abbr>.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv4 address 192.0.2.5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv6 address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-address-address" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить маршрутизатор на запуск целевой IPv6 LDP-сессии с указанным удаленным LSR.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv6 address 2001:db8::5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv4 hello-holdtime &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-hello-holdtime-1-65535" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить время удержания, в секундах,advertised в целевых сообщениях Hello IPv4 LDP.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv4 hello-holdtime 45
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv4 hello-interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-hello-interval-1-65535" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить интервал, в секундах, между целевыми сообщениями Hello IPv4 LDP, отправляемыми на удаленные LSR.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv4 hello-interval 15
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv6 hello-holdtime &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-hello-holdtime-1-65535" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить время удержания, в секундах,advertised в целевых сообщениях Hello IPv6 LDP.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv6 hello-holdtime 45
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv6 hello-interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-hello-interval-1-65535" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить интервал, в секундах, между целевыми сообщениями Hello IPv6 LDP, отправляемыми на удаленные LSR.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv6 hello-interval 15
+</pre></div>
+</div>
+</section>
+<section id="operation">
+<h2>Операция</h2>
+<p>После установки LDP вы можете просматривать назначения меток прямо внутри
+<code class="docutils literal notranslate">show ip route</code> или <code class="docutils literal notranslate">show ipv6 route</code> вывода. Чтобы проверить операционное состояние LDP, используйте следующие команды.</p>
+<section id="show">
+<h3>Показать</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp binding
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать <abbr title="База информации о метках">LIB</abbr>.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp binding &lt;prefix&gt;
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-prefix" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать привязки меток LDP для указанного префикса.</p>
+<p>Параметр <code class="docutils literal notranslate">&lt;prefix&gt;</code> принимает IPv4-префикс (<code class="docutils literal notranslate">x.x.x.x/x</code>) или IPv6
+префикс (<code class="docutils literal notranslate">h:h:h:h:h:h:h:h/h</code>).</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp binding detail
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-detail" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать подробные записи базы информации о метках LDP (LIB).</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp binding neighbor &lt;address&gt;
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-neighbor-address" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать привязки меток LDP, полученные от указанного пира.</p>
+<p>Параметр <code class="docutils literal notranslate">&lt;address&gt;</code> принимает IPv4 или IPv6-адрес.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp binding local-label &lt;label&gt;
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-local-label-label" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать привязки меток LDP, связанные с указанным локально назначенным значением метки.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp binding remote-label &lt;label&gt;
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-remote-label-label" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать привязки меток LDP, связанные с указанным удаленно назначенным значением метки.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp discovery
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-discovery" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать информацию о Hello-сообщениях LDP.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp discovery detail
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-discovery-detail" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать подробную информацию о Hello-сообщениях LDP.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp interface
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-interface" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать информацию о интерфейсе LDP.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp neighbor
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать базовую информацию о соседях LDP.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp neighbor detail
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-detail" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать подробную информацию о соседях LDP.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp neighbor capabilities
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-capabilities" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать возможности LDP, согласованные с каждым пиром во время инициализации сессии.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp neighbor &lt;address&gt;
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-address" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать информацию о соседе LDP для указанного пира.</p>
+<p>Параметр <code class="docutils literal notranslate">&lt;address&gt;</code> принимает IPv4 или IPv6-адрес.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp neighbor &lt;address&gt; detail
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-address-detail" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать подробную информацию о сессии LDP для указанного пира.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp neighbor &lt;address&gt; capabilities
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-address-capabilities" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать возможности LDP, согласованные с указанным пиром.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls table
+<a class="cmdlink" href="#opcmd-show-mpls-table" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать таблицу MPLS.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls pseudowire
+<a class="cmdlink" href="#opcmd-show-mpls-pseudowire" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать интерфейсы псевдопроводов MPLS.</p>
+</div>
+</div>
+</section>
+<section id="reset">
+<h3>Сброс</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+reset mpls ldp neighbor &lt;address&gt;
+<a class="cmdlink" href="#opcmd-reset-mpls-ldp-neighbor-address" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Сбросить установленную сессию LDP с указанным соседом.</p>
+<p>Параметр <code class="docutils literal notranslate">&lt;address&gt;</code> принимает IPv4 или IPv6-адрес.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="example">
+<h2>Пример</h2>
+<p>Следующая конфигурация настраивает базовый маршрутизатор, поддерживающий MPLS LDP.
+OSPF используется как underlying IGP для обеспечения достижимости между адресами loopback LDP
+пиров, которые затем используются как транспортные адреса LDP и идентификаторы маршрутизаторов. Передача MPLS и LDP включены на
+интерфейсе, подключенном к сети.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospf area 0 network &#39;192.0.2.1/32&#39;
+set protocols ospf area 0 network &#39;192.0.2.4/31&#39;
+set protocols ospf parameters router-id &#39;192.0.2.1&#39;
+set protocols mpls interface &#39;eth1&#39;
+set protocols mpls ldp discovery transport-ipv4-address &#39;192.0.2.1&#39;
+set protocols mpls ldp interface &#39;eth1&#39;
+set protocols mpls ldp interface &#39;lo&#39;
+set protocols mpls ldp router-id &#39;192.0.2.1&#39;
+set interfaces ethernet eth1 address &#39;192.0.2.5/31&#39;
+set interfaces loopback lo address &#39;192.0.2.1/32&#39;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Этот пример предполагает роль транзитного (P-роутера): передача MPLS включена
+только на транзитном интерфейсе, а не на loopback. Если маршрутизатору нужно завершить
+трафик, закодированный в MPLS на своем loopback (роль PE-роутера), также настройте
+<code class="docutils literal notranslate">set protocols mpls interface 'lo'</code>.</p>
+</div>
+<p>Примените ту же конфигурацию на пире LDP (используя собственные адреса loopback и
+транзитного интерфейса), чтобы установить базовую сессию LDP.</p>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

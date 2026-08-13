@@ -1,0 +1,2402 @@
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="ipv6-firewall-configuration">
+<h1>IPv6 防火墙 配置</h1>
+<section id="overview">
+<h2>Overview</h2>
+<p>This section covers useful information about IPv6 firewall configuration and
+appropriate operation-mode commands.</p>
+<p>This section describes the following configuration commands:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 …
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6" title="Permalink to this Command"></a></div></div>
+<p>To learn about the general traffic flow in VyOS firewalls, see <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">防火墙</a>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
+    * ipv6
+         - forward
+            + filter
+         - input
+            + filter
+         - output
+            + filter
+            + raw
+         - prerouting
+            + raw
+         - name
+            + custom_name
+</pre></div>
+</div>
+<p>The router first receives all traffic and processes it in the <strong>prerouting</strong>
+section.</p>
+<p>This stage includes:</p>
+<ul class="simple">
+<li><p><strong>防火墙 Prerouting</strong>: commands found under <code class="docutils literal notranslate">set firewall ipv6 prerouting raw ...</code></p></li>
+<li><p><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/../system/conntrack.html">Conntrack Ignore</a>: <code class="docutils literal notranslate">set system conntrack ignore ipv6...</code></p></li>
+<li><p><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/../policy/route.html">策略 路由</a>: commands found under
+<code class="docutils literal notranslate">set policy route6 ...</code></p></li>
+<li><p><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/../nat/nat44.html">目的 NAT</a>: commands found under
+<code class="docutils literal notranslate">set nat66 destination ...</code></p></li>
+</ul>
+<p>For transit traffic that the router receives and forwards, the base chain is
+<strong>forward</strong>. The following diagram shows a simplified packet flow for transit
+traffic:</p>
+<figure class="align-default">
+<img alt="../../_images/firewall-fwd-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-fwd-packet-flow.webp"></img>
+</figure>
+<p>Use <code class="docutils literal notranslate">set firewall ipv6 forward filter ...</code> to configure filtering rules for
+transit traffic. This command corresponds to stage 5 and is highlighted in red
+in the diagram.</p>
+<p>For traffic destined to the router, use the <strong>input</strong> chain. For traffic the
+router generates, use the <strong>output</strong> chain. The following diagram shows the
+packet flow for traffic destined to the router and traffic generated by the
+router (starting from circle number 6):</p>
+<figure class="align-default">
+<img alt="../../_images/firewall-input-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-input-packet-flow.webp"></img>
+</figure>
+<p>Use <code class="docutils literal notranslate">set firewall ipv6 input filter ...</code> to configure traffic destined to
+the router.</p>
+<p>Use <code class="docutils literal notranslate">set firewall ipv6 output ...</code> to configure traffic the router generates.
+Two sub-chains are available: <strong>filter</strong> and <strong>raw</strong>:</p>
+<ul class="simple">
+<li><p><strong>Output Prerouting</strong>: <code class="docutils literal notranslate">set firewall ipv6 output raw ...</code>.
+As described in <strong>Prerouting</strong>, the firewall processes rules in this
+section before the connection tracking subsystem.</p></li>
+<li><p><strong>Output 过滤器</strong>: <code class="docutils literal notranslate">set firewall ipv6 output filter ...</code>. The firewall
+processes rules in this section after the connection tracking subsystem.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p><strong>重要 note about default-actions:</strong>
+If you do not define a default action for a base chain, the system sets
+the default action to <strong>accept</strong> for that chain. For custom chains, if you
+do not define a default action, the system sets the default-action to
+<strong>drop</strong></p>
+</div>
+<p>创建 custom firewall chains using the commands
+<code class="docutils literal notranslate">set firewall ipv6 name <name> ...</code>. To use the custom chain, define a
+rule with <strong>action jump</strong> and the appropriate <strong>target</strong> in a base chain.</p>
+</section>
+<section id="firewall-ipv6-rules">
+<h2>防火墙 - IPv6 规则s</h2>
+<p>创建 firewall rules for firewall filtering. Each rule is numbered and has
+an action to apply when the rule is matched. You can specify multiple matching
+criteria. 数据包s go through rules from 1 - 999999, so order is crucial. The
+firewall executes the action of the first matching rule.</p>
+<section id="actions">
+<h3>动作</h3>
+<p>If you define a rule, you must define an action for it. The action tells the
+firewall what to do when all criteria for that rule are met.</p>
+<p>The action 可以 :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">accept</code>: accept the packet.</p></li>
+<li><p><code class="docutils literal notranslate">continue</code>: continue parsing next rule.</p></li>
+<li><p><code class="docutils literal notranslate">drop</code>: drop the packet.</p></li>
+<li><p><code class="docutils literal notranslate">reject</code>: reject the packet.</p></li>
+<li><p><code class="docutils literal notranslate">jump</code>: jump to another custom chain.</p></li>
+<li><p><code class="docutils literal notranslate">return</code>: Return from the current chain and continue at the next rule
+of the last chain.</p></li>
+<li><p><code class="docutils literal notranslate">queue</code>: Enqueue packet to userspace.</p></li>
+<li><p><code class="docutils literal notranslate">synproxy</code>: synproxy the packet.</p></li>
+</ul>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> action [accept | continue | drop | jump | queue | reject | return | synproxy]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-action-accept-continue-drop-jump-queue-reject-return-synproxy" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> action [accept | continue | drop | jump | queue | reject | return | synproxy]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-action-accept-continue-drop-jump-queue-reject-return-synproxy" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> action [accept | continue | drop | jump | queue | reject | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-action-accept-continue-drop-jump-queue-reject-return" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> action [accept | continue | drop | jump | queue | reject | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-action-accept-continue-drop-jump-queue-reject-return" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This required setting defines the action of the current rule. If you set
+the action to jump, you must also define a jump-target.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> jump-target <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-jump-target-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> jump-target <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-jump-target-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> jump-target <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-jump-target-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> jump-target <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-jump-target-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Use this command only when action is set to <code class="docutils literal notranslate">jump</code>. Specify the jump
+target.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> queue <0-65535>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-queue-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> queue <0-65535>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-queue-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> queue <0-65535>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-queue-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> queue <0-65535>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-queue-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Use this command only when action is set to <code class="docutils literal notranslate">queue</code>. Specify the queue
+target. Queue ranges are also supported.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-queue-options-bypass" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-queue-options-bypass" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-queue-options-bypass" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-queue-options-bypass" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Use this command only when action is set to <code class="docutils literal notranslate">queue</code>. This command allows
+the packet to go through the firewall when no userspace software is connected
+to the queue.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-queue-options-fanout" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-queue-options-fanout" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-queue-options-fanout" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-queue-options-fanout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Use this command only when action is set to <code class="docutils literal notranslate">queue</code>. This command
+distributes packets among multiple queues.</p>
+</div>
+</div>
+<p>Also, <strong>default-action</strong> is an action that takes place whenever a packet does
+not match any rule in its chain. For base chains, possible options for
+<strong>default-action</strong> are <strong>accept</strong> or <strong>drop</strong>.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter default-action [accept | drop]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-default-action-accept-drop" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter default-action [accept | drop]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-default-action-accept-drop" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter default-action [accept | drop]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-default-action-accept-drop" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> default-action [accept | drop | jump | queue | reject | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-default-action-accept-drop-jump-queue-reject-return" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 the default action of the rule-set if a packet does not match any rule
+criteria. If you set default-action to <code class="docutils literal notranslate">jump</code>, you must also define
+<code class="docutils literal notranslate">default-jump-target</code>. For base chains, you can only set the default
+action to <code class="docutils literal notranslate">accept</code> or <code class="docutils literal notranslate">drop</code>. For custom chains, more actions are
+available.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> default-jump-target <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-default-jump-target-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>To be used only when <code class="docutils literal notranslate">default-action</code> is set to <code class="docutils literal notranslate">jump</code>. Use this
+command to specify the jump target for the default rule.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p><strong>重要 note about default-actions:</strong>
+If you do not define the default action for a base chain, the system sets
+the default action to <strong>accept</strong> for that chain. For custom chains, if you
+do not define a default action, the system sets the default-action to
+<strong>drop</strong>.</p>
+</div>
+</section>
+<section id="firewall-logs">
+<h3>防火墙 日志s</h3>
+<p>You can enable logging for each firewall rule. When enabled, you can also
+define other log options.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-log" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Enable logging for matched packets. If this configuration command is not
+present, logging is disabled.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-default-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-default-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-default-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-default-log" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Use this command to enable the logging of the default action on
+the specified chain.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Define log-level. Only applicable if rule log is enabled.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> log-options group <0-65535>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-log-options-group-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> log-options group <0-65535>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-log-options-group-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> log-options group <0-65535>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-log-options-group-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> log-options group <0-65535>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-log-options-group-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Define the log group to send messages to. Only applicable if rule log is
+enabled.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> log-options snapshot-length <0-9000>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> log-options snapshot-length <0-9000>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> log-options snapshot-length <0-9000>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> log-options snapshot-length <0-9000>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-log-options-snapshot-length-0-9000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Define the length of packet payload to include in a netlink message. Only
+applicable when rule logging is enabled and log group is defined.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> log-options queue-threshold <0-65535>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> log-options queue-threshold <0-65535>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> log-options queue-threshold <0-65535>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> log-options queue-threshold <0-65535>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-log-options-queue-threshold-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Define the number of packets to queue inside the kernel before sending them
+to userspace. Only applicable when rule logging is enabled and log group is
+defined.</p>
+</div>
+</div>
+</section>
+<section id="firewall-description">
+<h3>防火墙 描述</h3>
+<p>For reference, you can define descriptions on every rule and custom chain.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> description <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Provide a rule-set description to a custom firewall chain.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> description <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-description-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> description <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-description-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> description <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-description-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> description <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Provide a description for each rule.</p>
+</div>
+</div>
+</section>
+<section id="rule-status">
+<h3>规则 Status</h3>
+<p>New rules are enabled by default. In some cases, you may want to disable a
+rule rather than remove it.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> disable
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-disable" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> disable
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-disable" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> disable
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-disable" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> disable
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Command for disabling a rule but keep it in the configuration.</p>
+</div>
+</div>
+</section>
+<section id="matching-criteria">
+<h3>匹配ing criteria</h3>
+<p>There are a lot of matching criteria against which the packet 可以 tested.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> connection-status nat [destination | source]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-connection-status-nat-destination-source" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> connection-status nat [destination | source]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-connection-status-nat-destination-source" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> connection-status nat [destination | source]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-connection-status-nat-destination-source" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> connection-status nat [destination | source]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-connection-status-nat-destination-source" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 packets based on NAT connection status.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> connection-mark <1-2147483647>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-connection-mark-1-2147483647" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> connection-mark <1-2147483647>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-connection-mark-1-2147483647" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> connection-mark <1-2147483647>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-connection-mark-1-2147483647" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> connection-mark <1-2147483647>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-connection-mark-1-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 packets based on connection mark.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> source address [address | addressrange | CIDR]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-source-address-address-addressrange-cidr" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> source address [address | addressrange | CIDR]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-source-address-address-addressrange-cidr" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> source address [address | addressrange | CIDR]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-source-address-address-addressrange-cidr" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> source address [address | addressrange | CIDR]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-source-address-address-addressrange-cidr" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> destination address [address | addressrange | CIDR]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-destination-address-address-addressrange-cidr" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> destination address [address | addressrange | CIDR]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-destination-address-address-addressrange-cidr" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> destination address [address | addressrange | CIDR]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-destination-address-address-addressrange-cidr" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> destination address [address | addressrange | CIDR]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-destination-address-address-addressrange-cidr" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on source or destination address. This is similar to network
+groups, but you can negate the matching addresses here.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv6 name FOO rule 100 source address 2001:db8::202
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> source address-mask [address]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-source-address-mask-address" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> source address-mask [address]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-source-address-mask-address" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> source address-mask [address]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-source-address-mask-address" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> source address-mask [address]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-source-address-mask-address" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> destination address-mask [address]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-destination-address-mask-address" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> destination address-mask [address]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-destination-address-mask-address" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> destination address-mask [address]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-destination-address-mask-address" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> destination address-mask [address]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-destination-address-mask-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>应用 an arbitrary netmask to mask addresses and match only a specific
+portion. This is useful for IPv6 because rules remain valid when the IPv6
+prefix changes if the host portion of the system’s IPv6 address is static.
+示例 include SLAAC and tokenised IPv6 addresses</p>
+<p>This function works for both individual addresses and address groups.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># Match any IPv6 address with the suffix ::0000:0000:0000:beef
+set firewall ipv6 forward filter rule 100 destination address ::beef
+set firewall ipv6 forward filter rule 100 destination address-mask ::ffff:ffff:ffff:ffff
+# Address groups
+set firewall group ipv6-address-group WEBSERVERS address ::1000
+set firewall group ipv6-address-group WEBSERVERS address ::2000
+set firewall ipv6 forward filter rule 200 source group address-group WEBSERVERS
+set firewall ipv6 forward filter rule 200 source address-mask ::ffff:ffff:ffff:ffff
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> source fqdn <fqdn>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-source-fqdn-fqdn" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> source fqdn <fqdn>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-source-fqdn-fqdn" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> source fqdn <fqdn>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-source-fqdn-fqdn" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> source fqdn <fqdn>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-source-fqdn-fqdn" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> destination fqdn <fqdn>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-destination-fqdn-fqdn" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> destination fqdn <fqdn>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-destination-fqdn-fqdn" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> destination fqdn <fqdn>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-destination-fqdn-fqdn" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> destination fqdn <fqdn>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-destination-fqdn-fqdn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specify a Fully Qualified 域 名称 as source or destination to match.
+Ensure that the router can resolve the DNS query.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> source geoip country-code <country>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-source-geoip-country-code-country" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> source geoip country-code <country>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-source-geoip-country-code-country" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> source geoip country-code <country>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-source-geoip-country-code-country" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> source geoip country-code <country>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-source-geoip-country-code-country" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> source geoip asn <1-4294967294>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-source-geoip-asn-1-4294967294" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> source geoip asn <1-4294967294>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-source-geoip-asn-1-4294967294" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> source geoip asn <1-4294967294>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-source-geoip-asn-1-4294967294" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> source geoip asn <1-4294967294>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-source-geoip-asn-1-4294967294" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> destination geoip country-code <country>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-destination-geoip-country-code-country" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> destination geoip country-code <country>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-destination-geoip-country-code-country" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> destination geoip country-code <country>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-destination-geoip-country-code-country" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> destination geoip country-code <country>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-destination-geoip-country-code-country" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> destination geoip asn <1-4294967294>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-destination-geoip-asn-1-4294967294" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> destination geoip asn <1-4294967294>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-destination-geoip-asn-1-4294967294" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> destination geoip asn <1-4294967294>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-destination-geoip-asn-1-4294967294" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> destination geoip asn <1-4294967294>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-destination-geoip-asn-1-4294967294" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> source geoip inverse-match
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-source-geoip-inverse-match" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> source geoip inverse-match
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-source-geoip-inverse-match" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> source geoip inverse-match
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-source-geoip-inverse-match" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> source geoip inverse-match
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-source-geoip-inverse-match" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> destination geoip inverse-match
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-destination-geoip-inverse-match" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> destination geoip inverse-match
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-destination-geoip-inverse-match" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> destination geoip inverse-match
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-destination-geoip-inverse-match" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> destination geoip inverse-match
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-destination-geoip-inverse-match" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 IP addresses based on their geolocation. For more information, see
+GeoIP matching.
+Use country-code or asn to match based on geography or origin network.
+Use inverse-match to match anything except the specified country code or ASN.</p>
+</div>
+</div>
+<p>DB-IP.com provides data under CC-BY-4.0 license. Attribution is required and
+redistribution is permitted, allowing VyOS to include a database in images
+(approximately 3 MB compressed). The package includes a cron script that you
+can manually call through op-mode update geoip to keep the database and rules
+updated.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> source mac-address <mac-address>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-source-mac-address-mac-address" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> source mac-address <mac-address>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-source-mac-address-mac-address" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> source mac-address <mac-address>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-source-mac-address-mac-address" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> source mac-address <mac-address>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-source-mac-address-mac-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>You can specify only a source MAC address to match.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv6 input filter rule 100 source mac-address 00:53:00:11:22:33
+set firewall ipv6 input filter rule 101 source mac-address !00:53:00:aa:12:34
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> source port [1-65535 | portname | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-source-port-1-65535-portname-start-end" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> source port [1-65535 | portname | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-source-port-1-65535-portname-start-end" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> source port [1-65535 | portname | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-source-port-1-65535-portname-start-end" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> source port [1-65535 | portname | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-source-port-1-65535-portname-start-end" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> destination port [1-65535 | portname | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-destination-port-1-65535-portname-start-end" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> destination port [1-65535 | portname | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-destination-port-1-65535-portname-start-end" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> destination port [1-65535 | portname | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-destination-port-1-65535-portname-start-end" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> destination port [1-65535 | portname | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-destination-port-1-65535-portname-start-end" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specify a port by number or by name as defined in <code class="docutils literal notranslate">/etc/services</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv6 forward filter rule 10 source port '22'
+set firewall ipv6 forward filter rule 11 source port '!http'
+set firewall ipv6 forward filter rule 12 source port 'https'
+</pre></div>
+</div>
+<p>Multiple source ports 可以 specified as a comma-separated list.
+The whole list can also be “negated” using <code class="docutils literal notranslate">!</code>. For example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv6 forward filter rule 10 source port '!22,https,3333-3338'
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> source group address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-source-group-address-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> source group address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-source-group-address-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> source group address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-source-group-address-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> source group address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-source-group-address-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> destination group address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-destination-group-address-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> destination group address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-destination-group-address-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> destination group address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-destination-group-address-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> destination group address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-destination-group-address-group-name-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specify an address group. You can prepend the character <code class="docutils literal notranslate">!</code> to invert the
+matching criteria.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> source group dynamic-address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-source-group-dynamic-address-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> source group dynamic-address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-source-group-dynamic-address-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> source group dynamic-address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-source-group-dynamic-address-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> source group dynamic-address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-source-group-dynamic-address-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> destination group dynamic-address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-destination-group-dynamic-address-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> destination group dynamic-address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-destination-group-dynamic-address-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> destination group dynamic-address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-destination-group-dynamic-address-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> destination group dynamic-address-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-destination-group-dynamic-address-group-name-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specify a dynamic address group. You can prepend the character <code class="docutils literal notranslate">!</code> to
+invert the matching criteria.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> source group network-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-source-group-network-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> source group network-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-source-group-network-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> source group network-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-source-group-network-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> source group network-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-source-group-network-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> destination group network-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-destination-group-network-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> destination group network-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-destination-group-network-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> destination group network-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-destination-group-network-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> destination group network-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-destination-group-network-group-name-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specify a network group. You can prepend the character <code class="docutils literal notranslate">!</code> to invert the
+matching criteria.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> source group port-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-source-group-port-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> source group port-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-source-group-port-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> source group port-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-source-group-port-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> source group port-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-source-group-port-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> destination group port-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-destination-group-port-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> destination group port-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-destination-group-port-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> destination group port-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-destination-group-port-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> destination group port-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-destination-group-port-group-name-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specify a port group. You can prepend the character <code class="docutils literal notranslate">!</code> to invert the
+matching criteria.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> source group domain-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-source-group-domain-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> source group domain-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-source-group-domain-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> source group domain-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-source-group-domain-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> source group domain-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-source-group-domain-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> destination group domain-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-destination-group-domain-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> destination group domain-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-destination-group-domain-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> destination group domain-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-destination-group-domain-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> destination group domain-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-destination-group-domain-group-name-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specify a domain group. You can prepend the character <code class="docutils literal notranslate">!</code> to invert the
+matching criteria.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> source group mac-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-source-group-mac-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> source group mac-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-source-group-mac-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> source group mac-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-source-group-mac-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> source group mac-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-source-group-mac-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> destination group mac-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-destination-group-mac-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> destination group mac-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-destination-group-mac-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> destination group mac-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-destination-group-mac-group-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> destination group mac-group <name | !name>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-destination-group-mac-group-name-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specify a MAC group. You can prepend the character <code class="docutils literal notranslate">!</code> to invert the
+matching criteria.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> dscp [0-63 | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-dscp-0-63-start-end" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> dscp [0-63 | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-dscp-0-63-start-end" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> dscp [0-63 | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-dscp-0-63-start-end" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> dscp [0-63 | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-dscp-0-63-start-end" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> dscp-exclude [0-63 | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-dscp-exclude-0-63-start-end" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> dscp-exclude [0-63 | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-dscp-exclude-0-63-start-end" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> dscp-exclude [0-63 | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-dscp-exclude-0-63-start-end" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> dscp-exclude [0-63 | start-end]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-dscp-exclude-0-63-start-end" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on dscp value.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> fragment [match-frag | match-non-frag]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-fragment-match-frag-match-non-frag" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> fragment [match-frag | match-non-frag]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-fragment-match-frag-match-non-frag" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> fragment [match-frag | match-non-frag]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-fragment-match-frag-match-non-frag" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> fragment [match-frag | match-non-frag]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-fragment-match-frag-match-non-frag" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 packets based on fragmentation.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> icmpv6 [code | type] <0-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-icmpv6-code-type-0-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> icmpv6 [code | type] <0-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-icmpv6-code-type-0-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> icmpv6 [code | type] <0-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-icmpv6-code-type-0-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> icmpv6 [code | type] <0-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-icmpv6-code-type-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 packets based on ICMP or ICMPv6 code and type.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> icmpv6 type-name <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-icmpv6-type-name-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> icmpv6 type-name <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-icmpv6-type-name-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> icmpv6 type-name <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-icmpv6-type-name-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> icmpv6 type-name <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-icmpv6-type-name-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on ICMPv6 type-name. Press <strong>Tab</strong> for information about
+supported <strong>type-name</strong> criteria.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> inbound-interface name <iface>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-inbound-interface-name-iface" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> inbound-interface name <iface>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-inbound-interface-name-iface" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> inbound-interface name <iface>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-inbound-interface-name-iface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on inbound interface. You can use the wildcard <code class="docutils literal notranslate">*</code>. For
+example: <code class="docutils literal notranslate">eth2*</code>. You can prepend the character <code class="docutils literal notranslate">!</code> to invert the
+matching criteria. For example <code class="docutils literal notranslate">!eth2</code></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>If an interface is attached to a non-default VRF, when using
+<strong>inbound-interface</strong>, use the VRF name. For example:
+<code class="docutils literal notranslate">set firewall ipv6 forward filter rule 10 inbound-interface name MGMT</code></p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> inbound-interface group <iface_group>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-inbound-interface-group-iface-group" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> inbound-interface group <iface_group>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-inbound-interface-group-iface-group" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> inbound-interface group <iface_group>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-inbound-interface-group-iface-group" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on the inbound interface group. You can prepend the character
+<code class="docutils literal notranslate">!</code> to invert the matching criteria. For example <code class="docutils literal notranslate">!IFACE_GROUP</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> outbound-interface name <iface>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-outbound-interface-name-iface" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> outbound-interface name <iface>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-outbound-interface-name-iface" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> outbound-interface name <iface>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-outbound-interface-name-iface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on outbound interface. You can use the wildcard <code class="docutils literal notranslate">*</code>. For
+example: <code class="docutils literal notranslate">eth2*</code>. You can prepend the character <code class="docutils literal notranslate">!</code> to invert the
+matching criteria. For example <code class="docutils literal notranslate">!eth2</code></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>If an interface is attached to a non-default VRF, when using
+<strong>outbound-interface</strong>, use the physical interface name. For example:
+<code class="docutils literal notranslate">set firewall ipv6 forward filter rule 10 outbound-interface name eth0</code></p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> outbound-interface group <iface_group>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-outbound-interface-group-iface-group" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> outbound-interface group <iface_group>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-outbound-interface-group-iface-group" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> outbound-interface group <iface_group>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-outbound-interface-group-iface-group" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on outbound interface group. You can prepend the character <code class="docutils literal notranslate">!</code>
+to invert the matching criteria. For example <code class="docutils literal notranslate">!IFACE_GROUP</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> ipsec [match-ipsec-in | match-ipsec-out | match-none-in | match-none-out]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-ipsec-match-ipsec-in-match-ipsec-out-match-none-in-match-none-out" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> ipsec [match-ipsec-in | match-none-in]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-ipsec-match-ipsec-in-match-none-in" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> ipsec [match-ipsec-out | match-none-out]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-ipsec-match-ipsec-out-match-none-out" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> ipsec [match-ipsec-in | match-ipsec-out | match-none-in | match-none-out]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-ipsec-match-ipsec-in-match-ipsec-out-match-none-in-match-none-out" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 packets based on IPsec.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> limit burst <0-4294967295>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-limit-burst-0-4294967295" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> limit burst <0-4294967295>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-limit-burst-0-4294967295" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> limit burst <0-4294967295>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-limit-burst-0-4294967295" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> limit burst <0-4294967295>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-limit-burst-0-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on the maximum number of packets allowed to exceed the rate
+limit.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> limit rate <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-limit-rate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> limit rate <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-limit-rate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> limit rate <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-limit-rate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> limit rate <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-limit-rate-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on the maximum average rate, specified as <code class="docutils literal notranslate">integer/unit</code>.
+For example, specify <code class="docutils literal notranslate">5/minutes</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> packet-length <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-packet-length-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> packet-length <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-packet-length-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> packet-length <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-packet-length-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> packet-length <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-packet-length-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> packet-length-exclude <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-packet-length-exclude-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> packet-length-exclude <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-packet-length-exclude-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> packet-length-exclude <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-packet-length-exclude-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> packet-length-exclude <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-packet-length-exclude-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on packet length. You can specify multiple values from 1 to
+65535 and ranges.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> packet-type [broadcast | host | multicast | other]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-packet-type-broadcast-host-multicast-other" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> packet-type [broadcast | host | multicast | other]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-packet-type-broadcast-host-multicast-other" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> packet-type [broadcast | host | multicast | other]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-packet-type-broadcast-host-multicast-other" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> packet-type [broadcast | host | multicast | other]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-packet-type-broadcast-host-multicast-other" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on packet type.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> protocol [<text> | <0-255> | all | tcp_udp]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-protocol-text-0-255-all-tcp-udp" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> protocol [<text> | <0-255> | all | tcp_udp]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-protocol-text-0-255-all-tcp-udp" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> protocol [<text> | <0-255> | all | tcp_udp]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-protocol-text-0-255-all-tcp-udp" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> protocol [<text> | <0-255> | all | tcp_udp]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-protocol-text-0-255-all-tcp-udp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on protocol number or name as defined in <code class="docutils literal notranslate">/etc/protocols</code>.
+Specify <code class="docutils literal notranslate">all</code> for all protocols and <code class="docutils literal notranslate">tcp_udp</code> for TCP and UDP packets.
+Prepend <code class="docutils literal notranslate">!</code> to negate the protocol selection.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv6 input filter rule 10 protocol tcp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> recent count <1-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-recent-count-1-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> recent count <1-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-recent-count-1-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> recent count <1-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-recent-count-1-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> recent count <1-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-recent-count-1-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> recent time [second | minute | hour]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-recent-time-second-minute-hour" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> recent time [second | minute | hour]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-recent-time-second-minute-hour" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> recent time [second | minute | hour]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-recent-time-second-minute-hour" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> recent time [second | minute | hour]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-recent-time-second-minute-hour" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 packets based on recently seen sources.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> tcp flags [not] <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-tcp-flags-not-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> tcp flags [not] <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-tcp-flags-not-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> tcp flags [not] <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-tcp-flags-not-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> tcp flags [not] <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-tcp-flags-not-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>允许ed values for TCP flags: <code class="docutils literal notranslate">ack</code>, <code class="docutils literal notranslate">cwr</code>, <code class="docutils literal notranslate">ecn</code>, <code class="docutils literal notranslate">fin</code>, <code class="docutils literal notranslate">psh</code>,
+<code class="docutils literal notranslate">rst</code>, <code class="docutils literal notranslate">syn</code>, and <code class="docutils literal notranslate">urg</code>. You can specify multiple values. To invert
+the selection, use <code class="docutils literal notranslate">not</code>, as shown in the following example.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv6 input filter rule 10 tcp flags 'ack'
+set firewall ipv6 input filter rule 12 tcp flags 'syn'
+set firewall ipv6 input filter rule 13 tcp flags not 'fin'
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> state [established | invalid | new | related]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-state-established-invalid-new-related" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> state [established | invalid | new | related]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-state-established-invalid-new-related" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> state [established | invalid | new | related]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-state-established-invalid-new-related" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> state [established | invalid | new | related]
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-state-established-invalid-new-related" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on packet state.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> time startdate <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-time-startdate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> time startdate <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-time-startdate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> time startdate <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-time-startdate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> time startdate <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-time-startdate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> time starttime <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-time-starttime-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> time starttime <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-time-starttime-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> time starttime <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-time-starttime-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> time starttime <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-time-starttime-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> time stopdate <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-time-stopdate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> time stopdate <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-time-stopdate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> time stopdate <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-time-stopdate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> time stopdate <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-time-stopdate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> time stoptime <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-time-stoptime-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> time stoptime <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-time-stoptime-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> time stoptime <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-time-stoptime-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> time stoptime <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-time-stoptime-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> time weekdays <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-time-weekdays-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> time weekdays <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-time-weekdays-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> time weekdays <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-time-weekdays-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> time weekdays <text>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-time-weekdays-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 packets based on time criteria.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> hop-limit <eq | gt | lt> <0-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-hop-limit-eq-gt-lt-0-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> hop-limit <eq | gt | lt> <0-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-hop-limit-eq-gt-lt-0-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> hop-limit <eq | gt | lt> <0-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-hop-limit-eq-gt-lt-0-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> hop-limit <eq | gt | lt> <0-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-hop-limit-eq-gt-lt-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 the hop-limit parameter. Use <code class="docutils literal notranslate">eq</code> for equal, <code class="docutils literal notranslate">gt</code> for greater than,
+and <code class="docutils literal notranslate">lt</code> for less than.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> recent count <1-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-recent-count-1-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> recent count <1-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-recent-count-1-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> recent count <1-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-recent-count-1-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> recent count <1-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-recent-count-1-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> recent time <second | minute | hour>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-recent-time-second-minute-hour" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 input filter rule <1-999999> recent time <second | minute | hour>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-filter-rule-1-999999-recent-time-second-minute-hour" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output filter rule <1-999999> recent time <second | minute | hour>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-rule-1-999999-recent-time-second-minute-hour" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name <name> rule <1-999999> recent time <second | minute | hour>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-recent-time-second-minute-hour" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 when the specified number of connections occur within the specified
+time period. Use these criteria to block brute-force attempts.</p>
+</div>
+</div>
+</section>
+<section id="packet-modifications">
+<h3>数据包 Modifications</h3>
+<p>The firewall can modify packets before sending them.
+This feature provides more flexibility for packet handling.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 prerouting raw rule <1-999999> set dscp <0-63>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-prerouting-raw-rule-1-999999-set-dscp-0-63" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> set dscp <0-63>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-set-dscp-0-63" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output [filter | raw] rule <1-999999> set dscp <0-63>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-raw-rule-1-999999-set-dscp-0-63" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 a specific value of Differentiated 服务s Codepoint (DSCP).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 prerouting raw rule <1-999999> set mark <1-2147483647>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-prerouting-raw-rule-1-999999-set-mark-1-2147483647" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> set mark <1-2147483647>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-set-mark-1-2147483647" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output [filter | raw] rule <1-999999> set mark <1-2147483647>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-raw-rule-1-999999-set-mark-1-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 a specific packet mark value.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 prerouting raw rule <1-999999> set tcp-mss <500-1460>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-prerouting-raw-rule-1-999999-set-tcp-mss-500-1460" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> set tcp-mss <500-1460>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-set-tcp-mss-500-1460" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output [filter | raw] rule <1-999999> set tcp-mss <500-1460>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-raw-rule-1-999999-set-tcp-mss-500-1460" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 the TCP-MSS (TCP maximum segment size) for the connection.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 prerouting raw rule <1-999999> set hop-limit <0-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-prerouting-raw-rule-1-999999-set-hop-limit-0-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> set hop-limit <0-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-set-hop-limit-0-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output [filter | raw] rule <1-999999> set hop-limit <0-255>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-raw-rule-1-999999-set-hop-limit-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 hop limit value.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 forward filter rule <1-999999> set connection-mark <0-2147483647>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-filter-rule-1-999999-set-connection-mark-0-2147483647" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 output [filter | raw] rule <1-999999> set connection-mark <0-2147483647>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-output-filter-raw-rule-1-999999-set-connection-mark-0-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 connection mark value.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="synproxy">
+<h2>Synproxy</h2>
+<p>Synproxy connections</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 [input | forward] filter rule <1-999999> action synproxy
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-forward-filter-rule-1-999999-action-synproxy" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 [input | forward] filter rule <1-999999> protocol tcp
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-forward-filter-rule-1-999999-protocol-tcp" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 [input | forward] filter rule <1-999999> synproxy tcp mss <501-65535>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-forward-filter-rule-1-999999-synproxy-tcp-mss-501-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 the TCP MSS (maximum segment size) for the connection.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 [input | forward] filter rule <1-999999> synproxy tcp window-scale <1-14>
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-input-forward-filter-rule-1-999999-synproxy-tcp-window-scale-1-14" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 the window scale factor for TCP window scaling.</p>
+</div>
+</div>
+<section id="example-synproxy">
+<h3>示例 synproxy</h3>
+<p>Requirements to enable synproxy:</p>
+<ul class="simple">
+<li><p>流量 必须 symmetric</p></li>
+<li><p>Synproxy relies on syncookies and TCP timestamps, ensure these are enabled</p></li>
+<li><p>Disable conntrack loose track option</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system sysctl parameter net.ipv4.tcp_timestamps value '1'
+
+
+set system conntrack tcp loose disable
+
+set system conntrack ignore ipv6 rule 10 destination port '8080'
+
+set system conntrack ignore ipv6 rule 10 protocol 'tcp'
+
+set system conntrack ignore ipv6 rule 10 tcp flags syn
+
+
+set firewall global-options syn-cookies 'enable'
+
+set firewall ipv6 input filter rule 10 action 'synproxy'
+
+set firewall ipv6 input filter rule 10 destination port '8080'
+
+set firewall ipv6 input filter rule 10 inbound-interface name 'eth1'
+
+set firewall ipv6 input filter rule 10 protocol 'tcp'
+
+set firewall ipv6 input filter rule 10 synproxy tcp mss '1460'
+
+set firewall ipv6 input filter rule 10 synproxy tcp window-scale '7'
+
+set firewall ipv6 input filter rule 1000 action 'drop'
+
+set firewall ipv6 input filter rule 1000 state invalid
+
+</pre></div>
+</div>
+</section>
+</section>
+<section id="operation-mode-firewall">
+<h2>Operation-mode 防火墙</h2>
+<section id="rule-set-overview">
+<h3>规则-set overview</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall
+<a class="cmdlink" href="#opcmd-show-firewall" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>显示 a basic firewall overview for all rule-sets, not only for IPv6:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show firewall
+Rulesets Information
+
+---------------------------------
+IPv4 Firewall "forward filter"
+
+Rule     Action    Protocol      Packets    Bytes  Conditions
+-------  --------  ----------  ---------  -------  -----------------------------------------
+5        jump      all                 0        0  iifname "eth1"  jump NAME_VyOS_MANAGEMENT
+10       jump      all                 0        0  oifname "eth1"  jump NAME_WAN_IN
+15       jump      all                 0        0  iifname "eth3"  jump NAME_WAN_IN
+default  accept    all
+
+---------------------------------
+IPv4 Firewall "name VyOS_MANAGEMENT"
+
+Rule     Action    Protocol      Packets    Bytes  Conditions
+-------  --------  ----------  ---------  -------  --------------------------------
+5        accept    all                 0        0  ct state established  accept
+10       drop      all                 0        0  ct state invalid
+20       accept    all                 0        0  ip saddr @A_GOOD_GUYS  accept
+30       accept    all                 0        0  ip saddr @N_ENTIRE_RANGE  accept
+40       accept    all                 0        0  ip saddr @A_VyOS_SERVERS  accept
+50       accept    icmp                0        0  meta l4proto icmp  accept
+default  drop      all                 0        0
+
+---------------------------------
+IPv6 Firewall "forward filter"
+
+Rule     Action    Protocol
+-------  --------  ----------
+5        jump      all
+10       jump      all
+15       jump      all
+default  accept    all
+
+---------------------------------
+IPv6 Firewall "input filter"
+
+Rule     Action    Protocol
+-------  --------  ----------
+5        jump      all
+default  accept    all
+
+---------------------------------
+IPv6 Firewall "ipv6_name IPV6-VyOS_MANAGEMENT"
+
+Rule     Action    Protocol
+-------  --------  ----------
+5        accept    all
+10       drop      all
+20       accept    all
+30       accept    all
+40       accept    all
+50       accept    ipv6-icmp
+default  drop      all
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall summary
+<a class="cmdlink" href="#opcmd-show-firewall-summary" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This will show you a summary of rule-sets and groups</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show firewall summary
+Ruleset Summary
+
+IPv6 Ruleset:
+
+Ruleset Hook    Ruleset Priority      Description
+--------------  --------------------  -------------------------
+forward         filter
+input           filter
+ipv6_name       IPV6-VyOS_MANAGEMENT
+ipv6_name       IPV6-WAN_IN           PUBLIC_INTERNET
+
+IPv4 Ruleset:
+
+Ruleset Hook    Ruleset Priority    Description
+--------------  ------------------  -------------------------
+forward         filter
+input           filter
+name            VyOS_MANAGEMENT
+name            WAN_IN              PUBLIC_INTERNET
+
+Firewall Groups
+
+Name                     Type                References               Members
+-----------------------  ------------------  -----------------------  ----------------
+PBX                      address_group       WAN_IN-100               198.51.100.77
+SERVERS                  address_group       WAN_IN-110               192.0.2.10
+WAN_IN-111               192.0.2.11
+WAN_IN-112               192.0.2.12
+WAN_IN-120
+WAN_IN-121
+WAN_IN-122
+SUPPORT                  address_group       VyOS_MANAGEMENT-20       192.168.1.2
+WAN_IN-20
+PHONE_VPN_SERVERS        address_group       WAN_IN-160               10.6.32.2
+PINGABLE_ADDRESSES        address_group       WAN_IN-170               192.168.5.2
+WAN_IN-171
+PBX                      ipv6_address_group  IPV6-WAN_IN-100          2001:db8::1
+SERVERS                  ipv6_address_group  IPV6-WAN_IN-110          2001:db8::2
+IPV6-WAN_IN-111          2001:db8::3
+IPV6-WAN_IN-112          2001:db8::4
+IPV6-WAN_IN-120
+IPV6-WAN_IN-121
+IPV6-WAN_IN-122
+SUPPORT                  ipv6_address_group  IPV6-VyOS_MANAGEMENT-20  2001:db8::5
+IPV6-WAN_IN-20
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall ipv6 [forward | input | output] filter
+<a class="cmdlink" href="#opcmd-show-firewall-ipv6-forward-input-output-filter" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall ipv6 ipv6-name <name>
+<a class="cmdlink" href="#opcmd-show-firewall-ipv6-ipv6-name-name" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command will give an overview of a single rule-set.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show firewall ipv6 input filter
+Ruleset Information
+
+---------------------------------
+ipv6 Firewall "input filter"
+
+Rule     Action    Protocol      Packets    Bytes  Conditions
+-------  --------  ----------  ---------  -------  ------------------------------------------------------------------------------
+10       jump      all                13     1456  iifname "eth1"  jump NAME6_INP-ETH1
+20       accept    ipv6-icmp          10     1112  meta l4proto ipv6-icmp iifname "eth0"  prefix "[ipv6-INP-filter-20-A]"  accept
+default  accept    all                14     1584
+
+vyos@vyos:~$
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall ipv6 [forward | input | output] filter rule <1-999999>
+<a class="cmdlink" href="#opcmd-show-firewall-ipv6-forward-input-output-filter-rule-1-999999" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall ipv6 name <name> rule <1-999999>
+<a class="cmdlink" href="#opcmd-show-firewall-ipv6-name-name-rule-1-999999" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall ipv6 ipv6-name <name> rule <1-999999>
+<a class="cmdlink" href="#opcmd-show-firewall-ipv6-ipv6-name-name-rule-1-999999" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>This command will give an overview of a rule in a single rule-set</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall group <name>
+<a class="cmdlink" href="#opcmd-show-firewall-group-name" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>显示 an overview of defined groups, including the type, members, and where
+the group is used.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show firewall group LAN
+Firewall Groups
+
+Name          Type                References               Members
+------------  ------------------  -----------------------  ----------------
+LAN           ipv6_network_group  IPV6-VyOS_MANAGEMENT-30  2001:db8::0/64
+IPV6-WAN_IN-30
+LAN           network_group       VyOS_MANAGEMENT-30       192.168.200.0/24
+WAN_IN-30
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall statistics
+<a class="cmdlink" href="#opcmd-show-firewall-statistics" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>显示 statistics of all rule-sets since the last boot.</p>
+</div>
+</div>
+</section>
+<section id="show-firewall-log">
+<h3>显示 防火墙 log</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall
+<a class="cmdlink" href="#opcmd-show-log-firewall" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall ipv6
+<a class="cmdlink" href="#opcmd-show-log-firewall-ipv6" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall ipv6 [forward | input | output | name]
+<a class="cmdlink" href="#opcmd-show-log-firewall-ipv6-forward-input-output-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall ipv6 [forward | input | output] filter
+<a class="cmdlink" href="#opcmd-show-log-firewall-ipv6-forward-input-output-filter" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall ipv6 name <name>
+<a class="cmdlink" href="#opcmd-show-log-firewall-ipv6-name-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall ipv6 [forward | input | output] filter rule <rule>
+<a class="cmdlink" href="#opcmd-show-log-firewall-ipv6-forward-input-output-filter-rule-rule" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall ipv6 name <name> rule <rule>
+<a class="cmdlink" href="#opcmd-show-log-firewall-ipv6-name-name-rule-rule" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>显示 firewall logs for all firewalls, all IPv6 firewalls, specific hooks,
+specific priorities, specific custom chains, or specific rule-sets.</p>
+</div>
+</div>
+</section>
+<section id="example-partial-config">
+<h3>示例 Partial Config</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>firewall {
+    ipv6 {
+        input {
+            filter {
+                rule 10 {
+                    action jump
+                    inbound-interface {
+                        name eth1
+                    }
+                    jump-target INP-ETH1
+                }
+                rule 20 {
+                    action accept
+                    inbound-interface {
+                        name eth0
+                    }
+                    log
+                    protocol ipv6-icmp
+                }
+            }
+        }
+        name INP-ETH1 {
+            default-action drop
+            default-log
+            rule 10 {
+                action accept
+                protocol tcp_udp
+            }
+        }
+    }
+}
+</pre></div>
+</div>
+</section>
+<section id="update-geoip-database">
+<h3>更新 geoip database</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+update geoip
+<a class="cmdlink" href="#opcmd-update-geoip" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Command used to update GeoIP database and firewall sets.</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

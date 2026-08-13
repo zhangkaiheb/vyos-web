@@ -1,7 +1,8 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { configApi } from '/src/api/index.js';
 import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
@@ -11,59 +12,59 @@ const VALIDATION_OPTIONS = ['', 'strict', 'loose', 'disable'];
 const ACTION_OPTIONS = ['', 'accept', 'drop', 'reject'];
 const LOG_LEVEL_OPTIONS = ['', 'emerg', 'alert', 'crit', 'err', 'warn', 'notice', 'info', 'debug'];
 
-const GENERAL_SCHEMA = [
-  { key: 'all_ping', title: '所有 ICMP 请求 (all-ping)', type: 'checkbox', help: '处理所有 IPv4 ICMP echo 请求' },
-  { key: 'broadcast_ping', title: '广播 ICMP 请求 (broadcast-ping)', type: 'checkbox', help: '处理广播 IPv4 ICMP echo/timestamp 请求' },
-  { key: 'directed_broadcast', title: '定向广播转发 (directed-broadcast)', type: 'checkbox', help: '所有接口 IPv4 定向广播转发' },
-  { key: 'ip_src_route', title: 'IPv4 源路由选项 (ip-src-route)', type: 'checkbox', help: '处理带源路由选项的 IPv4 数据包' },
-  { key: 'ipv6_receive_redirects', title: 'IPv6 接收重定向 (ipv6-receive-redirects)', type: 'checkbox', help: '处理接收到的 ICMPv6 重定向消息' },
-  { key: 'ipv6_source_validation', title: 'IPv6 源验证 (ipv6-source-validation)', type: 'select', options: VALIDATION_OPTIONS, help: 'RFC3704 IPv6 反向路径源验证' },
-  { key: 'ipv6_src_route', title: 'IPv6 源路由扩展头 (ipv6-src-route)', type: 'checkbox', help: '处理带路由扩展头的 IPv6 数据包' },
-  { key: 'log_martians', title: '无效地址日志 (log-martians)', type: 'checkbox', help: '记录无效地址的 IPv4 数据包' },
-  { key: 'receive_redirects', title: 'IPv4 接收重定向 (receive-redirects)', type: 'checkbox', help: '处理接收到的 IPv4 ICMP 重定向消息' },
-  { key: 'resolver_cache', title: '域名解析缓存 (resolver-cache)', type: 'checkbox', help: '解析失败时保留上次成功值' },
-  { key: 'resolver_interval', title: '解析更新间隔 (resolver-interval)', type: 'number', placeholder: '300', help: '域名解析更新间隔，单位秒', min: 10, max: 3600 },
-  { key: 'send_redirects', title: 'IPv4 发送重定向 (send-redirects)', type: 'checkbox', help: '发送 IPv4 ICMP 重定向消息' },
-  { key: 'source_validation', title: 'IPv4 源验证 (source-validation)', type: 'select', options: VALIDATION_OPTIONS, help: 'RFC3704 IPv4 反向路径源验证' },
-  { key: 'syn_cookies', title: 'TCP SYN Cookies (syn-cookies)', type: 'checkbox', help: 'IPv4 TCP SYN Cookie 保护' },
-  { key: 'twa_hazards_protection', title: 'TIME-WAIT 保护 (twa-hazards-protection)', type: 'checkbox', help: 'RFC1337 TCP TIME-WAIT 暗杀风险保护' },
-];
-
-function statePolicySchema(state) {
-  const titleMap = { established: '已建立', invalid: '无效', related: '相关' };
+function buildGeneralSchema(t) {
   return [
-    { key: `state_policy_${state}_action`, title: `${titleMap[state]} 连接动作`, type: 'select', options: ACTION_OPTIONS },
-    { key: `state_policy_${state}_log`, title: `${titleMap[state]} 连接日志`, type: 'checkbox' },
-    { key: `state_policy_${state}_log_level`, title: `${titleMap[state]} 日志级别`, type: 'select', options: LOG_LEVEL_OPTIONS },
+    { key: 'all_ping', title: t('firewall.global.allPing'), type: 'checkbox', help: t('firewall.global.allPingHelp') },
+    { key: 'broadcast_ping', title: t('firewall.global.broadcastPing'), type: 'checkbox', help: t('firewall.global.broadcastPingHelp') },
+    { key: 'directed_broadcast', title: t('firewall.global.directedBroadcast'), type: 'checkbox', help: t('firewall.global.directedBroadcastHelp') },
+    { key: 'ip_src_route', title: t('firewall.global.ipSrcRoute'), type: 'checkbox', help: t('firewall.global.ipSrcRouteHelp') },
+    { key: 'ipv6_receive_redirects', title: t('firewall.global.ipv6ReceiveRedirects'), type: 'checkbox', help: t('firewall.global.ipv6ReceiveRedirectsHelp') },
+    { key: 'ipv6_source_validation', title: t('firewall.global.ipv6SourceValidation'), type: 'select', options: VALIDATION_OPTIONS, help: t('firewall.global.ipv6SourceValidationHelp') },
+    { key: 'ipv6_src_route', title: t('firewall.global.ipv6SrcRoute'), type: 'checkbox', help: t('firewall.global.ipv6SrcRouteHelp') },
+    { key: 'log_martians', title: t('firewall.global.logMartians'), type: 'checkbox', help: t('firewall.global.logMartiansHelp') },
+    { key: 'receive_redirects', title: t('firewall.global.receiveRedirects'), type: 'checkbox', help: t('firewall.global.receiveRedirectsHelp') },
+    { key: 'resolver_cache', title: t('firewall.global.resolverCache'), type: 'checkbox', help: t('firewall.global.resolverCacheHelp') },
+    { key: 'resolver_interval', title: t('firewall.global.resolverInterval'), type: 'number', placeholder: '300', help: t('firewall.global.resolverIntervalHelp'), min: 10, max: 3600 },
+    { key: 'send_redirects', title: t('firewall.global.sendRedirects'), type: 'checkbox', help: t('firewall.global.sendRedirectsHelp') },
+    { key: 'source_validation', title: t('firewall.global.sourceValidation'), type: 'select', options: VALIDATION_OPTIONS, help: t('firewall.global.sourceValidationHelp') },
+    { key: 'syn_cookies', title: t('firewall.global.synCookies'), type: 'checkbox', help: t('firewall.global.synCookiesHelp') },
+    { key: 'twa_hazards_protection', title: t('firewall.global.twaHazardsProtection'), type: 'checkbox', help: t('firewall.global.twaHazardsProtectionHelp') },
   ];
 }
 
-const STATE_POLICY_SCHEMA = [
-  ...statePolicySchema('established'),
-  ...statePolicySchema('invalid'),
-  ...statePolicySchema('related'),
-];
+function buildSingleStatePolicySchema(t, state) {
+  const titleMap = { established: t('firewall.global.established'), invalid: t('firewall.global.invalid'), related: t('firewall.global.related') };
+  return [
+    { key: `state_policy_${state}_action`, title: `${titleMap[state]} ${t('firewall.global.connectionAction')}`, type: 'select', options: ACTION_OPTIONS },
+    { key: `state_policy_${state}_log`, title: `${titleMap[state]} ${t('firewall.global.connectionLog')}`, type: 'checkbox' },
+    { key: `state_policy_${state}_log_level`, title: `${titleMap[state]} ${t('firewall.global.logLevel')}`, type: 'select', options: LOG_LEVEL_OPTIONS },
+  ];
+}
 
-const TIMEOUT_SCHEMA = [
-  { key: 'timeout_icmp', title: 'ICMP 超时 (秒)', type: 'number', placeholder: '30', min: 1, max: 21474836 },
-  { key: 'timeout_other', title: '通用连接超时 (秒)', type: 'number', placeholder: '600', min: 1, max: 21474836 },
-  { key: 'timeout_tcp_close', title: 'TCP CLOSE 超时 (秒)', type: 'number', placeholder: '10', min: 1, max: 21474836 },
-  { key: 'timeout_tcp_close_wait', title: 'TCP CLOSE-WAIT 超时 (秒)', type: 'number', placeholder: '60', min: 1, max: 21474836 },
-  { key: 'timeout_tcp_established', title: 'TCP ESTABLISHED 超时 (秒)', type: 'number', placeholder: '432000', min: 1, max: 21474836 },
-  { key: 'timeout_tcp_fin_wait', title: 'TCP FIN-WAIT 超时 (秒)', type: 'number', placeholder: '120', min: 1, max: 21474836 },
-  { key: 'timeout_tcp_last_ack', title: 'TCP LAST-ACK 超时 (秒)', type: 'number', placeholder: '30', min: 1, max: 21474836 },
-  { key: 'timeout_tcp_syn_recv', title: 'TCP SYN-RECEIVED 超时 (秒)', type: 'number', placeholder: '60', min: 1, max: 21474836 },
-  { key: 'timeout_tcp_syn_sent', title: 'TCP SYN-SENT 超时 (秒)', type: 'number', placeholder: '120', min: 1, max: 21474836 },
-  { key: 'timeout_tcp_time_wait', title: 'TCP TIME-WAIT 超时 (秒)', type: 'number', placeholder: '120', min: 1, max: 21474836 },
-  { key: 'timeout_udp_other', title: 'UDP OTHER 超时 (秒)', type: 'number', placeholder: '30', min: 1, max: 21474836 },
-  { key: 'timeout_udp_stream', title: 'UDP STREAM 超时 (秒)', type: 'number', placeholder: '180', min: 1, max: 21474836 },
-];
+function buildStatePolicySchema(t) {
+  return [
+    ...buildSingleStatePolicySchema(t, 'established'),
+    ...buildSingleStatePolicySchema(t, 'invalid'),
+    ...buildSingleStatePolicySchema(t, 'related'),
+  ];
+}
 
-const TAB_DEFS = [
-  { key: 'general', title: '常规', schema: GENERAL_SCHEMA },
-  { key: 'state_policy', title: '状态策略', schema: STATE_POLICY_SCHEMA },
-  { key: 'timeout', title: '超时', schema: TIMEOUT_SCHEMA },
-];
+function buildTimeoutSchema(t) {
+  return [
+    { key: 'timeout_icmp', title: t('firewall.global.timeoutIcmp'), type: 'number', placeholder: '30', min: 1, max: 21474836 },
+    { key: 'timeout_other', title: t('firewall.global.timeoutOther'), type: 'number', placeholder: '600', min: 1, max: 21474836 },
+    { key: 'timeout_tcp_close', title: t('firewall.global.timeoutTcpClose'), type: 'number', placeholder: '10', min: 1, max: 21474836 },
+    { key: 'timeout_tcp_close_wait', title: t('firewall.global.timeoutTcpCloseWait'), type: 'number', placeholder: '60', min: 1, max: 21474836 },
+    { key: 'timeout_tcp_established', title: t('firewall.global.timeoutTcpEstablished'), type: 'number', placeholder: '432000', min: 1, max: 21474836 },
+    { key: 'timeout_tcp_fin_wait', title: t('firewall.global.timeoutTcpFinWait'), type: 'number', placeholder: '120', min: 1, max: 21474836 },
+    { key: 'timeout_tcp_last_ack', title: t('firewall.global.timeoutTcpLastAck'), type: 'number', placeholder: '30', min: 1, max: 21474836 },
+    { key: 'timeout_tcp_syn_recv', title: t('firewall.global.timeoutTcpSynRecv'), type: 'number', placeholder: '60', min: 1, max: 21474836 },
+    { key: 'timeout_tcp_syn_sent', title: t('firewall.global.timeoutTcpSynSent'), type: 'number', placeholder: '120', min: 1, max: 21474836 },
+    { key: 'timeout_tcp_time_wait', title: t('firewall.global.timeoutTcpTimeWait'), type: 'number', placeholder: '120', min: 1, max: 21474836 },
+    { key: 'timeout_udp_other', title: t('firewall.global.timeoutUdpOther'), type: 'number', placeholder: '30', min: 1, max: 21474836 },
+    { key: 'timeout_udp_stream', title: t('firewall.global.timeoutUdpStream'), type: 'number', placeholder: '180', min: 1, max: 21474836 },
+  ];
+}
 
 const DEFAULTS = {
   all_ping: true,
@@ -272,12 +273,19 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const configStore = useConfigStore();
+    const { t } = inject('i18n');
     const form = ref({ ...DEFAULTS });
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
     const activeTab = ref('general');
     const writeDisabled = computed(() => route.meta?.menuItem?.permission === 'read');
+
+    const tabs = computed(() => [
+      { key: 'general', title: t('firewall.global.tabGeneral'), schema: buildGeneralSchema(t) },
+      { key: 'state_policy', title: t('firewall.global.tabStatePolicy'), schema: buildStatePolicySchema(t) },
+      { key: 'timeout', title: t('firewall.global.tabTimeout'), schema: buildTimeoutSchema(t) },
+    ]);
 
     async function load() {
       loading.value = true;
@@ -298,22 +306,24 @@ export default defineComponent({
       try {
         const value = formToConfig(form.value);
         await configApi.set('firewall global-options', value);
+        configStore.markPending();
         // Boolean nodes must be set without a value (null) because set_section
         // treats empty strings as leaf values and creates invalid paths.
         if (form.value.resolver_cache) {
           await configApi.set('firewall global-options resolver-cache', null);
+          configStore.markPending();
         } else {
           try { await configApi.delete('firewall global-options resolver-cache'); } catch (_) {}
         }
         for (const state of ['established', 'invalid', 'related']) {
           if (form.value[`state_policy_${state}_log`]) {
             await configApi.set(`firewall global-options state-policy ${state} log`, null);
+            configStore.markPending();
           } else {
             try { await configApi.delete(`firewall global-options state-policy ${state} log`); } catch (_) {}
           }
         }
         saved.value = true;
-        await configStore.checkSessionChanged();
       } catch (e) {
         showError(e);
       } finally {
@@ -321,26 +331,27 @@ export default defineComponent({
       }
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
-    return {
+    return {t,
+      
       form, loading, saving, saved, activeTab, writeDisabled,
-      tabs: TAB_DEFS,
+      tabs,
       load, save, route,
     };
   },
   template: `
     <div>
       <div class="page-section">
-        <div v-if="saved" class="alert alert-success">已保存</div>
+        <div v-if="saved" class="alert alert-success">{{ $t('firewall.global.saved') }}</div>
         <TabGroup v-model="activeTab" :tabs="tabs">
-          <template v-for="tab in tabs" :key="tab.key" #[tab.key]="{ tab: t }">
-            <ConfigForm v-model="form" :schema="t.schema" :disabled="writeDisabled" :formKey="'fw_global_' + t.key" />
+          <template v-for="tab in tabs" :key="tab.key" #[tab.key]>
+            <ConfigForm v-model="form" :schema="tab.schema" :disabled="writeDisabled" :formKey="'fw_global_' + tab.key" />
           </template>
         </TabGroup>
-        <div class="page-actions-bottom">
-          <ToolbarButton icon="save" primary @click="save" :disabled="writeDisabled || saving">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-        </div>
       </div>
     </div>
   `,

@@ -7,45 +7,48 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 export default defineComponent({
   name: 'TaskSchedulerPage',
   components: { DataTable, DraggableModal, ConfigForm, ToolbarButton },
   setup() {
+    const { t } = useI18n();
     const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
     const tasks = ref([]);
     const selected = ref([]);
     const showModal = ref(false);
     const editingTask = ref(null);
+    const deleteModalVisible = ref(false);
+    const pendingDeleteName = ref('');
 
     const taskSchema = [
-      { key: 'name', title: '任务名称', type: 'text', required: true, help: '定时任务名称' },
-      { key: 'crontab-spec', title: 'Crontab 表达式', type: 'text', help: 'UNIX crontab 时间规范字符串（如: 0 * * * *）' },
-      { key: 'executable-path', title: '可执行文件路径', type: 'text', help: '可执行文件的路径' },
-      { key: 'executable-arguments', title: '参数', type: 'text', help: '传递给可执行文件的参数' },
-      { key: 'interval', title: '执行间隔', type: 'text', help: '执行间隔（如: 30, 30m, 2h, 1d；纯数字表示分钟）' },
+      { key: 'name', title: t('taskScheduler.form.name'), type: 'text', required: true, help: t('taskScheduler.form.nameHelp') },
+      { key: 'crontab-spec', title: t('taskScheduler.form.crontabSpec'), type: 'text', help: t('taskScheduler.form.crontabSpecHelp') },
+      { key: 'executable-path', title: t('taskScheduler.form.executablePath'), type: 'text', help: t('taskScheduler.form.executablePathHelp') },
+      { key: 'executable-arguments', title: t('taskScheduler.form.executableArguments'), type: 'text', help: t('taskScheduler.form.executableArgumentsHelp') },
+      { key: 'interval', title: t('taskScheduler.form.interval'), type: 'text', help: t('taskScheduler.form.intervalHelp') },
     ];
 
     const taskColumns = [
-      { key: 'name', title: '任务名称' },
-      { key: 'crontab_spec', title: 'Crontab 表达式' },
-      { key: 'executable_path', title: '可执行文件' },
-      { key: 'executable_arguments', title: '参数' },
-      { key: 'interval', title: '执行间隔' },
+      { key: 'name', title: t('taskScheduler.columns.name') },
+      { key: 'crontab_spec', title: t('taskScheduler.columns.crontabSpec') },
+      { key: 'executable_path', title: t('taskScheduler.columns.executablePath') },
+      { key: 'executable_arguments', title: t('taskScheduler.columns.executableArguments') },
+      { key: 'interval', title: t('taskScheduler.columns.interval') },
     ];
 
     const commandPath = computed(() => 'system task-scheduler');
 
-    function taskToForm(t) {
+    function taskToForm(task) {
       return {
-        name: t.name,
-        'crontab-spec': t.crontab_spec || '',
-        'executable-path': t.executable_path || '',
-        'executable-arguments': t.executable_arguments || '',
-        interval: t.interval || '',
+        name: task.name,
+        'crontab-spec': task.crontab_spec || '',
+        'executable-path': task.executable_path || '',
+        'executable-arguments': task.executable_arguments || '',
+        interval: task.interval || '',
       };
     }
 
@@ -61,19 +64,18 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('system task-scheduler', true);
         const d = res.data || {};
-        tasks.value = Object.entries(d.task || {}).map(([name, t]) => ({
+        tasks.value = Object.entries(d.task || {}).map(([name, task]) => ({
           name,
-          crontab_spec: t['crontab-spec'] || '',
-          executable_path: t.executable?.path || '',
-          executable_arguments: t.executable?.arguments || '',
-          interval: t.interval || '',
+          crontab_spec: task['crontab-spec'] || '',
+          executable_path: task.executable?.path || '',
+          executable_arguments: task.executable?.arguments || '',
+          interval: task.interval || '',
         }));
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('taskScheduler.errors.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -90,19 +92,24 @@ export default defineComponent({
     }
 
     function removeTaskByRecord(record) {
-      if (confirm(`确认删除定时任务 "${record.name}"？`)) {
-        const idx = tasks.value.findIndex(t => t.name === record.name);
-        if (idx >= 0) tasks.value.splice(idx, 1);
-      }
+      pendingDeleteName.value = record.name;
+      deleteModalVisible.value = true;
+    }
+
+    function confirmRemoveTask() {
+      deleteModalVisible.value = false;
+      const idx = tasks.value.findIndex(item => item.name === pendingDeleteName.value);
+      if (idx >= 0) tasks.value.splice(idx, 1);
+      pendingDeleteName.value = '';
     }
 
     function saveTask(form) {
-      const t = formToTask(form);
-      const idx = tasks.value.findIndex(x => x.name === t.name);
+      const task = formToTask(form);
+      const idx = tasks.value.findIndex(x => x.name === task.name);
       if (idx >= 0) {
-        tasks.value.splice(idx, 1, t);
+        tasks.value.splice(idx, 1, task);
       } else {
-        tasks.value.push(t);
+        tasks.value.push(task);
       }
       showModal.value = false;
     }
@@ -111,25 +118,24 @@ export default defineComponent({
       saving.value = true;
       try {
         await configApi.delete('system task-scheduler');
-        for (const t of tasks.value) {
-          if (t.crontab_spec) {
-            await configApi.set(`system task-scheduler task ${t.name} crontab-spec`, t.crontab_spec);
+        for (const task of tasks.value) {
+          if (task.crontab_spec) {
+            await configApi.set(`system task-scheduler task ${task.name} crontab-spec`, task.crontab_spec);
           }
-          if (t.executable_path) {
-            await configApi.set(`system task-scheduler task ${t.name} executable path`, t.executable_path);
+          if (task.executable_path) {
+            await configApi.set(`system task-scheduler task ${task.name} executable path`, task.executable_path);
           }
-          if (t.executable_arguments) {
-            await configApi.set(`system task-scheduler task ${t.name} executable arguments`, t.executable_arguments);
+          if (task.executable_arguments) {
+            await configApi.set(`system task-scheduler task ${task.name} executable arguments`, task.executable_arguments);
           }
-          if (t.interval) {
-            await configApi.set(`system task-scheduler task ${t.name} interval`, t.interval);
+          if (task.interval) {
+            await configApi.set(`system task-scheduler task ${task.name} interval`, task.interval);
           }
         }
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('taskScheduler.errors.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -137,16 +143,17 @@ export default defineComponent({
 
     onMounted(() => { load(); onMenuRefresh(load); });
 
-    return {
-      loading, saving, saved, tasks, selected, showModal, editingTask,
+    return {t,
+      
+      loading, saving, tasks, selected, showModal, editingTask,
+      deleteModalVisible, pendingDeleteName,
       taskSchema, taskColumns, commandPath,
       load, save,
-      createTask, editTaskByRecord, removeTaskByRecord, saveTask,
+      createTask, editTaskByRecord, removeTaskByRecord, confirmRemoveTask, saveTask,
     };
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
       <DataTable
         :columns="taskColumns"
         :data="tasks"
@@ -159,13 +166,10 @@ export default defineComponent({
         @remove="removeTaskByRecord"
       >
         <template #toolbar-left>
-          <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+          <ToolbarButton icon="refresh" @click="load">{{ t('taskScheduler.buttons.refresh') }}</ToolbarButton>
         </template>
       </DataTable>
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-      </div>
-      <DraggableModal v-model:visible="showModal" :title="editingTask?.name ? '编辑定时任务' : '新建定时任务'" width="600px">
+      <DraggableModal v-model:visible="showModal" :title="editingTask?.name ? t('taskScheduler.buttons.edit') : t('taskScheduler.buttons.create')" width="600px">
         <ConfigForm
           v-if="showModal"
           :schema="taskSchema"
@@ -174,6 +178,12 @@ export default defineComponent({
           @save="saveTask"
           @cancel="showModal = false"
         />
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('taskScheduler.modal.confirmDelete')" width="400px" @confirm="confirmRemoveTask">
+        <div>{{ t('taskScheduler.modal.confirmDeleteMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div style="padding:2px 0;">{{ pendingDeleteName }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

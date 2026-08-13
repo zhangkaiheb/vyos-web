@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="dhcp-relay">
+<h1>DHCP relay</h1>
+<p>A DHCP relay agent enables a single DHCP server to serve clients on
+remote subnets, eliminating the need for a separate server on each
+subnet.</p>
+<p>The DHCP relay agent receives client requests on one interface,
+forwards them as unicasts to the designated server on another network,
+and delivers the server’s replies back to the originating clients.</p>
+<p>VyOS provides two independent DHCP relay services:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">service dhcp-relay</code>: Relays messages between IPv4 clients and
+servers.</p></li>
+<li><p><code class="docutils literal notranslate">service dhcpv6-relay</code>: Relays messages between IPv6 clients and
+servers.</p></li>
+</ul>
+<p>The two services are configured separately and share no settings. On a
+dual-stack network where clients of both address families need DHCP,
+configure both.</p>
+<section id="ipv4-relay">
+<h2>IPv4 relay</h2>
+<section id="configuration">
+<h3>Configuration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay listen-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-listen-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a listen interface on which the DHCPv4 relay receives
+client broadcast requests.</strong></p>
+<p>Repeat the command to configure multiple listen interfaces.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>At least one <code class="docutils literal notranslate">listen-interface</code> and one <code class="docutils literal notranslate">upstream-interface</code> must be
+configured for a successful commit.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay listen-interface eth1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay upstream-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-upstream-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure an upstream interface through which the DHCPv4 relay
+forwards client requests toward the DHCP server.</strong></p>
+<p>Repeat the command to configure multiple upstream interfaces.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>At least one <code class="docutils literal notranslate">listen-interface</code> and one <code class="docutils literal notranslate">upstream-interface</code> must be
+configured for a successful commit.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay upstream-interface eth2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay server &lt;ipv4-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-server-ipv4-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IPv4 address of a DHCPv4 server to which the relay
+forwards client requests.</strong></p>
+<p>Repeat the command to forward client requests to multiple DHCPv4
+servers.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>At least one DHCPv4 server must be configured for a successful commit.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay server 203.0.113.4
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure an interface that participates in DHCPv4 relaying.</strong></p>
+<p>Interfaces configured under this legacy command operate
+bidirectionally, receiving DHCPv4 client broadcasts and forwarding
+requests to the server.</p>
+</div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This command is deprecated and remains available only to support
+existing configurations. New deployments should use
+<code class="docutils literal notranslate">listen-interface</code> and <code class="docutils literal notranslate">upstream-interface</code>, which cannot be combined
+with this command. A deprecation warning appears upon commit.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The loopback interface (<code class="docutils literal notranslate">lo</code>) is not accepted as a valid value for
+this command.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay interface eth1
+set service dhcp-relay interface eth2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay disable
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Administratively disable the DHCPv4 relay service without removing
+its configuration.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay disable
+</pre></div>
+</div>
+</section>
+<section id="relay-options">
+<h3>Relay options</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay relay-options hop-count &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-relay-options-hop-count-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the DHCPv4 hop count at which relayed packets are
+discarded.</strong></p>
+<p>A DHCPv4 relay that receives a client message sets the hop count to
+0. Each subsequent DHCPv4 relay along the packet path increments it.
+Packets whose hop count has reached the specified value are silently
+dropped.</p>
+<p>The default is 10.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay relay-options hop-count 4
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay relay-options max-size &lt;64-1400&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-relay-options-max-size-64-1400" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the maximum size, in bytes, that a DHCPv4 packet may
+reach with the Relay Agent Information option added.</strong></p>
+<p>If the packet with the appended option exceeds this size, the option
+is omitted, and the packet is forwarded without it.</p>
+<p>The default is 576.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay relay-options max-size 1400
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay relay-options relay-agents-packets &lt;append | discard | forward | replace&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-relay-options-relay-agents-packets-append-discard-forward-replace" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the policy applied to incoming DHCPv4 packets that
+already carry a Relay Agent Information option:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">append</code>: Adds the local Relay Agent Information option while
+preserving the existing Relay Agent Information option.</p></li>
+<li><p><code class="docutils literal notranslate">discard</code>: Drops packets carrying a Relay Agent Information option.</p></li>
+<li><p><code class="docutils literal notranslate">forward</code>: Forwards packets with their existing Relay Agent
+Information option unchanged.</p></li>
+<li><p><code class="docutils literal notranslate">replace</code>: Strips the existing Relay Agent Information option and
+inserts the local Relay Agent Information option.</p></li>
+</ul>
+<p>The default is <code class="docutils literal notranslate">forward</code>.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay relay-options relay-agents-packets discard
+</pre></div>
+</div>
+</section>
+<section id="operation">
+<h3>Operation</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+restart dhcp relay-agent
+<a class="cmdlink" href="#opcmd-restart-dhcp-relay-agent" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Restart the DHCPv4 relay service.</p>
+</div>
+</div>
+</section>
+<section id="example">
+<h3>Example</h3>
+<p>The following configuration forwards DHCP client requests received on
+<code class="docutils literal notranslate">eth1</code> (the client-facing interface) via <code class="docutils literal notranslate">eth2</code> (the server-facing
+interface) to a DHCP server at <code class="docutils literal notranslate">203.0.113.4</code>. Packets that already
+contain Relay Agent Information are dropped, so that only requests
+originating directly from clients are forwarded.</p>
+<figure class="align-default" id="id6">
+<a class="reference internal image-reference" href="https://docs.vyos.io/en/rolling/_images/service_dhcp-relay01.webp"><img alt="DHCPv4 relay topology" src="https://docs.vyos.io/en/rolling/_images/service_dhcp-relay01.webp" style="width: 505.6px; height: 203.20000000000002px;" /></a>
+<figcaption>
+<p>DHCPv4 relay topology</p>
+</figcaption>
+</figure>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address &#39;192.0.2.1/24&#39;
+set interfaces ethernet eth2 address &#39;198.51.100.1/24&#39;
+set service dhcp-relay listen-interface &#39;eth1&#39;
+set service dhcp-relay upstream-interface &#39;eth2&#39;
+set service dhcp-relay server &#39;203.0.113.4&#39;
+set service dhcp-relay relay-options relay-agents-packets discard
+</pre></div>
+</div>
+<p>The equivalent configuration using the deprecated <code class="docutils literal notranslate">interface</code> syntax,
+retained only for backward compatibility, is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address &#39;192.0.2.1/24&#39;
+set interfaces ethernet eth2 address &#39;198.51.100.1/24&#39;
+set service dhcp-relay interface &#39;eth1&#39;
+set service dhcp-relay interface &#39;eth2&#39;
+set service dhcp-relay server &#39;203.0.113.4&#39;
+set service dhcp-relay relay-options relay-agents-packets discard
+</pre></div>
+</div>
+</section>
+</section>
+<section id="ipv6-relay">
+<h2>IPv6 relay</h2>
+<section id="dhcp-relay-ipv6-configuration">
+<h3>Configuration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-relay listen-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-listen-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a listen interface on which the DHCPv6 relay receives
+client multicast requests.</strong></p>
+<p>The interface must already have a global unicast IPv6 address
+assigned.</p>
+<p>Repeat the command to configure multiple listen interfaces.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>At least one <code class="docutils literal notranslate">listen-interface</code> and one <code class="docutils literal notranslate">upstream-interface</code> must be
+configured for a successful commit.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay listen-interface eth1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-relay listen-interface &lt;interface&gt; address &lt;ipv6-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-listen-interface-interface-address-ipv6-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IPv6 address the DHCPv6 relay uses to identify the
+client-facing network to the DHCPv6 server.</strong></p>
+<p>The address must be a non-link-local IPv6 address already assigned to
+the specified listen interface.</p>
+<p>If the address is not set, the DHCPv6 relay uses the first
+non-link-local IPv6 address found on that listen interface.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay listen-interface eth1 address 2001:db8:1::1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-relay upstream-interface &lt;interface&gt; address &lt;ipv6-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-upstream-interface-interface-address-ipv6-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IPv6 address of a DHCPv6 server (or another relay
+agent) to which the DHCPv6 relay forwards client messages via the
+specified upstream interface.</strong></p>
+<p>Repeat the command to forward client messages to multiple servers (or
+relay agents).</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>At least one server (or relay agent) address must be configured for
+each upstream interface for a successful commit.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay upstream-interface eth2 address 2001:db8:2::4
+</pre></div>
+</div>
+<div class="cmd cmd-cfg" id="dhcp-relay-ipv6-options">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-relay disable
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Administratively disable the DHCPv6 relay service without removing
+its configuration.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay disable
+</pre></div>
+</div>
+</section>
+<section id="dhcp-relay-v6-options">
+<h3>Relay options</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-relay max-hop-count &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-max-hop-count-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the DHCPv6 hop count at which relayed packets are
+discarded.</strong></p>
+<p>A DHCPv6 relay that receives a client message sets the hop count to
+0. Each subsequent DHCPv6 relay along the packet path increments it.
+Packets whose hop count has reached the specified value are silently
+dropped.</p>
+<p>The default is 10.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay max-hop-count 4
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-relay use-interface-id-option
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-use-interface-id-option" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable insertion of the Interface-ID option into every
+Relay-forward message.</strong></p>
+<p>The Interface-ID option is inserted automatically whenever more than
+one listen interface is configured on a relay, regardless of this
+setting.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay use-interface-id-option
+</pre></div>
+</div>
+</section>
+<section id="dhcp-relay-ipv6-op-cmd">
+<h3>Operation</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+restart dhcpv6 relay-agent
+<a class="cmdlink" href="#opcmd-restart-dhcpv6-relay-agent" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Restart the DHCPv6 relay service.</p>
+</div>
+</div>
+</section>
+<section id="dhcp-relay-ipv6-example">
+<h3>Example</h3>
+<p>The following configuration forwards DHCPv6 client requests received
+on <code class="docutils literal notranslate">eth1</code> (the client-facing interface) via <code class="docutils literal notranslate">eth2</code> (the server-facing
+interface) to a DHCPv6 server at <code class="docutils literal notranslate">2001:db8:2::4</code>.</p>
+<figure class="align-default" id="id7">
+<a class="reference internal image-reference" href="https://docs.vyos.io/en/rolling/_images/service_dhcpv6-relay01.webp"><img alt="DHCPv6 relay topology" src="https://docs.vyos.io/en/rolling/_images/service_dhcpv6-relay01.webp" style="width: 491.20000000000005px; height: 185.60000000000002px;" /></a>
+<figcaption>
+<p>DHCPv6 relay topology</p>
+</figcaption>
+</figure>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address &#39;2001:db8:1::1/64&#39;
+set interfaces ethernet eth2 address &#39;2001:db8:2::1/64&#39;
+set service dhcpv6-relay listen-interface &#39;eth1&#39;
+set service dhcpv6-relay upstream-interface &#39;eth2&#39; address &#39;2001:db8:2::4&#39;
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

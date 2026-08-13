@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="route-map-policy">
+<h1>Политика карты маршрутов</h1>
+<p>Карта маршрутов — это мощная команда, которая предоставляет сетевым администраторам очень
+полезный и гибкий инструмент для манипуляции трафиком.</p>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<section id="route-map">
+<h3>Карта маршрутов</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Эта команда создает новую политику карты маршрутов, идентифицируемую как &lt;text&gt;.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-description-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Задать описание для политики карты маршрутов.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; action &lt;permit|deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-action-permit-deny" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить действие для политики карты маршрутов.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; call &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-call-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Вызов другой политики карты маршрутов при совпадении.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; continue &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-continue-1-65535" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Перейти к другому правилу в этой карте маршрутов при совпадении.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-description-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить описание для правила в политике карты маршрутов.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match as-path &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-as-path-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>BGP список as-path для совпадения.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match community community-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-community-community-list-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>BGP список сообщества для совпадения.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match community exact-match
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-community-exact-match" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить BGP список сообщества для точного совпадения.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match extcommunity &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-extcommunity-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>BGP расширенное сообщество для совпадения.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match interface &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-interface-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Первый интерфейс маршрута для совпадения.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip address access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-address-access-list-1-2699" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>IP-адрес маршрута для совпадения, основанный на списке доступа.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip address prefix-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-address-prefix-list-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>IP-адрес маршрута для совпадения, основанный на префиксном списке.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip address prefix-len &lt;0-32&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-address-prefix-len-0-32" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>IP-адрес маршрута для совпадения, основанный на указанной длине префикса.
+Обратите внимание, что это может использоваться только для маршрутов ядра.
+Не применяйте к маршрутам динамических протоколов маршрутизации (например, BGP,
+RIP, OSFP), так как это может привести к неожиданным результатам.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip nexthop access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-access-list-1-2699" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>IP-адрес следующего узла маршрута для совпадения, основанный на списке доступа.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip nexthop address &lt;x.x.x.x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-address-x-x-x-x" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>IP-адрес следующего узла маршрута для совпадения, основанный на IP-адресе.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip nexthop prefix-len &lt;0-32&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-prefix-len-0-32" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>IP-адрес следующего узла маршрута для совпадения, основанный на длине префикса.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip nexthop prefix-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-prefix-list-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>IP-адрес следующего узла маршрута для совпадения, основанный на префиксном списке.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip nexthop type &lt;blackhole&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-type-blackhole" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>IP-адрес следующего узла маршрута для совпадения, основанный на типе.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip route-source access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-route-source-access-list-1-2699" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Исходный IP-адрес маршрута для совпадения, основанный на списке доступа.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip route-source prefix-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-route-source-prefix-list-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Исходный IP-адрес маршрута для совпадения, основанный на префиксном списке.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ipv6 address access-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-address-access-list-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>IPv6-адрес маршрута для совпадения, основанный на IPv6-списке доступа.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ipv6 address prefix-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-address-prefix-list-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>IPv6-адрес маршрута для совпадения, основанный на IPv6-префиксном списке.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ipv6 address prefix-len &lt;0-128&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-address-prefix-len-0-128" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>IPv6-адрес маршрута для совпадения, основанный на указанной длине префикса.
+Обратите внимание, что это может использоваться только для маршрутов ядра.
+Не применяйте к маршрутам динамических протоколов маршрутизации (например, BGP,
+RIP, OSFP), так как это может привести к неожиданным результатам.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ipv6 nexthop &lt;h:h:h:h:h:h:h:h&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-nexthop-h-h-h-h-h-h-h-h" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>IPv6-адрес следующего узла для совпадения.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match large-community large-community-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-large-community-large-community-list-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Совпадение с большими сообществами BGP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match local-preference &lt;0-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-local-preference-0-4294967295" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Совпадение с локальной предпочтительностью.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match metric &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-metric-1-65535" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Совпадение с метрикой маршрута.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match origin &lt;egp|igp|incomplete&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-origin-egp-igp-incomplete" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Код источника границы шлюза (BGP) для совпадения.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match peer &lt;x.x.x.x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-peer-x-x-x-x" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>IP-адрес соседа для совпадения.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match protocol &lt;protocol&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-protocol-protocol" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<dl class="simple">
+<dt>Исходный протокол для совпадения.</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate">babel</code> - Протокол маршрутизации Babel (Babel)</p></li>
+<li><p><code class="docutils literal notranslate">bgp</code> - Граница шлюза (BGP)</p></li>
+<li><p><code class="docutils literal notranslate">connected</code> - Связанные маршруты (непосредственно подключенные подсеть или хост)</p></li>
+<li><p><code class="docutils literal notranslate">isis</code> - Промежуточные системы (IS-IS)</p></li>
+<li><p><code class="docutils literal notranslate">kernel</code> - Маршруты ядра</p></li>
+<li><p><code class="docutils literal notranslate">ospf</code> - Открытый кратчайший путь (OSPFv2)</p></li>
+<li><p><code class="docutils literal notranslate">ospfv3</code> - Открытый кратчайший путь (IPv6) (OSPFv3)</p></li>
+<li><p><code class="docutils literal notranslate">rip</code> - Протокол информационных маршрутов (RIP)</p></li>
+<li><p><code class="docutils literal notranslate">ripng</code> - Новое поколение протокола информационных маршрутов (IPv6) (RIPng)</p></li>
+<li><p><code class="docutils literal notranslate">static</code> - Статически настроенные маршруты</p></li>
+<li><p><code class="docutils literal notranslate">table</code> - Неглавная таблица маршрутизации ядра</p></li>
+<li><p><code class="docutils literal notranslate">vnc</code> - Виртуальное управление сетью (VNC)</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match rpki &lt;invalid|notfound|valid&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-rpki-invalid-notfound-valid" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Совпадение с результатом проверки RPKI.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match source-vrf &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-source-vrf-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Исходный VRF для совпадения.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match tag &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-tag-1-65535" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Тег маршрута для совпадения.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; on-match goto &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-on-match-goto-1-65535" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Выход из политики при совпадении: перейти к правилу &lt;1-65535&gt;</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; on-match next
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-on-match-next" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Выход из политики при совпадении: перейти к следующему номеру последовательности.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set aggregator &lt;as|ip&gt; &lt;1-4294967295|x.x.x.x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-aggregator-as-ip-1-4294967295-x-x-x-x" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Атрибут агрегатора BGP: номер AS или IP-адрес агрегации.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set as-path exclude &lt;1-4294967295 | all&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-as-path-exclude-1-4294967295-all" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Удалить AS-NUMBER из BGP AS path.</p>
+<p>Если указано <code class="docutils literal notranslate">all</code>, удалите все номера AS из AS_PATH BGP
+пути NLRI.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set as-path prepend &lt;1-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-as-path-prepend-1-4294967295" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Добавьте заданный набор номеров AS в AS_PATH BGP пути NLRI.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set as-path prepend-last-as &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-as-path-prepend-last-as-n" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Добавьте существующий последний номер AS (левый ASN) в AS_PATH.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set atomic-aggregate
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-atomic-aggregate" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Атрибут атомарного агрегата BGP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set community &lt;add|replace&gt; &lt;community&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-community-add-replace-community" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Добавить или заменить атрибут сообщества BGP в формате <code class="docutils literal notranslate">&lt;0-65535:0-65535&gt;</code>
+или из списка известных сообществ</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set community none
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-community-none" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Удалить все сообщества BGP</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set community delete &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-community-delete-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Удалить сообщества BGP, совпадающие со списком сообществ.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set large-community &lt;add|replace&gt; &lt;GA:LDP1:LDP2&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-large-community-add-replace-ga-ldp1-ldp2" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Добавить или заменить атрибут больших сообществ BGP в формате
+<code class="docutils literal notranslate">&lt;0-4294967295:0-4294967295:0-4294967295&gt;</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set large-community none
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-large-community-none" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Удалить все большие сообщества BGP</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set large-community delete &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-large-community-delete-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Удалить сообщества BGP, совпадающие со списком больших сообществ.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set extcommunity bandwidth &lt;1-25600|cumulative|num-multipaths&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-bandwidth-1-25600-cumulative-num-multipaths" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить расширенное сообщество полосы пропускания</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set extcommunity bandwidth-non-transitive
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-bandwidth-non-transitive" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Расширенное сообщество полосы пропускания кодируется как непередаваемое</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set extcommunity rt &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-rt-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить значение маршрута в формате <code class="docutils literal notranslate">&lt;0-65535:0-4294967295&gt;</code> или <code class="docutils literal notranslate">&lt;IP:0-65535&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set extcommunity soo &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-soo-text" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить значение места происхождения в формате <code class="docutils literal notranslate">&lt;0-65535:0-4294967295&gt;</code> или <code class="docutils literal notranslate">&lt;IP:0-65535&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set extcommunity none
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-none" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Очистить все BGP extcommunities.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set distance &lt;0-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-distance-0-255" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Локально значимое административное расстояние.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ip-next-hop &lt;x.x.x.x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ip-next-hop-x-x-x-x" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>IP-адрес следующего узла.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ip-next-hop unchanged
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ip-next-hop-unchanged" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить следующий узел без изменений. Пройти через карту маршрутов без
+изменения его значения</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ip-next-hop peer-address
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ip-next-hop-peer-address" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить адрес следующего узла BGP в адрес соседа. Для входящей карты маршрутов
+это означает использование IP-адреса нашего соседа. Для исходящей карты маршрутов
+это означает использование IP-адреса нашего собственного устройства для
+установления связи с нашим соседом.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ipv6-next-hop &lt;global|local&gt; &lt;h:h:h:h:h:h:h:h&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ipv6-next-hop-global-local-h-h-h-h-h-h-h-h" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>IPv6-адрес следующего узла.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ipv6-next-hop peer-address
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ipv6-next-hop-peer-address" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить адрес следующего узла BGP в адрес соседа. Для входящей карты маршрутов
+это означает использование IP-адреса нашего соседа. Для исходящей карты маршрутов
+это означает использование IP-адреса нашего собственного устройства для
+установления связи с нашим соседом.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ipv6-next-hop prefer-global
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ipv6-next-hop-prefer-global" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Для входящих и импортированных карт маршрутов, если мы получаем v6 глобальный и v6 LL
+адрес для маршрута, то предпочтительно использовать глобальный адрес как
+следующий узел.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set local-preference &lt;0-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-local-preference-0-4294967295" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить атрибут локальной предпочтительности BGP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set metric &lt;+/-metric|0-4294967295|rtt|+rtt|-rtt&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-metric-metric-0-4294967295-rtt-rtt-rtt" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить метрику маршрута. При использовании с BGP установите атрибут MED
+в конкретное значение. Используйте <code class="docutils literal notranslate">+/-</code>, чтобы добавить или вычесть указанное значение
+из существующего/MED. Используйте <code class="docutils literal notranslate">rtt</code>, чтобы установить MED в время обратного прохода
+или <code class="docutils literal notranslate">+rtt/-rtt</code>, чтобы добавить/вычесть время обратного прохода из MED.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set metric-type &lt;type-1|type-2&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-metric-type-type-1-type-2" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить тип внешней метрики OSPF.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set origin &lt;igp|egp|incomplete&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-origin-igp-egp-incomplete" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить код источника BGP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set originator-id &lt;x.x.x.x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-originator-id-x-x-x-x" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Атрибут идентификатора создателя BGP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set src &lt;x.x.x.x|h:h:h:h:h:h:h:h&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-src-x-x-x-x-h-h-h-h-h-h-h-h" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить исходный IP/IPv6-адрес для маршрута.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set table &lt;1-200&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-table-1-200" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить префиксы в таблицу.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set tag &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-tag-1-65535" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установить значение тега для протокола маршрутизации.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set weight &lt;0-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-weight-0-4294967295" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p>Атрибут веса BGP</p>
+</div>
+</div>
+</section>
+<section id="list-of-well-known-communities">
+<h3>Список известных сообществ</h3>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate">local-as</code> - Значение известного сообщества NO_EXPORT_SUBCONFED 0xFFFFFF03</p></li>
+<li><p><code class="docutils literal notranslate">no-advertise</code> - Значение известного сообщества NO_ADVERTISE 0xFFFFFF02</p></li>
+<li><p><code class="docutils literal notranslate">no-export</code> - Значение известного сообщества NO_EXPORT 0xFFFFFF01</p></li>
+<li><p><code class="docutils literal notranslate">graceful-shutdown</code> - Значение известного сообщества GRACEFUL_SHUTDOWN 0xFFFF0000</p></li>
+<li><p><code class="docutils literal notranslate">accept-own</code> - Значение известного сообщества ACCEPT_OWN 0xFFFF0001</p></li>
+<li><p><code class="docutils literal notranslate">route-filter-translated-v4</code> - Значение известного сообщества ROUTE_FILTER_TRANSLATED_v4 0xFFFF0002</p></li>
+<li><p><code class="docutils literal notranslate">route-filter-v4</code> - Значение известного сообщества ROUTE_FILTER_v4 0xFFFF0003</p></li>
+<li><p><code class="docutils literal notranslate">route-filter-translated-v6</code> - Значение известного сообщества ROUTE_FILTER_TRANSLATED_v6 0xFFFF0004</p></li>
+<li><p><code class="docutils literal notranslate">route-filter-v6</code> - Значение известного сообщества ROUTE_FILTER_v6 0xFFFF0005</p></li>
+<li><p><code class="docutils literal notranslate">llgr-stale</code> - Значение известного сообщества LLGR_STALE 0xFFFF0006</p></li>
+<li><p><code class="docutils literal notranslate">no-llgr</code> - Значение известного сообщества NO_LLGR 0xFFFF0007</p></li>
+<li><p><code class="docutils literal notranslate">accept-own-nexthop</code> - Значение известного сообщества accept-own-nexthop 0xFFFF0008</p></li>
+<li><p><code class="docutils literal notranslate">blackhole</code> - Значение известного сообщества BLACKHOLE 0xFFFF029A</p></li>
+<li><p><code class="docutils literal notranslate">no-peer</code> - Значение известного сообщества NOPEER 0xFFFFFF04</p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

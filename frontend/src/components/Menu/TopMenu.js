@@ -1,12 +1,17 @@
-import { defineComponent, ref, computed, h, onMounted, onUnmounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, h, onMounted, onUnmounted, inject } from '/src/utils/vue-import.js';
 import { useRoute, useRouter } from '/src/utils/vue-router-import.js';
 import { useAuthStore } from '/src/stores/auth.js';
 import { useNotificationStore } from '/src/stores/notifications.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { emitMenuRefresh } from '/src/utils/eventBus.js';
 import PendingChanges from '/src/components/Layout/PendingChanges.js';
+import { locale, localeNames, LOCALES } from '/src/i18n/index.js';
 
 const CLOSE_DELAY = 600;
+
+function getLabel(item) {
+  return locale.value === 'en' ? (item.label_en || item.label) : item.label;
+}
 
 function renderSubmenu(items, state, keepParentOpen, clearParent, setOpen, clearOpen, toggleOpen, closeAll, router, route, level = 0, fixedStyle = null) {
   const style = fixedStyle || undefined;
@@ -43,12 +48,12 @@ function renderSubmenu(items, state, keepParentOpen, clearParent, setOpen, clear
               }
               closeAll();
             }
-          }, item.label)
+          }, getLabel(item))
         : h('span', {
             style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
             onClick: (e) => { e.stopPropagation(); if (hasChildren) toggleOpen(item.id); }
           }, [
-            item.label,
+            getLabel(item),
             hasChildren ? h('span', { class: 'arrow' }, '▸') : null
           ]),
       isOpen ? renderSubmenu(item.children, state, () => setOpen(item.id), clearOpen, setOpen, clearOpen, toggleOpen, closeAll, router, route, level + 1) : null,
@@ -132,12 +137,19 @@ export default defineComponent({
     }
 
     const userMenuOpen = ref(false);
+    const langDropdownOpen = ref(false);
     function toggleUserMenu(e) {
       e.stopPropagation();
       userMenuOpen.value = !userMenuOpen.value;
+      langDropdownOpen.value = false;
     }
     function closeUserMenu() {
       userMenuOpen.value = false;
+      langDropdownOpen.value = false;
+    }
+    function toggleLangDropdown(e) {
+      e.stopPropagation();
+      langDropdownOpen.value = !langDropdownOpen.value;
     }
 
     const notificationOpen = ref(false);
@@ -150,6 +162,13 @@ export default defineComponent({
     }
     function closeNotification() {
       notificationOpen.value = false;
+    }
+
+    function switchLanguage(langCode) {
+      locale.value = langCode;
+      localStorage.setItem('locale', langCode);
+      langDropdownOpen.value = false;
+      userMenuOpen.value = false;
     }
     async function onNotificationClick(item, e) {
       e.stopPropagation();
@@ -204,6 +223,9 @@ export default defineComponent({
       stopNotificationPolling();
     });
 
+    // i18n
+    const { t } = inject('i18n');
+
     const itemRefs = {};
 
     return () => {
@@ -225,7 +247,7 @@ export default defineComponent({
             onClick: (e) => { e.stopPropagation(); if (hasChildren) toggleL1(l1.id); }
           }, [
             h('span', { style: { display: 'flex', alignItems: 'center', minWidth: 0 } }, [
-              h('span', { class: 'top-menu-label' }, l1.label),
+              h('span', { class: 'top-menu-label' }, getLabel(l1)),
               hasChildren ? h('span', { class: 'arrow' }, '▾') : null
             ]),
           ]);
@@ -237,7 +259,7 @@ export default defineComponent({
           h(PendingChanges),
           h('div', {
             class: ['notification', { open: notificationOpen.value }],
-            title: '通知',
+            title: t('app.notification'),
             onClick: toggleNotification,
           }, [
             h('span', { class: 'notification-icon' }, '🔔'),
@@ -247,12 +269,12 @@ export default defineComponent({
             notificationOpen.value
               ? h('div', { class: 'notification-dropdown', onClick: (e) => e.stopPropagation() }, [
                   h('div', { class: 'notification-header' }, [
-                    h('span', { class: 'notification-title' }, '报警信息'),
+                    h('span', { class: 'notification-title' }, t('app.alarmInfo')),
                     h('button', { class: 'notification-close', onClick: closeNotification }, '×'),
                   ]),
                   h('div', { class: 'notification-list' }, [
                     notifications.sortedNotifications.length === 0
-                      ? h('div', { class: 'notification-empty' }, '暂无通知')
+                      ? h('div', { class: 'notification-empty' }, t('app.noNotification'))
                       : notifications.sortedNotifications.map(item => h('div', {
                           key: item.id,
                           class: ['notification-item', { unread: !item.read }],
@@ -271,7 +293,7 @@ export default defineComponent({
                   ]),
                   notifications.unreadCount > 0
                     ? h('div', { class: 'notification-footer' }, [
-                        h('button', { class: 'notification-mark-read', onClick: onMarkAllRead }, '全部已读'),
+                        h('button', { class: 'notification-mark-read', onClick: onMarkAllRead }, t('app.markAllRead')),
                       ])
                     : null,
                 ])
@@ -288,10 +310,30 @@ export default defineComponent({
             ]),
             userMenuOpen.value
               ? h('div', { class: 'user-menu-dropdown' }, [
+                  // Language dropdown
+                  h('div', {
+                    class: ['user-menu-item', 'has-submenu', { open: langDropdownOpen.value }],
+                    onClick: toggleLangDropdown,
+                  }, [
+                    h('span', null, t('app.language')),
+                    h('span', { class: 'submenu-arrow' }, '▸'),
+                    langDropdownOpen.value
+                      ? h('div', { class: 'user-submenu-dropdown', onClick: (e) => e.stopPropagation() }, [
+                          ...LOCALES.map(langCode => h('div', {
+                            class: ['user-submenu-item', { active: locale.value === langCode }],
+                            onClick: (e) => { e.stopPropagation(); switchLanguage(langCode); }
+                          }, [
+                            h('span', null, localeNames[langCode]),
+                            locale.value === langCode ? h('span', { class: 'lang-check' }, '✓') : null,
+                          ]))
+                        ])
+                      : null,
+                  ]),
+                  h('div', { class: 'user-menu-divider' }),
                   h('div', {
                     class: 'user-menu-item',
                     onClick: (e) => { e.stopPropagation(); logout(); closeUserMenu(); }
-                  }, '注销')
+                  }, t('app.logout'))
                 ])
               : null,
           ]),

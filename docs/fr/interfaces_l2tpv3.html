@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="l2tpv3">
+<h1>L2TPv3</h1>
+<p><abbr title="Couche 2 Tunneling Protocol version 3">L2TPv3</abbr> interfaces vous permettent d'établir des tunnels L2TPv3 pour transporter le trafic de la couche 2 sur des réseaux IP.</p>
+<p>Le protocole L2TPv3 (défini dans le RFC 3931) encapsule les trames de la couche 2 (par exemple, Ethernet, Frame Relay, HDLC) dans des paquets IP, permettant ainsi de traverser l'infrastructure IP sous-jacente.</p>
+<p>Contrairement à L2TPv2, qui nécessite strictement l'encapsulation UDP, le protocole L2TPv3 est plus flexible et prend en charge deux types d'encapsulation :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>IP direct :</strong> Les données du tunnel sont encapsulées directement dans des paquets IP (Protocole 115) pour un surcoût plus faible.</p></li>
+<li><p><strong>UDP :</strong> Les données du tunnel sont encapsulées dans un datagramme UDP. Cela permet au tunnel de traverser plus facilement le NAT.</p></li>
+</ul>
+</div></blockquote>
+<p>Les tunnels L2TPv3 relient des sites géographiquement séparés, servant d'alternative plus simple à <a class="reference internal" href="../protocols/mpls.html#mpls">MPLS</a> en fonctionnant sur une connectivité IP basique plutôt qu'en nécessitant une infrastructure MPLS complète.</p>
+<p>Les tunnels L2TPv3 peuvent être établis sur des réseaux sous-jacents IPv4 et IPv6.</p>
+<section id="configuration">
+<h2>Configuration</h2>
+<section id="common-interface-configuration">
+<h3>Configuration commune de l'interface</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez une ou plusieurs adresses IP d'interface.</strong></p>
+<p><code class="docutils literal notranslate">&lt;address&gt;</code> prend en charge IPv4 et IPv6 en notation CIDR. Par exemple, utilisez <code class="docutils literal notranslate">192.0.2.1/24</code> pour IPv4 ou <code class="docutils literal notranslate">2001:db8::1/64</code> pour IPv6.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 address 192.0.2.1/24
+set interfaces l2tpv3 l2tpeth0 address 2001:db8::1/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un alias clair et descriptif pour l'interface.</strong></p>
+<p>Cet alias apparaît dans la commande <code class="docutils literal notranslate">show interfaces</code> et dans les outils de surveillance basés sur SNMP.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez l'interface.</strong></p>
+<p>L'interface sera définie sur l'état administrativement down (<code class="docutils literal notranslate">A/D</code>).</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt;  disable-flow-control
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-disable-flow-control" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez le contrôle de flux Ethernet (trame pause IEEE 802.3x) sur l'interface.</strong></p>
+<blockquote>
+<div><p>Le contrôle de flux Ethernet, défini par la norme IEEE 802.3x, arrête temporairement la transmission des données pour éviter la perte de paquets pendant la congestion du réseau. Par exemple, lorsqu'un émetteur transmet des données plus rapidement que le récepteur ne peut les traiter.</p>
+<p>La désactivation du contrôle de flux Ethernet signifie que l'interface ne signalera pas à l'appareil connecté de suspendre la transmission et supprimera les paquets si elle est submergée.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 disable-flow-control
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; disable-link-detect
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-disable-link-detect" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez la détection des changements d'état physique de l'interface, tels que lorsque un câble est débranché.</strong></p>
+<p>Par défaut, l'interface détecte les changements d'état physique.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 disable-link-detect
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; mac &lt;xx:xx:xx:xx:xx:xx&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-mac-xx-xx-xx-xx-xx-xx" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez une adresse MAC personnalisée sur l'interface.</strong></p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 mac &#39;00:53:01:02:03:04&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le MTU sur l'interface.</strong></p>
+<p>Cette valeur définit la taille maximale du paquet, en octets, que l'interface transmet sans fragmentation.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la</strong> <abbr title="Taille maximale de segment">MSS</abbr> <strong>annoncée dans les paquets TCP SYN sortants sur l'interface spécifiée.</strong></p>
+<p>En limitant la valeur de MSS dans les paquets TCP SYN, vous informez explicitement l'extrémité distante qu'elle ne doit pas envoyer de paquets plus grands que cette taille. Cela empêche les problèmes de connexion qui surviennent lorsque la découverte du MTU du chemin (PMTUD) échoue.</p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>mss :</strong> Définit la MSS à une valeur spécifique, en octets. Utilisez cette option si vous avez besoin d'imposer une MSS spécifique, par exemple pour résoudre des problèmes de connectivité ou répondre à des exigences réseau spécifiques.</p></li>
+<li><p><strong>clamp-mss-to-pmtu :</strong> Le routeur calcule automatiquement la MSS à être la MTU de l'interface moins 40 octets pour le trafic IPv4 (20 octets pour l'en-tête IPv4 et 20 octets pour l'en-tête TCP). Cette option est recommandée pour définir automatiquement la bonne valeur.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ip-arp-cache-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la durée pendant laquelle une entrée ARP reste valide après avoir appris une correspondance entre une adresse IP et une adresse MAC sur cette interface.</strong></p>
+<p>La durée par défaut est de 30 secondes.</p>
+<p>Une entrée ARP reste valide s'il reçoit un feedback positif des protocoles de niveau supérieur.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ip-disable-arp-filter" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le filtrage ARP sur cette interface.</strong></p>
+<p><strong>Comportement par défaut :</strong> Le noyau répond aux demandes ARP sur cette interface uniquement si le trafic serait routé de retour à l'expéditeur ARP via cette interface spécifique.</p>
+<p><strong>Si configuré :</strong> Le noyau répond aux demandes ARP sur cette interface pour toute adresse IP configurée sur l'hôte local, indépendamment de l'interface spécifique à laquelle cette adresse IP est assignée, et indépendamment de la table de routage. Cela reflète le concept Linux selon lequel les adresses IP appartiennent à l'hôte, et non à des interfaces individuelles.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ip disable-arp-filter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour un comportement d'hôte ou de routeur.</strong></p>
+<p>Si configuré, l'interface passe en mode hôte, et le transfert IPv4 est désactivé sur celle-ci.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez si les paquets broadcast directs IP reçus sur cette interface doivent être transmis.</strong></p>
+<p><strong>Comportement par défaut :</strong> Les paquets broadcast directs IP sont supprimés.</p>
+<p><strong>Si configuré :</strong> Les paquets broadcast directs IP sont transmis à tous les hôtes sur le sous-réseau de destination, conformément au <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> et au <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ip-enable-arp-accept" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez comment traiter les ARP gratuit sur cette interface.</strong></p>
+<p>Si configuré, une correspondance IP-MAC est ajoutée au tableau ARP en fonction des demandes ou réponses ARP gratuit.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Si le tableau ARP contient déjà l'adresse IP provenant d'un ARP gratuit, son entrée est mise à jour indépendamment de la configuration de ce paramètre.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ip-enable-arp-announce" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la sélection de l'adresse IP source pour les demandes ARP sur cette interface.</strong></p>
+<p><strong>Comportement par défaut :</strong> Le noyau peut utiliser n'importe quelle adresse IP possédée par l'hôte comme adresse IP source dans les demandes ARP sur cette interface.</p>
+<p><strong>Si configuré :</strong> Le noyau essaie d'abord de sélectionner une adresse IP configurée sur l'interface partageant un sous-réseau commun avec l'adresse IP cible. Si aucun tel sous-réseau n'existe, le noyau sélectionne l'adresse IP qu'il utiliserait normalement (en se basant sur la table de routage pour atteindre la destination cible).</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ip-enable-arp-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez les demandes ARP qui seront ignorées sur cette interface.</strong></p>
+<p><strong>Comportement par défaut :</strong> Le noyau répond aux demandes ARP pour toutes les adresses IP locales, indépendamment de l'interface à laquelle elles sont assignées.</p>
+<p><strong>Si configuré :</strong> Le noyau répond aux demandes ARP uniquement si l'adresse IP cible est assignée à cette interface spécifique.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ip-enable-proxy-arp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le proxy ARP sur cette interface.</strong></p>
+<p>Si configuré, le routeur (noyau) intercepte les demandes ARP pour des adresses IP non locales et répond avec l'adresse <abbr title="Media Access Control">MAC</abbr> de l'interface qui a reçu la demande. Les paquets suivants destinés à ces adresses IP sont ensuite transmis vers leurs destinations réelles sur les sous-réseaux distants.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ip enable-proxy-arp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ip-proxy-arp-pvlan" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le proxy ARP local sur l'interface.</strong></p>
+<p>Si configuré, le routeur (noyau) répond aux demandes ARP sur cette interface VLAN même si l'adresse IP cible se trouve sur le même sous-réseau et interface.</p>
+<p>Cela est utilisé pour soutenir les exigences d'isolation réseau (RFC 3069) pour les VLAN privés (PVLAN). Dans les configurations PVLAN, les hôtes sur les ports isolés ne sont PAS autorisés à communiquer directement entre eux au niveau 2, mais ils peuvent communiquer avec le routeur supérieur.</p>
+<p>En répondant aux demandes ARP inter-hôtes avec sa propre adresse <abbr title="Media Access Control">MAC</abbr>, le routeur (noyau) dirige le trafic inter-hôtes à travers lui-même au lieu de directement entre les hôtes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette commande fonctionne indépendamment et ne nécessite pas l'activation du proxy ARP standard sur l'interface.</p>
+</div>
+<p>Le proxy ARP local est également connu sous les noms suivants :</p>
+<ul class="simple">
+<li><p>Aggregation VLAN (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>VLAN privé (Cisco, Allied Telesyn).</p></li>
+<li><p>Filtrage de port source ou isolation de port (Hewlett-Packard).</p></li>
+<li><p>Transfert forcé MAC (Ericsson).</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la validation de l'adresse IP source à l'aide de</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>sur cette interface, comme spécifié dans</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>strict :</strong> Chaque adresse IP source des paquets entrants est vérifiée contre la base d'informations de routage (FIB). Si l'interface n'est pas le meilleur chemin de retour vers cette source, la validation échoue et le paquet est supprimé.</p></li>
+<li><p><strong>loose :</strong> Chaque adresse IP source des paquets entrants est vérifiée contre la FIB. Si l'adresse IP source est inatteignable à travers n'importe quelle interface, la validation échoue.</p></li>
+<li><p><strong>disable :</strong> Aucune validation de l'adresse IP source n'est effectuée. Tous les paquets entrants sont acceptés.</p></li>
+</ul>
+<p>Le RFC 3704 recommande d'activer le mode strict pour empêcher la falsification d'IP, telle que les attaques DDoS. Pour les scénarios de routage asymétrique ou autres complexes, utilisez le mode loose.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour obtenir automatiquement une adresse IPv6 à l'aide de</strong> <abbr title="Autoconfiguration d'adresse sans état">SLAAC</abbr>, <strong>comme spécifié dans</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<p>Les hôtes IPv6 peuvent se configurer automatiquement lorsqu'ils sont connectés à un réseau IPv6 en utilisant le protocole de découverte des voisins via les messages ICMPv6 de découverte de routeur. Lorsqu'ils se connectent pour la première fois à un réseau, un hôte envoie une demande multicast de routeur de lien local pour ses paramètres de configuration. Le routeur répond avec un paquet d'annonce de routeur contenant les paramètres de configuration de la couche Internet.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette méthode désactive automatiquement le transfert de trafic IPv6 sur l'interface.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ipv6 address autoconf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ipv6-address-eui64-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour lui attribuer une adresse IPv6 à l'aide de la méthode</strong> <abbr title="64-Bit Extended Unique Identifier">EUI-64</abbr> <strong>, comme spécifié</strong> dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ipv6 address eui64 2001:db8:beef::/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ipv6 address no-default-link-local
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ipv6-address-no-default-link-local" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez l'attribution automatique d'une adresse IPv6 de lien local à cette interface.</strong></p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ipv6 address no-default-link-local
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ipv6-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour un comportement d'hôte ou de routeur.</strong></p>
+<p>Si configuré, l'interface passe en mode hôte, et le transfert IPv6 est désactivé sur celle-ci.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ipv6 disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ipv6 adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la</strong> <abbr title="Taille maximale de segment">MSS</abbr> <strong>annoncée dans les paquets TCP SYN sortants sur l'interface spécifiée.</strong></p>
+<p>En limitant la valeur de MSS dans les paquets TCP SYN, vous informez explicitement l'extrémité distante qu'elle ne doit pas envoyer de paquets plus grands que cette taille. Cela empêche les problèmes de connexion lorsqu'il y a un échec de la découverte du MTU du chemin (PMTUD).</p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>mss :</strong> Définit la MSS à une valeur spécifique, en octets. Utilisez cette option pour imposer une MSS spécifique, par exemple pour résoudre des problèmes de connectivité ou répondre à des exigences réseau spécifiques.</p></li>
+<li><p><strong>clamp-mss-to-pmtu :</strong> Le routeur calcule la MSS comme étant la MTU de l'interface moins 60 octets pour le trafic IPv6 (40 octets pour l'en-tête IPv6 et 20 octets pour l'en-tête TCP). Cette option est recommandée pour définir automatiquement la bonne valeur.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ipv6 accept-dad &lt;0 | 1 | 2&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ipv6-accept-dad-0-1-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le</strong> <abbr title="Détection de duplication d'adresse">DAD</abbr> <strong>IPv6 sur l'interface.</strong></p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>0 :</strong> Désactive le DAD. Aucune détection de duplication d'adresse n'est effectuée.</p></li>
+<li><p><strong>1 :</strong> Active le DAD (par défaut). Les adresses dupliquées sont détectées. L'opération IPv6 de l'interface continue pour les adresses IPv6 valides.</p></li>
+<li><p><strong>2 :</strong> Active le DAD et, si une adresse de lien local dupliquée basée sur la MAC est trouvée, désactive l'opération IPv6 sur cette interface.</p></li>
+</ul>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ipv6 accept-dad 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; ipv6 dup-addr-detect-transmits &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ipv6-dup-addr-detect-transmits-n" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le nombre de</strong> <abbr title="Détection de duplication d'adresse">DAD</abbr> <strong>messages que le routeur (noyau) envoie pendant l'attribution d'adresse IPv6 sur cette interface.</strong></p>
+<p>La valeur par défaut est 1.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ipv6 dup-addr-detect-transmits 5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; vrf &lt;vrf&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-vrf-vrf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Attribuez l'interface à une instance spécifique de</strong> <abbr title="Routing et forwarding virtuel">VRF</abbr> <strong>.</strong></p>
+<div class="admonition seealso">
+<p class="admonition-title">Voir aussi</p>
+<p>Pour plus d'informations sur la configuration d'un VRF, consultez la section <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 vrf red
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="l2tpv3-options">
+<h3>Options L2TPv3</h3>
+<p>Utilisez les commandes suivantes pour configurer les paramètres spécifiques du tunnel L2TPv3.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; encapsulation &lt;udp | ip&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-encapsulation-udp-ip" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le type d'encapsulation pour le tunnel L2TPv3.</strong></p>
+<p>Les valeurs valides sont <code class="docutils literal notranslate">udp</code> et <code class="docutils literal notranslate">ip</code>.</p>
+<p>Le type d'encapsulation par défaut est <code class="docutils literal notranslate">udp</code>.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Le type d'encapsulation doit être identique sur les pairs locaux et distants pour que le tunnel puisse être établi.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'adresse IP source du tunnel L2TPv3.</strong></p>
+<p>L'adresse spécifiée doit être une adresse IP d'interface locale et peut être soit IPv4, soit IPv6.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; remote &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-remote-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'adresse IP de destination du tunnel L2TPv3.</strong></p>
+<p>L'adresse spécifiée doit être une adresse IP d'interface d'un pair distant et peut être soit IPv4, soit IPv6.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; session-id &lt;id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-session-id-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'identifiant de session local dans le tunnel L2TPv3.</strong></p>
+<p>Le <code class="docutils literal notranslate">session-id</code> est une valeur de 32 bits qui identifie une session de tunnel entrante sur le pair local.</p>
+<p>Le <code class="docutils literal notranslate">peer-session-id</code> qui identifie cette session sur le pair distant doit être configuré avec la même valeur.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; peer-session-id &lt;id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-peer-session-id-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'identifiant de session du pair dans le tunnel L2TPv3.</strong></p>
+<p>Le <code class="docutils literal notranslate">peer-session-id</code> est une valeur de 32 bits qui identifie une session de tunnel sortante depuis le pair local.</p>
+<p>Le <code class="docutils literal notranslate">peer-session-id</code> doit correspondre au <code class="docutils literal notranslate">session-id</code> configuré pour cette session sur le pair distant.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; tunnel-id &lt;id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-tunnel-id-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'identifiant local du tunnel L2TPv3.</strong></p>
+<p>Le <code class="docutils literal notranslate">tunnel-id</code> est une valeur de 32 bits qui identifie le tunnel L2TPv3 sur le pair local.</p>
+<p>Le <code class="docutils literal notranslate">peer-tunnel-id</code> qui identifie ce tunnel sur le pair distant doit être configuré avec la même valeur.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces l2tpv3 &lt;interface&gt; peer-tunnel-id &lt;id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-peer-tunnel-id-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'identifiant du pair pour le tunnel L2TPv3.</strong></p>
+<p>Le <code class="docutils literal notranslate">peer-tunnel-id</code> est une valeur de 32 bits qui identifie le tunnel L2TPv3 sur le pair distant et doit correspondre au <code class="docutils literal notranslate">tunnel-id</code> configuré pour ce tunnel sur ce pair.</p>
+<p>Le <code class="docutils literal notranslate">peer-tunnel-id</code> doit correspondre au <code class="docutils literal notranslate">tunnel-id</code> qui identifie ce tunnel sur le pair distant.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="example">
+<h2>Exemple</h2>
+<section id="l2tpv3-tunnel-with-ip-encapsulation">
+<h3>Tunnel L2TPv3 avec encapsulation IP</h3>
+<p>L'exemple suivant montre la configuration d'un tunnel L2TPv3 utilisant l'encapsulation IP directe :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># show interfaces l2tpv3
+l2tpv3 l2tpeth10 {
+    address 192.168.37.1/27
+    encapsulation ip
+    source-address 192.0.2.1
+    peer-session-id 100
+    peer-tunnel-id 200
+    remote 203.0.113.24
+    session-id 100
+    tunnel-id 200
+}
+</pre></div>
+</div>
+<p>La configuration inverse doit être appliquée au pair distant.</p>
+</section>
+<section id="l2tpv3-tunnel-with-udp-encapsulation">
+<h3>Tunnel L2TPv3 avec encapsulation UDP</h3>
+<p>L'exemple suivant montre la configuration d'un tunnel L2TPv3 utilisant l'encapsulation UDP.</p>
+<p>Cette configuration est recommandée lorsque le tunnel traverse des dispositifs NAT.</p>
+<p>Remarques concernant la configuration :</p>
+<ul class="simple">
+<li><p>Utilisez une adresse IP LAN locale comme <code class="docutils literal notranslate">source-address</code>.</p></li>
+<li><p>Configurez une règle de transfert pour autoriser le trafic de tunnel sur le port UDP spécifié sur le dispositif NAT amont.</p></li>
+<li><p>Utilisez un port UDP distinct pour chaque tunnel individuel.</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre># show interfaces l2tpv3
+l2tpv3 l2tpeth10 {
+    address 192.168.37.1/27
+    destination-port 9001
+    encapsulation udp
+    source-address 192.0.2.1
+    peer-session-id 100
+    peer-tunnel-id 200
+    remote 203.0.113.24
+    session-id 100
+    source-port 9000
+    tunnel-id 200
+}
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

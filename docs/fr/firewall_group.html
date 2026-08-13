@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="firewall-groups">
+<h1>Groupes de pare-feu</h1>
+<section id="configuration">
+<h2>Configuration</h2>
+<p>Les groupes de pare-feu représentent des collections d'adresses IP, de réseaux, de ports,
+d'adresses MAC, de domaines ou d'interfaces. Vous pouvez faire référence à un groupe dans les règles de pare-feu,
+de NAT et de routage politique soit comme correspondance source ou destination, et/ou
+comme entrant ou sortant dans le cas des groupes d'interfaces.</p>
+<section id="address-groups">
+<h3>Groupes d'adresses</h3>
+<p>Un <strong>groupe d'adresses</strong> contient une seule adresse IP ou une plage d'adresses IP.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group address-group &lt;name&gt; address [address | address range]
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-address-group-name-address-address-address-range" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group ipv6-address-group &lt;name&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-ipv6-address-group-name-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir un groupe d'adresses IPv4 ou IPv6.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group address-group ADR-INSIDE-v4 address 192.168.0.1
+set firewall group address-group ADR-INSIDE-v4 address 10.0.0.1-10.0.0.8
+set firewall group ipv6-address-group ADR-INSIDE-v6 address 2001:db8::1
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group address-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-address-group-name-description-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group ipv6-address-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-ipv6-address-group-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Fournir une description pour un groupe d'adresses IPv4 ou IPv6.</p>
+</div>
+</div>
+</section>
+<section id="remote-groups">
+<h3>Groupes distants</h3>
+<p>Un <strong>groupe distant</strong> utilise une URL qui héberge une liste délimitée par des sauts de ligne d'adresses IPv4
+et/ou IPv6, de CIDR et de plages. VyOS récupère cette liste périodiquement
+selon la fréquence que vous définissez dans le pare-feu <strong>resolver-interval</strong>
+et charge les entrées correspondantes dans le groupe pour utilisation dans les règles. La liste est stockée
+en stockage persistant, donc les règles continuent de fonctionner si les mises à jour échouent.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group remote-group &lt;name&gt; url &lt;http(s) url&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-remote-group-name-url-http-s-url" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Spécifier une liste d'adresses IPv4 et/ou IPv6, de plages et de CIDR
+à récupérer.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group remote-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-remote-group-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir une description pour un groupe distant.</p>
+</div>
+</div>
+<p>Le format de la liste distante est flexible. VyOS tente de parser la première mot de
+chaque ligne comme une entrée et ignore les lignes qu'il ne peut pas matcher. Les lignes commençant par
+un caractère alphanumérique mais qui ne correspondent pas à des adresses IPv4 ou IPv6 valides,
+des plages ou des CIDR sont enregistrées dans le journal système. Les exemples suivants montrent
+les formats acceptables que VyOS parse correctement :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>127.0.0.1
+127.0.0.0/24
+127.0.0.1-127.0.0.254
+2001:db8::1
+2001:db8:cafe::/48
+2001:db8:cafe::1-2001:db8:cafe::ffff
+</pre></div>
+</div>
+</section>
+<section id="network-groups">
+<h3>Groupes de réseaux</h3>
+<p>Les <strong>groupes de réseaux</strong> acceptent des réseaux IP au format CIDR. Vous pouvez ajouter des adresses spécifiques
+en tant que préfixe de 32 bits. Si vous avez besoin d'ajouter un mélange d'adresses et
+de réseaux, utilisez un groupe de réseau.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group network-group &lt;name&gt; network &lt;CIDR&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-network-group-name-network-cidr" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group ipv6-network-group &lt;name&gt; network &lt;CIDR&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-ipv6-network-group-name-network-cidr" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir un groupe de réseau IPv4 ou IPv6.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group network-group NET-INSIDE-v4 network 192.168.0.0/24
+set firewall group network-group NET-INSIDE-v4 network 192.168.1.0/24
+set firewall group ipv6-network-group NET-INSIDE-v6 network 2001:db8::/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group network-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-network-group-name-description-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group ipv6-network-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-ipv6-network-group-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Fournir une description pour un groupe de réseau IPv4 ou IPv6.</p>
+</div>
+</div>
+</section>
+<section id="interface-groups">
+<h3>Groupes d'interfaces</h3>
+<p>Un <strong>groupe d'interfaces</strong> représente une collection d'interfaces.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group interface-group &lt;name&gt; interface &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-interface-group-name-interface-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir un groupe d'interfaces.
+Le caractère joker <code class="docutils literal notranslate">*</code> est pris en charge. Par exemple : <code class="docutils literal notranslate">eth3*</code>.
+Préfixez le caractère <code class="docutils literal notranslate">!</code> pour inverser les critères. Par exemple : <code class="docutils literal notranslate">!eth2</code>.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group interface-group LAN interface bond1001
+set firewall group interface-group LAN interface eth3*
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group interface-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-interface-group-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Fournir une description pour un groupe d'interfaces.</p>
+</div>
+</div>
+</section>
+<section id="port-groups">
+<h3>Groupes de ports</h3>
+<p>Un <strong>groupe de ports</strong> représente uniquement les numéros de ports, pas le protocole. Vous pouvez
+référencer des groupes de ports pour TCP ou UDP. Créez des groupes TCP et UDP
+séparément pour éviter de filtrer accidentellement des ports inutiles. Spécifiez des plages de ports
+en utilisant <code class="docutils literal notranslate">-</code>.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group port-group &lt;name&gt; port [portname | portnumber | startport-endport]
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-port-group-name-port-portname-portnumber-startport-endport" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir un groupe de ports. Un nom de port peut être n'importe quel nom défini dans
+/etc/services. Par exemple, <code class="docutils literal notranslate">http</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group port-group PORT-TCP-SERVER1 port http
+set firewall group port-group PORT-TCP-SERVER1 port 443
+set firewall group port-group PORT-TCP-SERVER1 port 5000-5010
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group port-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-port-group-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Fournir une description pour un groupe de ports.</p>
+</div>
+</div>
+</section>
+<section id="mac-groups">
+<h3>Groupes MAC</h3>
+<p>Un <strong>groupe MAC</strong> représente une collection d'adresses MAC.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group mac-group &lt;name&gt; mac-address &lt;mac-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-mac-group-name-mac-address-mac-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir un groupe MAC.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group mac-group MAC-G01 mac-address 88:a4:c2:15:b6:4f
+set firewall group mac-group MAC-G01 mac-address 4c:d5:77:c0:19:81
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group mac-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-mac-group-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Fournir une description pour un groupe MAC.</p>
+</div>
+</div>
+</section>
+<section id="domain-groups">
+<h3>Groupes de domaines</h3>
+<p>Un <strong>groupe de domaines</strong> représente une collection de domaines.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group domain-group &lt;name&gt; address &lt;domain&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-domain-group-name-address-domain" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir un groupe de domaines.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group domain-group DOM address example.com
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group domain-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-domain-group-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Fournir une description pour un groupe de domaines.</p>
+</div>
+</div>
+</section>
+<section id="dynamic-groups">
+<h3>Groupes dynamiques</h3>
+<p>Les groupes dynamiques de pare-feu diffèrent des autres groupes car vous pouvez les utiliser comme
+source/destination dans les règles de pare-feu, et les membres ne sont pas définis statiquement
+dans la configuration VyOS. À la place, les règles de pare-feu ajoutent dynamiquement des membres à
+ces groupes.</p>
+<section id="defining-dynamic-address-groups">
+<h4>Définition des groupes d'adresses dynamiques</h4>
+<p>Les groupes d'adresses dynamiques prennent en charge les familles IPv4 et IPv6. Utilisez ces
+commandes pour définir des groupes d'adresses IPv4 et IPv6 dynamiques :</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group dynamic-group address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-dynamic-group-address-group-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group dynamic-group ipv6-address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-dynamic-group-ipv6-address-group-name" title="Permalink to this Command"></a></div></div>
+<p>Ajouter une description aux groupes de pare-feu :</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group dynamic-group address-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-dynamic-group-address-group-name-description-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group dynamic-group ipv6-address-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-dynamic-group-ipv6-address-group-name-description-text" title="Permalink to this Command"></a></div></div>
+</section>
+<section id="adding-elements-to-dynamic-firewall-groups">
+<h4>Ajout d'éléments aux groupes de pare-feu dynamiques</h4>
+<p>Après avoir défini les groupes de pare-feu dynamiques, utilisez-les dans les règles de pare-feu pour
+ajouter dynamiquement des éléments à ceux-ci.</p>
+<p>Les commandes utilisées pour cette tâche sont :</p>
+<ul class="simple">
+<li><p>Ajouter l'adresse IP de destination de la connexion à un groupe d'adresses dynamique :</p></li>
+</ul>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv4 [forward | input | output] filter rule &lt;1-999999&gt; add-address-to-group destination-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-forward-input-output-filter-rule-1-999999-add-address-to-group-destination-address-address-group-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv4 name &lt;name&gt; rule &lt;1-999999&gt; add-address-to-group destination-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-name-name-rule-1-999999-add-address-to-group-destination-address-address-group-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 [forward | input | output] filter rule &lt;1-999999&gt; add-address-to-group destination-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-input-output-filter-rule-1-999999-add-address-to-group-destination-address-address-group-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; add-address-to-group destination-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-add-address-to-group-destination-address-address-group-name" title="Permalink to this Command"></a></div></div>
+<ul class="simple">
+<li><p>Ajouter l'adresse IP source de la connexion à un groupe d'adresses dynamique :</p></li>
+</ul>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv4 [forward | input | output] filter rule &lt;1-999999&gt; add-address-to-group source-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-forward-input-output-filter-rule-1-999999-add-address-to-group-source-address-address-group-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv4 name &lt;name&gt; rule &lt;1-999999&gt; add-address-to-group source-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-name-name-rule-1-999999-add-address-to-group-source-address-address-group-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 [forward | input | output] filter rule &lt;1-999999&gt; add-address-to-group source-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-input-output-filter-rule-1-999999-add-address-to-group-source-address-address-group-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; add-address-to-group source-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-add-address-to-group-source-address-address-group-name" title="Permalink to this Command"></a></div></div>
+<p>Vous pouvez définir des délais d'expiration par règle. Lorsqu'une règle correspond, l'adresse source ou
+destination est ajoutée au groupe, et l'élément reste dans le groupe jusqu'à ce que le délai expire. Si vous ne définissez pas de délai, l'élément reste
+dans le groupe jusqu'au prochain redémarrage ou jusqu'à ce que vous validiez les modifications de configuration du pare-feu.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv4 [forward | input | output] filter rule &lt;1-999999&gt; add-address-to-group [destination-address | source-address] timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-forward-input-output-filter-rule-1-999999-add-address-to-group-destination-address-source-address-timeout-timeout" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv4 name &lt;name&gt; rule &lt;1-999999&gt; add-address-to-group [destination-address | source-address] timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-name-name-rule-1-999999-add-address-to-group-destination-address-source-address-timeout-timeout" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 [forward | input | output] filter rule &lt;1-999999&gt; add-address-to-group [destination-address | source-address] timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-input-output-filter-rule-1-999999-add-address-to-group-destination-address-source-address-timeout-timeout" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; add-address-to-group [destination-address | source-address] timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-add-address-to-group-destination-address-source-address-timeout-timeout" title="Permalink to this Command"></a></div></div>
+<p>Le délai peut être défini en secondes, minutes, heures ou jours :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv6 name FOO rule 10 add-address-to-group source-address timeout
+Possible completions:
+&lt;number&gt;s            Délai en secondes
+&lt;number&gt;m            Délai en minutes
+&lt;number&gt;h            Délai en heures
+&lt;number&gt;d            Délai en jours
+</pre></div>
+</div>
+</section>
+<section id="using-dynamic-firewall-groups">
+<h4>Utilisation des groupes de pare-feu dynamiques</h4>
+<p>Comme les autres groupes de pare-feu, vous pouvez utiliser les groupes de pare-feu dynamiques dans les règles de pare-feu
+en tant qu'options de correspondance. Par exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv4 input filter rule 10 source group dynamic-address-group FOO
+set firewall ipv4 input filter rule 10 destination group dynamic-address-group BAR
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="examples">
+<h2>Exemples</h2>
+<section id="general-example">
+<h3>Exemple général</h3>
+<p>Une fois que vous avez créé des groupes de pare-feu, vous pouvez les référencer dans les règles de pare-feu, de NAT,
+de NAT66 et/ou de routage politique. L'exemple suivant crée plusieurs groupes :</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group address-group SERVERS address 198.51.100.101
+set firewall group address-group SERVERS address 198.51.100.102
+set firewall group network-group TRUSTEDv4 network 192.0.2.0/30
+set firewall group network-group TRUSTEDv4 network 203.0.113.128/25
+set firewall group ipv6-network-group TRUSTEDv6 network 2001:db8::/64
+set firewall group interface-group LAN interface eth2.2001
+set firewall group interface-group LAN interface bon0
+set firewall group port-group PORT-SERVERS port http
+set firewall group port-group PORT-SERVERS port 443
+set firewall group port-group PORT-SERVERS port 5000-5010
+</pre></div>
+</div>
+</div></blockquote>
+<p>Et ensuite, un exemple de configuration où les groupes sont utilisés :</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv4 output filter rule 10 action accept
+set firewall ipv4 output filter rule 10 outbound-interface group !LAN
+set firewall ipv4 forward filter rule 20 action accept
+set firewall ipv4 forward filter rule 20 source group network-group TRUSTEDv4
+set firewall ipv6 input filter rule 10 action accept
+set firewall ipv6 input filter rule 10 source group network-group TRUSTEDv6
+set nat destination rule 101 inbound-interface group LAN
+set nat destination rule 101 destination group address-group SERVERS
+set nat destination rule 101 protocol tcp
+set nat destination rule 101 destination group port-group PORT-SERVERS
+set nat destination rule 101 translation address 203.0.113.250
+set policy route PBR rule 201 destination group port-group PORT-SERVERS
+set policy route PBR rule 201 protocol tcp
+set policy route PBR rule 201 set table 15
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="port-knocking-example">
+<h3>Exemple de port knocking</h3>
+<p>Vous pouvez utiliser des groupes de pare-feu dynamiques avec le port knocking pour sécuriser l'accès au
+routeur ou à tout autre appareil. L'exemple suivant montre une configuration de port knocking en 4 étapes :</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>set firewall global-options state-policy established action &#39;accept&#39;
+set firewall global-options state-policy invalid action &#39;drop&#39;
+set firewall global-options state-policy related action &#39;accept&#39;
+set firewall group dynamic-group address-group ALLOWED
+set firewall group dynamic-group address-group PN_01
+set firewall group dynamic-group address-group PN_02
+set firewall ipv4 input filter default-action &#39;drop&#39;
+set firewall ipv4 input filter rule 5 action &#39;accept&#39;
+set firewall ipv4 input filter rule 5 protocol &#39;icmp&#39;
+set firewall ipv4 input filter rule 10 action &#39;drop&#39;
+set firewall ipv4 input filter rule 10 add-address-to-group source-address address-group &#39;PN_01&#39;
+set firewall ipv4 input filter rule 10 add-address-to-group source-address timeout &#39;2m&#39;
+set firewall ipv4 input filter rule 10 description &#39;Port_nock 01&#39;
+set firewall ipv4 input filter rule 10 destination port &#39;9990&#39;
+set firewall ipv4 input filter rule 10 protocol &#39;tcp&#39;
+set firewall ipv4 input filter rule 20 action &#39;drop&#39;
+set firewall ipv4 input filter rule 20 add-address-to-group source-address address-group &#39;PN_02&#39;
+set firewall ipv4 input filter rule 20 add-address-to-group source-address timeout &#39;3m&#39;
+set firewall ipv4 input filter rule 20 description &#39;Port_nock 02&#39;
+set firewall ipv4 input filter rule 20 destination port &#39;9991&#39;
+set firewall ipv4 input filter rule 20 protocol &#39;tcp&#39;
+set firewall ipv4 input filter rule 20 source group dynamic-address-group &#39;PN_01&#39;
+set firewall ipv4 input filter rule 30 action &#39;drop&#39;
+set firewall ipv4 input filter rule 30 add-address-to-group source-address address-group &#39;ALLOWED&#39;
+set firewall ipv4 input filter rule 30 add-address-to-group source-address timeout &#39;2h&#39;
+set firewall ipv4 input filter rule 30 description &#39;Port_nock 03&#39;
+set firewall ipv4 input filter rule 30 destination port &#39;9992&#39;
+set firewall ipv4 input filter rule 30 protocol &#39;tcp&#39;
+set firewall ipv4 input filter rule 30 source group dynamic-address-group &#39;PN_02&#39;
+set firewall ipv4 input filter rule 99 action &#39;accept&#39;
+set firewall ipv4 input filter rule 99 description &#39;Port_nock 04 - Allow ssh&#39;
+set firewall ipv4 input filter rule 99 destination port &#39;22&#39;
+set firewall ipv4 input filter rule 99 protocol &#39;tcp&#39;
+set firewall ipv4 input filter rule 99 source group dynamic-address-group &#39;ALLOWED&#39;
+</pre></div>
+</div>
+</div></blockquote>
+<p>Avant de tester, nous pouvons vérifier les membres des groupes de pare-feu :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# run show firewall group
+Groupes de pare-feu
+
+Nom        Type                    Références            Membres        Délai    Expires
+---------  ----------------------  --------------------  -------------  ---------  ---------
+ALLOWED    address_group(dynamic)  ipv4-input-filter-30  N/D            N/D        N/D
+PN_01      address_group(dynamic)  ipv4-input-filter-10  N/D            N/D        N/D
+PN_02      address_group(dynamic)  ipv4-input-filter-20  N/D            N/D        N/D
+[edit]
+vyos@vyos#
+</pre></div>
+</div>
+<p>Avec cette configuration, pour obtenir un accès SSH au routeur, l'utilisateur doit :</p>
+<ol class="arabic">
+<li><p>Créer une nouvelle connexion TCP vers le port de destination 9990. Une nouvelle entrée est ajoutée
+au groupe d'adresses dynamiques <code class="docutils literal notranslate">PN_01</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# run show firewall group
+Groupes de pare-feu
+
+Nom        Type                    Références            Membres        Délai    Expires
+---------  ----------------------  --------------------  -------------  ---------  ---------
+ALLOWED    address_group(dynamic)  ipv4-input-filter-30  N/D            N/D        N/D
+PN_01      address_group(dynamic)  ipv4-input-filter-10  192.168.89.31  120        119
+PN_02      address_group(dynamic)  ipv4-input-filter-20  N/D            N/D        N/D
+[edit]
+vyos@vyos#
+</pre></div>
+</div>
+</li>
+<li><p>Créer une nouvelle connexion TCP vers le port de destination 9991. Une nouvelle entrée est ajoutée
+au groupe d'adresses dynamiques <code class="docutils literal notranslate">PN_02</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# run show firewall group
+Groupes de pare-feu
+
+Nom        Type                    Références            Membres        Délai    Expires
+---------  ----------------------  --------------------  -------------  ---------  ---------
+ALLOWED    address_group(dynamic)  ipv4-input-filter-30  N/D            N/D        N/D
+PN_01      address_group(dynamic)  ipv4-input-filter-10  192.168.89.31  120        106
+PN_02      address_group(dynamic)  ipv4-input-filter-20  192.168.89.31  180        179
+[edit]
+vyos@vyos#
+</pre></div>
+</div>
+</li>
+<li><p>Créer une nouvelle connexion TCP vers le port de destination 9992. Une nouvelle entrée est ajoutée
+au groupe d'adresses dynamiques <code class="docutils literal notranslate">ALLOWED</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# run show firewall group
+Groupes de pare-feu
+
+Nom        Type                    Références            Membres        Délai    Expires
+---------  ----------------------  --------------------  -------------  ---------  ---------
+ALLOWED    address_group(dynamic)  ipv4-input-filter-30  192.168.89.31       7200       7199
+PN_01      address_group(dynamic)  ipv4-input-filter-10  192.168.89.31        120         89
+PN_02      address_group(dynamic)  ipv4-input-filter-20  192.168.89.31        180        170
+[edit]
+vyos@vyos#
+</pre></div>
+</div>
+</li>
+<li><p>Vous pouvez maintenant vous connecter via SSH au routeur (si SSH est configuré).</p></li>
+</ol>
+</section>
+</section>
+<section id="operation-mode">
+<h2>Mode opérationnel</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall group
+<a class="cmdlink" href="#opcmd-show-firewall-group" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall group &lt;name&gt;
+<a class="cmdlink" href="#opcmd-show-firewall-group-name" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher un aperçu des groupes définis, y compris le nom du groupe de pare-feu,
+le type, les références (où le groupe est utilisé), les membres, le délai d'expiration et
+l'expiration (les deux derniers s'appliquent uniquement aux groupes de pare-feu dynamiques).</p>
+</div>
+</div>
+<p>Voici un exemple de commande :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show firewall group
+Groupes de pare-feu
+
+Nom           Type                    Références              Membres             Délai    Expires
+------------  ----------------------  ----------------------  ----------------  ---------  ---------
+SERVERS       address_group           nat-destination-101     198.51.100.101
+                                                              198.51.100.102
+ALLOWED       address_group(dynamic)  ipv4-input-filter-30    192.168.77.39          7200       7174
+PN_01         address_group(dynamic)  ipv4-input-filter-10    192.168.0.245           120        112
+                                                              192.168.77.39           120         85
+PN_02         address_group(dynamic)  ipv4-input-filter-20    192.168.77.39           180        151
+LAN           interface_group         ipv4-output-filter-10   bon0
+                                      nat-destination-101     eth2.2001
+TRUSTEDv6     ipv6_network_group      ipv6-input-filter-10    2001:db8::/64
+TRUSTEDv4     network_group           ipv4-forward-filter-20  192.0.2.0/30
+                                                              203.0.113.128/25
+PORT-SERVERS  port_group              route-PBR-201           443
+                                      route-PBR-201           5000-5010
+                                      nat-destination-101     http
+vyos@vyos:~$
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

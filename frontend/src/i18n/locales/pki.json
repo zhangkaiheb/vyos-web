@@ -1,0 +1,142 @@
+{
+  "zh-CN": {
+    "pki": {
+      "confirmDeleteCA": "确定 删除 c a",
+      "confirmDeleteCert": "确定 删除 cert",
+      "confirmDeleteDH": "确定 删除 d h",
+      "confirmDeleteKeyPair": "确定 删除 密钥 pair",
+      "confirmDeleteOpenSSH": "确定 删除 open s s h",
+      "confirmDeleteOpenVPN": "确定 删除 open v p n",
+      "errors": {
+        "enterName": "enter 名称",
+        "nameExists": "名称 exists",
+        "selectOneCA": "请选择 one c a",
+        "selectOneCert": "请选择 one cert",
+        "selectOneDH": "请选择 one d h",
+        "selectOneKeyPair": "请选择 one 密钥 pair",
+        "selectOneOpenSSH": "请选择 one open s s h",
+        "selectOneOpenVPN": "请选择 one open v p n"
+      }
+    }
+  },
+  "en": {
+    "pki": {
+      "confirmDeleteCA": "Confirm Delete C A",
+      "confirmDeleteCert": "Confirm Delete Cert",
+      "confirmDeleteDH": "Confirm Delete D H",
+      "confirmDeleteKeyPair": "Confirm Delete Key Pair",
+      "confirmDeleteOpenSSH": "Confirm Delete Open S S H",
+      "confirmDeleteOpenVPN": "Confirm Delete Open V P N",
+      "errors": {
+        "enterName": "Enter Name",
+        "nameExists": "Name Exists",
+        "selectOneCA": "Select One C A",
+        "selectOneCert": "Select One Cert",
+        "selectOneDH": "Select One D H",
+        "selectOneKeyPair": "Select One Key Pair",
+        "selectOneOpenSSH": "Select One Open S S H",
+        "selectOneOpenVPN": "Select One Open V P N"
+      }
+    }
+  },
+  "zh-TW": {
+    "pki": {
+      "confirmDeleteCA": "Confirm Delete C A",
+      "confirmDeleteCert": "Confirm Delete Cert",
+      "confirmDeleteDH": "Confirm Delete D H",
+      "confirmDeleteKeyPair": "Confirm Delete Key Pair",
+      "confirmDeleteOpenSSH": "Confirm Delete Open S S H",
+      "confirmDeleteOpenVPN": "Confirm Delete Open V P N",
+      "errors": {
+        "enterName": "Enter Name",
+        "nameExists": "Name Exists",
+        "selectOneCA": "Select One C A",
+        "selectOneCert": "Select One Cert",
+        "selectOneDH": "Select One D H",
+        "selectOneKeyPair": "Select One Key Pair",
+        "selectOneOpenSSH": "Select One Open S S H",
+        "selectOneOpenVPN": "Select One Open V P N"
+      }
+    }
+  },
+  "ru": {
+    "pki": {
+      "confirmDeleteCA": "Confirm Delete C A",
+      "confirmDeleteCert": "Confirm Delete Cert",
+      "confirmDeleteDH": "Confirm Delete D H",
+      "confirmDeleteKeyPair": "Confirm Delete Key Pair",
+      "confirmDeleteOpenSSH": "Confirm Delete Open S S H",
+      "confirmDeleteOpenVPN": "Confirm Delete Open V P N",
+      "errors": {
+        "enterName": "Enter Name",
+        "nameExists": "Name Exists",
+        "selectOneCA": "Select One C A",
+        "selectOneCert": "Select One Cert",
+        "selectOneDH": "Select One D H",
+        "selectOneKeyPair": "Select One Key Pair",
+        "selectOneOpenSSH": "Select One Open S S H",
+        "selectOneOpenVPN": "Select One Open V P N"
+      }
+    }
+  },
+  "de": {
+    "pki": {
+      "confirmDeleteCA": "Confirm Delete C A",
+      "confirmDeleteCert": "Confirm Delete Cert",
+      "confirmDeleteDH": "Confirm Delete D H",
+      "confirmDeleteKeyPair": "Confirm Delete Key Pair",
+      "confirmDeleteOpenSSH": "Confirm Delete Open S S H",
+      "confirmDeleteOpenVPN": "Confirm Delete Open V P N",
+      "errors": {
+        "enterName": "Enter Name",
+        "nameExists": "Name Exists",
+        "selectOneCA": "Select One C A",
+        "selectOneCert": "Select One Cert",
+        "selectOneDH": "Select One D H",
+        "selectOneKeyPair": "Select One Key Pair",
+        "selectOneOpenSSH": "Select One Open S S H",
+        "selectOneOpenVPN": "Select One Open V P N"
+      }
+    }
+  },
+  "fr": {
+    "pki": {
+      "confirmDeleteCA": "Confirm Delete C A",
+      "confirmDeleteCert": "Confirm Delete Cert",
+      "confirmDeleteDH": "Confirm Delete D H",
+      "confirmDeleteKeyPair": "Confirm Delete Key Pair",
+      "confirmDeleteOpenSSH": "Confirm Delete Open S S H",
+      "confirmDeleteOpenVPN": "Confirm Delete Open V P N",
+      "errors": {
+        "enterName": "Enter Name",
+        "nameExists": "Name Exists",
+        "selectOneCA": "Select One C A",
+        "selectOneCert": "Select One Cert",
+        "selectOneDH": "Select One D H",
+        "selectOneKeyPair": "Select One Key Pair",
+        "selectOneOpenSSH": "Select One Open S S H",
+        "selectOneOpenVPN": "Select One Open V P N"
+      }
+    }
+  },
+  "ko": {
+    "pki": {
+      "confirmDeleteCA": "Confirm Delete C A",
+      "confirmDeleteCert": "Confirm Delete Cert",
+      "confirmDeleteDH": "Confirm Delete D H",
+      "confirmDeleteKeyPair": "Confirm Delete Key Pair",
+      "confirmDeleteOpenSSH": "Confirm Delete Open S S H",
+      "confirmDeleteOpenVPN": "Confirm Delete Open V P N",
+      "errors": {
+        "enterName": "Enter Name",
+        "nameExists": "Name Exists",
+        "selectOneCA": "Select One C A",
+        "selectOneCert": "Select One Cert",
+        "selectOneDH": "Select One D H",
+        "selectOneKeyPair": "Select One Key Pair",
+        "selectOneOpenSSH": "Select One Open S S H",
+        "selectOneOpenVPN": "Select One Open V P N"
+      }
+    }
+  }
+}

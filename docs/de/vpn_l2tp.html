@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="l2tp">
+<h1>L2TP</h1>
+<p>VyOS verwendet <a class="reference external" href="https://accel-ppp.org/">accel-ppp</a>, um L2TP-Server-Funktionen bereitzustellen. Es kann mit lokaler Authentifizierung oder einem angeschlossenen RADIUS-Server verwendet werden.</p>
+<section id="configuring-l2tp-server">
+<h2>L2TP-Server konfigurieren</h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn l2tp remote-access authentication mode local
+set vpn l2tp remote-access authentication local-users username test password &#39;test&#39;
+set vpn l2tp remote-access client-ip-pool L2TP-POOL range 192.168.255.2-192.168.255.254
+set vpn l2tp remote-access default-pool &#39;L2TP-POOL&#39;
+set vpn l2tp remote-access outside-address 192.0.2.2
+set vpn l2tp remote-access gateway-address 192.168.255.1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication mode &lt;local | radius&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-mode-local-radius" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Legt den Authentifizierungsbackend fest. Der konfigurierte Authentifizierungsbackend wird für alle Abfragen verwendet.</p>
+<ul class="simple">
+<li><p><strong>radius</strong>: Alle Authentifizierungsanfragen werden durch einen konfigurierten RADIUS-Server verarbeitet.</p></li>
+<li><p><strong>local</strong>: Alle Authentifizierungsanfragen werden lokal verarbeitet.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication local-users username &lt;user&gt; password &lt;pass&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-local-users-username-user-password-pass" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Erstellt einen <code class="docutils literal notranslate">&lt;user&gt;</code> für die lokale Authentifizierung auf diesem System. Das Passwort des Benutzers wird auf <code class="docutils literal notranslate">&lt;pass&gt;</code> gesetzt.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access client-ip-pool &lt;POOL-NAME&gt; range &lt;x.x.x.x-x.x.x.x | x.x.x.x/x&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-client-ip-pool-pool-name-range-x-x-x-x-x-x-x-x-x-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um die erste IP-Adresse eines Adresspools zu definieren, der an L2TP-Clients vergeben wird. Wenn die Notation <code class="docutils literal notranslate">x.x.x.x-x.x.x.x</code> verwendet wird, muss sie innerhalb eines /24-Subnets liegen. Wenn die Notation <code class="docutils literal notranslate">x.x.x.x/x</code> verwendet wird, besteht die Möglichkeit, Host/Netzmaske anzugeben.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access default-pool &lt;POOL-NAME&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-default-pool-pool-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um den Namen des Standard-Adresspools zu definieren.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access gateway-address &lt;gateway&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-gateway-address-gateway" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt eine einzelne <code class="docutils literal notranslate">&lt;gateway&gt;</code> IP-Adresse an, die als lokale Adresse der PPP-Schnittstellen verwendet wird.</p>
+</div>
+</div>
+</section>
+<section id="configuring-ipsec">
+<h2>IPsec konfigurieren</h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn ipsec interface eth0
+set vpn l2tp remote-access ipsec-settings authentication mode pre-shared-secret
+set vpn l2tp remote-access ipsec-settings authentication pre-shared-secret secret
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn ipsec interface &lt;INTERFACE&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-ipsec-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um die IPsec-Schnittstelle zu definieren.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ipsec-settings authentication mode &lt;pre-shared-secret | x509&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ipsec-settings-authentication-mode-pre-shared-secret-x509" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Legt den Modus für die IPsec-Authentifizierung zwischen VyOS und L2TP-Clients fest.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ipsec-settings authentication pre-shared-secret &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ipsec-settings-authentication-pre-shared-secret-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Legt einen vordefinierten gemeinsamen Geheimnistext fest.</p>
+</div>
+</div>
+<p>Wenn auf Ihrer externen Schnittstelle eine lokale Firewall-Richtlinie aktiviert ist, müssen Sie die folgenden Ports erlauben:</p>
+<ul class="simple">
+<li><p>UDP-Port 500 (IKE)</p></li>
+<li><p>IP-Protokollnummer 50 (ESP)</p></li>
+<li><p>UDP-Port 1701 für IPsec</p></li>
+</ul>
+<p>Außerdem müssen die folgenden für NAT-Traversierung erlaubt werden (wenn der VPN-Client NAT detektiert, wird ESP in UDP für NAT-Traversierung gekapselt):</p>
+<ul class="simple">
+<li><p>UDP-Port 4500 (NAT-T)</p></li>
+</ul>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv4 name OUTSIDE-LOCAL rule 40 action &#39;accept&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 40 protocol &#39;esp&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 41 action &#39;accept&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 41 destination port &#39;500&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 41 protocol &#39;udp&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 42 action &#39;accept&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 42 destination port &#39;4500&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 42 protocol &#39;udp&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 43 action &#39;accept&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 43 destination port &#39;1701&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 43 ipsec &#39;match-ipsec&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 43 protocol &#39;udp&#39;
+</pre></div>
+</div>
+<p>Um den Zugriff von VPN-Clients über Ihre externe Adresse zu ermöglichen, ist eine NAT-Regel erforderlich:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat source rule 110 outbound-interface name &#39;eth0&#39;
+set nat source rule 110 source address &#39;192.168.255.0/24&#39;
+set nat source rule 110 translation address masquerade
+</pre></div>
+</div>
+</section>
+<section id="configuring-radius-authentication">
+<h2>RADIUS-Authentifizierung konfigurieren</h2>
+<p>Um RADIUS-basierte Authentifizierung zu aktivieren, muss der Authentifizierungsmodus innerhalb der Konfiguration geändert werden. Vorhandene Einstellungen wie lokale Benutzer existieren weiterhin in der Konfiguration, jedoch werden sie nicht verwendet, wenn der Modus von local auf radius geändert wurde. Sobald der Modus wieder auf local geändert wird, werden alle lokalen Konten erneut verwendet.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn l2tp remote-access authentication mode radius
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius server &lt;server&gt; key &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-server-server-key-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Konfiguriert den RADIUS <code class="docutils literal notranslate">&lt;server&gt;</code> und seinen erforderlichen gemeinsamen <code class="docutils literal notranslate">&lt;secret&gt;</code> für die Kommunikation mit dem RADIUS-Server.</p>
+</div>
+</div>
+<p>Da der RADIUS-Server ein einziger Ausfallpunkt sein kann, können mehrere RADIUS-Server eingerichtet werden und werden anschließend nacheinander verwendet.
+Zum Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn l2tp remote-access authentication radius server 10.0.0.1 key &#39;foo&#39;
+set vpn l2tp remote-access authentication radius server 10.0.0.2 key &#39;foo&#39;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Einige RADIUS-Server verwenden eine Zugriffssteuerungsliste, die Anfragen erlaubt oder ablehnt, stellen Sie sicher, dass Ihr VyOS-Router zur erlaubten Client-Liste hinzugefügt wird.</p>
+</div>
+<section id="radius-source-address">
+<h3>RADIUS-Quelladresse</h3>
+<p>Wenn Sie OSPF als Ihren IGP verwenden, verwenden Sie die am nächsten am RADIUS-Server angeschlossene Schnittstelle. Sie können alle ausgehenden RADIUS-Anfragen an eine einzelne Quell-IP-Adresse binden, z. B. die Loopback-Schnittstelle.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Quell-IPv4-Adresse, die bei allen RADIUS-Server-Abfragen verwendet wird.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Die <code class="docutils literal notranslate">source-address</code> muss so konfiguriert werden, dass sie einer Schnittstelle entspricht. Best Practice wäre eine Loopback- oder Dummy-Schnittstelle.</p>
+</div>
+</section>
+<section id="radius-advanced-options">
+<h3>Erweiterte RADIUS-Optionen</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius server &lt;server&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-server-server-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Konfiguriert den RADIUS <code class="docutils literal notranslate">&lt;server&gt;</code> und seinen erforderlichen Port für Authentifizierungsanfragen.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius server &lt;server&gt; fail-time &lt;time&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-server-server-fail-time-time" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Markiert den RADIUS-Server für diese gegebene <code class="docutils literal notranslate">&lt;time&gt;</code> Sekunden als offline.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius server &lt;server&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-server-server-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Deaktiviert diesen RADIUS-Server vorübergehend.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius acct-timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-acct-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Zeitlimit zum Warten auf Antwort für Interim-Update-Pakete. (Standardwert 3 Sekunden)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius dynamic-author server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-dynamic-author-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt die IP-Adresse für den Dynamic Authorization Extension Server (DM/CoA) an. Diese IP muss auf irgendeiner VyOS-Schnittstelle existieren oder es kann <code class="docutils literal notranslate">0.0.0.0</code> sein.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius dynamic-author port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-dynamic-author-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>UDP-Port für Dynamic Authorization Extension Server (DM/CoA)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius dynamic-author key &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-dynamic-author-key-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Geheimnis für Dynamic Authorization Extension Server (DM/CoA)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius max-try &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-max-try-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Maximale Anzahl Versuche, Access-Request/Accounting-Request-Anfragen zu senden</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Zeitlimit zum Warten auf Antwort vom Server (Sekunden)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius nas-identifier &lt;identifier&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-nas-identifier-identifier" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Wert, der an den RADIUS-Server im NAS-Identifier-Attribut gesendet wird und in DM/CoA-Anfragen übereinstimmen muss.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius nas-ip-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-nas-ip-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Wert, der an den RADIUS-Server im NAS-IP-Address-Attribut gesendet wird und in DM/CoA-Anfragen übereinstimmen muss. Auch DM/CoA-Server bindet sich an diese Adresse.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Quell-IPv4-Adresse, die bei allen RADIUS-Server-Abfragen verwendet wird.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius rate-limit attribute &lt;attribute&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-rate-limit-attribute-attribute" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt an, welches RADIUS-Server-Attribut die Rate-Limit-Information enthält. Das Standardattribut ist <code class="docutils literal notranslate">Filter-Id</code>.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Wenn Sie ein benutzerdefiniertes RADIUS-Attribut festlegen, müssen Sie es auf beiden Dictionaries auf dem RADIUS-Server und Client definieren.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius rate-limit enable
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-rate-limit-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Ermöglicht Bandbreitensteuerung über RADIUS.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius rate-limit vendor
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-rate-limit-vendor" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt das Herstellerdictionary an. Dieses Dictionary muss in
+/usr/share/accel-ppp/radius vorhanden sein.</p>
+</div>
+</div>
+<p>Empfangene RADIUS-Attribute haben Priorität gegenüber Parametern, die innerhalb der CLI-Konfiguration definiert sind, siehe unten für weitere Informationen.</p>
+</section>
+<section id="allocation-clients-ip-addresses-by-radius">
+<h3>Client-IP-Adressen durch RADIUS zuweisen</h3>
+<p>Wenn der RADIUS-Server das Attribut <code class="docutils literal notranslate">Framed-IP-Address</code> sendet, wird diese IP-Adresse dem Client zugewiesen und der Parameter <code class="docutils literal notranslate">default-pool</code> innerhalb der CLI-Konfiguration wird ignoriert.</p>
+<p>Wenn der RADIUS-Server das Attribut <code class="docutils literal notranslate">Framed-Pool</code> sendet, wird die IP-Adresse aus einem vordefinierten IP-Pool zugewiesen, dessen Name dem Attributwert entspricht.</p>
+<p>Wenn der RADIUS-Server das Attribut <code class="docutils literal notranslate">Stateful-IPv6-Address-Pool</code> sendet, wird die IPv6-Adresse aus einem vordefinierten IPv6-Pool <code class="docutils literal notranslate">prefix</code> zugewiesen, dessen Name dem Attributwert entspricht.</p>
+<p>Wenn der RADIUS-Server das Attribut <code class="docutils literal notranslate">Delegated-IPv6-Prefix-Pool</code> sendet, wird ein IPv6-Delegationspräfix aus einem vordefinierten IPv6-Pool <code class="docutils literal notranslate">delegate</code> zugewiesen, dessen Name dem Attributwert entspricht.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p><code class="docutils literal notranslate">Stateful-IPv6-Address-Pool</code> und <code class="docutils literal notranslate">Delegated-IPv6-Prefix-Pool</code> sind in RFC6911 definiert. Wenn sie in Ihrem RADIUS-Server nicht definiert sind, fügen Sie neue <a class="reference external" href="https://github.com/accel-ppp/accel-ppp/blob/master/accel-pppd/radius/dict/dictionary.rfc6911">Dictionary</a> hinzu.</p>
+</div>
+<p>Die Schnittstelle des Clients kann über einen RADIUS Access-Accept-Paket in einen VRF-Kontext versetzt werden oder über RADIUS CoA geändert werden. <code class="docutils literal notranslate">Accel-VRF-Name</code> wird dafür verwendet. Dies ist ein benutzerdefiniertes <a class="reference external" href="https://github.com/accel-ppp/accel-ppp/blob/master/accel-pppd/radius/dict/dictionary.accel">ACCEL-PPP-Attribut</a>. Definieren Sie es auf Ihrem RADIUS-Server.</p>
+</section>
+<section id="renaming-clients-interfaces-by-radius">
+<h3>Benennung der Clientschnittstellen durch RADIUS ändern</h3>
+<p>Wenn der RADIUS-Server das Attribut <code class="docutils literal notranslate">NAS-Port-Id</code> verwendet, werden die PPP-Tunnel umbenannt.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Der Wert des Attributs <code class="docutils literal notranslate">NAS-Port-Id</code> muss weniger als 16 Zeichen lang sein, andernfalls wird die Schnittstelle nicht umbenannt.</p>
+</div>
+</section>
+</section>
+<section id="configuring-lns-l2tp-network-server">
+<h2>LNS (L2TP Network Server) konfigurieren</h2>
+<p>LNS werden oft verwendet, um sich mit einem LAC (L2TP Access Concentrator) zu verbinden.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access lns host-name &lt;hostname&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-lns-host-name-hostname" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Wird an den Client (LAC) im Host-Name-Attribut gesendet</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access lns shared-secret &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-lns-shared-secret-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Tunnel-Passwort, das zur Authentifizierung des Clients (LAC) verwendet wird</p>
+</div>
+</div>
+<p>Um die Verwendung von LNS zu erklären, folgen Sie unserem Blueprint <a class="reference internal" href="../../configexamples/lac-lns.html#examples-lac-lns">PPPoE über L2TP</a>.</p>
+</section>
+<section id="ipv6">
+<h2>IPv6</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options ipv6 &lt;require | prefer | allow | deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-ipv6-require-prefer-allow-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Legt die Präferenz für die IPv6-Verhandlung fest.</p>
+<ul class="simple">
+<li><p><strong>require</strong> - IPv6-Verhandlung erfordern</p></li>
+<li><p><strong>prefer</strong> - Client nach IPv6-Verhandlung fragen, nicht fehlschlagen, wenn er ablehnt</p></li>
+<li><p><strong>allow</strong> - IPv6 nur dann verhandeln, wenn der Client darum bittet (Standardwert)</p></li>
+<li><p><strong>deny</strong> - IPv6 nicht verhandeln (Standardwert)</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access client-ipv6-pool &lt;IPv6-POOL-NAME&gt; prefix &lt;address&gt; mask &lt;number-of-bits&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-client-ipv6-pool-ipv6-pool-name-prefix-address-mask-number-of-bits" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um den IPv6-Adresspool zu setzen, aus dem ein L2TP-Client eine IPv6-Präfix von Ihrer definierten Länge (Maske) erhält, um das L2TP-Endgerät auf ihrer Seite zu beenden. Die Maske kann zwischen 48 und 128 Bit lang sein, der Standardwert ist 64.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access client-ipv6-pool &lt;IPv6-POOL-NAME&gt; delegate &lt;address&gt; delegation-prefix &lt;number-of-bits&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-client-ipv6-pool-ipv6-pool-name-delegate-address-delegation-prefix-number-of-bits" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um DHCPv6 Prefix Delegation (RFC3633) auf L2TP zu konfigurieren. Sie müssen Ihren IPv6-Pool und die Länge des Delegationspräfixes festlegen. Aus dem definierten IPv6-Pool geben Sie Netzwerke der definierten Länge (Delegationspräfix) aus. Die Länge des Delegationspräfixes kann zwischen 32 und 64 Bit lang sein.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access default-ipv6-pool &lt;IPv6-POOL-NAME&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-default-ipv6-pool-ipv6-pool-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um den Namen des Standard-IPv6-Adresspools zu definieren.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn l2tp remote-access ppp-options ipv6 allow
+set vpn l2tp remote-access client-ipv6-pool IPv6-POOL delegate &#39;2001:db8:8003::/48&#39; delegation-prefix &#39;56&#39;
+set vpn l2tp remote-access client-ipv6-pool IPv6-POOL prefix &#39;2001:db8:8002::/48&#39; mask &#39;64&#39;
+set vpn l2tp remote-access default-ipv6-pool IPv6-POOL
+</pre></div>
+</div>
+<section id="ipv6-advanced-options">
+<h3>Erweiterte IPv6-Optionen</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options ipv6-accept-peer-interface-id
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-ipv6-accept-peer-interface-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Peer-Interface-Identifikator akzeptieren. Standardmäßig ist dies nicht definiert.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options ipv6-interface-id &lt;random | x:x:x:x&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-ipv6-interface-id-random-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Legt fest, ob ein fester oder zufälliger Interface-Identifikator für IPv6 verwendet wird. Der Standard ist fest.</p>
+<ul class="simple">
+<li><p><strong>random</strong> - Zufälliger Interface-Identifikator für IPv6</p></li>
+<li><p><strong>x:x:x:x</strong> - Interface-Identifikator für IPv6 angeben</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options ipv6-interface-id &lt;random | x:x:x:x&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-ipv6-interface-id-random-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Legt den Peer-Interface-Identifikator für IPv6 fest. Der Standard ist fest.</p>
+<ul class="simple">
+<li><p><strong>random</strong> - Zufälliger Interface-Identifikator für IPv6</p></li>
+<li><p><strong>x:x:x:x</strong> - Interface-Identifikator für IPv6 angeben</p></li>
+<li><p><strong>ipv4-addr</strong> - Interface-Identifikator aus IPv4-Adresse berechnen.</p></li>
+<li><p><strong>calling-sid</strong> - Interface-Identifikator aus calling-station-id berechnen.</p></li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="scripting">
+<h2>Skripting</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access extended-scripts on-change &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-extended-scripts-on-change-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Skript, das ausgeführt wird, wenn die Sitzungsschnittstelle durch RADIUS CoA-Behandlung geändert wird</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access extended-scripts on-down &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-extended-scripts-on-down-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Skript, das ausgeführt wird, wenn die Sitzungsschnittstelle beendet wird</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access extended-scripts on-pre-up &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-extended-scripts-on-pre-up-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Skript, das vor dem Hochfahren der Sitzungsschnittstelle ausgeführt wird</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access extended-scripts on-up &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-extended-scripts-on-up-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Skript, das ausgeführt wird, wenn die Sitzungsschnittstelle vollständig konfiguriert und gestartet ist</p>
+</div>
+</div>
+</section>
+<section id="advanced-options">
+<h2>Erweiterte Optionen</h2>
+<section id="authentication-advanced-options">
+<h3>Erweiterte Authentifizierungs-Optionen</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication local-users username &lt;user&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-local-users-username-user-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Deaktiviert das <code class="docutils literal notranslate">&lt;user&gt;</code> Konto.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication local-users username &lt;user&gt; static-ip &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-local-users-username-user-static-ip-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Weist eine statische IP-Adresse dem <code class="docutils literal notranslate">&lt;user&gt;</code> Konto zu.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication local-users username &lt;user&gt; rate-limit download &lt;bandwidth&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-local-users-username-user-rate-limit-download-bandwidth" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Limitiert die Download-Bandbreite für <code class="docutils literal notranslate">&lt;user&gt;</code> auf <code class="docutils literal notranslate">&lt;bandwidth&gt;</code> kbit/s.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication local-users username &lt;user&gt; rate-limit upload &lt;bandwidth&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-local-users-username-user-rate-limit-upload-bandwidth" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Limitiert die Upload-Bandbreite für <code class="docutils literal notranslate">&lt;user&gt;</code> auf <code class="docutils literal notranslate">&lt;bandwidth&gt;</code> kbit/s</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication protocols &lt;pap | chap | mschap | mschap-v2&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-protocols-pap-chap-mschap-mschap-v2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verlangt, dass der Peer sich mit einem der folgenden Protokolle authentifiziert: pap, chap, mschap, mschap-v2.</p>
+</div>
+</div>
+</section>
+<section id="client-ip-pool-advanced-options">
+<h3>Erweiterte Client-IP-Pool-Optionen</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access client-ip-pool &lt;POOL-NAME&gt; next-pool &lt;NEXT-POOL-NAME&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-client-ip-pool-pool-name-next-pool-next-pool-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um den Namen des nächsten Adresspools zu definieren.</p>
+</div>
+</div>
+</section>
+<section id="ppp-advanced-options">
+<h3>Erweiterte PPP-Optionen</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options disable-ccp
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-disable-ccp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Deaktiviert das Compression Control Protocol (CCP).
+CCP ist standardmäßig aktiviert.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options interface-cache &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-interface-cache-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Legt die Anzahl der zu cachenden Schnittstellen fest. Dies verhindert, dass Schnittstellen gelöscht werden, sobald die entsprechende Sitzung zerstört wird. Stattdessen werden Schnittstellen für spätere Verwendung in neuen Sitzungen gecached. Dies sollte die Rate der Erstellung/Löschung von Schnittstellen auf Kernel-Ebene reduzieren.
+Der Standardwert ist <strong>0</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options ipv4 &lt;require | prefer | allow | deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-ipv4-require-prefer-allow-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Legt die Präferenz für die IPv4-Verhandlung fest.</p>
+<ul class="simple">
+<li><p><strong>require</strong> - IPv4-Verhandlung erfordern</p></li>
+<li><p><strong>prefer</strong> - Client nach IPv4-Verhandlung fragen, nicht fehlschlagen, wenn er ablehnt</p></li>
+<li><p><strong>allow</strong> - IPv4 nur dann verhandeln, wenn der Client darum bittet (Standardwert)</p></li>
+<li><p><strong>deny</strong> - IPv4 nicht verhandeln</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options lcp-echo-failure &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-lcp-echo-failure-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Definiert die maximale Anzahl <code class="docutils literal notranslate">&lt;number&gt;</code> unbeantworteter Echo-Anfragen. Bei Erreichen des Werts <code class="docutils literal notranslate">&lt;number&gt;</code> wird die Sitzung zurückgesetzt. Der Standardwert ist <strong>3</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options lcp-echo-interval &lt;interval&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-lcp-echo-interval-interval" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Wenn dieser Option angegeben und größer als 0, sendet das PPP-Modul LCP Echo-Anfragen alle <code class="docutils literal notranslate">&lt;interval&gt;</code> Sekunden.
+Der Standardwert ist <strong>30</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options lcp-echo-timeout
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-lcp-echo-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt die Zeit in Sekunden an, um auf beliebige Peer-Aktivität zu warten. Wenn diese Option angegeben wird, wird adaptive LCP Echo-Funktion aktiviert und „lcp-echo-failure“ wird nicht verwendet. Der Standardwert ist <strong>0</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options min-mtu &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-min-mtu-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Definiert das minimale akzeptable MTU. Wenn ein Client versucht, ein MTU zu verhandeln, das kleiner als dieses ist, wird es NAKed und getrennt, wenn es ein größeres MTU ablehnt.
+Der Standardwert ist <strong>100</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options mppe &lt;require | prefer | deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-mppe-require-prefer-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Legt die <abbr title="Microsoft Point-to-Point Encryption">MPPE</abbr>-Verhandlungspräferenz fest.</p>
+<ul class="simple">
+<li><p><strong>require</strong> - Client nach MPPE fragen, falls er ablehnt, Verbindung trennen</p></li>
+<li><p><strong>prefer</strong> - Client nach MPPE fragen, falls er ablehnt, nicht fehlschlagen. (Standardwert)</p></li>
+<li><p><strong>deny</strong> - MPPE ablehnen</p></li>
+</ul>
+<p>Standardverhalten - Client nicht nach MPPE fragen, aber erlauben, wenn der Client will. Bitte beachten Sie, dass RADIUS diesen Parameter mit dem MS-MPPE-Encryption-Policy-Attribut überschreiben kann.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options mru &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-mru-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Definiert das bevorzugte MRU. Standardmäßig ist es nicht definiert.</p>
+</div>
+</div>
+</section>
+<section id="global-advanced-options">
+<h3>Erweiterte globale Optionen</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Setzen Sie die Beschreibung.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access limits burst &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-limits-burst-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Burst-Zahl</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access limits connection-limit &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-limits-connection-limit-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Maximale akzeptierte Verbindungsraten (z. B. 1/min, 60/sec)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access limits timeout &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-limits-timeout-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Timeout in Sekunden</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access mtu
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Maximum Transmission Unit (MTU) (Standardwert: <strong>1436</strong>)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access max-concurrent-sessions
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-max-concurrent-sessions" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Maximale Anzahl gleichzeitiger Sitzungsstartversuche</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-name-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Die verbundenen Clients sollten <code class="docutils literal notranslate">&lt;address&gt;</code> als DNS-Server verwenden. Dieser Befehl akzeptiert sowohl IPv4- als auch IPv6-Adressen. Bis zu zwei Nameserver können für IPv4, bis zu drei für IPv6 konfiguriert werden.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access shaper fwmark &lt;1-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-shaper-fwmark-1-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Match-Firewall-Mark-Wert</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access snmp master-agent
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-snmp-master-agent" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>SNMP aktivieren</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access wins-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-wins-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Windows Internet Name Service (WINS)-Server, die an den Client weitergeleitet werden</p>
+</div>
+</div>
+</section>
+</section>
+<section id="monitoring">
+<h2>Überwachung</h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show l2tp-server sessions
+ ifname | username |      ip       | ip6 | ip6-dp | calling-sid | rate-limit | state  |  uptime  | rx-bytes | tx-bytes
+--------+----------+---------------+-----+--------+-------------+------------+--------+----------+----------+----------
+ l2tp0  | test     | 192.168.255.3 |     |        | 192.168.0.36 |            | active | 02:01:47 | 7.7 KiB  | 1.2 KiB
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show l2tp-server statistics
+ uptime: 0.02:49:49
+cpu: 0%
+mem(rss/virt): 5920/100892 kB
+core:
+  mempool_allocated: 133202
+  mempool_available: 131770
+  thread_count: 1
+  thread_active: 1
+  context_count: 5
+  context_sleeping: 0
+  context_pending: 0
+  md_handler_count: 3
+  md_handler_pending: 0
+  timer_count: 0
+  timer_pending: 0
+sessions:
+  starting: 0
+  active: 0
+  finishing: 0
+l2tp:
+  tunnels:
+    starting: 0
+    active: 0
+    finishing: 0
+  sessions (control channels):
+    starting: 0
+    active: 0
+    finishing: 0
+  sessions (data channels):
+    starting: 0
+    active: 0
+    finishing: 0
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

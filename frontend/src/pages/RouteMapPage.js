@@ -7,6 +7,8 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const ACTION_OPTIONS = [
   { value: 'permit', label: 'permit' },
@@ -49,11 +51,11 @@ const METRIC_TYPE_OPTIONS = [
   { value: 'type-2', label: 'type-2 (OSPF external type 2)' },
 ];
 
-const RULE_TABS = [
-  { key: 'basic', title: '基本' },
-  { key: 'match', title: '匹配条件' },
-  { key: 'set', title: '设置属性' },
-  { key: 'onmatch', title: '匹配后操作' },
+const getRuleTabs = (t) => [
+  { key: 'basic', title: t('routeMap.tabs.basic') },
+  { key: 'match', title: t('routeMap.tabs.match') },
+  { key: 'set', title: t('routeMap.tabs.set') },
+  { key: 'onmatch', title: t('routeMap.tabs.onmatch') },
 ];
 
 export default defineComponent({
@@ -61,6 +63,7 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const configStore = useConfigStore();
+    const { t } = useI18n();
     const lists = ref([]);
     const loading = ref(false);
     const selectedListNames = ref([]);
@@ -84,34 +87,39 @@ export default defineComponent({
     const editingRuleOriginalNumber = ref('');
     const ruleActiveTab = ref('basic');
 
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
+    const ruleDeleteModalVisible = ref(false);
+    const pendingDeleteRuleNumbers = ref([]);
+
     const path = computed(() => route.path.replace(/^\//, '').replace(/\//g, ' '));
     const writeDisabled = computed(() => route.meta?.menuItem?.permission === 'read');
 
     const canCreateRule = computed(() => !!editingList.value?.name);
 
-    const listColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'description', title: '描述' },
-      { key: 'ruleCount', title: '规则数' },
-    ];
+    const listColumns = computed(() => [
+      { key: 'name', title: t('routeMap.columns.name') },
+      { key: 'description', title: t('routeMap.columns.description') },
+      { key: 'ruleCount', title: t('routeMap.columns.ruleCount') },
+    ]);
 
-    const ruleColumns = [
-      { key: 'rule', title: '规则编号' },
-      { key: 'action', title: '动作' },
-      { key: 'description', title: '描述' },
-    ];
+    const ruleColumns = computed(() => [
+      { key: 'rule', title: t('routeMap.columns.rule') },
+      { key: 'action', title: t('routeMap.columns.action') },
+      { key: 'description', title: t('routeMap.columns.description') },
+    ]);
 
     const listSchema = computed(() => [
-      { key: 'name', title: '名称', type: 'text', required: true, placeholder: '例如: rm01' },
-      { key: 'description', title: '描述', type: 'text' },
+      { key: 'name', title: t('routeMap.form.name'), type: 'text', required: true, placeholder: t('routeMap.form.namePlaceholder') },
+      { key: 'description', title: t('routeMap.form.description'), type: 'text' },
     ]);
 
     const basicRuleSchema = computed(() => [
-      { key: 'rule', title: '规则编号', type: 'number', min: 1, max: 65535, required: true, help: '范围 1-65535' },
-      { key: 'action', title: '动作', type: 'select', options: ACTION_OPTIONS, required: true },
-      { key: 'description', title: '描述', type: 'text' },
-      { key: 'call', title: '调用路由映射', type: 'select', options: routeMaps.value.map(rm => ({ value: rm, label: rm })), placeholder: '选择路由映射', advanced: true },
-      { key: 'continue', title: '继续规则编号', type: 'number', min: 1, max: 65535, placeholder: '跳转到指定规则', help: '范围 1-65535', advanced: true },
+      { key: 'rule', title: t('routeMap.form.rule'), type: 'number', min: 1, max: 65535, required: true, help: t('routeMap.form.ruleHelp') },
+      { key: 'action', title: t('routeMap.form.action'), type: 'select', options: ACTION_OPTIONS, required: true },
+      { key: 'description', title: t('routeMap.form.description'), type: 'text' },
+      { key: 'call', title: t('routeMap.form.call'), type: 'select', options: routeMaps.value.map(rm => ({ value: rm, label: rm })), placeholder: t('routeMap.form.callPlaceholder'), advanced: true },
+      { key: 'continue', title: t('routeMap.form.continue'), type: 'number', min: 1, max: 65535, placeholder: t('routeMap.form.continuePlaceholder'), help: t('routeMap.form.ruleHelp'), advanced: true },
     ]);
 
     const ruleTabSchemas = computed(() => ({
@@ -223,7 +231,7 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { load(); loadReferenceData(); });
+    onMounted(() => { load(); loadReferenceData(); onMenuRefresh(load); });
     watch(() => route.path, () => {
       selectedListNames.value = [];
       selectedRuleNumbers.value = [];
@@ -404,8 +412,8 @@ export default defineComponent({
     function createList() { editingList.value = emptyList(); editingListOriginalName.value = ''; selectedRuleNumbers.value = []; listModalVisible.value = true; }
 
     async function editList() {
-      if (!selectedListNames.value.length) return showError({ message: '请选择一个路由映射' });
-      if (selectedListNames.value.length > 1) return showError({ message: '请选择一个路由映射' });
+      if (!selectedListNames.value.length) return showError({ message: t('routeMap.messages.selectRouteMap') });
+      if (selectedListNames.value.length > 1) return showError({ message: t('routeMap.messages.selectRouteMap') });
       const list = lists.value.find(l => l.name === selectedListNames.value[0]);
       if (!list) return;
       editingList.value = {
@@ -419,28 +427,36 @@ export default defineComponent({
       listModalVisible.value = true;
     }
 
-    async function removeList() {
-      if (!selectedListNames.value.length) return showError({ message: '请选择一个路由映射' });
-      if (!confirm('确认删除选中的路由映射及其所有规则？')) return;
-      for (const name of selectedListNames.value) {
+    function removeList() {
+      if (!selectedListNames.value.length) return showError({ message: t('routeMap.messages.selectRouteMap') });
+      pendingDeleteNames.value = [...selectedListNames.value];
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveList() {
+      deleteModalVisible.value = false;
+      for (const name of pendingDeleteNames.value) {
         await configStore.deleteConfig(`${path.value} ${name}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selectedListNames.value = [];
+      pendingDeleteNames.value = [];
       await load();
     }
 
     async function saveList() {
-      if (!editingList.value.name) return showError({ message: '请输入名称' });
+      if (!editingList.value.name) return showError({ message: t('routeMap.messages.enterName') });
       const original = editingListOriginalName.value;
       if (!original && lists.value.some(l => l.name === editingList.value.name)) {
-        return showError({ message: '名称已存在' });
+        return showError({ message: t('routeMap.messages.nameExists') });
       }
       const value = {};
       if (editingList.value.description) value.description = editingList.value.description;
       try {
         if (original && original !== editingList.value.name) {
           await configStore.deleteConfig(`${path.value} ${original}`);
+          configStore.markPending();
           const newValue = { ...value };
           if (editingList.value.rules?.length) {
             const rules = {};
@@ -450,8 +466,10 @@ export default defineComponent({
             newValue.rule = rules;
           }
           await configStore.setConfig(`${path.value} ${editingList.value.name}`, newValue);
+          configStore.markPending();
         } else {
           await configStore.setConfig(`${path.value} ${editingList.value.name}`, value);
+          configStore.markPending();
         }
         listModalVisible.value = false;
         await configStore.checkSessionChanged();
@@ -463,9 +481,9 @@ export default defineComponent({
 
     function createRule() {
       if (!editingList.value) return;
-      if (!editingList.value.name) return showError({ message: '请先输入名称' });
+      if (!editingList.value.name) return showError({ message: t('routeMap.messages.enterNameFirst') });
       if (!editingListOriginalName.value && lists.value.some(l => l.name === editingList.value.name)) {
-        return showError({ message: '名称已存在' });
+        return showError({ message: t('routeMap.messages.nameExists') });
       }
       editingRule.value = emptyRule();
       editingRuleOriginalNumber.value = '';
@@ -475,8 +493,8 @@ export default defineComponent({
 
     function editRule() {
       if (!editingList.value) return;
-      if (!selectedRuleNumbers.value.length) return showError({ message: '请选择一条规则' });
-      if (selectedRuleNumbers.value.length > 1) return showError({ message: '请选择一条规则' });
+      if (!selectedRuleNumbers.value.length) return showError({ message: t('routeMap.messages.selectRule') });
+      if (selectedRuleNumbers.value.length > 1) return showError({ message: t('routeMap.messages.selectRule') });
       const row = editingList.value.rules.find(r => String(r.rule) === String(selectedRuleNumbers.value[0]));
       if (!row) return;
       // Load full rule data
@@ -486,26 +504,33 @@ export default defineComponent({
       ruleModalVisible.value = true;
     }
 
-    async function removeRule() {
+    function removeRule() {
       if (!editingList.value) return;
-      if (!selectedRuleNumbers.value.length) return showError({ message: '请选择一条规则' });
-      if (!confirm('确认删除选中的规则？')) return;
+      if (!selectedRuleNumbers.value.length) return showError({ message: t('routeMap.messages.selectRule') });
+      pendingDeleteRuleNumbers.value = [...selectedRuleNumbers.value];
+      ruleDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveRule() {
+      ruleDeleteModalVisible.value = false;
       const listName = editingList.value.name;
-      for (const num of selectedRuleNumbers.value) {
+      for (const num of pendingDeleteRuleNumbers.value) {
         await configStore.deleteConfig(`${path.value} ${listName} rule ${num}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selectedRuleNumbers.value = [];
+      pendingDeleteRuleNumbers.value = [];
       await loadListRules(listName);
       await load();
     }
 
     function validateRule() {
       const r = editingRule.value;
-      if (!r.rule) return '请输入规则编号';
+      if (!r.rule) return t('routeMap.messages.enterRuleNumber');
       const n = parseInt(r.rule, 10);
-      if (isNaN(n) || n < 1 || n > 65535) return '规则编号范围 1-65535';
-      if (!r.action) return '请选择动作';
+      if (isNaN(n) || n < 1 || n > 65535) return t('routeMap.messages.ruleNumberRange');
+      if (!r.action) return t('routeMap.messages.selectAction');
       return '';
     }
 
@@ -516,14 +541,16 @@ export default defineComponent({
       const listName = editingList.value.name;
       const original = editingRuleOriginalNumber.value;
       if (!original && editingList.value.rules.some(r => String(r.rule) === String(editingRule.value.rule))) {
-        return showError({ message: '规则编号已存在' });
+        return showError({ message: t('routeMap.messages.ruleNumberExists') });
       }
       const value = unflattenRuleData(editingRule.value);
       try {
         if (original && String(original) !== String(editingRule.value.rule)) {
           await configStore.deleteConfig(`${path.value} ${listName} rule ${original}`);
+          configStore.markPending();
         }
         await configStore.setConfig(`${path.value} ${listName} rule ${editingRule.value.rule}`, value);
+        configStore.markPending();
         ruleModalVisible.value = false;
         await configStore.checkSessionChanged();
         await load();
@@ -547,8 +574,8 @@ export default defineComponent({
 
     // Override editList to also load raw rule data
     async function editListWithRaw() {
-      if (!selectedListNames.value.length) return showError({ message: '请选择一个路由映射' });
-      if (selectedListNames.value.length > 1) return showError({ message: '请选择一个路由映射' });
+      if (!selectedListNames.value.length) return showError({ message: t('routeMap.messages.selectRouteMap') });
+      if (selectedListNames.value.length > 1) return showError({ message: t('routeMap.messages.selectRouteMap') });
       const list = lists.value.find(l => l.name === selectedListNames.value[0]);
       if (!list) return;
       // Load raw rules
@@ -565,15 +592,17 @@ export default defineComponent({
       listModalVisible.value = true;
     }
 
-    return {
+    return {t,
+      
       lists, loading, selectedListNames, selectedRuleNumbers,
       listModalVisible, editingList, editingListOriginalName,
       ruleModalVisible, ruleActiveTab, editingRule, editingRuleOriginalNumber,
-      listColumns, ruleColumns, listSchema, ruleTabs: RULE_TABS, ruleTabSchemas,
+      listColumns, ruleColumns, listSchema, ruleTabs: computed(() => getRuleTabs(t)), ruleTabSchemas,
       path, writeDisabled, canCreateRule, ACTION_OPTIONS, ORIGIN_OPTIONS, PROTOCOL_OPTIONS, RPKI_OPTIONS, NEXTHOP_TYPE_OPTIONS, METRIC_TYPE_OPTIONS,
       prefixLists, prefixLists6, accessLists, communityLists, extcommunityLists, largeCommunityLists, asPathLists, routeMaps,
-      load, loadReferenceData, createList, editList: editListWithRaw, removeList, saveList,
-      createRule, editRule, removeRule, saveRule, loadListRules, loadRuleData,
+      deleteModalVisible, pendingDeleteNames, ruleDeleteModalVisible, pendingDeleteRuleNumbers,
+      load, loadReferenceData, createList, editList: editListWithRaw, removeList, confirmRemoveList, saveList,
+      createRule, editRule, removeRule, confirmRemoveRule, saveRule, loadListRules, loadRuleData,
     };
   },
   template: `
@@ -581,10 +610,10 @@ export default defineComponent({
       <div class="section">
         <div class="toolbar">
           <div class="toolbar-left">
-            <ToolbarButton icon="create" @click="createList" :disabled="writeDisabled">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editList" :disabled="writeDisabled || !selectedListNames.length || selectedListNames.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeList" :disabled="writeDisabled || !selectedListNames.length">删除</ToolbarButton>
-            <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+            <ToolbarButton icon="create" @click="createList" :disabled="writeDisabled">{{ t('routeMap.buttons.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editList" :disabled="writeDisabled || !selectedListNames.length || selectedListNames.length > 1">{{ t('routeMap.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeList" :disabled="writeDisabled || !selectedListNames.length">{{ t('routeMap.buttons.delete') }}</ToolbarButton>
+            <ToolbarButton icon="refresh" @click="load">{{ t('routeMap.buttons.refresh') }}</ToolbarButton>
           </div>
         </div>
         <DataTable :columns="listColumns" :data="lists" :loading="loading" :disabled="writeDisabled"
@@ -593,16 +622,16 @@ export default defineComponent({
       </div>
       <div class="section">
       </div>
-      <DraggableModal v-model:visible="listModalVisible" :title="editingListOriginalName ? '编辑' : '创建'" width="780px" @confirm="saveList">
+      <DraggableModal v-model:visible="listModalVisible" :title="editingListOriginalName ? t('routeMap.modal.edit') : t('routeMap.modal.create')" width="780px" @confirm="saveList">
         <div>
           <ConfigForm v-model="editingList" :schema="listSchema" :disabled="writeDisabled" :showAdvanced="true" />
           <div style="margin-top:16px;">
-            <div class="section-title" style="font-weight:bold;margin-bottom:8px;">规则</div>
+            <div class="section-title" style="font-weight:bold;margin-bottom:8px;">{{ t('routeMap.buttons.rules') }}</div>
             <div class="toolbar toolbar-compact">
               <div class="toolbar-left">
-                <ToolbarButton icon="create" @click="createRule" :disabled="writeDisabled || !canCreateRule">创建</ToolbarButton>
-                <ToolbarButton icon="edit" @click="editRule" :disabled="writeDisabled || !selectedRuleNumbers.length || selectedRuleNumbers.length > 1">编辑</ToolbarButton>
-                <ToolbarButton icon="delete" @click="removeRule" :disabled="writeDisabled || !selectedRuleNumbers.length">删除</ToolbarButton>
+                <ToolbarButton icon="create" @click="createRule" :disabled="writeDisabled || !canCreateRule">{{ t('routeMap.buttons.create') }}</ToolbarButton>
+                <ToolbarButton icon="edit" @click="editRule" :disabled="writeDisabled || !selectedRuleNumbers.length || selectedRuleNumbers.length > 1">{{ t('routeMap.buttons.edit') }}</ToolbarButton>
+                <ToolbarButton icon="delete" @click="removeRule" :disabled="writeDisabled || !selectedRuleNumbers.length">{{ t('routeMap.buttons.delete') }}</ToolbarButton>
               </div>
             </div>
             <DataTable :columns="ruleColumns" :data="editingList.rules" :disabled="writeDisabled"
@@ -611,279 +640,291 @@ export default defineComponent({
           </div>
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ruleModalVisible" :title="editingRuleOriginalNumber ? '编辑规则' : '创建规则'" width="900px" @confirm="saveRule" modal-class="on-top">
+      <DraggableModal v-model:visible="ruleModalVisible" :title="editingRuleOriginalNumber ? t('routeMap.modal.editRule') : t('routeMap.modal.createRule')" width="900px" @confirm="saveRule" modal-class="on-top">
         <TabGroup v-model="ruleActiveTab" :tabs="ruleTabs">
           <template #basic>
             <ConfigForm v-model="editingRule" :schema="ruleTabSchemas.basic" :disabled="writeDisabled" :showAdvanced="true" />
           </template>
           <template #match>
             <div style="display:flex;flex-direction:column;gap:12px;">
-              <div class="form-section-title">IP 地址匹配</div>
+              <div class="form-section-title">{{ t('routeMap.match.ipAddressMatch') }}</div>
               <div class="form-row">
-                <label class="form-label">IPv4 前缀列表</label>
+                <label class="form-label">{{ t('routeMap.match.ipv4PrefixList') }}</label>
                 <select class="form-control" v-model="editingRule.ipAddrPrefixList" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.match.selectPlaceholder') }}</option>
                   <option v-for="opt in prefixLists" :key="opt" :value="opt">{{ opt }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">IPv4 访问列表</label>
+                <label class="form-label">{{ t('routeMap.match.ipv4AccessList') }}</label>
                 <select class="form-control" v-model="editingRule.ipAddrAccessList" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.match.selectPlaceholder') }}</option>
                   <option v-for="opt in accessLists" :key="opt" :value="opt">{{ opt }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">IPv4 下一跳前缀列表</label>
+                <label class="form-label">{{ t('routeMap.match.ipv4NexthopPrefixList') }}</label>
                 <select class="form-control" v-model="editingRule.ipNexthopPrefixList" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.match.selectPlaceholder') }}</option>
                   <option v-for="opt in prefixLists" :key="opt" :value="opt">{{ opt }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">IPv4 下一跳访问列表</label>
+                <label class="form-label">{{ t('routeMap.match.ipv4NexthopAccessList') }}</label>
                 <select class="form-control" v-model="editingRule.ipNexthopAccessList" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.match.selectPlaceholder') }}</option>
                   <option v-for="opt in accessLists" :key="opt" :value="opt">{{ opt }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">IPv4 下一跳类型</label>
+                <label class="form-label">{{ t('routeMap.match.ipv4NexthopType') }}</label>
                 <select class="form-control" v-model="editingRule.ipNexthopType" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.match.selectPlaceholder') }}</option>
                   <option v-for="opt in NEXTHOP_TYPE_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                 </select>
               </div>
-              <div class="form-section-title">IPv6 地址匹配</div>
+              <div class="form-section-title">{{ t('routeMap.match.ipv6AddressMatch') }}</div>
               <div class="form-row">
-                <label class="form-label">IPv6 前缀列表</label>
+                <label class="form-label">{{ t('routeMap.match.ipv6PrefixList') }}</label>
                 <select class="form-control" v-model="editingRule.ipv6AddrPrefixList" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.match.selectPlaceholder') }}</option>
                   <option v-for="opt in prefixLists6" :key="opt" :value="opt">{{ opt }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">IPv6 下一跳前缀列表</label>
+                <label class="form-label">{{ t('routeMap.match.ipv6NexthopPrefixList') }}</label>
                 <select class="form-control" v-model="editingRule.ipv6NexthopPrefixList" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.match.selectPlaceholder') }}</option>
                   <option v-for="opt in prefixLists6" :key="opt" :value="opt">{{ opt }}</option>
                 </select>
               </div>
-              <div class="form-section-title">BGP 匹配</div>
+              <div class="form-section-title">{{ t('routeMap.match.bgpMatch') }}</div>
               <div class="form-row">
-                <label class="form-label">团体列表</label>
+                <label class="form-label">{{ t('routeMap.match.communityList') }}</label>
                 <select class="form-control" v-model="editingRule.communityList" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.match.selectPlaceholder') }}</option>
                   <option v-for="opt in communityLists" :key="opt" :value="opt">{{ opt }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">精确匹配团体</label>
+                <label class="form-label">{{ t('routeMap.match.communityExactMatch') }}</label>
                 <input type="checkbox" v-model="editingRule.communityExactMatch" style="margin-left:8px;" />
               </div>
               <div class="form-row">
-                <label class="form-label">扩展团体列表</label>
+                <label class="form-label">{{ t('routeMap.match.extcommunityList') }}</label>
                 <select class="form-control" v-model="editingRule.extcommunityList" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.match.selectPlaceholder') }}</option>
                   <option v-for="opt in extcommunityLists" :key="opt" :value="opt">{{ opt }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">大型团体列表</label>
+                <label class="form-label">{{ t('routeMap.match.largeCommunityList') }}</label>
                 <select class="form-control" v-model="editingRule.largeCommunityList" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.match.selectPlaceholder') }}</option>
                   <option v-for="opt in largeCommunityLists" :key="opt" :value="opt">{{ opt }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">AS 路径列表</label>
+                <label class="form-label">{{ t('routeMap.match.asPathList') }}</label>
                 <select class="form-control" v-model="editingRule.asPath" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.match.selectPlaceholder') }}</option>
                   <option v-for="opt in asPathLists" :key="opt" :value="opt">{{ opt }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">Origin</label>
+                <label class="form-label">{{ t('routeMap.match.origin') }}</label>
                 <select class="form-control" v-model="editingRule.origin" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.match.selectPlaceholder') }}</option>
                   <option v-for="opt in ORIGIN_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">Peer 地址</label>
-                <input type="text" class="form-control" v-model="editingRule.peer" placeholder="Peer 地址" style="width:100%;" />
+                <label class="form-label">{{ t('routeMap.match.peerAddress') }}</label>
+                <input type="text" class="form-control" v-model="editingRule.peer" :placeholder="t('routeMap.match.peerAddressPlaceholder')" style="width:100%;" />
               </div>
-              <div class="form-section-title">其他匹配</div>
+              <div class="form-section-title">{{ t('routeMap.match.otherMatch') }}</div>
               <div class="form-row">
-                <label class="form-label">接口</label>
-                <input type="text" class="form-control" v-model="editingRule.interface" placeholder="接口名称" style="width:100%;" />
-              </div>
-              <div class="form-row">
-                <label class="form-label">Local Preference</label>
-                <input type="number" class="form-control" v-model="editingRule.localPreference" min="0" max="4294967295" placeholder="本地优先级值" style="width:100%;" />
-                <small class="form-text text-muted">范围 0-4294967295</small>
+                <label class="form-label">{{ t('routeMap.match.interface') }}</label>
+                <input type="text" class="form-control" v-model="editingRule.interface" :placeholder="t('routeMap.match.interfacePlaceholder')" style="width:100%;" />
               </div>
               <div class="form-row">
-                <label class="form-label">Metric</label>
-                <input type="number" class="form-control" v-model="editingRule.metric" min="1" max="65535" placeholder="Metric 值" style="width:100%;" />
-                <small class="form-text text-muted">范围 1-65535</small>
+                <label class="form-label">{{ t('routeMap.match.localPreference') }}</label>
+                <input type="number" class="form-control" v-model="editingRule.localPreference" min="0" max="4294967295" :placeholder="t('routeMap.match.localPreferencePlaceholder')" style="width:100%;" />
+                <small class="form-text text-muted">{{ t('routeMap.match.localPreferenceHelp') }}</small>
               </div>
               <div class="form-row">
-                <label class="form-label">协议</label>
+                <label class="form-label">{{ t('routeMap.match.metric') }}</label>
+                <input type="number" class="form-control" v-model="editingRule.metric" min="1" max="65535" :placeholder="t('routeMap.match.metricPlaceholder')" style="width:100%;" />
+                <small class="form-text text-muted">{{ t('routeMap.match.metricHelp') }}</small>
+              </div>
+              <div class="form-row">
+                <label class="form-label">{{ t('routeMap.match.protocol') }}</label>
                 <select class="form-control" v-model="editingRule.protocol" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.match.selectPlaceholder') }}</option>
                   <option v-for="opt in PROTOCOL_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                 </select>
-                <small class="form-text text-muted">选择路由协议</small>
+                <small class="form-text text-muted">{{ t('routeMap.match.protocolHelp') }}</small>
               </div>
               <div class="form-row">
-                <label class="form-label">RPKI</label>
+                <label class="form-label">{{ t('routeMap.match.rpki') }}</label>
                 <select class="form-control" v-model="editingRule.rpki" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.match.selectPlaceholder') }}</option>
                   <option v-for="opt in RPKI_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">Tag</label>
-                <input type="number" class="form-control" v-model="editingRule.tag" min="1" max="65535" placeholder="路由标签值" style="width:100%;" />
-                <small class="form-text text-muted">范围 1-65535</small>
+                <label class="form-label">{{ t('routeMap.match.tag') }}</label>
+                <input type="number" class="form-control" v-model="editingRule.tag" min="1" max="65535" :placeholder="t('routeMap.match.tagPlaceholder')" style="width:100%;" />
+                <small class="form-text text-muted">{{ t('routeMap.match.tagHelp') }}</small>
               </div>
             </div>
           </template>
           <template #set>
             <div style="display:flex;flex-direction:column;gap:12px;">
-              <div class="form-section-title">BGP 属性设置</div>
+              <div class="form-section-title">{{ t('routeMap.set.bgpAttributeSet') }}</div>
               <div class="form-row">
-                <label class="form-label">Aggregator</label>
-                <input type="text" class="form-control" v-model="editingRule.aggregator" placeholder="例如: 65001 10.0.0.1" style="width:100%;" />
+                <label class="form-label">{{ t('routeMap.set.aggregator') }}</label>
+                <input type="text" class="form-control" v-model="editingRule.aggregator" :placeholder="t('routeMap.set.aggregatorPlaceholder')" style="width:100%;" />
               </div>
               <div class="form-row">
-                <label class="form-label">AS Path Prepend</label>
-                <input type="text" class="form-control" v-model="editingRule.asPathPrepend" placeholder="AS 号列表" style="width:100%;" />
+                <label class="form-label">{{ t('routeMap.set.asPathPrepend') }}</label>
+                <input type="text" class="form-control" v-model="editingRule.asPathPrepend" :placeholder="t('routeMap.set.asPathPrependPlaceholder')" style="width:100%;" />
               </div>
               <div class="form-row">
-                <label class="form-label">Atomic Aggregate</label>
+                <label class="form-label">{{ t('routeMap.set.atomicAggregate') }}</label>
                 <input type="checkbox" v-model="editingRule.atomicAggregate" style="margin-left:8px;" />
               </div>
               <div class="form-row">
-                <label class="form-label">Community 操作</label>
+                <label class="form-label">{{ t('routeMap.set.communityAction') }}</label>
                 <select class="form-control" v-model="editingRule.communityAction" style="width:100%;margin-bottom:4px;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.set.selectPlaceholder') }}</option>
                   <option value="add">add</option>
                   <option value="delete">delete</option>
                   <option value="none">none</option>
                   <option value="replace">replace</option>
                 </select>
                 <select class="form-control" v-model="editingRule.communityList" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.set.selectPlaceholder') }}</option>
                   <option v-for="opt in communityLists" :key="opt" :value="opt">{{ opt }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">扩展团体操作</label>
+                <label class="form-label">{{ t('routeMap.set.extcommunityAction') }}</label>
                 <select class="form-control" v-model="editingRule.extcommunityAction" style="width:100%;margin-bottom:4px;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.set.selectPlaceholder') }}</option>
                   <option value="add">add</option>
                   <option value="delete">delete</option>
                   <option value="none">none</option>
                   <option value="replace">replace</option>
                 </select>
                 <select class="form-control" v-model="editingRule.extcommunityList" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.set.selectPlaceholder') }}</option>
                   <option v-for="opt in extcommunityLists" :key="opt" :value="opt">{{ opt }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">大型团体操作</label>
+                <label class="form-label">{{ t('routeMap.set.largeCommunityAction') }}</label>
                 <select class="form-control" v-model="editingRule.largeCommunityAction" style="width:100%;margin-bottom:4px;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.set.selectPlaceholder') }}</option>
                   <option value="add">add</option>
                   <option value="delete">delete</option>
                   <option value="none">none</option>
                   <option value="replace">replace</option>
                 </select>
                 <select class="form-control" v-model="editingRule.largeCommunityList" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.set.selectPlaceholder') }}</option>
                   <option v-for="opt in largeCommunityLists" :key="opt" :value="opt">{{ opt }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">Local Preference</label>
-                <input type="number" class="form-control" v-model="editingRule.localPreference" min="0" max="4294967295" placeholder="本地优先级值" style="width:100%;" />
-                <small class="form-text text-muted">范围 0-4294967295</small>
+                <label class="form-label">{{ t('routeMap.set.localPreference') }}</label>
+                <input type="number" class="form-control" v-model="editingRule.localPreference" min="0" max="4294967295" :placeholder="t('routeMap.set.localPreferencePlaceholder')" style="width:100%;" />
+                <small class="form-text text-muted">{{ t('routeMap.set.localPreferenceHelp') }}</small>
               </div>
               <div class="form-row">
-                <label class="form-label">Origin</label>
+                <label class="form-label">{{ t('routeMap.set.origin') }}</label>
                 <select class="form-control" v-model="editingRule.origin" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.set.selectPlaceholder') }}</option>
                   <option v-for="opt in ORIGIN_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">Originator ID</label>
-                <input type="text" class="form-control" v-model="editingRule.originatorId" placeholder="Originator ID" style="width:100%;" />
+                <label class="form-label">{{ t('routeMap.set.originatorId') }}</label>
+                <input type="text" class="form-control" v-model="editingRule.originatorId" :placeholder="t('routeMap.set.originatorIdPlaceholder')" style="width:100%;" />
               </div>
               <div class="form-row">
-                <label class="form-label">Weight</label>
-                <input type="number" class="form-control" v-model="editingRule.weight" min="0" max="4294967295" placeholder="BGP weight" style="width:100%;" />
-                <small class="form-text text-muted">范围 0-4294967295</small>
+                <label class="form-label">{{ t('routeMap.set.weight') }}</label>
+                <input type="number" class="form-control" v-model="editingRule.weight" min="0" max="4294967295" :placeholder="t('routeMap.set.weightPlaceholder')" style="width:100%;" />
+                <small class="form-text text-muted">{{ t('routeMap.set.weightHelp') }}</small>
               </div>
-              <div class="form-section-title">路由属性设置</div>
+              <div class="form-section-title">{{ t('routeMap.set.routeAttributeSet') }}</div>
               <div class="form-row">
-                <label class="form-label">Distance</label>
-                <input type="number" class="form-control" v-model="editingRule.distance" min="0" max="255" placeholder="管理距离" style="width:100%;" />
-                <small class="form-text text-muted">范围 0-255</small>
-              </div>
-              <div class="form-row">
-                <label class="form-label">IPv4 下一跳</label>
-                <input type="text" class="form-control" v-model="editingRule.ipNextHop" placeholder="下一跳 IP 地址" style="width:100%;" />
+                <label class="form-label">{{ t('routeMap.set.distance') }}</label>
+                <input type="number" class="form-control" v-model="editingRule.distance" min="0" max="255" :placeholder="t('routeMap.set.distancePlaceholder')" style="width:100%;" />
+                <small class="form-text text-muted">{{ t('routeMap.set.distanceHelp') }}</small>
               </div>
               <div class="form-row">
-                <label class="form-label">IPv6 下一跳</label>
-                <input type="text" class="form-control" v-model="editingRule.ipv6NextHop" placeholder="下一跳 IPv6 地址" style="width:100%;" />
+                <label class="form-label">{{ t('routeMap.set.ipv4Nexthop') }}</label>
+                <input type="text" class="form-control" v-model="editingRule.ipNextHop" :placeholder="t('routeMap.set.ipv4NexthopPlaceholder')" style="width:100%;" />
               </div>
               <div class="form-row">
-                <label class="form-label">Metric</label>
-                <input type="text" class="form-control" v-model="editingRule.metric" placeholder="例如: 100 或 +10 或 -10" style="width:100%;" />
-                <small class="form-text text-muted">例如: 100 或 +10 或 -10</small>
+                <label class="form-label">{{ t('routeMap.set.ipv6Nexthop') }}</label>
+                <input type="text" class="form-control" v-model="editingRule.ipv6NextHop" :placeholder="t('routeMap.set.ipv6NexthopPlaceholder')" style="width:100%;" />
               </div>
               <div class="form-row">
-                <label class="form-label">Metric Type</label>
+                <label class="form-label">{{ t('routeMap.set.metric') }}</label>
+                <input type="text" class="form-control" v-model="editingRule.metric" :placeholder="t('routeMap.set.metricPlaceholder')" style="width:100%;" />
+                <small class="form-text text-muted">{{ t('routeMap.set.metricHelp') }}</small>
+              </div>
+              <div class="form-row">
+                <label class="form-label">{{ t('routeMap.set.metricType') }}</label>
                 <select class="form-control" v-model="editingRule.metricType" style="width:100%;">
-                  <option value="">请选择</option>
+                  <option value="">{{ t('routeMap.set.selectPlaceholder') }}</option>
                   <option v-for="opt in METRIC_TYPE_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                 </select>
               </div>
               <div class="form-row">
-                <label class="form-label">Source</label>
-                <input type="text" class="form-control" v-model="editingRule.src" placeholder="源地址" style="width:100%;" />
+                <label class="form-label">{{ t('routeMap.set.source') }}</label>
+                <input type="text" class="form-control" v-model="editingRule.src" :placeholder="t('routeMap.set.sourcePlaceholder')" style="width:100%;" />
               </div>
               <div class="form-row">
-                <label class="form-label">Table</label>
-                <input type="number" class="form-control" v-model="editingRule.table" min="1" max="4294967295" placeholder="路由表名称" style="width:100%;" />
-                <small class="form-text text-muted">范围 1-4294967295</small>
+                <label class="form-label">{{ t('routeMap.set.table') }}</label>
+                <input type="number" class="form-control" v-model="editingRule.table" min="1" max="4294967295" :placeholder="t('routeMap.set.tablePlaceholder')" style="width:100%;" />
+                <small class="form-text text-muted">{{ t('routeMap.set.tableHelp') }}</small>
               </div>
               <div class="form-row">
-                <label class="form-label">Tag</label>
-                <input type="number" class="form-control" v-model="editingRule.tag" min="1" max="65535" placeholder="路由标签值" style="width:100%;" />
-                <small class="form-text text-muted">范围 1-65535</small>
+                <label class="form-label">{{ t('routeMap.set.tag') }}</label>
+                <input type="number" class="form-control" v-model="editingRule.tag" min="1" max="65535" :placeholder="t('routeMap.set.tagPlaceholder')" style="width:100%;" />
+                <small class="form-text text-muted">{{ t('routeMap.set.tagHelp') }}</small>
               </div>
             </div>
           </template>
           <template #onmatch>
             <div style="display:flex;flex-direction:column;gap:12px;">
               <div class="form-row">
-                <label class="form-label">Goto 规则编号</label>
-                <input type="number" class="form-control" v-model="editingRule.goto" min="1" max="65535" placeholder="跳转到指定规则编号" style="width:100%;" />
-                <small class="form-text text-muted">范围 1-65535</small>
+                <label class="form-label">{{ t('routeMap.onmatch.gotoRule') }}</label>
+                <input type="number" class="form-control" v-model="editingRule.goto" min="1" max="65535" :placeholder="t('routeMap.onmatch.gotoPlaceholder')" style="width:100%;" />
+                <small class="form-text text-muted">{{ t('routeMap.onmatch.gotoHelp') }}</small>
               </div>
               <div class="form-row">
-                <label class="form-label">Next (下一条规则)</label>
+                <label class="form-label">{{ t('routeMap.onmatch.nextRule') }}</label>
                 <input type="checkbox" v-model="editingRule.next" style="margin-left:8px;" />
               </div>
             </div>
           </template>
         </TabGroup>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('routeMap.modal.confirmDelete')" width="400px" @confirm="confirmRemoveList">
+        <div>{{ t('routeMap.modal.confirmDeleteList') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+      <DraggableModal v-model:visible="ruleDeleteModalVisible" :title="t('routeMap.modal.confirmDelete')" width="400px" @confirm="confirmRemoveRule">
+        <div>{{ t('routeMap.modal.confirmDeleteRule') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="num in pendingDeleteRuleNumbers" :key="num" style="padding:2px 0;">{{ num }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

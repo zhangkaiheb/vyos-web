@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="pim">
+<h1>PIM</h1>
+<p><abbr title="Protocol Independent Multicast">PIM</abbr> маршрутизирует мультикастовый трафик между
+маршрутизаторами, используя существующую таблицу маршрутизации для принятия решений о пути. VyOS
+поддерживает PIM Sparse Mode (PIM-SM) и версии IGMP 2 и 3.</p>
+<p>В PIM-SM трафик от мультикаст-источников передается к
+<abbr title="Rendezvous Point">RP</abbr>. Мультикаст-приемники используют IGMP для сигнализации своего локального
+маршрутизатора, какие группы они хотят получать, а маршрутизатор использует PIM для получения этого
+трафика от RP через общее дерево.</p>
+<p>Для работы в PIM-SM необходимо:</p>
+<ul class="simple">
+<li><p>PIM должен быть включен на каждом интерфейсе по пути мультикаста.</p></li>
+<li><p>Положение RP должно быть объявлено одинаково на каждом маршрутизаторе в домене PIM.</p></li>
+<li><p>IGMP должен быть включен на интерфейсах, подключенных к мультикаст-приемникам.</p></li>
+</ul>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<section id="pim-sm">
+<h3>PIM-SM</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim ecmp
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-ecmp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Включить маршрутизацию ECMP для мультикастового трафика.</strong></p>
+<p>Когда при поиске RPF возвращается несколько равных по стоимости следующих узлов, включение этой функции распределяет (S,G) потоки мультикаста между всеми из них.</p>
+<p>Если ECMP не включен, PIM по умолчанию использует только первый следующий узел, возвращенный при поиске RPF.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim ecmp
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim ecmp rebalance
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-ecmp-rebalance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Включить автоматическое перераспределение всех потоков PIM (S,G), когда интерфейс ECMP выходит из строя.</strong></p>
+<p>Когда ECMP включен, и один из интерфейсов, используемых PIM, выходит из строя, эта функция заставляет PIM перераспределить все существующие потоки (S,G) по оставшимся интерфейсам с одинаковой стоимостью.</p>
+<p>Если перераспределение не настроено, PIM перенаправляет только те потоки, которые активно использовали неисправный интерфейс.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim ecmp rebalance
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim join-prune-interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-join-prune-interval-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интервал, в секундах, с которым PIM отправляет сообщения Join/Prune соседям сверху.</strong></p>
+<p>По умолчанию интервал составляет 60 секунд. Установка значения ниже 60 секунд может негативно повлиять на сходимость масштаба.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim join-prune-interval 120
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim keep-alive-timer &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-keep-alive-timer-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте временной интервал, в секундах, для состояния потока (S,G) мультикаста.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Некоторое оборудование не может обнаруживать трафик, поступающий с интервалом менее 30
+секунд. Для такого оборудования убедитесь, что значение установлено на 31 секунду или
+выше.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim keep-alive-timer 60
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim packets &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-packets-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте количество последовательно обрабатываемых входящих пакетов PIM с соседа до того, как система перейдет к следующей задаче.</strong></p>
+<p>Значение по умолчанию — 3 пакета. Эта команда полезна только в развертываниях с большим количеством пакетов управления PIM.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim packets 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim register-accept-list prefix-list &lt;prefix-list&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-register-accept-list-prefix-list-prefix-list" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте список префиксов для фильтрации входящих сообщений PIM Register.</strong></p>
+<p>Когда PIM получает пакет Register, IP-адрес источника мультикаста оценивается по указанному списку префиксов. Если IP-адрес источника разрешен, нормальная обработка PIM продолжается. Если IP-адрес источника запрещен, отправляется сообщение Register-Stop отправителю.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim register-accept-list prefix-list MULTICAST-SOURCES
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim register-suppress-time &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-register-suppress-time-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте продолжительность, в секундах, в течение которой FHR подавляет отправку сообщений PIM Register.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim register-suppress-time 60
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim rp address &lt;ip-address&gt; group &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-rp-address-ip-address-group-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте точку привязки (RP) для заданного диапазона мультикаст-группы.</strong></p>
+<p>Чтобы использовать PIM, необходимо настроить RP для получения сообщений Join. VyOS в настоящее время поддерживает только статическую конфигурацию RP.</p>
+<p>Параметр <code class="docutils literal notranslate">&lt;address&gt;</code> определяет IP-адрес RP, а параметр <code class="docutils literal notranslate">&lt;group&gt;</code>
+определяет префикс диапазона мультикаст-группы, обслуживаемой этим RP.</p>
+<p>Один RP может обслуживать несколько диапазонов групп. Повторите команду с разными префиксами <code class="docutils literal notranslate">&lt;group&gt;</code>, чтобы сопоставить несколько диапазонов с одним RP.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim rp address 192.0.2.1 group 239.0.0.0/8
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim rp keep-alive-timer &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-rp-keep-alive-timer-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте временной интервал, в секундах, для состояния (S,G) мультикаст-потока на точке привязки (RP).</strong></p>
+<p>Это значение должно быть не меньше, чем register-suppression-time; в противном случае RP может истечь (S,G) состояние до того, как придет следующее сообщение Null-Register от FHR.</p>
+<p>Когда отправляется сообщение Register-Stop, KAT(S,G) на RP устанавливается в максимальное значение глобального Keepalive_Period и RP_Keepalive_Period.</p>
+<p>Значение по умолчанию — 210 секунд.</p>
+<p>См. <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7761#section-4.1">RFC 7761, раздел 4.1</a>
+для деталей.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Поскольку некоторые аппаратные платформы не могут обнаруживать данные, поступающие с интервалом менее 30 секунд, убедитесь, что значение установлено на 31 секунду или выше.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim rp keep-alive-timer 300
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim no-v6-secondary
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-no-v6-secondary" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Отключить отправку второстепенных адресов IPv6 в сообщениях PIM Hello.</strong></p>
+<p>По умолчанию сообщения PIM Hello включают все второстепенные IPv6 адреса, настроенные на интерфейсе, позволяя PIM-соседям использовать их как IPv6 следующие узлы для поиска RPF.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim no-v6-secondary
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim spt-switchover infinity-and-beyond prefix-list &lt;list&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-spt-switchover-infinity-and-beyond-prefix-list-list" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>На LHR подавить переключение с общего дерева (*,G) на специфичное по источнику (S,G)
+<abbr title="Shortest-Path Tree">SPT</abbr>.</strong></p>
+<p>Опциональный <code class="docutils literal notranslate">prefix-list</code> контролирует, какие группы затронуты: группы, соответствующие записи <em>permit</em>, остаются на общем дереве, группы, соответствующие записи <em>deny</em>, переключаются нормально. Без списка префиксов подавление применяется ко всем группам.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim spt-switchover infinity-and-beyond
+set protocols pim spt-switchover infinity-and-beyond prefix-list SHARED-TREE-GROUPS
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim ssm prefix-list &lt;list&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-ssm-prefix-list-list" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте список префиксов с диапазоном IP-адресов групп мультикаста, работающих в режиме <abbr title="Source-Specific Multicast">SSM</abbr>.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim ssm prefix-list SSM-RANGE
+</pre></div>
+</div>
+<section id="interface-specific-commands">
+<h4>Команды, специфичные для интерфейса</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Включить BFD для каждого PIM-соседа, обнаруженного на указанном интерфейсе.</strong></p>
+<p>Когда BFD обнаруживает сбой связи, связь PIM-соседа разрывается, и все связанные с ней записи (S,G) мультикаста удаляются.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 bfd
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; bfd profile &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-bfd-profile-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Примените указанный профиль BFD к сессиям BFD на этом интерфейсе PIM.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 bfd profile fast-failover
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; dr-priority &lt;1-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-dr-priority-1-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте приоритет маршрутизатора-дизайнер (DR) для указанного
+интерфейса.</strong></p>
+<p>Маршрутизатор с самым высоким приоритетом интерфейса выбирается в качестве DR для сегмента LAN.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 dr-priority 100
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; hello &lt;1-180&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-hello-1-180" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интервал PIM Hello, в секундах, для указанного интерфейса.</strong></p>
+<p>Сообщения PIM Hello отправляются периодически на интерфейсе для обнаружения и поддержания отношений PIM-соседей. Время ожидания (продолжительность, после которой сосед считается мертвым, если не получено сообщение Hello) рассчитывается на основе интервала Hello.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 hello 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; no-bsm
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-no-bsm" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Отключить обработку сообщений PIM BSM на указанном интерфейсе.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 no-bsm
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; no-unicast-bsm
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-no-unicast-bsm" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Отключить обработку однократных сообщений PIM BSM на этом интерфейсе.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 no-unicast-bsm
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; passive
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-passive" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Отключить отправку и получение контрольных пакетов PIM на этом интерфейсе.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 passive
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; source-address &lt;ip-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-source-address-ip-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IP-адрес источника, который PIM использует для отправки контрольных сообщений на указанном интерфейсе.</strong></p>
+<p>Эта команда полезна, когда на одном интерфейсе настроено несколько IP-адресов.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 source-address 192.0.2.10
+</pre></div>
+</div>
+</section>
+</section>
+<section id="igmp">
+<h3>IGMP</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim igmp watermark-warning &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-igmp-watermark-warning-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте генерацию предупреждения по водяным меткам на основе количества присоединенных групп IGMP.</strong></p>
+<p>Когда общее количество присоединенных групп IGMP достигает этого заданного предела, маршрутизатор генерирует предупреждение.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim igmp watermark-warning 500
+</pre></div>
+</div>
+<section id="id2">
+<h4>Команды, специфичные для интерфейса</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; igmp
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Включить IGMP на указанном интерфейсе.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 igmp
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; igmp disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Административно отключить IGMP на указанном интерфейсе без удаления существующей конфигурации IGMP.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 igmp disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; igmp join &lt;multicast-address&gt; source-address &lt;IP-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-join-multicast-address-source-address-ip-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс для присоединения к определенному каналу (S,G).</strong></p>
+<p>Укажите оба IP-адреса мультикаста (G) и IP-адрес источника (S). Каждая команда присоединяет один канал (S,G). Чтобы присоединиться к нескольким каналам, имеющим одну и ту же группу, повторите команду с разными значениями <code class="docutils literal notranslate">source-address</code>.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 igmp join 232.1.1.100 source-address 192.0.2.50
+set protocols pim interface eth0 igmp join 232.1.1.100 source-address 192.0.2.51
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; igmp query-interval &lt;1-1800&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-query-interval-1-1800" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интервал запроса IGMP, в секундах, на указанном интерфейсе.</strong></p>
+<p>Это настройка определяет интервал между запросами IGMP, отправляемыми маршрутизатором для обнаружения, какие группы мультикаста имеют активных слушателей на подключенной сети.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth1 igmp query-interval 125
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; igmp query-max-response-time &lt;10-250&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-query-max-response-time-10-250" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте максимальное время ответа запроса IGMP, в децисекундах, на указанном интерфейсе.</strong></p>
+<p>Это значение вставляется в запросы IGMP и указывает максимальное время, в течение которого хосты могут ответить сообщением о регистрации. Если сообщение не получено в течение указанного времени, PIM предполагает, что больше нет активных локальных получателей, и может истечь срок действия связанного с ним состояния (*,G) или (S,G) (см. <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7761#section-4.1">RFC 7761, раздел 4.1</a>).</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 igmp query-max-response-time 50
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; igmp version &lt;2-3&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-version-2-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте версию IGMP на указанном интерфейсе.</strong></p>
+<p>По умолчанию версия 3.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 igmp version 2
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="example">
+<h2>Пример</h2>
+<p>Следующий пример демонстрирует базовую реализацию PIM Sparse Mode (PIM-SM) в трех маршрутизаторах, показывая, как настроить роль каждого маршрутизатора в мультикаст-домене. Вместе три маршрутизатора образуют полный путь распространения мультикаста от источников к получателям, один из которых действует как точка привязки (RP).</p>
+<section id="topology-and-roles">
+<h3>Топология и роли</h3>
+<ul class="simple">
+<li><p>Маршрутизатор 1 — это <abbr title="Last-Hop Router">LHR</abbr>.</p></li>
+<li><p>Маршрутизатор 3 — это <abbr title="Rendezvous Point">RP</abbr>.</p></li>
+<li><p>Маршрутизатор 2 — это <abbr title="First-Hop Router">FHR</abbr>.</p></li>
+</ul>
+<p><strong>Маршрутизатор 1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth2 address &#39;198.51.100.1/30&#39;
+set interfaces ethernet eth1 address &#39;192.0.2.1/24&#39;
+set protocols ospf area 0 network &#39;198.51.100.0/30&#39;
+set protocols ospf area 0 network &#39;192.0.2.0/24&#39;
+set protocols pim interface eth1
+set protocols pim interface eth1 igmp
+set protocols pim interface eth2
+set protocols pim rp address 203.0.113.1 group &#39;224.0.0.0/4&#39;
+</pre></div>
+</div>
+<p><strong>Маршрутизатор 3:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum0 address &#39;203.0.113.1/32&#39;
+set interfaces ethernet eth0 address &#39;198.51.100.2/30&#39;
+set interfaces ethernet eth1 address &#39;198.51.100.5/30&#39;
+set protocols ospf area 0 network &#39;198.51.100.0/30&#39;
+set protocols ospf area 0 network &#39;203.0.113.1/32&#39;
+set protocols ospf area 0 network &#39;198.51.100.4/30&#39;
+set protocols pim interface dum0
+set protocols pim interface eth0
+set protocols pim interface eth1
+set protocols pim rp address 203.0.113.1 group &#39;224.0.0.0/4&#39;
+</pre></div>
+</div>
+<p><strong>Маршрутизатор 2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address &#39;203.0.113.129/25&#39;
+set interfaces ethernet eth2 address &#39;198.51.100.6/30&#39;
+set protocols ospf area 0 network &#39;203.0.113.128/25&#39;
+set protocols ospf area 0 network &#39;198.51.100.4/30&#39;
+set protocols pim interface eth1
+set protocols pim interface eth2
+set protocols pim rp address 203.0.113.1 group &#39;224.0.0.0/4&#39;
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

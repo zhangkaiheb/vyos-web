@@ -1,0 +1,806 @@
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="route-and-route6-policy">
+<h1>路由 and 路由6 策略</h1>
+<p>IPv4 route and IPv6 route policies are defined in this section. These route
+policies can then be associated to interfaces.</p>
+<section id="rule-sets">
+<h2>规则-设置s</h2>
+<p>A rule-set is a named collection of rules that 可以 applied to an interface.
+Each rule is numbered, has an action to apply if the rule is matched, and the
+ability to specify the criteria to match. 数据 packets go through the rules
+from 1 - 999999, at the first match the action of the rule 将 executed.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> description <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> description <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Provide a rule-set description.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> default-log
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-default-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> default-log
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-default-log" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Option to log packets hitting default-action.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> interface <interface>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-interface-interface" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> interface <interface>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>应用 routing policy to interface</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> description <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-description-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> description <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Provide a description for each rule.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> log <enable|disable>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-log-enable-disable" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> log <enable|disable>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-log-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Option to enable or disable log matching rule.</p>
+</div>
+</div>
+<section id="matching-criteria">
+<h3>匹配ing criteria</h3>
+<p>There are a lot of matching criteria options available, both for
+<code class="docutils literal notranslate">policy route</code> and <code class="docutils literal notranslate">policy route6</code>. These options are listed
+in this section.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> connection-mark <1-2147483647>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-connection-mark-1-2147483647" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> connection-mark <1-2147483647>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-connection-mark-1-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 match criteria based on connection mark.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> mark <match_criteria>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-mark-match-criteria" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> mark <match_criteria>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-mark-match-criteria" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on the firewall mark (fwmark), where <match_criteria> 可以:</p>
+<ul class="simple">
+<li><p><0-2147483647> a single fwmark</p></li>
+<li><p>!<0-2147483647> everything except a single fwmark</p></li>
+<li><p><start-end> a range of marks</p></li>
+<li><p>!<start-end> everything except the range of marks</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>When using the <code class="docutils literal notranslate">set table</code> or <code class="docutils literal notranslate">set vrf</code> commands the mark
+settings are ignored and overwritten with a table-specific mark that
+is set to 0x7FFFFFFF - the id of the table/VRF.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> source address <match_criteria>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-source-address-match-criteria" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> destination address <match_criteria>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-destination-address-match-criteria" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> source address <match_criteria>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-source-address-match-criteria" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> destination address <match_criteria>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-destination-address-match-criteria" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 match criteria based on source or destination ipv4|ipv6 address, where
+<match_criteria> 可能:</p>
+</div>
+</div>
+<dl class="simple myst">
+<dt>For ipv4:</dt><dd><ul class="simple">
+<li><p><x.x.x.x>: IP address to match.</p></li>
+<li><p><x.x.x.x/x>: Subnet to match.</p></li>
+<li><p><x.x.x.x>-<x.x.x.x>: IP range to match.</p></li>
+<li><p>!<x.x.x.x>: 匹配 everything except the specified address.</p></li>
+<li><p>!<x.x.x.x/x>: 匹配 everything except the specified subnet.</p></li>
+<li><p>!<x.x.x.x>-<x.x.x.x>: 匹配 everything except the specified range.</p></li>
+</ul>
+</dd>
+<dt>And for ipv6:</dt><dd><ul class="simple">
+<li><p><h:h:h:h:h:h:h:h>: IPv6 address to match.</p></li>
+<li><p><h:h:h:h:h:h:h:h/x>: IPv6 prefix to match.</p></li>
+<li><p><h:h:h:h:h:h:h:h>-<h:h:h:h:h:h:h:h>: IPv6 range to match.</p></li>
+<li><p>!<h:h:h:h:h:h:h:h>: 匹配 everything except the specified address.</p></li>
+<li><p>!<h:h:h:h:h:h:h:h/x>: 匹配 everything except the specified prefix.</p></li>
+<li><p>!<h:h:h:h:h:h:h:h>-<h:h:h:h:h:h:h:h>: 匹配 everything except the
+specified range.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> source group <address-group|domain-group|mac-group|network-group|port-group> <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-source-group-address-group-domain-group-mac-group-network-group-port-group-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> destination group <address-group|domain-group|mac-group|network-group|port-group> <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-destination-group-address-group-domain-group-mac-group-network-group-port-group-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> source group <address-group|domain-group|mac-group|network-group|port-group> <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-source-group-address-group-domain-group-mac-group-network-group-port-group-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> destination group <address-group|domain-group|mac-group|network-group|port-group> <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-destination-group-address-group-domain-group-mac-group-network-group-port-group-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 match criteria based on source or destination groups, where <text>
+将 the group name/identifier. Prepend character ‘!’ for inverted
+matching criteria.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> destination port <match_criteria>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-destination-port-match-criteria" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> destination port <match_criteria>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-destination-port-match-criteria" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 match criteria based on destination port, where <match_criteria> could
+be:</p>
+<ul class="simple">
+<li><p><port name>: 名称d port (any name in /etc/services, e.g., http).</p></li>
+<li><p><1-65535>: Numbered port.</p></li>
+<li><p><start>-<end>: Numbered port range (e.g., 1001-1005).</p></li>
+</ul>
+<p>Multiple destination ports 可以 specified as a comma-separated list. The
+whole list can also be “negated” using ‘!’. For example:
+‘!22,telnet,http,123,1001-1005’</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> disable
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-disable" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> disable
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Option to disable rule.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> dscp <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-dscp-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> dscp <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-dscp-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> dscp-exclude <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-dscp-exclude-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> dscp-exclude <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-dscp-exclude-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on dscp value criteria. Multiple values from 0 to 63
+and ranges are supported.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> fragment <match-grag|match-non-frag>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-fragment-match-grag-match-non-frag" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> fragment <match-grag|match-non-frag>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-fragment-match-grag-match-non-frag" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 IP fragment match, where:</p>
+<ul class="simple">
+<li><p>match-frag: Second and further fragments of fragmented packets.</p></li>
+<li><p>match-non-frag: Head fragments or unfragmented packets.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> icmp <code | type>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-icmp-code-type" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> icmpv6 <code | type>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-icmpv6-code-type" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on icmp|icmpv6 code and type.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> icmp type-name <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-icmp-type-name-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> icmpv6 type-name <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-icmpv6-type-name-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on icmp|icmpv6 type-name criteria. Use tab for information
+about what type-name criteria are supported.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> ipsec <match-ipsec|match-none>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-ipsec-match-ipsec-match-none" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> ipsec <match-ipsec|match-none>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-ipsec-match-ipsec-match-none" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 IPSec inbound match criteria, where:</p>
+<ul class="simple">
+<li><p>match-ipsec: match inbound IPsec packets.</p></li>
+<li><p>match-none: match inbound non-IPsec packets.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> limit burst <0-4294967295>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-limit-burst-0-4294967295" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> limit burst <0-4294967295>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-limit-burst-0-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 maximum number of packets to allow in excess of rate.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> limit rate <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-limit-rate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> limit rate <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-limit-rate-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 maximum average matching rate. 格式 for rate: integer/time_unit, where
+time_unit 可能 any one of second, minute, hour or day.For example
+1/second implies rule to be matched at an average of once per second.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> protocol <text | 0-255 | tcp_udp | all >
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-protocol-text-0-255-tcp-udp-all" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> protocol <text | 0-255 | tcp_udp | all >
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-protocol-text-0-255-tcp-udp-all" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 a protocol criteria. A protocol number or a name which is defined in:
+<code class="docutils literal notranslate">/etc/protocols</code>. Special names are <code class="docutils literal notranslate">all</code> for all protocols and
+<code class="docutils literal notranslate">tcp_udp</code> for tcp and udp based packets. The <code class="docutils literal notranslate">!</code> negates the selected
+protocol.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> packet-length <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-packet-length-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> packet-length <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-packet-length-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> packet-length-exclude <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-packet-length-exclude-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> packet-length-exclude <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-packet-length-exclude-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on packet length criteria. Multiple values from 1 to 65535
+and ranges are supported.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> packet-type [broadcast | host | multicast | other]
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-packet-type-broadcast-host-multicast-other" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> packet-type [broadcast | host | multicast | other]
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-packet-type-broadcast-host-multicast-other" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 based on packet type criteria.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> recent count <1-255>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-recent-count-1-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> recent count <1-255>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-recent-count-1-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> recent time <1-4294967295>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-recent-time-1-4294967295" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> recent time <1-4294967295>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-recent-time-1-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 parameters for matching recently seen sources. This match 可能 used
+by setting count (source address seen more than <1-255> times) and/or time
+(source address seen in the last <0-4294967295> seconds).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> state <established | invalid | new | related>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-state-established-invalid-new-related" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> state <established | invalid | new | related>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-state-established-invalid-new-related" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 match criteria based on session state.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> tcp flags <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-tcp-flags-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> tcp flags <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-tcp-flags-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 match criteria based on tcp flags. 允许ed values for TCP flags: SYN ACK
+FIN RST URG PSH ALL. When specifying more than one flag, flags 应该
+comma-separated. For example : value of ‘SYN,!ACK,!FIN,!RST’ will only match
+packets with the SYN flag set, and the ACK, FIN and RST flags unset.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> time monthdays <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-time-monthdays-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> time monthdays <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-time-monthdays-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> time startdate <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-time-startdate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> time startdate <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-time-startdate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> time starttime <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-time-starttime-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> time starttime <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-time-starttime-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> time stopdate <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-time-stopdate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> time stopdate <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-time-stopdate-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> time stoptime <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-time-stoptime-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> time stoptime <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-time-stoptime-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> time weekdays <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-time-weekdays-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> time weekdays <text>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-time-weekdays-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> time utc
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-time-utc" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> time utc
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-time-utc" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Time to match the defined rule.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route rule <n> ttl <eq | gt | lt> <0-255>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-rule-n-ttl-eq-gt-lt-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 time to live parameter, where ‘eq’ stands for ‘equal’; ‘gt’ stands for
+‘greater than’, and ‘lt’ stands for ‘less than’.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 rule <n> hop-limit <eq | gt | lt> <0-255>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-rule-n-hop-limit-eq-gt-lt-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>匹配 hop-limit parameter, where ‘eq’ stands for ‘equal’; ‘gt’ stands for
+‘greater than’, and ‘lt’ stands for ‘less than’.</p>
+</div>
+</div>
+</section>
+<section id="actions">
+<h3>动作</h3>
+<p>When matching all patterns defined in a rule, then different actions can
+be made. This includes dropping the packet, modifying certain data, or
+setting a different routing table.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> action drop
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-action-drop" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> action drop
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-action-drop" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 rule action to drop.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> set connection-mark <1-2147483647>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-set-connection-mark-1-2147483647" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> set connection-mark <1-2147483647>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-set-connection-mark-1-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 a specific connection mark.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> set dscp <0-63>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-set-dscp-0-63" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> set dscp <0-63>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-set-dscp-0-63" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 packet modifications: 数据包 Differentiated 服务s Codepoint (DSCP)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> set mark <1-2147483647>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-set-mark-1-2147483647" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> set mark <1-2147483647>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-set-mark-1-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 a specific packet mark.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> set table <main | 1-200>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-set-table-main-1-200" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> set table <main | 1-200>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-set-table-main-1-200" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 the routing table to forward packet with.</p>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>When using the <code class="docutils literal notranslate">set table</code> or <code class="docutils literal notranslate">set vrf</code> commands matching
+against the mark is not possible, because it gets overwritten with a
+table-specific mark that is 0x7FFFFFFF - the id of the table/VRF.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> set tcp-mss <500-1460>
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-set-tcp-mss-500-1460" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> set tcp-mss <500-1460>
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-set-tcp-mss-500-1460" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 packet modifications: Explicitly set TCP Maximum segment size value.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route <name> rule <n> set vrf <default | text >
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-set-vrf-default-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 <name> rule <n> set vrf <default | text >
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-set-vrf-default-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>设置 the VRF to forward packet with.</p>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>When using the <code class="docutils literal notranslate">set table</code> or <code class="docutils literal notranslate">set vrf</code> commands matching
+against the mark is not possible, because it gets overwritten with a
+table-specific mark that is 0x7FFFFFFF - the id of the table/VRF.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

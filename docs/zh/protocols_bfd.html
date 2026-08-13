@@ -1,0 +1,600 @@
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="bfd">
+<h1>BFD</h1>
+<p><abbr title="Bidirectional Forwarding Detection">BFD</abbr> is a network protocol that
+detects communication failures between two connected routing devices in mere
+milliseconds — far faster than traditional routing protocols.
+BFD does not route traffic itself. Instead, it provides rapid failure detection
+for other protocols, such as <abbr title="Border Gateway Protocol">BGP</abbr>,
+<abbr title="Open Shortest Path First">OSPF</abbr>, and static routes.</p>
+<p>BFD is described and extended by the following RFCs: <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5880.html"><strong>RFC 5880</strong></a>, <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5881.html"><strong>RFC 5881</strong></a>
+and <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5883.html"><strong>RFC 5883</strong></a>.</p>
+<p><strong>How BFD works</strong></p>
+<p>BFD establishes a session between two peers and exchanges rapid
+<abbr title="User Datagram Protocol">UDP</abbr> control packets at a negotiated interval
+(e.g., 300 ms between consecutive packets). If a peer doesn’t receive these
+packets within the detection time (the negotiated interval multiplied by a
+detection multiplier), BFD assumes a connection failure and notifies the
+routing protocols.</p>
+<section id="configuration">
+<h2>配置</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer <address>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IPv4 or IPv6 address of the BFD peer.</strong></p>
+<p>You can configure multiple BFD peers by specifying a different IP address
+for each neighbor you want to monitor.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>For IPv6 peers, you must configure a source IP address or interface.</p>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 198.51.100.33
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer <address> echo-mode
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-echo-mode" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable BFD echo transmission mode for the peer at the specified IP
+address.</strong></p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 198.51.100.33 echo-mode
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer <address> multihop
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-multihop" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the peer at the specified IP address as a multi-hop neighbor.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>For BFD multi-hop peers, you must configure a local source IP address.</p>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 198.51.100.33 multihop
+set protocols bfd peer 198.51.100.33 source address 198.51.100.1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer <address> source address <address>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the source IP address for the BFD session with the peer at the
+specified IP address.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>Configuring a source IP address or interface is mandatory for IPv6 BFD
+peers.</p>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 198.51.100.33 source address 198.51.100.1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer <address> source interface <interface>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-source-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the source interface for the BFD session with the peer at the
+specified IP address.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>Configuring a source IP address or interface is mandatory for IPv6 BFD
+peers.</p>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 2001:db8::2 source interface eth0
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer <address> interval echo-interval <10-60000>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-interval-echo-interval-10-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the minimum interval, in milliseconds, at which the local system
+can receive echo packets from the peer at the specified IP address.</strong></p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 198.51.100.33 interval echo-interval 50
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer <address> interval multiplier <2-255>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-interval-multiplier-2-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the detection multiplier for the peer at the specified IP
+address.</strong></p>
+<p>BFD multiplies the negotiated interval by this value to calculate the
+detection time — the period after which it declares the session down if no
+control packets arrive.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 192.0.2.1 interval multiplier 3
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer <address> interval receive <10-60000>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-interval-receive-10-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interval, in milliseconds, at which the local system can
+receive BFD control packets from the peer at the specified IP address.</strong></p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 192.0.2.1 interval receive 300
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer <address> interval transmit <10-60000>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-interval-transmit-10-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interval, in milliseconds, at which you want the local
+system to transmit BFD control packets to the peer at the specified IP
+address.</strong></p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 192.0.2.1 interval transmit 300
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer <address> shutdown
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-shutdown" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable the BFD session with the peer at the specified IP address.</strong></p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 198.51.100.33 shutdown
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer <address> minimum-ttl <1-254>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-minimum-ttl-1-254" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the minimum <abbr title="Time to Live">TTL</abbr> value that incoming BFD
+control packets must have to be accepted from the peer at the specified IP
+address.</strong></p>
+<p>BFD discards any packet whose TTL is below this threshold.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>This setting applies only to multi-hop sessions.</p>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 192.0.2.1 minimum-ttl 250
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer <address> passive
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-passive" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the BFD session with the peer at the specified IP address to
+operate in passive mode.</strong></p>
+<p>In passive mode, the local system does not initiate the BFD session.
+Instead, it waits to receive the first BFD control packet from the remote
+peer.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>At least one of the two peers must remain in active mode for the session
+to establish. If both peers are passive, neither will initiate, and the
+session never establishes.</p>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 198.51.100.33 passive
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer <address> profile <profile>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-profile-profile" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>应用 settings from a designated BFD profile to the peer at the specified
+IP address.</strong></p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 192.0.2.1 profile datacenter-fast
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bfd peer <address> vrf <vrf>
+<a class="cmdlink" href="#cfgcmd-set-protocols-bfd-peer-address-vrf-vrf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>绑定 the BFD session with the peer at the specified IP address to a
+specific <abbr title="Virtual Routing and Forwarding">VRF</abbr> instance.</strong></p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bfd peer 192.0.2.1 vrf customer-a
+</pre></div>
+</div>
+<section id="enable-bfd-in-bgp">
+<h3>Enable BFD in BGP</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor <neighbor> bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-neighbor-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable BFD failure detection for the BGP session with the neighbor at the
+specified IP address.</strong></p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bgp neighbor 192.0.2.1 bfd
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp peer-group <neighbor> bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-peer-group-neighbor-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable BFD failure detection for all neighbors in the specified BGP peer
+group.</strong></p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols bgp peer-group INTERNAL-PEERS bfd
+</pre></div>
+</div>
+</section>
+<section id="enable-bfd-in-ospf">
+<h3>Enable BFD in OSPF</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf interface <interface> bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable BFD failure detection for OSPF neighbors discovered on the specified
+interface.</strong></p>
+<p>When OSPF forms an adjacency with a neighbor on this interface, it requests
+BFD to establish a session with that neighbor.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospf interface eth0 bfd
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospfv3 interface <interface> bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-interface-interface-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable BFD failure detection for OSPFv3 neighbors discovered on the
+specified interface.</strong></p>
+<p>When OSPFv3 forms an adjacency with a neighbor on this interface, it
+requests BFD to establish a session with that neighbor.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospfv3 interface eth0 bfd
+</pre></div>
+</div>
+</section>
+<section id="enable-bfd-in-is-is">
+<h3>Enable BFD in IS-IS</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable BFD failure detection for IS-IS neighbors discovered on the
+specified interface.</strong></p>
+<p>When IS-IS forms an adjacency with a neighbor on this interface, it requests
+BFD to establish a session with that neighbor.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth0 bfd
+</pre></div>
+</div>
+</section>
+</section>
+<section id="operation">
+<h2>Operation</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bfd peers
+<a class="cmdlink" href="#opcmd-show-bfd-peers" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p><strong>显示 all BFD peers.</strong></p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show bfd peers
+BFD Peers:
+        peer 198.51.100.33 vrf default
+                ID: 4182341893
+                Remote ID: 3267892964
+                Active mode
+                Status: up
+                Uptime: 1 month(s), 16 hour(s), 29 minute(s), 38 second(s)
+                Diagnostics: ok
+                Remote diagnostics: ok
+                Peer Type: configured
+                RTT min/avg/max: 245/267/289 usec
+                Local timers:
+                        Detect-multiplier: 3
+                        Receive interval: 300ms
+                        Transmission interval: 300ms
+                        Echo receive interval: 50ms
+                        Echo transmission interval: disabled
+                Remote timers:
+                        Detect-multiplier: 3
+                        Receive interval: 300ms
+                        Transmission interval: 300ms
+                        Echo receive interval: disabled
+
+        peer 198.51.100.55 multihop local-address 198.51.100.1 vrf default
+                ID: 3618932327
+                Remote ID: 3312345688
+                Active mode
+                Minimum TTL: 254
+                Status: up
+                Uptime: 20 hour(s), 16 minute(s), 19 second(s)
+                Diagnostics: ok
+                Remote diagnostics: ok
+                Peer Type: configured
+                RTT min/avg/max: 1240/1289/1356 usec
+                Local timers:
+                        Detect-multiplier: 3
+                        Receive interval: 300ms
+                        Transmission interval: 300ms
+                        Echo receive interval: 50ms
+                        Echo transmission interval: disabled
+                Remote timers:
+                        Detect-multiplier: 3
+                        Receive interval: 1000ms
+                        Transmission interval: 1000ms
+                        Echo receive interval: disabled
+</pre></div>
+</div>
+</section>
+<section id="bfd-static-route-monitoring">
+<h2>BFD static route monitoring</h2>
+<p>A monitored static route is present in the
+<abbr title="Routing Information Base">RIB</abbr> only when the BFD session is up. If
+the session goes down, the route is removed.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> next-hop <address> bfd profile <profile>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd-profile-profile" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure BFD failure detection for a single-hop static route.</strong></p>
+<p>BFD uses the next-hop IP address as the BFD peer IP address and applies
+settings from the specified BFD profile.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/24 next-hop 192.0.2.1 bfd profile datacenter-fast
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> next-hop <address> bfd multi-hop source-address <address>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd-multi-hop-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure BFD failure detection for a multi-hop static route.</strong></p>
+<p>BFD uses the next-hop IP address as the BFD peer IP address and the
+multi-hop source IP address as the local source IP for outgoing BFD packets.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/24 next-hop 198.51.100.33 bfd multi-hop source-address 198.51.100.1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> next-hop <address> bfd profile <profile>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd-profile-profile" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure BFD failure detection for a single-hop IPv6 static route.</strong></p>
+<p>BFD uses the next-hop IPv6 address as the BFD peer IPv6 address and applies
+settings from the specified BFD profile.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8::1 bfd profile datacenter-fast
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> next-hop <address> bfd multi-hop source-address <address>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd-multi-hop-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure BFD failure detection for a multi-hop IPv6 static route.</strong></p>
+<p>BFD uses the next-hop IPv6 address as the BFD peer IPv6 address and the
+multi-hop source IPv6 address as the local source IPv6 address for outgoing
+BFD packets.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::33 bfd multi-hop source-address 2001:db8::1
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

@@ -8,43 +8,44 @@ import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh, offMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const POLICY_TYPES = [
   { value: 'cake', label: 'CAKE' },
   { value: 'drop-tail', label: 'Drop Tail (FIFO)' },
   { value: 'fair-queue', label: 'Fair Queue (SFQ)' },
   { value: 'fq-codel', label: 'FQ-CoDel' },
-  { value: 'limiter', label: 'Limiter (流量限制)' },
-  { value: 'network-emulator', label: 'Network Emulator (网络仿真)' },
-  { value: 'priority-queue', label: 'Priority Queue (优先级队列)' },
-  { value: 'random-detect', label: 'Random Detect (WRED)' },
-  { value: 'rate-control', label: 'Rate Control (速率控制)' },
-  { value: 'round-robin', label: 'Round Robin (轮询)' },
-  { value: 'shaper', label: 'Shaper (HTB 整形)' },
+  { value: 'limiter', label: 'qosPolicy.types.limiter' },
+  { value: 'network-emulator', label: 'qosPolicy.types.networkEmulator' },
+  { value: 'priority-queue', label: 'qosPolicy.types.priorityQueue' },
+  { value: 'random-detect', label: 'qosPolicy.types.randomDetect' },
+  { value: 'rate-control', label: 'qosPolicy.types.rateControl' },
+  { value: 'round-robin', label: 'qosPolicy.types.roundRobin' },
+  { value: 'shaper', label: 'qosPolicy.types.shaper' },
   { value: 'shaper-hfsc', label: 'Shaper HFSC' },
 ];
 
 const FLOW_ISOLATION_OPTIONS = [
-  { value: 'blind', label: 'blind (无流隔离)' },
-  { value: 'src-host', label: 'src-host (按源主机)' },
-  { value: 'dst-host', label: 'dst-host (按目标主机)' },
-  { value: 'host', label: 'host (按主机对)' },
-  { value: 'flow', label: 'flow (按5元组流)' },
-  { value: 'dual-src-host', label: 'dual-src-host (双源主机)' },
-  { value: 'dual-dst-host', label: 'dual-dst-host (双目标主机)' },
-  { value: 'triple-isolate', label: 'triple-isolate (三向隔离，默认)' },
+  { value: 'blind', label: 'blind' },
+  { value: 'src-host', label: 'src-host' },
+  { value: 'dst-host', label: 'dst-host' },
+  { value: 'host', label: 'host' },
+  { value: 'flow', label: 'flow' },
+  { value: 'dual-src-host', label: 'dual-src-host' },
+  { value: 'dual-dst-host', label: 'dual-dst-host' },
+  { value: 'triple-isolate', label: 'triple-isolate' },
 ];
 
 const EXCEED_OPTIONS = [
-  { value: 'continue', label: 'continue (继续)' },
-  { value: 'drop', label: 'drop (丢弃，默认)' },
-  { value: 'ok', label: 'ok (接受)' },
-  { value: 'reclassify', label: 'reclassify (重新分类)' },
-  { value: 'pipe', label: 'pipe (管道)' },
+  { value: 'continue', label: 'qosPolicy.options.continue' },
+  { value: 'drop', label: 'qosPolicy.options.drop' },
+  { value: 'ok', label: 'qosPolicy.options.ok' },
+  { value: 'reclassify', label: 'qosPolicy.options.reclassify' },
+  { value: 'pipe', label: 'qosPolicy.options.pipe' },
 ];
 
 const QUEUE_TYPE_OPTIONS = [
-  { value: 'drop-tail', label: 'drop-tail (默认)' },
+  { value: 'drop-tail', label: 'drop-tail' },
   { value: 'fq-codel', label: 'fq-codel' },
 ];
 
@@ -60,26 +61,26 @@ const DSCP_OPTIONS = [
   { value: 'critical', label: 'critical (101000)' },
   { value: 'internet', label: 'internet (110000)' },
   { value: 'network', label: 'network (111000)' },
-  { value: 'AF11', label: 'AF11 (高吞吐量数据)' },
-  { value: 'AF12', label: 'AF12 (高吞吐量数据)' },
-  { value: 'AF13', label: 'AF13 (高吞吐量数据)' },
-  { value: 'AF21', label: 'AF21 (低延迟数据)' },
-  { value: 'AF22', label: 'AF22 (低延迟数据)' },
-  { value: 'AF23', label: 'AF23 (低延迟数据)' },
-  { value: 'AF31', label: 'AF31 (多媒体流)' },
-  { value: 'AF32', label: 'AF32 (多媒体流)' },
-  { value: 'AF33', label: 'AF33 (多媒体流)' },
-  { value: 'AF41', label: 'AF41 (多媒体会议)' },
-  { value: 'AF42', label: 'AF42 (多媒体会议)' },
-  { value: 'AF43', label: 'AF43 (多媒体会议)' },
-  { value: 'CS1', label: 'CS1 (低优先级数据)' },
+  { value: 'AF11', label: 'qosPolicy.dscp.AF11' },
+  { value: 'AF12', label: 'qosPolicy.dscp.AF12' },
+  { value: 'AF13', label: 'qosPolicy.dscp.AF13' },
+  { value: 'AF21', label: 'qosPolicy.dscp.AF21' },
+  { value: 'AF22', label: 'qosPolicy.dscp.AF22' },
+  { value: 'AF23', label: 'qosPolicy.dscp.AF23' },
+  { value: 'AF31', label: 'qosPolicy.dscp.AF31' },
+  { value: 'AF32', label: 'qosPolicy.dscp.AF32' },
+  { value: 'AF33', label: 'qosPolicy.dscp.AF33' },
+  { value: 'AF41', label: 'qosPolicy.dscp.AF41' },
+  { value: 'AF42', label: 'qosPolicy.dscp.AF42' },
+  { value: 'AF43', label: 'qosPolicy.dscp.AF43' },
+  { value: 'CS1', label: 'qosPolicy.dscp.CS1' },
   { value: 'CS2', label: 'CS2 (OAM)' },
-  { value: 'CS3', label: 'CS3 (广播视频)' },
-  { value: 'CS4', label: 'CS4 (实时交互)' },
-  { value: 'CS5', label: 'CS5 (信令)' },
-  { value: 'CS6', label: 'CS6 (网络控制)' },
+  { value: 'CS3', label: 'qosPolicy.dscp.CS3' },
+  { value: 'CS4', label: 'qosPolicy.dscp.CS4' },
+  { value: 'CS5', label: 'qosPolicy.dscp.CS5' },
+  { value: 'CS6', label: 'qosPolicy.dscp.CS6' },
   { value: 'CS7', label: 'CS7' },
-  { value: 'EF', label: 'EF (加速转发)' },
+  { value: 'EF', label: 'qosPolicy.dscp.EF' },
 ];
 
 const IP_PROTOCOL_OPTIONS = [
@@ -106,314 +107,314 @@ const IP_PROTOCOL_OPTIONS = [
 ];
 
 const ETHER_PROTOCOL_OPTIONS = [
-  { value: 'all', label: 'all (任意协议)' },
-  { value: 'ip', label: 'ip (IPv4)' },
-  { value: 'ipv6', label: 'ipv6 (IPv6)' },
+  { value: 'all', label: 'qosPolicy.etherProtocol.all' },
+  { value: 'ip', label: 'qosPolicy.etherProtocol.ip' },
+  { value: 'ipv6', label: 'qosPolicy.etherProtocol.ipv6' },
   { value: 'arp', label: 'arp' },
-  { value: 'atalk', label: 'atalk (AppleTalk)' },
-  { value: 'ipx', label: 'ipx (Novell IPX)' },
-  { value: '802.1Q', label: '802.1Q (VLAN 标签)' },
-  { value: '802_2', label: '802_2 (IEEE 802.2)' },
-  { value: '802_3', label: '802_3 (IEEE 802.3)' },
-  { value: 'aarp', label: 'aarp (AppleTalk ARP)' },
-  { value: 'aoe', label: 'aoe (ATA over Ethernet)' },
-  { value: 'dec', label: 'dec (DECnet)' },
-  { value: 'lat', label: 'lat (Local Area Transport)' },
-  { value: 'localtalk', label: 'localtalk (Apple LocalTalk)' },
-  { value: 'rarp', label: 'rarp (反向 ARP)' },
-  { value: 'snap', label: 'snap (子网访问协议)' },
-  { value: 'x25', label: 'x25 (X.25 分组交换)' },
+  { value: 'atalk', label: 'qosPolicy.etherProtocol.atalk' },
+  { value: 'ipx', label: 'qosPolicy.etherProtocol.ipx' },
+  { value: '802.1Q', label: 'qosPolicy.etherProtocol.802.1Q' },
+  { value: '802_2', label: 'qosPolicy.etherProtocol.802_2' },
+  { value: '802_3', label: 'qosPolicy.etherProtocol.802_3' },
+  { value: 'aarp', label: 'qosPolicy.etherProtocol.aarp' },
+  { value: 'aoe', label: 'qosPolicy.etherProtocol.aoe' },
+  { value: 'dec', label: 'qosPolicy.etherProtocol.dec' },
+  { value: 'lat', label: 'qosPolicy.etherProtocol.lat' },
+  { value: 'localtalk', label: 'qosPolicy.etherProtocol.localtalk' },
+  { value: 'rarp', label: 'qosPolicy.etherProtocol.rarp' },
+  { value: 'snap', label: 'qosPolicy.etherProtocol.snap' },
+  { value: 'x25', label: 'qosPolicy.etherProtocol.x25' },
 ];
 
-const BANDWIDTH_HELP = '支持: 100mbit, 1gbit, 50%, 1000kbit 等';
+const BANDWIDTH_HELP = 'qos.help.bandwidth';
 
 // ========== Schema definitions per policy type ==========
 
-function cakeSchema() {
+function cakeSchema(t) {
   return [
-    { key: 'name', title: '策略名称', type: 'text', required: true },
-    { key: 'description', title: '描述', type: 'text' },
-    { key: 'bandwidth', title: '带宽', type: 'text', placeholder: '如 100mbit, 1gbit, 50%', help: BANDWIDTH_HELP },
+    { key: 'name', title: t('qosPolicy.fields.name'), type: 'text', required: true },
+    { key: 'description', title: t('qosPolicy.fields.description'), type: 'text' },
+    { key: 'bandwidth', title: t('qosPolicy.fields.bandwidth'), type: 'text', placeholder: t('qosPolicy.placeholders.bandwidth'), help: BANDWIDTH_HELP },
     {
-      key: 'ack-filter', title: 'ACK 过滤', type: 'group', children: [
-        { key: 'aggressive', title: '激进模式', type: 'checkbox', valueless: true, help: '更积极地压缩/过滤 ACK 包' },
+      key: 'ack-filter', title: t('qosPolicy.fields.ackFilter'), type: 'group', children: [
+        { key: 'aggressive', title: t('qosPolicy.fields.aggressive'), type: 'checkbox', valueless: true, help: t('qosPolicy.help.aggressive') },
       ],
     },
-    { key: 'flow-isolation', title: '流隔离模式', type: 'select', options: FLOW_ISOLATION_OPTIONS, help: '默认: triple-isolate' },
-    { key: 'flow-isolation-nat', title: 'NAT 流隔离', type: 'checkbox', valueless: true, help: '在流隔离前执行 NAT 查找' },
-    { key: 'no-split-gso', title: '不拆分 GSO', type: 'checkbox', valueless: true, help: '不将 GSO 大包拆分为线包' },
-    { key: 'rtt', title: 'RTT (ms)', type: 'number', min: 1, max: 1000000000, placeholder: '1-1000000000', help: '默认: 100' },
+    { key: 'flow-isolation', title: t('qosPolicy.fields.flowIsolation'), type: 'select', options: FLOW_ISOLATION_OPTIONS, help: t('qosPolicy.help.defaultTripleIsolate') },
+    { key: 'flow-isolation-nat', title: t('qosPolicy.fields.flowIsolationNat'), type: 'checkbox', valueless: true, help: t('qosPolicy.help.flowIsolationNat') },
+    { key: 'no-split-gso', title: t('qosPolicy.fields.noSplitGso'), type: 'checkbox', valueless: true, help: t('qosPolicy.help.noSplitGso') },
+    { key: 'rtt', title: 'RTT (ms)', type: 'number', min: 1, max: 1000000000, placeholder: '1-1000000000', help: t('qosPolicy.help.defaultRtt') },
   ];
 }
 
-function dropTailSchema() {
+function dropTailSchema(t) {
   return [
-    { key: 'name', title: '策略名称', type: 'text', required: true },
-    { key: 'description', title: '描述', type: 'text' },
-    { key: 'queue-limit', title: '队列限制', type: 'number', min: 1, max: 4294967295, placeholder: '1-4294967295', help: '队列大小（包数）' },
+    { key: 'name', title: t('qosPolicy.fields.name'), type: 'text', required: true },
+    { key: 'description', title: t('qosPolicy.fields.description'), type: 'text' },
+    { key: 'queue-limit', title: t('qosPolicy.fields.queueLimit'), type: 'number', min: 1, max: 4294967295, placeholder: '1-4294967295', help: t('qosPolicy.help.queueLimitPackets') },
   ];
 }
 
-function fairQueueSchema() {
+function fairQueueSchema(t) {
   return [
-    { key: 'name', title: '策略名称', type: 'text', required: true },
-    { key: 'description', title: '描述', type: 'text' },
-    { key: 'hash-interval', title: '哈希间隔 (s)', type: 'number', min: 0, max: 2147483647, placeholder: '0 或 1-2147483647', help: '0=无扰动, 默认: 0, 建议: 10' },
-    { key: 'queue-limit', title: '队列限制', type: 'number', min: 1, max: 127, placeholder: '1-127', help: '默认: 127' },
+    { key: 'name', title: t('qos.columns.name'), type: 'text', required: true },
+    { key: 'description', title: t('qos.columns.description'), type: 'text' },
+    { key: 'hash-interval', title: t('qos.fields.hashInterval'), type: 'number', min: 0, max: 2147483647, placeholder: t('qosPolicy.placeholders.hashInterval'), help: t('qos.help.hashInterval') },
+    { key: 'queue-limit', title: t('qos.columns.queueLimit'), type: 'number', min: 1, max: 127, placeholder: '1-127', help: t('qos.help.defaultQueueLimit127') },
   ];
 }
 
-function fqCodelSchema() {
+function fqCodelSchema(t) {
   return [
-    { key: 'name', title: '策略名称', type: 'text', required: true },
-    { key: 'description', title: '描述', type: 'text' },
-    { key: 'codel-quantum', title: 'CoDel Quantum', type: 'number', min: 0, max: 1048576, placeholder: '0-1048576', help: '默认: 1514 (字节)' },
-    { key: 'flows', title: '流数量', type: 'number', min: 1, max: 65536, placeholder: '1-65536', help: '默认: 1024' },
-    { key: 'interval', title: '间隔 (ms)', type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: '默认: 100' },
-    { key: 'queue-limit', title: '队列限制', type: 'number', min: 2, max: 10999, placeholder: '2-10999', help: '默认: 10240' },
-    { key: 'target', title: '目标延迟 (ms)', type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: '默认: 5' },
+    { key: 'name', title: t('qos.columns.name'), type: 'text', required: true },
+    { key: 'description', title: t('qos.columns.description'), type: 'text' },
+    { key: 'codel-quantum', title: t('qos.fields.codelQuantum'), type: 'number', min: 0, max: 1048576, placeholder: '0-1048576', help: t('qos.help.defaultCodelQuantum') },
+    { key: 'flows', title: t('qos.fields.flows'), type: 'number', min: 1, max: 65536, placeholder: '1-65536', help: t('qos.help.defaultFlows') },
+    { key: 'interval', title: t('qos.fields.interval'), type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: t('qos.help.defaultInterval') },
+    { key: 'queue-limit', title: t('qos.columns.queueLimit'), type: 'number', min: 2, max: 10999, placeholder: '2-10999', help: t('qos.help.defaultQueueLimit10240') },
+    { key: 'target', title: t('qos.fields.target'), type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: t('qos.help.defaultTarget') },
   ];
 }
 
-function networkEmulatorSchema() {
+function networkEmulatorSchema(t) {
   return [
-    { key: 'name', title: '策略名称', type: 'text', required: true },
-    { key: 'description', title: '描述', type: 'text' },
-    { key: 'bandwidth', title: '带宽', type: 'text', placeholder: '如 100mbit', help: BANDWIDTH_HELP },
-    { key: 'corruption', title: '误码率 (%)', type: 'number', min: 0, max: 100, placeholder: '0-100', help: '随机位置出错的包百分比' },
-    { key: 'delay', title: '延迟 (ms)', type: 'number', min: 0, placeholder: '毫秒', help: '出站包延迟' },
-    { key: 'duplicate', title: '重复率 (%)', type: 'number', min: 0, max: 100, placeholder: '0-100', help: '重复包百分比' },
-    { key: 'loss', title: '丢包率 (%)', type: 'number', min: 0, max: 100, placeholder: '0-100', help: '独立丢包概率' },
-    { key: 'queue-limit', title: '队列限制', type: 'number', min: 1, placeholder: '最大队列大小' },
-    { key: 'reordering', title: '重排序率 (%)', type: 'number', min: 0, max: 100, placeholder: '0-100', help: '模拟包重排序百分比' },
+    { key: 'name', title: t('qos.columns.name'), type: 'text', required: true },
+    { key: 'description', title: t('qos.columns.description'), type: 'text' },
+    { key: 'bandwidth', title: t('qos.columns.bandwidth'), type: 'text', placeholder: t('qosPolicy.placeholders.bandwidthSimple'), help: t(BANDWIDTH_HELP) },
+    { key: 'corruption', title: t('qos.fields.corruption'), type: 'number', min: 0, max: 100, placeholder: '0-100', help: t('qos.help.corruption') },
+    { key: 'delay', title: t('qos.fields.delay'), type: 'number', min: 0, placeholder: t('qos.placeholder.milliseconds'), help: t('qos.help.delay') },
+    { key: 'duplicate', title: t('qos.fields.duplicate'), type: 'number', min: 0, max: 100, placeholder: '0-100', help: t('qos.help.duplicate') },
+    { key: 'loss', title: t('qos.fields.loss'), type: 'number', min: 0, max: 100, placeholder: '0-100', help: t('qos.help.loss') },
+    { key: 'queue-limit', title: t('qos.columns.queueLimit'), type: 'number', min: 1, placeholder: t('qos.placeholder.maxQueueSize') },
+    { key: 'reordering', title: t('qos.fields.reordering'), type: 'number', min: 0, max: 100, placeholder: '0-100', help: t('qos.help.reordering') },
   ];
 }
 
-function rateControlSchema() {
+function rateControlSchema(t) {
   return [
-    { key: 'name', title: '策略名称', type: 'text', required: true },
-    { key: 'description', title: '描述', type: 'text' },
-    { key: 'bandwidth', title: '带宽', type: 'text', placeholder: '如 100mbit', help: BANDWIDTH_HELP },
-    { key: 'burst', title: '突发大小', type: 'text', placeholder: '如 15k, 1mb', help: '默认: 15k (字节)' },
-    { key: 'latency', title: '最大延迟 (ms)', type: 'number', min: 0, placeholder: '毫秒', help: '默认: 50' },
+    { key: 'name', title: t('qos.columns.name'), type: 'text', required: true },
+    { key: 'description', title: t('qos.columns.description'), type: 'text' },
+    { key: 'bandwidth', title: t('qos.columns.bandwidth'), type: 'text', placeholder: t('qosPolicy.placeholders.bandwidthSimple'), help: t(BANDWIDTH_HELP) },
+    { key: 'burst', title: t('qos.fields.burst'), type: 'text', placeholder: t('qosPolicy.placeholders.burstExample'), help: t('qos.help.defaultBurst') },
+    { key: 'latency', title: t('qos.fields.latency'), type: 'number', min: 0, placeholder: t('qos.placeholder.milliseconds'), help: t('qos.help.defaultLatency') },
   ];
 }
 
 // ========== Complex policies with classes ==========
 
-function limiterTopSchema() {
+function limiterTopSchema(t) {
   return [
-    { key: 'name', title: '策略名称', type: 'text', required: true },
-    { key: 'description', title: '描述', type: 'text' },
+    { key: 'name', title: t('qos.columns.name'), type: 'text', required: true },
+    { key: 'description', title: t('qos.columns.description'), type: 'text' },
     {
-      key: 'default', title: '默认类', type: 'group', children: [
-        { key: 'bandwidth', title: '带宽', type: 'text', placeholder: '如 100mbit', help: BANDWIDTH_HELP },
-        { key: 'burst', title: '突发大小', type: 'text', placeholder: '如 15k, 1mb', help: '默认: 15k (字节)' },
-        { key: 'exceed', title: '超限动作', type: 'select', options: EXCEED_OPTIONS, help: '默认: drop' },
+      key: 'default', title: t('qos.fields.defaultClass'), type: 'group', children: [
+        { key: 'bandwidth', title: t('qos.columns.bandwidth'), type: 'text', placeholder: t('qosPolicy.placeholders.bandwidthSimple'), help: t(BANDWIDTH_HELP) },
+        { key: 'burst', title: t('qos.fields.burst'), type: 'text', placeholder: t('qosPolicy.placeholders.burstExample'), help: t('qos.help.defaultBurst') },
+        { key: 'exceed', title: t('qos.fields.exceed'), type: 'select', options: EXCEED_OPTIONS, help: t('qos.help.defaultExceed') },
         { key: 'mtu', title: 'MTU', type: 'number', min: 256, max: 65535, placeholder: '256-65535' },
-        { key: 'not-exceed', title: '未超限动作', type: 'select', options: [
-          { value: 'continue', label: 'continue (继续)' },
-          { value: 'drop', label: 'drop (丢弃)' },
-          { value: 'ok', label: 'ok (接受，默认)' },
-          { value: 'reclassify', label: 'reclassify (重新分类)' },
-          { value: 'pipe', label: 'pipe (管道)' },
-        ], help: '默认: ok' },
+        { key: 'not-exceed', title: t('qos.fields.notExceed'), type: 'select', options: [
+          { value: 'continue', label: 'continue' },
+          { value: 'drop', label: 'drop' },
+          { value: 'ok', label: 'ok' },
+          { value: 'reclassify', label: 'reclassify' },
+          { value: 'pipe', label: 'pipe' },
+        ], help: t('qos.help.defaultNotExceed') },
       ],
     },
   ];
 }
 
-function limiterClassSchema() {
+function limiterClassSchema(t) {
   return [
-    { key: 'id', title: '类 ID', type: 'number', min: 1, max: 4090, required: true, placeholder: '1-4090' },
-    { key: 'description', title: '描述', type: 'text' },
-    { key: 'bandwidth', title: '带宽', type: 'text', placeholder: '如 100mbit', help: BANDWIDTH_HELP },
-    { key: 'burst', title: '突发大小', type: 'text', placeholder: '如 15k, 1mb', help: '默认: 15k (字节)' },
-    { key: 'exceed', title: '超限动作', type: 'select', options: EXCEED_OPTIONS, help: '默认: drop' },
-    { key: 'not-exceed', title: '未超限动作', type: 'select', options: [
-      { value: 'continue', label: 'continue (继续)' },
-      { value: 'drop', label: 'drop (丢弃)' },
-      { value: 'ok', label: 'ok (接受，默认)' },
-      { value: 'reclassify', label: 'reclassify (重新分类)' },
-      { value: 'pipe', label: 'pipe (管道)' },
-    ], help: '默认: ok' },
-    { key: 'match-group', title: '过滤组', type: 'text', placeholder: '过滤组名称', help: 'QoS 策略的过滤组' },
+    { key: 'id', title: t('qos.columns.classId'), type: 'number', min: 1, max: 4090, required: true, placeholder: '1-4090' },
+    { key: 'description', title: t('qos.columns.description'), type: 'text' },
+    { key: 'bandwidth', title: t('qos.columns.bandwidth'), type: 'text', placeholder: t('qosPolicy.placeholders.bandwidthSimple'), help: t(BANDWIDTH_HELP) },
+    { key: 'burst', title: t('qos.fields.burst'), type: 'text', placeholder: t('qosPolicy.placeholders.burstExample'), help: t('qos.help.defaultBurst') },
+    { key: 'exceed', title: t('qos.fields.exceed'), type: 'select', options: EXCEED_OPTIONS, help: t('qos.help.defaultExceed') },
+    { key: 'not-exceed', title: t('qos.fields.notExceed'), type: 'select', options: [
+      { value: 'continue', label: 'continue' },
+      { value: 'drop', label: 'drop' },
+      { value: 'ok', label: 'ok' },
+      { value: 'reclassify', label: 'reclassify' },
+      { value: 'pipe', label: 'pipe' },
+    ], help: t('qos.help.defaultNotExceed') },
+    { key: 'match-group', title: t('qos.fields.matchGroup'), type: 'text', placeholder: t('qos.placeholder.filterGroupName'), help: t('qos.help.matchGroup') },
     { key: 'mtu', title: 'MTU', type: 'number', min: 256, max: 65535, placeholder: '256-65535' },
-    { key: 'priority', title: '优先级', type: 'number', min: 0, max: 20, placeholder: '0-20', help: '默认: 20' },
+    { key: 'priority', title: t('qos.columns.priority'), type: 'number', min: 0, max: 20, placeholder: '0-20', help: t('qos.help.defaultPriority') },
   ];
 }
 
-function priorityQueueTopSchema() {
+function priorityQueueTopSchema(t) {
   return [
-    { key: 'name', title: '策略名称', type: 'text', required: true },
-    { key: 'description', title: '描述', type: 'text' },
+    { key: 'name', title: t('qosPolicy.fields.name'), type: 'text', required: true },
+    { key: 'description', title: t('qosPolicy.fields.description'), type: 'text' },
     {
-      key: 'default', title: '默认类', type: 'group', children: [
-        { key: 'codel-quantum', title: 'CoDel Quantum', type: 'number', min: 0, max: 1048576, placeholder: '0-1048576', help: '默认: 1514' },
-        { key: 'flows', title: '流数量', type: 'number', min: 1, max: 65536, placeholder: '1-65536', help: '默认: 1024' },
-        { key: 'interval', title: '间隔 (ms)', type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: '默认: 100' },
-        { key: 'queue-limit', title: '队列限制', type: 'number', min: 1, max: 4294967295, placeholder: '1-4294967295', help: '默认: 最大队列大小' },
-        { key: 'queue-type', title: '队列类型', type: 'select', options: QUEUE_TYPE_OPTIONS, help: '默认: drop-tail' },
-        { key: 'target', title: '目标延迟 (ms)', type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: '默认: 5' },
+      key: 'default', title: t('qosPolicy.fields.defaultClass'), type: 'group', children: [
+        { key: 'codel-quantum', title: 'CoDel Quantum', type: 'number', min: 0, max: 1048576, placeholder: '0-1048576', help: t('qosPolicy.help.defaultCodelQuantum1514') },
+        { key: 'flows', title: t('qosPolicy.fields.flows'), type: 'number', min: 1, max: 65536, placeholder: '1-65536', help: t('qosPolicy.help.defaultFlows1024') },
+        { key: 'interval', title: t('qosPolicy.fields.interval'), type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: t('qosPolicy.help.defaultRtt') },
+        { key: 'queue-limit', title: t('qosPolicy.fields.queueLimit'), type: 'number', min: 1, max: 4294967295, placeholder: '1-4294967295', help: t('qosPolicy.help.defaultMaxQueueSize') },
+        { key: 'queue-type', title: t('qosPolicy.fields.queueType'), type: 'select', options: QUEUE_TYPE_OPTIONS, help: t('qosPolicy.help.defaultDropTail') },
+        { key: 'target', title: t('qosPolicy.fields.targetDelay'), type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: t('qosPolicy.help.defaultTargetDelay') },
       ],
     },
   ];
 }
 
-function priorityQueueClassSchema() {
+function priorityQueueClassSchema(t) {
   return [
-    { key: 'id', title: '优先级', type: 'number', min: 1, max: 7, required: true, placeholder: '1-7' },
-    { key: 'description', title: '描述', type: 'text' },
-    { key: 'codel-quantum', title: 'CoDel Quantum', type: 'number', min: 0, max: 1048576, placeholder: '0-1048576', help: '默认: 1514' },
-    { key: 'flows', title: '流数量', type: 'number', min: 1, max: 65536, placeholder: '1-65536', help: '默认: 1024' },
-    { key: 'interval', title: '间隔 (ms)', type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: '默认: 100' },
-    { key: 'match-group', title: '过滤组', type: 'text', placeholder: '过滤组名称', help: 'QoS 策略的过滤组' },
-    { key: 'queue-limit', title: '队列限制', type: 'number', min: 1, placeholder: '最大队列大小' },
-    { key: 'queue-type', title: '队列类型', type: 'select', options: QUEUE_TYPE_OPTIONS, help: '默认: drop-tail' },
-    { key: 'target', title: '目标延迟 (ms)', type: 'number', min: 0, placeholder: '最小持续队列延迟', help: '默认: 5' },
+    { key: 'id', title: t('qos.columns.priority'), type: 'number', min: 1, max: 7, required: true, placeholder: '1-7' },
+    { key: 'description', title: t('qos.columns.description'), type: 'text' },
+    { key: 'codel-quantum', title: t('qos.fields.codelQuantum'), type: 'number', min: 0, max: 1048576, placeholder: '0-1048576', help: t('qos.help.defaultCodelQuantum1514') },
+    { key: 'flows', title: t('qos.fields.flows'), type: 'number', min: 1, max: 65536, placeholder: '1-65536', help: t('qos.help.defaultFlows') },
+    { key: 'interval', title: t('qos.fields.interval'), type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: t('qos.help.defaultInterval') },
+    { key: 'match-group', title: t('qos.fields.matchGroup'), type: 'text', placeholder: t('qos.placeholder.filterGroupName'), help: t('qos.help.matchGroup') },
+    { key: 'queue-limit', title: t('qos.columns.queueLimit'), type: 'number', min: 1, placeholder: t('qos.placeholder.maxQueueSize') },
+    { key: 'queue-type', title: t('qos.fields.queueType'), type: 'select', options: QUEUE_TYPE_OPTIONS, help: t('qos.help.defaultQueueType') },
+    { key: 'target', title: t('qos.fields.target'), type: 'number', min: 0, placeholder: t('qos.placeholder.minQueueDelay'), help: t('qos.help.defaultTarget') },
   ];
 }
 
-function roundRobinTopSchema() {
+function roundRobinTopSchema(t) {
   return [
-    { key: 'name', title: '策略名称', type: 'text', required: true },
-    { key: 'description', title: '描述', type: 'text' },
+    { key: 'name', title: t('qosPolicy.fields.name'), type: 'text', required: true },
+    { key: 'description', title: t('qosPolicy.fields.description'), type: 'text' },
   ];
 }
 
-function roundRobinClassSchema() {
+function roundRobinClassSchema(t) {
   return [
-    { key: 'id', title: '类 ID', type: 'number', min: 1, max: 4095, required: true, placeholder: '1-4095' },
-    { key: 'description', title: '描述', type: 'text' },
-    { key: 'codel-quantum', title: 'CoDel Quantum', type: 'number', min: 0, max: 1048576, placeholder: '0-1048576', help: '默认: 1514' },
-    { key: 'flows', title: '流数量', type: 'number', min: 1, max: 65536, placeholder: '1-65536', help: '默认: 1024' },
-    { key: 'interval', title: '间隔 (ms)', type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: '默认: 100' },
-    { key: 'quantum', title: '调度量子', type: 'number', min: 1, placeholder: '包调度量子值' },
-    { key: 'queue-limit', title: '队列限制', type: 'number', min: 1, placeholder: '最大队列大小' },
-    { key: 'queue-type', title: '队列类型', type: 'select', options: QUEUE_TYPE_OPTIONS, help: '默认: drop-tail' },
-    { key: 'target', title: '目标延迟 (ms)', type: 'number', min: 0, placeholder: '最小持续队列延迟', help: '默认: 5' },
+    { key: 'id', title: t('qos.columns.classId'), type: 'number', min: 1, max: 4095, required: true, placeholder: '1-4095' },
+    { key: 'description', title: t('qos.columns.description'), type: 'text' },
+    { key: 'codel-quantum', title: t('qos.fields.codelQuantum'), type: 'number', min: 0, max: 1048576, placeholder: '0-1048576', help: t('qos.help.defaultCodelQuantum1514') },
+    { key: 'flows', title: t('qos.fields.flows'), type: 'number', min: 1, max: 65536, placeholder: '1-65536', help: t('qos.help.defaultFlows') },
+    { key: 'interval', title: t('qos.fields.interval'), type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: t('qos.help.defaultInterval') },
+    { key: 'quantum', title: t('qos.fields.quantum'), type: 'number', min: 1, placeholder: t('qos.placeholder.packetQuantum') },
+    { key: 'queue-limit', title: t('qos.columns.queueLimit'), type: 'number', min: 1, placeholder: t('qos.placeholder.maxQueueSize') },
+    { key: 'queue-type', title: t('qos.fields.queueType'), type: 'select', options: QUEUE_TYPE_OPTIONS, help: t('qos.help.defaultQueueType') },
+    { key: 'target', title: t('qos.fields.target'), type: 'number', min: 0, placeholder: t('qos.placeholder.minQueueDelay'), help: t('qos.help.defaultTarget') },
   ];
 }
 
-function shaperTopSchema() {
+function shaperTopSchema(t) {
   return [
-    { key: 'name', title: '策略名称', type: 'text', required: true },
-    { key: 'description', title: '描述', type: 'text' },
-    { key: 'bandwidth', title: '带宽', type: 'text', placeholder: '如 auto, 100mbit', help: '默认: auto, ' + BANDWIDTH_HELP },
+    { key: 'name', title: t('qos.columns.name'), type: 'text', required: true },
+    { key: 'description', title: t('qos.columns.description'), type: 'text' },
+    { key: 'bandwidth', title: t('qos.columns.bandwidth'), type: 'text', placeholder: t('qosPolicy.placeholders.autoOrBandwidth'), help: t('qos.help.defaultAuto') + ', ' + t(BANDWIDTH_HELP) },
   ];
 }
 
-function shaperClassSchema() {
+function shaperClassSchema(t) {
   return [
-    { key: 'id', title: '类 ID', type: 'number', min: 2, max: 4095, required: true, placeholder: '2-4095' },
-    { key: 'description', title: '描述', type: 'text' },
-    { key: 'average-packet', title: '平均包大小', type: 'number', min: 16, max: 10240, placeholder: '16-10240', help: '默认: 1024 (字节)' },
-    { key: 'bandwidth', title: '带宽', type: 'text', placeholder: '如 auto, 100mbit', help: '默认: auto' },
-    { key: 'burst', title: '突发大小', type: 'text', placeholder: '如 15k, 1mb', help: '默认: 15k (字节)' },
-    { key: 'ceiling', title: '带宽上限', type: 'text', placeholder: '如 100mbit', help: '该类带宽上限' },
-    { key: 'codel-quantum', title: 'CoDel Quantum', type: 'number', min: 0, max: 1048576, placeholder: '0-1048576', help: '默认: 1514' },
-    { key: 'flows', title: '流数量', type: 'number', min: 1, max: 65536, placeholder: '1-65536', help: '默认: 1024' },
-    { key: 'interval', title: '间隔 (ms)', type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: '默认: 100' },
-    { key: 'mark-probability', title: '标记概率', type: 'number', min: 0, max: 100, placeholder: '0-100', help: '默认: 10' },
-    { key: 'maximum-threshold', title: '最大阈值', type: 'number', min: 0, placeholder: '随机检测最大阈值', help: '默认: 18' },
-    { key: 'minimum-threshold', title: '最小阈值', type: 'number', min: 0, placeholder: '随机检测最小阈值' },
-    { key: 'priority', title: '优先级', type: 'number', min: 0, placeholder: '规则评估优先级' },
-    { key: 'queue-limit', title: '队列限制', type: 'number', min: 1, placeholder: '最大队列大小' },
-    { key: 'queue-type', title: '队列类型', type: 'select', options: [
-      { value: 'fq-codel', label: 'fq-codel (默认)' },
+    { key: 'id', title: t('qos.columns.classId'), type: 'number', min: 2, max: 4095, required: true, placeholder: '2-4095' },
+    { key: 'description', title: t('qos.columns.description'), type: 'text' },
+    { key: 'average-packet', title: t('qos.fields.averagePacket'), type: 'number', min: 16, max: 10240, placeholder: '16-10240', help: t('qos.help.defaultAveragePacket') },
+    { key: 'bandwidth', title: t('qos.columns.bandwidth'), type: 'text', placeholder: t('qosPolicy.placeholders.autoOrBandwidth'), help: t('qos.help.defaultAuto') },
+    { key: 'burst', title: t('qos.fields.burst'), type: 'text', placeholder: t('qosPolicy.placeholders.burstExample'), help: t('qos.help.defaultBurst') },
+    { key: 'ceiling', title: t('qos.fields.ceiling'), type: 'text', placeholder: t('qosPolicy.placeholders.bandwidthSimple'), help: t('qos.help.classBandwidthLimit') },
+    { key: 'codel-quantum', title: t('qos.fields.codelQuantum'), type: 'number', min: 0, max: 1048576, placeholder: '0-1048576', help: t('qos.help.defaultCodelQuantum1514') },
+    { key: 'flows', title: t('qos.fields.flows'), type: 'number', min: 1, max: 65536, placeholder: '1-65536', help: t('qos.help.defaultFlows') },
+    { key: 'interval', title: t('qos.fields.interval'), type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: t('qos.help.defaultInterval') },
+    { key: 'mark-probability', title: t('qos.fields.markProbability'), type: 'number', min: 0, max: 100, placeholder: '0-100', help: t('qos.help.defaultMarkProbability') },
+    { key: 'maximum-threshold', title: t('qos.fields.maximumThreshold'), type: 'number', min: 0, placeholder: t('qos.placeholder.randomDetectMax'), help: t('qos.help.defaultMaximumThreshold') },
+    { key: 'minimum-threshold', title: t('qos.fields.minimumThreshold'), type: 'number', min: 0, placeholder: t('qos.placeholder.randomDetectMin') },
+    { key: 'priority', title: t('qos.columns.priority'), type: 'number', min: 0, placeholder: t('qos.placeholder.ruleEvalPriority') },
+    { key: 'queue-limit', title: t('qos.columns.queueLimit'), type: 'number', min: 1, placeholder: t('qos.placeholder.maxQueueSize') },
+    { key: 'queue-type', title: t('qos.fields.queueType'), type: 'select', options: [
+      { value: 'fq-codel', label: 'fq-codel' },
       { value: 'drop-tail', label: 'drop-tail' },
-    ], help: '默认: fq-codel' },
-    { key: 'set-dscp', title: '设置 DSCP', type: 'text', placeholder: 'DSCP 值', help: '修改 IP 头 DiffServ 字段' },
-    { key: 'target', title: '目标延迟 (ms)', type: 'number', min: 0, placeholder: '最小持续队列延迟', help: '默认: 5' },
+    ], help: t('qos.help.defaultQueueTypeFqCodel') },
+    { key: 'set-dscp', title: t('qos.fields.setDscp'), type: 'text', placeholder: t('qos.placeholder.dscpValue'), help: t('qos.help.setDscp') },
+    { key: 'target', title: t('qos.fields.target'), type: 'number', min: 0, placeholder: t('qos.placeholder.minQueueDelay'), help: t('qos.help.defaultTarget') },
   ];
 }
 
-function shaperHfscTopSchema() {
+function shaperHfscTopSchema(t) {
   return [
-    { key: 'name', title: '策略名称', type: 'text', required: true },
-    { key: 'description', title: '描述', type: 'text' },
-    { key: 'bandwidth', title: '带宽', type: 'text', placeholder: '如 auto, 100mbit', help: '默认: auto, ' + BANDWIDTH_HELP },
+    { key: 'name', title: t('qos.columns.name'), type: 'text', required: true },
+    { key: 'description', title: t('qos.columns.description'), type: 'text' },
+    { key: 'bandwidth', title: t('qos.columns.bandwidth'), type: 'text', placeholder: t('qosPolicy.placeholders.autoOrBandwidth'), help: t('qos.help.defaultAuto') + ', ' + t(BANDWIDTH_HELP) },
   ];
 }
 
-function shaperHfscClassSchema() {
+function shaperHfscClassSchema(t) {
   return [
-    { key: 'id', title: '类 ID', type: 'number', min: 1, max: 4095, required: true, placeholder: '1-4095' },
-    { key: 'description', title: '描述', type: 'text' },
+    { key: 'id', title: t('qosPolicy.fields.classId'), type: 'number', min: 1, max: 4095, required: true, placeholder: '1-4095' },
+    { key: 'description', title: t('qosPolicy.fields.description'), type: 'text' },
     {
-      key: 'linkshare', title: 'Linkshare (带宽共享)', type: 'group', children: [
-        { key: 'd', title: '延迟 (ms)', type: 'number', min: 0, placeholder: '服务曲线延迟' },
-        { key: 'm1', title: 'M1 速率', type: 'text', placeholder: '如 100kbit, 50%', help: '初始速率' },
-        { key: 'm2', title: 'M2 速率', type: 'text', placeholder: '如 100kbit, 50%', help: '稳定速率' },
+      key: 'linkshare', title: t('qosPolicy.fields.linkshare'), type: 'group', children: [
+        { key: 'd', title: t('qosPolicy.fields.delayMs'), type: 'number', min: 0, placeholder: t('qosPolicy.placeholders.serviceCurveDelay') },
+        { key: 'm1', title: t('qosPolicy.fields.m1Rate'), type: 'text', placeholder: t('qosPolicy.placeholders.rateExample'), help: t('qosPolicy.help.initialRate') },
+        { key: 'm2', title: t('qosPolicy.fields.m2Rate'), type: 'text', placeholder: t('qosPolicy.placeholders.rateExample'), help: t('qosPolicy.help.sustainableRate') },
       ],
     },
     {
-      key: 'realtime', title: 'Realtime (实时)', type: 'group', children: [
-        { key: 'd', title: '延迟 (ms)', type: 'number', min: 0, placeholder: '服务曲线延迟' },
-        { key: 'm1', title: 'M1 速率', type: 'text', placeholder: '如 100kbit, 50%', help: '初始速率' },
-        { key: 'm2', title: 'M2 速率', type: 'text', placeholder: '如 100kbit, 50%', help: '稳定速率' },
+      key: 'realtime', title: t('qosPolicy.fields.realtime'), type: 'group', children: [
+        { key: 'd', title: t('qosPolicy.fields.delayMs'), type: 'number', min: 0, placeholder: t('qosPolicy.placeholders.serviceCurveDelay') },
+        { key: 'm1', title: t('qosPolicy.fields.m1Rate'), type: 'text', placeholder: t('qosPolicy.placeholders.rateExample'), help: t('qosPolicy.help.initialRate') },
+        { key: 'm2', title: t('qosPolicy.fields.m2Rate'), type: 'text', placeholder: t('qosPolicy.placeholders.rateExample'), help: t('qosPolicy.help.sustainableRate') },
       ],
     },
     {
-      key: 'upperlimit', title: 'Upperlimit (上限)', type: 'group', children: [
-        { key: 'd', title: '延迟 (ms)', type: 'number', min: 0, placeholder: '服务曲线延迟' },
-        { key: 'm1', title: 'M1 速率', type: 'text', placeholder: '如 100kbit, 50%', help: '初始速率' },
-        { key: 'm2', title: 'M2 速率', type: 'text', placeholder: '如 100kbit, 50%', help: '稳定速率' },
+      key: 'upperlimit', title: t('qosPolicy.fields.upperlimit'), type: 'group', children: [
+        { key: 'd', title: t('qosPolicy.fields.delayMs'), type: 'number', min: 0, placeholder: t('qosPolicy.placeholders.serviceCurveDelay') },
+        { key: 'm1', title: t('qosPolicy.fields.m1Rate'), type: 'text', placeholder: t('qosPolicy.placeholders.rateExample'), help: t('qosPolicy.help.initialRate') },
+        { key: 'm2', title: t('qosPolicy.fields.m2Rate'), type: 'text', placeholder: t('qosPolicy.placeholders.rateExample'), help: t('qosPolicy.help.sustainableRate') },
       ],
     },
   ];
 }
 
-function randomDetectTopSchema() {
+function randomDetectTopSchema(t) {
   return [
-    { key: 'name', title: '策略名称', type: 'text', required: true },
-    { key: 'description', title: '描述', type: 'text' },
-    { key: 'bandwidth', title: '带宽', type: 'text', placeholder: '如 auto, 100mbit', help: '默认: auto, ' + BANDWIDTH_HELP },
+    { key: 'name', title: t('qos.columns.name'), type: 'text', required: true },
+    { key: 'description', title: t('qos.columns.description'), type: 'text' },
+    { key: 'bandwidth', title: t('qos.columns.bandwidth'), type: 'text', placeholder: t('qosPolicy.placeholders.autoOrBandwidth'), help: t('qos.help.defaultAuto') + ', ' + t(BANDWIDTH_HELP) },
   ];
 }
 
-function randomDetectPrecedenceSchema() {
+function randomDetectPrecedenceSchema(t) {
   return [
-    { key: 'id', title: 'IP 优先级', type: 'number', min: 0, max: 7, required: true, placeholder: '0-7' },
-    { key: 'average-packet', title: '平均包大小', type: 'number', min: 16, max: 10240, placeholder: '16-10240', help: '默认: 1024 (字节)' },
-    { key: 'mark-probability', title: '标记概率', type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: '默认: 10 (1/N)' },
-    { key: 'maximum-threshold', title: '最大阈值', type: 'number', min: 0, max: 4096, placeholder: '0-4096', help: '默认: 18 (包)' },
-    { key: 'minimum-threshold', title: '最小阈值', type: 'number', min: 0, max: 4096, placeholder: '0-4096', help: '随机检测最小阈值' },
-    { key: 'queue-limit', title: '队列限制', type: 'number', min: 1, max: 4294967295, placeholder: '1-4294967295', help: '队列大小 (包)' },
+    { key: 'id', title: t('qos.fields.ipPriority'), type: 'number', min: 0, max: 7, required: true, placeholder: '0-7' },
+    { key: 'average-packet', title: t('qos.fields.averagePacket'), type: 'number', min: 16, max: 10240, placeholder: '16-10240', help: t('qos.help.defaultAveragePacket') },
+    { key: 'mark-probability', title: t('qos.fields.markProbability'), type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: t('qos.help.defaultMarkProbability1N') },
+    { key: 'maximum-threshold', title: t('qos.fields.maximumThreshold'), type: 'number', min: 0, max: 4096, placeholder: '0-4096', help: t('qos.help.defaultMaximumThresholdPackets') },
+    { key: 'minimum-threshold', title: t('qos.fields.minimumThreshold'), type: 'number', min: 0, max: 4096, placeholder: '0-4096', help: t('qos.help.randomDetectMinThreshold') },
+    { key: 'queue-limit', title: t('qos.columns.queueLimit'), type: 'number', min: 1, max: 4294967295, placeholder: '1-4294967295', help: t('qos.help.queueSizePackets') },
   ];
 }
 
 // ========== Helper: get schema by type ==========
 
-function getSchemaByType(type) {
+function getSchemaByType(type, t) {
   switch (type) {
-    case 'cake': return cakeSchema();
-    case 'drop-tail': return dropTailSchema();
-    case 'fair-queue': return fairQueueSchema();
-    case 'fq-codel': return fqCodelSchema();
-    case 'network-emulator': return networkEmulatorSchema();
-    case 'rate-control': return rateControlSchema();
-    case 'limiter': return limiterTopSchema();
-    case 'priority-queue': return priorityQueueTopSchema();
-    case 'round-robin': return roundRobinTopSchema();
-    case 'shaper': return shaperTopSchema();
-    case 'shaper-hfsc': return shaperHfscTopSchema();
-    case 'random-detect': return randomDetectTopSchema();
+    case 'cake': return cakeSchema(t);
+    case 'drop-tail': return dropTailSchema(t);
+    case 'fair-queue': return fairQueueSchema(t);
+    case 'fq-codel': return fqCodelSchema(t);
+    case 'network-emulator': return networkEmulatorSchema(t);
+    case 'rate-control': return rateControlSchema(t);
+    case 'limiter': return limiterTopSchema(t);
+    case 'priority-queue': return priorityQueueTopSchema(t);
+    case 'round-robin': return roundRobinTopSchema(t);
+    case 'shaper': return shaperTopSchema(t);
+    case 'shaper-hfsc': return shaperHfscTopSchema(t);
+    case 'random-detect': return randomDetectTopSchema(t);
     default: return [
-      { key: 'name', title: '策略名称', type: 'text', required: true },
-      { key: 'description', title: '描述', type: 'text' },
+      { key: 'name', title: t('qos.columns.name'), type: 'text', required: true },
+      { key: 'description', title: t('qos.columns.description'), type: 'text' },
     ];
   }
 }
 
-function getClassSchemaByType(type) {
+function getClassSchemaByType(type, t) {
   switch (type) {
-    case 'limiter': return limiterClassSchema();
-    case 'priority-queue': return priorityQueueClassSchema();
-    case 'round-robin': return roundRobinClassSchema();
-    case 'shaper': return shaperClassSchema();
-    case 'shaper-hfsc': return shaperHfscClassSchema();
-    case 'random-detect': return randomDetectPrecedenceSchema();
+    case 'limiter': return limiterClassSchema(t);
+    case 'priority-queue': return priorityQueueClassSchema(t);
+    case 'round-robin': return roundRobinClassSchema(t);
+    case 'shaper': return shaperClassSchema(t);
+    case 'shaper-hfsc': return shaperHfscClassSchema(t);
+    case 'random-detect': return randomDetectPrecedenceSchema(t);
     default: return null;
   }
 }
@@ -428,6 +429,7 @@ export default defineComponent({
   name: 'QosPolicyPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
+    const { t } = useI18n();
     const configStore = useConfigStore();
     const loading = ref(false);
     const policies = ref([]);
@@ -450,162 +452,162 @@ export default defineComponent({
 
     const POLICY_COLUMNS = {
       cake: [
-        { key: 'name', title: '策略名称', dataIndex: 'name', width: 150 },
-        { key: 'bandwidth', title: '带宽', dataIndex: 'bandwidth', width: 120 },
-        { key: 'flowIsolation', title: '流隔离', dataIndex: 'flowIsolation', width: 120 },
-        { key: 'rtt', title: 'RTT(ms)', dataIndex: 'rtt', width: 100 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 180, fixed: 'right' },
+        { key: 'name', title: t('qos.columns.name'), dataIndex: 'name', width: 150 },
+        { key: 'bandwidth', title: t('qos.columns.bandwidth'), dataIndex: 'bandwidth', width: 120 },
+        { key: 'flowIsolation', title: t('qos.columns.flowIsolation'), dataIndex: 'flowIsolation', width: 120 },
+        { key: 'rtt', title: t('qos.columns.rtt'), dataIndex: 'rtt', width: 100 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 200 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 180, fixed: 'right' },
       ],
       'drop-tail': [
-        { key: 'name', title: '策略名称', dataIndex: 'name', width: 150 },
-        { key: 'queueLimit', title: '队列限制', dataIndex: 'queueLimit', width: 120 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 180, fixed: 'right' },
+        { key: 'name', title: t('qos.columns.name'), dataIndex: 'name', width: 150 },
+        { key: 'queueLimit', title: t('qos.columns.queueLimit'), dataIndex: 'queueLimit', width: 120 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 200 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 180, fixed: 'right' },
       ],
       'fair-queue': [
-        { key: 'name', title: '策略名称', dataIndex: 'name', width: 150 },
-        { key: 'hashInterval', title: '哈希间隔', dataIndex: 'hashInterval', width: 120 },
-        { key: 'queueLimit', title: '队列限制', dataIndex: 'queueLimit', width: 120 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 180, fixed: 'right' },
+        { key: 'name', title: t('qos.columns.name'), dataIndex: 'name', width: 150 },
+        { key: 'hashInterval', title: t('qos.columns.hashInterval'), dataIndex: 'hashInterval', width: 120 },
+        { key: 'queueLimit', title: t('qos.columns.queueLimit'), dataIndex: 'queueLimit', width: 120 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 200 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 180, fixed: 'right' },
       ],
       'fq-codel': [
-        { key: 'name', title: '策略名称', dataIndex: 'name', width: 150 },
-        { key: 'codelQuantum', title: 'CoDel量子', dataIndex: 'codelQuantum', width: 120 },
-        { key: 'flows', title: '流数', dataIndex: 'flows', width: 80 },
-        { key: 'interval', title: '间隔', dataIndex: 'interval', width: 100 },
-        { key: 'queueLimit', title: '队列限制', dataIndex: 'queueLimit', width: 120 },
-        { key: 'target', title: '目标', dataIndex: 'target', width: 100 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 180, fixed: 'right' },
+        { key: 'name', title: t('qos.columns.name'), dataIndex: 'name', width: 150 },
+        { key: 'codelQuantum', title: t('qos.columns.codelQuantum'), dataIndex: 'codelQuantum', width: 120 },
+        { key: 'flows', title: t('qos.columns.flows'), dataIndex: 'flows', width: 80 },
+        { key: 'interval', title: t('qos.columns.interval'), dataIndex: 'interval', width: 100 },
+        { key: 'queueLimit', title: t('qos.columns.queueLimit'), dataIndex: 'queueLimit', width: 120 },
+        { key: 'target', title: t('qos.columns.target'), dataIndex: 'target', width: 100 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 200 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 180, fixed: 'right' },
       ],
       'network-emulator': [
-        { key: 'name', title: '策略名称', dataIndex: 'name', width: 150 },
-        { key: 'bandwidth', title: '带宽', dataIndex: 'bandwidth', width: 120 },
-        { key: 'delay', title: '延迟', dataIndex: 'delay', width: 100 },
-        { key: 'loss', title: '丢包率', dataIndex: 'loss', width: 100 },
-        { key: 'corruption', title: '损坏率', dataIndex: 'corruption', width: 100 },
-        { key: 'duplicate', title: '重复率', dataIndex: 'duplicate', width: 100 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 180, fixed: 'right' },
+        { key: 'name', title: t('qos.columns.name'), dataIndex: 'name', width: 150 },
+        { key: 'bandwidth', title: t('qos.columns.bandwidth'), dataIndex: 'bandwidth', width: 120 },
+        { key: 'delay', title: t('qos.columns.delay'), dataIndex: 'delay', width: 100 },
+        { key: 'loss', title: t('qos.columns.loss'), dataIndex: 'loss', width: 100 },
+        { key: 'corruption', title: t('qos.columns.corruption'), dataIndex: 'corruption', width: 100 },
+        { key: 'duplicate', title: t('qos.columns.duplicate'), dataIndex: 'duplicate', width: 100 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 200 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 180, fixed: 'right' },
       ],
       'rate-control': [
-        { key: 'name', title: '策略名称', dataIndex: 'name', width: 150 },
-        { key: 'bandwidth', title: '带宽', dataIndex: 'bandwidth', width: 120 },
-        { key: 'burst', title: '突发', dataIndex: 'burst', width: 100 },
-        { key: 'latency', title: '延迟', dataIndex: 'latency', width: 100 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 180, fixed: 'right' },
+        { key: 'name', title: t('qos.columns.name'), dataIndex: 'name', width: 150 },
+        { key: 'bandwidth', title: t('qos.columns.bandwidth'), dataIndex: 'bandwidth', width: 120 },
+        { key: 'burst', title: t('qos.columns.burst'), dataIndex: 'burst', width: 100 },
+        { key: 'latency', title: t('qos.columns.latency'), dataIndex: 'latency', width: 100 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 200 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 180, fixed: 'right' },
       ],
       limiter: [
-        { key: 'name', title: '策略名称', dataIndex: 'name', width: 150 },
-        { key: 'classCount', title: '类数量', dataIndex: 'classCount', width: 100 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 220, fixed: 'right' },
+        { key: 'name', title: t('qos.columns.name'), dataIndex: 'name', width: 150 },
+        { key: 'classCount', title: t('qos.columns.classCount'), dataIndex: 'classCount', width: 100 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 200 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 220, fixed: 'right' },
       ],
       'priority-queue': [
-        { key: 'name', title: '策略名称', dataIndex: 'name', width: 150 },
-        { key: 'classCount', title: '类数量', dataIndex: 'classCount', width: 100 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 180, fixed: 'right' },
+        { key: 'name', title: t('qos.columns.name'), dataIndex: 'name', width: 150 },
+        { key: 'classCount', title: t('qos.columns.classCount'), dataIndex: 'classCount', width: 100 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 200 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 180, fixed: 'right' },
       ],
       'round-robin': [
-        { key: 'name', title: '策略名称', dataIndex: 'name', width: 150 },
-        { key: 'classCount', title: '类数量', dataIndex: 'classCount', width: 100 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 180, fixed: 'right' },
+        { key: 'name', title: t('qos.columns.name'), dataIndex: 'name', width: 150 },
+        { key: 'classCount', title: t('qos.columns.classCount'), dataIndex: 'classCount', width: 100 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 200 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 180, fixed: 'right' },
       ],
       shaper: [
-        { key: 'name', title: '策略名称', dataIndex: 'name', width: 150 },
-        { key: 'bandwidth', title: '带宽', dataIndex: 'bandwidth', width: 120 },
-        { key: 'classCount', title: '类数量', dataIndex: 'classCount', width: 100 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 180, fixed: 'right' },
+        { key: 'name', title: t('qos.columns.name'), dataIndex: 'name', width: 150 },
+        { key: 'bandwidth', title: t('qos.columns.bandwidth'), dataIndex: 'bandwidth', width: 120 },
+        { key: 'classCount', title: t('qos.columns.classCount'), dataIndex: 'classCount', width: 100 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 200 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 180, fixed: 'right' },
       ],
       'shaper-hfsc': [
-        { key: 'name', title: '策略名称', dataIndex: 'name', width: 150 },
-        { key: 'classCount', title: '类数量', dataIndex: 'classCount', width: 100 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 180, fixed: 'right' },
+        { key: 'name', title: t('qos.columns.name'), dataIndex: 'name', width: 150 },
+        { key: 'classCount', title: t('qos.columns.classCount'), dataIndex: 'classCount', width: 100 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 200 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 180, fixed: 'right' },
       ],
       'random-detect': [
-        { key: 'name', title: '策略名称', dataIndex: 'name', width: 150 },
-        { key: 'bandwidth', title: '带宽', dataIndex: 'bandwidth', width: 120 },
-        { key: 'classCount', title: '优先级数', dataIndex: 'classCount', width: 100 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 180, fixed: 'right' },
+        { key: 'name', title: t('qos.columns.name'), dataIndex: 'name', width: 150 },
+        { key: 'bandwidth', title: t('qos.columns.bandwidth'), dataIndex: 'bandwidth', width: 120 },
+        { key: 'classCount', title: t('qos.columns.priorityCount'), dataIndex: 'classCount', width: 100 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 200 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 180, fixed: 'right' },
       ],
     };
 
     const classColumnsMap = {
       limiter: [
-        { key: 'id', title: '类 ID', dataIndex: 'id', width: 80 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 120 },
-        { key: 'bandwidth', title: '带宽', dataIndex: 'bandwidth', width: 100 },
-        { key: 'burst', title: '突发', dataIndex: 'burst', width: 80 },
-        { key: 'priority', title: '优先级', dataIndex: 'priority', width: 70 },
+        { key: 'id', title: t('qos.columns.classId'), dataIndex: 'id', width: 80 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 120 },
+        { key: 'bandwidth', title: t('qos.columns.bandwidth'), dataIndex: 'bandwidth', width: 100 },
+        { key: 'burst', title: t('qos.columns.burst'), dataIndex: 'burst', width: 80 },
+        { key: 'priority', title: t('qos.columns.priority'), dataIndex: 'priority', width: 70 },
         { key: 'mtu', title: 'MTU', dataIndex: 'mtu', width: 70 },
-        { key: 'exceed', title: '超限动作', dataIndex: 'exceed', width: 80 },
-        { key: 'ruleCount', title: '规则数量', dataIndex: 'ruleCount', width: 80 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+        { key: 'exceed', title: t('qos.columns.exceed'), dataIndex: 'exceed', width: 80 },
+        { key: 'ruleCount', title: t('qos.columns.ruleCount'), dataIndex: 'ruleCount', width: 80 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
       ],
       'priority-queue': [
-        { key: 'id', title: '优先级', dataIndex: 'id', width: 80 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 120 },
-        { key: 'codelQuantum', title: 'CoDel量子', dataIndex: 'codelQuantum', width: 100 },
-        { key: 'flows', title: '流数', dataIndex: 'flows', width: 70 },
-        { key: 'interval', title: '间隔', dataIndex: 'interval', width: 80 },
-        { key: 'queueLimit', title: '队列限制', dataIndex: 'queueLimit', width: 90 },
-        { key: 'queueType', title: '队列类型', dataIndex: 'queueType', width: 90 },
-        { key: 'target', title: '目标延迟', dataIndex: 'target', width: 80 },
-        { key: 'ruleCount', title: '规则数量', dataIndex: 'ruleCount', width: 80 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+        { key: 'id', title: t('qos.columns.priority'), dataIndex: 'id', width: 80 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 120 },
+        { key: 'codelQuantum', title: t('qos.columns.codelQuantum'), dataIndex: 'codelQuantum', width: 100 },
+        { key: 'flows', title: t('qos.columns.flows'), dataIndex: 'flows', width: 70 },
+        { key: 'interval', title: t('qos.columns.interval'), dataIndex: 'interval', width: 80 },
+        { key: 'queueLimit', title: t('qos.columns.queueLimit'), dataIndex: 'queueLimit', width: 90 },
+        { key: 'queueType', title: t('qos.columns.queueType'), dataIndex: 'queueType', width: 90 },
+        { key: 'target', title: t('qos.columns.target'), dataIndex: 'target', width: 80 },
+        { key: 'ruleCount', title: t('qos.columns.ruleCount'), dataIndex: 'ruleCount', width: 80 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
       ],
       'round-robin': [
-        { key: 'id', title: '类 ID', dataIndex: 'id', width: 80 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 120 },
-        { key: 'codelQuantum', title: 'CoDel量子', dataIndex: 'codelQuantum', width: 100 },
-        { key: 'flows', title: '流数', dataIndex: 'flows', width: 70 },
-        { key: 'interval', title: '间隔', dataIndex: 'interval', width: 80 },
-        { key: 'quantum', title: '量子', dataIndex: 'quantum', width: 80 },
-        { key: 'queueLimit', title: '队列限制', dataIndex: 'queueLimit', width: 90 },
-        { key: 'queueType', title: '队列类型', dataIndex: 'queueType', width: 90 },
-        { key: 'target', title: '目标延迟', dataIndex: 'target', width: 80 },
-        { key: 'ruleCount', title: '规则数量', dataIndex: 'ruleCount', width: 80 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+        { key: 'id', title: t('qos.columns.classId'), dataIndex: 'id', width: 80 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 120 },
+        { key: 'codelQuantum', title: t('qos.columns.codelQuantum'), dataIndex: 'codelQuantum', width: 100 },
+        { key: 'flows', title: t('qos.columns.flows'), dataIndex: 'flows', width: 70 },
+        { key: 'interval', title: t('qos.columns.interval'), dataIndex: 'interval', width: 80 },
+        { key: 'quantum', title: t('qos.columns.quantum'), dataIndex: 'quantum', width: 80 },
+        { key: 'queueLimit', title: t('qos.columns.queueLimit'), dataIndex: 'queueLimit', width: 90 },
+        { key: 'queueType', title: t('qos.columns.queueType'), dataIndex: 'queueType', width: 90 },
+        { key: 'target', title: t('qos.columns.target'), dataIndex: 'target', width: 80 },
+        { key: 'ruleCount', title: t('qos.columns.ruleCount'), dataIndex: 'ruleCount', width: 80 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
       ],
       shaper: [
-        { key: 'id', title: '类 ID', dataIndex: 'id', width: 80 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 120 },
-        { key: 'bandwidth', title: '带宽', dataIndex: 'bandwidth', width: 100 },
-        { key: 'burst', title: '突发', dataIndex: 'burst', width: 80 },
-        { key: 'ceiling', title: '上限', dataIndex: 'ceiling', width: 80 },
-        { key: 'codelQuantum', title: 'CoDel量子', dataIndex: 'codelQuantum', width: 100 },
-        { key: 'flows', title: '流数', dataIndex: 'flows', width: 70 },
-        { key: 'interval', title: '间隔', dataIndex: 'interval', width: 80 },
-        { key: 'queueLimit', title: '队列限制', dataIndex: 'queueLimit', width: 90 },
-        { key: 'queueType', title: '队列类型', dataIndex: 'queueType', width: 90 },
-        { key: 'target', title: '目标延迟', dataIndex: 'target', width: 80 },
-        { key: 'ruleCount', title: '规则数量', dataIndex: 'ruleCount', width: 80 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+        { key: 'id', title: t('qos.columns.classId'), dataIndex: 'id', width: 80 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 120 },
+        { key: 'bandwidth', title: t('qos.columns.bandwidth'), dataIndex: 'bandwidth', width: 100 },
+        { key: 'burst', title: t('qos.columns.burst'), dataIndex: 'burst', width: 80 },
+        { key: 'ceiling', title: t('qos.columns.ceiling'), dataIndex: 'ceiling', width: 80 },
+        { key: 'codelQuantum', title: t('qos.columns.codelQuantum'), dataIndex: 'codelQuantum', width: 100 },
+        { key: 'flows', title: t('qos.columns.flows'), dataIndex: 'flows', width: 70 },
+        { key: 'interval', title: t('qos.columns.interval'), dataIndex: 'interval', width: 80 },
+        { key: 'queueLimit', title: t('qos.columns.queueLimit'), dataIndex: 'queueLimit', width: 90 },
+        { key: 'queueType', title: t('qos.columns.queueType'), dataIndex: 'queueType', width: 90 },
+        { key: 'target', title: t('qos.columns.target'), dataIndex: 'target', width: 80 },
+        { key: 'ruleCount', title: t('qos.columns.ruleCount'), dataIndex: 'ruleCount', width: 80 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
       ],
       'shaper-hfsc': [
-        { key: 'id', title: '类 ID', dataIndex: 'id', width: 80 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 120 },
-        { key: 'ruleCount', title: '规则数量', dataIndex: 'ruleCount', width: 80 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+        { key: 'id', title: t('qos.columns.classId'), dataIndex: 'id', width: 80 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 120 },
+        { key: 'ruleCount', title: t('qos.columns.ruleCount'), dataIndex: 'ruleCount', width: 80 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
       ],
       'random-detect': [
-        { key: 'id', title: '优先级', dataIndex: 'id', width: 80 },
-        { key: 'description', title: '描述', dataIndex: 'description', width: 120 },
-        { key: 'averagePacket', title: '平均包', dataIndex: 'averagePacket', width: 80 },
-        { key: 'markProbability', title: '标记概率', dataIndex: 'markProbability', width: 90 },
-        { key: 'maximumThreshold', title: '最大阈值', dataIndex: 'maximumThreshold', width: 90 },
-        { key: 'minimumThreshold', title: '最小阈值', dataIndex: 'minimumThreshold', width: 90 },
-        { key: 'queueLimit', title: '队列限制', dataIndex: 'queueLimit', width: 90 },
-        { key: 'ruleCount', title: '规则数量', dataIndex: 'ruleCount', width: 80 },
-        { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+        { key: 'id', title: t('qos.columns.priority'), dataIndex: 'id', width: 80 },
+        { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 120 },
+        { key: 'averagePacket', title: t('qos.columns.averagePacket'), dataIndex: 'averagePacket', width: 80 },
+        { key: 'markProbability', title: t('qos.columns.markProbability'), dataIndex: 'markProbability', width: 90 },
+        { key: 'maximumThreshold', title: t('qos.columns.maximumThreshold'), dataIndex: 'maximumThreshold', width: 90 },
+        { key: 'minimumThreshold', title: t('qos.columns.minimumThreshold'), dataIndex: 'minimumThreshold', width: 90 },
+        { key: 'queueLimit', title: t('qos.columns.queueLimit'), dataIndex: 'queueLimit', width: 90 },
+        { key: 'ruleCount', title: t('qos.columns.ruleCount'), dataIndex: 'ruleCount', width: 80 },
+        { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
       ],
     };
 
@@ -615,38 +617,38 @@ export default defineComponent({
     });
 
     const ruleColumns = [
-      { key: 'name', title: '规则名称', dataIndex: 'name', width: 120 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 150 },
-      { key: 'protocol', title: '协议', dataIndex: 'protocol', width: 80 },
-      { key: 'srcAddress', title: '源地址', dataIndex: 'srcAddress', width: 120 },
-      { key: 'dstAddress', title: '目标地址', dataIndex: 'dstAddress', width: 120 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'name', title: t('qos.columns.ruleName'), dataIndex: 'name', width: 120 },
+      { key: 'description', title: t('qos.columns.description'), dataIndex: 'description', width: 150 },
+      { key: 'protocol', title: t('qos.columns.protocol'), dataIndex: 'protocol', width: 80 },
+      { key: 'srcAddress', title: t('qos.columns.srcAddress'), dataIndex: 'srcAddress', width: 120 },
+      { key: 'dstAddress', title: t('qos.columns.dstAddress'), dataIndex: 'dstAddress', width: 120 },
+      { key: 'actions', title: t('qos.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     // Rule schema for edit modal
     const ruleSchema = computed(() => {
       return [
-        { key: 'name', title: '规则名称', type: 'text', required: true },
-        { key: 'description', title: '描述', type: 'text' },
+        { key: 'name', title: t('qos.columns.ruleName'), type: 'text', required: true },
+        { key: 'description', title: t('qos.columns.description'), type: 'text' },
         {
           key: 'ip', title: 'IPv4', type: 'group', children: [
-            { key: 'protocol', title: '协议', type: 'select', options: IP_PROTOCOL_OPTIONS, placeholder: '选择协议' },
-            { key: 'dscp', title: 'DSCP', type: 'select', options: DSCP_OPTIONS, placeholder: '选择 DSCP 值' },
-            { key: 'max-length', title: '最大长度', type: 'number', min: 1, max: 65535 },
+            { key: 'protocol', title: t('qos.columns.protocol'), type: 'select', options: IP_PROTOCOL_OPTIONS, placeholder: t('qos.placeholder.selectProtocol') },
+            { key: 'dscp', title: 'DSCP', type: 'select', options: DSCP_OPTIONS, placeholder: t('qos.placeholder.selectDscp') },
+            { key: 'max-length', title: t('qos.fields.maxLength'), type: 'number', min: 1, max: 65535 },
             {
-              key: 'source', title: '源', type: 'group', children: [
-                { key: 'address', title: '源地址', type: 'text', placeholder: '如 192.168.1.0/24' },
-                { key: 'port', title: '源端口', type: 'number', min: 1, max: 65535 },
+              key: 'source', title: t('qos.fields.source'), type: 'group', children: [
+                { key: 'address', title: t('qos.columns.srcAddress'), type: 'text', placeholder: t('qosPolicy.placeholders.srcNetwork') },
+                { key: 'port', title: t('qos.fields.srcPort'), type: 'number', min: 1, max: 65535 },
               ],
             },
             {
-              key: 'destination', title: '目标', type: 'group', children: [
-                { key: 'address', title: '目标地址', type: 'text', placeholder: '如 10.0.0.0/8' },
-                { key: 'port', title: '目标端口', type: 'number', min: 1, max: 65535 },
+              key: 'destination', title: t('qos.fields.destination'), type: 'group', children: [
+                { key: 'address', title: t('qos.columns.dstAddress'), type: 'text', placeholder: t('qosPolicy.placeholders.dstNetwork') },
+                { key: 'port', title: t('qos.fields.dstPort'), type: 'number', min: 1, max: 65535 },
               ],
             },
             {
-              key: 'tcp', title: 'TCP 标志', type: 'group', children: [
+              key: 'tcp', title: t('qos.fields.tcpFlags'), type: 'group', children: [
                 { key: 'syn', title: 'SYN', type: 'checkbox', valueless: true },
                 { key: 'ack', title: 'ACK', type: 'checkbox', valueless: true },
               ],
@@ -655,31 +657,31 @@ export default defineComponent({
         },
         {
           key: 'ipv6', title: 'IPv6', type: 'group', children: [
-            { key: 'protocol', title: '协议', type: 'select', options: IP_PROTOCOL_OPTIONS, placeholder: '选择协议' },
-            { key: 'dscp', title: 'DSCP', type: 'select', options: DSCP_OPTIONS, placeholder: '选择 DSCP 值' },
-            { key: 'max-length', title: '最大长度', type: 'number', min: 1, max: 65535 },
+            { key: 'protocol', title: t('qos.columns.protocol'), type: 'select', options: IP_PROTOCOL_OPTIONS, placeholder: t('qos.placeholder.selectProtocol') },
+            { key: 'dscp', title: 'DSCP', type: 'select', options: DSCP_OPTIONS, placeholder: t('qos.placeholder.selectDscp') },
+            { key: 'max-length', title: t('qos.fields.maxLength'), type: 'number', min: 1, max: 65535 },
             {
-              key: 'source', title: '源', type: 'group', children: [
-                { key: 'address', title: '源地址', type: 'text', placeholder: '如 2001:db8::/32' },
-                { key: 'port', title: '源端口', type: 'number', min: 1, max: 65535 },
+              key: 'source', title: t('qos.fields.source'), type: 'group', children: [
+                { key: 'address', title: t('qos.columns.srcAddress'), type: 'text', placeholder: t('qosPolicy.placeholders.srcIpv6Network') },
+                { key: 'port', title: t('qos.fields.srcPort'), type: 'number', min: 1, max: 65535 },
               ],
             },
             {
-              key: 'destination', title: '目标', type: 'group', children: [
-                { key: 'address', title: '目标地址', type: 'text', placeholder: '如 2001:db8:1::/64' },
-                { key: 'port', title: '目标端口', type: 'number', min: 1, max: 65535 },
+              key: 'destination', title: t('qos.fields.destination'), type: 'group', children: [
+                { key: 'address', title: t('qos.columns.dstAddress'), type: 'text', placeholder: t('qosPolicy.placeholders.dstIpv6Network') },
+                { key: 'port', title: t('qos.fields.dstPort'), type: 'number', min: 1, max: 65535 },
               ],
             },
           ],
         },
         {
-          key: 'ether', title: '以太网', type: 'group', children: [
-            { key: 'source', title: '源 MAC', type: 'text', placeholder: '如 00:11:22:33:44:55' },
-            { key: 'destination', title: '目标 MAC', type: 'text', placeholder: '如 00:11:22:33:44:55' },
-            { key: 'protocol', title: '协议', type: 'select', options: ETHER_PROTOCOL_OPTIONS, placeholder: '选择以太网协议' },
+          key: 'ether', title: t('qos.fields.ethernet'), type: 'group', children: [
+            { key: 'source', title: t('qos.fields.srcMac'), type: 'text', placeholder: t('qosPolicy.placeholders.macAddress') },
+            { key: 'destination', title: t('qos.fields.dstMac'), type: 'text', placeholder: t('qosPolicy.placeholders.macAddress') },
+            { key: 'protocol', title: t('qos.columns.protocol'), type: 'select', options: ETHER_PROTOCOL_OPTIONS, placeholder: t('qos.placeholder.selectEtherProtocol') },
           ],
         },
-        { key: 'interface', title: '接口', type: 'select', options: interfaceOptions.value, placeholder: '选择接口' },
+        { key: 'interface', title: t('qos.columns.interface'), type: 'select', options: interfaceOptions.value, placeholder: t('qos.placeholder.selectInterface') },
         { key: 'mark', title: 'Mark', type: 'number', min: 0, max: 4294967295 },
         { key: 'vif', title: 'VLAN ID', type: 'number', min: 0, max: 4095 },
       ];
@@ -717,7 +719,7 @@ export default defineComponent({
     });
 
     const filterTabs = computed(() => {
-      return POLICY_TYPES.map(t => ({ key: t.value, title: t.label }));
+      return POLICY_TYPES.map(pt => ({ key: pt.value, title: t(pt.label) }));
     });
 
     const filteredData = computed(() => {
@@ -726,13 +728,13 @@ export default defineComponent({
     });
 
     const currentSchema = computed(() => {
-      if (editingPolicy.value) return getSchemaByType(editingPolicy.value.type);
-      return getSchemaByType(typeFilter.value || 'cake');
+      if (editingPolicy.value) return getSchemaByType(editingPolicy.value.type, t);
+      return getSchemaByType(typeFilter.value || 'cake', t);
     });
 
     const classSchema = computed(() => {
       if (!editingPolicy.value) return [];
-      return getClassSchemaByType(editingPolicy.value.type) || [];
+      return getClassSchemaByType(editingPolicy.value.type, t) || [];
     });
 
     const commandText = computed(() => {
@@ -806,7 +808,7 @@ export default defineComponent({
           console.error('Failed to load interfaces:', e);
         }
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('qos.error.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -933,11 +935,11 @@ export default defineComponent({
           }
         }
 
-        await configStore.commit();
+        configStore.markPending();
         modalVisible.value = false;
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('qosPolicy.errors.saveFailed'));
       }
     }
 
@@ -963,14 +965,14 @@ export default defineComponent({
 
     async function confirmDelete() {
       deleteConfirmVisible.value = false;
-      for (const t of deleteTargets.value) {
+      for (const target of deleteTargets.value) {
         try {
-          await configApi.delete(`qos policy ${t.type} ${t.name}`);
+          await configApi.delete(`qos policy ${target.type} ${target.name}`);
         } catch (e) {
-          showError(`删除 ${t.name} 失败: ${e.message || e}`);
+          showError(t('qos.error.deleteFailed', { name: target.name }) + ': ' + (e.message || e));
         }
       }
-      await configStore.commit();
+      configStore.markPending();
       selected.value = [];
       deleteTargets.value = [];
       await load();
@@ -979,7 +981,7 @@ export default defineComponent({
     // ========== Class management ==========
 
     function origCreateClass() {
-      const schema = getClassSchemaByType(editingPolicy.value.type);
+      const schema = getClassSchemaByType(editingPolicy.value.type, t);
       const newClass = { id: null, description: '' };
       // Set defaults from schema
       if (schema) {
@@ -1233,39 +1235,39 @@ export default defineComponent({
       const parts = [];
       for (const [ruleName, ruleConfig] of Object.entries(match)) {
         if (!ruleConfig || typeof ruleConfig !== 'object') continue;
-        parts.push(`规则: ${ruleName}`);
+        parts.push(t('qos.match.rule') + ': ' + ruleName);
         if (ruleConfig.ip) {
           const ip = ruleConfig.ip;
-          if (ip.destination?.address) parts.push(`目标地址: ${ip.destination.address}`);
-          if (ip.destination?.port) parts.push(`目标端口: ${ip.destination.port}`);
-          if (ip.source?.address) parts.push(`源地址: ${ip.source.address}`);
-          if (ip.source?.port) parts.push(`源端口: ${ip.source.port}`);
-          if (ip.dscp) parts.push(`DSCP: ${ip.dscp}`);
-          if (ip.protocol) parts.push(`协议: ${ip.protocol}`);
-          if (ip['max-length']) parts.push(`最大长度: ${ip['max-length']}`);
+          if (ip.destination?.address) parts.push(t('qos.match.dstAddress') + ': ' + ip.destination.address);
+          if (ip.destination?.port) parts.push(t('qos.match.dstPort') + ': ' + ip.destination.port);
+          if (ip.source?.address) parts.push(t('qos.match.srcAddress') + ': ' + ip.source.address);
+          if (ip.source?.port) parts.push(t('qos.match.srcPort') + ': ' + ip.source.port);
+          if (ip.dscp) parts.push('DSCP: ' + ip.dscp);
+          if (ip.protocol) parts.push(t('qos.match.protocol') + ': ' + ip.protocol);
+          if (ip['max-length']) parts.push(t('qos.match.maxLength') + ': ' + ip['max-length']);
           if (ip.tcp) {
             const flags = Object.keys(ip.tcp).filter(k => ip.tcp[k] === '' || ip.tcp[k] === true);
-            if (flags.length) parts.push(`TCP 标志: ${flags.join(', ')}`);
+            if (flags.length) parts.push(t('qos.match.tcpFlags') + ': ' + flags.join(', '));
           }
         }
         if (ruleConfig.ipv6) {
           const ipv6 = ruleConfig.ipv6;
-          if (ipv6.destination?.address) parts.push(`IPv6 目标: ${ipv6.destination.address}`);
-          if (ipv6.destination?.port) parts.push(`IPv6 目标端口: ${ipv6.destination.port}`);
-          if (ipv6.source?.address) parts.push(`IPv6 源: ${ipv6.source.address}`);
-          if (ipv6.source?.port) parts.push(`IPv6 源端口: ${ipv6.source.port}`);
-          if (ipv6.dscp) parts.push(`DSCP: ${ipv6.dscp}`);
-          if (ipv6.protocol) parts.push(`协议: ${ipv6.protocol}`);
+          if (ipv6.destination?.address) parts.push(t('qos.match.ipv6Dst') + ': ' + ipv6.destination.address);
+          if (ipv6.destination?.port) parts.push(t('qos.match.ipv6DstPort') + ': ' + ipv6.destination.port);
+          if (ipv6.source?.address) parts.push(t('qos.match.ipv6Src') + ': ' + ipv6.source.address);
+          if (ipv6.source?.port) parts.push(t('qos.match.ipv6SrcPort') + ': ' + ipv6.source.port);
+          if (ipv6.dscp) parts.push('DSCP: ' + ipv6.dscp);
+          if (ipv6.protocol) parts.push(t('qos.match.protocol') + ': ' + ipv6.protocol);
         }
         if (ruleConfig.ether) {
           const ether = ruleConfig.ether;
-          if (ether.destination) parts.push(`以太网目标: ${ether.destination}`);
-          if (ether.source) parts.push(`以太网源: ${ether.source}`);
-          if (ether.protocol) parts.push(`以太网协议: ${ether.protocol}`);
+          if (ether.destination) parts.push(t('qos.match.etherDst') + ': ' + ether.destination);
+          if (ether.source) parts.push(t('qos.match.etherSrc') + ': ' + ether.source);
+          if (ether.protocol) parts.push(t('qos.match.etherProtocol') + ': ' + ether.protocol);
         }
-        if (ruleConfig.interface) parts.push(`接口: ${ruleConfig.interface}`);
-        if (ruleConfig.mark !== undefined) parts.push(`Mark: ${ruleConfig.mark}`);
-        if (ruleConfig.vif !== undefined) parts.push(`VLAN: ${ruleConfig.vif}`);
+        if (ruleConfig.interface) parts.push(t('qos.match.interface') + ': ' + ruleConfig.interface);
+        if (ruleConfig.mark !== undefined) parts.push('Mark: ' + ruleConfig.mark);
+        if (ruleConfig.vif !== undefined) parts.push('VLAN: ' + ruleConfig.vif);
       }
       return parts.join(' | ');
     }
@@ -1274,19 +1276,19 @@ export default defineComponent({
       const type = editingPolicy.value?.type;
       if (type === 'shaper-hfsc') {
         return [
-          { key: 'basic', title: '基本' },
+          { key: 'basic', title: t('qos.tabs.basic') },
           { key: 'linkshare', title: 'Linkshare' },
           { key: 'realtime', title: 'Realtime' },
           { key: 'upperlimit', title: 'Upperlimit' },
         ];
       }
-      return [{ key: 'basic', title: '基本' }];
+      return [{ key: 'basic', title: t('qos.tabs.basic') }];
     }
 
     function getClassFormSchema(tabKey) {
       if (!classModalEditing.value || !editingPolicy.value) return [];
       const type = editingPolicy.value.type;
-      const schema = getClassSchemaByType(type);
+      const schema = getClassSchemaByType(type, t);
       if (!schema) return [];
 
       if (tabKey === 'basic') {
@@ -1302,6 +1304,7 @@ export default defineComponent({
     });
 
     return {
+      t,
       loading, tableData, filteredData, POLICY_COLUMNS, selected, modalVisible, editingPolicy, typeFilter,
       filterTabs, currentSchema, commandText, dataTableRef, POLICY_TYPES,
       editingClasses, classModalEditing, classModalVisible, classFormTab,
@@ -1318,10 +1321,10 @@ export default defineComponent({
   template: `
     <div class="page-container">
       <TabGroup v-model="typeFilter" :tabs="filterTabs" @change="selected = []">
-        <template v-for="t in POLICY_TYPES" :key="t.value" #[t.value]>
+        <template v-for="pt in POLICY_TYPES" :key="pt.value" #[pt.value]>
           <DataTable
             rowKey="key"
-            :columns="POLICY_COLUMNS[t.value]"
+            :columns="POLICY_COLUMNS[pt.value]"
             :data="filteredData"
             :loading="loading"
             :selectedKeys="selected"
@@ -1334,8 +1337,8 @@ export default defineComponent({
           >
             <template #bodyCell="{ column, record }">
               <template v-if="column.key === 'actions'">
-                <a @click="edit(record)" style="margin-right: 8px">编辑</a>
-                <a @click="remove(record)" style="color: #ff4d4f">删除</a>
+                <a @click="edit(record)" style="margin-right: 8px">{{ t('qos.buttons.edit') }}</a>
+                <a @click="remove(record)" style="color: #ff4d4f">{{ t('qos.buttons.delete') }}</a>
               </template>
             </template>
           </DataTable>
@@ -1345,7 +1348,7 @@ export default defineComponent({
       <!-- Policy create/edit modal -->
       <DraggableModal
         v-model:visible="modalVisible"
-        :title="editingPolicy && tableData.find(d => d.key === editingPolicy.key) ? '编辑QoS策略' : '新建QoS策略'"
+        :title="editingPolicy && tableData.find(d => d.key === editingPolicy.key) ? t('qos.modal.editPolicy') : t('qos.modal.createPolicy')"
         @confirm="save"
         @close="modalVisible = false"
         width="900"
@@ -1354,7 +1357,7 @@ export default defineComponent({
 
         <!-- Class management section (for policies with classes) -->
         <div v-if="editingPolicy && hasClasses(editingPolicy.type)" style="margin-top: 20px; border-top: 1px solid #e8e8e8; padding-top: 16px;">
-          <h4 style="margin: 0 0 12px 0;">{{ editingPolicy.type === 'random-detect' ? '优先级管理' : '类管理' }}</h4>
+          <h4 style="margin: 0 0 12px 0;">{{ editingPolicy.type === 'random-detect' ? t('qos.sections.priorityManagement') : t('qos.sections.classManagement') }}</h4>
           <DataTable
             rowKey="id"
             :columns="classColumns"
@@ -1366,8 +1369,8 @@ export default defineComponent({
           >
             <template #bodyCell="{ column, record }">
               <template v-if="column.key === 'actions'">
-                <a @click="editClass(record)" style="margin-right: 8px">编辑</a>
-                <a @click="removeClass(record)" style="color: #ff4d4f">删除</a>
+                <a @click="editClass(record)" style="margin-right: 8px">{{ t('qos.buttons.edit') }}</a>
+                <a @click="removeClass(record)" style="color: #ff4d4f">{{ t('qos.buttons.delete') }}</a>
               </template>
             </template>
           </DataTable>
@@ -1377,7 +1380,7 @@ export default defineComponent({
       <!-- Class edit modal -->
       <DraggableModal
         v-model:visible="classModalVisible"
-        :title="classModalEditing && editingClasses.find(c => c.id === classModalEditing.id) ? '编辑类' : '新建类'"
+        :title="classModalEditing && editingClasses.find(c => c.id === classModalEditing.id) ? t('qos.modal.editClass') : t('qos.modal.createClass')"
         @confirm="saveClass"
         @close="classModalVisible = false"
         width="900"
@@ -1394,7 +1397,7 @@ export default defineComponent({
 
           <!-- Rule management section (not for random-detect) -->
           <div v-if="editingPolicy.type !== 'random-detect'" style="margin-top: 20px; border-top: 1px solid #e8e8e8; padding-top: 16px;">
-            <h4 style="margin: 0 0 12px 0;">规则管理</h4>
+            <h4 style="margin: 0 0 12px 0;">{{ t('qos.sections.ruleManagement') }}</h4>
             <DataTable
               rowKey="name"
               :columns="ruleColumns"
@@ -1406,12 +1409,12 @@ export default defineComponent({
             >
               <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'actions'">
-                  <a @click="editRule(record)" style="margin-right: 8px">编辑</a>
-                  <a @click="removeRule(record)" style="color: #ff4d4f">删除</a>
+                  <a @click="editRule(record)" style="margin-right: 8px">{{ t('qos.buttons.edit') }}</a>
+                  <a @click="removeRule(record)" style="color: #ff4d4f">{{ t('qos.buttons.delete') }}</a>
                 </template>
               </template>
             </DataTable>
-            <div v-if="editingRules.length === 0" style="text-align: center; color: #999; padding: 20px;">暂无规则</div>
+            <div v-if="editingRules.length === 0" style="text-align: center; color: #999; padding: 20px;">{{ t('qos.messages.noRules') }}</div>
           </div>
         </div>
       </DraggableModal>
@@ -1419,7 +1422,7 @@ export default defineComponent({
       <!-- Rule edit modal -->
       <DraggableModal
         v-model:visible="ruleModalVisible"
-        :title="editingRule ? '编辑规则' : '新建规则'"
+        :title="editingRule ? t('qos.modal.editRule') : t('qos.modal.createRule')"
         @confirm="saveRule"
         @close="ruleModalVisible = false"
         width="700"
@@ -1430,14 +1433,14 @@ export default defineComponent({
       <!-- Delete confirmation modal -->
       <DraggableModal
         v-model:visible="deleteConfirmVisible"
-        title="确认删除"
+        :title="t('qos.modal.confirmDelete')"
         @confirm="confirmDelete"
         @close="deleteConfirmVisible = false"
         width="400"
       >
-        <p style="margin-bottom: 12px;">确定删除以下策略？</p>
+        <p style="margin-bottom: 12px;">{{ t('qos.messages.confirmDeletePolicy') }}</p>
         <ul style="margin: 0; padding-left: 20px;">
-          <li v-for="t in deleteTargets" :key="t.name + t.type">{{ t.name }} ({{ t.type }})</li>
+          <li v-for="target in deleteTargets" :key="target.name + target.type">{{ target.name }} ({{ target.type }})</li>
         </ul>
       </DraggableModal>
     </div>

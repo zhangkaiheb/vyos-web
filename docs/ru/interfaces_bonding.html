@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3483; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="bond-link-aggregation">
+<h1>Объединение интерфейсов / агрегирование линий</h1>
+<p><strong>Интерфейс объединения</strong> объединяет несколько сетевых интерфейсов в один логический интерфейс (называемый объединением, <abbr title="Группа агрегирования линии">LAG</abbr>, EtherChannel или портовым каналом).</p>
+<p>Поведение интерфейса объединения зависит от выбранного режима. Режимы обеспечивают либо отказоустойчивость, либо комбинацию балансировки нагрузки и отказоустойчивости. Кроме того, интерфейс объединения можно настроить для мониторинга целостности соединения.</p>
+<section id="configuration">
+<h2>Настройка</h2>
+<section id="common-interface-configuration">
+<h3>Общая конфигурация интерфейса</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; address &lt;address | dhcp |  dhcpv6&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-address-address-dhcp-dhcpv6" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс с одним или несколькими IP-адресами.</strong></p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>address:</strong> Назначьте один или несколько IPv4 или IPv6 адресов интерфейсу.
+Например, используйте 192.0.2.1/24 для IPv4 или 2001:db8::1/64 для IPv6.</p></li>
+<li><p><strong>dhcp:</strong> Интерфейс получает IPv4-адрес от DHCP-сервера на той же сетевой подсети.</p></li>
+<li><p><strong>dhcpv6:</strong> Интерфейс получает IPv6-адрес от DHCPv6-сервера на той же сетевой подсети.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если интерфейс получает IPv4-адрес через DHCP, и необходимы специальные настройки до/после получения IP-адреса, используйте предоставленные скрипты-хуки:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/pre-hooks.d/</code></p></li>
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/post-hooks.d/</code></p></li>
+</ul>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 address 192.0.2.1/24
+set interfaces bonding bond0 address 2001:db8::1/64
+set interfaces bonding bond0 address dhcp
+set interfaces bonding bond0 address dhcpv6
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-description-description" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте ясное, описательное имя интерфейса.</strong></p>
+<p>Это имя появляется в команде <code class="docutils literal notranslate">show interfaces</code> и инструментах мониторинга на основе SNMP.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 description 'This is an interface running on VyOS.'
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-disable" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите интерфейс.</strong></p>
+<p>Интерфейс будет установлен в состояние административно выключенное (<code class="docutils literal notranslate">A/D</code>).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt;  disable-flow-control
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-disable-flow-control" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите управление потоком Ethernet (стандарт IEEE 802.3x pause frames) на интерфейсе.</strong></p>
+<blockquote>
+<div><p>Управление потоком Ethernet, определенное стандартом IEEE 802.3x, временно прекращает передачу данных, чтобы предотвратить потерю пакетов при перегрузке сети. Например, когда отправитель передает данные быстрее, чем получатель может их обработать.</p>
+<p>Отключение управления потоком Ethernet означает, что интерфейс не будет сигнализировать подключенному устройству о приостановке передачи и будет удалять пакеты, если перегружен.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 disable-flow-control
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; disable-link-detect
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-disable-link-detect" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите обнаружение физического изменения состояния интерфейса, например, когда кабель отсоединен.</strong></p>
+<p>По умолчанию интерфейс обнаруживает физические изменения состояния.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 disable-link-detect
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; mac &lt;xx:xx:xx:xx:xx:xx&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-mac-xx-xx-xx-xx-xx-xx" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте пользовательский MAC-адрес на интерфейсе.</strong></p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 mac '00:53:01:02:03:04'
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-mtu-mtu" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте MTU на интерфейсе.</strong></p>
+<p>Это значение определяет максимальный размер пакета, в байтах, который интерфейс передает без фрагментации.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте</strong> <abbr title="Максимальный размер сегмента">MSS</abbr> <strong>объявленный в исходящих TCP SYN-пакетах на указанном интерфейсе.</strong></p>
+<p>При ограничении значения MSS в пакетах TCP SYN вы явно информируете удаленную сторону, что она не должна отправлять пакеты большего размера. Это предотвращает проблемы с соединением, когда PMTUD не работает.</p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Устанавливает MSS в конкретное значение, в байтах. Используйте этот вариант, если нужно принудительно установить конкретное значение MSS, например, для устранения проблем с подключением или соответствия требованиям сети.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> Роутер автоматически рассчитывает MSS как MTU интерфейса минус 40 байт для IPv4 (20 байт для заголовка IPv4 и 20 байт для заголовка TCP). Этот вариант рекомендуется для автоматической установки правильного значения.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-arp-cache-timeout" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, как долго ARP-запись остается действительной после изучения сопоставления IP-адреса и MAC-адреса на этом интерфейсе.</strong></p>
+<p>По умолчанию длительность составляет 30 секунд.</p>
+<p>ARP-запись остается действительной, если она получает положительный ответ от протоколов верхнего уровня.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-disable-arp-filter" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте фильтрацию ARP на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> Ядро отвечает на запросы ARP на этом интерфейсе только в том случае, если трафик будет маршрутизироваться обратно к отправителю ARP через этот конкретный интерфейс.</p>
+<p><strong>Если настроено:</strong> Ядро отвечает на запросы ARP на этом интерфейсе для любого IP-адреса, настроенного на локальном хосте, независимо от того, какой конкретный интерфейс этому IP-адресу назначен, и независимо от таблицы маршрутизации. Это отражает концепцию Linux, согласно которой IP-адреса принадлежат хосту, а не отдельным интерфейсам.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip disable-arp-filter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-disable-forwarding" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс для работы в режиме хоста или роутера.</strong></p>
+<p>Если настроено, интерфейс переключается в режим хоста, и IPv4-пересылка отключена на нем.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-enable-directed-broadcast" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, будут ли передаваться пакеты направленной широковещательной передачи, полученные на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> Пакеты направленной широковещательной передачи отбрасываются.</p>
+<p><strong>Если настроено:</strong> Пакеты направленной широковещательной передачи передаются всем хостам на подсети назначения, как определено в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> и <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-enable-arp-accept" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, как обрабатывать бесплатные ARP на этом интерфейсе.</strong></p>
+<p>Если настроено, IP-адреса добавляются в таблицу ARP на основе бесплатных ARP-запросов или ответов.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если в таблице ARP уже есть IP-адрес из бесплатного ARP, его запись обновляется независимо от того, настроено ли это настройка.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-enable-arp-announce" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте выбор источника IP-адреса для запросов ARP на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> Ядро может использовать любой IP-адрес, которым владеет хост, в качестве источника IP-адреса в запросах ARP на этом интерфейсе.</p>
+<p><strong>Если настроено:</strong> Ядро сначала пытается выбрать источник IP-адреса, настроенный на интерфейсе, который совпадает с подсетью цели. Если такой подсети нет, ядро выбирает IP-адрес, который обычно используется (на основе таблицы маршрутизации для достижения цели).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-enable-arp-ignore" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, какие запросы ARP будут игнорироваться на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> Ядро отвечает на запросы ARP для любых локальных IP-адресов, независимо от того, к какому интерфейсу они привязаны.</p>
+<p><strong>Если настроено:</strong> Ядро отвечает на запросы ARP только в том случае, если целевой IP-адрес привязан к этому конкретному интерфейсу.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-enable-arp-accept" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте прокси-ARP на этом интерфейсе.</strong></p>
+<p>Если настроено, роутер (ядро) перехватывает запросы ARP для не локальных IP-адресов и отвечает MAC-адресом интерфейса, который получил запрос. Последующие пакеты, предназначенные этим IP-адресам, перенаправляются на их фактические цели на удаленных подсетях.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip enable-proxy-arp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-proxy-arp-pvlan" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте локальный прокси-ARP на интерфейсе.</strong></p>
+<p>Если настроено, роутер (ядро) отвечает на запросы ARP на этом VLAN-интерфейсе, даже если целевой IP-адрес находится на той же подсети и интерфейсе.</p>
+<p>Это используется для поддержки требований изоляции сети (RFC 3069) для частных VLAN (PVLAN). В конфигурациях PVLAN, хосты на изолированных портах не могут напрямую общаться друг с другом на уровне 2, но могут общаться с шлюзом.</p>
+<p>Посредством ответа на запросы ARP между хостами своим MAC-адресом, роутер направляет трафик между хостами через себя вместо прямого взаимодействия между хостами.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Эта команда работает самостоятельно и не требует включения стандартного прокси-ARP на интерфейсе.</p>
+</div>
+<p>Локальный прокси-ARP также известен как:</p>
+<ul class="simple">
+<li><p>VLAN-агрегация (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>Частная VLAN (Cisco, Allied Telesyn).</p></li>
+<li><p>Фильтрация порта или изоляция порта (Hewlett-Packard).</p></li>
+<li><p>Перенаправление MAC (Ericsson).</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-source-validation-strict-loose-disable" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте проверку исходного IP-адреса с использованием</strong> <abbr title="Обратное перенаправление">RPF</abbr> <strong>на этом интерфейсе, как указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>strict:</strong> Каждый входящий пакет проверяется на соответствие FIB. Если интерфейс не является лучшим маршрутом обратно к этому источнику, проверка завершается неудачей, и пакет удаляется.</p></li>
+<li><p><strong>loose:</strong> Каждый входящий пакет проверяется на соответствие FIB. Если IP-адрес недоступен через любой интерфейс, проверка завершается неудачей.</p></li>
+<li><p><strong>disable:</strong> Не производится проверка исходного IP-адреса. Все входящие пакеты принимаются.</p></li>
+</ul>
+<p>RFC 3704 рекомендует включить строгий режим для предотвращения спуфинга IP, такого как DDoS-атаки. Для асимметричных или других сложных сценариев маршрутизации используйте строгий режим.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ipv6-address-autoconf" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс для автоматического получения IPv6-адреса с использованием</strong> <abbr title="Состояние автоконфигурации без состояния">SLAAC</abbr>, <strong>как указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<p>Хосты IPv6 могут настраивать себя автоматически, когда подключены к IPv6-сети с использованием протокола обнаружения соседей через ICMPv6-сообщения о маршрутизации. При первом подключении к сети хост отправляет многоадресное сообщение о запросе маршрутизации на локальной подсети для получения параметров своей конфигурации. Маршрутизатор отвечает пакетом объявления маршрутизации, содержащим параметры конфигурации сетевого уровня.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Этот метод автоматически отключает передачу IPv6-трафика на интерфейсе.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ipv6 address autoconf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ipv6-address-eui64-prefix" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс для назначения себе IPv6-адреса с использованием метода</strong> <abbr title="64-битный расширенный уникальный идентификатор">EUI-64</abbr> <strong>, как указано</strong> в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ipv6 address eui64 2001:db8:beef::/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ipv6 address no-default-link-local
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ipv6-address-no-default-link-local" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите автоматическое назначение локального IPv6-адреса этому интерфейсу.</strong></p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ipv6 address no-default-link-local
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ipv6-disable-forwarding" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс для работы в режиме хоста или роутера.</strong></p>
+<p>Если настроено, интерфейс переключается в режим хоста, и IPv6-пересылка отключена на нем.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ipv6 disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ipv6 adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте</strong> <abbr title="Максимальный размер сегмента">MSS</abbr> <strong>объявляемый в исходящих TCP SYN-пакетах на указанном интерфейсе.</strong></p>
+<p>Ограничение значения MSS в пакетах TCP SYN позволяет явно информировать удалённую сторону, что она не должна отправлять пакеты большего размера. Это предотвращает проблемы с соединением, когда PMTUD не работает.</p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Установите MSS на конкретное значение, в байтах. Используйте этот вариант, чтобы принудительно установить конкретное значение MSS, например, для устранения проблем с подключением или соответствия требованиям сети.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> Роутер рассчитывает MSS как MTU интерфейса минус 60 байт для IPv6-трафика (40 байт для заголовка IPv6 и 20 байт для заголовка TCP). Этот вариант рекомендуется для автоматической установки правильного значения.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ipv6 accept-dad &lt;0 | 1 | 2&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ipv6-accept-dad-0-1-2" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте</strong> <abbr title="Проверка дублирования адреса">DAD</abbr> <strong>на интерфейсе.</strong></p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>0:</strong> Отключает DAD. Проверка дублирования адреса не выполняется.</p></li>
+<li><p><strong>1:</strong> Включает DAD (по умолчанию). Дублирование адреса обнаруживается. Работа интерфейса IPv6 продолжается для действительных IPv6-адресов.</p></li>
+<li><p><strong>2:</strong> Включает DAD и, если найден дублированный MAC-адрес локальной подсети, отключает работу IPv6 на этом интерфейсе.</p></li>
+</ul>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ipv6 accept-dad 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ipv6 dup-addr-detect-transmits &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ipv6-dup-addr-detect-transmits-n" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте количество</strong> <abbr title="Проверка дублирования адреса">DAD</abbr> <strong>сообщений, которые отправляет роутер (ядро) во время назначения IPv6-адреса на этом интерфейсе.</strong></p>
+<p>Значение по умолчанию — 1.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ipv6 dup-addr-detect-transmits 5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vrf &lt;vrf&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vrf-vrf" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Назначьте интерфейс определённому экземпляру</strong> <abbr title="Виртуальная маршрутизация и пересылка">VRF</abbr> <strong>.</strong></p>
+<div class="admonition seealso">
+<p class="admonition-title">Смотрите также</p>
+<p>Для информации о настройке VRF см. раздел <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vrf red
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>DHCP(v6)</strong></p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcp-options client-id &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcp-options-client-id-description" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте идентификатор клиента DHCP для интерфейса, как указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2131.html"><strong>RFC 2131</strong></a>.</p>
+<p><code class="docutils literal notranslate">client-id</code> — это идентификатор, который клиент DHCP отправляет серверу DHCP, чтобы уникально идентифицировать себя для назначения IP-адреса. По умолчанию клиент использует свой MAC-адрес. <code class="docutils literal notranslate">&lt;description&gt;</code> — это пользовательская строка, которая будет отправлена серверу DHCP в качестве идентификатора клиента DHCP.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcp-options client-id 'foo-bar'
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcp-options host-name &lt;hostname&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcp-options-host-name-hostname" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте конкретное имя хоста для интерфейса.</strong></p>
+<p>Вместо настоящего имени хоста, клиент DHCP будет отправлять конкретное имя хоста на сервер DHCP при запросе IP-адреса.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcp-options host-name 'VyOS'
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcp-options vendor-class-id &lt;vendor-id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcp-options-vendor-class-id-vendor-id" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте клиент DHCP, чтобы включить идентификатор класса поставщика в своих запросах DHCP на этом интерфейсе.</strong></p>
+<p>Идентификатор класса поставщика — это специфичная для поставщика строка байтов, позволяющая серверу DHCP идентифицировать устройство и, в некоторых случаях, предоставлять опции конфигурации.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcp-options vendor-class-id 'VyOS'
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcp-options no-default-route
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcp-options-no-default-route" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте клиента DHCP, чтобы получить IP-адрес, но проигнорировать любой маршрут по умолчанию, предоставляемый сервером DHCP на этом интерфейсе.</strong></p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcp-options no-default-route
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcp-options default-route-distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcp-options-default-route-distance-distance" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте расстояние для маршрута по умолчанию, полученного от сервера DHCP на этом интерфейсе.</strong></p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcp-options default-route-distance 220
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcp-options reject &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcp-options-reject-address" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте клиента DHCP, чтобы отклонить конкретный IP-адрес или диапазон IP-адресов от сервера DHCP на этом интерфейсе.</strong></p>
+<p>Это полезно, когда модем назначает локальный IP-адрес при запуске. Чтобы отклонить несколько адресов, выполните эту команду несколько раз с разными значениями. Вы можете отклонять отдельные адреса (192.168.100.1) или целые подсети (192.168.100.0/24).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcp-options reject 192.168.100.0/24
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcp-options user-class &lt;string&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcp-options-user-class-string" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте клиента DHCP, чтобы отправить определённый идентификатор класса пользователя в своих запросах DHCP на этом интерфейсе.</strong></p>
+<p>Сервер DHCP может интерпретировать этот идентификатор и предоставить специфические опции конфигурации на основе него (например, маршруты по умолчанию).
+Значение класса пользователя обычно группирует клиентов DHCP с похожими потребностями в конфигурации (например, сотрудники, гости или принтеры).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcp-options user-class VyOS
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options duid &lt;duid&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-duid-duid" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте определённый</strong> <abbr title="Идентификатор уникального DHCP">DUID</abbr> <strong>для клиента DHCPv6 на этом интерфейсе.</strong></p>
+<p>DUID — это идентификатор, используемый клиентом DHCPv6 для получения IPv6-адреса от сервера DHCPv6. Он состоит из 2-байтового поля типа, за которым следует переменная длина идентификатора до 128 байт. Формат части идентификатора зависит от типа DUID:</p>
+<ul class="simple">
+<li><p><strong>DUID-LLT:</strong> Самый распространённый тип, который включает тип оборудования, временную метку и MAC-адрес.</p></li>
+<li><p><strong>DUID-EN:</strong> Основан на номере предприятия поставщика и уникальном идентификаторе, назначенном поставщиком.</p></li>
+<li><p><strong>DUID-LL:</strong> Включает только MAC-адрес.</p></li>
+</ul>
+<p>Сервер DHCP сопоставляет DUID с базой данных и предоставляет конфигурационные данные (например, адрес, срок аренды, серверы DNS и т.д.) клиенту DHCP.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 duid '0e:00:00:01:00:01:27:71:db:f0:00:50:56:bf:c5:6d'
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options no-release
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-no-release" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте клиента DHCP, чтобы не отправлять сообщение о выпуске, когда он останавливается на этом интерфейсе.</strong></p>
+<p>Это помогает сохранить назначенный адрес или префикс.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcpv6-options no-release
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options parameters-only
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-parameters-only" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Включите режим клиента DHCPv6 без состояния на этом интерфейсе.</strong></p>
+<p>В режиме без состояния клиент DHCPv6 запрашивает только параметры конфигурации без состояния от сервера DHCP (например, адреса серверов DNS). Он не запрашивает состояние, например, IPv6-адреса или префиксы.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcpv6-options parameters-only
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options rapid-commit
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-rapid-commit" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Включите быструю отправку запроса DHCPv6 на этом интерфейсе.</strong></p>
+<p>Когда включено, клиент и сервер пропускают шаги согласования (Advertise и Request), завершая процесс конфигурации DHCPv6 всего двумя сообщениями (Solicit и окончательный Reply).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcpv6-options rapid-commit
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options temporary
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-temporary" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте клиента DHCPv6, чтобы запросить временный IPv6-адрес на этом интерфейсе.</strong></p>
+<p>При настройке клиент не формирует связь Identity Association для постоянных адресов. Следовательно, он получает только временный IPv6-адрес и не получает постоянный.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcpv6-options temporary
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>DHCPv6 Передача префикса (PD)</strong></p>
+<p>VyOS поддерживает DHCPv6 Передача префикса (DHCPv6-PD), как описано в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3633.html"><strong>RFC 3633</strong></a>.
+DHCPv6-PD поддерживается большинством провайдеров, которые предлагают native IPv6 для потребителей на фиксированных сетях.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options pd &lt;id&gt; length &lt;length&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-pd-id-length-length" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте определённую длину префикса для запросов DHCPv6-PD на этом интерфейсе.</strong></p>
+<p>Некоторые провайдеры по умолчанию предоставляют только префикс /64. Используйте эту команду, чтобы запросить другой размер префикса для определённого запроса DHCPv6-PD, варьируя от /32 (если разрешено вашим провайдером) до /64. &lt;id&gt; — уникальный идентификатор для запроса DHCPv6-PD.</p>
+<p>Значение по умолчанию — 64.</p>
+<p>Чтобы запросить префикс /56 от вашего провайдера, используйте:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcpv6-options pd 0 length 56
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options pd &lt;id&gt; interface &lt;delegatee&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-pd-id-interface-delegatee-address-address" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте идентификатор интерфейса IPv6 (часть хоста) для интерфейса делегата.</strong></p>
+<p>Значение должно быть десятичным целым числом. Оно добавляется к делегированному префиксу и конфигурации <abbr title="ID агрегирования на уровне сайта">SLA ID</abbr>, чтобы создать окончательный IPv6-адрес.</p>
+<p>По умолчанию часть хоста генерируется на основе MAC-адреса родительского интерфейса (формат EUI-64).</</p>
+<p><strong>Пример:</strong></p>
+<p>Если /64-префикс делегирован интерфейсу eth8, и вы настраивает часть хоста как 65535, результат IPv6-адреса будет заканчиваться ::ffff, так как 65535 соответствует ffff в шестнадцатеричной записи.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcpv6-options pd 0 interface eth8 address 65534
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options pd &lt;id&gt; interface &lt;delegatee&gt; sla-id &lt;id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-pd-id-interface-delegatee-sla-id-id" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте</strong> <abbr title="ID агрегирования на уровне сайта">SLA ID</abbr> <strong>для интерфейса делегата.</strong></p>
+<p>Значение должно быть десятичным целым числом больше 0 и помещается в длину SLA ID. Оно преобразуется в шестнадцатеричное число и добавляется к делегированному префиксу, чтобы создать конкретный подсетевой префикс для интерфейса делегата.</<p>
+<p><strong>Пример:</strong></p>
+<p>Если SLA ID равен 1, а делегированный префикс равен <code class="docutils literal notranslate">2001:db8:ffff::/48</code>, подсетной префикс для интерфейса делегата будет <code class="docutils literal notranslate">2001:db8:ffff:1::/64</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcpv6-options pd 0 interface eth8 sla-id 1
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="member-interfaces">
+<h3>Членские интерфейсы</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; member interface &lt;member&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-member-interface-member" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Добавьте интерфейс в группу объединения.</strong></p>
+<p><strong>Пример:</strong></p>
+<p>Чтобы настроить eth0 и eth1 как членов интерфейса bond0, выполните следующие команды:</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 member interface eth0
+set interfaces bonding bond0 member interface eth1
+</pre></div>
+</div>
+</section>
+<section id="bond-modes">
+<h3>Режимы объединения</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; mode &lt;802.3ad | active-backup | broadcast | round-robin | transmit-load-balance | adaptive-load-balance | xor-hash&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-mode-802-3ad-active-backup-broadcast-round-robin-transmit-load-balance-adaptive-load-balance-xor-hash" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте режим объединения на интерфейсе. Режим по умолчанию — </strong><code class="docutils literal notranslate">802.3ad</code>.</p>
+<p>Доступные режимы:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">802.3ad</code></p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Описание:</strong></p></td>
+<td><p>Динамическая агрегация ссылок, основанная на стандарте IEEE 802.3ad. Группируются только члены интерфейса с одинаковой скоростью (например, 1 Гбит/с) и настройками дуплекса. Члены интерфейса с различной скоростью и настройками дуплекса не входят в активное объединение.</p>
+<p>Предоставляет баланс нагрузки и отказоустойчивость. Использует <abbr title="Протокол управления агрегацией ссылок">LACP</abbr> для согласования объединения с коммутатором.</</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><strong>Распределение трафика:</strong></p></td>
+<td><p>Трафик распределяется в соответствии с <strong>политикой хэширования передачи</strong> (по умолчанию: XOR).</p>
+<p>Драйвер объединения применяет операцию XOR к определенным полям заголовка пакета, генерируя значение хэша, которое отображается на определённый член интерфейса. Это гарантирует, что один и тот же сетевой поток последовательно передаётся через один и тот же член интерфейса.</p>
+<p>Политика хэширования передачи настраивается через опцию <code class="docutils literal notranslate">hash-policy</code>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><strong>Обработка отказа:</strong></p></td>
+<td><p>Если член интерфейса выходит из строя, хэш пересчитывается, чтобы распределить трафик среди оставшихся активных членов интерфейса.</</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Не все политики хэширования передачи соответствуют 802.3ad, особенно раздел 43.2.4. Использование несоответствующей политики может привести к неупорядоченной доставке пакетов.</p>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">active-backup</code></p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Описание:</strong></p></td>
+<td><p>Предоставляет отказоустойчивость. Только один член интерфейса активен в течение времени. Другие члены интерфейса остаются в режиме ожидания.</</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><strong>Распределение трафика:</strong></p></td>
+<td><p>Все трафик (входящий и исходящий) направляется через один активный член интерфейса.</</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><strong>Обработка отказа:</strong></p></td>
+<td><p>Если активный член интерфейса выходит из строя, весь трафик направляется на другой член интерфейса. Драйвер объединения отправляет <abbr title="ARP-запрос">ARP</abbr> для обновления таблицы MAC-адреса у соседа, связывая MAC-адрес объединения с другим физическим портом.</</p>
+</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">broadcast</code></p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Описание:</strong></p></td>
+<td><p>Предоставляет максимальную отказоустойчивость, дублируя трафик.</</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><strong>Распределение трафика:</strong></p></td>
+<td><p>Каждый пакет дублируется и отправляется на <strong>все</strong> члены интерфейса.</</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><strong>Обработка отказа:</strong></p></td>
+<td><p>Поток не прерывается, пока хотя бы один член интерфейса остаётся активным.</</p>
+</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">round-robin</code></p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Описание:</strong></p></td>
+<td><p>Предоставляет баланс нагрузки и отказоустойчивость.</</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><strong>Распределение трафика:</strong></p></td>
+<td><p>Пакеты передаются последовательно по членам интерфейса (например, пакет 1 > интерфейс A, пакет 2 > интерфейс B и т.д.).</</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><strong>Обработка отказа:</strong></p></td>
+<td><p>Если член интерфейса выходит из строя, последовательность пропускает неисправный член и продолжает работу с оставшимися активными членами интерфейса.</</p>
+</td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">transmit-load-balance</code></p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0

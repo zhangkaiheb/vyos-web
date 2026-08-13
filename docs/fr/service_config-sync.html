@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="config-sync">
+<h1>Synchronisation de configuration</h1>
+<p>La synchronisation de configuration (config-sync) est un service VyOS qui
+réplique les sections sélectionnées de la configuration d'un routeur vers un
+autre routeur. Elle élimine le besoin de miroir manuellement les modifications de configuration
+d'un routeur principal vers un secondaire.</p>
+<p>La synchronisation est effectuée par un hook post-commit sur le routeur principal.
+Le hook surveille les sections sélectionnées pour la synchronisation. Lorsqu'une de ces sections est modifiée par un commit, le hook appelle l'API HTTPS sur le routeur secondaire et envoie l'état actuel de toutes les sections sélectionnées dans l'une des modes suivants :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">load</code>: Remplace les sections sélectionnées sur le secondaire avec la version
+du principal. Tout ce qui existe uniquement sur le secondaire à l'intérieur
+de ces sections est supprimé.</p></li>
+<li><p><code class="docutils literal notranslate">set</code>: Fusionne la version du principal des sections sélectionnées dans le
+secondaire. Les valeurs en conflit sont remplacées par le principal. Les entrées
+qui existent uniquement sur le secondaire sont conservées.</p></li>
+</ul>
+<p>La synchronisation est strictement unidirectionnelle du principal au secondaire;
+les modifications apportées au secondaire ne sont pas envoyées en arrière.</p>
+<p>Les deux routeurs doivent être en ligne pendant un commit sur le principal qui modifie une section configurée. Si le secondaire est inatteignable, le commit du principal réussit, mais la configuration n'est pas synchronisée, et l'échec est enregistré dans le journal système.</p>
+<section id="configuration">
+<h2>Configuration</h2>
+<section id="secondary-router-parameters">
+<h3>Paramètres du routeur secondaire</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service config-sync secondary address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-config-sync-secondary-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'adresse du routeur secondaire.</strong></p>
+<p>Le routeur principal envoie la configuration synchronisée à cette adresse
+via l'API HTTPS du secondaire. La valeur peut être une adresse IPv4, une
+adresse IPv6 ou un <abbr title="Fully Qualified Domain Name">FQDN</abbr>. Cette
+valeur est obligatoire.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>L'adresse doit être définie chaque fois que <code class="docutils literal notranslate">service config-sync</code> est configuré.
+Sinon, le commit est rejeté.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service config-sync secondary address 192.0.2.112
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service config-sync secondary port &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-config-sync-secondary-port-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le port TCP sur lequel l'API HTTPS du routeur secondaire écoute.</strong></p>
+<p>La valeur doit correspondre au port configuré sous <code class="docutils literal notranslate">service https port</code> sur
+le routeur secondaire. Si elles diffèrent, le commit du principal réussit,
+mais la synchronisation post-commit échoue. Le secondaire n'est pas mis à jour, et le
+principal enregistre l'erreur dans le journal système.</p>
+<p>La valeur par défaut est 443, correspondant à la valeur par défaut de <code class="docutils literal notranslate">service https port</code>.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service config-sync secondary port 8443
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service config-sync secondary key &lt;key&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-config-sync-secondary-key-key" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la clé API HTTPS que le routeur principal utilise pour s'authentifier
+à l'API HTTPS du routeur secondaire.</strong></p>
+<p>La valeur doit correspondre à une clé configurée sous <code class="docutils literal notranslate">service https api keys id &lt;ID&gt; key</code> sur le secondaire. Si aucune clé correspondante n'existe sur le secondaire,
+le commit du principal réussit, mais la synchronisation post-commit échoue.
+Le secondaire n'est pas mis à jour, et le principal enregistre l'erreur dans le
+journal système.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette valeur doit être définie chaque fois que <code class="docutils literal notranslate">service config-sync</code> est configuré.
+Sinon, le commit est rejeté.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service config-sync secondary key &#39;foo&#39;
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service config-sync secondary timeout &lt;1-3600&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-config-sync-secondary-timeout-1-3600" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la durée, en secondes, pendant laquelle le routeur principal attend une réponse HTTPS du secondaire après avoir envoyé la configuration.</strong></p>
+<p>La valeur par défaut est de 60 secondes.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service config-sync secondary timeout 120
+</pre></div>
+</div>
+</section>
+<section id="synchronization-mode">
+<h3>Mode de synchronisation</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service config-sync mode &lt;load | set&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-config-sync-mode-load-set" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez comment le routeur secondaire applique la configuration poussée
+par le principal :</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">load</code>: Remplace les sections sélectionnées sur le secondaire par la version
+du principal. Tout ce qui existe uniquement sur le secondaire à l'intérieur
+de ces sections est supprimé.</p></li>
+<li><p><code class="docutils literal notranslate">set</code>: Fusionne la version du principal des sections sélectionnées dans le
+secondaire. Les valeurs en conflit sont remplacées par le principal. Les entrées
+qui existent uniquement sur le secondaire sont conservées.</p></li>
+</ul>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette valeur doit être définie chaque fois que <code class="docutils literal notranslate">service config-sync</code> est configuré.
+Sinon, le commit est rejeté.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service config-sync mode load
+</pre></div>
+</div>
+</section>
+<section id="sections-to-synchronize">
+<h3>Sections à synchroniser</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service config-sync section &lt;section&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-config-sync-section-section" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez une ou plusieurs sections de configuration à synchroniser du
+principal vers le routeur secondaire.</strong></p>
+<p>Répétez la commande pour ajouter des sections supplémentaires. Si une section configurée a été modifiée par un commit sur le principal, le hook envoie l'état actuel de toutes les sections configurées au secondaire. Si aucune des sections configurées n'a été modifiée, le hook ne fait rien.</p>
+<p>Sections prises en charge :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">firewall</code></p></li>
+<li><p><code class="docutils literal notranslate">interfaces &lt;bonding | bridge | dummy | ethernet | geneve | input | l2tpv3 | loopback | macsec | openvpn | pppoe | pseudo-ethernet | sstpc | tunnel | virtual-ethernet | vti | vxlan | wireguard | wireless | wwan&gt;</code></p></li>
+<li><p><code class="docutils literal notranslate">nat</code></p></li>
+<li><p><code class="docutils literal notranslate">nat66</code></p></li>
+<li><p><code class="docutils literal notranslate">pki</code></p></li>
+<li><p><code class="docutils literal notranslate">policy</code></p></li>
+<li><p><code class="docutils literal notranslate">protocols &lt;babel | bfd | bgp | failover | igmp-proxy | isis | mpls | nhrp | ospf | ospfv3 | pim | pim6 | rip | ripng | rpki | segment-routing | static&gt;</code></p></li>
+<li><p><code class="docutils literal notranslate">qos &lt;interface | policy&gt;</code></p></li>
+<li><p><code class="docutils literal notranslate">service &lt;console-server | dhcp-relay | dhcp-server | dhcpv6-relay | dhcpv6-server | dns | lldp | mdns | monitoring | ndp-proxy | ntp | snmp | tftp-server | webproxy&gt;</code></p></li>
+<li><p><code class="docutils literal notranslate">system &lt;conntrack | flow-accounting | login | option | sflow | static-host-mapping | sysctl | time-zone&gt;</code></p></li>
+<li><p><code class="docutils literal notranslate">vpn</code></p></li>
+<li><p><code class="docutils literal notranslate">vrf</code></p></li>
+</ul>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Au moins une section doit être configurée chaque fois que <code class="docutils literal notranslate">service config-sync</code> est
+configuré. Sinon, le commit est rejeté.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service config-sync section protocols ospf
+set service config-sync section system time-zone
+</pre></div>
+</div>
+</section>
+</section>
+<section id="operation">
+<h2>Fonctionnement</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show configuration secondary sync [commands] [running | candidate | saved [&lt;config-node-path&gt;]]
+<a class="cmdlink" href="#opcmd-show-configuration-secondary-sync-commands-running-candidate-saved-config-node-path" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p><strong>Affiche la différence entre la configuration locale sur le principal
+et la configuration en cours sur le secondaire.</strong></p>
+<p>La commande récupère la configuration en cours du secondaire en temps réel via l'API HTTPS, donc le secondaire doit être accessible.</p>
+<p>La configuration locale par défaut est <code class="docutils literal notranslate">running</code> et peut être définie sur
+<code class="docutils literal notranslate">candidate</code> (changements non commis) ou <code class="docutils literal notranslate">saved</code> (dernière configuration sauvegardée).
+Le côté distant est toujours la configuration en cours du secondaire.</p>
+<p>Par défaut, la différence est affichée au format de configuration avec
+<code class="docutils literal notranslate">-</code> devant les lignes qui existent uniquement sur le secondaire et
+<code class="docutils literal notranslate">+</code> devant les lignes qui existent uniquement sur le principal. Le mot-clé
+optionnel <code class="docutils literal notranslate">commands</code> affiche la même différence sous forme d'une séquence de commandes <code class="docutils literal notranslate">set</code>
+et <code class="docutils literal notranslate">delete</code> de configuration, où <code class="docutils literal notranslate">set</code> liste les chemins présents
+uniquement sur le principal, et <code class="docutils literal notranslate">delete</code> liste les chemins présents uniquement sur le
+secondaire.</p>
+<p>L'argument optionnel <code class="docutils literal notranslate">&lt;config-node-path&gt;</code> limite la différence à une seule section et doit être l'une des sections déjà configurées sous
+<code class="docutils literal notranslate">set service config-sync section</code>. Si omis, la différence couvre toutes les sections configurées.</p>
+</div>
+</div>
+<p>Exemples :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># Comparer la configuration complète en cours avec le secondaire
+show configuration secondary sync
+
+# Comparer uniquement la configuration du protocole OSPF avec le secondaire
+show configuration secondary sync running protocols ospf
+
+# Comparer la configuration candidate avec le secondaire,
+# affichée sous forme de commandes
+show configuration secondary sync commands candidate
+</pre></div>
+</div>
+</section>
+<section id="example">
+<h2>Exemple</h2>
+<p>L'exemple suivant synchronise les sections <code class="docutils literal notranslate">system time-zone</code> et
+<code class="docutils literal notranslate">protocols ospf</code> du Routeur A (principal, <code class="docutils literal notranslate">192.0.2.1</code>) vers
+le Routeur B (secondaire, <code class="docutils literal notranslate">192.0.2.112</code>). L'API HTTPS du Routeur B écoute sur
+le port TCP 8443.</p>
+<p>Activez et configurez le service d'API HTTPS sur le Routeur B :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https listen-address &#39;192.0.2.112&#39;
+set service https port &#39;8443&#39;
+set service https api keys id primary key &#39;foo&#39;
+set service https api rest
+</pre></div>
+</div>
+<p>Configurez le service de synchronisation de configuration sur le Routeur A :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service config-sync mode &#39;load&#39;
+set service config-sync secondary address &#39;192.0.2.112&#39;
+set service config-sync secondary port &#39;8443&#39;
+set service config-sync secondary key &#39;foo&#39;
+set service config-sync section protocols &#39;ospf&#39;
+set service config-sync section system &#39;time-zone&#39;
+</pre></div>
+</div>
+<p>Apportez des modifications sur le Routeur A qui relèvent d'une des sections synchronisées. Le hook post-commit s'active automatiquement lors du commit :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos-A# set system time-zone &#39;America/Los_Angeles&#39;
+vyos@vyos-A# commit
+INFO:vyos_config_sync:Config synchronization: Mode=load, Secondary=192.0.2.112
+vyos@vyos-A# save
+
+vyos@vyos-A# set protocols ospf area 0 network &#39;198.51.100.0/30&#39;
+vyos@vyos-A# commit
+INFO:vyos_config_sync:Config synchronization: Mode=load, Secondary=192.0.2.112
+vyos@vyos-A# save
+</pre></div>
+</div>
+<p>Chaque commit sur le Routeur A modifie une section, mais comme le hook envoie toutes les sections configurées chaque fois qu'une de celles-ci est modifiée, les deux commits remplacent l'état complet de <code class="docutils literal notranslate">system</code> et <code class="docutils literal notranslate">protocols ospf</code> sur le Routeur B.</p>
+<p>Vérifiez que les modifications ont été appliquées sur le Routeur B :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos-B:~$ show configuration commands | match time-zone
+set system time-zone &#39;America/Los_Angeles&#39;
+
+vyos@vyos-B:~$ show configuration commands | match ospf
+set protocols ospf area 0 network &#39;198.51.100.0/30&#39;
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="rpki">
+<h1>RPKI</h1>
+<p><abbr title="Resource Public Key Infrastructure">RPKI</abbr> is an architecture designed
+to secure the internet routing infrastructure. It cryptographically associates
+IP address prefixes with the correct originating
+<abbr title="Autonomous System Numbers">ASNs</abbr>. BGP routers can use this data to
+check the origin of each route against the corresponding
+<abbr title="Route Origin Authorization">ROA</abbr> for validity. RPKI is described in
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6480">RFC 6480</a>.</p>
+<p>BGP routers can retrieve ROA information from RPKI Relying Party software,
+also known as an RPKI server or validator, using the RTR protocol. Open-source
+implementations include NLnet Labs’
+<a class="reference external" href="https://www.nlnetlabs.nl/projects/routing/routinator/">Routinator</a> (Rust),
+OpenBSD’s <a class="reference external" href="https://www.rpki-client.org/">rpki-client</a> (C), and
+<a class="reference external" href="https://github.com/bgp/stayrtr">StayRTR</a> (Go). The RTR protocol is described
+in <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc8210">RFC 8210</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you are new to routing security, the
+<a class="reference external" href="https://rpki.readthedocs.io/">RPKI Documentation</a> maintained by NLnet Labs
+will quickly get you up to speed. It covers everything from fundamental
+concepts to production deployment.</p>
+</div>
+<section id="getting-started">
+<h2>Getting started</h2>
+<p>First, you need to deploy an RPKI validator for your routers. The
+<a class="reference external" href="https://rpki.readthedocs.io/">RPKI Documentation</a> maintained by NLnet Labs
+provides a comprehensive list of open-source software packages you can compare
+and choose from. Once your chosen server is running, your routers can start
+validating announcements.</p>
+<p>After validation, imported routes may have one of the following states:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">valid</code>: The prefix and originating ASN match a signed ROA. These route
+announcements are considered trustworthy.</p></li>
+<li><p><code class="docutils literal notranslate">invalid</code>: The prefix, prefix length, or originating ASN does not match
+any existing ROA. This may indicate a prefix hijack or misconfiguration
+and should be treated as untrustworthy.</p></li>
+<li><p><code class="docutils literal notranslate">notfound</code>: No ROA covers the prefix. As of early 2024, this applies to
+approximately 40% to 50% of prefixes announced to the
+<abbr title="Default-Free Zone">DFZ</abbr>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you manage global IP addresses for your network, ensure their prefixes
+have associated ROAs to prevent them from being marked as <code class="docutils literal notranslate">notfound</code> by
+RPKI.</p>
+</div>
+<p>For most network operators, this involves publishing ROAs through their
+respective <abbr title="Regional Internet Registry">RIR</abbr>, such as ARIN, RIPE NCC,
+APNIC, LACNIC, or AFRINIC. It is highly recommended to create ROAs for any IP
+prefixes you plan to announce into the DFZ.</p>
+<p>Particularly large networks may choose to run their own RPKI certificate
+authority and publication server instead of publishing ROAs via their RIR.
+This subject is beyond the scope of VyOS documentation. For more information,
+consider reviewing resources about
+<a class="reference external" href="https://www.nlnetlabs.nl/projects/routing/krill/">Krill</a>.</p>
+</section>
+<section id="current-implementation">
+<h2>Current implementation</h2>
+<p>The current implementation includes the following features:</p>
+<ul class="simple">
+<li><p>The BGP router connects to one or more RPKI cache servers to receive
+validated prefix-to-origin AS mappings. Advanced failover can be
+implemented by configuring multiple cache servers with different
+preference values.</p></li>
+<li><p>If no connection to an RPKI cache server is established after a predefined
+timeout, the router processes routes without prefix origin validation. It
+will continue attempting to connect to an RPKI cache server in the
+background.</p></li>
+<li><p>By default, enabling RPKI does not affect best path selection. Invalid
+prefixes are still considered during best path selection, but you can
+configure the router to ignore them.</p></li>
+<li><p>You can configure route maps to match a specific RPKI validation state.
+This enables the creation of local policies that handle BGP routes based
+on Prefix Origin Validation results.</p></li>
+<li><p>Updates from RPKI cache servers are applied directly, and path selection
+is updated accordingly. Note: BGP soft reconfiguration must be enabled
+for this feature to work.</p></li>
+</ul>
+</section>
+<section id="configuration">
+<h2>Configuration</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rpki polling-period &lt;1-86400&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rpki-polling-period-1-86400" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interval, in seconds, at which the router polls the RPKI
+cache server for updates.</strong></p>
+<p>The default value is 300 seconds.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki polling-period 600
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rpki expire-interval &lt;600-172800&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rpki-expire-interval-600-172800" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interval, in seconds, after which the router expires its
+cached RPKI data.</strong></p>
+<p>The default value is 7200 seconds.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki expire-interval 14400
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rpki retry-interval &lt;1-7200&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rpki-retry-interval-1-7200" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interval, in seconds, before the router retries a failed
+connection to the RPKI cache server.</strong></p>
+<p>The default value is 600 seconds.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki retry-interval 60
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rpki cache &lt;address&gt; port &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rpki-cache-address-port-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the address and port of an RPKI cache server.</strong></p>
+<p>The address can be specified as an IPv4 or IPv6 address, or as a
+<abbr title="Fully Qualified Domain Name">FQDN</abbr>.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You need to configure both <code class="docutils literal notranslate">port</code> and <code class="docutils literal notranslate">preference</code> for each cache server
+IP address.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki cache 192.0.2.1 port 3323
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rpki cache &lt;address&gt; preference &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rpki-cache-address-preference-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the preference value for an RPKI cache server.</strong></p>
+<p>When multiple cache servers are configured, the router prioritizes
+connecting to the server with the lowest preference value.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You need to configure both <code class="docutils literal notranslate">port</code> and <code class="docutils literal notranslate">preference</code> for each cache server
+IP address.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate">preference</code> values must be unique across cache servers.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki cache 192.0.2.1 preference 1
+</pre></div>
+</div>
+<section id="ssh">
+<h3>SSH</h3>
+<p>You can connect to the RPKI cache server using the RTR protocol over plain
+TCP or over SSH. SSH provides transport integrity and confidentiality. Use
+SSH if your validation software supports this option.</p>
+<p>To use SSH authentication, complete the following steps:</p>
+<p><strong>Step 1.</strong> Generate an SSH client keypair:</p>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+generate ssh client-key /config/auth/id_rsa_rpki
+<a class="cmdlink" href="#opcmd-generate-ssh-client-key-config-auth-id-rsa-rpki" title="Permalink to this Command"></a></div></div>
+<p><strong>Step 2.</strong> Extract the base64 portion from both keys, plus the public
+key’s algorithm identifier:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre>   grep -v &quot;PRIVATE KEY&quot; /config/auth/id_rsa_rpki | tr -d &#39;\n&#39;
+   awk &#39;{print $2}&#39; /config/auth/id_rsa_rpki.pub
+   awk &#39;{print $1}&#39; /config/auth/id_rsa_rpki.pub
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The PKI subsystem accepts only the base64 portion of each key, without
+any PEM/OpenSSH headers, footer, or line breaks. If you paste the file
+contents directly, the commit fails.</p>
+</div>
+<p><strong>Step 3.</strong> Import the keypair into the PKI subsystem:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>   set pki openssh &lt;name&gt; private key &lt;base64-encoded-private-key&gt;
+   set pki openssh &lt;name&gt; public key &lt;base64-encoded-public-key&gt;
+   set pki openssh &lt;name&gt; public type &lt;type&gt;
+</pre></div>
+</div>
+<p>Once the keypair is imported, set up the SSH connection using the commands
+below.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rpki cache &lt;address&gt; ssh username &lt;user&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rpki-cache-address-ssh-username-user" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the SSH username for authenticating to the RPKI cache server.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki cache 192.0.2.1 ssh username rpki-user
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rpki cache &lt;address&gt; ssh key &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rpki-cache-address-ssh-key-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the name of the OpenSSH keypair used to authenticate to the RPKI
+cache server.</strong></p>
+<p>The <code class="docutils literal notranslate">&lt;name&gt;</code> must match a keypair name previously defined under the
+<code class="docutils literal notranslate">set pki openssh</code> commands.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki cache 192.0.2.1 ssh key rpki
+</pre></div>
+</div>
+</section>
+</section>
+<section id="example">
+<h2>Example</h2>
+<p>The following example demonstrates how to connect to an RPKI cache server
+(such as Routinator) and build an import route-map to filter prefixes based
+on their validation state.</p>
+<p>First, configure the connection to the RPKI cache server at <code class="docutils literal notranslate">192.0.2.1</code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rpki cache 192.0.2.1 port &#39;3323&#39;
+set protocols rpki cache 192.0.2.1 preference &#39;1&#39;
+</pre></div>
+</div>
+<p>Next, create a route-map to apply to your incoming BGP updates. This policy
+dictates the following behavior:</p>
+<ul class="simple">
+<li><p>Permits <code class="docutils literal notranslate">valid</code> prefixes and assigns a high local-preference (300).</p></li>
+<li><p>Permits <code class="docutils literal notranslate">notfound</code> prefixes but assigns a lower local-preference (125).</p></li>
+<li><p>Rejects prefixes with an <code class="docutils literal notranslate">invalid</code> state.</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set policy route-map ROUTES-IN rule 10 action &#39;permit&#39;
+set policy route-map ROUTES-IN rule 10 match rpki &#39;valid&#39;
+set policy route-map ROUTES-IN rule 10 set local-preference &#39;300&#39;
+
+set policy route-map ROUTES-IN rule 20 action &#39;permit&#39;
+set policy route-map ROUTES-IN rule 20 match rpki &#39;notfound&#39;
+set policy route-map ROUTES-IN rule 20 set local-preference &#39;125&#39;
+
+set policy route-map ROUTES-IN rule 30 action &#39;deny&#39;
+set policy route-map ROUTES-IN rule 30 match rpki &#39;invalid&#39;
+</pre></div>
+</div>
+<p>After configuring your routers to reject RPKI-invalid prefixes, verify the
+setup using <a class="reference external" href="https://isbgpsafe.com/">Cloudflare’s test website</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ensure there are no default routes or other paths that would direct traffic
+to RPKI-invalid destinations. Otherwise, the test may report the router as
+unsafe.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

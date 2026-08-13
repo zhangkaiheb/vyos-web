@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { configApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
@@ -28,32 +28,32 @@ export default defineComponent({
   components: { DataTable, DraggableModal, ConfigForm, ToolbarButton },
   setup() {
     const configStore = useConfigStore();
+    const { t } = inject('i18n');
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
 
-    const columns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 150 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-      { key: 'offload', title: '卸载方式', dataIndex: 'offload', width: 120 },
-      { key: 'interfaces', title: '接口', dataIndex: 'interfaces', width: 200 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const columns = computed(() => [
+      { key: 'name', title: t('firewall.flowtable.name'), dataIndex: 'name', width: 150 },
+      { key: 'description', title: t('firewall.flowtable.description'), dataIndex: 'description', width: 200 },
+      { key: 'offload', title: t('firewall.flowtable.offload'), dataIndex: 'offload', width: 120 },
+      { key: 'interfaces', title: t('firewall.flowtable.interfaces'), dataIndex: 'interfaces', width: 200 },
+      { key: 'actions', title: t('firewall.flowtable.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
     const flowtables = ref([]);
     const selected = ref([]);
     const showFlowtableModal = ref(false);
     const editingFlowtable = ref(null);
 
-    const flowtableSchema = [
-      { key: 'name', title: '名称', type: 'text', required: true, help: '流表名称' },
-      { key: 'description', title: '描述', type: 'text', help: '流表描述' },
-      { key: 'offload', title: '卸载方式', type: 'select', options: [
-        { value: 'software', label: '软件卸载 (默认)' },
-        { value: 'hardware', label: '硬件卸载' },
-      ], help: '流表卸载方式' },
-      { key: 'interfaces', title: '接口', type: 'textarea', help: '逗号分隔的接口名称，如 eth0, eth1' },
-    ];
+    const flowtableSchema = computed(() => [
+      { key: 'name', title: t('firewall.flowtable.name'), type: 'text', required: true, help: t('firewall.flowtable.nameHelp') },
+      { key: 'description', title: t('firewall.flowtable.description'), type: 'text', help: t('firewall.flowtable.descriptionHelp') },
+      { key: 'offload', title: t('firewall.flowtable.offload'), type: 'select', options: [
+        { value: 'software', label: t('firewall.flowtable.softwareOffload') },
+        { value: 'hardware', label: t('firewall.flowtable.hardwareOffload') },
+      ], help: t('firewall.flowtable.offloadHelp') },
+      { key: 'interfaces', title: t('firewall.flowtable.interfaces'), type: 'textarea', help: t('firewall.flowtable.interfacesHelp') },
+    ]);
 
     const commandPath = computed(() => 'firewall flowtable');
 
@@ -83,12 +83,11 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('firewall flowtable', true);
         flowtables.value = flowtableToForm(res.data || {});
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('firewall.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -99,11 +98,10 @@ export default defineComponent({
       try {
         const payload = formToFlowtable(flowtables.value);
         await configApi.set('firewall flowtable', payload);
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('firewall.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -115,21 +113,21 @@ export default defineComponent({
     }
 
     function editFlowtable() {
-      if (!selected.value.length) return alert('请选择要编辑的流表');
+      if (!selected.value.length) return showError({ message: t('firewall.flowtable.selectToEdit') });
       const row = flowtables.value.find(f => f.name === selected.value[0]);
-      if (!row) return alert('未找到选中的流表');
+      if (!row) return showError({ message: t('firewall.flowtable.notFound') });
       editingFlowtable.value = JSON.parse(JSON.stringify(row));
       showFlowtableModal.value = true;
     }
 
     function removeFlowtable() {
-      if (!selected.value.length) return alert('请选择要删除的流表');
+      if (!selected.value.length) return showError({ message: t('firewall.flowtable.selectToDelete') });
       flowtables.value = flowtables.value.filter(f => f.name !== selected.value[0]);
       selected.value = [];
     }
 
     function saveFlowtable() {
-      if (!editingFlowtable.value.name) return alert('请输入流表名称');
+      if (!editingFlowtable.value.name) return showError({ message: t('firewall.flowtable.enterName') });
       const list = flowtables.value;
       const idx = list.findIndex(f => f._name === editingFlowtable.value._name);
       if (idx >= 0) list.splice(idx, 1, { ...editingFlowtable.value });
@@ -152,8 +150,9 @@ export default defineComponent({
       onMenuRefresh(load);
     });
 
-    return {
-      loading, saving, saved, flowtables, selected,
+    return {t,
+      
+      loading, saving, flowtables, selected,
       showFlowtableModal, editingFlowtable,
       columns, flowtableSchema, commandPath,
       load, save,
@@ -163,28 +162,22 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
-
       <div class="toolbar">
-        <ToolbarButton icon="create" @click="createFlowtable">创建</ToolbarButton>
-        <ToolbarButton icon="edit" @click="editFlowtable" :disabled="!selected.length || selected.length > 1">编辑</ToolbarButton>
-        <ToolbarButton icon="delete" @click="removeFlowtable" :disabled="!selected.length">删除</ToolbarButton>
+        <ToolbarButton icon="create" @click="createFlowtable">{{ $t('app.create') }}</ToolbarButton>
+        <ToolbarButton icon="edit" @click="editFlowtable" :disabled="!selected.length || selected.length > 1">{{ $t('app.edit') }}</ToolbarButton>
+        <ToolbarButton icon="delete" @click="removeFlowtable" :disabled="!selected.length">{{ $t('app.delete') }}</ToolbarButton>
       </div>
 
       <DataTable :columns="columns" :data="flowtables" rowKey="name" :externalToolbar="true" @selection-change="selected = $event" :selectable="true" :loading="loading">
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'actions'">
-            <a @click="editFlowtableByRecord(record)">编辑</a>
-            <a @click="removeFlowtableByRecord(record)" style="color:#ff4d4f;margin-left:8px">删除</a>
+            <a @click="editFlowtableByRecord(record)">{{ $t('app.edit') }}</a>
+            <a @click="removeFlowtableByRecord(record)" style="color:#ff4d4f;margin-left:8px">{{ $t('app.delete') }}</a>
           </template>
         </template>
       </DataTable>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="showFlowtableModal" :title="editingFlowtable && editingFlowtable._name ? '编辑流表' : '新建流表'" @confirm="saveFlowtable" @close="showFlowtableModal = false">
+      <DraggableModal v-model:visible="showFlowtableModal" :title="editingFlowtable && editingFlowtable._name ? $t('firewall.flowtable.editFlowtable') : $t('firewall.flowtable.createFlowtable')" @confirm="saveFlowtable" @close="showFlowtableModal = false">
         <ConfigForm :schema="flowtableSchema" v-model="editingFlowtable" />
       </DraggableModal>
     </div>

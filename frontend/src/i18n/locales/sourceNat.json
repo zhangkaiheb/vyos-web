@@ -1,0 +1,164 @@
+{
+  "zh-CN": {
+    "sourceNat": {
+      "tab": {
+        "basic": "基本",
+        "source": "源地址",
+        "destination": "目标地址",
+        "outbound": "出站接口",
+        "translation": "转换"
+      },
+      "field": {
+        "ruleNumber": "规则编号",
+        "description": "描述",
+        "protocol": "协议",
+        "packetType": "数据包类型",
+        "log": "日志",
+        "exclude": "排除",
+        "disable": "禁用",
+        "port": "端口",
+        "interfaceName": "接口名称",
+        "interfaceGroup": "接口组",
+        "translationAddress": "转换地址",
+        "masquerade": "伪装",
+        "translationPort": "转换端口",
+        "addressMapping": "地址映射",
+        "portMapping": "端口映射"
+      },
+      "help": {
+        "ruleNumber": "规则编号",
+        "description": "规则描述",
+        "protocol": "协议类型",
+        "packetType": "数据包类型",
+        "log": "启用日志记录",
+        "exclude": "排除此规则匹配",
+        "disable": "禁用此规则",
+        "sourcePort": "源端口",
+        "destinationPort": "目标端口",
+        "outboundInterfaceName": "出站接口名称",
+        "outboundInterfaceGroup": "出站接口组",
+        "translationAddress": "转换后的地址",
+        "masquerade": "使用伪装地址",
+        "translationPort": "转换后的端口",
+        "addressMapping": "地址映射方式",
+        "portMapping": "端口映射方式"
+      },
+      "placeholder": {
+        "port": "端口号或范围",
+        "translationAddress": "转换地址",
+        "translationPort": "转换端口"
+      },
+      "column": {
+        "ruleNumber": "规则编号",
+        "description": "描述",
+        "protocol": "协议",
+        "sourceAddress": "源地址",
+        "destinationAddress": "目标地址",
+        "outboundInterface": "出站接口",
+        "translationAddress": "转换地址",
+        "log": "日志",
+        "disable": "禁用"
+      },
+      "groupType": {
+        "address": "地址",
+        "addressGroup": "地址组",
+        "networkGroup": "网络组",
+        "domainGroup": "域名组"
+      },
+      "loadFailed": "加载源 NAT 规则失败",
+      "saveFailed": "保存源 NAT 规则失败",
+      "deleteFailed": "删除源 NAT 规则失败",
+      "editRule": "编辑源 NAT 规则",
+      "createRule": "创建源 NAT 规则",
+      "ruleNumberRequired": "规则编号为必填项",
+      "portProtocolError": "端口字段仅在协议为 tcp、udp 或 tcp_udp 时可用",
+      "confirmDelete": "确定要删除选中的规则吗？",
+      "sourceAddress": "源地址",
+      "destinationAddress": "目标地址",
+      "ipAddressGroupPlaceholder": "输入 IP 地址或选择地址组",
+      "macGroupPlaceholder": "输入 MAC 地址或选择 MAC 组",
+      "portGroupPlaceholder": "输入端口或选择端口组"
+    }
+  },
+  "en": {
+    "sourceNat": {
+      "tab": {
+        "basic": "Basic",
+        "source": "Source",
+        "destination": "Destination",
+        "outbound": "Outbound",
+        "translation": "Translation"
+      },
+      "field": {
+        "ruleNumber": "Rule Number",
+        "description": "Description",
+        "protocol": "Protocol",
+        "packetType": "Packet Type",
+        "log": "Log",
+        "exclude": "Exclude",
+        "disable": "Disable",
+        "port": "Port",
+        "interfaceName": "Interface Name",
+        "interfaceGroup": "Interface Group",
+        "translationAddress": "Translation Address",
+        "masquerade": "Masquerade",
+        "translationPort": "Translation Port",
+        "addressMapping": "Address Mapping",
+        "portMapping": "Port Mapping"
+      },
+      "help": {
+        "ruleNumber": "Rule number",
+        "description": "Rule description",
+        "protocol": "Protocol type",
+        "packetType": "Packet type",
+        "log": "Enable logging",
+        "exclude": "Exclude this rule match",
+        "disable": "Disable this rule",
+        "sourcePort": "Source port",
+        "destinationPort": "Destination port",
+        "outboundInterfaceName": "Outbound interface name",
+        "outboundInterfaceGroup": "Outbound interface group",
+        "translationAddress": "Translated address",
+        "masquerade": "Use masquerade address",
+        "translationPort": "Translated port",
+        "addressMapping": "Address mapping method",
+        "portMapping": "Port mapping method"
+      },
+      "placeholder": {
+        "port": "Port number or range",
+        "translationAddress": "Translation address",
+        "translationPort": "Translation port"
+      },
+      "column": {
+        "ruleNumber": "Rule Number",
+        "description": "Description",
+        "protocol": "Protocol",
+        "sourceAddress": "Source Address",
+        "destinationAddress": "Destination Address",
+        "outboundInterface": "Outbound Interface",
+        "translationAddress": "Translation Address",
+        "log": "Log",
+        "disable": "Disable"
+      },
+      "groupType": {
+        "address": "Address",
+        "addressGroup": "Address Group",
+        "networkGroup": "Network Group",
+        "domainGroup": "Domain Group"
+      },
+      "loadFailed": "Failed to load source NAT rules",
+      "saveFailed": "Failed to save source NAT rule",
+      "deleteFailed": "Failed to delete source NAT rule",
+      "editRule": "Edit Source NAT Rule",
+      "createRule": "Create Source NAT Rule",
+      "ruleNumberRequired": "Rule number is required",
+      "portProtocolError": "Port fields are only available when protocol is tcp, udp, or tcp_udp",
+      "confirmDelete": "Are you sure you want to delete the selected rule(s)?",
+      "sourceAddress": "Source Address",
+      "destinationAddress": "Destination Address",
+      "ipAddressGroupPlaceholder": "Enter IP address or select address group",
+      "macGroupPlaceholder": "Enter MAC address or select MAC group",
+      "portGroupPlaceholder": "Enter port or select port group"
+    }
+  }
+}

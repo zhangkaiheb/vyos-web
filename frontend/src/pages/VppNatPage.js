@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { configApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
@@ -32,9 +32,9 @@ export default defineComponent({
   components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
     const configStore = useConfigStore();
+    const { t } = inject('i18n');
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
     const activeTab = ref('cgnat');
 
     const config = ref({
@@ -49,13 +49,13 @@ export default defineComponent({
       },
     });
 
-    const ruleColumns = [
-      { key: 'rule_number', title: '规则号', dataIndex: 'rule_number', width: 100 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-      { key: 'inside_prefix', title: '内部前缀', dataIndex: 'inside_prefix', width: 150 },
-      { key: 'outside_prefix', title: '外部前缀', dataIndex: 'outside_prefix', width: 150 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const ruleColumns = computed(() => [
+      { key: 'rule_number', title: t('vppNat.ruleNumber'), dataIndex: 'rule_number', width: 100 },
+      { key: 'description', title: t('vppNat.description'), dataIndex: 'description', width: 200 },
+      { key: 'inside_prefix', title: t('vppNat.insidePrefix'), dataIndex: 'inside_prefix', width: 150 },
+      { key: 'outside_prefix', title: t('vppNat.outsidePrefix'), dataIndex: 'outside_prefix', width: 150 },
+      { key: 'actions', title: t('vppNat.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
     const selectedRules = ref([]);
     const showRuleModal = ref(false);
@@ -117,12 +117,11 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('vpp nat', true);
         config.value = natToForm(res.data || {});
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('vppNat.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -136,11 +135,10 @@ export default defineComponent({
         if (Object.keys(payload).length) {
           await configApi.set('vpp nat', payload);
         }
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('vppNat.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -152,21 +150,21 @@ export default defineComponent({
     }
 
     function editRule() {
-      if (!selectedRules.value.length) return alert('请选择要编辑的规则');
+      if (!selectedRules.value.length) return showError({ message: t('vppNat.selectRuleToEdit') });
       const row = config.value.rules.find(r => r.rule_number === selectedRules.value[0]);
-      if (!row) return alert('未找到选中的规则');
+      if (!row) return showError({ message: t('vppNat.ruleNotFound') });
       editingRule.value = JSON.parse(JSON.stringify(row));
       showRuleModal.value = true;
     }
 
     function removeRule() {
-      if (!selectedRules.value.length) return alert('请选择要删除的规则');
+      if (!selectedRules.value.length) return showError({ message: t('vppNat.selectRuleToDelete') });
       config.value.rules = config.value.rules.filter(r => r.rule_number !== selectedRules.value[0]);
       selectedRules.value = [];
     }
 
     function saveRule() {
-      if (!editingRule.value.rule_number) return alert('请输入规则号');
+      if (!editingRule.value.rule_number) return showError({ message: t('vppNat.enterRuleNumber') });
       const list = config.value.rules;
       const idx = list.findIndex(r => r._rule_number === editingRule.value._rule_number);
       if (idx >= 0) list.splice(idx, 1, { ...editingRule.value });
@@ -180,49 +178,49 @@ export default defineComponent({
       onMenuRefresh(load);
     });
 
-    return {
-      loading, saving, saved, config, activeTab, commandPath,
+    return {t,
+      
+      loading, saving, config, activeTab, commandPath,
       ruleColumns, selectedRules, showRuleModal, editingRule,
       load, save,
       createRule, editRule, removeRule, saveRule,
     };
-  },
-  template: `
+  },template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
       <TabGroup v-model="activeTab" :tabs="[
         { key: 'cgnat', title: 'CGNAT' }
       ]">
 
       <template #cgnat>
-        <div class="form-row"><label class="form-label">内部接口</label><textarea class="form-control" v-model="config.inside_interfaces" rows="3" placeholder="每行一个接口" title="NAT内部接口" /></div>
-        <div class="form-row"><label class="form-label">外部接口</label><textarea class="form-control" v-model="config.outside_interfaces" rows="3" placeholder="每行一个接口" title="NAT外部接口" /></div>
+        <div class="form-row"><label class="form-label">{{ $t('vppNat.insideInterfaces') }}</label><textarea class="form-control" v-model="config.inside_interfaces" rows="3" :placeholder="$t('vppNat.insideInterfacesPlaceholder')" :title="$t('vppNat.insideInterfacesTitle')" /></div>
+        <div class="form-row"><label class="form-label">{{ $t('vppNat.outsideInterfaces') }}</label><textarea class="form-control" v-model="config.outside_interfaces" rows="3" :placeholder="$t('vppNat.outsideInterfacesPlaceholder')" :title="$t('vppNat.outsideInterfacesTitle')" /></div>
 
-        <div style="font-weight:bold;margin:16px 0 8px;">规则</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ $t('vppNat.rules') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createRule">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editRule" :disabled="!selectedRules.length || selectedRules.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeRule" :disabled="!selectedRules.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createRule">{{ $t('vppNat.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editRule" :disabled="!selectedRules.length || selectedRules.length > 1">{{ $t('vppNat.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeRule" :disabled="!selectedRules.length">{{ $t('vppNat.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="ruleColumns" :data="config.rules" rowKey="rule_number" :externalToolbar="true" @selection-change="selectedRules = $event" :selectable="true" />
 
-        <div style="font-weight:bold;margin:16px 0 8px;">超时设置</div>
-        <div class="form-row"><label class="form-label">ICMP</label><input class="form-control" type="number" v-model="config.timeouts.icmp" title="ICMP超时（秒），默认60" /></div>
-        <div class="form-row"><label class="form-label">TCP已建立</label><input class="form-control" type="number" v-model="config.timeouts.tcp_established" title="TCP已建立连接超时（秒），默认7440" /></div>
-        <div class="form-row"><label class="form-label">TCP临时</label><input class="form-control" type="number" v-model="config.timeouts.tcp_transitory" title="TCP临时连接超时（秒），默认240" /></div>
-        <div class="form-row"><label class="form-label">UDP</label><input class="form-control" type="number" v-model="config.timeouts.udp" title="UDP超时（秒），默认300" /></div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ $t('vppNat.timeoutSettings') }}</div>
+        <div class="form-row"><label class="form-label">ICMP</label><input class="form-control" type="number" v-model="config.timeouts.icmp" :title="$t('vppNat.icmpTimeoutTitle')" /></div>
+        <div class="form-row"><label class="form-label">{{ $t('vppNat.tcpEstablished') }}</label><input class="form-control" type="number" v-model="config.timeouts.tcp_established" :title="$t('vppNat.tcpEstablishedTitle')" /></div>
+        <div class="form-row"><label class="form-label">{{ $t('vppNat.tcpTransitory') }}</label><input class="form-control" type="number" v-model="config.timeouts.tcp_transitory" :title="$t('vppNat.tcpTransitoryTitle')" /></div>
+        <div class="form-row"><label class="form-label">UDP</label><input class="form-control" type="number" v-model="config.timeouts.udp" :title="$t('vppNat.udpTimeoutTitle')" /></div>
       </template>
       </TabGroup>
-
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
+      <div class="toolbar" style="margin-top:16px;">
+        <div class="toolbar-left">
+          <ToolbarButton icon="save" @click="save" :disabled="saving || loading">{{ saving ? $t('vppNat.saving') : $t('vppNat.confirm') }}</ToolbarButton>
+        </div>
       </div>
 
-      <DraggableModal v-model:visible="showRuleModal" :title="editingRule && editingRule._rule_number ? '编辑规则' : '新建规则'" @confirm="saveRule" @close="showRuleModal = false">
-        <div class="form-row"><label class="form-label">规则号</label><input class="form-control" v-model="editingRule.rule_number" :disabled="editingRule._rule_number" title="规则编号" /></div>
-        <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingRule.description" title="规则描述" /></div>
-        <div class="form-row"><label class="form-label">内部前缀</label><input class="form-control" v-model="editingRule.inside_prefix" placeholder="x.x.x.x/x" title="内部IP前缀" /></div>
-        <div class="form-row"><label class="form-label">外部前缀</label><input class="form-control" v-model="editingRule.outside_prefix" placeholder="x.x.x.x/x" title="外部IP前缀" /></div>
+      <DraggableModal v-model:visible="showRuleModal" :title="editingRule && editingRule._rule_number ? $t('vppNat.editRule') : $t('vppNat.createRule')" @confirm="saveRule" @close="showRuleModal = false">
+        <div class="form-row"><label class="form-label">{{ $t('vppNat.ruleNumber') }}</label><input class="form-control" v-model="editingRule.rule_number" :disabled="editingRule._rule_number" :title="$t('vppNat.ruleNumberTitle')" /></div>
+        <div class="form-row"><label class="form-label">{{ $t('vppNat.description') }}</label><input class="form-control" v-model="editingRule.description" :title="$t('vppNat.descriptionTitle')" /></div>
+        <div class="form-row"><label class="form-label">{{ $t('vppNat.insidePrefix') }}</label><input class="form-control" v-model="editingRule.inside_prefix" placeholder="x.x.x.x/x" :title="$t('vppNat.insidePrefixTitle')" /></div>
+        <div class="form-row"><label class="form-label">{{ $t('vppNat.outsidePrefix') }}</label><input class="form-control" v-model="editingRule.outside_prefix" placeholder="x.x.x.x/x" :title="$t('vppNat.outsidePrefixTitle')" /></div>
       </DraggableModal>
     </div>
   `,

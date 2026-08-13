@@ -1,0 +1,198 @@
+{
+  "zh-CN": {
+    "netns": {
+      "columns": {
+        "name": "名称",
+        "description": "描述"
+      },
+      "form": {
+        "namePlaceholder": "请输入命名空间名称"
+      },
+      "buttons": {
+        "create": "创建",
+        "edit": "编辑",
+        "delete": "删除",
+        "refresh": "刷新"
+      },
+      "modal": {
+        "create": "创建命名空间",
+        "edit": "编辑命名空间",
+        "confirmDelete": "确认删除",
+        "deleteConfirmText": "确认删除以下命名空间？"
+      },
+      "errors": {
+        "selectOne": "请选择一个命名空间",
+        "nameRequired": "请输入名称",
+        "nameExists": "该名称已存在"
+      }
+    }
+  },
+  "en": {
+    "netns": {
+      "columns": {
+        "name": "Name",
+        "description": "Description"
+      },
+      "form": {
+        "namePlaceholder": "Please enter namespace name"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modal": {
+        "create": "Create Namespace",
+        "edit": "Edit Namespace",
+        "confirmDelete": "Confirm Delete",
+        "deleteConfirmText": "Confirm delete the following namespaces?"
+      },
+      "errors": {
+        "selectOne": "Please select a namespace",
+        "nameRequired": "Please enter a name",
+        "nameExists": "This name already exists"
+      }
+    }
+  },
+  "zh-TW": {
+    "netns": {
+      "columns": {
+        "name": "Name",
+        "description": "Description"
+      },
+      "form": {
+        "namePlaceholder": "Please enter namespace name"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modal": {
+        "create": "Create Namespace",
+        "edit": "Edit Namespace",
+        "confirmDelete": "Confirm Delete",
+        "deleteConfirmText": "Confirm delete the following namespaces?"
+      },
+      "errors": {
+        "selectOne": "Please select a namespace",
+        "nameRequired": "Please enter a name",
+        "nameExists": "This name already exists"
+      }
+    }
+  },
+  "ru": {
+    "netns": {
+      "columns": {
+        "name": "Name",
+        "description": "Description"
+      },
+      "form": {
+        "namePlaceholder": "Please enter namespace name"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modal": {
+        "create": "Create Namespace",
+        "edit": "Edit Namespace",
+        "confirmDelete": "Confirm Delete",
+        "deleteConfirmText": "Confirm delete the following namespaces?"
+      },
+      "errors": {
+        "selectOne": "Please select a namespace",
+        "nameRequired": "Please enter a name",
+        "nameExists": "This name already exists"
+      }
+    }
+  },
+  "de": {
+    "netns": {
+      "columns": {
+        "name": "Name",
+        "description": "Description"
+      },
+      "form": {
+        "namePlaceholder": "Please enter namespace name"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modal": {
+        "create": "Create Namespace",
+        "edit": "Edit Namespace",
+        "confirmDelete": "Confirm Delete",
+        "deleteConfirmText": "Confirm delete the following namespaces?"
+      },
+      "errors": {
+        "selectOne": "Please select a namespace",
+        "nameRequired": "Please enter a name",
+        "nameExists": "This name already exists"
+      }
+    }
+  },
+  "fr": {
+    "netns": {
+      "columns": {
+        "name": "Name",
+        "description": "Description"
+      },
+      "form": {
+        "namePlaceholder": "Please enter namespace name"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modal": {
+        "create": "Create Namespace",
+        "edit": "Edit Namespace",
+        "confirmDelete": "Confirm Delete",
+        "deleteConfirmText": "Confirm delete the following namespaces?"
+      },
+      "errors": {
+        "selectOne": "Please select a namespace",
+        "nameRequired": "Please enter a name",
+        "nameExists": "This name already exists"
+      }
+    }
+  },
+  "ko": {
+    "netns": {
+      "columns": {
+        "name": "Name",
+        "description": "Description"
+      },
+      "form": {
+        "namePlaceholder": "Please enter namespace name"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "modal": {
+        "create": "Create Namespace",
+        "edit": "Edit Namespace",
+        "confirmDelete": "Confirm Delete",
+        "deleteConfirmText": "Confirm delete the following namespaces?"
+      },
+      "errors": {
+        "selectOne": "Please select a namespace",
+        "nameRequired": "Please enter a name",
+        "nameExists": "This name already exists"
+      }
+    }
+  }
+}

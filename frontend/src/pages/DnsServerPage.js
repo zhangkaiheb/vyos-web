@@ -3,13 +3,16 @@ import { useAuthStore } from '/src/stores/auth.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import { useI18n } from '/src/i18n/index.js';
 
 export default defineComponent({
   name: 'DnsServerPage',
   components: { DataTable, DraggableModal },
   setup() {
+    const { t } = useI18n();
     const auth = useAuthStore();
     const config = useConfigStore();
     const loading = ref(false);
@@ -22,8 +25,8 @@ export default defineComponent({
     const inputMode = ref('address'); // 'address' or 'interface'
 
     const columns = [
-      { key: 'address', title: 'DNS 服务器地址/接口', width: 300 },
-      { key: 'type', title: '类型', width: 120 },
+      { key: 'address', title: t('dnsserver.columns.address'), width: 300 },
+      { key: 'type', title: t('dnsserver.columns.type'), width: 120 },
     ];
 
     const isIPv4 = (addr) => /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(addr);
@@ -33,8 +36,8 @@ export default defineComponent({
     const getType = (addr) => {
       if (isIPv4(addr)) return 'IPv4';
       if (isIPv6(addr)) return 'IPv6';
-      if (isInterface(addr)) return 'DHCP 接口';
-      return '未知';
+      if (isInterface(addr)) return t('dnsserver.type.dhcpInterface');
+      return t('dnsserver.type.unknown');
     };
 
     const loadInterfaces = async () => {
@@ -43,7 +46,7 @@ export default defineComponent({
         const list = res.interfaces || [];
         interfaces.value = list.map(i => i.name).sort();
       } catch (err) {
-        console.error('加载接口列表失败:', err);
+        console.error('Failed to load interfaces:', err);
       }
     };
 
@@ -76,7 +79,7 @@ export default defineComponent({
 
         dnsServers.value = servers;
       } catch (err) {
-        console.error('加载 DNS 服务器失败:', err);
+        console.error('Failed to load DNS servers:', err);
       } finally {
         loading.value = false;
       }
@@ -111,8 +114,8 @@ export default defineComponent({
         deleteTargetKeys.value = [];
         await loadData();
       } catch (err) {
-        console.error('删除 DNS 服务器失败:', err);
-        alert('删除失败: ' + (err.message || '未知错误'));
+        console.error('Failed to delete DNS server:', err);
+        showError({ message: t('dnsserver.messages.deleteFailed') + ': ' + (err.message || t('dnsserver.type.unknown')) });
       } finally {
         loading.value = false;
       }
@@ -124,7 +127,7 @@ export default defineComponent({
         : editingServer.value.interface;
       
       if (!value) {
-        alert(inputMode.value === 'address' ? '请输入 DNS 服务器地址' : '请选择接口');
+        showError({ message: inputMode.value === 'address' ? t('dnsserver.messages.enterAddress') : t('dnsserver.messages.selectInterface') });
         return;
       }
 
@@ -135,7 +138,7 @@ export default defineComponent({
         showEditModal.value = false;
         await loadData();
       } catch (err) {
-        console.error('保存 DNS 服务器失败:', err);
+        console.error('Failed to save DNS server:', err);
       } finally {
         loading.value = false;
       }
@@ -147,7 +150,8 @@ export default defineComponent({
       onMenuRefresh(loadData);
     });
 
-    return {
+    return {t,
+      
       loading,
       dnsServers,
       columns,
@@ -178,30 +182,30 @@ export default defineComponent({
         @refresh="loadData"
       />
 
-      <!-- 删除确认对话框 -->
-      <DraggableModal v-model:visible="showDeleteModal" title="确认删除" @confirm="confirmDelete" @close="showDeleteModal = false" width="400px">
+      <!-- Delete confirmation dialog -->
+      <DraggableModal v-model:visible="showDeleteModal" :title="t('dnsserver.modals.confirmDelete')" @confirm="confirmDelete" @close="showDeleteModal = false" width="400px">
         <div style="padding: 20px 0;">
-          确定要删除选中的 {{ deleteTargetKeys.length }} 个 DNS 服务器吗？
+          {{ t('dnsserver.modals.deleteConfirm', { count: deleteTargetKeys.length }) }}
         </div>
       </DraggableModal>
 
-      <!-- 编辑对话框 -->
-      <DraggableModal v-model:visible="showEditModal" :title="editingServer && editingServer.address ? '编辑 DNS 服务器' : '添加 DNS 服务器'" @confirm="handleSave" @close="showEditModal = false" width="500px">
+      <!-- Edit dialog -->
+      <DraggableModal v-model:visible="showEditModal" :title="editingServer && editingServer.address ? t('dnsserver.modals.edit') : t('dnsserver.modals.add')" @confirm="handleSave" @close="showEditModal = false" width="500px">
         <div class="form-row">
-          <label class="form-label">类型</label>
+          <label class="form-label">{{ t('dnsserver.form.type') }}</label>
           <div style="flex:1; display:flex; gap:12px; padding-top:4px;">
-            <label style="cursor:pointer;"><input type="radio" value="address" v-model="inputMode" /> DNS 服务器地址</label>
-            <label style="cursor:pointer;"><input type="radio" value="interface" v-model="inputMode" /> DHCP 接口</label>
+            <label style="cursor:pointer;"><input type="radio" value="address" v-model="inputMode" /> {{ t('dnsserver.form.addressLabel') }}</label>
+            <label style="cursor:pointer;"><input type="radio" value="interface" v-model="inputMode" /> {{ t('dnsserver.form.dhcpInterface') }}</label>
           </div>
         </div>
         <div v-if="inputMode === 'address'" class="form-row">
-          <label class="form-label">服务器地址 *</label>
-          <input class="form-control" v-model="editingServer.address" placeholder="例如: 8.8.8.8, 2001:4860:4860::8888" />
+          <label class="form-label">{{ t('dnsserver.form.serverAddress') }}</label>
+          <input class="form-control" v-model="editingServer.address" :placeholder="t('dnsserver.form.addressPlaceholder')" />
         </div>
         <div v-if="inputMode === 'interface'" class="form-row">
-          <label class="form-label">接口 *</label>
+          <label class="form-label">{{ t('dnsserver.form.interface') }}</label>
           <select class="form-control" v-model="editingServer.interface">
-            <option value="">请选择接口</option>
+            <option value="">{{ t('dnsserver.form.selectInterface') }}</option>
             <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
           </select>
         </div>

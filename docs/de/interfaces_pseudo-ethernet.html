@@ -1,0 +1,2868 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="macvlan-pseudo-ethernet">
+<h1>MACVLAN (Pseudoethernet)</h1>
+<p>MACVLAN, oder Pseudoethernet-Schnittstellen, funktionieren als logische Unterschnittstellen von Standard-Ethernet-Schnittstellen. Jede Unterschnittstelle hat eine eindeutige MAC-Adresse, teilt sich aber einen einzigen physischen Ethernet-Port.
+Das ermöglicht dem Benutzer, Pakete mit unterschiedlichen Quell-IPv4- oder IPv6-Adressen über eine unterschiedliche MAC-Adresse zu senden.</p>
+<p>Pseudoethernet-Schnittstellen verhalten sich wie physische Ethernet-Schnittstellen. Sie unterstützen IPv4 und IPv6-Adressierung, können IP-Adressen über DHCP oder DHCPv6 erhalten und werden einer physischen Ethernet-Schnittstelle zugeordnet. Sie erben Eigenschaften wie Geschwindigkeit und Duplex von ihrer Elternschnittstelle und können wie gewöhnliche Ethernet-Schnittstellen verwiesen werden, sobald sie erstellt wurden.</p>
+<dl class="simple">
+<dt>Pseudoethernet-Schnittstellen können in Umgebungen nicht funktionieren, die eine</dt><dd><p><abbr title="Netzwerkadapter">NIC</abbr> erfordern, die nur eine MAC-Adresse hat.
+Dies beinhaltet:</p>
+<ul class="simple">
+<li><p>VMware-Maschinen mit Standardeinstellungen.</p></li>
+<li><p>Netzwerkswitches, die nur eine einzelne MAC-Adresse erlauben.</p></li>
+<li><p>xDSL-Modems, die die MAC-Adresse der NIC lernen.</p></li>
+</ul>
+</dd>
+</dl>
+<section id="configuration">
+<h2>Konfiguration</h2>
+<section id="common-interface-configuration">
+<h3>Gemeinsame Schnittstellenkonfiguration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; address &lt;address | dhcp |  dhcpv6&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-address-address-dhcp-dhcpv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Schnittstelle mit einer oder mehreren IP-Adressen.</strong></p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><strong>address:</strong> Weisen Sie der Schnittstelle eine oder mehrere IPv4- oder IPv6-Adressen zu.
+Zum Beispiel verwenden Sie 192.0.2.1/24 für IPv4 oder 2001:db8::1/64 für IPv6.</p></li>
+<li><p><strong>dhcp:</strong> Die Schnittstelle erhält eine IPv4-Adresse von einem DHCP-Server im gleichen Netzwerksegment.</p></li>
+<li><p><strong>dhcpv6:</strong> Die Schnittstelle erhält eine IPv6-Adresse von einem DHCPv6-Server im gleichen Netzwerksegment.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Wenn die Schnittstelle eine IPv4-Adresse über DHCP erhält und spezielle Anpassungen vor oder nach der Erhaltung der IP-Adresse erforderlich sind, verwenden Sie die bereitgestellten Hook-Skripte:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/pre-hooks.d/</code></p></li>
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/post-hooks.d/</code></p></li>
+</ul>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 address 192.0.2.1/24
+set interfaces pseudo-ethernet peth0 address 2001:db8::1/64
+set interfaces pseudo-ethernet peth0 address dhcp
+set interfaces pseudo-ethernet peth0 address dhcpv6
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine klare, beschreibende Aliasbezeichnung für die Schnittstelle.</strong></p>
+<p>Diese Bezeichnung erscheint im Befehl <code class="docutils literal notranslate">show interfaces</code> und in SNMP-basierten Überwachungstools.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie die Schnittstelle.</strong></p>
+<p>Die Schnittstelle wird auf den administrativ heruntergefahrenen Zustand (<code class="docutils literal notranslate">A/D</code>) gesetzt.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt;  disable-flow-control
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-disable-flow-control" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie das Ethernet-Flow-Control (IEEE 802.3x-Pause-Frames) auf der Schnittstelle.</strong></p>
+<blockquote>
+<div><p>Ethernet-Flow-Control, definiert durch den IEEE 802.3x-Standard, stoppt temporär die Datenübertragung, um Paketverluste während Netzwerkengpässe zu verhindern. Zum Beispiel, wenn ein Sender Daten schneller überträgt, als der Empfänger verarbeiten kann.</p>
+<p>Das Deaktivieren des Ethernet-Flow-Controls bedeutet, dass die Schnittstelle keine Signale sendet, um die Übertragung zu pausieren, und Pakete abwirft, wenn sie überfordert ist.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 disable-flow-control
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; disable-link-detect
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-disable-link-detect" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie die physische Link-State-Änderungserkennung auf der Schnittstelle, z. B. bei einem Kabelentfernen.</strong></p>
+<p>Standardmäßig erkennt die Schnittstelle physische Link-State-Änderungen.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 disable-link-detect
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; mac &lt;xx:xx:xx:xx:xx:xx&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-mac-xx-xx-xx-xx-xx-xx" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine benutzerdefinierte MAC-Adresse auf der Schnittstelle.</strong></p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 mac &#39;00:53:01:02:03:04&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie das MTU auf der Schnittstelle.</strong></p>
+<p>Dieser Wert definiert die größte Paketgröße in Bytes, die die Schnittstelle ohne Fragmentierung überträgt.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie das</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>, das in ausgehenden TCP SYN-Paketen auf der angegebenen Schnittstelle angegeben wird.</strong></p>
+<p>Durch das Einklemmen des MSS-Werts in TCP SYN-Paketen informieren Sie den Remote-Partner explizit, dass keine Pakete größer als dieser Wert gesendet werden sollen. Dies verhindert Verbindungsprobleme, die auftreten, wenn die Pfad-MTU-Entdeckung (PMTUD) fehlschlägt.</p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Legt das MSS auf einen bestimmten Wert in Bytes fest. Verwenden Sie diese Option, wenn Sie ein bestimmtes MSS erzwingen müssen, z. B. zur Fehlerbehebung von Verbindungsproblemen oder zur Erfüllung spezifischer Netzwerkanforderungen.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> Der Router berechnet das MSS automatisch als das MTU der Schnittstelle minus 40 Bytes für IPv4-Datenverkehr (20 Bytes für den IPv4-Header und 20 Bytes für den TCP-Header). Diese Option wird empfohlen, um den richtigen Wert automatisch zu setzen.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ip-arp-cache-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie, wie lange ein ARP-Eintrag gültig bleibt, nachdem eine IP-zu-MAC-Zuordnung auf dieser Schnittstelle gelernt wurde.</strong></p>
+<p>Der Standardzeitraum beträgt 30 Sekunden.</p>
+<p>Ein ARP-Eintrag bleibt gültig, wenn er positive Rückmeldungen von höheren Protokollen erhält.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ip-disable-arp-filter" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie ARP-Filterung auf dieser Schnittstelle.</strong></p>
+<p><strong>Standardverhalten:</strong> Das Kernel antwortet auf ARP-Anfragen auf dieser Schnittstelle nur, wenn der Verkehr zurück zum ARP-Sender über diese spezifische Schnittstelle geroutet wird.</p>
+<p><strong>Wenn konfiguriert:</strong> Das Kernel antwortet auf ARP-Anfragen auf dieser Schnittstelle für jede IP-Adresse, die auf dem lokalen Host konfiguriert ist, unabhängig davon, welche spezifische Schnittstelle diese IP-Adresse zugewiesen ist, und unabhängig vom Routing-Tabellen. Dies spiegelt den Linux-Konzept wider, dass IP-Adressen dem Host gehören, nicht den individuellen Schnittstellen.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 ip disable-arp-filter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Schnittstelle für Host- oder Router-Verhalten.</strong></p>
+<p>Wenn konfiguriert, wechselt die Schnittstelle in den Host-Modus und deaktiviert die IPv4-Weiterleitung darauf.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie, ob IP-gerichtete Broadcast-Pakete, die auf dieser Schnittstelle empfangen werden, weitergeleitet werden.</strong></p>
+<p><strong>Standardverhalten:</strong> IP-gerichtete Broadcast-Pakete werden abgeworfen.</p>
+<p><strong>Wenn konfiguriert:</strong> IP-gerichtete Broadcast-Pakete werden an alle Hosts im Ziel-Subnetz weitergeleitet, wie in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> und <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a> definiert.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ip-enable-arp-accept" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie, wie mit kostenlosen ARPs auf dieser Schnittstelle umgegangen wird.</strong></p>
+<p>Wenn konfiguriert, wird ein IP-zu-MAC-Zuordnungseintrag in die ARP-Tabelle basierend auf kostenlosen ARP-Anfragen oder Antworten hinzugefügt.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Wenn die ARP-Tabelle bereits eine IP-Adresse aus einem kostenlosen ARP enthält, wird der Eintrag aktualisiert, unabhängig davon, ob diese Einstellung konfiguriert ist.</p>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ip-enable-arp-announce" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Quell-IP-Auswahl für ARP-Anfragen auf dieser Schnittstelle.</strong></p>
+<p><strong>Standardverhalten:</strong> Das Kernel kann jede IP-Adresse verwenden, die der Host besitzt, als Quell-IP-Adresse in ARP-Anfragen auf dieser Schnittstelle.</p>
+<p><strong>Wenn konfiguriert:</strong> Das Kernel versucht zunächst, eine Quell-IP-Adresse zu wählen, die auf der Schnittstelle konfiguriert ist und mit dem Ziel-IP-Adress-Subnetz übereinstimmt. Wenn kein solches Subnetz vorhanden ist, wählt das Kernel die IP-Adresse aus, die es normalerweise verwendet (basierend auf dem Routing-Tabellen, um das Zielziel zu erreichen).</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ip-enable-arp-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie, welche ARP-Anfragen auf dieser Schnittstelle ignoriert werden.</strong></p>
+<p><strong>Standardverhalten:</strong> Das Kernel antwortet auf ARP-Anfragen für beliebige lokale IP-Adressen, unabhängig davon, welcher Schnittstelle diese IP-Adresse zugewiesen ist.</p>
+<p><strong>Wenn konfiguriert:</strong> Das Kernel antwortet nur dann auf ARP-Anfragen, wenn die Ziel-IP-Adresse auf dieser spezifischen Schnittstelle zugewiesen ist.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ip-enable-proxy-arp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie Proxy-ARP auf dieser Schnittstelle.</strong></p>
+<p>Wenn konfiguriert, greift der Router (Kernel) ARP-Anfragen für nicht-lokale IP-Adressen ab und antwortet mit der <abbr title="Media Access Control">MAC</abbr>-Adresse der Schnittstelle, die die Anfrage empfangen hat. Danach werden Pakete, die an diese IP-Adressen gerichtet sind, an ihre tatsächlichen Ziele auf entfernten Subnetzen weitergeleitet.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 ip enable-proxy-arp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ip-proxy-arp-pvlan" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie lokales Proxy-ARP auf der Schnittstelle.</strong></p>
+<p>Wenn konfiguriert, antwortet der Router (Kernel) auf ARP-Anfragen auf dieser VLAN-Schnittstelle, auch wenn die Ziel-IP-Adresse auf dem gleichen Subnetz und der gleichen Schnittstelle liegt.</p>
+<p>Dies wird verwendet, um Netzwerkisolierungsanforderungen (RFC 3069) für private VLANs (PVLANs) zu unterstützen. In PVLAN-Konfigurationen dürfen Hosts auf isolierten Ports nicht direkt miteinander kommunizieren, jedoch können sie mit dem Upstream-Router kommunizieren.</p>
+<p>Durch die Antwort auf inter-host ARP-Anfragen mit seiner eigenen <abbr title="Media Access Control">MAC</abbr>-Adresse leitet der Router den inter-host Traffic über sich selbst statt direkt zwischen Hosts.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Dieser Befehl funktioniert unabhängig und erfordert nicht, dass der Standard-Proxy-ARP auf der Schnittstelle aktiviert ist.</p>
+</div>
+<p>Lokales Proxy-ARP wird auch bezeichnet als:</p>
+<ul class="simple">
+<li><p>VLAN-Aggregation (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>Private VLAN (Cisco, Allied Telesyn).</p></li>
+<li><p>Source-port filtering oder Port-Isolation (Hewlett-Packard).</p></li>
+<li><p>MAC-Forced Forwarding (Ericsson).</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Quell-IP-Adressen-Überprüfung mit</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>auf dieser Schnittstelle, wie in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> <strong>spezifiziert.</strong></p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><strong>strict:</strong> Jedes eingehende Paket wird anhand der Forwarding Information Base (FIB) überprüft. Wenn die Schnittstelle nicht der beste Weg zurück zur Quelle ist, schlägt die Überprüfung fehl und das Paket wird gelöscht.</p></li>
+<li><p><strong>loose:</strong> Jedes eingehende Paket wird anhand der FIB überprüft. Wenn die Quell-IP-Adresse über keine Schnittstelle erreichbar ist, schlägt die Überprüfung fehl.</p></li>
+<li><p><strong>disable:</strong> Keine Quell-IP-Adressen-Überprüfung wird durchgeführt. Alle eingehenden Pakete werden akzeptiert.</p></li>
+</ul>
+<p>RFC 3704 empfiehlt, strengen Modus zu aktivieren, um IP-Spoofing, wie DDoS-Angriffe, zu verhindern. Für asynchrone oder andere komplexe Routing-Szenarien verwenden Sie den losen Modus.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pseudo-ethernet &lt;interface&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Schnittstelle, um eine IPv6-Adresse automatisch unter Verwendung von</strong> <abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>wie in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a> <strong>spezifiziert, zu erhalten.</strong></p>
+<p>IPv6-Hosts können sich automatisch konfigurieren, wenn sie sich einem IPv6-Netzwerk anschließen, indem sie den Neighbor Discovery Protocol via ICMPv6 Router Discovery Nachrichten verwenden. Bei der ersten Verbindung zu einem Netzwerk sendet ein Host eine link-local Router Solicitation Multicast Anfrage für seine Konfigurationsparameter. Der Router antwortet mit einer Router Advertisement Packet, das Internet Layer Konfigurationsparameter enthält.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Diese Methode deaktiviert
+
+<div>code>style="ip>p>;</code>p>code:client>Die="href="img>
+</p>
+</p>><span>"title=">
+>1=";">
+   ="client>code="class:ubliclass></p></="client="]</p>."</p>
+   >
+code=".</p>
+</p>
+</p>
+   >
+></p>
+code>
+   ">
+</="l>
+p>
+el>
+p>
+br>
+</p><p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth</p>
+p>
+p</p>
+></p>
+   code</"
+   >
+begricht</p>
+p>
+</p>
+</p>
+</p>
+   p>
+   ><code:span>
+   </</p>
+p>
+   p>
+</p>
+p>
+p>
+p>
+</p>
+</p</p>
+</p>
+</p>
+p>
+</p>
+code>
+</p>
+</code>
+</p>
+code>
+code>
+</p><span>
+p>
+</>
+code</p>
+code:>
+</code>
+code>
+</>
+</code>
+>
+code>
+</p>
+   p>
+</code>
+</p>
+</p>
+</p>
+</p>
+p>
+</p>
+</p>
+</p>
+</p>
+<p> </p>
+</p>
+</p>
+p>
+p>
+</p>
+p>
+p>
+    />
+p>
+code>
+</p>
+</p>
+</p>
+</p>
+</p>
+</code>
+code>
+>
+</p>
+p>
+</code>
+pcode>
+</p>
+p>
+code>
+</p>
+p>
+p>
+p>
+p>
+code>
+p>
+</p>
+code>
+code>
+</p>
+p:
+</p>
+p>
+</ep>
+p>
+</p>
+</p>
+label="src="p>
+p>
+>
+</p>
+p>
+p>
+</p>
+p>
+</p>
+</code>
+p>
+</p>
+</p>
+</p>
+p>
+p>
+code:
+</p>
+</p>
+p>
+code>
+p>
+p>
+p>
+code>
+p>
+</p>
+code>
+code>
+p>
+p>
+code>
+p>
+p>
+p>
+p>
+code</p>
+pcode>
+code</p>
+code>
+p>
+p>
+</p>
+code>
+p>
+code>
+p>
+p>
+code>
+</p>
+</p>
+code>
+p>
+=
+</code>
+code>
+p>
+p>
+p>
+code>
+p>
+code>
+code>
+code>
+</p>
+</>
+</p>
+</>
+p>
+p>
+</p>
+p>
+p>
+</code>
+code="p>
+>
+p>
+</p>
+</code>
+p>
+</code>
+</p>
+</code>
+</p>
+p>
+code>
+</code>
+</p>
+p>
+</p>
+code>
+p>
+p>
+p>
+p>
+p>
+code>
+p>
+p>
+code>
+p>
+</p>
+p>
+</p>
+p>
+p>
+</p>
+p>
+code>
+p>
+p>
+p>
+p>
+p>
+code>
+p>
+</p>
+code>
+p>
+p>
+p>
+</p>
+p</p>
+</p>
+code>
+p>
+p>
+p>
+p>
+p>
+p>
+</p>
+p>
+</p>
+</p>
+code>
+p>
+code>
+>
+p>
+p>
+</code>
+p>
+p>
+p>
+code>
+</p>
+code>
+p>
+p>
+code>
+p>
+</code>
+p>
+</p>
+</p>
+p>
+p>
+>
+>
+p>
+</code>
+p>
+</p>
+</code>
+p>
+</p>
+p>
+</p>
+p>
+p>
+p>
+p>
+code>
+code:
+p>
+p>
+</code>
+p>
+code>
+p>
+p>
+p>
+</code>
+p>
+   >
+</code>
+p>
+code>
+</p>
+code>
+</p>
+code>
+</code>
+p>
+p>
+code>
+>
+p>
+</code>
+   code>
+div>
+</code>
+code>
+code>
+p>
+code>
+p>
+p>
+code>
+>
+code>
+code>
+code>
+p>
+p>
+code>
+code>
+p>
+code>
+p>
+code>
+code>
+p>
+p>
+p>
+p>
+code>
+p>
+p>
+code>
+code>
+p>
+</p>
+code>
+p>
+p>
+code>
+p>
+</p>
+code>
+p>
+code>
+code>
+p>
+code>
+code>
+p>
+code>
+p>
+codep>
+code>
+code>
+p>
+code>
+code>
+code</code>
+code>
+code>
+code</code>
+code>
+code>
+code>
+code>
+p>
+p>
+code>
+code>
+code>
+code>
+code>
+code>
+code>
+code>
+p>
+code>
+code>
+code>
+code>
+code>
+code>
+p>
+code>
+code>
+p>
+code>
+code>
+code>
+code>
+code>
+code>
+</p>
+code>
+code>
+code>
+code>
+p>
+code>
+codep>
+code>
+</code>
+code>
+p>
+</code>
+</code>
+p>
+</p>
+code>
+code>
+</p</code>
+code>
+</code>
+code>
+</code>
+p>
+</code>
+</p>
+</p>
+</code>
+</p</code>
+code>
+code>
+p>
+code>
+code>
+code>
+p>
+</code:
+code>
+p</code>
+</code>
+p>
+code>
+p>
+code>
+</p>
+code>
+p>
+p>
+code>
+p>
+p>
+p>
+code>
+p>
+</code>
+</p>
+</code>
+code>
+code>
+p>
+code>
+</p</p>
+code>
+p</p>
+</code>
+code>
+p>
+</code>
+code>
+code>
+</p</p>
+code>
+code>
+code>
+p>
+</code>
+code>
+</code>
+code>
+code>
+code>
+code>
+</p>
+code="="http://code>
+p>
+code="name="code>
+code>
+</code>
+p>
+code>
+code>
+code>
+code>
+code>
+code>
+code>
+code>
+code>
+p>
+code>
+code>
+code>
+p>
+code>
+code>
+p>
+</p>
+code>
+p>
+code>
+p>
+p>
+code>
+code>
+p>
+code>
+p>
+code>
+p>
+code>
+   code>
+</p>
+</p>
+code>
+</code>
+p>
+</code>
+code="p>
+code>
+code="p>
+</code>
+p>
+code>
+</p>
+</p>
+p>
+</code>
+p</code>
+code>
+p</p>
+</code>
+p</p>
+code</p>
+code>
+p>
+code>
+code>
+code>
+p</code>
+code</code>
+p>
+code>
+code>
+p>
+code</p>
+code>
+code>
+p>
+p>
+code>
+p>
+code>
+p>
+p>
+p>
+code>
+p>
+</p>
+</p>
+code>
+code>
+p>
+code>
+p>
+code>
+code>
+code>
+p>
+code>
+p>
+p>
+code>
+p>
+code>
+code>
+p>
+code>
+p>
+code>
+code>
+p>
+codeehr>
+code>
+</code>
+code>
+p</p>
+code>
+code>
+code>
+code>
+code>
+code>
+p>
+code>
+</code>
+p>
+p>
+</code>
+p>
+p>
+code>
+p>
+code>
+code>
+code>
+p>
+code>
+p>
+code>
+p>
+code>
+p>
+code>
+</p</p>
+code>
+code>
+code>
+code>
+p>
+code</p>
+code>
+code>
+p>
+p>
+</code>
+code>
+p>
+code>
+p>
+p>
+p>
+code>
+p>
+code>
+p>
+code>
+p</p</code>
+code>
+code>
+p>
+code>
+p>
+</code>
+p>
+p>
+p>
+code>
+code>
+code>
+p>
+code>
+p>
+code>
+p>
+code>
+code>
+p>
+code>
+code>
+p>
+code</p>
+code>
+p>
+code>
+code>
+p>
+code>
+p>
+p>
+   code>
+code>
+p>
+code</p>
+code>
+p>
+code>
+code:
+code>
+code>
+p>
+code:</code>
+</codecode>
+nbsp>
+p>
+code>
+code>
+code>
+code>
+code:
+code>
+code>
+p>
+code>
+p>
+code>
+code>
+p>
+code>
+p>
+code>
+p>
+</code>
+</p>
+code>
+code>
+p>
+code>
+code>
+p>
+code>
+code>
+p>
+code:
+p>
+p>
+code>
+pinter>
+code:
+p>
+code:</code:
+code:</code>
+p>
+style=">"
+p>
+p>
+</code>
+p>
+code>
+code>
+code>
+p>
+code:</code>
+code>
+p>
+code>
+code:</code>
+code>
+</code</p>
+code>
+p>
+code:</code</code</code>
+</code</p>
+code>
+    </p>
+</code>
+p>
+p>
+code>
+p>
+code:</p>
+code>
+code>
+p</code>
+p>
+code>
+p>
+code>
+p>
+p</code</code>
+code>
+p</p>
+code>
+code</code>
+p</p>
+code>
+code>
+p>
+code>
+p>
+p>
+p>
+code>
+p</code>
+p>
+p>
+code>
+p>
+code>
+p</code>
+p</p>
+p>
+</code>
+code>
+code>
+</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 ipv6 address autoconf
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</code>
+</code>
+</code>
+</code>
+</code>
+</code</code>
+</code>
+</code</code>
+</code>
+</code>
+</code
+</code>
+</code>
+</code>
+</code>
+</code
+</code:code>
+</code
+</code
+</code>
+</code>
+</code
+</code>
+</code>
+</code
+</code>
+</code
+</code
+</code
+</code
+</code
+</code:p>
+</code>
+</code>
+</code>
+</code>
+</code
+</code>
+</code>
+</code>
+</code
+</code>
+</code>
+</code:code
+</code>
+</code>
+</code>
+</code=">
+</code
+</code
+</code
+</code
+</code
+</code>
+</code>
+</code>
+</code
+</code>
+</code:
+</code>
+</code:
+</code>
+</code>
+</code>
+</code>
+</code>
+</code:
+</code>
+</code>
+</code>
+</code>
+</code
+</p>
+</code>
+</p>
+</code
+</code>
+</code
+</code
+</code:
+</code
+```
+</code:
+</code
+</code>
+</code
+</code:
+</code
+</code>
+</code:=">
+</code>
+</code>
+</code>
+</code>
+</code>
+</code:
+</code>
+</code://code://code:
+</code>
+</code>
+</code>
+</code
+</code://code>
+</code
+</code>
+</code>
+</code</code>
+</code
+</code
+</code>
+</code
+</code="
+</code>
+p>
+code>
+</code
+</code>
+</code="=">
+</code
+</code
+p>
+</code>
+</code</code
+</code
+</code
+</code>
+</code>
+</code
+</code
+   	code>
+   code
+</code>
+</code</code
+</code
+</code
+code
+code>
+   code>
+</code</code>
+</code
+</code>
+   	code="</code
+   code
+</code>
+    </code</code>
+   code>
+   code>
+</code
+   code://code
+</code
+</code>
+</code>
+</code>
+    
+</code
+    />
+   code>
+    >
+   >
+    <p>
+    ```
+</code</code
+   ></code>
+</code</code
+   code>
+</code>
+   >
+</code>
+   code
+</code
+</code>
+</code
+   code
+</code>
+</code>
+</code
+   code>
+</code
+</code>
+</code>
+</code>
+</code>
+</code>
+</code
+   code
+   code>
+   code>
+   code
+</code
+p>
+</code
+</code>
+p>
+   code>
+</code:
+</code>
+   code<strong>
+   code>
+   <br>
+</code>
+   <pre>
+   code>
+   >
+</code>
+    <p>
+    
+   code>
+    <code>
+    <code>
+      >
+    -->
+    />
+   code>
+   >
+   code>
+</code>
+   code>
+   code>
+    |
+   code>
+code>
+   code>
+code>
+    <>
+   >
+   code>
+   code>
+   code
+   >
+   code>
+   code>
+   code>
+   </code>
+   code>
+    />
+   code>
+   </code>
+   code>
+</code>
+</code>
+</code>
+</code>
+</code>
+</code>
+   code>
+</code>
+   code>
+</code>
+code>
+   code>
+   code>
+</code>
+   code>
+   code>
+   code>
+   code>
+    />
+   code>
+</code>
+   code>
+   code>
+   code>
+   >
+   >
+</code>
+    <p>
+   code>
+   code>
+</code>
+    :</   code>
+</code>
+   code>
+   code>
+   code>
+   code>
+   code>
+</code>
+</code>
+   code>
+   code>
+</code>
+</</code>
+   code>
+   code>
+   code>
+</    </code>
+</code>
+</code>
+    </code>
+</code>
+    />
+   code>
+    <code>
+   code>
+   >
+</code>
+   </code>
+   code>
+</code>
+   code>
+    <
+    <code>
+   code>
+    <codecodecode>
+</code>
+</code</p>
+   code</    <code>
+   code>
+    </code</</    </code>
+   code   </code>
+</   </code>
+   code>
+    <code>
+   code   </code>
+   code>
+   code>
+    /></code>
+    </   code>
+<p>Be</p>
+<p></p>
+</code</</    <code>
+</   </pcode</</</    <code>
+    <code>
+       
+      </code</code
+      code>
+   code
+    </       =
+   </code
+    </code</code>
+      code>
+    </code>
+   </code>
+</code>
+      code>
+   </code>
+    <code>
+   code>
+</code>
+    <code>
+    <code>
+    <code</code>
+       <code>
+   </   code:
+   code>
+    <code>
+      </    <code
+       <code>
+   </    <code>
+    </code>
+</code>
+</code>
+    <code>
+   code>
+    <code>
+   >
+    </code>
+   code>
+    <code>
+   ></code>
+   code>
+    <p>
+code>
+   	
+<p>
+    />
+    />
+    <code>
+   code>
+</code>
+   +
+    <code>
+   >
+    <code>
+    >
+    <code>
+    >
+<p>
+    />
+   code>
+    </code>
+   </code>
+    </code>
+    <code>
+    <code>
+    <code>
+   >
+    <>
+    </code>
+   >
+   code>
+    <code>
+    </code>
+   >
+   code    <code>
+       <code>
+    />
+    <code>
+    <code>
+    <code>
+    <code>
+    <code>
+    <code>
+    <code>
+    <code>
+    <code>
+   >
+    <code>
+    <p>
+    <code>
+    <p>
+    <code>
+    <code>
+   </code>
+    <code
+    <p>
+    <code>
+    <p>
+    <code>
+    </code>
+    <p>
+    <code>
+    <p>
+    <code>
+    <code>
+    <p>
+    <p
+   >
+    <    <p>
+    <code</    <code
+    <code>
+    <code
+    <code>
+    <
+    <p
+    <code>
+    <code>
+    <p>
+    <p>
+    <code>
+    <code>
+    <code>
+    <p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+<p>
+                                                                      <p                         *
+                         <p>
+        <strong>
+            <p>
+                <strong>
+                    <p>
+                        <strong>
+                            <p>
+                                <strong>
+                                    <p>
+                                        <strong>
+                                            <p>
+                                                <strong>
+                                                    <p>
+                                                        <strong>
+                                                            <p>
+                                                                <strong>
+                                                                    <p>
+                                                                        <strong>
+                                                                            <p>
+                                                                                <strong>
+                                                                                    <p>
+                                                                                        <strong>
+    <code                               <p                     =">
+                                                                                                                                                                                                                                                                                                                     p>
+                                                                                                                                                                                                                                                                                                                <p>
+        <strong>
+            <p>
+                <strong>
+                    <p>
+                        <strong>
+                            <p>
+                                <strong>
+                                    <p>
+                                        <strong>
+                                            <p>
+                                                <strong>
+                                                    <p>
+                                                        <strong>
+                                                            <p>
+                                                                <strong>
+                                                                    <p>
+                                                                        <strong>
+                                                                            <p>
+                                                                                <strong>
+                                                                                    <p>
+                                                                                        <strong>
+                                                                                            <p>
+                                                                                                <strong>
+                                                                                                    <p>
+                                                                                                        <strong>
+                                                                                                            <p>
+                                                                                                                <strong>
+                                                                   p                                                                                                                                                                                                                                                                                                                                     <p>
+        <strong>
+            <p>
+                <strong>
+                    <p>
+                        <strong>
+                            <p>
+                                <strong>
+                                    <p>
+                                        <strong>
+                                            <p>
+                                                <strong>
+                                                    <p>
+                                                        <strong>
+                                                            <p>
+                                                                <strong>
+                                                                    <p>
+                                                                        <strong>
+                                                                            <p>
+                                                                                <strong>
+                                                                                    <p>
+                                                                                        <strong>
+                                                                                            <p>
+                                                                                                <strong>
+                                                                                                    <p>
+                                                                                                        <strong>
+                                                                                                            <p>
+                                                                                                                <strong>
+                                                                                                                    <p>
+                                                                                                                        <strong>
+                                                                                                                            <p>
+                                                                                                                                <strong>
+                                                                                                                                    <p>
+                                                                                                                                        <strong>
+                                                                                                                                            <p>
+                                                                                                                                                
+                                                                                                                                                <strong>
+                                                                                                                                                    
+                                                                                                                                                    <p>
+                                                                                                                                                        
+                                                                                                                                                        <strong>
+                                                                                                                                                            
+                                                                                                                                                            <p>
+                                                                                                                                                                
+                                                                                                                                                                <strong>
+                                                                                                                                                                    
+                                                                                                                                                                    <p>
+                                                                                                                                                                        
+                                                                                                                                                                            <p>
+                                                                                                                                                                                
+                                                                                                                                                                                    <p>
+                                                                                                                                                                                        <strong>
+                                                                                                                                                                                            <p>
+                                                                                                                                                                                                <strong>
+                                                                                                                                                                                                    <p>
+                                                                                                                                                                                                        <strong>
+                                                                                                                                                                                                            <p>
+                                                                                                                                                                                                                <strong>
+                                                                                                                                                                                                                    <p>
+                                                                                                                                                                                                                        <strong>
+                                                                                                                                                                                                                            <p>
+                                                                                                                                                                                                                                <strong>
+                                                                                                                                                                                                                                    <p>
+                                                                                                                                                                                                                                        <strong>
+                                                                                                                                                                                                                                            <p>
+                                                                                                                                                                                                                                                <strong>
+                                                                                                                                                                                                                                                    <p>
+                                                                                                                                                                                                                                                        <strong>
+                                                                                                                                                                                                                                                            <p>
+                                                                                                                                                                                                                                                                <strong>
+                                                                                                                                                                                                                                                                    <p>
+                                                             <p>
+                <p>
+                                                             <p>
+    <p>
+    <p>
+    <p>
+    <p>
+    <p>
+    <p>
+    <p>
+    <p>
+    <p>
+    <p>
+    <p>
+    <p>
+    <p>
+               p>
+                              p                                                                                             p>
+                                                                                                                                                                     p>
+                                                                                                                                                                                                                   <p                                                                                 p                         <p       <                  p                         <p>
+    <p>
+    <p>
+   
+    <p          </p>
+    <p>
+   </            p>
+                                    p                  p>
+                              p>
+       <p>
+               p>
+             p>
+          <p>
+                                                                                                                           <p                                                                                                                                                                                                                                                                   </p>
+                      <p    <p             <p                            <p                                                            p         p                                 p                                             p>
+      p>
+                              p>
+                  p>
+         p      p>
+      p                </pp         p
+         p                     p>
+         p
+         p            p>
+                         </p                                                                   <p>
+                <p                                  <p>
+    <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+                                                                                                                                                                                                                                                p                                 p>
+                  p>
+      p>
+                                                                                                                                 p                                                                                       p>
+                                    p>
+                              p                                             p                                       p                           p            p                                          p                           p                                                                   <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p>
+        <p      p>
+      p>
+                  p>
+      p>
+      pp      p>
+      p>
+      p>
+      p>
+      >
+    <p>
+    <p>
+         p>
+      p>
+      p>
+   p>
+         p>
+      p>
+      p>
+    <p>
+      p>
+      p>
+      p>
+      p>
+      p>
+      p>
+   p>
+            p>
+   p>
+   <p>
+         p>
+         p>
+   p>
+   <p>
+   >
+   p>
+    <p>
+         >
+   p>
+       <p>
+               p>
+       <p>
+               <p>
+                                 p>
+      p

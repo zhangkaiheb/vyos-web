@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="snmp">
+<h1>SNMP</h1>
+<p><abbr title="Simple Network Management Protocol">SNMP</abbr> ist ein Internet-Standardprotokoll zur Erfassung und Organisation von Informationen über verwaltete Geräte auf IP-Netzwerken und zur Änderung dieser Informationen, um das Verhalten der Geräte zu verändern. Geräte, die typischerweise SNMP unterstützen, umfassen Kabelmodems, Router, Switches, Server, Workstations, Drucker und vieles mehr.</p>
+<p>SNMP wird weit verbreitet in der Netzwerkverwaltung für Netzwerküberwachung verwendet. SNMP stellt Verwaltungsdaten in Form von Variablen auf den verwalteten Systemen bereit, die in einer Verwaltungsinformationsbasis (MIB) organisiert sind, die den Systemstatus und die Konfiguration beschreiben. Diese Variablen können dann von Verwaltungsanwendungen ferngesteuert abgefragt (und in einigen Fällen auch manipuliert) werden.</p>
+<p>Drei bedeutende Versionen des SNMP wurden entwickelt und eingesetzt. SNMPv1 ist die ursprüngliche Version des Protokolls. Neuere Versionen, SNMPv2c und SNMPv3, bieten Verbesserungen in Leistung, Flexibilität und Sicherheit.</p>
+<p>SNMP ist ein Bestandteil des Internet-Protokollstapels, wie vom Internet Engineering Task Force (IETF) definiert. Es besteht aus einem Satz von Standards für Netzwerkverwaltung, einschließlich eines Anwendungsprotokolls, eines Datenbank-Schemas und eines Satzes von Datenobjekten.</p>
+<section id="overview-and-basic-concepts">
+<h2>Übersicht und grundlegende Konzepte</h2>
+<p>In typischen Anwendungen des SNMP hat ein oder mehrere administrative Computer, die als Manager bezeichnet werden, die Aufgabe, eine Gruppe von Hosts oder Geräten auf einem Computernetzwerk zu überwachen oder zu verwalten. Jedes verwaltete System führt ein Softwarekomponente namens Agent aus, der Informationen über SNMP an den Manager meldet.</p>
+<p>Ein SNMP-verwaltetes Netzwerk besteht aus drei Schlüsselkomponenten:</p>
+<ul class="simple">
+<li><p>Verwaltete Geräte</p></li>
+<li><p>Agent – Software, die auf verwalteten Geräten läuft</p></li>
+<li><p>Netzwerkverwaltungsstation (NMS) – Software, die auf dem Manager läuft</p></li>
+</ul>
+<p>Eine verwaltete Einheit ist ein Netzwerk-Knoten, der ein SNMP-Schnittstelle implementiert, das unidirektionale (nur Lesen) oder bidirektionale (Lesen und Schreiben) Zugriff auf knotenspezifische Informationen ermöglicht. Verwaltete Geräte tauschen knotenspezifische Informationen mit NMSs aus. Manchmal auch als Netzwerkelemente bezeichnet, können verwaltete Geräte jedes Gerät sein, einschließlich, aber nicht beschränkt auf Router, Zugangsserver, Switches, Kabelmodems, Brücken, Hub, IP-Telefon, IP-Videokamera, Computerhost und Drucker.</p>
+<p>Ein Agent ist ein Netzwerkmanagement-Softwaremodul, das auf einem verwalteten Gerät residieren. Ein Agent hat lokale Kenntnisse über Verwaltungsinformationen und übersetzt diese Information in oder aus einem SNMP-spezifischen Format.</p>
+<p>Eine Netzwerkverwaltungsstation führt Anwendungen aus, die verwaltete Geräte überwachen und steuern. NMSs stellen den Großteil der erforderlichen Verarbeitungs- und Speicherressourcen für die Netzwerkverwaltung bereit. Eine oder mehrere NMSs können auf jedem verwalteten Netzwerk existieren.</p>
+<figure class="align-default" id="id3">
+<a class="reference internal image-reference" href="https://docs.vyos.io/en/rolling/_images/service_snmp_communication_principles_diagram.webp"><img alt="Prinzip der SNMP-Kommunikation" src="https://docs.vyos.io/en/rolling/_images/service_snmp_communication_principles_diagram.webp" style="width: 735.8000000000001px; height: 340.0px;" /></a>
+<figcaption>
+<p>Bild freundlicherweise geliehen von
+<a class="reference external" href="https://en.wikipedia.org/wiki/File:SNMP_communication_principles_diagram.PNG">https://en.wikipedia.org/wiki/File:SNMP_communication_principles_diagram.PNG</a>
+welches unter der GNU Free Documentation License steht</p>
+</figcaption>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>VyOS SNMP unterstützt sowohl IPv4 als auch IPv6.</p>
+</div>
+</section>
+<section id="snmp-protocol-versions">
+<h2>SNMP-Protokollversionen</h2>
+<p>VyOS selbst unterstützt <a class="reference external" href="https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol#Version_2">SNMPv2</a> (Version 2) und <a class="reference external" href="https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol#Version_3">SNMPv3</a> (Version 3), wobei die letztere aufgrund verbesserten Sicherheit (optionaler Authentifizierung und Verschlüsselung) empfohlen wird.</p>
+<section id="snmpv2">
+<h3>SNMPv2</h3>
+<p>SNMPv2 ist die ursprüngliche und am häufigsten verwendete Version. Für die Autorisierung von Clients verwendet SNMP das Konzept von Communities. Communities können autorisierter auf Lesezugriff (das ist am häufigsten) oder auf Lese- und Schreibzugriff (diese Option wird in VyOS nicht aktiv verwendet) gesetzt werden.</p>
+<p>SNMP kann synchron oder asynchron arbeiten. Bei synchroner Kommunikation fragt das Überwachungssystem den Router periodisch ab. Bei asynchroner Kommunikation sendet der Router eine Benachrichtigung an den „Trap“ (die Überwachungsstation).</p>
+<p>SNMPv2 unterstützt keine Authentifizierungsmechanismen, außer dem Client-Quelladresse, daher sollten Sie Adressen der Clients angeben, die den Router überwachen dürfen. Beachten Sie, dass SNMPv2 auch keine Verschlüsselung unterstützt und immer Daten im Klartext sendet.</p>
+<section id="example">
+<h4>Beispiel</h4>
+<div class="highlight-none notranslate"><div class="highlight"><pre># Definieren einer Community
+set service snmp community routers authorization ro
+
+# Ermöglichen des Monitoring-Zugriffs aus dem gesamten Netzwerk
+set service snmp community routers network 192.0.2.0/24
+set service snmp community routers network 2001::db8:ffff:eeee::/64
+
+# Ermöglichen des Monitoring-Zugriffs von spezifischen Adressen
+set service snmp community routers client 203.0.113.10
+set service snmp community routers client 203.0.113.20
+
+# Definieren optionaler Router-Informationen
+set service snmp location &quot;UK, London&quot;
+set service snmp contact &quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="94f5f0f9fdfad4f1ecf5f9e4f8f1baf7fbf9">[email&#160;protected]</a>&quot;
+
+# Trap-Ziel, falls asynchrone Kommunikation gewünscht ist
+set service snmp trap-target 203.0.113.10
+
+# Nur auf bestimmten IP-Adressen lauschen (Port standardmäßig 161)
+set service snmp listen-address 172.16.254.36 port 161
+set service snmp listen-address 2001:db8::f00::1
+</pre></div>
+</div>
+</section>
+</section>
+<section id="snmpv3">
+<h3>SNMPv3</h3>
+<p>SNMPv3 (Version 3 des SNMP-Protokolls) führte eine ganze Menge neuer sicherheitsbezogener Funktionen ein, die in den vorherigen Versionen fehlten. Sicherheit war eines der größten Schwächen von SNMP bis hin zu v3. Die Authentifizierung in SNMP-Versionen 1 und 2 besteht lediglich darin, ein Passwort (Community-String) in Klartext zwischen Manager und Agent zu senden. Jede SNMPv3-Nachricht enthält Sicherheitsparameter, die als Oktettstring codiert sind. Die Bedeutung dieser Sicherheitsparameter hängt vom verwendeten Sicherheitsmodell ab.</p>
+<p>Der Sicherheitsansatz in SNMPv3 zielt auf:</p>
+<ul class="simple">
+<li><p>Vertraulichkeit – Verschlüsselung von Paketen, um Spionage durch einen unbefugten Quelle zu verhindern.</p></li>
+<li><p>Integrität – Nachrichtenintegrität, um sicherzustellen, dass ein Paket während der Übertragung nicht manipuliert wurde, einschließlich eines optionalen Mechanismus zur Paket-Wiederholungsschutz.</p></li>
+<li><p>Authentifizierung – um sicherzustellen, dass die Nachricht von einer gültigen Quelle stammt.</p></li>
+</ul>
+<section id="snmp-v3-example">
+<h4>Beispiel</h4>
+<ul class="simple">
+<li><p>Lassen Sie den SNMP-Dienst nur auf der IP-Adresse 192.0.2.1 lauschen</p></li>
+<li><p>Konfigurieren Sie einen neuen SNMP-Benutzer mit dem Namen „vyos“ mit dem Passwort „vyos12345678“</p></li>
+<li><p>Der neue Benutzer verwendet SHA/AES für Authentifizierung und Privatsphäre</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service snmp listen-address 192.0.2.1
+set service snmp location &#39;VyOS Datacenter&#39;
+set service snmp v3 engineid &#39;000000000000000000000002&#39;
+set service snmp v3 group default mode &#39;ro&#39;
+set service snmp v3 group default view &#39;default&#39;
+set service snmp v3 user vyos auth plaintext-password &#39;vyos12345678&#39;
+set service snmp v3 user vyos auth type &#39;sha&#39;
+set service snmp v3 user vyos group &#39;default&#39;
+set service snmp v3 user vyos privacy plaintext-password &#39;vyos12345678&#39;
+set service snmp v3 user vyos privacy type &#39;aes&#39;
+set service snmp v3 view default oid 1
+</pre></div>
+</div>
+<p>Nach dem Commit werden die Klartext-Passwörter gehasht und in Ihrer Konfiguration gespeichert. Der resultierende CLI-Konfigurationsbefehl sieht wie folgt aus:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# show service snmp
+ listen-address 192.0.2.1 {
+ }
+ location &quot;VyOS Datacenter&quot;
+ v3 {
+     engineid 000000000000000000000002
+     group default {
+         mode ro
+         view default
+     }
+     user vyos {
+         auth {
+             encrypted-password 4e52fe55fd011c9c51ae2c65f4b78ca93dcafdfe
+             type sha
+         }
+         group default
+         privacy {
+             encrypted-password 4e52fe55fd011c9c51ae2c65f4b78ca93dcafdfe
+             type aes
+         }
+     }
+     view default {
+         oid 1 {
+         }
+     }
+ }
+</pre></div>
+</div>
+<p>Sie können die SNMPv3-Funktionen von jedem Linux-basierten System aus testen, indem Sie einfach den folgenden Befehl ausführen: <code class="docutils literal notranslate">snmpwalk -v 3 -u vyos -a SHA -A vyos12345678 -x AES -X vyos12345678 -l authPriv 192.0.2.1 .1</code></p>
+</section>
+</section>
+</section>
+<section id="vyos-mibs">
+<h2>VyOS MIBs</h2>
+<p>Alle SNMP-MIBs befinden sich in jedem VyOS-Image hier: <code class="docutils literal notranslate">/usr/share/snmp/mibs/</code></p>
+<p>Sie können die Dateien mit SCP herunterladen, sobald der SSH-Dienst aktiviert wurde, so wie folgt</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>scp -r vyos@your_router:/usr/share/snmp/mibs /your_folder/mibs
+</pre></div>
+</div>
+</section>
+<section id="snmp-extensions">
+<h2>SNMP-Erweiterungen</h2>
+<p>Um die Funktionalität des SNMP-Agents zu erweitern, können benutzerdefinierte Skripte ausgeführt werden, sobald der Agent aufgerufen wird. Dies kann erreicht werden, indem man
+<code class="docutils literal notranslate">arbitrary extensioncommands</code> verwendet. Der erste Schritt ist selbstverständlich, ein funktionales Skript zu erstellen, danach muss es über den Befehl
+<code class="docutils literal notranslate">scp your_script.sh vyos&#64;your_router:/config/user-data</code> auf Ihr VyOS-System hochgeladen werden.
+Sobald das Skript hochgeladen wurde, muss es mit dem folgenden Befehl konfiguriert werden.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service snmp script-extensions extension-name my-extension script your_script.sh
+commit
+</pre></div>
+</div>
+<p>Die OID <code class="docutils literal notranslate">.1.3.6.1.4.1.8072.1.3.2.3.1.1.4.116.101.115.116</code>, sobald sie aufgerufen wird, enthält die Ausgabe der Erweiterung.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>root@vyos:/home/vyos# snmpwalk -v2c  -c public 127.0.0.1 nsExtendOutput1
+NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.&quot;my-extension&quot; = STRING: hello
+NET-SNMP-EXTEND-MIB::nsExtendOutputFull.&quot;my-extension&quot; = STRING: hello
+NET-SNMP-EXTEND-MIB::nsExtendOutNumLines.&quot;my-extension&quot; = INTEGER: 1
+NET-SNMP-EXTEND-MIB::nsExtendResult.&quot;my-extension&quot; = INTEGER: 0
+</pre></div>
+</div>
+</section>
+<section id="solarwinds">
+<h2>SolarWinds</h2>
+<p>Wenn Sie SolarWinds Orion als NMS verwenden, können Sie auch das Device Templates Management nutzen. Ein Template für VyOS kann leicht importiert werden.</p>
+<p>Erstellen Sie eine Datei mit dem Namen <code class="docutils literal notranslate">VyOS-1.3.6.1.4.1.44641.ConfigMgmt-Commands</code> mit dem folgenden Inhalt:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>&lt;Configuration-Management Device=&quot;VyOS&quot; SystemOID=&quot;1.3.6.1.4.1.44641&quot;&gt;
+    &lt;Commands&gt;
+        &lt;Command Name=&quot;Reset&quot; Value=&quot;set terminal width 0${CRLF}set terminal length 0&quot;/&gt;
+        &lt;Command Name=&quot;Reboot&quot; Value=&quot;reboot${CRLF}Yes&quot;/&gt;
+        &lt;Command Name=&quot;EnterConfigMode&quot; Value=&quot;configure&quot;/&gt;
+        &lt;Command Name=&quot;ExitConfigMode&quot; Value=&quot;commit${CRLF}exit&quot;/&gt;
+        &lt;Command Name=&quot;DownloadConfig&quot; Value=&quot;show configuration commands&quot;/&gt;
+        &lt;Command Name=&quot;SaveConfig&quot; Value=&quot;commit${CRLF}save&quot;/&gt;
+        &lt;Command Name=&quot;Version&quot; Value=&quot;show version&quot;/&gt;
+        &lt;Command Name=&quot;MenuBased&quot; Value=&quot;False&quot;/&gt;
+        &lt;Command Name=&quot;VirtualPrompt&quot; Value=&quot;:~&quot;/&gt;
+    &lt;/Commands&gt;
+&lt;/Configuration-Management&gt;
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

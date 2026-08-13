@@ -1,47 +1,50 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import DualListSelector from '/src/components/Form/DualListSelector.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
-const PROTOCOL_OPTIONS = [
-  { key: 'udp', label: 'UDP（默认）' },
+const getProtocolOptions = (t) => [
+  { key: 'udp', label: t('snmp.options.udpDefault') },
   { key: 'tcp', label: 'TCP' },
 ];
 
-const AUTHORIZATION_OPTIONS = [
-  { key: 'ro', label: 'Read-Only（默认）' },
+const getAuthorizationOptions = (t) => [
+  { key: 'ro', label: t('snmp.options.readOnlyDefault') },
   { key: 'rw', label: 'Read-Write' },
 ];
 
-const OID_ENABLE_OPTIONS = [
+const getOidEnableOptions = (t) => [
   { key: 'ip-forward', label: 'ip-forward (.1.3.6.1.2.1.4.24)' },
   { key: 'ip-route-table', label: 'ip-route-table (.1.3.6.1.2.1.4.21)' },
   { key: 'ip-net-to-media-table', label: 'ip-net-to-media-table (.1.3.6.1.2.1.4.22)' },
   { key: 'ip-net-to-physical-phys-address', label: 'ip-net-to-physical-phys-address (.1.3.6.1.2.1.4.35)' },
 ];
 
-const V3_MODE_OPTIONS = [
-  { key: 'ro', label: 'Read-Only（默认）' },
+const getV3ModeOptions = (t) => [
+  { key: 'ro', label: t('snmp.options.readOnlyDefault') },
   { key: 'rw', label: 'Read-Write' },
 ];
 
-const V3_SECLEVEL_OPTIONS = [
-  { key: 'auth', label: 'auth（默认）' },
+const getV3SeclevelOptions = (t) => [
+  { key: 'auth', label: t('snmp.options.authDefault') },
   { key: 'noauth', label: 'noauth' },
   { key: 'priv', label: 'priv' },
 ];
 
-const V3_AUTH_TYPE_OPTIONS = [
-  { key: 'md5', label: 'MD5（默认）' },
+const getV3AuthTypeOptions = (t) => [
+  { key: 'md5', label: t('snmp.options.md5Default') },
   { key: 'sha', label: 'SHA' },
 ];
 
-const V3_PRIVACY_TYPE_OPTIONS = [
-  { key: 'des', label: 'DES（默认）' },
+const getV3PrivacyTypeOptions = (t) => [
+  { key: 'des', label: t('snmp.options.desDefault') },
   { key: 'aes', label: 'AES' },
 ];
 
@@ -66,60 +69,6 @@ function joinMembers(val) {
 
 function splitMembers(text) {
   return String(text || '').split('\n').map(s => s.trim()).filter(Boolean);
-}
-
-function validateName(name) {
-  if (!name || !String(name).trim()) return '请输入名称';
-  if (!/^[a-zA-Z0-9_-]+$/.test(String(name))) return '名称只能包含字母、数字、下划线和连字符';
-  return '';
-}
-
-function validateIPv4(value) {
-  if (!value) return '';
-  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return 'IPv4 地址格式错误';
-  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return 'IPv4 地址格式错误';
-  return '';
-}
-
-function validateIPv6(value) {
-  if (!value) return '';
-  const re = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}$|^(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}$|^(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}$|^:(?::[0-9a-fA-F]{1,4}){1,7}$|^::$/;
-  if (!re.test(value)) return 'IPv6 地址格式错误';
-  return '';
-}
-
-function validateIP(value) {
-  if (!value) return '';
-  if (!validateIPv4(value) || !validateIPv6(value)) return '';
-  return 'IP 地址格式错误';
-}
-
-function validateIPPrefix(value) {
-  if (!value) return '';
-  const parts = value.split('/');
-  if (parts.length !== 2) return 'IP 前缀格式应为 地址/长度';
-  const [ip, prefix] = parts;
-  const p = parseInt(prefix, 10);
-  if (isNaN(p)) return '前缀长度必须为数字';
-  const v4Err = validateIPv4(ip);
-  const v6Err = validateIPv6(ip);
-  if (!v4Err && (p < 0 || p > 32)) return 'IPv4 前缀范围 0-32';
-  if (!v6Err && (p < 0 || p > 128)) return 'IPv6 前缀范围 0-128';
-  if (v4Err && v6Err) return 'IP 地址格式错误';
-  return '';
-}
-
-function validateEngineID(value) {
-  if (!value) return '';
-  if (!/^[0-9a-fA-F]+$/.test(value)) return 'Engine ID 必须为十六进制字符';
-  if (value.length < 10 || value.length > 64) return 'Engine ID 长度应为 10-64 个十六进制字符';
-  return '';
-}
-
-function validateOID(value) {
-  if (!value) return '';
-  if (!/^\.?\d+(\.\d+)*$/.test(value)) return 'OID 格式错误，示例：.1.3.6.1.2.1.4.24';
-  return '';
 }
 
 function communitiesToForm(communities = {}) {
@@ -353,6 +302,63 @@ function snmpToConfig(form) {
 export default defineComponent({
   name: 'SnmpPage',
   setup() {
+    const { t } = useI18n();
+
+    function validateName(name) {
+      if (!name || !String(name).trim()) return t('snmp.validation.nameRequired');
+      if (!/^[a-zA-Z0-9_-]+$/.test(String(name))) return t('snmp.validation.nameInvalidChars');
+      return '';
+    }
+
+    function validateIPv4(value) {
+      if (!value) return '';
+      if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return t('snmp.validation.ipv4Format');
+      if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return t('snmp.validation.ipv4Format');
+      return '';
+    }
+
+    function validateIPv6(value) {
+      if (!value) return '';
+      const re = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}$|^(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}$|^(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}$|^:(?::[0-9a-fA-F]{1,4}){1,7}$|^::$/;
+      if (!re.test(value)) return t('snmp.validation.ipv6Format');
+      return '';
+    }
+
+    function validateIP(value) {
+      if (!value) return '';
+      if (!validateIPv4(value) || !validateIPv6(value)) return '';
+      return t('snmp.validation.ipFormat');
+    }
+
+    function validateIPPrefix(value) {
+      if (!value) return '';
+      const parts = value.split('/');
+      if (parts.length !== 2) return t('snmp.validation.ipPrefixFormat');
+      const [ip, prefix] = parts;
+      const p = parseInt(prefix, 10);
+      if (isNaN(p)) return t('snmp.validation.prefixMustBeNumber');
+      const v4Err = validateIPv4(ip);
+      const v6Err = validateIPv6(ip);
+      if (!v4Err && (p < 0 || p > 32)) return t('snmp.validation.ipv4PrefixRange');
+      if (!v6Err && (p < 0 || p > 128)) return t('snmp.validation.ipv6PrefixRange');
+      if (v4Err && v6Err) return t('snmp.validation.ipFormat');
+      return '';
+    }
+
+    function validateEngineID(value) {
+      if (!value) return '';
+      if (!/^[0-9a-fA-F]+$/.test(value)) return t('snmp.validation.engineIdHex');
+      if (value.length < 10 || value.length > 64) return t('snmp.validation.engineIdLength');
+      return '';
+    }
+
+    function validateOID(value) {
+      if (!value) return '';
+      if (!/^\.?\d+(\.\d+)*$/.test(value)) return t('snmp.validation.oidFormat');
+      return '';
+    }
+
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -409,73 +415,74 @@ export default defineComponent({
     async function save() {
       for (const ip of config.value.listen_address || []) {
         const err = validateIP(ip);
-        if (err) return alert(`监听地址 ${ip}：${err}`);
+        if (err) return showError({ message: `${t('snmp.errors.listenAddress')} ${ip}：${err}` });
       }
       if (isPresent(config.value.trap_source)) {
         const err = validateIP(config.value.trap_source);
-        if (err) return alert(`Trap 源地址：${err}`);
+        if (err) return showError({ message: `${t('snmp.errors.trapSource')}：${err}` });
       }
-      for (const t of config.value.trap_targets || []) {
-        if (!t.target) return alert('Trap 目标地址不能为空');
-        const err = validateIP(t.target);
-        if (err) return alert(`Trap 目标 ${t.target}：${err}`);
-        if (isPresent(t.port)) {
-          const port = parseInt(t.port, 10);
-          if (isNaN(port) || port < 1 || port > 65535) return alert(`Trap 目标 ${t.target} 端口范围 1-65535`);
+      for (const tgt of config.value.trap_targets || []) {
+        if (!tgt.target) return showError({ message: t('snmp.errors.trapTargetRequired') });
+        const err = validateIP(tgt.target);
+        if (err) return showError({ message: `${t('snmp.errors.trapTarget')} ${tgt.target}：${err}` });
+        if (isPresent(tgt.port)) {
+          const port = parseInt(tgt.port, 10);
+          if (isNaN(port) || port < 1 || port > 65535) return showError({ message: `${t('snmp.errors.trapTarget')} ${tgt.target} ${t('snmp.errors.portRange')}` });
         }
       }
       for (const c of config.value.communities || []) {
-        if (!c.name) return alert('Community 名称不能为空');
+        if (!c.name) return showError({ message: t('snmp.errors.communityNameRequired') });
         for (const ip of c.client || []) {
           const err = validateIP(ip);
-          if (err) return alert(`Community ${c.name} 客户端 ${ip}：${err}`);
+          if (err) return showError({ message: `${t('snmp.errors.community')} ${c.name} ${t('snmp.errors.client')} ${ip}：${err}` });
         }
         for (const net of c.network || []) {
           const err = validateIPPrefix(net);
-          if (err) return alert(`Community ${c.name} 网络 ${net}：${err}`);
+          if (err) return showError({ message: `${t('snmp.errors.community')} ${c.name} ${t('snmp.errors.network')} ${net}：${err}` });
         }
       }
       for (const e of config.value.script_extensions || []) {
-        if (!e.name) return alert('Script Extension 名称不能为空');
-        if (!isPresent(e.script)) return alert(`Script Extension ${e.name} 脚本路径不能为空`);
+        if (!e.name) return showError({ message: t('snmp.errors.scriptExtNameRequired') });
+        if (!isPresent(e.script)) return showError({ message: `${t('snmp.errors.scriptExt')} ${e.name} ${t('snmp.errors.scriptPathRequired')}` });
       }
       for (const oid of config.value.smux_peer || []) {
         const err = validateOID(oid);
-        if (err) return alert(`SMUX Peer OID ${oid}：${err}`);
+        if (err) return showError({ message: `SMUX Peer OID ${oid}：${err}` });
       }
       if (isPresent(config.value.v3?.engineid)) {
         const err = validateEngineID(config.value.v3.engineid);
-        if (err) return alert(`Engine ID：${err}`);
+        if (err) return showError({ message: `Engine ID：${err}` });
       }
       for (const g of config.value.v3?.groups || []) {
-        if (!g.name) return alert('v3 组名不能为空');
+        if (!g.name) return showError({ message: t('snmp.errors.v3GroupNameRequired') });
         const err = validateName(g.name);
-        if (err) return alert(`v3 组 ${g.name}：${err}`);
+        if (err) return showError({ message: `${t('snmp.errors.v3Group')} ${g.name}：${err}` });
       }
-      for (const t of config.value.v3?.trap_targets || []) {
-        if (!t.target) return alert('v3 Trap 目标地址不能为空');
-        const err = validateIP(t.target);
-        if (err) return alert(`v3 Trap 目标 ${t.target}：${err}`);
-        if (isPresent(t.port)) {
-          const port = parseInt(t.port, 10);
-          if (isNaN(port) || port < 1 || port > 65535) return alert(`v3 Trap 目标 ${t.target} 端口范围 1-65535`);
+      for (const vt of config.value.v3?.trap_targets || []) {
+        if (!vt.target) return showError({ message: t('snmp.errors.v3TrapTargetRequired') });
+        const err = validateIP(vt.target);
+        if (err) return showError({ message: `${t('snmp.errors.v3TrapTarget')} ${vt.target}：${err}` });
+        if (isPresent(vt.port)) {
+          const port = parseInt(vt.port, 10);
+          if (isNaN(port) || port < 1 || port > 65535) return showError({ message: `${t('snmp.errors.v3TrapTarget')} ${vt.target} ${t('snmp.errors.portRange')}` });
         }
       }
       for (const u of config.value.v3?.users || []) {
-        if (!u.name) return alert('v3 用户名不能为空');
-        if (!isPresent(u.group)) return alert(`v3 用户 ${u.name} 所属组不能为空`);
+        if (!u.name) return showError({ message: t('snmp.errors.v3UserNameRequired') });
+        if (!isPresent(u.group)) return showError({ message: `${t('snmp.errors.v3User')} ${u.name} ${t('snmp.errors.v3UserGroupRequired')}` });
       }
       for (const v of config.value.v3?.views || []) {
-        if (!v.name) return alert('v3 视图名称不能为空');
+        if (!v.name) return showError({ message: t('snmp.errors.v3ViewNameRequired') });
         for (const oid of splitMembers(v.oids)) {
           const err = validateOID(oid);
-          if (err) return alert(`v3 视图 ${v.name} OID ${oid}：${err}`);
+          if (err) return showError({ message: `${t('snmp.errors.v3View')} ${v.name} OID ${oid}：${err}` });
         }
       }
 
       saving.value = true;
       try {
         await configApi.set('service snmp', snmpToConfig(config.value));
+        configStore.markPending();
         saved.value = true;
         await load();
       } catch (e) {
@@ -486,10 +493,10 @@ export default defineComponent({
     }
 
     const communityColumns = [
-      { key: 'name', title: 'Community 名称' },
-      { key: 'authorization', title: '授权' },
-      { key: 'client', title: '允许客户端', render: v => toArray(v).join(', ') },
-      { key: 'network', title: '允许网络', render: v => toArray(v).join(', ') },
+      { key: 'name', title: t('snmp.columns.communityName') },
+      { key: 'authorization', title: t('snmp.columns.authorization') },
+      { key: 'client', title: t('snmp.columns.allowedClients'), render: v => toArray(v).join(', ') },
+      { key: 'network', title: t('snmp.columns.allowedNetworks'), render: v => toArray(v).join(', ') },
     ];
     const selectedCommunity = ref([]);
     const showCommunityModal = ref(false);
@@ -501,28 +508,28 @@ export default defineComponent({
     }
 
     function editCommunity() {
-      if (!selectedCommunity.value.length) return alert('请选择要编辑的 Community');
+      if (!selectedCommunity.value.length) return showError({ message: t('snmp.errors.selectCommunityToEdit') });
       const row = (config.value.communities || []).find(c => c._name === selectedCommunity.value[0]);
-      if (!row) return alert('未找到选中的 Community');
+      if (!row) return showError({ message: t('snmp.errors.communityNotFound') });
       editingCommunity.value = JSON.parse(JSON.stringify(row));
       showCommunityModal.value = true;
     }
 
     function removeCommunity() {
-      if (!selectedCommunity.value.length) return alert('请选择要删除的 Community');
+      if (!selectedCommunity.value.length) return showError({ message: t('snmp.errors.selectCommunityToDelete') });
       config.value.communities = (config.value.communities || []).filter(c => c._name !== selectedCommunity.value[0]);
       selectedCommunity.value = [];
     }
 
     function saveCommunity() {
       const err = validateName(editingCommunity.value.name);
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       const list = config.value.communities || [];
       const idx = list.findIndex(c => c._name === editingCommunity.value._name);
       if (idx >= 0) {
         list.splice(idx, 1, JSON.parse(JSON.stringify(editingCommunity.value)));
       } else {
-        if (list.some(c => c.name === editingCommunity.value.name)) return alert('该 Community 名称已存在');
+        if (list.some(c => c.name === editingCommunity.value.name)) return showError({ message: t('snmp.errors.communityNameExists') });
         list.push(JSON.parse(JSON.stringify(editingCommunity.value)));
       }
       config.value.communities = [...list];
@@ -531,8 +538,8 @@ export default defineComponent({
     }
 
     const trapTargetColumns = [
-      { key: 'target', title: '目标地址' },
-      { key: 'port', title: '端口' },
+      { key: 'target', title: t('snmp.columns.targetAddress') },
+      { key: 'port', title: t('snmp.columns.port') },
     ];
     const selectedTrapTarget = ref([]);
     const showTrapTargetModal = ref(false);
@@ -544,29 +551,29 @@ export default defineComponent({
     }
 
     function editTrapTarget() {
-      if (!selectedTrapTarget.value.length) return alert('请选择要编辑的 Trap 目标');
-      const row = (config.value.trap_targets || []).find(t => t._target === selectedTrapTarget.value[0]);
-      if (!row) return alert('未找到选中的 Trap 目标');
+      if (!selectedTrapTarget.value.length) return showError({ message: t('snmp.errors.selectTrapTargetToEdit') });
+      const row = (config.value.trap_targets || []).find(item => item._target === selectedTrapTarget.value[0]);
+      if (!row) return showError({ message: t('snmp.errors.trapTargetNotFound') });
       editingTrapTarget.value = JSON.parse(JSON.stringify(row));
       showTrapTargetModal.value = true;
     }
 
     function removeTrapTarget() {
-      if (!selectedTrapTarget.value.length) return alert('请选择要删除的 Trap 目标');
-      config.value.trap_targets = (config.value.trap_targets || []).filter(t => t._target !== selectedTrapTarget.value[0]);
+      if (!selectedTrapTarget.value.length) return showError({ message: t('snmp.errors.selectTrapTargetToDelete') });
+      config.value.trap_targets = (config.value.trap_targets || []).filter(item => item._target !== selectedTrapTarget.value[0]);
       selectedTrapTarget.value = [];
     }
 
     function saveTrapTarget() {
-      if (!editingTrapTarget.value.target) return alert('请输入 Trap 目标地址');
+      if (!editingTrapTarget.value.target) return showError({ message: t('snmp.errors.trapTargetAddressRequired') });
       const err = validateIP(editingTrapTarget.value.target);
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       const list = config.value.trap_targets || [];
-      const idx = list.findIndex(t => t._target === editingTrapTarget.value._target);
+      const idx = list.findIndex(item => item._target === editingTrapTarget.value._target);
       if (idx >= 0) {
         list.splice(idx, 1, JSON.parse(JSON.stringify(editingTrapTarget.value)));
       } else {
-        if (list.some(t => t.target === editingTrapTarget.value.target)) return alert('该 Trap 目标已存在');
+        if (list.some(item => item.target === editingTrapTarget.value.target)) return showError({ message: t('snmp.errors.trapTargetExists') });
         list.push(JSON.parse(JSON.stringify(editingTrapTarget.value)));
       }
       config.value.trap_targets = [...list];
@@ -575,8 +582,8 @@ export default defineComponent({
     }
 
     const scriptExtensionColumns = [
-      { key: 'name', title: '扩展名称' },
-      { key: 'script', title: '脚本路径' },
+      { key: 'name', title: t('snmp.columns.extensionName') },
+      { key: 'script', title: t('snmp.columns.scriptPath') },
     ];
     const selectedScriptExtension = ref([]);
     const showScriptExtensionModal = ref(false);
@@ -588,28 +595,28 @@ export default defineComponent({
     }
 
     function editScriptExtension() {
-      if (!selectedScriptExtension.value.length) return alert('请选择要编辑的 Script Extension');
-      const row = (config.value.script_extensions || []).find(e => e._name === selectedScriptExtension.value[0]);
-      if (!row) return alert('未找到选中的 Script Extension');
+      if (!selectedScriptExtension.value.length) return showError({ message: t('snmp.errors.selectScriptExtToEdit') });
+      const row = (config.value.script_extensions || []).find(item => item._name === selectedScriptExtension.value[0]);
+      if (!row) return showError({ message: t('snmp.errors.scriptExtNotFound') });
       editingScriptExtension.value = JSON.parse(JSON.stringify(row));
       showScriptExtensionModal.value = true;
     }
 
     function removeScriptExtension() {
-      if (!selectedScriptExtension.value.length) return alert('请选择要删除的 Script Extension');
-      config.value.script_extensions = (config.value.script_extensions || []).filter(e => e._name !== selectedScriptExtension.value[0]);
+      if (!selectedScriptExtension.value.length) return showError({ message: t('snmp.errors.selectScriptExtToDelete') });
+      config.value.script_extensions = (config.value.script_extensions || []).filter(item => item._name !== selectedScriptExtension.value[0]);
       selectedScriptExtension.value = [];
     }
 
     function saveScriptExtension() {
-      if (!editingScriptExtension.value.name) return alert('请输入扩展名称');
-      if (!isPresent(editingScriptExtension.value.script)) return alert('请输入脚本路径');
+      if (!editingScriptExtension.value.name) return showError({ message: t('snmp.errors.extensionNameRequired') });
+      if (!isPresent(editingScriptExtension.value.script)) return showError({ message: t('snmp.errors.scriptPathRequired') });
       const list = config.value.script_extensions || [];
-      const idx = list.findIndex(e => e._name === editingScriptExtension.value._name);
+      const idx = list.findIndex(item => item._name === editingScriptExtension.value._name);
       if (idx >= 0) {
         list.splice(idx, 1, JSON.parse(JSON.stringify(editingScriptExtension.value)));
       } else {
-        if (list.some(e => e.name === editingScriptExtension.value.name)) return alert('该扩展名称已存在');
+        if (list.some(item => item.name === editingScriptExtension.value.name)) return showError({ message: t('snmp.errors.extensionNameExists') });
         list.push(JSON.parse(JSON.stringify(editingScriptExtension.value)));
       }
       config.value.script_extensions = [...list];
@@ -618,10 +625,10 @@ export default defineComponent({
     }
 
     const v3GroupColumns = [
-      { key: 'name', title: '组名' },
-      { key: 'mode', title: '模式' },
-      { key: 'seclevel', title: '安全级别' },
-      { key: 'view', title: '视图' },
+      { key: 'name', title: t('snmp.columns.groupName') },
+      { key: 'mode', title: t('snmp.columns.mode') },
+      { key: 'seclevel', title: t('snmp.columns.securityLevel') },
+      { key: 'view', title: t('snmp.columns.view') },
     ];
     const selectedV3Group = ref([]);
     const showV3GroupModal = ref(false);
@@ -633,28 +640,28 @@ export default defineComponent({
     }
 
     function editV3Group() {
-      if (!selectedV3Group.value.length) return alert('请选择要编辑的 v3 组');
-      const row = (config.value.v3?.groups || []).find(g => g._name === selectedV3Group.value[0]);
-      if (!row) return alert('未找到选中的 v3 组');
+      if (!selectedV3Group.value.length) return showError({ message: t('snmp.errors.selectV3GroupToEdit') });
+      const row = (config.value.v3?.groups || []).find(item => item._name === selectedV3Group.value[0]);
+      if (!row) return showError({ message: t('snmp.errors.v3GroupNotFound') });
       editingV3Group.value = JSON.parse(JSON.stringify(row));
       showV3GroupModal.value = true;
     }
 
     function removeV3Group() {
-      if (!selectedV3Group.value.length) return alert('请选择要删除的 v3 组');
-      config.value.v3.groups = (config.value.v3?.groups || []).filter(g => g._name !== selectedV3Group.value[0]);
+      if (!selectedV3Group.value.length) return showError({ message: t('snmp.errors.selectV3GroupToDelete') });
+      config.value.v3.groups = (config.value.v3?.groups || []).filter(item => item._name !== selectedV3Group.value[0]);
       selectedV3Group.value = [];
     }
 
     function saveV3Group() {
       const err = validateName(editingV3Group.value.name);
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       const list = config.value.v3?.groups || [];
-      const idx = list.findIndex(g => g._name === editingV3Group.value._name);
+      const idx = list.findIndex(item => item._name === editingV3Group.value._name);
       if (idx >= 0) {
         list.splice(idx, 1, JSON.parse(JSON.stringify(editingV3Group.value)));
       } else {
-        if (list.some(g => g.name === editingV3Group.value.name)) return alert('该 v3 组已存在');
+        if (list.some(item => item.name === editingV3Group.value.name)) return showError({ message: t('snmp.errors.v3GroupExists') });
         list.push(JSON.parse(JSON.stringify(editingV3Group.value)));
       }
       if (!config.value.v3) config.value.v3 = {};
@@ -664,11 +671,11 @@ export default defineComponent({
     }
 
     const v3UserColumns = [
-      { key: 'name', title: '用户名' },
-      { key: 'group', title: '所属组' },
-      { key: 'mode', title: '模式' },
-      { key: 'auth_type', title: '认证协议' },
-      { key: 'privacy_type', title: '加密协议' },
+      { key: 'name', title: t('snmp.columns.userName') },
+      { key: 'group', title: t('snmp.columns.group') },
+      { key: 'mode', title: t('snmp.columns.mode') },
+      { key: 'auth_type', title: t('snmp.columns.authProtocol') },
+      { key: 'privacy_type', title: t('snmp.columns.privacyProtocol') },
     ];
     const selectedV3User = ref([]);
     const showV3UserModal = ref(false);
@@ -683,28 +690,28 @@ export default defineComponent({
     }
 
     function editV3User() {
-      if (!selectedV3User.value.length) return alert('请选择要编辑的 v3 用户');
-      const row = (config.value.v3?.users || []).find(u => u._name === selectedV3User.value[0]);
-      if (!row) return alert('未找到选中的 v3 用户');
+      if (!selectedV3User.value.length) return showError({ message: t('snmp.errors.selectV3UserToEdit') });
+      const row = (config.value.v3?.users || []).find(item => item._name === selectedV3User.value[0]);
+      if (!row) return showError({ message: t('snmp.errors.v3UserNotFound') });
       editingV3User.value = JSON.parse(JSON.stringify(row));
       showV3UserModal.value = true;
     }
 
     function removeV3User() {
-      if (!selectedV3User.value.length) return alert('请选择要删除的 v3 用户');
-      config.value.v3.users = (config.value.v3?.users || []).filter(u => u._name !== selectedV3User.value[0]);
+      if (!selectedV3User.value.length) return showError({ message: t('snmp.errors.selectV3UserToDelete') });
+      config.value.v3.users = (config.value.v3?.users || []).filter(item => item._name !== selectedV3User.value[0]);
       selectedV3User.value = [];
     }
 
     function saveV3User() {
-      if (!editingV3User.value.name) return alert('请输入 v3 用户名');
-      if (!isPresent(editingV3User.value.group)) return alert('请选择 v3 用户所属组');
+      if (!editingV3User.value.name) return showError({ message: t('snmp.errors.v3UserNameRequired') });
+      if (!isPresent(editingV3User.value.group)) return showError({ message: t('snmp.errors.v3UserGroupRequired') });
       const list = config.value.v3?.users || [];
-      const idx = list.findIndex(u => u._name === editingV3User.value._name);
+      const idx = list.findIndex(item => item._name === editingV3User.value._name);
       if (idx >= 0) {
         list.splice(idx, 1, JSON.parse(JSON.stringify(editingV3User.value)));
       } else {
-        if (list.some(u => u.name === editingV3User.value.name)) return alert('该 v3 用户已存在');
+        if (list.some(item => item.name === editingV3User.value.name)) return showError({ message: t('snmp.errors.v3UserExists') });
         list.push(JSON.parse(JSON.stringify(editingV3User.value)));
       }
       if (!config.value.v3) config.value.v3 = {};
@@ -714,8 +721,8 @@ export default defineComponent({
     }
 
     const v3ViewColumns = [
-      { key: 'name', title: '视图名' },
-      { key: 'oids', title: 'OID 列表', render: v => String(v || '').replace(/\n/g, ', ') },
+      { key: 'name', title: t('snmp.columns.viewName') },
+      { key: 'oids', title: t('snmp.columns.oidList'), render: v => String(v || '').replace(/\n/g, ', ') },
     ];
     const selectedV3View = ref([]);
     const showV3ViewModal = ref(false);
@@ -727,31 +734,31 @@ export default defineComponent({
     }
 
     function editV3View() {
-      if (!selectedV3View.value.length) return alert('请选择要编辑的 v3 视图');
-      const row = (config.value.v3?.views || []).find(v => v._name === selectedV3View.value[0]);
-      if (!row) return alert('未找到选中的 v3 视图');
+      if (!selectedV3View.value.length) return showError({ message: t('snmp.errors.selectV3ViewToEdit') });
+      const row = (config.value.v3?.views || []).find(item => item._name === selectedV3View.value[0]);
+      if (!row) return showError({ message: t('snmp.errors.v3ViewNotFound') });
       editingV3View.value = JSON.parse(JSON.stringify(row));
       showV3ViewModal.value = true;
     }
 
     function removeV3View() {
-      if (!selectedV3View.value.length) return alert('请选择要删除的 v3 视图');
-      config.value.v3.views = (config.value.v3?.views || []).filter(v => v._name !== selectedV3View.value[0]);
+      if (!selectedV3View.value.length) return showError({ message: t('snmp.errors.selectV3ViewToDelete') });
+      config.value.v3.views = (config.value.v3?.views || []).filter(item => item._name !== selectedV3View.value[0]);
       selectedV3View.value = [];
     }
 
     function saveV3View() {
-      if (!editingV3View.value.name) return alert('请输入 v3 视图名');
+      if (!editingV3View.value.name) return showError({ message: t('snmp.errors.v3ViewNameRequired') });
       for (const oid of splitMembers(editingV3View.value.oids)) {
         const err = validateOID(oid);
-        if (err) return alert(`OID ${oid}：${err}`);
+        if (err) return showError({ message: `OID ${oid}：${err}` });
       }
       const list = config.value.v3?.views || [];
-      const idx = list.findIndex(v => v._name === editingV3View.value._name);
+      const idx = list.findIndex(item => item._name === editingV3View.value._name);
       if (idx >= 0) {
         list.splice(idx, 1, JSON.parse(JSON.stringify(editingV3View.value)));
       } else {
-        if (list.some(v => v.name === editingV3View.value.name)) return alert('该 v3 视图已存在');
+        if (list.some(item => item.name === editingV3View.value.name)) return showError({ message: t('snmp.errors.v3ViewExists') });
         list.push(JSON.parse(JSON.stringify(editingV3View.value)));
       }
       if (!config.value.v3) config.value.v3 = {};
@@ -761,8 +768,8 @@ export default defineComponent({
     }
 
     const v3TrapTargetColumns = [
-      { key: 'target', title: '目标地址' },
-      { key: 'port', title: '端口' },
+      { key: 'target', title: t('snmp.columns.targetAddress') },
+      { key: 'port', title: t('snmp.columns.port') },
     ];
     const selectedV3TrapTarget = ref([]);
     const showV3TrapTargetModal = ref(false);
@@ -774,33 +781,33 @@ export default defineComponent({
     }
 
     function editV3TrapTarget() {
-      if (!selectedV3TrapTarget.value.length) return alert('请选择要编辑的 v3 Trap 目标');
-      const row = (config.value.v3?.trap_targets || []).find(t => t._target === selectedV3TrapTarget.value[0]);
-      if (!row) return alert('未找到选中的 v3 Trap 目标');
+      if (!selectedV3TrapTarget.value.length) return showError({ message: t('snmp.errors.selectV3TrapTargetToEdit') });
+      const row = (config.value.v3?.trap_targets || []).find(item => item._target === selectedV3TrapTarget.value[0]);
+      if (!row) return showError({ message: t('snmp.errors.v3TrapTargetNotFound') });
       editingV3TrapTarget.value = JSON.parse(JSON.stringify(row));
       showV3TrapTargetModal.value = true;
     }
 
     function removeV3TrapTarget() {
-      if (!selectedV3TrapTarget.value.length) return alert('请选择要删除的 v3 Trap 目标');
-      config.value.v3.trap_targets = (config.value.v3?.trap_targets || []).filter(t => t._target !== selectedV3TrapTarget.value[0]);
+      if (!selectedV3TrapTarget.value.length) return showError({ message: t('snmp.errors.selectV3TrapTargetToDelete') });
+      config.value.v3.trap_targets = (config.value.v3?.trap_targets || []).filter(item => item._target !== selectedV3TrapTarget.value[0]);
       selectedV3TrapTarget.value = [];
     }
 
     function saveV3TrapTarget() {
-      if (!editingV3TrapTarget.value.target) return alert('请输入 v3 Trap 目标地址');
+      if (!editingV3TrapTarget.value.target) return showError({ message: t('snmp.errors.v3TrapTargetAddressRequired') });
       const err = validateIP(editingV3TrapTarget.value.target);
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       if (isPresent(editingV3TrapTarget.value.port)) {
         const port = parseInt(editingV3TrapTarget.value.port, 10);
-        if (isNaN(port) || port < 1 || port > 65535) return alert('端口范围 1-65535');
+        if (isNaN(port) || port < 1 || port > 65535) return showError({ message: t('snmp.errors.portRange') });
       }
       const list = config.value.v3?.trap_targets || [];
-      const idx = list.findIndex(t => t._target === editingV3TrapTarget.value._target);
+      const idx = list.findIndex(item => item._target === editingV3TrapTarget.value._target);
       if (idx >= 0) {
         list.splice(idx, 1, JSON.parse(JSON.stringify(editingV3TrapTarget.value)));
       } else {
-        if (list.some(t => t.target === editingV3TrapTarget.value.target)) return alert('该 v3 Trap 目标已存在');
+        if (list.some(item => item.target === editingV3TrapTarget.value.target)) return showError({ message: t('snmp.errors.v3TrapTargetExists') });
         list.push(JSON.parse(JSON.stringify(editingV3TrapTarget.value)));
       }
       if (!config.value.v3) config.value.v3 = {};
@@ -809,9 +816,13 @@ export default defineComponent({
       showV3TrapTargetModal.value = false;
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
-    return {
+    return {t,
+      
       loading, saving, saved, config, activeTab, writeDisabled, commandPath, interfaces, localAddresses,
       communityColumns, selectedCommunity, showCommunityModal, editingCommunity,
       trapTargetColumns, selectedTrapTarget, showTrapTargetModal, editingTrapTarget,
@@ -828,45 +839,50 @@ export default defineComponent({
       createV3User, editV3User, removeV3User, saveV3User,
       createV3View, editV3View, removeV3View, saveV3View,
       createV3TrapTarget, editV3TrapTarget, removeV3TrapTarget, saveV3TrapTarget,
-      PROTOCOL_OPTIONS, AUTHORIZATION_OPTIONS, OID_ENABLE_OPTIONS,
-      V3_MODE_OPTIONS, V3_SECLEVEL_OPTIONS, V3_AUTH_TYPE_OPTIONS, V3_PRIVACY_TYPE_OPTIONS,
+      PROTOCOL_OPTIONS: getProtocolOptions(t),
+      AUTHORIZATION_OPTIONS: getAuthorizationOptions(t),
+      OID_ENABLE_OPTIONS: getOidEnableOptions(t),
+      V3_MODE_OPTIONS: getV3ModeOptions(t),
+      V3_SECLEVEL_OPTIONS: getV3SeclevelOptions(t),
+      V3_AUTH_TYPE_OPTIONS: getV3AuthTypeOptions(t),
+      V3_PRIVACY_TYPE_OPTIONS: getV3PrivacyTypeOptions(t),
     };
   },
   components: { DataTable, DraggableModal, DualListSelector, TabGroup, ToolbarButton },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('snmp.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本' },
-        { key: 'communities', title: 'Community' },
-        { key: 'trap-targets', title: 'Trap 目标' },
-        { key: 'script-extensions', title: '脚本扩展' },
-        { key: 'v3', title: 'SNMP v3' }
+        { key: 'basic', title: t('snmp.tabs.basic') },
+        { key: 'communities', title: t('snmp.tabs.communities') },
+        { key: 'trap-targets', title: t('snmp.tabs.trapTargets') },
+        { key: 'script-extensions', title: t('snmp.tabs.scriptExtensions') },
+        { key: 'v3', title: t('snmp.tabs.v3') }
       ]">
 
         <template #basic>
-          <div class="form-row"><label class="form-label" title="SNMP 服务描述">描述</label><input class="form-control" v-model="config.description" placeholder="描述" /></div>
-          <div class="form-row"><label class="form-label" title="联系人信息">联系人</label><input class="form-control" v-model="config.contact" placeholder="contact@example.com" /></div>
-          <div class="form-row"><label class="form-label" title="位置信息">位置</label><input class="form-control" v-model="config.location" placeholder="Beijing" /></div>
-          <div class="form-row"><label class="form-label" title="监听协议，默认 UDP">协议</label>
+          <div class="form-row"><label class="form-label" :title="t('snmp.basic.descriptionTip')">{{ t('snmp.basic.description') }}</label><input class="form-control" v-model="config.description" :placeholder="t('snmp.basic.description')" /></div>
+          <div class="form-row"><label class="form-label" :title="t('snmp.basic.contactTip')">{{ t('snmp.basic.contact') }}</label><input class="form-control" v-model="config.contact" placeholder="contact@example.com" /></div>
+          <div class="form-row"><label class="form-label" :title="t('snmp.basic.locationTip')">{{ t('snmp.basic.location') }}</label><input class="form-control" v-model="config.location" placeholder="Beijing" /></div>
+          <div class="form-row"><label class="form-label" :title="t('snmp.basic.protocolTip')">{{ t('snmp.basic.protocol') }}</label>
             <select class="form-control" v-model="config.protocol">
               <option v-for="o in PROTOCOL_OPTIONS" :key="o.key" :value="o.key">{{ o.label }}</option>
             </select>
           </div>
-          <div class="form-row"><label class="form-label" title="SNMP 所属 VRF">VRF</label><input class="form-control" v-model="config.vrf" placeholder="VRF 名称" /></div>
-          <div class="form-row"><label class="form-label" title="监听地址">监听地址</label>
+          <div class="form-row"><label class="form-label" :title="t('snmp.basic.vrfTip')">VRF</label><input class="form-control" v-model="config.vrf" :placeholder="t('snmp.basic.vrfPlaceholder')" /></div>
+          <div class="form-row"><label class="form-label" :title="t('snmp.basic.listenAddressTip')">{{ t('snmp.basic.listenAddress') }}</label>
             <div style="flex:1;max-width:600px;">
-              <DualListSelector v-model="config.listen_address" :options="localAddresses" title-left="可选" title-right="已选" />
+              <DualListSelector v-model="config.listen_address" :options="localAddresses" :title-left="t('snmp.basic.available')" :title-right="t('snmp.basic.selected')" />
             </div>
           </div>
-          <div class="form-row"><label class="form-label" title="Trap 源地址">Trap 源地址</label><input class="form-control" v-model="config.trap_source" placeholder="IPv4 / IPv6 地址" /></div>
-          <div class="form-row"><label class="form-label" title="SMUX 子树 OID">SMUX Peer</label>
+          <div class="form-row"><label class="form-label" :title="t('snmp.basic.trapSourceTip')">{{ t('snmp.basic.trapSource') }}</label><input class="form-control" v-model="config.trap_source" :placeholder="t('snmp.basic.ipPlaceholder')" /></div>
+          <div class="form-row"><label class="form-label" :title="t('snmp.basic.smuxTip')">SMUX Peer</label>
             <div style="flex:1;max-width:600px;">
-              <DualListSelector v-model="config.smux_peer" :options="[]" title-left="可选" title-right="已选" />
+              <DualListSelector v-model="config.smux_peer" :options="[]" :title-left="t('snmp.basic.available')" :title-right="t('snmp.basic.selected')" />
             </div>
           </div>
           <div class="form-row" style="align-items:flex-start;">
-            <label class="form-label" title="启用默认禁用的 OID" style="padding-top:6px;">启用 OID</label>
+            <label class="form-label" :title="t('snmp.basic.enableOidTip')" style="padding-top:6px;">{{ t('snmp.basic.enableOid') }}</label>
             <div style="flex:1;max-width:700px;">
               <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:8px 16px;">
                 <label v-for="o in OID_ENABLE_OPTIONS" :key="o.key" style="display:flex;align-items:center;gap:6px;white-space:nowrap;">
@@ -879,165 +895,161 @@ export default defineComponent({
 
         <template #communities>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createCommunity">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editCommunity" :disabled="!selectedCommunity.length || selectedCommunity.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeCommunity" :disabled="!selectedCommunity.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createCommunity">{{ t('snmp.buttons.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editCommunity" :disabled="!selectedCommunity.length || selectedCommunity.length > 1">{{ t('snmp.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeCommunity" :disabled="!selectedCommunity.length">{{ t('snmp.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="communityColumns" :data="config.communities" row-key="name" :externalToolbar="true" :selectable="true" @selection-change="selectedCommunity = $event" />
         </template>
 
         <template #trap-targets>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createTrapTarget">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editTrapTarget" :disabled="!selectedTrapTarget.length || selectedTrapTarget.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeTrapTarget" :disabled="!selectedTrapTarget.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createTrapTarget">{{ t('snmp.buttons.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editTrapTarget" :disabled="!selectedTrapTarget.length || selectedTrapTarget.length > 1">{{ t('snmp.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeTrapTarget" :disabled="!selectedTrapTarget.length">{{ t('snmp.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="trapTargetColumns" :data="config.trap_targets" row-key="target" :externalToolbar="true" :selectable="true" @selection-change="selectedTrapTarget = $event" />
         </template>
 
         <template #script-extensions>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createScriptExtension">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editScriptExtension" :disabled="!selectedScriptExtension.length || selectedScriptExtension.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeScriptExtension" :disabled="!selectedScriptExtension.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createScriptExtension">{{ t('snmp.buttons.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editScriptExtension" :disabled="!selectedScriptExtension.length || selectedScriptExtension.length > 1">{{ t('snmp.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeScriptExtension" :disabled="!selectedScriptExtension.length">{{ t('snmp.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="scriptExtensionColumns" :data="config.script_extensions" row-key="name" :externalToolbar="true" :selectable="true" @selection-change="selectedScriptExtension = $event" />
         </template>
 
         <template #v3>
-          <div class="form-row"><label class="form-label" title="SNMPv3 引擎 ID（10-64 位十六进制）">Engine ID</label><input class="form-control" v-model="config.v3.engineid" placeholder="10-64 位十六进制字符" /></div>
+          <div class="form-row"><label class="form-label" :title="t('snmp.v3.engineIdTip')">Engine ID</label><input class="form-control" v-model="config.v3.engineid" :placeholder="t('snmp.v3.engineIdPlaceholder')" /></div>
 
-          <h3 style="margin:16px 0 8px;">组配置</h3>
+          <h3 style="margin:16px 0 8px;">{{ t('snmp.v3.groupConfig') }}</h3>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createV3Group">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editV3Group" :disabled="!selectedV3Group.length || selectedV3Group.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeV3Group" :disabled="!selectedV3Group.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createV3Group">{{ t('snmp.buttons.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editV3Group" :disabled="!selectedV3Group.length || selectedV3Group.length > 1">{{ t('snmp.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeV3Group" :disabled="!selectedV3Group.length">{{ t('snmp.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="v3GroupColumns" :data="config.v3.groups" row-key="name" :externalToolbar="true" :selectable="true" @selection-change="selectedV3Group = $event" />
 
-          <h3 style="margin:16px 0 8px;">用户配置</h3>
+          <h3 style="margin:16px 0 8px;">{{ t('snmp.v3.userConfig') }}</h3>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createV3User">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editV3User" :disabled="!selectedV3User.length || selectedV3User.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeV3User" :disabled="!selectedV3User.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createV3User">{{ t('snmp.buttons.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editV3User" :disabled="!selectedV3User.length || selectedV3User.length > 1">{{ t('snmp.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeV3User" :disabled="!selectedV3User.length">{{ t('snmp.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="v3UserColumns" :data="config.v3.users" row-key="name" :externalToolbar="true" :selectable="true" @selection-change="selectedV3User = $event" />
 
-          <h3 style="margin:16px 0 8px;">视图配置</h3>
+          <h3 style="margin:16px 0 8px;">{{ t('snmp.v3.viewConfig') }}</h3>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createV3View">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editV3View" :disabled="!selectedV3View.length || selectedV3View.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeV3View" :disabled="!selectedV3View.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createV3View">{{ t('snmp.buttons.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editV3View" :disabled="!selectedV3View.length || selectedV3View.length > 1">{{ t('snmp.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeV3View" :disabled="!selectedV3View.length">{{ t('snmp.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="v3ViewColumns" :data="config.v3.views" row-key="name" :externalToolbar="true" :selectable="true" @selection-change="selectedV3View = $event" />
 
-          <h3 style="margin:16px 0 8px;">v3 Trap 目标</h3>
+          <h3 style="margin:16px 0 8px;">{{ t('snmp.v3.v3TrapTargets') }}</h3>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createV3TrapTarget">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editV3TrapTarget" :disabled="!selectedV3TrapTarget.length || selectedV3TrapTarget.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeV3TrapTarget" :disabled="!selectedV3TrapTarget.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createV3TrapTarget">{{ t('snmp.buttons.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editV3TrapTarget" :disabled="!selectedV3TrapTarget.length || selectedV3TrapTarget.length > 1">{{ t('snmp.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeV3TrapTarget" :disabled="!selectedV3TrapTarget.length">{{ t('snmp.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="v3TrapTargetColumns" :data="config.v3.trap_targets" row-key="target" :externalToolbar="true" :selectable="true" @selection-change="selectedV3TrapTarget = $event" />
         </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="showCommunityModal" title="Community" width="620px" @confirm="saveCommunity" @close="showCommunityModal = false">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingCommunity.name" :disabled="!!editingCommunity._name" placeholder="public" /></div>
-        <div class="form-row"><label class="form-label">授权</label>
+      <DraggableModal v-model:visible="showCommunityModal" :title="t('snmp.modals.community')" width="620px" @confirm="saveCommunity" @close="showCommunityModal = false">
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.name') }}</label><input class="form-control" v-model="editingCommunity.name" :disabled="!!editingCommunity._name" placeholder="public" /></div>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.authorization') }}</label>
           <select class="form-control" v-model="editingCommunity.authorization">
             <option v-for="o in AUTHORIZATION_OPTIONS" :key="o.key" :value="o.key">{{ o.label }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">允许客户端</label>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.allowedClients') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingCommunity.client" :options="[]" title-left="可选" title-right="已选" />
-            <div class="form-hint">每行一个 IPv4/IPv6 地址</div>
+            <DualListSelector v-model="editingCommunity.client" :options="[]" :title-left="t('snmp.basic.available')" :title-right="t('snmp.basic.selected')" />
+            <div class="form-hint">{{ t('snmp.hints.oneIpPerLine') }}</div>
           </div>
         </div>
-        <div class="form-row"><label class="form-label">允许网络</label>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.allowedNetworks') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingCommunity.network" :options="[]" title-left="可选" title-right="已选" />
-            <div class="form-hint">每行一个 IPv4/IPv6 CIDR，默认 0.0.0.0/0, ::/0</div>
+            <DualListSelector v-model="editingCommunity.network" :options="[]" :title-left="t('snmp.basic.available')" :title-right="t('snmp.basic.selected')" />
+            <div class="form-hint">{{ t('snmp.hints.oneCidrPerLine') }}</div>
           </div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showTrapTargetModal" title="Trap 目标" @confirm="saveTrapTarget" @close="showTrapTargetModal = false">
-        <div class="form-row"><label class="form-label">目标地址</label><input class="form-control" v-model="editingTrapTarget.target" :disabled="!!editingTrapTarget._target" placeholder="IPv4 / IPv6 地址" /></div>
-        <div class="form-row"><label class="form-label">端口</label><input type="number" min="1" max="65535" class="form-control" v-model="editingTrapTarget.port" placeholder="1-65535" /></div>
+      <DraggableModal v-model:visible="showTrapTargetModal" :title="t('snmp.modals.trapTarget')" @confirm="saveTrapTarget" @close="showTrapTargetModal = false">
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.targetAddress') }}</label><input class="form-control" v-model="editingTrapTarget.target" :disabled="!!editingTrapTarget._target" :placeholder="t('snmp.basic.ipPlaceholder')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.port') }}</label><input type="number" min="1" max="65535" class="form-control" v-model="editingTrapTarget.port" placeholder="1-65535" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showScriptExtensionModal" title="脚本扩展" @confirm="saveScriptExtension" @close="showScriptExtensionModal = false">
-        <div class="form-row"><label class="form-label">扩展名称</label><input class="form-control" v-model="editingScriptExtension.name" :disabled="!!editingScriptExtension._name" /></div>
-        <div class="form-row"><label class="form-label">脚本路径</label><input class="form-control" v-model="editingScriptExtension.script" placeholder="/config/scripts/..." /></div>
+      <DraggableModal v-model:visible="showScriptExtensionModal" :title="t('snmp.modals.scriptExtension')" @confirm="saveScriptExtension" @close="showScriptExtensionModal = false">
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.extensionName') }}</label><input class="form-control" v-model="editingScriptExtension.name" :disabled="!!editingScriptExtension._name" /></div>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.scriptPath') }}</label><input class="form-control" v-model="editingScriptExtension.script" placeholder="/config/scripts/..." /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showV3GroupModal" title="SNMP v3 组" width="620px" @confirm="saveV3Group" @close="showV3GroupModal = false">
-        <div class="form-row"><label class="form-label">组名</label><input class="form-control" v-model="editingV3Group.name" :disabled="!!editingV3Group._name" placeholder="group01" /></div>
-        <div class="form-row"><label class="form-label">模式</label>
+      <DraggableModal v-model:visible="showV3GroupModal" :title="t('snmp.modals.v3Group')" width="620px" @confirm="saveV3Group" @close="showV3GroupModal = false">
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.groupName') }}</label><input class="form-control" v-model="editingV3Group.name" :disabled="!!editingV3Group._name" placeholder="group01" /></div>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.mode') }}</label>
           <select class="form-control" v-model="editingV3Group.mode">
             <option v-for="o in V3_MODE_OPTIONS" :key="o.key" :value="o.key">{{ o.label }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">安全级别</label>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.securityLevel') }}</label>
           <select class="form-control" v-model="editingV3Group.seclevel">
             <option v-for="o in V3_SECLEVEL_OPTIONS" :key="o.key" :value="o.key">{{ o.label }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">视图</label>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.view') }}</label>
           <select class="form-control" v-model="editingV3Group.view">
-            <option value="">-- 不指定 --</option>
+            <option value="">{{ t('snmp.form.notSpecified') }}</option>
             <option v-for="v in config.v3.views" :key="v.name" :value="v.name">{{ v.name }}</option>
           </select>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showV3UserModal" title="SNMP v3 用户" width="620px" @confirm="saveV3User" @close="showV3UserModal = false">
-        <div class="form-row"><label class="form-label">用户名</label><input class="form-control" v-model="editingV3User.name" :disabled="!!editingV3User._name" placeholder="user01" /></div>
-        <div class="form-row"><label class="form-label">所属组</label>
+      <DraggableModal v-model:visible="showV3UserModal" :title="t('snmp.modals.v3User')" width="620px" @confirm="saveV3User" @close="showV3UserModal = false">
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.userName') }}</label><input class="form-control" v-model="editingV3User.name" :disabled="!!editingV3User._name" placeholder="user01" /></div>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.group') }}</label>
           <select class="form-control" v-model="editingV3User.group">
-            <option value="">-- 请选择 --</option>
+            <option value="">{{ t('snmp.form.pleaseSelect') }}</option>
             <option v-for="g in config.v3.groups" :key="g.name" :value="g.name">{{ g.name }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">模式</label>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.mode') }}</label>
           <select class="form-control" v-model="editingV3User.mode">
             <option v-for="o in V3_MODE_OPTIONS" :key="o.key" :value="o.key">{{ o.label }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">认证协议</label>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.authProtocol') }}</label>
           <select class="form-control" v-model="editingV3User.auth_type">
             <option v-for="o in V3_AUTH_TYPE_OPTIONS" :key="o.key" :value="o.key">{{ o.label }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">认证明文密码</label><input type="password" class="form-control" v-model="editingV3User.auth_plaintext" placeholder="plain text key" /></div>
-        <div class="form-row"><label class="form-label">认证加密密码</label><input type="password" class="form-control" v-model="editingV3User.auth_encrypted" placeholder="encrypted key" /></div>
-        <div class="form-row"><label class="form-label">加密协议</label>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.authPlaintextPassword') }}</label><input type="password" class="form-control" v-model="editingV3User.auth_plaintext" placeholder="plain text key" /></div>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.authEncryptedPassword') }}</label><input type="password" class="form-control" v-model="editingV3User.auth_encrypted" placeholder="encrypted key" /></div>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.privacyProtocol') }}</label>
           <select class="form-control" v-model="editingV3User.privacy_type">
             <option v-for="o in V3_PRIVACY_TYPE_OPTIONS" :key="o.key" :value="o.key">{{ o.label }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">加密明文密码</label><input type="password" class="form-control" v-model="editingV3User.privacy_plaintext" placeholder="plain text key" /></div>
-        <div class="form-row"><label class="form-label">加密加密密码</label><input type="password" class="form-control" v-model="editingV3User.privacy_encrypted" placeholder="encrypted key" /></div>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.privacyPlaintextPassword') }}</label><input type="password" class="form-control" v-model="editingV3User.privacy_plaintext" placeholder="plain text key" /></div>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.privacyEncryptedPassword') }}</label><input type="password" class="form-control" v-model="editingV3User.privacy_encrypted" placeholder="encrypted key" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showV3ViewModal" title="SNMP v3 视图" width="620px" @confirm="saveV3View" @close="showV3ViewModal = false">
-        <div class="form-row"><label class="form-label">视图名</label><input class="form-control" v-model="editingV3View.name" :disabled="!!editingV3View._name" placeholder="view01" /></div>
-        <div class="form-row"><label class="form-label" style="align-self:flex-start;padding-top:6px;">OID 列表</label>
+      <DraggableModal v-model:visible="showV3ViewModal" :title="t('snmp.modals.v3View')" width="620px" @confirm="saveV3View" @close="showV3ViewModal = false">
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.viewName') }}</label><input class="form-control" v-model="editingV3View.name" :disabled="!!editingV3View._name" placeholder="view01" /></div>
+        <div class="form-row"><label class="form-label" style="align-self:flex-start;padding-top:6px;">{{ t('snmp.form.oidList') }}</label>
           <div style="flex:1;max-width:600px;">
-            <textarea class="form-control" v-model="editingV3View.oids" rows="5" placeholder="每行一个 OID，示例：.1.3.6.1.2.1.4.24"></textarea>
-            <div class="form-hint">每行一个 OID</div>
+            <textarea class="form-control" v-model="editingV3View.oids" rows="5" :placeholder="t('snmp.form.oidPlaceholder')"></textarea>
+            <div class="form-hint">{{ t('snmp.hints.oneOidPerLine') }}</div>
           </div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showV3TrapTargetModal" title="SNMP v3 Trap 目标" @confirm="saveV3TrapTarget" @close="showV3TrapTargetModal = false">
-        <div class="form-row"><label class="form-label">目标地址</label><input class="form-control" v-model="editingV3TrapTarget.target" :disabled="!!editingV3TrapTarget._target" placeholder="IPv4 / IPv6 地址" /></div>
-        <div class="form-row"><label class="form-label">端口</label><input type="number" min="1" max="65535" class="form-control" v-model="editingV3TrapTarget.port" placeholder="1-65535" /></div>
+      <DraggableModal v-model:visible="showV3TrapTargetModal" :title="t('snmp.modals.v3TrapTarget')" @confirm="saveV3TrapTarget" @close="showV3TrapTargetModal = false">
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.targetAddress') }}</label><input class="form-control" v-model="editingV3TrapTarget.target" :disabled="!!editingV3TrapTarget._target" :placeholder="t('snmp.basic.ipPlaceholder')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('snmp.form.port') }}</label><input type="number" min="1" max="65535" class="form-control" v-model="editingV3TrapTarget.port" placeholder="1-65535" /></div>
       </DraggableModal>
     </div>
   `,

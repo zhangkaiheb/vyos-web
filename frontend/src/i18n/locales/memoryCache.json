@@ -1,0 +1,163 @@
+{
+  "zh-CN": {
+    "memoryCache": {
+      "tabs": {
+        "summary": "概览",
+        "cache": "缓存详情"
+      },
+      "columns": {
+        "key": "项目",
+        "value": "值",
+        "objs": "对象数",
+        "active": "活跃数",
+        "use": "使用率",
+        "objSize": "对象大小",
+        "slabs": "SLAB",
+        "objPerSlab": "对象/SLAB",
+        "cacheSize": "缓存大小",
+        "name": "名称"
+      },
+      "buttons": {
+        "refresh": "刷新"
+      }
+    }
+  },
+  "en": {
+    "memoryCache": {
+      "tabs": {
+        "summary": "Summary",
+        "cache": "Cache Details"
+      },
+      "columns": {
+        "key": "Item",
+        "value": "Value",
+        "objs": "Objects",
+        "active": "Active",
+        "use": "Usage",
+        "objSize": "Object Size",
+        "slabs": "SLAB",
+        "objPerSlab": "Objects/SLAB",
+        "cacheSize": "Cache Size",
+        "name": "Name"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "zh-TW": {
+    "memoryCache": {
+      "tabs": {
+        "summary": "Summary",
+        "cache": "Cache Details"
+      },
+      "columns": {
+        "key": "Item",
+        "value": "Value",
+        "objs": "Objects",
+        "active": "Active",
+        "use": "Usage",
+        "objSize": "Object Size",
+        "slabs": "SLAB",
+        "objPerSlab": "Objects/SLAB",
+        "cacheSize": "Cache Size",
+        "name": "Name"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "ru": {
+    "memoryCache": {
+      "tabs": {
+        "summary": "Summary",
+        "cache": "Cache Details"
+      },
+      "columns": {
+        "key": "Item",
+        "value": "Value",
+        "objs": "Objects",
+        "active": "Active",
+        "use": "Usage",
+        "objSize": "Object Size",
+        "slabs": "SLAB",
+        "objPerSlab": "Objects/SLAB",
+        "cacheSize": "Cache Size",
+        "name": "Name"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "de": {
+    "memoryCache": {
+      "tabs": {
+        "summary": "Summary",
+        "cache": "Cache Details"
+      },
+      "columns": {
+        "key": "Item",
+        "value": "Value",
+        "objs": "Objects",
+        "active": "Active",
+        "use": "Usage",
+        "objSize": "Object Size",
+        "slabs": "SLAB",
+        "objPerSlab": "Objects/SLAB",
+        "cacheSize": "Cache Size",
+        "name": "Name"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "fr": {
+    "memoryCache": {
+      "tabs": {
+        "summary": "Summary",
+        "cache": "Cache Details"
+      },
+      "columns": {
+        "key": "Item",
+        "value": "Value",
+        "objs": "Objects",
+        "active": "Active",
+        "use": "Usage",
+        "objSize": "Object Size",
+        "slabs": "SLAB",
+        "objPerSlab": "Objects/SLAB",
+        "cacheSize": "Cache Size",
+        "name": "Name"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "ko": {
+    "memoryCache": {
+      "tabs": {
+        "summary": "Summary",
+        "cache": "Cache Details"
+      },
+      "columns": {
+        "key": "Item",
+        "value": "Value",
+        "objs": "Objects",
+        "active": "Active",
+        "use": "Usage",
+        "objSize": "Object Size",
+        "slabs": "SLAB",
+        "objPerSlab": "Objects/SLAB",
+        "cacheSize": "Cache Size",
+        "name": "Name"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  }
+}

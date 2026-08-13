@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="config-sync">
+<h1>Синхронизация конфигурации</h1>
+<p>Служба синхронизации конфигурации (config-sync) в VyOS реплицирует выбранные разделы конфигурации одного маршрутизатора на другой. Это устраняет необходимость вручную отражать изменения конфигурации с основного маршрутизатора на резервный.</p>
+<p>Синхронизация выполняется посредством хука post-commit на основном маршрутизаторе. Хук наблюдает за разделами, выбранными для синхронизации. При изменении любого из них при коммите хук вызывает HTTPS API на резервном маршрутизаторе и отправляет текущее состояние всех выбранных разделов в одном из следующих режимов:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">load</code>: Заменяет выбранные разделы на резервном маршрутизаторе версией с основного. Все, что существует только на резервном внутри этих разделов, удаляется.</p></li>
+<li><p><code class="docutils literal notranslate">set</code>: Объединяет версию выбранных разделов с основного маршрутизатора на резервном. Конфликтующие значения перезаписываются основным. Записи, существующие только на резервном, сохраняются.</p></li>
+</ul>
+<p>Синхронизация строго односторонняя от основного к резервному; изменения, сделанные на резервном, не отправляются обратно.</p>
+<p>Оба маршрутизатора должны быть онлайн во время коммита на основном, который модифицирует настроенный раздел. Если резервный недоступен, коммит на основном успешно завершается, но конфигурация не синхронизируется, и ошибка записывается в системный журнал.</p>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<section id="secondary-router-parameters">
+<h3>Параметры резервного маршрутизатора</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service config-sync secondary address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-config-sync-secondary-address-address" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте адрес резервного маршрутизатора.</strong></p>
+<p>Основной маршрутизатор отправляет синхронизированную конфигурацию по HTTPS API резервного маршрутизатора. Значение может быть IPv4-адресом, IPv6-адресом или <abbr title="Fully Qualified Domain Name">FQDN</abbr>. Это значение обязательно.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Адрес должен быть установлен каждый раз, когда настраивается <code class="docutils literal notranslate">service config-sync</code>. В противном случае коммит будет отклонен.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service config-sync secondary address 192.0.2.112
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service config-sync secondary port &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-config-sync-secondary-port-1-65535" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте TCP-порт, на котором HTTPS API резервного маршрутизатора слушает.</strong></p>
+<p>Значение должно совпадать с портом, настроенным под <code class="docutils literal notranslate">service https port</code> на резервном маршрутизаторе. Если они отличаются, коммит на основном маршрутизаторе успешен, но синхронизация после коммита не удалась. Резервный маршрутизатор не обновляется, и основной маршрутизатор записывает ошибку в системный журнал.</p>
+<p>По умолчанию 443, соответствует значению по умолчанию <code class="docutils literal notranslate">service https port</code>.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service config-sync secondary port 8443
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service config-sync secondary key &lt;key&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-config-sync-secondary-key-key" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте ключ HTTPS API, который основной маршрутизатор использует для аутентификации на HTTPS API резервного маршрутизатора.</strong></p>
+<p>Значение должно совпадать с ключом, настроенным под <code class="docutils literal notranslate">service https api keys id &lt;ID&gt; key</code> на резервном маршрутизаторе. Если на резервном маршрутизаторе нет соответствующего ключа, коммит на основном маршрутизаторе все равно успешен, но синхронизация после коммита не удалась. Резервный маршрутизатор не обновляется, и основной маршрутизатор записывает ошибку в системный журнал.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Это значение должно быть установлено каждый раз, когда настраивается <code class="docutils literal notranslate">service config-sync</code>. В противном случае коммит будет отклонен.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service config-sync secondary key &#39;foo&#39;
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service config-sync secondary timeout &lt;1-3600&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-config-sync-secondary-timeout-1-3600" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, сколько секунд основной маршрутизатор ждет ответа HTTPS от резервного маршрутизатора после отправки конфигурации.</strong></p>
+<p>По умолчанию 60 секунд.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service config-sync secondary timeout 120
+</pre></div>
+</div>
+</section>
+<section id="synchronization-mode">
+<h3>Режим синхронизации</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service config-sync mode &lt;load | set&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-config-sync-mode-load-set" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, как резервный маршрутизатор применяет конфигурацию, отправленную основным:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">load</code>: Заменяет выбранные разделы на резервном маршрутизаторе версией с основного. Все, что существует только на резервном внутри этих разделов, удаляется.</p></li>
+<li><p><code class="docutils literal notranslate">set</code>: Объединяет версию выбранных разделов с основного маршрутизатора на резервном. Конфликтующие значения перезаписываются основным. Записи, существующие только на резервном, сохраняются.</p></li>
+</ul>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Это значение должно быть установлено каждый раз, когда настраивается <code class="docutils literal notranslate">service config-sync</code>. В противном случае коммит будет отклонен.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service config-sync mode load
+</pre></div>
+</div>
+</section>
+<section id="sections-to-synchronize">
+<h3>Разделы для синхронизации</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service config-sync section &lt;section&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-config-sync-section-section" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте один или несколько разделов конфигурации, которые будут синхронизироваться с основного на резервный маршрутизатор.</strong></p>
+<p>Повторите команду, чтобы добавить дополнительные разделы. Если какой-либо настроенный раздел был изменен при коммите на основном маршрутизаторе, хук отправляет текущее состояние всех настроенных разделов на резервный. Если ни один из настроенных разделов не был изменен, хук ничего не делает.</p>
+<p>Поддерживаемые разделы:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">firewall</code></p></li>
+<li><p><code class="docutils literal notranslate">interfaces &lt;bonding | bridge | dummy | ethernet | geneve | input | l2tpv3 | loopback | macsec | openvpn | pppoe | pseudo-ethernet | sstpc | tunnel | virtual-ethernet | vti | vxlan | wireguard | wireless | wwan&gt;</code></p></li>
+<li><p><code class="docutils literal notranslate">nat</code></p></li>
+<li><p><code class="docutils literal notranslate">nat66</code></p></li>
+<li><p><code class="docutils literal notranslate">pki</code></p></li>
+<li><p><code class="docutils literal notranslate">policy</code></p></li>
+<li><p><code class="docutils literal notranslate">protocols &lt;babel | bfd | bgp | failover | igmp-proxy | isis | mpls | nhrp | ospf | ospfv3 | pim | pim6 | rip | ripng | rpki | segment-routing | static&gt;</code></p></li>
+<li><p><code class="docutils literal notranslate">qos &lt;interface | policy&gt;</code></p></li>
+<li><p><code class="docutils literal notranslate">service &lt;console-server | dhcp-relay | dhcp-server | dhcpv6-relay | dhcpv6-server | dns | lldp | mdns | monitoring | ndp-proxy | ntp | snmp | tftp-server | webproxy&gt;</code></p></li>
+<li><p><code class="docutils literal notranslate">system &lt;conntrack | flow-accounting | login | option | sflow | static-host-mapping | sysctl | time-zone&gt;</code></p></li>
+<li><p><code class="docutils literal notranslate">vpn</code></p></li>
+<li><p><code class="docutils literal notranslate">vrf</code></p></li>
+</ul>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Должен быть установлен хотя бы один раздел каждый раз, когда настраивается <code class="docutils literal notranslate">service config-sync</code>. В противном случае коммит будет отклонен.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service config-sync section protocols ospf
+set service config-sync section system time-zone
+</pre></div>
+</div>
+</section>
+</section>
+<section id="operation">
+<h2>Работа</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show configuration secondary sync [commands] [running | candidate | saved [&lt;config-node-path&gt;]]
+<a class="cmdlink" href="#opcmd-show-configuration-secondary-sync-commands-running-candidate-saved-config-node-path" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p><strong>Показать различие между локальной конфигурацией на основном и текущей конфигурацией на резервном.</strong></p>
+<p>Команда получает текущую конфигурацию резервного маршрутизатора через HTTPS API, поэтому резервный маршрутизатор должен быть доступен.</p>
+<p>Локальная конфигурация по умолчанию — <code class="docutils literal notranslate">running</code> и может быть установлена в <code class="docutils literal notranslate">candidate</code> (незафиксированные изменения) или <code class="docutils literal notranslate">saved</code> (последняя сохраненная конфигурация). Сторона удаленного — всегда текущая конфигурация резервного маршрутизатора.</p>
+<p>По умолчанию различие показывается в формате конфигурации со скобками, где строки, существующие только на резервном, предваряются символом <code class="docutils literal notranslate">-</code>, а строки, существующие только на основном, предваряются символом <code class="docutils literal notranslate">+</code>. Опциональное слово <code class="docutils literal notranslate">commands</code> отображает то же самое различие в виде последовательности команд <code class="docutils literal notranslate">set</code> и <code class="docutils literal notranslate">delete</code> конфигурации, где <code class="docutils literal notranslate">set</code> перечисляет пути, присутствующие только на основном, а <code class="docutils literal notranslate">delete</code> перечисляет пути, присутствующие только на резервном.</p>
+<p>Опциональный аргумент <code class="docutils literal notranslate">&lt;config-node-path&gt;</code> ограничивает различие одним разделом и должен быть одним из разделов, уже настроенных под <code class="docutils literal notranslate">set service config-sync section</code>. Если опущен, различие охватывает все настроенные разделы.</p>
+</div>
+</div>
+<p>Примеры:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># Сравнить полную текущую конфигурацию с резервным
+show configuration secondary sync
+
+# Сравнить только конфигурацию протокола OSPF с резервным
+show configuration secondary sync running protocols ospf
+
+# Сравнить кандидатскую конфигурацию с резервным,
+# отобразить как команды
+show configuration secondary sync commands candidate
+</pre></div>
+</div>
+</section>
+<section id="example">
+<h2>Пример</h2>
+<p>В следующем примере синхронизируются разделы <code class="docutils literal notranslate">system time-zone</code> и <code class="docutils literal notranslate">protocols ospf</code> с маршрутизатора A (основной, <code class="docutils literal notranslate">192.0.2.1</code>) на маршрутизатор B (резервный, <code class="docutils literal notranslate">192.0.2.112</code>). HTTPS API маршрутизатора B слушает на TCP-порту 8443.</p>
+<p>Включите и настройте службу HTTPS API на маршрутизаторе B:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https listen-address &#39;192.0.2.112&#39;
+set service https port &#39;8443&#39;
+set service https api keys id primary key &#39;foo&#39;
+set service https api rest
+</pre></div>
+</div>
+<p>Настройте службу config-sync на маршрутизаторе A:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service config-sync mode &#39;load&#39;
+set service config-sync secondary address &#39;192.0.2.112&#39;
+set service config-sync secondary port &#39;8443&#39;
+set service config-sync secondary key &#39;foo&#39;
+set service config-sync section protocols &#39;ospf&#39;
+set service config-sync section system &#39;time-zone&#39;
+</pre></div>
+</div>
+<p>Внесите изменения на маршрутизаторе A, которые попадают под один из синхронизированных разделов. Хук post-commit автоматически запускается при коммите:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos-A# set system time-zone &#39;America/Los_Angeles&#39;
+vyos@vyos-A# commit
+INFO:vyos_config_sync:Config synchronization: Mode=load, Secondary=192.0.2.112
+vyos@vyos-A# save
+
+vyos@vyos-A# set protocols ospf area 0 network &#39;198.51.100.0/30&#39;
+vyos@vyos-A# commit
+INFO:vyos_config_sync:Config synchronization: Mode=load, Secondary=192.0.2.112
+vyos@vyos-A# save
+</pre></div>
+</div>
+<p>Каждый коммит на маршрутизаторе A модифицирует один раздел, но так как хук отправляет все настроенные разделы, когда любой из них изменяется, оба коммита заменяют полное состояние <code class="docutils literal notranslate">system</code> и <code class="docutils literal notranslate">protocols ospf</code> на маршрутизаторе B.</p>
+<p>Проверьте, были ли изменения применены на маршрутизаторе B:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos-B:~$ show configuration commands | match time-zone
+set system time-zone &#39;America/Los_Angeles&#39;
+
+vyos@vyos-B:~$ show configuration commands | match ospf
+set protocols ospf area 0 network &#39;198.51.100.0/30&#39;
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

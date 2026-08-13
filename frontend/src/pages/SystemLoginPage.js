@@ -8,6 +8,7 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -248,10 +249,10 @@ export default defineComponent({
   name: 'SystemLoginPage',
   components: { ConfigForm, DataTable, DraggableModal, ToolbarButton, TabGroup },
   setup() {
+    const { t } = useI18n();
     const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
     const activeTab = ref('basic');
 
     const config = ref(loginToForm());
@@ -310,49 +311,48 @@ export default defineComponent({
     }
 
     const userColumns = [
-      { key: 'name', title: '用户名', width: 120 },
-      { key: 'full-name', title: '全名', width: 150 },
-      { key: 'home-directory', title: '主目录', width: 150 },
-      { key: 'operator', title: '操作员', width: 80, render: v => v ? '✓' : '' },
-      { key: 'disable', title: '禁用', width: 80, render: v => v ? '✓' : '' },
+      { key: 'name', title: t('system.login.columns.username'), width: 120 },
+      { key: 'full-name', title: t('system.login.columns.fullName'), width: 150 },
+      { key: 'home-directory', title: t('system.login.columns.homeDirectory'), width: 150 },
+      { key: 'operator', title: t('system.login.columns.operator'), width: 80, render: v => v ? '✓' : '' },
+      { key: 'disable', title: t('system.login.columns.disable'), width: 80, render: v => v ? '✓' : '' },
       { key: 'has_otp', title: 'OTP', width: 60, render: (v, row) => row.authentication?.otp?.key ? '✓' : '' },
-      { key: 'has_public_keys', title: '公钥', width: 60, render: (v, row) => (row.authentication?.['public-keys']?.length || 0) > 0 ? '✓' : '' },
+      { key: 'has_public_keys', title: t('system.login.columns.publicKeys'), width: 60, render: (v, row) => (row.authentication?.['public-keys']?.length || 0) > 0 ? '✓' : '' },
     ];
 
     const pubKeyColumns = [
-      { key: 'key_id', title: '密钥ID', width: 120 },
-      { key: 'type', title: '类型', width: 150 },
-      { key: 'key', title: '密钥', width: 200 },
-      { key: 'options', title: '选项', width: 150 },
+      { key: 'key_id', title: t('system.login.columns.keyId'), width: 120 },
+      { key: 'type', title: t('system.login.columns.type'), width: 150 },
+      { key: 'key', title: t('system.login.columns.key'), width: 200 },
+      { key: 'options', title: t('system.login.columns.options'), width: 150 },
     ];
 
     const opGroupColumns = [
-      { key: 'name', title: '组名', width: 150 },
-      { key: 'command_policy_allow', title: '允许命令', width: 300, render: (v, row) => (row['command-policy']?.allow || []).join(', ') },
+      { key: 'name', title: t('system.login.columns.groupName'), width: 150 },
+      { key: 'command_policy_allow', title: t('system.login.columns.allowCommands'), width: 300, render: (v, row) => (row['command-policy']?.allow || []).join(', ') },
     ];
 
     const radiusServerColumns = [
-      { key: 'address', title: '地址', width: 150 },
-      { key: 'port', title: '端口', width: 80 },
-      { key: 'priority', title: '优先级', width: 80 },
-      { key: 'timeout', title: '超时', width: 80 },
-      { key: 'disable', title: '禁用', width: 80, render: v => v ? '✓' : '' },
+      { key: 'address', title: t('system.login.columns.address'), width: 150 },
+      { key: 'port', title: t('system.login.columns.port'), width: 80 },
+      { key: 'priority', title: t('system.login.columns.priority'), width: 80 },
+      { key: 'timeout', title: t('system.login.columns.timeout'), width: 80 },
+      { key: 'disable', title: t('system.login.columns.disable'), width: 80, render: v => v ? '✓' : '' },
     ];
 
     const tacacsServerColumns = [
-      { key: 'address', title: '地址', width: 150 },
-      { key: 'port', title: '端口', width: 80 },
-      { key: 'disable', title: '禁用', width: 80, render: v => v ? '✓' : '' },
+      { key: 'address', title: t('system.login.columns.address'), width: 150 },
+      { key: 'port', title: t('system.login.columns.port'), width: 80 },
+      { key: 'disable', title: t('system.login.columns.disable'), width: 80, render: v => v ? '✓' : '' },
     ];
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('system login', true);
         config.value = loginToForm(res.data || {});
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('system.login.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -366,11 +366,10 @@ export default defineComponent({
         if (Object.keys(payload).length) {
           await configApi.set('system login', payload);
         }
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('system.login.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -397,22 +396,22 @@ export default defineComponent({
     }
 
     function editUser() {
-      if (!selectedUsers.value.length) return alert('请选择要编辑的用户');
+      if (!selectedUsers.value.length) return showError({ message: t('system.login.selectUserFirst') });
       const row = config.value.users.find(u => u.name === selectedUsers.value[0]);
-      if (!row) return alert('未找到选中的用户');
+      if (!row) return showError({ message: t('system.login.userNotFound') });
       editingUserIndex.value = config.value.users.indexOf(row);
       editingUser.value = JSON.parse(JSON.stringify(row));
       showUserModal.value = true;
     }
 
     function removeUser() {
-      if (!selectedUsers.value.length) return alert('请选择要删除的用户');
+      if (!selectedUsers.value.length) return showError({ message: t('system.login.selectUserFirst') });
       config.value.users = config.value.users.filter(u => !selectedUsers.value.includes(u.name));
       selectedUsers.value = [];
     }
 
     function saveUser() {
-      if (!editingUser.value.name) return alert('请输入用户名');
+      if (!editingUser.value.name) return showError({ message: t('system.login.usernameRequired') });
       const users = config.value.users;
       if (editingUserIndex.value >= 0) {
         users.splice(editingUserIndex.value, 1, { ...editingUser.value });
@@ -431,22 +430,22 @@ export default defineComponent({
     }
 
     function editPubKey() {
-      if (!selectedPubKeys.value.length) return alert('请选择要编辑的公钥');
+      if (!selectedPubKeys.value.length) return showError({ message: t('system.login.selectPubKeyFirst') });
       const row = editingUser.value.authentication['public-keys'].find(pk => pk.key_id === selectedPubKeys.value[0]);
-      if (!row) return alert('未找到选中的公钥');
+      if (!row) return showError({ message: t('system.login.pubKeyNotFound') });
       editingPubKeyIndex.value = editingUser.value.authentication['public-keys'].indexOf(row);
       editingPubKey.value = JSON.parse(JSON.stringify(row));
       showPubKeyModal.value = true;
     }
 
     function removePubKey() {
-      if (!selectedPubKeys.value.length) return alert('请选择要删除的公钥');
+      if (!selectedPubKeys.value.length) return showError({ message: t('system.login.selectPubKeyFirst') });
       editingUser.value.authentication['public-keys'] = editingUser.value.authentication['public-keys'].filter(pk => !selectedPubKeys.value.includes(pk.key_id));
       selectedPubKeys.value = [];
     }
 
     function savePubKey() {
-      if (!editingPubKey.value.key_id) return alert('请输入密钥ID');
+      if (!editingPubKey.value.key_id) return showError({ message: t('system.login.keyIdRequired') });
       const pubKeys = editingUser.value.authentication['public-keys'];
       if (editingPubKeyIndex.value >= 0) {
         pubKeys.splice(editingPubKeyIndex.value, 1, { ...editingPubKey.value });
@@ -464,22 +463,22 @@ export default defineComponent({
     }
 
     function editOpGroup() {
-      if (!selectedOpGroups.value.length) return alert('请选择要编辑的组');
+      if (!selectedOpGroups.value.length) return showError({ message: t('system.login.selectOpGroupFirst') });
       const row = config.value.operator_groups.find(g => g.name === selectedOpGroups.value[0]);
-      if (!row) return alert('未找到选中的组');
+      if (!row) return showError({ message: t('system.login.opGroupNotFound') });
       editingOpGroupIndex.value = config.value.operator_groups.indexOf(row);
       editingOpGroup.value = JSON.parse(JSON.stringify(row));
       showOpGroupModal.value = true;
     }
 
     function removeOpGroup() {
-      if (!selectedOpGroups.value.length) return alert('请选择要删除的组');
+      if (!selectedOpGroups.value.length) return showError({ message: t('system.login.selectOpGroupFirst') });
       config.value.operator_groups = config.value.operator_groups.filter(g => !selectedOpGroups.value.includes(g.name));
       selectedOpGroups.value = [];
     }
 
     function saveOpGroup() {
-      if (!editingOpGroup.value.name) return alert('请输入组名');
+      if (!editingOpGroup.value.name) return showError({ message: t('system.login.groupNameRequired') });
       const groups = config.value.operator_groups;
       if (editingOpGroupIndex.value >= 0) {
         groups.splice(editingOpGroupIndex.value, 1, { ...editingOpGroup.value });
@@ -498,22 +497,22 @@ export default defineComponent({
     }
 
     function editRadiusServer() {
-      if (!selectedRadiusServers.value.length) return alert('请选择要编辑的服务器');
+      if (!selectedRadiusServers.value.length) return showError({ message: t('system.login.selectServerFirst') });
       const row = config.value.radius.servers.find(s => s.address === selectedRadiusServers.value[0]);
-      if (!row) return alert('未找到选中的服务器');
+      if (!row) return showError({ message: t('system.login.serverNotFound') });
       editingRadiusServerIndex.value = config.value.radius.servers.indexOf(row);
       editingRadiusServer.value = JSON.parse(JSON.stringify(row));
       showRadiusServerModal.value = true;
     }
 
     function removeRadiusServer() {
-      if (!selectedRadiusServers.value.length) return alert('请选择要删除的服务器');
+      if (!selectedRadiusServers.value.length) return showError({ message: t('system.login.selectServerFirst') });
       config.value.radius.servers = config.value.radius.servers.filter(s => !selectedRadiusServers.value.includes(s.address));
       selectedRadiusServers.value = [];
     }
 
     function saveRadiusServer() {
-      if (!editingRadiusServer.value.address) return alert('请输入服务器地址');
+      if (!editingRadiusServer.value.address) return showError({ message: t('system.login.serverAddressRequired') });
       const servers = config.value.radius.servers;
       if (editingRadiusServerIndex.value >= 0) {
         servers.splice(editingRadiusServerIndex.value, 1, { ...editingRadiusServer.value });
@@ -532,22 +531,22 @@ export default defineComponent({
     }
 
     function editTacacsServer() {
-      if (!selectedTacacsServers.value.length) return alert('请选择要编辑的服务器');
+      if (!selectedTacacsServers.value.length) return showError({ message: t('system.login.selectServerFirst') });
       const row = config.value.tacacs.servers.find(s => s.address === selectedTacacsServers.value[0]);
-      if (!row) return alert('未找到选中的服务器');
+      if (!row) return showError({ message: t('system.login.serverNotFound') });
       editingTacacsServerIndex.value = config.value.tacacs.servers.indexOf(row);
       editingTacacsServer.value = JSON.parse(JSON.stringify(row));
       showTacacsServerModal.value = true;
     }
 
     function removeTacacsServer() {
-      if (!selectedTacacsServers.value.length) return alert('请选择要删除的服务器');
+      if (!selectedTacacsServers.value.length) return showError({ message: t('system.login.selectServerFirst') });
       config.value.tacacs.servers = config.value.tacacs.servers.filter(s => !selectedTacacsServers.value.includes(s.address));
       selectedTacacsServers.value = [];
     }
 
     function saveTacacsServer() {
-      if (!editingTacacsServer.value.address) return alert('请输入服务器地址');
+      if (!editingTacacsServer.value.address) return showError({ message: t('system.login.serverAddressRequired') });
       const servers = config.value.tacacs.servers;
       if (editingTacacsServerIndex.value >= 0) {
         servers.splice(editingTacacsServerIndex.value, 1, { ...editingTacacsServer.value });
@@ -563,8 +562,9 @@ export default defineComponent({
       onMenuRefresh(load);
     });
 
-    return {
-      loading, saving, saved, config, activeTab, commandPath,
+    return {t,
+      
+      loading, saving, config, activeTab, commandPath,
       principalText, onPrincipalInput, opGroupAllowText, onOpGroupAllowInput,
       userColumns, selectedUsers, showUserModal, editingUser,
       pubKeyColumns, selectedPubKeys, showPubKeyModal, editingPubKey,
@@ -581,196 +581,179 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本设置' },
-        { key: 'users', title: '用户管理' },
-        { key: 'operator_groups', title: 'Operator组' },
+        { key: 'basic', title: t('system.login.tabs.basic') },
+        { key: 'users', title: t('system.login.tabs.users') },
+        { key: 'operator_groups', title: t('system.login.tabs.operatorGroups') },
         { key: 'radius', title: 'RADIUS' },
         { key: 'tacacs', title: 'TACACS+' },
       ]">
 
         <template #basic>
           <div class="form-row">
-            <label class="form-label" title="登录前显示的横幅消息">登录前横幅</label>
-            <textarea class="form-control" v-model="config.basic['pre-login']" rows="3" placeholder="登录前显示的横幅消息" />
+            <label class="form-label" :title="t('system.login.preLoginBannerHelp')">{{ t('system.login.preLoginBanner') }}</label>
+            <textarea class="form-control" v-model="config.basic['pre-login']" rows="3" :placeholder="t('system.login.preLoginBannerHelp')" />
           </div>
           <div class="form-row">
-            <label class="form-label" title="登录后显示的横幅消息">登录后横幅</label>
-            <textarea class="form-control" v-model="config.basic['post-login']" rows="3" placeholder="登录后显示的横幅消息" />
+            <label class="form-label" :title="t('system.login.postLoginBannerHelp')">{{ t('system.login.postLoginBanner') }}</label>
+            <textarea class="form-control" v-model="config.basic['post-login']" rows="3" :placeholder="t('system.login.postLoginBannerHelp')" />
           </div>
           <div class="form-row">
-            <label class="form-label" title="最大登录会话数 (1-65536)">最大登录会话</label>
+            <label class="form-label" :title="t('system.login.maxLoginSessionHelp')">{{ t('system.login.maxLoginSession') }}</label>
             <input class="form-control" type="number" min="1" max="65536" v-model="config.basic['max-login-session']" />
           </div>
           <div class="form-row">
-            <label class="form-label" title="会话超时时间（秒，5-604800）">会话超时</label>
+            <label class="form-label" :title="t('system.login.sessionTimeoutHelp')">{{ t('system.login.sessionTimeout') }}</label>
             <input class="form-control" type="number" min="5" max="604800" v-model="config.basic.timeout" />
-          </div>
-          <div class="page-actions-bottom">
-            <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
           </div>
         </template>
 
         <template #users>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createUser">添加用户</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editUser" :disabled="!selectedUsers.length || selectedUsers.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeUser" :disabled="!selectedUsers.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createUser">{{ t('system.login.buttons.addUser') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editUser" :disabled="!selectedUsers.length || selectedUsers.length > 1">{{ t('system.login.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeUser" :disabled="!selectedUsers.length">{{ t('system.login.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="userColumns" :data="config.users" rowKey="name" :externalToolbar="true" @selection-change="selectedUsers = $event" :selectable="true" />
-          <div class="page-actions-bottom">
-            <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-          </div>
         </template>
 
         <template #operator_groups>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createOpGroup">添加组</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editOpGroup" :disabled="!selectedOpGroups.length || selectedOpGroups.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeOpGroup" :disabled="!selectedOpGroups.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createOpGroup">{{ t('system.login.buttons.addGroup') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editOpGroup" :disabled="!selectedOpGroups.length || selectedOpGroups.length > 1">{{ t('system.login.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeOpGroup" :disabled="!selectedOpGroups.length">{{ t('system.login.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="opGroupColumns" :data="config.operator_groups" rowKey="name" :externalToolbar="true" @selection-change="selectedOpGroups = $event" :selectable="true" />
-          <div class="page-actions-bottom">
-            <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-          </div>
         </template>
 
         <template #radius>
           <div class="form-row">
-            <label class="form-label" title="RADIUS 安全模式">安全模式</label>
+            <label class="form-label" :title="t('system.login.radiusSecurityModeHelp')">{{ t('system.login.radiusSecurityMode') }}</label>
             <select class="form-control" v-model="config.radius['security-mode']">
-              <option value="mandatory">强制</option>
-              <option value="optional">可选</option>
+              <option value="mandatory">{{ t('system.login.mandatory') }}</option>
+              <option value="optional">{{ t('system.login.optional') }}</option>
             </select>
           </div>
           <div class="form-row">
-            <label class="form-label" title="RADIUS 源地址">源地址</label>
-            <input class="form-control" type="text" v-model="config.radius['source-address']" placeholder="IP 地址" />
+            <label class="form-label" :title="t('system.login.radiusSourceAddressHelp')">{{ t('system.login.sourceAddress') }}</label>
+            <input class="form-control" type="text" v-model="config.radius['source-address']" :placeholder="t('system.login.ipAddress')" />
           </div>
           <div class="form-row">
-            <label class="form-label" title="RADIUS VRF">VRF</label>
-            <input class="form-control" type="text" v-model="config.radius.vrf" placeholder="VRF 名称" />
+            <label class="form-label" :title="t('system.login.radiusVrfHelp')">VRF</label>
+            <input class="form-control" type="text" v-model="config.radius.vrf" :placeholder="t('system.login.vrfName')" />
           </div>
-          <div style="font-weight:bold;margin:16px 0 8px;">RADIUS 服务器</div>
+          <div style="font-weight:bold;margin:16px 0 8px;">{{ t('system.login.radiusServers') }}</div>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createRadiusServer">添加服务器</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editRadiusServer" :disabled="!selectedRadiusServers.length || selectedRadiusServers.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeRadiusServer" :disabled="!selectedRadiusServers.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createRadiusServer">{{ t('system.login.buttons.addServer') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editRadiusServer" :disabled="!selectedRadiusServers.length || selectedRadiusServers.length > 1">{{ t('system.login.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeRadiusServer" :disabled="!selectedRadiusServers.length">{{ t('system.login.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="radiusServerColumns" :data="config.radius.servers" rowKey="address" :externalToolbar="true" @selection-change="selectedRadiusServers = $event" :selectable="true" />
-          <div class="page-actions-bottom">
-            <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-          </div>
         </template>
 
         <template #tacacs>
           <div class="form-row">
-            <label class="form-label" title="TACACS+ 安全模式">安全模式</label>
+            <label class="form-label" :title="t('system.login.tacacsSecurityModeHelp')">{{ t('system.login.tacacsSecurityMode') }}</label>
             <select class="form-control" v-model="config.tacacs['security-mode']">
-              <option value="mandatory">强制</option>
-              <option value="optional">可选</option>
+              <option value="mandatory">{{ t('system.login.mandatory') }}</option>
+              <option value="optional">{{ t('system.login.optional') }}</option>
             </select>
           </div>
           <div class="form-row">
-            <label class="form-label" title="TACACS+ 源地址">源地址</label>
-            <input class="form-control" type="text" v-model="config.tacacs['source-address']" placeholder="IPv4 地址" />
+            <label class="form-label" :title="t('system.login.tacacsSourceAddressHelp')">{{ t('system.login.sourceAddress') }}</label>
+            <input class="form-control" type="text" v-model="config.tacacs['source-address']" :placeholder="t('system.login.ipv4Address')" />
           </div>
           <div class="form-row">
-            <label class="form-label" title="TACACS+ 超时（秒，1-240）">超时</label>
+            <label class="form-label" :title="t('system.login.tacacsTimeoutHelp')">{{ t('system.login.timeout') }}</label>
             <input class="form-control" type="number" min="1" max="240" v-model="config.tacacs.timeout" />
           </div>
           <div class="form-row">
-            <label class="form-label" title="TACACS+ VRF">VRF</label>
-            <input class="form-control" type="text" v-model="config.tacacs.vrf" placeholder="VRF 名称" />
+            <label class="form-label" :title="t('system.login.tacacsVrfHelp')">VRF</label>
+            <input class="form-control" type="text" v-model="config.tacacs.vrf" :placeholder="t('system.login.vrfName')" />
           </div>
-          <div style="font-weight:bold;margin:16px 0 8px;">TACACS+ 服务器</div>
+          <div style="font-weight:bold;margin:16px 0 8px;">{{ t('system.login.tacacsServers') }}</div>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createTacacsServer">添加服务器</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editTacacsServer" :disabled="!selectedTacacsServers.length || selectedTacacsServers.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeTacacsServer" :disabled="!selectedTacacsServers.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createTacacsServer">{{ t('system.login.buttons.addServer') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editTacacsServer" :disabled="!selectedTacacsServers.length || selectedTacacsServers.length > 1">{{ t('system.login.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeTacacsServer" :disabled="!selectedTacacsServers.length">{{ t('system.login.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="tacacsServerColumns" :data="config.tacacs.servers" rowKey="address" :externalToolbar="true" @selection-change="selectedTacacsServers = $event" :selectable="true" />
-          <div class="page-actions-bottom">
-            <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-          </div>
         </template>
 
       </TabGroup>
 
-
       <!-- User edit modal -->
-      <DraggableModal v-model:visible="showUserModal" :title="editingUser && editingUser._key ? '编辑用户' : '添加用户'" @confirm="saveUser" @close="showUserModal = false" width="800px">
+      <DraggableModal v-model:visible="showUserModal" :title="editingUser && editingUser._key ? t('system.login.modal.editUser') : t('system.login.modal.addUser')" @confirm="saveUser" @close="showUserModal = false" width="800px">
         <div class="form-row">
-          <label class="form-label">用户名</label>
-          <input class="form-control" v-model="editingUser.name" :disabled="editingUser._key" placeholder="用户名" />
+          <label class="form-label">{{ t('system.login.username') }}</label>
+          <input class="form-control" v-model="editingUser.name" :disabled="editingUser._key" :placeholder="t('system.login.username')" />
         </div>
         <div class="form-row">
-          <label class="form-label">全名</label>
-          <input class="form-control" v-model="editingUser['full-name']" placeholder="全名" />
+          <label class="form-label">{{ t('system.login.fullName') }}</label>
+          <input class="form-control" v-model="editingUser['full-name']" :placeholder="t('system.login.fullName')" />
         </div>
         <div class="form-row">
-          <label class="form-label">主目录</label>
+          <label class="form-label">{{ t('system.login.homeDirectory') }}</label>
           <input class="form-control" v-model="editingUser['home-directory']" placeholder="/home/username" />
         </div>
         <div class="form-row">
-          <label class="form-label">操作员</label>
+          <label class="form-label">{{ t('system.login.operator') }}</label>
           <input type="checkbox" v-model="editingUser.operator" />
         </div>
         <div class="form-row">
-          <label class="form-label">禁用</label>
+          <label class="form-label">{{ t('system.login.disable') }}</label>
           <input type="checkbox" v-model="editingUser.disable" />
         </div>
-        <div style="font-weight:bold;margin:16px 0 8px;">认证设置</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('system.login.authSettings') }}</div>
         <div class="form-row">
-          <label class="form-label">明文密码</label>
-          <input class="form-control" type="text" v-model="editingUser.authentication['plaintext-password']" placeholder="明文密码" />
+          <label class="form-label">{{ t('system.login.plaintextPassword') }}</label>
+          <input class="form-control" type="text" v-model="editingUser.authentication['plaintext-password']" :placeholder="t('system.login.plaintextPassword')" />
         </div>
         <div class="form-row">
-          <label class="form-label">加密密码</label>
-          <input class="form-control" type="text" v-model="editingUser.authentication['encrypted-password']" placeholder="加密密码" />
+          <label class="form-label">{{ t('system.login.encryptedPassword') }}</label>
+          <input class="form-control" type="text" v-model="editingUser.authentication['encrypted-password']" :placeholder="t('system.login.encryptedPassword')" />
         </div>
-        <div style="font-weight:bold;margin:16px 0 8px;">OTP 设置</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('system.login.otpSettings') }}</div>
         <div class="form-row">
-          <label class="form-label">OTP 密钥</label>
-          <input class="form-control" v-model="editingUser.authentication.otp.key" placeholder="Base32 编码的密钥" />
+          <label class="form-label">{{ t('system.login.otpKey') }}</label>
+          <input class="form-control" v-model="editingUser.authentication.otp.key" :placeholder="t('system.login.otpKeyPlaceholder')" />
         </div>
         <div class="form-row">
-          <label class="form-label">速率限制 (1-10)</label>
+          <label class="form-label">{{ t('system.login.rateLimit') }}</label>
           <input class="form-control" type="number" min="1" max="10" v-model="editingUser.authentication.otp['rate-limit']" />
         </div>
         <div class="form-row">
-          <label class="form-label">速率时间 (15-600)</label>
+          <label class="form-label">{{ t('system.login.rateTime') }}</label>
           <input class="form-control" type="number" min="15" max="600" v-model="editingUser.authentication.otp['rate-time']" />
         </div>
         <div class="form-row">
-          <label class="form-label">窗口大小 (1-21)</label>
+          <label class="form-label">{{ t('system.login.windowSize') }}</label>
           <input class="form-control" type="number" min="1" max="21" v-model="editingUser.authentication.otp['window-size']" />
         </div>
         <div style="font-weight:bold;margin:16px 0 8px;">Principal</div>
         <div class="form-row">
-          <label class="form-label">Principal 列表</label>
-          <textarea class="form-control" :value="principalText" @input="onPrincipalInput" rows="3" placeholder="每行一个 principal" />
+          <label class="form-label">{{ t('system.login.principalList') }}</label>
+          <textarea class="form-control" :value="principalText" @input="onPrincipalInput" rows="3" :placeholder="t('system.login.principalPlaceholder')" />
         </div>
-        <div style="font-weight:bold;margin:16px 0 8px;">公钥</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('system.login.publicKeys') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createPubKey">添加公钥</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editPubKey" :disabled="!selectedPubKeys.length || selectedPubKeys.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removePubKey" :disabled="!selectedPubKeys.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createPubKey">{{ t('system.login.buttons.addPubKey') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editPubKey" :disabled="!selectedPubKeys.length || selectedPubKeys.length > 1">{{ t('system.login.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removePubKey" :disabled="!selectedPubKeys.length">{{ t('system.login.buttons.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="pubKeyColumns" :data="editingUser.authentication['public-keys']" rowKey="key_id" :externalToolbar="true" @selection-change="selectedPubKeys = $event" :selectable="true" />
       </DraggableModal>
 
       <!-- Public key edit modal -->
-      <DraggableModal v-model:visible="showPubKeyModal" :title="editingPubKey && editingPubKey._key ? '编辑公钥' : '添加公钥'" @confirm="savePubKey" @close="showPubKeyModal = false" width="600px">
+      <DraggableModal v-model:visible="showPubKeyModal" :title="editingPubKey && editingPubKey._key ? t('system.login.modal.editPubKey') : t('system.login.modal.addPubKey')" @confirm="savePubKey" @close="showPubKeyModal = false" width="600px">
         <div class="form-row">
-          <label class="form-label">密钥 ID</label>
-          <input class="form-control" v-model="editingPubKey.key_id" :disabled="editingPubKey._key" placeholder="密钥标识符" />
+          <label class="form-label">{{ t('system.login.keyId') }}</label>
+          <input class="form-control" v-model="editingPubKey.key_id" :disabled="editingPubKey._key" :placeholder="t('system.login.keyIdPlaceholder')" />
         </div>
         <div class="form-row">
-          <label class="form-label">类型</label>
+          <label class="form-label">{{ t('system.login.type') }}</label>
           <select class="form-control" v-model="editingPubKey.type">
-            <option value="">未选择</option>
+            <option value="">{{ t('system.login.notSelected') }}</option>
             <option value="ssh-dss">ssh-dss</option>
             <option value="ssh-rsa">ssh-rsa</option>
             <option value="ecdsa-sha2-nistp256">ecdsa-sha2-nistp256</option>
@@ -782,71 +765,71 @@ export default defineComponent({
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">密钥</label>
-          <textarea class="form-control" v-model="editingPubKey.key" rows="4" placeholder="Base64 编码的公钥" />
+          <label class="form-label">{{ t('system.login.key') }}</label>
+          <textarea class="form-control" v-model="editingPubKey.key" rows="4" :placeholder="t('system.login.keyPlaceholder')" />
         </div>
         <div class="form-row">
-          <label class="form-label">选项</label>
-          <input class="form-control" v-model="editingPubKey.options" placeholder="SSH 选项" />
+          <label class="form-label">{{ t('system.login.options') }}</label>
+          <input class="form-control" v-model="editingPubKey.options" :placeholder="t('system.login.optionsPlaceholder')" />
         </div>
       </DraggableModal>
 
       <!-- Operator group edit modal -->
-      <DraggableModal v-model:visible="showOpGroupModal" :title="editingOpGroup && editingOpGroup._key ? '编辑 Operator 组' : '添加 Operator 组'" @confirm="saveOpGroup" @close="showOpGroupModal = false" width="600px">
+      <DraggableModal v-model:visible="showOpGroupModal" :title="editingOpGroup && editingOpGroup._key ? t('system.login.modal.editOpGroup') : t('system.login.modal.addOpGroup')" @confirm="saveOpGroup" @close="showOpGroupModal = false" width="600px">
         <div class="form-row">
-          <label class="form-label">组名</label>
-          <input class="form-control" v-model="editingOpGroup.name" :disabled="editingOpGroup._key" placeholder="组名" />
+          <label class="form-label">{{ t('system.login.groupName') }}</label>
+          <input class="form-control" v-model="editingOpGroup.name" :disabled="editingOpGroup._key" :placeholder="t('system.login.groupName')" />
         </div>
         <div class="form-row">
-          <label class="form-label">允许的命令</label>
-          <textarea class="form-control" :value="opGroupAllowText" @input="onOpGroupAllowInput" rows="5" placeholder="每行一个允许执行的命令路径" />
+          <label class="form-label">{{ t('system.login.allowCommands') }}</label>
+          <textarea class="form-control" :value="opGroupAllowText" @input="onOpGroupAllowInput" rows="5" :placeholder="t('system.login.allowCommandsPlaceholder')" />
         </div>
       </DraggableModal>
 
       <!-- RADIUS server edit modal -->
-      <DraggableModal v-model:visible="showRadiusServerModal" :title="editingRadiusServer && editingRadiusServer._key ? '编辑 RADIUS 服务器' : '添加 RADIUS 服务器'" @confirm="saveRadiusServer" @close="showRadiusServerModal = false" width="600px">
+      <DraggableModal v-model:visible="showRadiusServerModal" :title="editingRadiusServer && editingRadiusServer._key ? t('system.login.modal.editRadiusServer') : t('system.login.modal.addRadiusServer')" @confirm="saveRadiusServer" @close="showRadiusServerModal = false" width="600px">
         <div class="form-row">
-          <label class="form-label">地址</label>
-          <input class="form-control" v-model="editingRadiusServer.address" :disabled="editingRadiusServer._key" placeholder="IP 地址" />
+          <label class="form-label">{{ t('system.login.address') }}</label>
+          <input class="form-control" v-model="editingRadiusServer.address" :disabled="editingRadiusServer._key" :placeholder="t('system.login.ipAddress')" />
         </div>
         <div class="form-row">
-          <label class="form-label">密钥</label>
-          <input class="form-control" v-model="editingRadiusServer.key" placeholder="共享密钥" />
+          <label class="form-label">{{ t('system.login.key') }}</label>
+          <input class="form-control" v-model="editingRadiusServer.key" :placeholder="t('system.login.sharedSecret')" />
         </div>
         <div class="form-row">
-          <label class="form-label">端口 (1-65535)</label>
+          <label class="form-label">{{ t('system.login.port') }}</label>
           <input class="form-control" type="number" min="1" max="65535" v-model="editingRadiusServer.port" />
         </div>
         <div class="form-row">
-          <label class="form-label">优先级 (1-255)</label>
+          <label class="form-label">{{ t('system.login.priority') }}</label>
           <input class="form-control" type="number" min="1" max="255" v-model="editingRadiusServer.priority" />
         </div>
         <div class="form-row">
-          <label class="form-label">超时 (1-240)</label>
+          <label class="form-label">{{ t('system.login.timeout') }}</label>
           <input class="form-control" type="number" min="1" max="240" v-model="editingRadiusServer.timeout" />
         </div>
         <div class="form-row">
-          <label class="form-label">禁用</label>
+          <label class="form-label">{{ t('system.login.disable') }}</label>
           <input type="checkbox" v-model="editingRadiusServer.disable" />
         </div>
       </DraggableModal>
 
       <!-- TACACS server edit modal -->
-      <DraggableModal v-model:visible="showTacacsServerModal" :title="editingTacacsServer && editingTacacsServer._key ? '编辑 TACACS+ 服务器' : '添加 TACACS+ 服务器'" @confirm="saveTacacsServer" @close="showTacacsServerModal = false" width="600px">
+      <DraggableModal v-model:visible="showTacacsServerModal" :title="editingTacacsServer && editingTacacsServer._key ? t('system.login.modal.editTacacsServer') : t('system.login.modal.addTacacsServer')" @confirm="saveTacacsServer" @close="showTacacsServerModal = false" width="600px">
         <div class="form-row">
-          <label class="form-label">地址</label>
-          <input class="form-control" v-model="editingTacacsServer.address" :disabled="editingTacacsServer._key" placeholder="IP 地址" />
+          <label class="form-label">{{ t('system.login.address') }}</label>
+          <input class="form-control" v-model="editingTacacsServer.address" :disabled="editingTacacsServer._key" :placeholder="t('system.login.ipAddress')" />
         </div>
         <div class="form-row">
-          <label class="form-label">密钥</label>
-          <input class="form-control" v-model="editingTacacsServer.key" placeholder="共享密钥" />
+          <label class="form-label">{{ t('system.login.key') }}</label>
+          <input class="form-control" v-model="editingTacacsServer.key" :placeholder="t('system.login.sharedSecret')" />
         </div>
         <div class="form-row">
-          <label class="form-label">端口 (1-65535)</label>
+          <label class="form-label">{{ t('system.login.port') }}</label>
           <input class="form-control" type="number" min="1" max="65535" v-model="editingTacacsServer.port" />
         </div>
         <div class="form-row">
-          <label class="form-label">禁用</label>
+          <label class="form-label">{{ t('system.login.disable') }}</label>
           <input type="checkbox" v-model="editingTacacsServer.disable" />
         </div>
       </DraggableModal>

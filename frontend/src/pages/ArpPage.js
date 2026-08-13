@@ -1,4 +1,5 @@
 import { defineComponent, ref, onMounted } from '/src/utils/vue-import.js';
+import { useI18n } from '/src/i18n/index.js';
 import { opModeApi, monitorApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
@@ -80,17 +81,18 @@ function parseArpTable(output) {
 export default defineComponent({
   name: 'ArpPage',
   setup() {
+    const { t } = useI18n();
     const loading = ref(false);
     const rows = ref([]);
     const interfaces = ref([]);
     const selectedInterface = ref('');
 
     const columns = [
-      { key: 'address', title: '地址' },
-      { key: 'hwtype', title: '硬件类型' },
-      { key: 'hwaddress', title: 'MAC 地址' },
-      { key: 'flags_mask', title: '标志掩码' },
-      { key: 'iface', title: '接口' },
+      { key: 'address', title: t('arp.columns.address') },
+      { key: 'hwtype', title: t('arp.columns.hwtype') },
+      { key: 'hwaddress', title: t('arp.columns.hwaddress') },
+      { key: 'flags_mask', title: t('arp.columns.flags_mask') },
+      { key: 'iface', title: t('arp.columns.iface') },
     ];
 
     async function fetchInterfaces() {
@@ -122,18 +124,18 @@ export default defineComponent({
       await load();
     });
 
-    return { loading, rows, columns, interfaces, selectedInterface, load };
+    return { loading, rows, columns, interfaces, selectedInterface, load, t };
   },
   components: { DataTable, ToolbarButton },
   template: `
     <div class="page-container">
       <div class="toolbar toolbar-compact">
         <div class="toolbar-left">
-          <select v-model="selectedInterface" @change="load" title="按接口过滤">
-            <option value="">全部接口</option>
+          <select v-model="selectedInterface" @change="load" :title="t('arp.filterByInterface')">
+            <option value="">{{ t('arp.allInterfaces') }}</option>
             <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
           </select>
-          <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+          <ToolbarButton icon="refresh" @click="load">{{ t('app.refresh') }}</ToolbarButton>
         </div>
       </div>
       <DataTable

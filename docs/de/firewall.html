@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="firewall">
+<h1>Firewall</h1>
+<div class="admonition warning">
+<p class="admonition-title">Warnung</p>
+<p>Due to a boot-time race condition, all interfaces initialize
+before the firewall. This temporarily leaves the system open to all traffic
+and poses a security risk.</p>
+</div>
+<p>VyOS uses Netfilter. The Netfilter
+project developed <code class="docutils literal notranslate">iptables</code> and its successor <code class="docutils literal notranslate">nftables</code> for the Linux
+kernel to process packet data flows directly. This extends the concept of
+zone-based security to let you manipulate data at multiple stages after the
+network interface and driver accept it, and before sending it to its
+destination (for example, a web server or another device).</p>
+<p>The following is a simplified traffic flow diagram based on Netfilter
+packet flow.
+This diagram provides an overview of how packets are processed and the
+possible paths traffic can take.</p>
+<figure class="align-default">
+<img alt="../../_images/firewall-gral-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-gral-packet-flow.webp" />
+</figure>
+<p>The main points regarding packet flow and terminology in VyOS firewall
+are:</p>
+<ul class="simple">
+<li><p><strong>Bridge Port?</strong>: Choose the appropriate path based on whether the
+interface where the packet was received is part of a bridge.</p></li>
+</ul>
+<p>If the interface where the packet was received is not part of a bridge, the
+packet is processed at the <strong>IP Layer</strong>:</p>
+<blockquote>
+<div><ul>
+<li><p><strong>Prerouting</strong>: The router processes all packets in this stage,
+regardless of the destination. You can perform several actions in
+this stage, and these actions are also defined in different parts of the
+VyOS configuration. Order is important. The relevant configuration that
+applies in this stage includes:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Firewall prerouting</strong>: Rules you define under <code class="docutils literal notranslate">set firewall
+[ipv4 | ipv6] prerouting raw...</code>. The system processes all rules in
+this section before the connection tracking subsystem.</p></li>
+<li><p><strong>Conntrack Ignore</strong>: Rules you define under <code class="docutils literal notranslate">set system conntrack
+ignore [ipv4 | ipv6] ...</code>. You can configure this section with
+<code class="docutils literal notranslate">firewall [ipv4 | ipv6] prerouting ...</code>. For compatibility reasons,
+this feature is supported, but will be deprecated in the future.</p></li>
+<li><p><strong>Policy Route</strong>: Rules you define under <code class="docutils literal notranslate">set policy [route |
+route6] ...</code>.</p></li>
+<li><p><strong>Destination NAT</strong>: Rules you define under <code class="docutils literal notranslate">set [nat | nat66]
+destination...</code>.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Destination is the router?</strong>: Choose the appropriate path based on the
+destination IP address. Transit traffic continues to <strong>forward</strong>, while
+traffic destined for the router continues to <strong>input</strong>.</p></li>
+<li><p><strong>Input</strong>: The stage where you filter and control traffic destined for
+the router itself. This is where you enforce all rules for securing the
+router. This includes IPv4 and IPv6 filtering rules, defined in:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">set firewall ipv4 input filter ...</code>.</p></li>
+<li><p><code class="docutils literal notranslate">set firewall ipv6 input filter ...</code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Forward</strong>: The stage where you filter and control transit traffic.
+This includes IPv4 and IPv6 filtering rules, defined in:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">set firewall ipv4 forward filter ...</code>.</p></li>
+<li><p><code class="docutils literal notranslate">set firewall ipv6 forward filter ...</code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Output</strong>: The stage where you filter and control traffic that the
+router originates. Note that this traffic comes from either a new
+connection that an internal process on the VyOS router (such as NTP)
+originates or a response to traffic the router receives externally through
+<strong>input</strong> (for example, a response to an SSH login attempt). This includes
+IPv4 and IPv6 rules, and two different sections apply:</p>
+<ul class="simple">
+<li><p><strong>Output Prerouting</strong>: <code class="docutils literal notranslate">set firewall [ipv4 | ipv6] output
+raw ...</code>. As described in <strong>Prerouting</strong>, the system processes
+rules in this section before the connection tracking subsystem.</p></li>
+<li><p><strong>Output Filter</strong>: <code class="docutils literal notranslate">set firewall [ipv4 | ipv6] output filter ...</code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Postrouting</strong>: As in <strong>Prerouting</strong>, you can perform several actions
+defined in different parts of VyOS configuration in this stage. This
+includes:</p>
+<ul class="simple">
+<li><p><strong>Source NAT</strong>: Rules you define under <code class="docutils literal notranslate">set [nat | nat66]
+source...</code>.</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+<p>If the interface where the packet was received is part of a bridge, the
+packet is processed at the <strong>Bridge Layer</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Prerouting (Bridge)</strong>: The bridge processes all packets it receives in
+this stage, regardless of the destination. First, you can apply filters
+here, or you can configure rules that ignore the connection tracking
+system. The relevant configuration that applies:</p>
+<ul>
+<li><p><code class="docutils literal notranslate">set firewall bridge prerouting filter ...</code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Forward (Bridge)</strong>: The stage where you filter and control traffic
+that passes through the bridge:</p>
+<ul>
+<li><p><code class="docutils literal notranslate">set firewall bridge forward filter ...</code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Input (Bridge)</strong>: The stage where you filter and control traffic
+destined for the bridge itself:</p>
+<ul>
+<li><p><code class="docutils literal notranslate">set firewall bridge input filter ...</code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Output (Bridge)</strong>: The stage where you filter and control traffic that
+the bridge originates:</p>
+<ul>
+<li><p><code class="docutils literal notranslate">set firewall bridge output filter ...</code>.</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+<p>The following is the overall structure of the VyOS firewall CLI:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
+    * bridge
+         - forward
+            + filter
+         - input
+            + filter
+         - output
+            + filter
+         - prerouting
+            + filter
+         - name
+            + custom_name
+    * flowtable
+         - custom_flow_table
+            + ...
+    * global-options
+         + all-ping
+         + broadcast-ping
+         + ...
+    * group
+         - address-group
+         - ipv6-address-group
+         - network-group
+         - ipv6-network-group
+         - interface-group
+         - mac-group
+         - port-group
+         - domain-group
+    * ipv4
+         - forward
+            + filter
+         - input
+            + filter
+         - output
+            + filter
+            + raw
+         - prerouting
+            + raw
+         - name
+            + custom_name
+    * ipv6
+         - forward
+            + filter
+         - input
+            + filter
+         - output
+            + filter
+            + raw
+         - prerouting
+            + raw
+         - ipv6-name
+            + custom_name
+    * zone
+         - custom_zone_name
+            + ...
+</pre></div>
+</div>
+<p>Here is a list of VyOS firewall CLI subcommands and their
+corresponding pages in the documentation:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge …
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configure bridge firewall rules for traffic at the bridge layer.
+See the Bridge Firewall Configuration page for detailed information.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall flowtable …
+<a class="cmdlink" href="#cfgcmd-set-firewall-flowtable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configure firewall flowtables for stateful connection tracking and rules.
+See the Flowtables Firewall Configuration page for detailed information.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options …
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configure global firewall options such as <code class="docutils literal notranslate">all-ping</code>, <code class="docutils literal notranslate">broadcast-ping</code>,
+<code class="docutils literal notranslate">syn-cookies</code>, and other system-wide firewall settings.
+See the Global Firewall Options page for detailed information.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group …
+<a class="cmdlink" href="#cfgcmd-set-firewall-group" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Organize firewall rules by creating reusable address, network, interface,
+MAC, port, and domain groups. Use groups in multiple rules to simplify
+configuration and maintenance.
+See the Firewall Groups page for detailed information.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv4 …
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configure IPv4-specific firewall rules.
+See the IPv4 Firewall Configuration page for detailed information.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 …
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configure IPv6-specific firewall rules.
+See the IPv6 Firewall Configuration page for detailed information.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone …
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configure zone-based firewall policies for controlling traffic between
+different network zones.
+See the Zone-Based Firewall Configuration page for detailed information.</p>
+</div>
+</div>
+<p>For more information on firewall configuration, see the following pages:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/global-options.html">Global Options Firewall Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/groups.html">Firewall groups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/bridge.html">Bridge Firewall Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv4.html">IPv4 Firewall Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv6.html">IPv6 Firewall Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/flowtables.html">Flowtables Firewall Configuration</a></li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>For more information on Netfilter hooks and Linux networking packet flows,
+see the <a class="reference external" href="https://wiki.nftables.org/wiki-nftables/index.php/Netfilter_hooks">Netfilter-Hooks</a>
+documentation.</p>
+</div>
+<section id="zone-based-firewall">
+<h2>Zonenbasiertes Firewall</h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/zone.html">Zonenbasiertes Firewall</a></li>
+</ul>
+</div>
+<p>With zone-based firewalls, a new concept applies. In addition to the standard
+in and out traffic flows, a local flow enables traffic originating from and
+destined to the router itself. This means you must configure additional rules to
+secure the firewall from the network, in addition to the existing inbound and
+outbound rules.</p>
+<p>To configure VyOS with zone-based firewall, see
+<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/zone.html">Zonenbasiertes Firewall-Konfigurations</a>.</p>
+<p>As the following example image shows, you must configure rules to allow or block
+traffic to or from the services running on the device that have open
+connections on that interface.</p>
+<figure class="align-default">
+<img alt="../../_images/firewall-zonebased.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-zonebased.webp" />
+</figure>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

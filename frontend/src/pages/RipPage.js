@@ -1,10 +1,13 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -21,49 +24,9 @@ function isPresent(value) {
   return true;
 }
 
-function validateIPv4(value) {
-  if (!value) return '';
-  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return 'IPv4 地址格式错误';
-  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return 'IPv4 地址格式错误';
-  return '';
-}
+// Validation functions moved inside setup() for i18n access
 
-function validateNetwork(value) {
-  if (!value) return '';
-  const m = value.match(/^(\d{1,3}\.){3}\d{1,3}\/(\d{1,2})$/);
-  if (!m) return '网络格式错误 (例如: 192.168.1.0/24)';
-  if (parseInt(m[2], 10) < 0 || parseInt(m[2], 10) > 32) return '前缀长度必须在 0-32 之间';
-  return '';
-}
-
-function validateMetric(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 0 || n > 16) return '度量值必须在 0-16 之间';
-  return '';
-}
-
-function validateDistance(value) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 255) return '管理距离必须在 1-255 之间';
-  return '';
-}
-
-function validateTimer(value, min, max, name) {
-  if (!value) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < min || n > max) return `${name}必须在 ${min}-${max} 之间`;
-  return '';
-}
-
-function validateVersion(value) {
-  if (!value) return '';
-  if (value !== '1' && value !== '2' && value !== '2R') return '版本必须为 1, 2 或 2R';
-  return '';
-}
-
-// RIP 配置转换
+// RIP configuration conversion
 function configToForm(data = {}) {
   const interfaces = [];
   const interfaceData = data.interface || {};
@@ -237,6 +200,8 @@ function configToConfig(form) {
 export default defineComponent({
   name: 'RipPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -248,6 +213,49 @@ export default defineComponent({
     const newRoute = ref('');
     const newPassiveInterface = ref('');
     const interfaces = ref([]);
+
+    // Validation functions with i18n
+    function validateIPv4(value) {
+      if (!value) return '';
+      if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return t('validation.ipv4Format');
+      if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return t('validation.ipv4Format');
+      return '';
+    }
+
+    function validateNetwork(value) {
+      if (!value) return '';
+      const m = value.match(/^(\d{1,3}\.){3}\d{1,3}\/(\d{1,2})$/);
+      if (!m) return t('validation.networkFormat');
+      if (parseInt(m[2], 10) < 0 || parseInt(m[2], 10) > 32) return t('validation.prefixLengthRange');
+      return '';
+    }
+
+    function validateMetric(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 0 || n > 16) return t('validation.metricRange');
+      return '';
+    }
+
+    function validateDistance(value) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 255) return t('validation.distanceRange');
+      return '';
+    }
+
+    function validateTimer(value, min, max, name) {
+      if (!value) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < min || n > max) return t('validation.timerRange');
+      return '';
+    }
+
+    function validateVersion(value) {
+      if (!value) return '';
+      if (value !== '1' && value !== '2' && value !== '2R') return t('validation.versionInvalid');
+      return '';
+    }
 
     const interfaceModalVisible = ref(false);
     const editingInterfaceIndex = ref(-1);
@@ -264,24 +272,24 @@ export default defineComponent({
     const editingRedistributeIndex = ref(-1);
     const redistributeForm = ref({ protocol: '', metric: '', 'route-map': '' });
 
-    const interfaceColumns = [
-      { key: 'name', title: '接口名称' },
-      { key: 'receive-version', title: '接收版本' },
-      { key: 'send-version', title: '发送版本' },
-      { key: 'split-horizon', title: '水平分割' },
-    ];
+    const interfaceColumns = computed(() => [
+      { key: 'name', title: t('routing.rip.col.interfaceName') },
+      { key: 'receive-version', title: t('routing.rip.col.receiveVersion') },
+      { key: 'send-version', title: t('routing.rip.col.sendVersion') },
+      { key: 'split-horizon', title: t('routing.rip.col.splitHorizon') },
+    ]);
 
-    const networkDistColumns = [
-      { key: 'network', title: '网络' },
-      { key: 'access-list', title: '访问列表' },
-      { key: 'distance', title: '距离' },
-    ];
+    const networkDistColumns = computed(() => [
+      { key: 'network', title: t('routing.rip.col.network') },
+      { key: 'access-list', title: t('routing.rip.col.accessList') },
+      { key: 'distance', title: t('routing.rip.col.distance') },
+    ]);
 
-    const redistributeColumns = [
-      { key: 'protocol', title: '协议' },
-      { key: 'metric', title: '度量值' },
-      { key: 'route-map', title: '路由映射' },
-    ];
+    const redistributeColumns = computed(() => [
+      { key: 'protocol', title: t('routing.rip.col.protocol') },
+      { key: 'metric', title: t('routing.rip.col.metric') },
+      { key: 'route-map', title: t('routing.rip.col.routeMap') },
+    ]);
 
     const commandPath = computed(() => {
       if (activeTab.value === 'interfaces') return 'protocols rip interface';
@@ -300,18 +308,18 @@ export default defineComponent({
       { value: 'static', label: 'Static' },
     ];
 
-    const SPLIT_HORIZON_OPTIONS = [
-      { value: '', label: '默认' },
-      { value: 'disable', label: '禁用' },
+    const SPLIT_HORIZON_OPTIONS = computed(() => [
+      { value: '', label: t('option.default') },
+      { value: 'disable', label: t('option.disable') },
       { value: 'poison-reverse', label: 'Poison Reverse' },
-    ];
+    ]);
 
-    const VERSION_OPTIONS = [
-      { value: '', label: '默认' },
+    const VERSION_OPTIONS = computed(() => [
+      { value: '', label: t('option.default') },
       { value: '1', label: 'RIPv1' },
       { value: '2', label: 'RIPv2' },
       { value: '2R', label: 'RIPv2R' },
-    ];
+    ]);
 
     async function load() {
       loading.value = true;
@@ -338,19 +346,19 @@ export default defineComponent({
     async function save() {
       if (config.value['default-distance']) {
         const err = validateDistance(config.value['default-distance']);
-        if (err) return alert(`默认距离：${err}`);
+        if (err) return showError({ message: t('routing.rip.error.defaultDistance') + err });
       }
       if (config.value['default-metric']) {
         const err = validateMetric(config.value['default-metric']);
-        if (err) return alert(`默认度量值：${err}`);
+        if (err) return showError({ message: t('routing.rip.error.defaultMetric') + err });
       }
       for (let i = 0; i < config.value.networks.length; i++) {
         const err = validateNetwork(config.value.networks[i]);
-        if (err) return alert(`网络 ${i + 1}：${err}`);
+        if (err) return showError({ message: t('routing.rip.error.network', { index: i + 1 }) + err });
       }
       for (let i = 0; i < config.value.neighbors.length; i++) {
         const err = validateIPv4(config.value.neighbors[i]);
-        if (err) return alert(`邻居 ${i + 1}：${err}`);
+        if (err) return showError({ message: t('routing.rip.error.neighbor', { index: i + 1 }) + err });
       }
 
       saving.value = true;
@@ -358,6 +366,7 @@ export default defineComponent({
       try {
         const payload = configToConfig(config.value);
         await configApi.set('protocols rip', payload);
+        configStore.markPending();
         saved.value = true;
         setTimeout(() => (saved.value = false), 2000);
         interfaceModalVisible.value = false;
@@ -419,7 +428,7 @@ export default defineComponent({
     function removeMd5Key(idx) { interfaceForm.value.md5Keys.splice(idx, 1); }
 
     function saveInterface() {
-      if (!interfaceForm.value.name) return alert('请输入接口名称');
+      if (!interfaceForm.value.name) return showError({ message: t('routing.rip.error.interfaceNameRequired') });
       if (editingInterfaceIndex.value >= 0) {
         config.value.interfaces.splice(editingInterfaceIndex.value, 1, JSON.parse(JSON.stringify(interfaceForm.value)));
       } else {
@@ -439,9 +448,9 @@ export default defineComponent({
     }
 
     function saveNetworkDist() {
-      if (!networkDistForm.value.network) return alert('请输入网络');
+      if (!networkDistForm.value.network) return showError({ message: t('routing.rip.error.networkRequired') });
       const err = validateNetwork(networkDistForm.value.network);
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       if (editingNetworkDistIndex.value >= 0) {
         config.value.networkDistances.splice(editingNetworkDistIndex.value, 1, JSON.parse(JSON.stringify(networkDistForm.value)));
       } else {
@@ -461,10 +470,10 @@ export default defineComponent({
     }
 
     function saveRedistribute() {
-      if (!redistributeForm.value.protocol) return alert('请选择协议');
+      if (!redistributeForm.value.protocol) return showError({ message: t('routing.rip.error.protocolRequired') });
       if (redistributeForm.value.metric) {
         const err = validateMetric(redistributeForm.value.metric);
-        if (err) return alert(err);
+        if (err) return showError({ message: err });
       }
       if (editingRedistributeIndex.value >= 0) {
         config.value.redistributes.splice(editingRedistributeIndex.value, 1, JSON.parse(JSON.stringify(redistributeForm.value)));
@@ -474,22 +483,66 @@ export default defineComponent({
       redistributeModalVisible.value = false;
     }
 
+    // Delete confirmation modals
+    const deleteInterfaceModalVisible = ref(false);
+    const pendingDeleteInterfaceNames = ref([]);
+
+    const deleteNetworkDistModalVisible = ref(false);
+    const pendingDeleteNetworkDistNames = ref([]);
+
+    const deleteRedistributeModalVisible = ref(false);
+    const pendingDeleteRedistributeNames = ref([]);
+
     function deleteInterface(index) {
-      if (confirm('确定删除此接口？')) config.value.interfaces.splice(index, 1);
+      pendingDeleteInterfaceNames.value = [config.value.interfaces[index].name];
+      deleteInterfaceModalVisible.value = true;
     }
+
+    function confirmDeleteInterface() {
+      const index = config.value.interfaces.findIndex(a => a.name === pendingDeleteInterfaceNames.value[0]);
+      if (index >= 0) {
+        config.value.interfaces.splice(index, 1);
+      }
+      deleteInterfaceModalVisible.value = false;
+      pendingDeleteInterfaceNames.value = [];
+    }
+
     function deleteNetworkDist(index) {
-      if (confirm('确定删除此网络距离配置？')) config.value.networkDistances.splice(index, 1);
+      pendingDeleteNetworkDistNames.value = [config.value.networkDistances[index].network];
+      deleteNetworkDistModalVisible.value = true;
     }
+
+    function confirmDeleteNetworkDist() {
+      const index = config.value.networkDistances.findIndex(a => a.network === pendingDeleteNetworkDistNames.value[0]);
+      if (index >= 0) {
+        config.value.networkDistances.splice(index, 1);
+      }
+      deleteNetworkDistModalVisible.value = false;
+      pendingDeleteNetworkDistNames.value = [];
+    }
+
     function deleteRedistribute(index) {
-      if (confirm('确定删除此重分发配置？')) config.value.redistributes.splice(index, 1);
+      pendingDeleteRedistributeNames.value = [config.value.redistributes[index].protocol];
+      deleteRedistributeModalVisible.value = true;
+    }
+
+    function confirmDeleteRedistribute() {
+      const index = config.value.redistributes.findIndex(a => a.protocol === pendingDeleteRedistributeNames.value[0]);
+      if (index >= 0) {
+        config.value.redistributes.splice(index, 1);
+      }
+      deleteRedistributeModalVisible.value = false;
+      pendingDeleteRedistributeNames.value = [];
     }
 
     onMounted(() => {
       load();
       loadInterfaces();
+      onMenuRefresh(load);
     });
 
-    return {
+    return {t,
+      
       loading, saving, saved, config, activeTab, writeDisabled,
       interfaces,
       newNeighbor, newNetwork, newRoute, newPassiveInterface,
@@ -502,6 +555,10 @@ export default defineComponent({
       REDISTRIBUTE_PROTOCOL_OPTIONS, SPLIT_HORIZON_OPTIONS, VERSION_OPTIONS, commandPath,
       openInterfaceModal, openNetworkDistModal, openRedistributeModal,
       deleteInterface, deleteNetworkDist, deleteRedistribute,
+      confirmDeleteInterface, confirmDeleteNetworkDist, confirmDeleteRedistribute,
+      deleteInterfaceModalVisible, pendingDeleteInterfaceNames,
+      deleteNetworkDistModalVisible, pendingDeleteNetworkDistNames,
+      deleteRedistributeModalVisible, pendingDeleteRedistributeNames,
       addMd5Key, removeMd5Key, saveInterface, saveNetworkDist, saveRedistribute,
       save, configToConfig,
     };
@@ -509,39 +566,39 @@ export default defineComponent({
   components: { TabGroup, ToolbarButton, DataTable, DraggableModal },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('msg.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本设置' },
-        { key: 'interfaces', title: '接口' },
-        { key: 'neighbors', title: '邻居' },
-        { key: 'networks', title: '网络' },
-        { key: 'network-dist', title: '网络距离' },
-        { key: 'routes', title: '静态路由' },
-        { key: 'redistribute', title: '重分发' },
-        { key: 'passive', title: '被动接口' },
-        { key: 'timers', title: '定时器' },
-        { key: 'default-info', title: '默认信息' }
+        { key: 'basic', title: t('routing.rip.tab.basic') },
+        { key: 'interfaces', title: t('routing.rip.tab.interfaces') },
+        { key: 'neighbors', title: t('routing.rip.tab.neighbors') },
+        { key: 'networks', title: t('routing.rip.tab.networks') },
+        { key: 'network-dist', title: t('routing.rip.tab.networkDist') },
+        { key: 'routes', title: t('routing.rip.tab.routes') },
+        { key: 'redistribute', title: t('routing.rip.tab.redistribute') },
+        { key: 'passive', title: t('routing.rip.tab.passive') },
+        { key: 'timers', title: t('routing.rip.tab.timers') },
+        { key: 'default-info', title: t('routing.rip.tab.defaultInfo') }
       ]">
 
         <template #basic>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">基本配置</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('routing.rip.basic.title') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">默认管理距离</label>
+                  <label class="form-label">{{ t('routing.rip.basic.defaultDistance') }}</label>
                   <input type="number" class="form-control" v-model="config['default-distance']" min="1" max="255" placeholder="1-255" style="width:100%;" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">默认度量值</label>
+                  <label class="form-label">{{ t('routing.rip.basic.defaultMetric') }}</label>
                   <input type="number" class="form-control" v-model="config['default-metric']" min="0" max="16" placeholder="0-16" style="width:100%;" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">路由映射</label>
-                  <input type="text" class="form-control" v-model="config['route-map']" placeholder="路由映射名称" style="width:100%;" />
+                  <label class="form-label">{{ t('routing.rip.basic.routeMap') }}</label>
+                  <input type="text" class="form-control" v-model="config['route-map']" :placeholder="t('routing.rip.basic.routeMapPlaceholder')" style="width:100%;" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">RIP 版本</label>
+                  <label class="form-label">{{ t('routing.rip.basic.version') }}</label>
                   <select class="form-control" v-model="config.version" style="width:100%;">
                     <option v-for="opt in VERSION_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                   </select>
@@ -549,23 +606,23 @@ export default defineComponent({
               </div>
             </div>
             <div style="margin-top:16px; border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">分发列表</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('routing.rip.basic.distributeList') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">访问列表 (入)</label>
-                  <input type="text" class="form-control" v-model="config['distribute-list']['access-list'].in" placeholder="访问列表名称" style="width:100%;" />
+                  <label class="form-label">{{ t('routing.rip.basic.accessListIn') }}</label>
+                  <input type="text" class="form-control" v-model="config['distribute-list']['access-list'].in" :placeholder="t('routing.rip.basic.accessListPlaceholder')" style="width:100%;" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">访问列表 (出)</label>
-                  <input type="text" class="form-control" v-model="config['distribute-list']['access-list'].out" placeholder="访问列表名称" style="width:100%;" />
+                  <label class="form-label">{{ t('routing.rip.basic.accessListOut') }}</label>
+                  <input type="text" class="form-control" v-model="config['distribute-list']['access-list'].out" :placeholder="t('routing.rip.basic.accessListPlaceholder')" style="width:100%;" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">前缀列表 (入)</label>
-                  <input type="text" class="form-control" v-model="config['distribute-list']['prefix-list'].in" placeholder="前缀列表名称" style="width:100%;" />
+                  <label class="form-label">{{ t('routing.rip.basic.prefixListIn') }}</label>
+                  <input type="text" class="form-control" v-model="config['distribute-list']['prefix-list'].in" :placeholder="t('routing.rip.basic.prefixListPlaceholder')" style="width:100%;" />
                 </div>
                 <div class="form-row">
-                  <label class="form-label">前缀列表 (出)</label>
-                  <input type="text" class="form-control" v-model="config['distribute-list']['prefix-list'].out" placeholder="前缀列表名称" style="width:100%;" />
+                  <label class="form-label">{{ t('routing.rip.basic.prefixListOut') }}</label>
+                  <input type="text" class="form-control" v-model="config['distribute-list']['prefix-list'].out" :placeholder="t('routing.rip.basic.prefixListPlaceholder')" style="width:100%;" />
                 </div>
               </div>
             </div>
@@ -581,15 +638,15 @@ export default defineComponent({
         <template #neighbors>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">邻居地址</label>
+              <label class="form-label">{{ t('routing.rip.neighbors.address') }}</label>
               <div style="display:flex; gap:10px; align-items:center;">
-                <input type="text" class="form-control" v-model="newNeighbor" placeholder="IPv4 地址" style="width:100%;" />
-                <ToolbarButton size="small" @click="addNeighbor">添加</ToolbarButton>
+                <input type="text" class="form-control" v-model="newNeighbor" :placeholder="t('routing.rip.neighbors.addressPlaceholder')" style="width:100%;" />
+                <ToolbarButton size="small" @click="addNeighbor">{{ t('btn.add') }}</ToolbarButton>
               </div>
             </div>
             <div v-for="(n, idx) in config.neighbors" :key="idx" style="display:flex; gap:10px; margin-bottom:5px; align-items:center;">
               <span>{{ n }}</span>
-              <ToolbarButton size="small" danger @click="removeNeighbor(idx)">删除</ToolbarButton>
+              <ToolbarButton size="small" danger @click="removeNeighbor(idx)">{{ t('btn.delete') }}</ToolbarButton>
             </div>
           </div>
         </template>
@@ -597,15 +654,15 @@ export default defineComponent({
         <template #networks>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">网络</label>
+              <label class="form-label">{{ t('routing.rip.networks.label') }}</label>
               <div style="display:flex; gap:10px; align-items:center;">
-                <input type="text" class="form-control" v-model="newNetwork" placeholder="例如: 192.168.1.0/24" style="width:100%;" />
-                <ToolbarButton size="small" @click="addNetwork">添加</ToolbarButton>
+                <input type="text" class="form-control" v-model="newNetwork" :placeholder="t('routing.rip.networks.placeholder')" style="width:100%;" />
+                <ToolbarButton size="small" @click="addNetwork">{{ t('btn.add') }}</ToolbarButton>
               </div>
             </div>
             <div v-for="(n, idx) in config.networks" :key="idx" style="display:flex; gap:10px; margin-bottom:5px; align-items:center;">
               <span>{{ n }}</span>
-              <ToolbarButton size="small" danger @click="removeNetwork(idx)">删除</ToolbarButton>
+              <ToolbarButton size="small" danger @click="removeNetwork(idx)">{{ t('btn.delete') }}</ToolbarButton>
             </div>
           </div>
         </template>
@@ -619,15 +676,15 @@ export default defineComponent({
         <template #routes>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">静态路由</label>
+              <label class="form-label">{{ t('routing.rip.routes.label') }}</label>
               <div style="display:flex; gap:10px; align-items:center;">
-                <input type="text" class="form-control" v-model="newRoute" placeholder="例如: 10.0.0.0/8" style="width:100%;" />
-                <ToolbarButton size="small" @click="addRoute">添加</ToolbarButton>
+                <input type="text" class="form-control" v-model="newRoute" :placeholder="t('routing.rip.routes.placeholder')" style="width:100%;" />
+                <ToolbarButton size="small" @click="addRoute">{{ t('btn.add') }}</ToolbarButton>
               </div>
             </div>
             <div v-for="(r, idx) in config.routes" :key="idx" style="display:flex; gap:10px; margin-bottom:5px; align-items:center;">
               <span>{{ r }}</span>
-              <ToolbarButton size="small" danger @click="removeRoute(idx)">删除</ToolbarButton>
+              <ToolbarButton size="small" danger @click="removeRoute(idx)">{{ t('btn.delete') }}</ToolbarButton>
             </div>
           </div>
         </template>
@@ -641,18 +698,18 @@ export default defineComponent({
         <template #passive>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">被动接口</label>
+              <label class="form-label">{{ t('routing.rip.passive.label') }}</label>
               <div style="display:flex; gap:10px; align-items:center;">
                 <select class="form-control" v-model="newPassiveInterface" style="width:100%;">
-                  <option value="">请选择接口</option>
+                  <option value="">{{ t('routing.rip.passive.selectPlaceholder') }}</option>
                   <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
                 </select>
-                <ToolbarButton size="small" @click="addPassiveInterface">添加</ToolbarButton>
+                <ToolbarButton size="small" @click="addPassiveInterface">{{ t('btn.add') }}</ToolbarButton>
               </div>
             </div>
             <div v-for="(iface, idx) in config['passive-interface']" :key="idx" style="display:flex; gap:10px; margin-bottom:5px; align-items:center;">
               <span>{{ iface }}</span>
-              <ToolbarButton size="small" danger @click="removePassiveInterface(idx)">删除</ToolbarButton>
+              <ToolbarButton size="small" danger @click="removePassiveInterface(idx)">{{ t('btn.delete') }}</ToolbarButton>
             </div>
           </div>
         </template>
@@ -660,16 +717,16 @@ export default defineComponent({
         <template #timers>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">垃圾回收定时器</label>
-              <input type="number" class="form-control" v-model="config.timers['garbage-collection']" min="1" max="65535" placeholder="默认: 120 秒" style="width:100%;" />
+              <label class="form-label">{{ t('routing.rip.timers.garbageCollection') }}</label>
+              <input type="number" class="form-control" v-model="config.timers['garbage-collection']" min="1" max="65535" :placeholder="t('routing.rip.timers.garbageCollectionPlaceholder')" style="width:100%;" />
             </div>
             <div class="form-row">
-              <label class="form-label">超时定时器</label>
-              <input type="number" class="form-control" v-model="config.timers.timeout" min="1" max="65535" placeholder="默认: 180 秒" style="width:100%;" />
+              <label class="form-label">{{ t('routing.rip.timers.timeout') }}</label>
+              <input type="number" class="form-control" v-model="config.timers.timeout" min="1" max="65535" :placeholder="t('routing.rip.timers.timeoutPlaceholder')" style="width:100%;" />
             </div>
             <div class="form-row">
-              <label class="form-label">更新定时器</label>
-              <input type="number" class="form-control" v-model="config.timers.update" min="1" max="65535" placeholder="默认: 30 秒" style="width:100%;" />
+              <label class="form-label">{{ t('routing.rip.timers.update') }}</label>
+              <input type="number" class="form-control" v-model="config.timers.update" min="1" max="65535" :placeholder="t('routing.rip.timers.updatePlaceholder')" style="width:100%;" />
             </div>
           </div>
         </template>
@@ -677,57 +734,53 @@ export default defineComponent({
         <template #default-info>
           <div style="padding:16px;">
             <div class="form-row">
-              <label class="form-label">通告默认路由</label>
+              <label class="form-label">{{ t('routing.rip.defaultInfo.originate') }}</label>
               <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['default-information'].originate" /></label>
             </div>
           </div>
         </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
-
       <!-- Interface Modal -->
-      <DraggableModal v-model:visible="interfaceModalVisible" :title="editingInterfaceIndex >= 0 ? '编辑 RIP 接口' : '添加 RIP 接口'" width="600px" @confirm="saveInterface">
+      <DraggableModal v-model:visible="interfaceModalVisible" :title="editingInterfaceIndex >= 0 ? t('routing.rip.modal.editInterface') : t('routing.rip.modal.addInterface')" width="600px" @confirm="saveInterface">
         <div class="form-row">
-          <label class="form-label">接口名称 *</label>
+          <label class="form-label">{{ t('routing.rip.modal.interfaceName') }} *</label>
           <template v-if="editingInterfaceIndex >= 0">
             <input type="text" class="form-control" v-model="interfaceForm.name"
                    style="width:100%;" disabled />
           </template>
           <template v-else>
             <select class="form-control" v-model="interfaceForm.name" style="width:100%;">
-              <option value="">请选择接口</option>
+              <option value="">{{ t('routing.rip.modal.selectInterface') }}</option>
               <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
             </select>
           </template>
         </div>
         <div class="form-row">
-          <label class="form-label">明文密码</label>
-          <input type="password" class="form-control" v-model="interfaceForm['plaintext-password']" placeholder="认证密码" style="width:100%;" />
+          <label class="form-label">{{ t('routing.rip.modal.plaintextPassword') }}</label>
+          <input type="password" class="form-control" v-model="interfaceForm['plaintext-password']" :placeholder="t('routing.rip.modal.passwordPlaceholder')" style="width:100%;" />
         </div>
-        <h4 style="margin-top:20px;">MD5 密钥</h4>
+        <h4 style="margin-top:20px;">{{ t('routing.rip.modal.md5Keys') }}</h4>
         <div v-for="(key, idx) in interfaceForm.md5Keys" :key="idx" style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
-          <input type="number" class="form-control" v-model="key['key-id']" min="1" max="255" placeholder="密钥 ID" style="width:100px;" />
-          <input type="password" class="form-control" v-model="key.password" placeholder="密码" style="flex:1;" />
-          <ToolbarButton size="small" danger @click="removeMd5Key(idx)">删除</ToolbarButton>
+          <input type="number" class="form-control" v-model="key['key-id']" min="1" max="255" :placeholder="t('routing.rip.modal.keyId')" style="width:100px;" />
+          <input type="password" class="form-control" v-model="key.password" :placeholder="t('routing.rip.modal.password')" style="flex:1;" />
+          <ToolbarButton size="small" danger @click="removeMd5Key(idx)">{{ t('btn.delete') }}</ToolbarButton>
         </div>
-        <ToolbarButton size="small" @click="addMd5Key">添加 MD5 密钥</ToolbarButton>
+        <ToolbarButton size="small" @click="addMd5Key">{{ t('routing.rip.modal.addMd5Key') }}</ToolbarButton>
         <div class="form-row" style="margin-top:20px;">
-          <label class="form-label">接收版本</label>
+          <label class="form-label">{{ t('routing.rip.modal.receiveVersion') }}</label>
           <select class="form-control" v-model="interfaceForm['receive-version']" style="width:100%;">
             <option v-for="opt in VERSION_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">发送版本</label>
+          <label class="form-label">{{ t('routing.rip.modal.sendVersion') }}</label>
           <select class="form-control" v-model="interfaceForm['send-version']" style="width:100%;">
             <option v-for="opt in VERSION_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">水平分割</label>
+          <label class="form-label">{{ t('routing.rip.modal.splitHorizon') }}</label>
           <select class="form-control" v-model="interfaceForm['split-horizon']" style="width:100%;">
             <option v-for="opt in SPLIT_HORIZON_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
@@ -735,36 +788,58 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Network Distance Modal -->
-      <DraggableModal v-model:visible="networkDistModalVisible" :title="editingNetworkDistIndex >= 0 ? '编辑网络距离' : '添加网络距离'" width="600px" @confirm="saveNetworkDist">
+      <DraggableModal v-model:visible="networkDistModalVisible" :title="editingNetworkDistIndex >= 0 ? t('routing.rip.modal.editNetworkDist') : t('routing.rip.modal.addNetworkDist')" width="600px" @confirm="saveNetworkDist">
         <div class="form-row">
-          <label class="form-label">网络 *</label>
-          <input type="text" class="form-control" v-model="networkDistForm.network" placeholder="例如: 192.168.1.0/24" style="width:100%;" :disabled="editingNetworkDistIndex >= 0" />
+          <label class="form-label">{{ t('routing.rip.modal.network') }} *</label>
+          <input type="text" class="form-control" v-model="networkDistForm.network" :placeholder="t('routing.rip.modal.networkPlaceholder')" style="width:100%;" :disabled="editingNetworkDistIndex >= 0" />
         </div>
         <div class="form-row">
-          <label class="form-label">访问列表</label>
-          <input type="text" class="form-control" v-model="networkDistForm['access-list']" placeholder="访问列表名称" style="width:100%;" />
+          <label class="form-label">{{ t('routing.rip.modal.accessList') }}</label>
+          <input type="text" class="form-control" v-model="networkDistForm['access-list']" :placeholder="t('routing.rip.modal.accessListPlaceholder')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">距离</label>
+          <label class="form-label">{{ t('routing.rip.modal.distance') }}</label>
           <input type="number" class="form-control" v-model="networkDistForm.distance" min="1" max="255" placeholder="1-255" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- Redistribute Modal -->
-      <DraggableModal v-model:visible="redistributeModalVisible" :title="editingRedistributeIndex >= 0 ? '编辑 RIP 重分发' : '添加 RIP 重分发'" width="600px" @confirm="saveRedistribute">
+      <DraggableModal v-model:visible="redistributeModalVisible" :title="editingRedistributeIndex >= 0 ? t('routing.rip.modal.editRedistribute') : t('routing.rip.modal.addRedistribute')" width="600px" @confirm="saveRedistribute">
         <div class="form-row">
-          <label class="form-label">协议 *</label>
+          <label class="form-label">{{ t('routing.rip.modal.protocol') }} *</label>
           <select class="form-control" v-model="redistributeForm.protocol" style="width:100%;" :disabled="editingRedistributeIndex >= 0">
             <option v-for="opt in REDISTRIBUTE_PROTOCOL_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">度量值</label>
+          <label class="form-label">{{ t('routing.rip.modal.metric') }}</label>
           <input type="number" class="form-control" v-model="redistributeForm.metric" min="0" max="16" placeholder="0-16" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">路由映射</label>
-          <input type="text" class="form-control" v-model="redistributeForm['route-map']" placeholder="路由映射名称" style="width:100%;" />
+          <label class="form-label">{{ t('routing.rip.modal.routeMap') }}</label>
+          <input type="text" class="form-control" v-model="redistributeForm['route-map']" :placeholder="t('routing.rip.modal.routeMapPlaceholder')" style="width:100%;" />
+        </div>
+      </DraggableModal>
+
+      <!-- Delete Confirmation Modals -->
+      <DraggableModal v-model:visible="deleteInterfaceModalVisible" :title="t('modal.confirmDelete')" width="400px" @confirm="confirmDeleteInterface">
+        <div>{{ t('routing.rip.delete.confirmInterface') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteInterfaceNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="deleteNetworkDistModalVisible" :title="t('modal.confirmDelete')" width="400px" @confirm="confirmDeleteNetworkDist">
+        <div>{{ t('routing.rip.delete.confirmNetworkDist') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNetworkDistNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="deleteRedistributeModalVisible" :title="t('modal.confirmDelete')" width="400px" @confirm="confirmDeleteRedistribute">
+        <div>{{ t('routing.rip.delete.confirmRedistribute') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteRedistributeNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
     </div>

@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { opModeApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
@@ -52,51 +52,52 @@ function parseIpStats(output) {
 export default defineComponent({
   name: 'InterfaceStatsPage',
   setup() {
+    const { t } = inject('i18n');
     const loading = ref(false);
     const activeTab = ref('physical');
     const physicalRows = ref([]);
     const virtualRows = ref([]);
 
-    const tabs = [
-      { key: 'physical', title: '物理接口' },
-      { key: 'virtual', title: '非物理接口' },
-    ];
+    const tabs = computed(() => [
+      { key: 'physical', title: t('interfaceStats.physical_interfaces') },
+      { key: 'virtual', title: t('interfaceStats.non_physical_interfaces') },
+    ]);
 
-    const physicalColumns = [
-      { key: 'interface', title: '接口' },
-      { key: 'rx_packets', title: 'RX 包' },
-      { key: 'tx_packets', title: 'TX 包' },
-      { key: 'rx_bytes', title: 'RX 字节' },
-      { key: 'tx_bytes', title: 'TX 字节' },
-      { key: 'rx_errors', title: 'RX 错误' },
-      { key: 'tx_errors', title: 'TX 错误' },
-      { key: 'rx_dropped', title: 'RX 丢弃' },
-      { key: 'tx_dropped', title: 'TX 丢弃' },
-      { key: 'multicast', title: '组播' },
-      { key: 'collisions', title: '冲突' },
-    ];
+    const physicalColumns = computed(() => [
+      { key: 'interface', title: t('interfaceStats.interface') },
+      { key: 'rx_packets', title: t('interfaceStats.rx_packets') },
+      { key: 'tx_packets', title: t('interfaceStats.tx_packets') },
+      { key: 'rx_bytes', title: t('interfaceStats.rx_bytes') },
+      { key: 'tx_bytes', title: t('interfaceStats.tx_bytes') },
+      { key: 'rx_errors', title: t('interfaceStats.rx_errors') },
+      { key: 'tx_errors', title: t('interfaceStats.tx_errors') },
+      { key: 'rx_dropped', title: t('interfaceStats.rx_dropped') },
+      { key: 'tx_dropped', title: t('interfaceStats.tx_dropped') },
+      { key: 'multicast', title: t('interfaceStats.multicast') },
+      { key: 'collisions', title: t('interfaceStats.collisions') },
+    ]);
 
-    const virtualColumns = [
-      { key: 'interface', title: '接口' },
-      { key: 'rx_packets', title: 'RX 包' },
-      { key: 'rx_bytes', title: 'RX 字节' },
-      { key: 'rx_errors', title: 'RX 错误' },
-      { key: 'rx_dropped', title: 'RX 丢弃' },
-      { key: 'rx_overruns', title: 'RX 溢出' },
-      { key: 'tx_packets', title: 'TX 包' },
-      { key: 'tx_bytes', title: 'TX 字节' },
-      { key: 'tx_errors', title: 'TX 错误' },
-      { key: 'tx_dropped', title: 'TX 丢弃' },
-      { key: 'tx_overruns', title: 'TX 溢出' },
-      { key: 'collisions', title: '冲突' },
-    ];
+    const virtualColumns = computed(() => [
+      { key: 'interface', title: t('interfaceStats.interface') },
+      { key: 'rx_packets', title: t('interfaceStats.rx_packets') },
+      { key: 'rx_bytes', title: t('interfaceStats.rx_bytes') },
+      { key: 'rx_errors', title: t('interfaceStats.rx_errors') },
+      { key: 'rx_dropped', title: t('interfaceStats.rx_dropped') },
+      { key: 'rx_overruns', title: t('interfaceStats.rx_overruns') },
+      { key: 'tx_packets', title: t('interfaceStats.tx_packets') },
+      { key: 'tx_bytes', title: t('interfaceStats.tx_bytes') },
+      { key: 'tx_errors', title: t('interfaceStats.tx_errors') },
+      { key: 'tx_dropped', title: t('interfaceStats.tx_dropped') },
+      { key: 'tx_overruns', title: t('interfaceStats.tx_overruns') },
+      { key: 'collisions', title: t('interfaceStats.collisions') },
+    ]);
 
     async function load() {
       loading.value = true;
       try {
         const res = await opModeApi.execute('ip -s link show');
         if (!res.success) {
-          showError({ message: '获取接口统计失败: ' + (res.output || '') });
+          showError({ message: t('interfaceStats.fetch_failed') + ': ' + (res.output || '') });
           physicalRows.value = [];
           virtualRows.value = [];
           return;
@@ -141,6 +142,7 @@ export default defineComponent({
       physicalColumns,
       virtualColumns,
       load,
+      t,
     };
   },
   components: { DataTable, ToolbarButton, HelpButton, TabGroup },
@@ -148,7 +150,7 @@ export default defineComponent({
     <div class="page-container interface-stats-page">
       <div class="toolbar toolbar-compact">
         <div class="toolbar-left">
-          <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+          <ToolbarButton icon="refresh" @click="load">{{ t('interfaceStats.refresh') }}</ToolbarButton>
           <HelpButton routePath="/monitor/interface-traffic/interface-stats" />
         </div>
       </div>

@@ -8,6 +8,7 @@ import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -28,10 +29,10 @@ export default defineComponent({
   name: 'VppIpfixPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
+    const { t } = useI18n();
     const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
 
     const config = ref({
       active_timeout: '15',
@@ -41,22 +42,22 @@ export default defineComponent({
       interfaces: [],
     });
 
-    const collectorColumns = [
-      { key: 'address', title: '地址', dataIndex: 'address', width: 150 },
-      { key: 'port', title: '端口', dataIndex: 'port', width: 80 },
+    const collectorColumns = computed(() => [
+      { key: 'address', title: t('vppIpfix.columns.address'), dataIndex: 'address', width: 150 },
+      { key: 'port', title: t('vppIpfix.columns.port'), dataIndex: 'port', width: 80 },
       { key: 'path_mtu', title: 'Path MTU', dataIndex: 'path_mtu', width: 100 },
-      { key: 'source_address', title: '源地址', dataIndex: 'source_address', width: 150 },
-      { key: 'template_interval', title: '模板间隔', dataIndex: 'template_interval', width: 100 },
-      { key: 'udp_checksum', title: 'UDP校验', dataIndex: 'udp_checksum', width: 80 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+      { key: 'source_address', title: t('vppIpfix.columns.sourceAddress'), dataIndex: 'source_address', width: 150 },
+      { key: 'template_interval', title: t('vppIpfix.columns.templateInterval'), dataIndex: 'template_interval', width: 100 },
+      { key: 'udp_checksum', title: t('vppIpfix.columns.udpChecksum'), dataIndex: 'udp_checksum', width: 80 },
+      { key: 'actions', title: t('vppIpfix.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
-    const interfaceColumns = [
-      { key: 'interface', title: '接口', dataIndex: 'interface', width: 150 },
-      { key: 'direction', title: '方向', dataIndex: 'direction', width: 100 },
-      { key: 'flow_variant', title: '流类型', dataIndex: 'flow_variant', width: 100 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const interfaceColumns = computed(() => [
+      { key: 'interface', title: t('vppIpfix.columns.interface'), dataIndex: 'interface', width: 150 },
+      { key: 'direction', title: t('vppIpfix.columns.direction'), dataIndex: 'direction', width: 100 },
+      { key: 'flow_variant', title: t('vppIpfix.columns.flowVariant'), dataIndex: 'flow_variant', width: 100 },
+      { key: 'actions', title: t('vppIpfix.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
     const selectedCollectors = ref([]);
     const selectedInterfaces = ref([]);
@@ -132,12 +133,11 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('vpp ipfix', true);
         config.value = ipfixToForm(res.data || {});
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('vppIpfix.messages.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -151,11 +151,10 @@ export default defineComponent({
         if (Object.keys(payload).length) {
           await configApi.set('vpp ipfix', payload);
         }
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('vppIpfix.messages.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -167,21 +166,21 @@ export default defineComponent({
     }
 
     function editCollector() {
-      if (!selectedCollectors.value.length) return alert('请选择要编辑的收集器');
+      if (!selectedCollectors.value.length) return showError({ message: t('vppIpfix.messages.selectCollectorToEdit') });
       const row = config.value.collectors.find(c => c.address === selectedCollectors.value[0]);
-      if (!row) return alert('未找到选中的收集器');
+      if (!row) return showError({ message: t('vppIpfix.messages.collectorNotFound') });
       editingCollector.value = JSON.parse(JSON.stringify(row));
       showCollectorModal.value = true;
     }
 
     function removeCollector() {
-      if (!selectedCollectors.value.length) return alert('请选择要删除的收集器');
+      if (!selectedCollectors.value.length) return showError({ message: t('vppIpfix.messages.selectCollectorToDelete') });
       config.value.collectors = config.value.collectors.filter(c => c.address !== selectedCollectors.value[0]);
       selectedCollectors.value = [];
     }
 
     function saveCollector() {
-      if (!editingCollector.value.address) return alert('请输入收集器地址');
+      if (!editingCollector.value.address) return showError({ message: t('vppIpfix.messages.enterCollectorAddress') });
       const list = config.value.collectors;
       const idx = list.findIndex(c => c._address === editingCollector.value._address);
       if (idx >= 0) list.splice(idx, 1, { ...editingCollector.value });
@@ -196,21 +195,21 @@ export default defineComponent({
     }
 
     function editInterface() {
-      if (!selectedInterfaces.value.length) return alert('请选择要编辑的接口');
+      if (!selectedInterfaces.value.length) return showError({ message: t('vppIpfix.messages.selectInterfaceToEdit') });
       const row = config.value.interfaces.find(i => i.interface === selectedInterfaces.value[0]);
-      if (!row) return alert('未找到选中的接口');
+      if (!row) return showError({ message: t('vppIpfix.messages.interfaceNotFound') });
       editingInterface.value = JSON.parse(JSON.stringify(row));
       showInterfaceModal.value = true;
     }
 
     function removeInterface() {
-      if (!selectedInterfaces.value.length) return alert('请选择要删除的接口');
+      if (!selectedInterfaces.value.length) return showError({ message: t('vppIpfix.messages.selectInterfaceToDelete') });
       config.value.interfaces = config.value.interfaces.filter(i => i.interface !== selectedInterfaces.value[0]);
       selectedInterfaces.value = [];
     }
 
     function saveInterface() {
-      if (!editingInterface.value.interface) return alert('请输入接口名称');
+      if (!editingInterface.value.interface) return showError({ message: t('vppIpfix.messages.enterInterfaceName') });
       const list = config.value.interfaces;
       const idx = list.findIndex(i => i._interface === editingInterface.value._interface);
       if (idx >= 0) list.splice(idx, 1, { ...editingInterface.value });
@@ -225,7 +224,7 @@ export default defineComponent({
     });
 
     return {
-      loading, saving, saved, config, commandPath,
+      t, loading, saving, config, commandPath,
       collectorColumns, interfaceColumns,
       selectedCollectors, selectedInterfaces,
       showCollectorModal, editingCollector, showInterfaceModal, editingInterface,
@@ -236,11 +235,9 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
-
-      <div class="form-row"><label class="form-label">活跃超时</label><input class="form-control" type="number" min="0" max="2147483647" v-model="config.active_timeout" title="活跃流超时时间（秒），默认15" /></div>
-      <div class="form-row"><label class="form-label">非活跃超时</label><input class="form-control" type="number" min="0" max="2147483647" v-model="config.inactive_timeout" title="非活跃流超时时间（秒），默认120" /></div>
-      <div class="form-row"><label class="form-label">Flowprobe记录</label>
+      <div class="form-row"><label class="form-label">{{ t('vppIpfix.labels.activeTimeout') }}</label><input class="form-control" type="number" min="0" max="2147483647" v-model="config.active_timeout" :title="t('vppIpfix.tooltips.activeTimeout')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('vppIpfix.labels.inactiveTimeout') }}</label><input class="form-control" type="number" min="0" max="2147483647" v-model="config.inactive_timeout" :title="t('vppIpfix.tooltips.inactiveTimeout')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('vppIpfix.labels.flowprobeRecord') }}</label>
         <div style="display:flex;gap:16px;flex-wrap:wrap;">
           <label><input type="checkbox" value="l2" v-model="config.flowprobe_record" /> L2</label>
           <label><input type="checkbox" value="l3" v-model="config.flowprobe_record" /> L3</label>
@@ -248,52 +245,53 @@ export default defineComponent({
         </div>
       </div>
 
-      <div style="font-weight:bold;margin:16px 0 8px;">收集器</div>
+      <div style="font-weight:bold;margin:16px 0 8px;">{{ t('vppIpfix.labels.collectors') }}</div>
       <div class="toolbar">
-        <ToolbarButton icon="create" @click="createCollector">添加</ToolbarButton>
-        <ToolbarButton icon="edit" @click="editCollector" :disabled="!selectedCollectors.length || selectedCollectors.length > 1">编辑</ToolbarButton>
-        <ToolbarButton icon="delete" @click="removeCollector" :disabled="!selectedCollectors.length">删除</ToolbarButton>
+        <ToolbarButton icon="create" @click="createCollector">{{ t('vppIpfix.buttons.add') }}</ToolbarButton>
+        <ToolbarButton icon="edit" @click="editCollector" :disabled="!selectedCollectors.length || selectedCollectors.length > 1">{{ t('vppIpfix.buttons.edit') }}</ToolbarButton>
+        <ToolbarButton icon="delete" @click="removeCollector" :disabled="!selectedCollectors.length">{{ t('vppIpfix.buttons.delete') }}</ToolbarButton>
       </div>
       <DataTable :columns="collectorColumns" :data="config.collectors" rowKey="address" :externalToolbar="true" @selection-change="selectedCollectors = $event" :selectable="true" />
 
-      <div style="font-weight:bold;margin:16px 0 8px;">接口</div>
+      <div style="font-weight:bold;margin:16px 0 8px;">{{ t('vppIpfix.labels.interfaces') }}</div>
       <div class="toolbar">
-        <ToolbarButton icon="create" @click="createInterface">添加</ToolbarButton>
-        <ToolbarButton icon="edit" @click="editInterface" :disabled="!selectedInterfaces.length || selectedInterfaces.length > 1">编辑</ToolbarButton>
-        <ToolbarButton icon="delete" @click="removeInterface" :disabled="!selectedInterfaces.length">删除</ToolbarButton>
+        <ToolbarButton icon="create" @click="createInterface">{{ t('vppIpfix.buttons.add') }}</ToolbarButton>
+        <ToolbarButton icon="edit" @click="editInterface" :disabled="!selectedInterfaces.length || selectedInterfaces.length > 1">{{ t('vppIpfix.buttons.edit') }}</ToolbarButton>
+        <ToolbarButton icon="delete" @click="removeInterface" :disabled="!selectedInterfaces.length">{{ t('vppIpfix.buttons.delete') }}</ToolbarButton>
       </div>
       <DataTable :columns="interfaceColumns" :data="config.interfaces" rowKey="interface" :externalToolbar="true" @selection-change="selectedInterfaces = $event" :selectable="true" />
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="showCollectorModal" :title="editingCollector && editingCollector._address ? '编辑收集器' : '添加收集器'" @confirm="saveCollector" @close="showCollectorModal = false">
-        <div class="form-row"><label class="form-label">地址</label><input class="form-control" v-model="editingCollector.address" :disabled="editingCollector._address" placeholder="x.x.x.x" title="收集器IP地址" /></div>
-        <div class="form-row"><label class="form-label">端口</label><input class="form-control" type="number" min="1" max="65535" v-model="editingCollector.port" title="收集器端口，默认4739" /></div>
-        <div class="form-row"><label class="form-label">Path MTU</label><input class="form-control" type="number" min="68" max="1450" v-model="editingCollector.path_mtu" title="路径MTU，默认512" /></div>
-        <div class="form-row"><label class="form-label">源地址</label><input class="form-control" v-model="editingCollector.source_address" placeholder="x.x.x.x" title="源IP地址" /></div>
-        <div class="form-row"><label class="form-label">模板间隔</label><input class="form-control" type="number" min="1" max="300" v-model="editingCollector.template_interval" title="模板发送间隔（秒），默认20" /></div>
-        <div class="form-row"><label class="form-label">UDP校验和</label><input type="checkbox" v-model="editingCollector.udp_checksum" title="启用UDP校验和" /></div>
+      <DraggableModal v-model:visible="showCollectorModal" :title="editingCollector && editingCollector._address ? t('vppIpfix.modals.editCollector') : t('vppIpfix.modals.addCollector')" @confirm="saveCollector" @close="showCollectorModal = false">
+        <div class="form-row"><label class="form-label">{{ t('vppIpfix.labels.address') }}</label><input class="form-control" v-model="editingCollector.address" :disabled="editingCollector._address" placeholder="x.x.x.x" :title="t('vppIpfix.tooltips.collectorAddress')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppIpfix.labels.port') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="editingCollector.port" :title="t('vppIpfix.tooltips.collectorPort')" /></div>
+        <div class="form-row"><label class="form-label">Path MTU</label><input class="form-control" type="number" min="68" max="1450" v-model="editingCollector.path_mtu" :title="t('vppIpfix.tooltips.pathMtu')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppIpfix.labels.sourceAddress') }}</label><input class="form-control" v-model="editingCollector.source_address" placeholder="x.x.x.x" :title="t('vppIpfix.tooltips.sourceAddress')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppIpfix.labels.templateInterval') }}</label><input class="form-control" type="number" min="1" max="300" v-model="editingCollector.template_interval" :title="t('vppIpfix.tooltips.templateInterval')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppIpfix.labels.udpChecksum') }}</label><input type="checkbox" v-model="editingCollector.udp_checksum" :title="t('vppIpfix.tooltips.udpChecksum')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showInterfaceModal" :title="editingInterface && editingInterface._interface ? '编辑接口' : '添加接口'" @confirm="saveInterface" @close="showInterfaceModal = false">
-        <div class="form-row"><label class="form-label">接口</label><input class="form-control" v-model="editingInterface.interface" :disabled="editingInterface._interface" title="接口名称" /></div>
-        <div class="form-row"><label class="form-label">方向</label>
-          <select class="form-control" v-model="editingInterface.direction" title="流量方向">
+      <DraggableModal v-model:visible="showInterfaceModal" :title="editingInterface && editingInterface._interface ? t('vppIpfix.modals.editInterface') : t('vppIpfix.modals.addInterface')" @confirm="saveInterface" @close="showInterfaceModal = false">
+        <div class="form-row"><label class="form-label">{{ t('vppIpfix.labels.interface') }}</label><input class="form-control" v-model="editingInterface.interface" :disabled="editingInterface._interface" :title="t('vppIpfix.tooltips.interfaceName')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppIpfix.labels.direction') }}</label>
+          <select class="form-control" v-model="editingInterface.direction" :title="t('vppIpfix.tooltips.trafficDirection')">
             <option value="rx">RX</option>
             <option value="tx">TX</option>
-            <option value="both">Both (默认)</option>
+            <option value="both">{{ t('vppIpfix.options.bothDefault') }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">流类型</label>
-          <select class="form-control" v-model="editingInterface.flow_variant" title="流变体">
+        <div class="form-row"><label class="form-label">{{ t('vppIpfix.labels.flowVariant') }}</label>
+          <select class="form-control" v-model="editingInterface.flow_variant" :title="t('vppIpfix.tooltips.flowVariant')">
             <option value="l2">L2</option>
-            <option value="ipv4">IPv4 (默认)</option>
+            <option value="ipv4">{{ t('vppIpfix.options.ipv4Default') }}</option>
             <option value="ipv6">IPv6</option>
           </select>
         </div>
       </DraggableModal>
+      <div class="toolbar" style="margin-top:16px;">
+        <div class="toolbar-left">
+          <ToolbarButton icon="save" @click="save" :disabled="saving || loading">{{ saving ? t('vppIpfix.buttons.saving') : t('vppIpfix.buttons.confirm') }}</ToolbarButton>
+        </div>
+      </div>
     </div>
   `,
 });

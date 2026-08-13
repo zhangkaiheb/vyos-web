@@ -1,17 +1,11 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { configApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
-
-const TABS = [
-  { key: 'global', title: '全局设置' },
-  { key: 'console', title: '控制台' },
-  { key: 'local', title: '本地日志' },
-  { key: 'remote', title: '远程主机' },
-];
+import DraggableModal from '/src/components/Modal/DraggableModal.js';
 
 const FACILITIES = [
   'all', 'auth', 'authpriv', 'cron', 'daemon', 'kern', 'lpr',
@@ -22,13 +16,22 @@ const LEVELS = ['emerg', 'alert', 'crit', 'err', 'warning', 'notice', 'info', 'd
 
 export default defineComponent({
   name: 'SyslogPage',
-  components: { ToolbarButton, TabGroup },
+  components: { ToolbarButton, TabGroup, DraggableModal },
   setup() {
     const configStore = useConfigStore();
+    const { t } = inject('i18n');
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
     const activeTab = ref('global');
+    const deleteRemoteHostModalVisible = ref(false);
+    const pendingDeleteRemoteHostName = ref('');
+
+    const TABS = computed(() => [
+      { key: 'global', title: t('syslog.globalSettings') },
+      { key: 'console', title: t('syslog.console') },
+      { key: 'local', title: t('syslog.localLog') },
+      { key: 'remote', title: t('syslog.remoteHost') },
+    ]);
 
     const config = ref({
       'console': {},
@@ -42,7 +45,6 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('system syslog', true);
         const d = res.data || {};
@@ -85,7 +87,7 @@ export default defineComponent({
         }
         config.value = c;
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('syslog.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -101,16 +103,21 @@ export default defineComponent({
     }
 
     function addRemoteHost() {
-      const host = prompt('请输入远程主机地址');
+      const host = prompt(t('syslog.enterRemoteHost'));
       if (host && !config.value.remote[host]) {
         config.value.remote[host] = { port: 514, protocol: 'udp', 'source-address': '', facilities: {} };
       }
     }
 
     function removeRemoteHost(host) {
-      if (confirm(`确认删除远程主机 ${host}？`)) {
-        delete config.value.remote[host];
-      }
+      pendingDeleteRemoteHostName.value = host;
+      deleteRemoteHostModalVisible.value = true;
+    }
+
+    function confirmDeleteRemoteHost() {
+      deleteRemoteHostModalVisible.value = false;
+      delete config.value.remote[pendingDeleteRemoteHostName.value];
+      pendingDeleteRemoteHostName.value = '';
     }
 
     function setRemoteFacility(host, fac, level) {
@@ -145,11 +152,10 @@ export default defineComponent({
             await configApi.set(`system syslog remote ${host} facility ${fac} level`, level);
           }
         }
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('syslog.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -157,39 +163,40 @@ export default defineComponent({
 
     onMounted(() => { load(); onMenuRefresh(load); });
 
-    return {
-      loading, saving, saved, config, activeTab, commandPath,
+    return {t,
+      
+      loading, saving, config, activeTab, commandPath,
+      deleteRemoteHostModalVisible, pendingDeleteRemoteHostName,
       TABS, FACILITIES, LEVELS,
       load, save,
       setFacility, removeFacility,
-      addRemoteHost, removeRemoteHost,
+      addRemoteHost, removeRemoteHost, confirmDeleteRemoteHost,
       setRemoteFacility, removeRemoteFacility,
     };
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
       <TabGroup v-model="activeTab" :tabs="TABS">
         <template #global>
           <div class="form-row">
-            <label class="form-label">Preserve FQDN</label>
+            <label class="form-label">{{ $t('syslog.preserveFqdn') }}</label>
             <input type="checkbox" v-model="config['preserve-fqdn']" />
-            <span class="form-hint">在主机名中始终包含域名部分</span>
+            <span class="form-hint">{{ $t('syslog.preserveFqdnHint') }}</span>
           </div>
           <div class="form-row">
-            <label class="form-label">Marker 间隔</label>
+            <label class="form-label">{{ $t('syslog.markerInterval') }}</label>
             <input class="form-control" type="number" v-model.number="config.marker.interval" min="1" max="65535" style="width:120px" />
-            <span class="form-hint">标记消息发送间隔（秒，默认: 1200）</span>
+            <span class="form-hint">{{ $t('syslog.markerIntervalHint') }}</span>
           </div>
           <div class="form-row">
-            <label class="form-label">Marker 禁用</label>
+            <label class="form-label">{{ $t('syslog.markerDisable') }}</label>
             <input type="checkbox" v-model="config.marker.disable" />
-            <span class="form-hint">禁用标记消息</span>
+            <span class="form-hint">{{ $t('syslog.markerDisableHint') }}</span>
           </div>
         </template>
         <template #console>
           <table class="data-table">
-            <thead><tr><th>Facility</th><th>Level</th><th>操作</th></tr></thead>
+            <thead><tr><th>{{ $t('syslog.facility') }}</th><th>{{ $t('syslog.level') }}</th><th>{{ $t('syslog.actions') }}</th></tr></thead>
             <tbody>
               <tr v-for="fac in FACILITIES" :key="fac">
                 <td>{{ fac }}</td>
@@ -197,11 +204,11 @@ export default defineComponent({
                   <select v-if="config.console[fac]" v-model="config.console[fac]" class="form-control" style="width:120px">
                     <option v-for="l in LEVELS" :key="l" :value="l">{{ l }}</option>
                   </select>
-                  <span v-else style="color:#999">未配置</span>
+                  <span v-else style="color:#999">{{ $t('syslog.notConfigured') }}</span>
                 </td>
                 <td>
-                  <a v-if="!config.console[fac]" @click="setFacility(config.console, fac, 'err')" style="color:#1890ff">添加</a>
-                  <a v-else @click="removeFacility(config.console, fac)" style="color:#ff4d4f">删除</a>
+                  <a v-if="!config.console[fac]" @click="setFacility(config.console, fac, 'err')" style="color:#1890ff">{{ $t('syslog.add') }}</a>
+                  <a v-else @click="removeFacility(config.console, fac)" style="color:#ff4d4f">{{ $t('syslog.delete') }}</a>
                 </td>
               </tr>
             </tbody>
@@ -209,7 +216,7 @@ export default defineComponent({
         </template>
         <template #local>
           <table class="data-table">
-            <thead><tr><th>Facility</th><th>Level</th><th>操作</th></tr></thead>
+            <thead><tr><th>{{ $t('syslog.facility') }}</th><th>{{ $t('syslog.level') }}</th><th>{{ $t('syslog.actions') }}</th></tr></thead>
             <tbody>
               <tr v-for="fac in FACILITIES" :key="fac">
                 <td>{{ fac }}</td>
@@ -217,11 +224,11 @@ export default defineComponent({
                   <select v-if="config.local[fac]" v-model="config.local[fac]" class="form-control" style="width:120px">
                     <option v-for="l in LEVELS" :key="l" :value="l">{{ l }}</option>
                   </select>
-                  <span v-else style="color:#999">未配置</span>
+                  <span v-else style="color:#999">{{ $t('syslog.notConfigured') }}</span>
                 </td>
                 <td>
-                  <a v-if="!config.local[fac]" @click="setFacility(config.local, fac, 'err')" style="color:#1890ff">添加</a>
-                  <a v-else @click="removeFacility(config.local, fac)" style="color:#ff4d4f">删除</a>
+                  <a v-if="!config.local[fac]" @click="setFacility(config.local, fac, 'err')" style="color:#1890ff">{{ $t('syslog.add') }}</a>
+                  <a v-else @click="removeFacility(config.local, fac)" style="color:#ff4d4f">{{ $t('syslog.delete') }}</a>
                 </td>
               </tr>
             </tbody>
@@ -229,30 +236,30 @@ export default defineComponent({
         </template>
         <template #remote>
           <div style="margin-bottom:12px">
-            <ToolbarButton icon="plus" @click="addRemoteHost">添加远程主机</ToolbarButton>
+            <ToolbarButton icon="plus" @click="addRemoteHost">{{ $t('syslog.addRemoteHost') }}</ToolbarButton>
           </div>
           <div v-for="(r, host) in config.remote" :key="host" style="border:1px solid #e8e8e8;border-radius:4px;padding:12px;margin-bottom:12px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
               <strong>{{ host }}</strong>
-              <a @click="removeRemoteHost(host)" style="color:#ff4d4f">删除主机</a>
+              <a @click="removeRemoteHost(host)" style="color:#ff4d4f">{{ $t('syslog.deleteHost') }}</a>
             </div>
             <div class="form-row">
-              <label class="form-label">端口</label>
+              <label class="form-label">{{ $t('syslog.port') }}</label>
               <input class="form-control" type="number" v-model.number="r.port" min="1" max="65535" style="width:100px" />
             </div>
             <div class="form-row">
-              <label class="form-label">协议</label>
+              <label class="form-label">{{ $t('syslog.protocol') }}</label>
               <select v-model="r.protocol" class="form-control" style="width:100px">
                 <option value="udp">UDP</option>
                 <option value="tcp">TCP</option>
               </select>
             </div>
             <div class="form-row">
-              <label class="form-label">源地址</label>
-              <input class="form-control" v-model="r['source-address']" placeholder="源IP地址" />
+              <label class="form-label">{{ $t('syslog.sourceAddress') }}</label>
+              <input class="form-control" v-model="r['source-address']" :placeholder="$t('syslog.sourceAddressPlaceholder')" />
             </div>
             <table class="data-table" style="margin-top:8px">
-              <thead><tr><th>Facility</th><th>Level</th><th>操作</th></tr></thead>
+              <thead><tr><th>{{ $t('syslog.facility') }}</th><th>{{ $t('syslog.level') }}</th><th>{{ $t('syslog.actions') }}</th></tr></thead>
               <tbody>
                 <tr v-for="fac in FACILITIES" :key="fac">
                   <td>{{ fac }}</td>
@@ -260,11 +267,11 @@ export default defineComponent({
                     <select v-if="r.facilities[fac]" v-model="r.facilities[fac]" class="form-control" style="width:120px">
                       <option v-for="l in LEVELS" :key="l" :value="l">{{ l }}</option>
                     </select>
-                    <span v-else style="color:#999">未配置</span>
+                    <span v-else style="color:#999">{{ $t('syslog.notConfigured') }}</span>
                   </td>
                   <td>
-                    <a v-if="!r.facilities[fac]" @click="setRemoteFacility(host, fac, 'err')" style="color:#1890ff">添加</a>
-                    <a v-else @click="removeRemoteFacility(host, fac)" style="color:#ff4d4f">删除</a>
+                    <a v-if="!r.facilities[fac]" @click="setRemoteFacility(host, fac, 'err')" style="color:#1890ff">{{ $t('syslog.add') }}</a>
+                    <a v-else @click="removeRemoteFacility(host, fac)" style="color:#ff4d4f">{{ $t('syslog.delete') }}</a>
                   </td>
                 </tr>
               </tbody>
@@ -272,9 +279,17 @@ export default defineComponent({
           </div>
         </template>
       </TabGroup>
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
+      <div class="toolbar" style="margin-top:16px;">
+        <div class="toolbar-left">
+          <ToolbarButton icon="save" @click="save" :disabled="saving || loading">{{ saving ? $t('syslog.saving') : $t('syslog.confirm') }}</ToolbarButton>
+        </div>
       </div>
+      <DraggableModal v-model:visible="deleteRemoteHostModalVisible" :title="$t('syslog.confirmDelete')" width="400px" @confirm="confirmDeleteRemoteHost">
+        <div>{{ $t('syslog.confirmDeleteRemoteHost') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div style="padding:2px 0;">{{ pendingDeleteRemoteHostName }}</div>
+        </div>
+      </DraggableModal>
     </div>
   `,
 });

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="dhcp-server">
+<h1>Serveur DHCP</h1>
+<p>VyOS utilise le serveur DHCP Kea pour l'attribution des adresses IPv4 et IPv6.</p>
+<section id="ipv4-server">
+<h2>Serveur IPv4</h2>
+<p>La topologie réseau est déclarée par shared-network-name et les déclarations de sous-réseau. Le service DHCP peut servir plusieurs réseaux partagés, chacun ayant 1 ou plus de sous-réseaux. Chaque sous-réseau doit être présent sur une interface. Une plage peut être déclarée à l'intérieur d'un sous-réseau pour définir un pool d'adresses dynamiques. Plusieurs plages peuvent être définies et peuvent contenir des trous. Les mappages statiques peuvent être configurés pour assigner des « adresses statiques » aux clients en fonction de leur adresse MAC.</p>
+<section id="configuration">
+<h3>Configuration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server hostfile-update
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-hostfile-update" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Créer une entrée DNS par location client, en ajoutant les clients au fichier /etc/hosts. L'entrée aura le format : <code class="docutils literal notranslate">&lt;shared-network-name&gt;_&lt;hostname&gt;.&lt;domain-name&gt;</code></p>
+</div>
+</div>
+<section id="shared-network-options">
+<h4>Options du réseau partagé</h4>
+<p>Les options DHCP suivantes s'appliquent à un réseau partagé entier. Tous les sous-réseaux héritent de ces valeurs, sauf si la même option est définie localement.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option bootfile-name &lt;filename&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-bootfile-name-filename" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>nom du fichier de démarrage (option DHCP 67).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option bootfile-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-bootfile-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>serveur à partir duquel le fichier de démarrage initial doit être chargé (champ siaddr du DHCP).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option bootfile-size &lt;size&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-bootfile-size-size" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Taille du fichier de démarrage en blocs de 512 octets (option DHCP 13).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option captive-portal &lt;url&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-captive-portal-url" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Point de terminaison API du portail captif (option DHCP 114).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option capwap-controller &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-capwap-controller-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Adresse IP du contrôleur CAPWAP (option DHCP 138).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option client-prefix-length &lt;prefix-length&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-client-prefix-length-prefix-length" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Spécifie le masque de sous-réseau du client selon le RFC 950. Si non défini, le déclaration de sous-réseau est utilisée (option DHCP 1).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option default-router &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-default-router-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Adresse IP du routeur par défaut (option DHCP 3).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option domain-name &lt;domain-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-domain-name-domain-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Le paramètre domain-name devrait être le nom de domaine qui sera ajouté au nom d'hôte du client pour former un nom de domaine complet (FQDN) (option DHCP 15).</p>
+<p>C'est le paramètre de configuration pour la définition du réseau partagé. Tous les sous-réseaux hériteront de cette configuration si elle n'est pas spécifiée localement.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option domain-search &lt;domain-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-domain-search-domain-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Le paramètre domain-name devrait être le nom de domaine utilisé lors de la complétion des requêtes DNS où aucun FQDN complet n'est passé. Cette option peut être donnée plusieurs fois si vous avez besoin de plusieurs domaines de recherche (option DHCP 119).</p>
+<p>C'est le paramètre de configuration pour la définition du réseau partagé. Tous les sous-réseaux hériteront de cette configuration si elle n'est pas spécifiée localement.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option interface-mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>MTU de l'interface client (option DHCP 26).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option ip-forwarding
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-ip-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Activer le routage IP sur le client (option DHCP 19).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option ipv6-only-preferred &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-ipv6-only-preferred-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Désactiver IPv4 sur les hôtes IPv6 uniquement pendant le nombre de secondes spécifié (RFC 8925, option DHCP 108).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-name-server-address" title="Permalink to this Command"></a
+</div="1</div>
+</span>
+</p>
+</div>
+"""
+</p>
+ div="div="section="<table="div="section="label="class="</code{code="</div=";">
+</code:="</code:code="$
+p>
+   code="class="class="title="class="&#code="class>
+code="class="class="</code="code="class="class="class="class="code>
+   ="code
+code>
+div>
+p1code
+</div="class="</code=".</code="</code=""
+</code
+code="</p>
+</code="</p>
+code
+code="code>
+</code
+code="code="client=""/>
+</code
+code="class="</code</code
+color="$$code
+code
+</code
+</code="code
+code="class="class="</p>
+p>
+title="
+</code="class="class
+code="</code="class
+code
+</think>

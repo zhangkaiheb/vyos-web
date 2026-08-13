@@ -1,0 +1,667 @@
+{
+  "zh-CN": {
+    "ssh": {
+      "accessControl": {
+        "allowGroupPlaceholder": "允许的用户组",
+        "allowGroupTitle": "允许的用户组",
+        "allowUserPlaceholder": "允许的用户",
+        "allowUserTitle": "允许的用户",
+        "denyGroupPlaceholder": "拒绝的用户组",
+        "denyGroupTitle": "拒绝的用户组",
+        "denyUserPlaceholder": "拒绝的用户",
+        "denyUserTitle": "拒绝的用户"
+      },
+      "basic": {
+        "clientKeepaliveHint": "客户端保活间隔（秒）",
+        "clientKeepaliveTitle": "客户端保活",
+        "disableHostValidationTitle": "禁用主机验证",
+        "disablePasswordAuthTitle": "禁用密码认证",
+        "listenAddressPlaceholder": "监听地址",
+        "listenAddressTitle": "监听地址",
+        "loglevelTitle": "日志级别",
+        "portHint": "SSH 端口号（1-65535）",
+        "portPlaceholder": "端口号",
+        "portTitle": "端口",
+        "vrfTitle": "VRF"
+      },
+      "crypto": {
+        "ciphersTitle": "加密算法",
+        "hostkeyAlgorithmTitle": "主机密钥算法",
+        "keyExchangeTitle": "密钥交换算法",
+        "macTitle": "MAC 算法"
+      },
+      "dualList": {
+        "available": "可用",
+        "selected": "已选择"
+      },
+      "dynamicProtection": {
+        "allowFromPlaceholder": "允许的源地址",
+        "allowFromTitle": "允许的源地址",
+        "blockTimeHint": "封锁时间（秒）",
+        "blockTimePlaceholder": "封锁时间",
+        "blockTimeTitle": "封锁时间",
+        "detectTimeHint": "检测时间窗口（秒）",
+        "detectTimePlaceholder": "检测时间",
+        "detectTimeTitle": "检测时间",
+        "thresholdHint": "失败次数阈值",
+        "thresholdPlaceholder": "阈值",
+        "thresholdTitle": "阈值"
+      },
+      "fields": {
+        "allowFrom": "允许的源",
+        "allowGroup": "允许的用户组",
+        "allowUser": "允许的用户",
+        "blockTime": "封锁时间",
+        "ciphers": "加密算法",
+        "clientKeepalive": "客户端保活",
+        "denyGroup": "拒绝的用户组",
+        "denyUser": "拒绝的用户",
+        "detectTime": "检测时间",
+        "disableHostValidation": "禁用主机验证",
+        "disablePasswordAuthentication": "禁用密码认证",
+        "hostkeyAlgorithm": "主机密钥算法",
+        "keyExchange": "密钥交换",
+        "listenAddress": "监听地址",
+        "loglevel": "日志级别",
+        "mac": "MAC",
+        "port": "端口",
+        "rekeyData": "重密钥数据量",
+        "rekeyTime": "重密钥时间",
+        "threshold": "阈值"
+      },
+      "rekey": {
+        "dataHint": "重密钥数据量阈值",
+        "dataTitle": "数据量",
+        "timeHint": "重密钥时间间隔",
+        "timeTitle": "时间"
+      },
+      "saved": "已保存",
+      "tabs": {
+        "accessControl": "访问控制",
+        "basic": "基本设置",
+        "crypto": "加密",
+        "dynamicProtection": "动态防护",
+        "rekey": "重密钥"
+      },
+      "validation": {
+        "ipFormat": "IP 格式不正确",
+        "ipOrPrefixFormat": "IP 或前缀格式不正确",
+        "ipv4Format": "IPv4 格式不正确",
+        "ipv4PrefixRange": "IPv4 前缀范围不正确",
+        "ipv6Format": "IPv6 格式不正确",
+        "ipv6PrefixRange": "IPv6 前缀范围不正确",
+        "prefixMustBeNumber": "前缀必须为数字"
+      }
+    }
+  },
+  "en": {
+    "ssh": {
+      "accessControl": {
+        "allowGroupPlaceholder": "Allow Group Placeholder",
+        "allowGroupTitle": "Allow Group Title",
+        "allowUserPlaceholder": "Allow User Placeholder",
+        "allowUserTitle": "Allow User Title",
+        "denyGroupPlaceholder": "Deny Group Placeholder",
+        "denyGroupTitle": "Deny Group Title",
+        "denyUserPlaceholder": "Deny User Placeholder",
+        "denyUserTitle": "Deny User Title"
+      },
+      "basic": {
+        "clientKeepaliveHint": "Client Keepalive Hint",
+        "clientKeepaliveTitle": "Client Keepalive Title",
+        "disableHostValidationTitle": "Disable Host Validation Title",
+        "disablePasswordAuthTitle": "Disable Password Auth Title",
+        "listenAddressPlaceholder": "Listen Address Placeholder",
+        "listenAddressTitle": "Listen Address Title",
+        "loglevelTitle": "Loglevel Title",
+        "portHint": "Port Hint",
+        "portPlaceholder": "Port Placeholder",
+        "portTitle": "Port Title",
+        "vrfTitle": "Vrf Title"
+      },
+      "crypto": {
+        "ciphersTitle": "Ciphers Title",
+        "hostkeyAlgorithmTitle": "Hostkey Algorithm Title",
+        "keyExchangeTitle": "Key Exchange Title",
+        "macTitle": "Mac Title"
+      },
+      "dualList": {
+        "available": "Available",
+        "selected": "Selected"
+      },
+      "dynamicProtection": {
+        "allowFromPlaceholder": "Allow From Placeholder",
+        "allowFromTitle": "Allow From Title",
+        "blockTimeHint": "Block Time Hint",
+        "blockTimePlaceholder": "Block Time Placeholder",
+        "blockTimeTitle": "Block Time Title",
+        "detectTimeHint": "Detect Time Hint",
+        "detectTimePlaceholder": "Detect Time Placeholder",
+        "detectTimeTitle": "Detect Time Title",
+        "thresholdHint": "Threshold Hint",
+        "thresholdPlaceholder": "Threshold Placeholder",
+        "thresholdTitle": "Threshold Title"
+      },
+      "fields": {
+        "allowFrom": "Allow From",
+        "allowGroup": "Allow Group",
+        "allowUser": "Allow User",
+        "blockTime": "Block Time",
+        "ciphers": "Ciphers",
+        "clientKeepalive": "Client Keepalive",
+        "denyGroup": "Deny Group",
+        "denyUser": "Deny User",
+        "detectTime": "Detect Time",
+        "disableHostValidation": "Disable Host Validation",
+        "disablePasswordAuthentication": "Disable Password Authentication",
+        "hostkeyAlgorithm": "Hostkey Algorithm",
+        "keyExchange": "Key Exchange",
+        "listenAddress": "Listen Address",
+        "loglevel": "Loglevel",
+        "mac": "Mac",
+        "port": "Port",
+        "rekeyData": "Rekey Data",
+        "rekeyTime": "Rekey Time",
+        "threshold": "Threshold"
+      },
+      "rekey": {
+        "dataHint": "Data Hint",
+        "dataTitle": "Data Title",
+        "timeHint": "Time Hint",
+        "timeTitle": "Time Title"
+      },
+      "saved": "Saved",
+      "tabs": {
+        "accessControl": "Access Control",
+        "basic": "Basic",
+        "crypto": "Crypto",
+        "dynamicProtection": "Dynamic Protection",
+        "rekey": "Rekey"
+      },
+      "validation": {
+        "ipFormat": "Ip Format",
+        "ipOrPrefixFormat": "Ip Or Prefix Format",
+        "ipv4Format": "Ipv4 Format",
+        "ipv4PrefixRange": "Ipv4 Prefix Range",
+        "ipv6Format": "Ipv6 Format",
+        "ipv6PrefixRange": "Ipv6 Prefix Range",
+        "prefixMustBeNumber": "Prefix Must Be Number"
+      }
+    }
+  },
+  "zh-TW": {
+    "ssh": {
+      "accessControl": {
+        "allowGroupPlaceholder": "Allow Group Placeholder",
+        "allowGroupTitle": "Allow Group Title",
+        "allowUserPlaceholder": "Allow User Placeholder",
+        "allowUserTitle": "Allow User Title",
+        "denyGroupPlaceholder": "Deny Group Placeholder",
+        "denyGroupTitle": "Deny Group Title",
+        "denyUserPlaceholder": "Deny User Placeholder",
+        "denyUserTitle": "Deny User Title"
+      },
+      "basic": {
+        "clientKeepaliveHint": "Client Keepalive Hint",
+        "clientKeepaliveTitle": "Client Keepalive Title",
+        "disableHostValidationTitle": "Disable Host Validation Title",
+        "disablePasswordAuthTitle": "Disable Password Auth Title",
+        "listenAddressPlaceholder": "Listen Address Placeholder",
+        "listenAddressTitle": "Listen Address Title",
+        "loglevelTitle": "Loglevel Title",
+        "portHint": "Port Hint",
+        "portPlaceholder": "Port Placeholder",
+        "portTitle": "Port Title",
+        "vrfTitle": "Vrf Title"
+      },
+      "crypto": {
+        "ciphersTitle": "Ciphers Title",
+        "hostkeyAlgorithmTitle": "Hostkey Algorithm Title",
+        "keyExchangeTitle": "Key Exchange Title",
+        "macTitle": "Mac Title"
+      },
+      "dualList": {
+        "available": "Available",
+        "selected": "Selected"
+      },
+      "dynamicProtection": {
+        "allowFromPlaceholder": "Allow From Placeholder",
+        "allowFromTitle": "Allow From Title",
+        "blockTimeHint": "Block Time Hint",
+        "blockTimePlaceholder": "Block Time Placeholder",
+        "blockTimeTitle": "Block Time Title",
+        "detectTimeHint": "Detect Time Hint",
+        "detectTimePlaceholder": "Detect Time Placeholder",
+        "detectTimeTitle": "Detect Time Title",
+        "thresholdHint": "Threshold Hint",
+        "thresholdPlaceholder": "Threshold Placeholder",
+        "thresholdTitle": "Threshold Title"
+      },
+      "fields": {
+        "allowFrom": "Allow From",
+        "allowGroup": "Allow Group",
+        "allowUser": "Allow User",
+        "blockTime": "Block Time",
+        "ciphers": "Ciphers",
+        "clientKeepalive": "Client Keepalive",
+        "denyGroup": "Deny Group",
+        "denyUser": "Deny User",
+        "detectTime": "Detect Time",
+        "disableHostValidation": "Disable Host Validation",
+        "disablePasswordAuthentication": "Disable Password Authentication",
+        "hostkeyAlgorithm": "Hostkey Algorithm",
+        "keyExchange": "Key Exchange",
+        "listenAddress": "Listen Address",
+        "loglevel": "Loglevel",
+        "mac": "Mac",
+        "port": "Port",
+        "rekeyData": "Rekey Data",
+        "rekeyTime": "Rekey Time",
+        "threshold": "Threshold"
+      },
+      "rekey": {
+        "dataHint": "Data Hint",
+        "dataTitle": "Data Title",
+        "timeHint": "Time Hint",
+        "timeTitle": "Time Title"
+      },
+      "saved": "Saved",
+      "tabs": {
+        "accessControl": "Access Control",
+        "basic": "Basic",
+        "crypto": "Crypto",
+        "dynamicProtection": "Dynamic Protection",
+        "rekey": "Rekey"
+      },
+      "validation": {
+        "ipFormat": "Ip Format",
+        "ipOrPrefixFormat": "Ip Or Prefix Format",
+        "ipv4Format": "Ipv4 Format",
+        "ipv4PrefixRange": "Ipv4 Prefix Range",
+        "ipv6Format": "Ipv6 Format",
+        "ipv6PrefixRange": "Ipv6 Prefix Range",
+        "prefixMustBeNumber": "Prefix Must Be Number"
+      }
+    }
+  },
+  "ru": {
+    "ssh": {
+      "accessControl": {
+        "allowGroupPlaceholder": "Allow Group Placeholder",
+        "allowGroupTitle": "Allow Group Title",
+        "allowUserPlaceholder": "Allow User Placeholder",
+        "allowUserTitle": "Allow User Title",
+        "denyGroupPlaceholder": "Deny Group Placeholder",
+        "denyGroupTitle": "Deny Group Title",
+        "denyUserPlaceholder": "Deny User Placeholder",
+        "denyUserTitle": "Deny User Title"
+      },
+      "basic": {
+        "clientKeepaliveHint": "Client Keepalive Hint",
+        "clientKeepaliveTitle": "Client Keepalive Title",
+        "disableHostValidationTitle": "Disable Host Validation Title",
+        "disablePasswordAuthTitle": "Disable Password Auth Title",
+        "listenAddressPlaceholder": "Listen Address Placeholder",
+        "listenAddressTitle": "Listen Address Title",
+        "loglevelTitle": "Loglevel Title",
+        "portHint": "Port Hint",
+        "portPlaceholder": "Port Placeholder",
+        "portTitle": "Port Title",
+        "vrfTitle": "Vrf Title"
+      },
+      "crypto": {
+        "ciphersTitle": "Ciphers Title",
+        "hostkeyAlgorithmTitle": "Hostkey Algorithm Title",
+        "keyExchangeTitle": "Key Exchange Title",
+        "macTitle": "Mac Title"
+      },
+      "dualList": {
+        "available": "Available",
+        "selected": "Selected"
+      },
+      "dynamicProtection": {
+        "allowFromPlaceholder": "Allow From Placeholder",
+        "allowFromTitle": "Allow From Title",
+        "blockTimeHint": "Block Time Hint",
+        "blockTimePlaceholder": "Block Time Placeholder",
+        "blockTimeTitle": "Block Time Title",
+        "detectTimeHint": "Detect Time Hint",
+        "detectTimePlaceholder": "Detect Time Placeholder",
+        "detectTimeTitle": "Detect Time Title",
+        "thresholdHint": "Threshold Hint",
+        "thresholdPlaceholder": "Threshold Placeholder",
+        "thresholdTitle": "Threshold Title"
+      },
+      "fields": {
+        "allowFrom": "Allow From",
+        "allowGroup": "Allow Group",
+        "allowUser": "Allow User",
+        "blockTime": "Block Time",
+        "ciphers": "Ciphers",
+        "clientKeepalive": "Client Keepalive",
+        "denyGroup": "Deny Group",
+        "denyUser": "Deny User",
+        "detectTime": "Detect Time",
+        "disableHostValidation": "Disable Host Validation",
+        "disablePasswordAuthentication": "Disable Password Authentication",
+        "hostkeyAlgorithm": "Hostkey Algorithm",
+        "keyExchange": "Key Exchange",
+        "listenAddress": "Listen Address",
+        "loglevel": "Loglevel",
+        "mac": "Mac",
+        "port": "Port",
+        "rekeyData": "Rekey Data",
+        "rekeyTime": "Rekey Time",
+        "threshold": "Threshold"
+      },
+      "rekey": {
+        "dataHint": "Data Hint",
+        "dataTitle": "Data Title",
+        "timeHint": "Time Hint",
+        "timeTitle": "Time Title"
+      },
+      "saved": "Saved",
+      "tabs": {
+        "accessControl": "Access Control",
+        "basic": "Basic",
+        "crypto": "Crypto",
+        "dynamicProtection": "Dynamic Protection",
+        "rekey": "Rekey"
+      },
+      "validation": {
+        "ipFormat": "Ip Format",
+        "ipOrPrefixFormat": "Ip Or Prefix Format",
+        "ipv4Format": "Ipv4 Format",
+        "ipv4PrefixRange": "Ipv4 Prefix Range",
+        "ipv6Format": "Ipv6 Format",
+        "ipv6PrefixRange": "Ipv6 Prefix Range",
+        "prefixMustBeNumber": "Prefix Must Be Number"
+      }
+    }
+  },
+  "de": {
+    "ssh": {
+      "accessControl": {
+        "allowGroupPlaceholder": "Allow Group Placeholder",
+        "allowGroupTitle": "Allow Group Title",
+        "allowUserPlaceholder": "Allow User Placeholder",
+        "allowUserTitle": "Allow User Title",
+        "denyGroupPlaceholder": "Deny Group Placeholder",
+        "denyGroupTitle": "Deny Group Title",
+        "denyUserPlaceholder": "Deny User Placeholder",
+        "denyUserTitle": "Deny User Title"
+      },
+      "basic": {
+        "clientKeepaliveHint": "Client Keepalive Hint",
+        "clientKeepaliveTitle": "Client Keepalive Title",
+        "disableHostValidationTitle": "Disable Host Validation Title",
+        "disablePasswordAuthTitle": "Disable Password Auth Title",
+        "listenAddressPlaceholder": "Listen Address Placeholder",
+        "listenAddressTitle": "Listen Address Title",
+        "loglevelTitle": "Loglevel Title",
+        "portHint": "Port Hint",
+        "portPlaceholder": "Port Placeholder",
+        "portTitle": "Port Title",
+        "vrfTitle": "Vrf Title"
+      },
+      "crypto": {
+        "ciphersTitle": "Ciphers Title",
+        "hostkeyAlgorithmTitle": "Hostkey Algorithm Title",
+        "keyExchangeTitle": "Key Exchange Title",
+        "macTitle": "Mac Title"
+      },
+      "dualList": {
+        "available": "Available",
+        "selected": "Selected"
+      },
+      "dynamicProtection": {
+        "allowFromPlaceholder": "Allow From Placeholder",
+        "allowFromTitle": "Allow From Title",
+        "blockTimeHint": "Block Time Hint",
+        "blockTimePlaceholder": "Block Time Placeholder",
+        "blockTimeTitle": "Block Time Title",
+        "detectTimeHint": "Detect Time Hint",
+        "detectTimePlaceholder": "Detect Time Placeholder",
+        "detectTimeTitle": "Detect Time Title",
+        "thresholdHint": "Threshold Hint",
+        "thresholdPlaceholder": "Threshold Placeholder",
+        "thresholdTitle": "Threshold Title"
+      },
+      "fields": {
+        "allowFrom": "Allow From",
+        "allowGroup": "Allow Group",
+        "allowUser": "Allow User",
+        "blockTime": "Block Time",
+        "ciphers": "Ciphers",
+        "clientKeepalive": "Client Keepalive",
+        "denyGroup": "Deny Group",
+        "denyUser": "Deny User",
+        "detectTime": "Detect Time",
+        "disableHostValidation": "Disable Host Validation",
+        "disablePasswordAuthentication": "Disable Password Authentication",
+        "hostkeyAlgorithm": "Hostkey Algorithm",
+        "keyExchange": "Key Exchange",
+        "listenAddress": "Listen Address",
+        "loglevel": "Loglevel",
+        "mac": "Mac",
+        "port": "Port",
+        "rekeyData": "Rekey Data",
+        "rekeyTime": "Rekey Time",
+        "threshold": "Threshold"
+      },
+      "rekey": {
+        "dataHint": "Data Hint",
+        "dataTitle": "Data Title",
+        "timeHint": "Time Hint",
+        "timeTitle": "Time Title"
+      },
+      "saved": "Saved",
+      "tabs": {
+        "accessControl": "Access Control",
+        "basic": "Basic",
+        "crypto": "Crypto",
+        "dynamicProtection": "Dynamic Protection",
+        "rekey": "Rekey"
+      },
+      "validation": {
+        "ipFormat": "Ip Format",
+        "ipOrPrefixFormat": "Ip Or Prefix Format",
+        "ipv4Format": "Ipv4 Format",
+        "ipv4PrefixRange": "Ipv4 Prefix Range",
+        "ipv6Format": "Ipv6 Format",
+        "ipv6PrefixRange": "Ipv6 Prefix Range",
+        "prefixMustBeNumber": "Prefix Must Be Number"
+      }
+    }
+  },
+  "fr": {
+    "ssh": {
+      "accessControl": {
+        "allowGroupPlaceholder": "Allow Group Placeholder",
+        "allowGroupTitle": "Allow Group Title",
+        "allowUserPlaceholder": "Allow User Placeholder",
+        "allowUserTitle": "Allow User Title",
+        "denyGroupPlaceholder": "Deny Group Placeholder",
+        "denyGroupTitle": "Deny Group Title",
+        "denyUserPlaceholder": "Deny User Placeholder",
+        "denyUserTitle": "Deny User Title"
+      },
+      "basic": {
+        "clientKeepaliveHint": "Client Keepalive Hint",
+        "clientKeepaliveTitle": "Client Keepalive Title",
+        "disableHostValidationTitle": "Disable Host Validation Title",
+        "disablePasswordAuthTitle": "Disable Password Auth Title",
+        "listenAddressPlaceholder": "Listen Address Placeholder",
+        "listenAddressTitle": "Listen Address Title",
+        "loglevelTitle": "Loglevel Title",
+        "portHint": "Port Hint",
+        "portPlaceholder": "Port Placeholder",
+        "portTitle": "Port Title",
+        "vrfTitle": "Vrf Title"
+      },
+      "crypto": {
+        "ciphersTitle": "Ciphers Title",
+        "hostkeyAlgorithmTitle": "Hostkey Algorithm Title",
+        "keyExchangeTitle": "Key Exchange Title",
+        "macTitle": "Mac Title"
+      },
+      "dualList": {
+        "available": "Available",
+        "selected": "Selected"
+      },
+      "dynamicProtection": {
+        "allowFromPlaceholder": "Allow From Placeholder",
+        "allowFromTitle": "Allow From Title",
+        "blockTimeHint": "Block Time Hint",
+        "blockTimePlaceholder": "Block Time Placeholder",
+        "blockTimeTitle": "Block Time Title",
+        "detectTimeHint": "Detect Time Hint",
+        "detectTimePlaceholder": "Detect Time Placeholder",
+        "detectTimeTitle": "Detect Time Title",
+        "thresholdHint": "Threshold Hint",
+        "thresholdPlaceholder": "Threshold Placeholder",
+        "thresholdTitle": "Threshold Title"
+      },
+      "fields": {
+        "allowFrom": "Allow From",
+        "allowGroup": "Allow Group",
+        "allowUser": "Allow User",
+        "blockTime": "Block Time",
+        "ciphers": "Ciphers",
+        "clientKeepalive": "Client Keepalive",
+        "denyGroup": "Deny Group",
+        "denyUser": "Deny User",
+        "detectTime": "Detect Time",
+        "disableHostValidation": "Disable Host Validation",
+        "disablePasswordAuthentication": "Disable Password Authentication",
+        "hostkeyAlgorithm": "Hostkey Algorithm",
+        "keyExchange": "Key Exchange",
+        "listenAddress": "Listen Address",
+        "loglevel": "Loglevel",
+        "mac": "Mac",
+        "port": "Port",
+        "rekeyData": "Rekey Data",
+        "rekeyTime": "Rekey Time",
+        "threshold": "Threshold"
+      },
+      "rekey": {
+        "dataHint": "Data Hint",
+        "dataTitle": "Data Title",
+        "timeHint": "Time Hint",
+        "timeTitle": "Time Title"
+      },
+      "saved": "Saved",
+      "tabs": {
+        "accessControl": "Access Control",
+        "basic": "Basic",
+        "crypto": "Crypto",
+        "dynamicProtection": "Dynamic Protection",
+        "rekey": "Rekey"
+      },
+      "validation": {
+        "ipFormat": "Ip Format",
+        "ipOrPrefixFormat": "Ip Or Prefix Format",
+        "ipv4Format": "Ipv4 Format",
+        "ipv4PrefixRange": "Ipv4 Prefix Range",
+        "ipv6Format": "Ipv6 Format",
+        "ipv6PrefixRange": "Ipv6 Prefix Range",
+        "prefixMustBeNumber": "Prefix Must Be Number"
+      }
+    }
+  },
+  "ko": {
+    "ssh": {
+      "accessControl": {
+        "allowGroupPlaceholder": "Allow Group Placeholder",
+        "allowGroupTitle": "Allow Group Title",
+        "allowUserPlaceholder": "Allow User Placeholder",
+        "allowUserTitle": "Allow User Title",
+        "denyGroupPlaceholder": "Deny Group Placeholder",
+        "denyGroupTitle": "Deny Group Title",
+        "denyUserPlaceholder": "Deny User Placeholder",
+        "denyUserTitle": "Deny User Title"
+      },
+      "basic": {
+        "clientKeepaliveHint": "Client Keepalive Hint",
+        "clientKeepaliveTitle": "Client Keepalive Title",
+        "disableHostValidationTitle": "Disable Host Validation Title",
+        "disablePasswordAuthTitle": "Disable Password Auth Title",
+        "listenAddressPlaceholder": "Listen Address Placeholder",
+        "listenAddressTitle": "Listen Address Title",
+        "loglevelTitle": "Loglevel Title",
+        "portHint": "Port Hint",
+        "portPlaceholder": "Port Placeholder",
+        "portTitle": "Port Title",
+        "vrfTitle": "Vrf Title"
+      },
+      "crypto": {
+        "ciphersTitle": "Ciphers Title",
+        "hostkeyAlgorithmTitle": "Hostkey Algorithm Title",
+        "keyExchangeTitle": "Key Exchange Title",
+        "macTitle": "Mac Title"
+      },
+      "dualList": {
+        "available": "Available",
+        "selected": "Selected"
+      },
+      "dynamicProtection": {
+        "allowFromPlaceholder": "Allow From Placeholder",
+        "allowFromTitle": "Allow From Title",
+        "blockTimeHint": "Block Time Hint",
+        "blockTimePlaceholder": "Block Time Placeholder",
+        "blockTimeTitle": "Block Time Title",
+        "detectTimeHint": "Detect Time Hint",
+        "detectTimePlaceholder": "Detect Time Placeholder",
+        "detectTimeTitle": "Detect Time Title",
+        "thresholdHint": "Threshold Hint",
+        "thresholdPlaceholder": "Threshold Placeholder",
+        "thresholdTitle": "Threshold Title"
+      },
+      "fields": {
+        "allowFrom": "Allow From",
+        "allowGroup": "Allow Group",
+        "allowUser": "Allow User",
+        "blockTime": "Block Time",
+        "ciphers": "Ciphers",
+        "clientKeepalive": "Client Keepalive",
+        "denyGroup": "Deny Group",
+        "denyUser": "Deny User",
+        "detectTime": "Detect Time",
+        "disableHostValidation": "Disable Host Validation",
+        "disablePasswordAuthentication": "Disable Password Authentication",
+        "hostkeyAlgorithm": "Hostkey Algorithm",
+        "keyExchange": "Key Exchange",
+        "listenAddress": "Listen Address",
+        "loglevel": "Loglevel",
+        "mac": "Mac",
+        "port": "Port",
+        "rekeyData": "Rekey Data",
+        "rekeyTime": "Rekey Time",
+        "threshold": "Threshold"
+      },
+      "rekey": {
+        "dataHint": "Data Hint",
+        "dataTitle": "Data Title",
+        "timeHint": "Time Hint",
+        "timeTitle": "Time Title"
+      },
+      "saved": "Saved",
+      "tabs": {
+        "accessControl": "Access Control",
+        "basic": "Basic",
+        "crypto": "Crypto",
+        "dynamicProtection": "Dynamic Protection",
+        "rekey": "Rekey"
+      },
+      "validation": {
+        "ipFormat": "Ip Format",
+        "ipOrPrefixFormat": "Ip Or Prefix Format",
+        "ipv4Format": "Ipv4 Format",
+        "ipv4PrefixRange": "Ipv4 Prefix Range",
+        "ipv6Format": "Ipv6 Format",
+        "ipv6PrefixRange": "Ipv6 Prefix Range",
+        "prefixMustBeNumber": "Prefix Must Be Number"
+      }
+    }
+  }
+}

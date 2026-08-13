@@ -1,23 +1,23 @@
-import { defineComponent, ref, computed, watch } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, watch, inject } from '/src/utils/vue-import.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 
-const ACTION_LABELS = {
-  create: '创建',
-  edit: '编辑',
-  delete: '删除',
-  move: '移动',
-  moveUp: '上移',
-  moveDown: '下移',
-  copy: '复制',
-  insert: '插入',
-  conflict: '冲突检查',
-  validity: '有效性',
-  batch: '批处理',
-  search: '搜索',
-  refresh: '刷新',
-  columnSetting: '列设定',
-  filter: '边界过滤',
+const ACTION_LABEL_KEYS = {
+  create: 'app.create',
+  edit: 'app.edit',
+  delete: 'app.delete',
+  move: 'app.move',
+  moveUp: 'app.moveUp',
+  moveDown: 'app.moveDown',
+  copy: 'app.copy',
+  insert: 'app.insert',
+  conflict: 'app.conflict',
+  validity: 'app.validity',
+  batch: 'app.batch',
+  search: 'app.search',
+  refresh: 'app.refresh',
+  columnSetting: 'app.columnSetting',
+  filter: 'app.filter',
 };
 
 const NEEDS_SELECTION = ['edit', 'delete', 'move', 'moveUp', 'moveDown', 'copy'];
@@ -39,6 +39,7 @@ export default defineComponent({
   },
   emits: ['create', 'edit', 'delete', 'move', 'move-up', 'move-down', 'copy', 'refresh', 'selection-change', 'row-click', 'filter-change'],
   setup(props, { emit, expose }) {
+    const { t } = inject('i18n');
     const currentPage = ref(1);
     const selectedKeys = ref(new Set());
     const quickFilter = ref('');
@@ -297,7 +298,7 @@ export default defineComponent({
     });
 
     return {
-      ACTION_LABELS,
+      ACTION_LABEL_KEYS,
       currentPage, selectedKeys, quickFilter, sortKey, sortOrder, visibleColumns,
       filteredData, totalPages, pagedData, pageRange,
       toggleSort, toggleSelect, toggleSelectAll, isSelected, allPageSelected,
@@ -305,7 +306,7 @@ export default defineComponent({
       columnSettingOpen, availableColumns, selectedColumns, selectedAvailable, selectedSelected,
       openColumnSetting, confirmColumnSetting, cancelColumnSetting, addColumn, removeColumn, moveSelectedColumn,
       filterOpen, filterFieldsLocal, selectedFilterField, filterEntries, filterForm,
-      openFilter, addFilterEntry, removeFilterEntry, clearFilters, confirmFilter, cancelFilter, fieldTitle,
+      openFilter, addFilterEntry, removeFilterEntry, clearFilters, confirmFilter, cancelFilter, fieldTitle, t,
     };
   },
   template: `
@@ -313,14 +314,15 @@ export default defineComponent({
       <div class="toolbar toolbar-split" v-if="!externalToolbar">
         <div class="toolbar-left">
           <ToolbarButton v-for="a in actions" :key="a" :icon="a" @click="handleAction(a)" :disabled="actionDisabled(a)">
-            {{ a === 'moveUp' ? $t('app.moveUp') : a === 'moveDown' ? $t('app.moveDown') : (ACTION_LABELS[a] || a) }}
+            {{ t(ACTION_LABEL_KEYS[a] || 'app.' + a) }}
           </ToolbarButton>
           <slot name="toolbar-left-extra"></slot>
         </div>
         <div class="toolbar-right">
-          <input v-model="quickFilter" placeholder="搜索..." />
-          <ToolbarButton icon="filter" @click="openFilter">边界过滤</ToolbarButton>
-          <ToolbarButton icon="columnSetting" @click="openColumnSetting">列设定</ToolbarButton>
+          <slot name="toolbar-right-extra"></slot>
+          <input v-model="quickFilter" :placeholder="t('app.search') + '...'" />
+          <ToolbarButton icon="filter" @click="openFilter">{{ t('app.filter') }}</ToolbarButton>
+          <ToolbarButton icon="columnSetting" @click="openColumnSetting">{{ t('app.columnSetting') }}</ToolbarButton>
         </div>
       </div>
       <div class="data-table-wrapper">
@@ -332,7 +334,7 @@ export default defineComponent({
               </th>
               <th v-for="col in columns.filter(c => visibleColumns.includes(c.key))" :key="col.key"
                   @click="toggleSort(col.key)" style="cursor:pointer;">
-                {{ col.title }}
+                {{ t(col.title) }}
                 <span v-if="sortKey === col.key">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
               </th>
             </tr>
@@ -351,28 +353,28 @@ export default defineComponent({
             </tr>
             <tr v-if="!pagedData.length">
               <td :colspan="columns.filter(c => visibleColumns.includes(c.key)).length + (selectable ? 1 : 0)" class="text-center">
-                暂无数据
+                {{ t('table.noData') }}
               </td>
             </tr>
           </tbody>
         </table>
       </div>
       <div class="pagination">
-        <button @click="currentPage = 1" :disabled="currentPage === 1">首页</button>
-        <button @click="currentPage--" :disabled="currentPage === 1">上一页</button>
+        <button @click="currentPage = 1" :disabled="currentPage === 1">{{ t('table.firstPage') }}</button>
+        <button @click="currentPage--" :disabled="currentPage === 1">{{ t('table.prevPage') }}</button>
         <template v-for="p in pageRange" :key="p">
           <span v-if="p === '...'" style="padding:0 6px;">...</span>
           <button v-else @click="currentPage = p" :class="{ active: p === currentPage }">{{ p }}</button>
         </template>
-        <button @click="currentPage++" :disabled="currentPage === totalPages">下一页</button>
-        <button @click="currentPage = totalPages" :disabled="currentPage === totalPages">末页</button>
-        <span style="margin-left:12px;">共 {{ filteredData.length }} 条 / {{ totalPages }} 页</span>
+        <button @click="currentPage++" :disabled="currentPage === totalPages">{{ t('table.nextPage') }}</button>
+        <button @click="currentPage = totalPages" :disabled="currentPage === totalPages">{{ t('table.lastPage') }}</button>
+        <span style="margin-left:12px;">{{ t('table.total', { total: filteredData.length }) }} / {{ t('table.page', { page: currentPage, pages: totalPages }) }}</span>
       </div>
 
-      <DraggableModal v-model:visible="columnSettingOpen" title="列设定" width="640px" @confirm="confirmColumnSetting" @close="cancelColumnSetting">
+      <DraggableModal v-model:visible="columnSettingOpen" :title="t('app.columnSetting')" width="640px" @confirm="confirmColumnSetting" @close="cancelColumnSetting">
         <div class="dialog-panes">
           <div class="pane">
-            <div class="pane-title">可用字段</div>
+            <div class="pane-title">{{ t('table.availableColumns') }}</div>
             <div class="pane-list">
               <div v-for="col in availableColumns" :key="col.key" class="pane-item"
                    :class="{ selected: selectedAvailable === col.key }"
@@ -388,7 +390,7 @@ export default defineComponent({
             <button @click="moveSelectedColumn(1)" :disabled="!selectedSelected">▼</button>
           </div>
           <div class="pane">
-            <div class="pane-title">已选字段</div>
+            <div class="pane-title">{{ t('table.selectedColumns') }}</div>
             <div class="pane-list">
               <div v-for="col in selectedColumns" :key="col.key" class="pane-item"
                    :class="{ selected: selectedSelected === col.key }"
@@ -399,15 +401,15 @@ export default defineComponent({
           </div>
         </div>
         <template #footer>
-          <ToolbarButton icon="cancel" @click="cancelColumnSetting">取消</ToolbarButton>
-          <ToolbarButton icon="confirm" primary @click="confirmColumnSetting">确定</ToolbarButton>
+          <ToolbarButton icon="cancel" @click="cancelColumnSetting">{{ t('app.cancel') }}</ToolbarButton>
+          <ToolbarButton icon="confirm" primary @click="confirmColumnSetting">{{ t('app.confirm') }}</ToolbarButton>
         </template>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="filterOpen" title="边界过滤器" width="640px" @confirm="confirmFilter" @close="cancelFilter">
+      <DraggableModal v-model:visible="filterOpen" :title="t('app.filter')" width="640px" @confirm="confirmFilter" @close="cancelFilter">
         <div class="dialog-panes">
           <div class="pane">
-            <div class="pane-title">字段列表</div>
+            <div class="pane-title">{{ t('filter.fieldList') }}</div>
             <div class="pane-list">
               <div v-for="f in filterFieldsLocal" :key="f.key" class="pane-item"
                    :class="{ selected: selectedFilterField === f.key }"
@@ -417,52 +419,52 @@ export default defineComponent({
             </div>
           </div>
           <div class="pane" style="flex:2;">
-            <div class="pane-title">条件配置</div>
+            <div class="pane-title">{{ t('filter.conditionConfig') }}</div>
             <div class="pane-list" style="padding:12px;">
               <div class="form-row" style="margin-bottom:8px;">
-                <label class="form-label" style="width:80px;">启用</label>
+                <label class="form-label" style="width:80px;">{{ t('filter.enable') }}</label>
                 <input type="checkbox" v-model="filterForm.enabled" />
               </div>
               <div class="form-row" style="margin-bottom:8px;">
-                <label class="form-label" style="width:80px;">匹配方式</label>
+                <label class="form-label" style="width:80px;">{{ t('filter.matchMode') }}</label>
                 <select v-model="filterForm.section" style="flex:1;">
-                  <option value="equals">等于</option>
-                  <option value="notEqual">不等于</option>
-                  <option value="contains">包含</option>
-                  <option value="notContains">不包含</option>
-                  <option value="startsWith">开头是</option>
-                  <option value="endsWith">结尾是</option>
+                  <option value="equals">{{ t('filter.equals') }}</option>
+                  <option value="notEqual">{{ t('filter.notEqual') }}</option>
+                  <option value="contains">{{ t('filter.contains') }}</option>
+                  <option value="notContains">{{ t('filter.notContains') }}</option>
+                  <option value="startsWith">{{ t('filter.startsWith') }}</option>
+                  <option value="endsWith">{{ t('filter.endsWith') }}</option>
                 </select>
               </div>
               <div class="form-row" style="margin-bottom:8px;">
-                <label class="form-label" style="width:80px;">取反</label>
+                <label class="form-label" style="width:80px;">{{ t('filter.negate') }}</label>
                 <input type="checkbox" v-model="filterForm.not" />
               </div>
               <div class="form-row" style="margin-bottom:8px;">
-                <label class="form-label" style="width:80px;">文本</label>
-                <input v-model="filterForm.text" style="flex:1;" placeholder="输入匹配文本" />
+                <label class="form-label" style="width:80px;">{{ t('filter.text') }}</label>
+                <input v-model="filterForm.text" style="flex:1;" :placeholder="t('filter.inputMatchText')" />
               </div>
               <div class="form-row" style="margin-bottom:8px;">
-                <label class="form-label" style="width:80px;">区分大小写</label>
+                <label class="form-label" style="width:80px;">{{ t('filter.caseSensitive') }}</label>
                 <input type="checkbox" v-model="filterForm.caseSensitive" />
               </div>
               <div style="display:flex;justify-content:flex-end;margin-top:8px;">
-                <ToolbarButton icon="create" @click="addFilterEntry">添加条件</ToolbarButton>
+                <ToolbarButton icon="create" @click="addFilterEntry">{{ t('filter.addCondition') }}</ToolbarButton>
               </div>
               <div style="margin-top:12px;border-top:1px solid #ddd;padding-top:8px;">
                 <div v-for="(entry, i) in filterEntries" :key="i" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                  <span :style="{ opacity: entry.enabled ? 1 : 0.5 }">{{ fieldTitle(entry.field) }} {{ entry.not ? '不' : '' }}{{ entry.section }} "{{ entry.text }}"</span>
-                  <ToolbarButton icon="delete" @click="removeFilterEntry(i)">删除</ToolbarButton>
+                  <span :style="{ opacity: entry.enabled ? 1 : 0.5 }">{{ fieldTitle(entry.field) }} {{ entry.not ? t('filter.not') : '' }}{{ t('filter.' + entry.section) }} "{{ entry.text }}"</span>
+                  <ToolbarButton icon="delete" @click="removeFilterEntry(i)">{{ t('app.delete') }}</ToolbarButton>
                 </div>
-                <div v-if="!filterEntries.length" style="color:#999;font-size:12px;">暂无过滤条件</div>
+                <div v-if="!filterEntries.length" style="color:#999;font-size:12px;">{{ t('filter.noConditions') }}</div>
               </div>
             </div>
           </div>
         </div>
         <template #footer>
-          <ToolbarButton icon="clear" @click="clearFilters">清除所有</ToolbarButton>
-          <ToolbarButton icon="cancel" @click="cancelFilter">取消</ToolbarButton>
-          <ToolbarButton icon="confirm" primary @click="confirmFilter">确定</ToolbarButton>
+          <ToolbarButton icon="clear" @click="clearFilters">{{ t('filter.clearAll') }}</ToolbarButton>
+          <ToolbarButton icon="cancel" @click="cancelFilter">{{ t('app.cancel') }}</ToolbarButton>
+          <ToolbarButton icon="confirm" primary @click="confirmFilter">{{ t('app.confirm') }}</ToolbarButton>
         </template>
       </DraggableModal>
     </div>

@@ -1,0 +1,471 @@
+{
+  "zh-CN": {
+    "cgnat": {
+      "columns": {
+        "ipRange": "IP 范围",
+        "name": "名称",
+        "perUserLimit": "每用户限制",
+        "portRange": "端口范围",
+        "ranges": "范围",
+        "ruleId": "规则 ID",
+        "seq": "序号",
+        "sourcePool": "源地址池",
+        "translationPool": "转换地址池"
+      },
+      "errors": {
+        "ipRangeRequired": "IP 范围为必填项",
+        "poolNameRequired": "地址池名称为必填项",
+        "ruleIdRequired": "规则 ID 为必填项",
+        "sourcePoolRequired": "源地址池为必填项",
+        "translationPoolRequired": "转换地址池为必填项"
+      },
+      "labels": {
+        "ipRange": "IP 范围",
+        "logAllocation": "记录分配"
+      },
+      "messages": {
+        "confirmDeleteExtPool": "确认删除外部地址池？",
+        "confirmDeleteIntPool": "确认删除内部地址池？",
+        "confirmDeleteRule": "确认删除规则？"
+      },
+      "modals": {
+        "addRange": "添加范围",
+        "confirmDelete": "确认删除",
+        "createPool": "创建地址池",
+        "createRule": "创建规则",
+        "editPool": "编辑地址池",
+        "editRange": "编辑范围",
+        "editRule": "编辑规则"
+      },
+      "schema": {
+        "extPoolNameHelp": "外部地址池名称",
+        "externalPortRange": "外部端口范围",
+        "externalPortRangeHelp": "外部端口范围说明",
+        "intPoolNameHelp": "内部地址池名称",
+        "ipRange": "IP 范围",
+        "ipRangePlaceholder": "例如: 192.168.1.0/24",
+        "perUserLimitPort": "每用户端口限制",
+        "perUserLimitPortHelp": "每用户端口限制说明",
+        "poolName": "地址池名称",
+        "ruleId": "规则 ID",
+        "ruleIdHelp": "规则 ID 说明",
+        "seq": "序号",
+        "seqHelp": "序号说明",
+        "seqHelpOptional": "序号（可选）",
+        "seqOptional": "序号（可选）",
+        "seqRequired": "序号为必填项",
+        "sourcePool": "源地址池",
+        "sourcePoolHelp": "源地址池说明",
+        "translationPool": "转换地址池",
+        "translationPoolHelp": "转换地址池说明"
+      },
+      "tabs": {
+        "external": "外部",
+        "internal": "内部",
+        "rules": "规则"
+      }
+    }
+  },
+  "en": {
+    "cgnat": {
+      "columns": {
+        "ipRange": "Ip Range",
+        "name": "Name",
+        "perUserLimit": "Per User Limit",
+        "portRange": "Port Range",
+        "ranges": "Ranges",
+        "ruleId": "Rule Id",
+        "seq": "Seq",
+        "sourcePool": "Source Pool",
+        "translationPool": "Translation Pool"
+      },
+      "errors": {
+        "ipRangeRequired": "Ip Range Required",
+        "poolNameRequired": "Pool Name Required",
+        "ruleIdRequired": "Rule Id Required",
+        "sourcePoolRequired": "Source Pool Required",
+        "translationPoolRequired": "Translation Pool Required"
+      },
+      "labels": {
+        "ipRange": "Ip Range",
+        "logAllocation": "Log Allocation"
+      },
+      "messages": {
+        "confirmDeleteExtPool": "Confirm Delete Ext Pool",
+        "confirmDeleteIntPool": "Confirm Delete Int Pool",
+        "confirmDeleteRule": "Confirm Delete Rule"
+      },
+      "modals": {
+        "addRange": "Add Range",
+        "confirmDelete": "Confirm Delete",
+        "createPool": "Create Pool",
+        "createRule": "Create Rule",
+        "editPool": "Edit Pool",
+        "editRange": "Edit Range",
+        "editRule": "Edit Rule"
+      },
+      "schema": {
+        "extPoolNameHelp": "Ext Pool Name Help",
+        "externalPortRange": "External Port Range",
+        "externalPortRangeHelp": "External Port Range Help",
+        "intPoolNameHelp": "Int Pool Name Help",
+        "ipRange": "Ip Range",
+        "ipRangePlaceholder": "Ip Range Placeholder",
+        "perUserLimitPort": "Per User Limit Port",
+        "perUserLimitPortHelp": "Per User Limit Port Help",
+        "poolName": "Pool Name",
+        "ruleId": "Rule Id",
+        "ruleIdHelp": "Rule Id Help",
+        "seq": "Seq",
+        "seqHelp": "Seq Help",
+        "seqHelpOptional": "Seq Help Optional",
+        "seqOptional": "Seq Optional",
+        "seqRequired": "Seq Required",
+        "sourcePool": "Source Pool",
+        "sourcePoolHelp": "Source Pool Help",
+        "translationPool": "Translation Pool",
+        "translationPoolHelp": "Translation Pool Help"
+      },
+      "tabs": {
+        "external": "External",
+        "internal": "Internal",
+        "rules": "Rules"
+      }
+    }
+  },
+  "zh-TW": {
+    "cgnat": {
+      "columns": {
+        "ipRange": "Ip Range",
+        "name": "Name",
+        "perUserLimit": "Per User Limit",
+        "portRange": "Port Range",
+        "ranges": "Ranges",
+        "ruleId": "Rule Id",
+        "seq": "Seq",
+        "sourcePool": "Source Pool",
+        "translationPool": "Translation Pool"
+      },
+      "errors": {
+        "ipRangeRequired": "Ip Range Required",
+        "poolNameRequired": "Pool Name Required",
+        "ruleIdRequired": "Rule Id Required",
+        "sourcePoolRequired": "Source Pool Required",
+        "translationPoolRequired": "Translation Pool Required"
+      },
+      "labels": {
+        "ipRange": "Ip Range",
+        "logAllocation": "Log Allocation"
+      },
+      "messages": {
+        "confirmDeleteExtPool": "Confirm Delete Ext Pool",
+        "confirmDeleteIntPool": "Confirm Delete Int Pool",
+        "confirmDeleteRule": "Confirm Delete Rule"
+      },
+      "modals": {
+        "addRange": "Add Range",
+        "confirmDelete": "Confirm Delete",
+        "createPool": "Create Pool",
+        "createRule": "Create Rule",
+        "editPool": "Edit Pool",
+        "editRange": "Edit Range",
+        "editRule": "Edit Rule"
+      },
+      "schema": {
+        "extPoolNameHelp": "Ext Pool Name Help",
+        "externalPortRange": "External Port Range",
+        "externalPortRangeHelp": "External Port Range Help",
+        "intPoolNameHelp": "Int Pool Name Help",
+        "ipRange": "Ip Range",
+        "ipRangePlaceholder": "Ip Range Placeholder",
+        "perUserLimitPort": "Per User Limit Port",
+        "perUserLimitPortHelp": "Per User Limit Port Help",
+        "poolName": "Pool Name",
+        "ruleId": "Rule Id",
+        "ruleIdHelp": "Rule Id Help",
+        "seq": "Seq",
+        "seqHelp": "Seq Help",
+        "seqHelpOptional": "Seq Help Optional",
+        "seqOptional": "Seq Optional",
+        "seqRequired": "Seq Required",
+        "sourcePool": "Source Pool",
+        "sourcePoolHelp": "Source Pool Help",
+        "translationPool": "Translation Pool",
+        "translationPoolHelp": "Translation Pool Help"
+      },
+      "tabs": {
+        "external": "External",
+        "internal": "Internal",
+        "rules": "Rules"
+      }
+    }
+  },
+  "ru": {
+    "cgnat": {
+      "columns": {
+        "ipRange": "Ip Range",
+        "name": "Name",
+        "perUserLimit": "Per User Limit",
+        "portRange": "Port Range",
+        "ranges": "Ranges",
+        "ruleId": "Rule Id",
+        "seq": "Seq",
+        "sourcePool": "Source Pool",
+        "translationPool": "Translation Pool"
+      },
+      "errors": {
+        "ipRangeRequired": "Ip Range Required",
+        "poolNameRequired": "Pool Name Required",
+        "ruleIdRequired": "Rule Id Required",
+        "sourcePoolRequired": "Source Pool Required",
+        "translationPoolRequired": "Translation Pool Required"
+      },
+      "labels": {
+        "ipRange": "Ip Range",
+        "logAllocation": "Log Allocation"
+      },
+      "messages": {
+        "confirmDeleteExtPool": "Confirm Delete Ext Pool",
+        "confirmDeleteIntPool": "Confirm Delete Int Pool",
+        "confirmDeleteRule": "Confirm Delete Rule"
+      },
+      "modals": {
+        "addRange": "Add Range",
+        "confirmDelete": "Confirm Delete",
+        "createPool": "Create Pool",
+        "createRule": "Create Rule",
+        "editPool": "Edit Pool",
+        "editRange": "Edit Range",
+        "editRule": "Edit Rule"
+      },
+      "schema": {
+        "extPoolNameHelp": "Ext Pool Name Help",
+        "externalPortRange": "External Port Range",
+        "externalPortRangeHelp": "External Port Range Help",
+        "intPoolNameHelp": "Int Pool Name Help",
+        "ipRange": "Ip Range",
+        "ipRangePlaceholder": "Ip Range Placeholder",
+        "perUserLimitPort": "Per User Limit Port",
+        "perUserLimitPortHelp": "Per User Limit Port Help",
+        "poolName": "Pool Name",
+        "ruleId": "Rule Id",
+        "ruleIdHelp": "Rule Id Help",
+        "seq": "Seq",
+        "seqHelp": "Seq Help",
+        "seqHelpOptional": "Seq Help Optional",
+        "seqOptional": "Seq Optional",
+        "seqRequired": "Seq Required",
+        "sourcePool": "Source Pool",
+        "sourcePoolHelp": "Source Pool Help",
+        "translationPool": "Translation Pool",
+        "translationPoolHelp": "Translation Pool Help"
+      },
+      "tabs": {
+        "external": "External",
+        "internal": "Internal",
+        "rules": "Rules"
+      }
+    }
+  },
+  "de": {
+    "cgnat": {
+      "columns": {
+        "ipRange": "Ip Range",
+        "name": "Name",
+        "perUserLimit": "Per User Limit",
+        "portRange": "Port Range",
+        "ranges": "Ranges",
+        "ruleId": "Rule Id",
+        "seq": "Seq",
+        "sourcePool": "Source Pool",
+        "translationPool": "Translation Pool"
+      },
+      "errors": {
+        "ipRangeRequired": "Ip Range Required",
+        "poolNameRequired": "Pool Name Required",
+        "ruleIdRequired": "Rule Id Required",
+        "sourcePoolRequired": "Source Pool Required",
+        "translationPoolRequired": "Translation Pool Required"
+      },
+      "labels": {
+        "ipRange": "Ip Range",
+        "logAllocation": "Log Allocation"
+      },
+      "messages": {
+        "confirmDeleteExtPool": "Confirm Delete Ext Pool",
+        "confirmDeleteIntPool": "Confirm Delete Int Pool",
+        "confirmDeleteRule": "Confirm Delete Rule"
+      },
+      "modals": {
+        "addRange": "Add Range",
+        "confirmDelete": "Confirm Delete",
+        "createPool": "Create Pool",
+        "createRule": "Create Rule",
+        "editPool": "Edit Pool",
+        "editRange": "Edit Range",
+        "editRule": "Edit Rule"
+      },
+      "schema": {
+        "extPoolNameHelp": "Ext Pool Name Help",
+        "externalPortRange": "External Port Range",
+        "externalPortRangeHelp": "External Port Range Help",
+        "intPoolNameHelp": "Int Pool Name Help",
+        "ipRange": "Ip Range",
+        "ipRangePlaceholder": "Ip Range Placeholder",
+        "perUserLimitPort": "Per User Limit Port",
+        "perUserLimitPortHelp": "Per User Limit Port Help",
+        "poolName": "Pool Name",
+        "ruleId": "Rule Id",
+        "ruleIdHelp": "Rule Id Help",
+        "seq": "Seq",
+        "seqHelp": "Seq Help",
+        "seqHelpOptional": "Seq Help Optional",
+        "seqOptional": "Seq Optional",
+        "seqRequired": "Seq Required",
+        "sourcePool": "Source Pool",
+        "sourcePoolHelp": "Source Pool Help",
+        "translationPool": "Translation Pool",
+        "translationPoolHelp": "Translation Pool Help"
+      },
+      "tabs": {
+        "external": "External",
+        "internal": "Internal",
+        "rules": "Rules"
+      }
+    }
+  },
+  "fr": {
+    "cgnat": {
+      "columns": {
+        "ipRange": "Ip Range",
+        "name": "Name",
+        "perUserLimit": "Per User Limit",
+        "portRange": "Port Range",
+        "ranges": "Ranges",
+        "ruleId": "Rule Id",
+        "seq": "Seq",
+        "sourcePool": "Source Pool",
+        "translationPool": "Translation Pool"
+      },
+      "errors": {
+        "ipRangeRequired": "Ip Range Required",
+        "poolNameRequired": "Pool Name Required",
+        "ruleIdRequired": "Rule Id Required",
+        "sourcePoolRequired": "Source Pool Required",
+        "translationPoolRequired": "Translation Pool Required"
+      },
+      "labels": {
+        "ipRange": "Ip Range",
+        "logAllocation": "Log Allocation"
+      },
+      "messages": {
+        "confirmDeleteExtPool": "Confirm Delete Ext Pool",
+        "confirmDeleteIntPool": "Confirm Delete Int Pool",
+        "confirmDeleteRule": "Confirm Delete Rule"
+      },
+      "modals": {
+        "addRange": "Add Range",
+        "confirmDelete": "Confirm Delete",
+        "createPool": "Create Pool",
+        "createRule": "Create Rule",
+        "editPool": "Edit Pool",
+        "editRange": "Edit Range",
+        "editRule": "Edit Rule"
+      },
+      "schema": {
+        "extPoolNameHelp": "Ext Pool Name Help",
+        "externalPortRange": "External Port Range",
+        "externalPortRangeHelp": "External Port Range Help",
+        "intPoolNameHelp": "Int Pool Name Help",
+        "ipRange": "Ip Range",
+        "ipRangePlaceholder": "Ip Range Placeholder",
+        "perUserLimitPort": "Per User Limit Port",
+        "perUserLimitPortHelp": "Per User Limit Port Help",
+        "poolName": "Pool Name",
+        "ruleId": "Rule Id",
+        "ruleIdHelp": "Rule Id Help",
+        "seq": "Seq",
+        "seqHelp": "Seq Help",
+        "seqHelpOptional": "Seq Help Optional",
+        "seqOptional": "Seq Optional",
+        "seqRequired": "Seq Required",
+        "sourcePool": "Source Pool",
+        "sourcePoolHelp": "Source Pool Help",
+        "translationPool": "Translation Pool",
+        "translationPoolHelp": "Translation Pool Help"
+      },
+      "tabs": {
+        "external": "External",
+        "internal": "Internal",
+        "rules": "Rules"
+      }
+    }
+  },
+  "ko": {
+    "cgnat": {
+      "columns": {
+        "ipRange": "Ip Range",
+        "name": "Name",
+        "perUserLimit": "Per User Limit",
+        "portRange": "Port Range",
+        "ranges": "Ranges",
+        "ruleId": "Rule Id",
+        "seq": "Seq",
+        "sourcePool": "Source Pool",
+        "translationPool": "Translation Pool"
+      },
+      "errors": {
+        "ipRangeRequired": "Ip Range Required",
+        "poolNameRequired": "Pool Name Required",
+        "ruleIdRequired": "Rule Id Required",
+        "sourcePoolRequired": "Source Pool Required",
+        "translationPoolRequired": "Translation Pool Required"
+      },
+      "labels": {
+        "ipRange": "Ip Range",
+        "logAllocation": "Log Allocation"
+      },
+      "messages": {
+        "confirmDeleteExtPool": "Confirm Delete Ext Pool",
+        "confirmDeleteIntPool": "Confirm Delete Int Pool",
+        "confirmDeleteRule": "Confirm Delete Rule"
+      },
+      "modals": {
+        "addRange": "Add Range",
+        "confirmDelete": "Confirm Delete",
+        "createPool": "Create Pool",
+        "createRule": "Create Rule",
+        "editPool": "Edit Pool",
+        "editRange": "Edit Range",
+        "editRule": "Edit Rule"
+      },
+      "schema": {
+        "extPoolNameHelp": "Ext Pool Name Help",
+        "externalPortRange": "External Port Range",
+        "externalPortRangeHelp": "External Port Range Help",
+        "intPoolNameHelp": "Int Pool Name Help",
+        "ipRange": "Ip Range",
+        "ipRangePlaceholder": "Ip Range Placeholder",
+        "perUserLimitPort": "Per User Limit Port",
+        "perUserLimitPortHelp": "Per User Limit Port Help",
+        "poolName": "Pool Name",
+        "ruleId": "Rule Id",
+        "ruleIdHelp": "Rule Id Help",
+        "seq": "Seq",
+        "seqHelp": "Seq Help",
+        "seqHelpOptional": "Seq Help Optional",
+        "seqOptional": "Seq Optional",
+        "seqRequired": "Seq Required",
+        "sourcePool": "Source Pool",
+        "sourcePoolHelp": "Source Pool Help",
+        "translationPool": "Translation Pool",
+        "translationPoolHelp": "Translation Pool Help"
+      },
+      "tabs": {
+        "external": "External",
+        "internal": "Internal",
+        "rules": "Rules"
+      }
+    }
+  }
+}

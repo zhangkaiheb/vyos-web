@@ -1,10 +1,13 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
 import { configApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import DataTable from '/src/components/Table/DataTable.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const AUTH_METHOD_OPTIONS = ['', 'ldap'];
 const CACHE_PEER_TYPE_OPTIONS = ['parent', 'sibling', 'multicast'];
@@ -34,42 +37,42 @@ function splitMembers(text) {
   return String(text || '').split('\n').map(s => s.trim()).filter(Boolean);
 }
 
-function validateName(name) {
-  if (!name || !String(name).trim()) return '请输入名称';
-  if (!/^[a-zA-Z0-9_.:-]+$/.test(String(name))) return '名称只能包含字母、数字、下划线、点、冒号和连字符';
+function validateName(name, t) {
+  if (!name || !String(name).trim()) return t('webproxy.validation.nameRequired');
+  if (!/^[a-zA-Z0-9_.:-]+$/.test(String(name))) return t('webproxy.validation.nameInvalidChars');
   return '';
 }
 
-function validateIPv4(value) {
+function validateIPv4(value, t) {
   if (!value) return '';
   const re = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-  if (!re.test(value)) return 'IPv4 地址格式错误';
+  if (!re.test(value)) return t('webproxy.validation.ipv4Invalid');
   return '';
 }
 
-function validateHostOrIPv4(value) {
+function validateHostOrIPv4(value, t) {
   if (!value) return '';
-  if (!validateIPv4(value)) return '';
+  if (!validateIPv4(value, t)) return '';
   const hostRe = /^(?=.{1,253}$)[a-zA-Z0-9_]([a-zA-Z0-9_\-]{0,61}[a-zA-Z0-9_])?(\.[a-zA-Z0-9_]([a-zA-Z0-9_\-]{0,61}[a-zA-Z0-9_])?)*\.?$/;
-  if (!hostRe.test(value)) return '请输入有效的 IPv4 地址或主机名';
+  if (!hostRe.test(value)) return t('webproxy.validation.hostOrIpv4Invalid');
   return '';
 }
 
-function validateRange(value, min, max, name) {
+function validateRange(value, min, max, nameKey, t, params = {}) {
   if (value === '' || value === undefined || value === null) return '';
   const n = Number(value);
-  if (isNaN(n) || n < min || n > max) return `${name} 范围为 ${min}-${max}`;
+  if (isNaN(n) || n < min || n > max) return t(nameKey, { min, max, ...params });
   return '';
 }
 
-function validatePort(value, allowZero = false) {
+function validatePort(value, t, allowZero = false) {
   const min = allowZero ? 0 : 1;
-  return validateRange(value, min, 65535, '端口');
+  return validateRange(value, min, 65535, 'webproxy.validation.portRange', t);
 }
 
-function validatePortList(text, allowZero = false) {
+function validatePortList(text, t, allowZero = false) {
   for (const line of splitMembers(text)) {
-    const err = validatePort(line, allowZero);
+    const err = validatePort(line, t, allowZero);
     if (err) return err;
   }
   return '';
@@ -80,61 +83,61 @@ function validateRequired(value, msg) {
   return '';
 }
 
-function validateFQDN(value) {
+function validateFQDN(value, t) {
   if (!value) return '';
   const re = /^(?=.{1,253}$)([a-zA-Z0-9_]([a-zA-Z0-9_\-]{0,61}[a-zA-Z0-9_])?\.)+[a-zA-Z]{2,63}$/;
-  if (!re.test(value)) return '请输入有效的域名';
+  if (!re.test(value)) return t('webproxy.validation.fqdnInvalid');
   return '';
 }
 
-function validateIPv4OrFQDN(value) {
+function validateIPv4OrFQDN(value, t) {
   if (!value) return '';
-  if (!validateIPv4(value) || !validateFQDN(value)) return '';
-  return '请输入有效的 IPv4 地址或域名';
+  if (!validateIPv4(value, t) || !validateFQDN(value, t)) return '';
+  return t('webproxy.validation.ipv4OrFqdnInvalid');
 }
 
-function validateURL(value) {
+function validateURL(value, t) {
   if (!value) return '';
   const re = /^(\/[a-zA-Z0-9_\-./?&=+%~#]*)$/;
-  if (!re.test(value)) return 'URL 格式错误（示例：/path/to/resource）';
+  if (!re.test(value)) return t('webproxy.validation.urlInvalid');
   return '';
 }
 
-function validateAppendDomain(value) {
+function validateAppendDomain(value, t) {
   if (!value) return '';
-  if (!value.startsWith('.')) return '追加域名必须以 "." 开头';
+  if (!value.startsWith('.')) return t('webproxy.validation.appendDomainMustStartWithDot');
   const re = /^\.[A-Za-z0-9][-.A-Za-z0-9]*$/;
-  if (!re.test(value)) return '追加域名格式错误';
+  if (!re.test(value)) return t('webproxy.validation.appendDomainInvalid');
   return '';
 }
 
-function validateSafePort(value) {
+function validateSafePort(value, t) {
   if (value === '' || value === undefined || value === null) return '';
   const n = Number(value);
-  if (isNaN(n) || n < 1 || n > 65535) return '端口范围为 1-65535';
+  if (isNaN(n) || n < 1 || n > 65535) return t('webproxy.validation.portRange', { min: 1, max: 65535 });
   const allowed = (n >= 1 && n <= 20) || (n >= 22 && n <= 69) || (n >= 71 && n <= 79) ||
     (n >= 81 && n <= 209) || (n >= 211 && n <= 279) || (n >= 281 && n <= 442) ||
     (n >= 444 && n <= 487) || (n >= 489 && n <= 590) || (n >= 592 && n <= 776) ||
     (n >= 778 && n <= 872) || (n >= 874 && n <= 1024) || n >= 1025;
-  if (!allowed) return '该端口已包含在默认安全端口列表中，无需手动添加';
+  if (!allowed) return t('webproxy.validation.safePortAlreadyIncluded');
   return '';
 }
 
-function validateSSLSafePort(value) {
+function validateSSLSafePort(value, t) {
   if (value === '' || value === undefined || value === null) return '';
   const n = Number(value);
-  if (isNaN(n) || n < 1 || n > 65535) return '端口范围为 1-65535';
-  if (n === 443) return '443 已包含在默认 SSL 安全端口列表中';
+  if (isNaN(n) || n < 1 || n > 65535) return t('webproxy.validation.portRange', { min: 1, max: 65535 });
+  if (n === 443) return t('webproxy.validation.sslSafePort443Included');
   return '';
 }
 
-function validateRuleNumber(value) {
-  return validateRange(value, 1, 1024, '规则编号');
+function validateRuleNumber(value, t) {
+  return validateRange(value, 1, 1024, 'webproxy.validation.ruleNumberRange', t);
 }
 
-function validateKeyword(value) {
+function validateKeyword(value, t) {
   if (!value) return '';
-  if (/[\x00-\x1f]/.test(value)) return '关键字包含非法字符';
+  if (/[\x00-\x1f]/.test(value)) return t('webproxy.validation.keywordInvalidChars');
   return '';
 }
 
@@ -473,6 +476,8 @@ function defaultTimePeriod() {
 export default defineComponent({
   name: 'WebProxyPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -482,39 +487,39 @@ export default defineComponent({
     const commandPath = 'service webproxy';
 
     const listenColumns = [
-      { key: 'address', title: '监听地址' },
-      { key: 'port', title: '端口' },
-      { key: 'disable_transparent', title: '非透明' },
+      { key: 'address', title: t('webproxy.columns.listenAddress') },
+      { key: 'port', title: t('webproxy.columns.port') },
+      { key: 'disable_transparent', title: t('webproxy.columns.nonTransparent') },
     ];
     const peerColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'address', title: '地址' },
-      { key: 'type', title: '类型' },
-      { key: 'http_port', title: 'HTTP 端口' },
-      { key: 'icp_port', title: 'ICP 端口' },
+      { key: 'name', title: t('webproxy.columns.name') },
+      { key: 'address', title: t('webproxy.columns.address') },
+      { key: 'type', title: t('webproxy.columns.type') },
+      { key: 'http_port', title: t('webproxy.columns.httpPort') },
+      { key: 'icp_port', title: t('webproxy.columns.icpPort') },
     ];
     const ruleColumns = [
-      { key: 'number', title: '规则编号' },
-      { key: 'source_group', title: '源组' },
-      { key: 'default_action', title: '默认动作' },
-      { key: 'time_period', title: '时间段' },
+      { key: 'number', title: t('webproxy.columns.ruleNumber') },
+      { key: 'source_group', title: t('webproxy.columns.sourceGroup') },
+      { key: 'default_action', title: t('webproxy.columns.defaultAction') },
+      { key: 'time_period', title: t('webproxy.columns.timePeriod') },
     ];
     const sourceGroupColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'address', title: '地址' },
-      { key: 'description', title: '描述' },
+      { key: 'name', title: t('webproxy.columns.name') },
+      { key: 'address', title: t('webproxy.columns.address') },
+      { key: 'description', title: t('webproxy.columns.description') },
     ];
     const timePeriodColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'ranges', title: '时间段' },
-      { key: 'description', title: '描述' },
+      { key: 'name', title: t('webproxy.columns.name') },
+      { key: 'ranges', title: t('webproxy.columns.timePeriod') },
+      { key: 'description', title: t('webproxy.columns.description') },
     ];
 
     const listenRows = computed(() => (config.value.listen_addresses || []).map(item => ({
       _address: item.address,
       address: item.address,
       port: item.port || '-',
-      disable_transparent: item.disable_transparent ? '是' : '否',
+      disable_transparent: item.disable_transparent ? t('webproxy.common.yes') : t('webproxy.common.no'),
     })));
     const peerRows = computed(() => (config.value.cache_peers || []).map(item => ({
       _name: item.name,
@@ -564,6 +569,17 @@ export default defineComponent({
       timePeriod: defaultTimePeriod(),
     });
 
+    const deleteListenModalVisible = ref(false);
+    const pendingDeleteListenNames = ref([]);
+    const deleteCachePeerModalVisible = ref(false);
+    const pendingDeleteCachePeerNames = ref([]);
+    const deleteRuleModalVisible = ref(false);
+    const pendingDeleteRuleNumbers = ref([]);
+    const deleteSourceGroupModalVisible = ref(false);
+    const pendingDeleteSourceGroupNames = ref([]);
+    const deleteTimePeriodModalVisible = ref(false);
+    const pendingDeleteTimePeriodNames = ref([]);
+
     async function load() {
       loading.value = true;
       saved.value = false;
@@ -592,16 +608,16 @@ export default defineComponent({
 
     function saveListenAddress() {
       const item = editing.value.listen;
-      const err = validateRequired(item.address, '请输入监听地址') || validateIPv4(item.address)
-        || (item.port ? validateRange(item.port, 1025, 65535, '监听端口') : '');
-      if (err) return alert(err);
+      const err = validateRequired(item.address, t('webproxy.validation.listenAddressRequired')) || validateIPv4(item.address, t)
+        || (item.port ? validateRange(item.port, 1025, 65535, 'webproxy.validation.listenPortRange', t) : '');
+      if (err) return showError({ message: err });
       const list = config.value.listen_addresses;
       const idx = list.findIndex(x => x._address === item._address);
       const newItem = { ...item };
       if (idx >= 0) {
         list[idx] = newItem;
       } else {
-        if (list.some(x => x.address === item.address)) return alert('监听地址已存在');
+        if (list.some(x => x.address === item.address)) return showError({ message: t('webproxy.validation.listenAddressExists') });
         list.push(newItem);
       }
       modals.value.listen = false;
@@ -611,22 +627,28 @@ export default defineComponent({
       const keys = Array.isArray(rows) ? rows : [rows?.address];
       const names = keys.map(k => config.value.listen_addresses.find(x => x.address === k)?.address).filter(Boolean);
       if (!names.length) return;
-      if (!confirm(`确认删除监听地址 ${names.map(n => `"${n}"`).join(', ')}？`)) return;
-      config.value.listen_addresses = config.value.listen_addresses.filter(x => !keys.includes(x.address));
+      pendingDeleteListenNames.value = names;
+      deleteListenModalVisible.value = true;
+    }
+
+    function confirmDeleteListenAddress() {
+      deleteListenModalVisible.value = false;
+      config.value.listen_addresses = config.value.listen_addresses.filter(x => !pendingDeleteListenNames.value.includes(x.address));
+      pendingDeleteListenNames.value = [];
     }
 
     function saveCachePeer() {
       const item = editing.value.peer;
-      const err = validateName(item.name) || validateHostOrIPv4(item.address)
-        || (item.http_port ? validateRange(item.http_port, 1025, 65535, 'HTTP 端口') : '')
-        || validateRange(item.icp_port, 0, 65535, 'ICP 端口');
-      if (err) return alert(err);
+      const err = validateName(item.name, t) || validateHostOrIPv4(item.address, t)
+        || (item.http_port ? validateRange(item.http_port, 1025, 65535, 'webproxy.validation.httpPortRange', t) : '')
+        || validateRange(item.icp_port, 0, 65535, 'webproxy.validation.icpPortRange', t);
+      if (err) return showError({ message: err });
       const list = config.value.cache_peers;
       const idx = list.findIndex(x => x._name === item._name);
       if (idx >= 0) {
         list[idx] = { ...item };
       } else {
-        if (list.some(x => x.name === item.name)) return alert('缓存对等体名称已存在');
+        if (list.some(x => x.name === item.name)) return showError({ message: t('webproxy.validation.cachePeerNameExists') });
         list.push({ ...item });
       }
       modals.value.peer = false;
@@ -636,27 +658,33 @@ export default defineComponent({
       const keys = Array.isArray(rows) ? rows : [rows?.name];
       const names = keys.map(k => config.value.cache_peers.find(x => x.name === k)?.name).filter(Boolean);
       if (!names.length) return;
-      if (!confirm(`确认删除缓存对等体 ${names.map(n => `"${n}"`).join(', ')}？`)) return;
-      config.value.cache_peers = config.value.cache_peers.filter(x => !keys.includes(x.name));
+      pendingDeleteCachePeerNames.value = names;
+      deleteCachePeerModalVisible.value = true;
+    }
+
+    function confirmDeleteCachePeer() {
+      deleteCachePeerModalVisible.value = false;
+      config.value.cache_peers = config.value.cache_peers.filter(x => !pendingDeleteCachePeerNames.value.includes(x.name));
+      pendingDeleteCachePeerNames.value = [];
     }
 
     function saveRule() {
       const item = editing.value.rule;
-      const err = validateRuleNumber(item.number)
-        || validateRequired(item.source_group, '请选择源组')
-        || (sourceGroupOptions.value.includes(item.source_group) ? '' : '源组不存在')
-        || validateList(item.local_block, validateIPv4OrFQDN)
-        || validateList(item.local_ok, validateIPv4OrFQDN)
-        || validateList(item.local_block_url, validateURL)
-        || validateList(item.local_ok_url, validateURL)
-        || validateList(item.local_block_keyword, validateKeyword);
-      if (err) return alert(err);
+      const err = validateRuleNumber(item.number, t)
+        || validateRequired(item.source_group, t('webproxy.validation.sourceGroupRequired'))
+        || (sourceGroupOptions.value.includes(item.source_group) ? '' : t('webproxy.validation.sourceGroupNotFound'))
+        || validateList(item.local_block, (v) => validateIPv4OrFQDN(v, t))
+        || validateList(item.local_ok, (v) => validateIPv4OrFQDN(v, t))
+        || validateList(item.local_block_url, (v) => validateURL(v, t))
+        || validateList(item.local_ok_url, (v) => validateURL(v, t))
+        || validateList(item.local_block_keyword, (v) => validateKeyword(v, t));
+      if (err) return showError({ message: err });
       const list = config.value.url_filtering.squidguard.rules;
       const idx = list.findIndex(x => x._number === item._number);
       if (idx >= 0) {
         list[idx] = { ...item };
       } else {
-        if (list.some(x => x.number === item.number)) return alert('规则编号已存在');
+        if (list.some(x => x.number === item.number)) return showError({ message: t('webproxy.validation.ruleNumberExists') });
         list.push({ ...item });
       }
       modals.value.rule = false;
@@ -666,21 +694,27 @@ export default defineComponent({
       const keys = Array.isArray(rows) ? rows : [rows?.number];
       const numbers = keys.map(k => config.value.url_filtering.squidguard.rules.find(x => x.number === k)?.number).filter(Boolean);
       if (!numbers.length) return;
-      if (!confirm(`确认删除规则 ${numbers.map(n => `"${n}"`).join(', ')}？`)) return;
+      pendingDeleteRuleNumbers.value = numbers;
+      deleteRuleModalVisible.value = true;
+    }
+
+    function confirmDeleteRule() {
+      deleteRuleModalVisible.value = false;
       const list = config.value.url_filtering.squidguard.rules;
-      config.value.url_filtering.squidguard.rules = list.filter(x => !numbers.includes(x.number));
+      config.value.url_filtering.squidguard.rules = list.filter(x => !pendingDeleteRuleNumbers.value.includes(x.number));
+      pendingDeleteRuleNumbers.value = [];
     }
 
     function saveSourceGroup() {
       const item = editing.value.sourceGroup;
-      const err = validateName(item.name) || validateRequired(item.address, '请输入地址');
-      if (err) return alert(err);
+      const err = validateName(item.name, t) || validateRequired(item.address, t('webproxy.validation.addressRequired'));
+      if (err) return showError({ message: err });
       const list = config.value.url_filtering.squidguard.source_groups;
       const idx = list.findIndex(x => x._name === item._name);
       if (idx >= 0) {
         list[idx] = { ...item };
       } else {
-        if (list.some(x => x.name === item.name)) return alert('源组名称已存在');
+        if (list.some(x => x.name === item.name)) return showError({ message: t('webproxy.validation.sourceGroupNameExists') });
         list.push({ ...item });
       }
       modals.value.sourceGroup = false;
@@ -690,23 +724,29 @@ export default defineComponent({
       const keys = Array.isArray(rows) ? rows : [rows?.name];
       const names = keys.map(k => config.value.url_filtering.squidguard.source_groups.find(x => x.name === k)?.name).filter(Boolean);
       if (!names.length) return;
-      if (!confirm(`确认删除源组 ${names.map(n => `"${n}"`).join(', ')}？`)) return;
+      pendingDeleteSourceGroupNames.value = names;
+      deleteSourceGroupModalVisible.value = true;
+    }
+
+    function confirmDeleteSourceGroup() {
+      deleteSourceGroupModalVisible.value = false;
       const list = config.value.url_filtering.squidguard.source_groups;
-      config.value.url_filtering.squidguard.source_groups = list.filter(x => !keys.includes(x.name));
+      config.value.url_filtering.squidguard.source_groups = list.filter(x => !pendingDeleteSourceGroupNames.value.includes(x.name));
+      pendingDeleteSourceGroupNames.value = [];
     }
 
     function saveTimePeriod() {
       const item = editing.value.timePeriod;
-      const err = validateName(item.name) || validateRequired(item.ranges, '请输入时间段');
-      if (err) return alert(err);
+      const err = validateName(item.name, t) || validateRequired(item.ranges, t('webproxy.validation.timePeriodRequired'));
+      if (err) return showError({ message: err });
       const parsed = parseTimePeriods(item.ranges);
-      if (!Object.keys(parsed).length) return alert('时间段格式错误，示例：Sun 09:00 - 17:00');
+      if (!Object.keys(parsed).length) return showError({ message: t('webproxy.validation.timePeriodFormatError') });
       const list = config.value.url_filtering.squidguard.time_periods;
       const idx = list.findIndex(x => x._name === item._name);
       if (idx >= 0) {
         list[idx] = { ...item };
       } else {
-        if (list.some(x => x.name === item.name)) return alert('时间段名称已存在');
+        if (list.some(x => x.name === item.name)) return showError({ message: t('webproxy.validation.timePeriodNameExists') });
         list.push({ ...item });
       }
       modals.value.timePeriod = false;
@@ -716,107 +756,113 @@ export default defineComponent({
       const keys = Array.isArray(rows) ? rows : [rows?.name];
       const names = keys.map(k => config.value.url_filtering.squidguard.time_periods.find(x => x.name === k)?.name).filter(Boolean);
       if (!names.length) return;
-      if (!confirm(`确认删除时间段 ${names.map(n => `"${n}"`).join(', ')}？`)) return;
+      pendingDeleteTimePeriodNames.value = names;
+      deleteTimePeriodModalVisible.value = true;
+    }
+
+    function confirmDeleteTimePeriod() {
+      deleteTimePeriodModalVisible.value = false;
       const list = config.value.url_filtering.squidguard.time_periods;
-      config.value.url_filtering.squidguard.time_periods = list.filter(x => !keys.includes(x.name));
+      config.value.url_filtering.squidguard.time_periods = list.filter(x => !pendingDeleteTimePeriodNames.value.includes(x.name));
+      pendingDeleteTimePeriodNames.value = [];
     }
 
     function validate() {
       const c = config.value;
       if (isPresent(c.default_port)) {
-        const err = validateRange(c.default_port, 1025, 65535, '默认端口');
+        const err = validateRange(c.default_port, 1025, 65535, 'webproxy.validation.defaultPortRange', t);
         if (err) return err;
       }
       if (isPresent(c.cache_size)) {
-        const err = validateRange(c.cache_size, 0, 1000000, '缓存大小');
+        const err = validateRange(c.cache_size, 0, 1000000, 'webproxy.validation.cacheSizeRange', t);
         if (err) return err;
       }
       if (isPresent(c.mem_cache_size)) {
-        const err = validateRange(c.mem_cache_size, 1, 100000, '内存缓存');
+        const err = validateRange(c.mem_cache_size, 1, 100000, 'webproxy.validation.memCacheSizeRange', t);
         if (err) return err;
       }
       if (isPresent(c.maximum_object_size)) {
-        const err = validateRange(c.maximum_object_size, 1, 1000000, '最大对象大小');
+        const err = validateRange(c.maximum_object_size, 1, 1000000, 'webproxy.validation.maxObjectSizeRange', t);
         if (err) return err;
       }
       if (isPresent(c.minimum_object_size)) {
-        const err = validateRange(c.minimum_object_size, 1, 100000, '最小对象大小');
+        const err = validateRange(c.minimum_object_size, 1, 100000, 'webproxy.validation.minObjectSizeRange', t);
         if (err) return err;
       }
       if (isPresent(c.reply_body_max_size)) {
-        const err = validateRange(c.reply_body_max_size, 1, 100000, '回复体最大大小');
+        const err = validateRange(c.reply_body_max_size, 1, 100000, 'webproxy.validation.replyBodyMaxSizeRange', t);
         if (err) return err;
       }
       if (isPresent(c.append_domain)) {
-        const err = validateAppendDomain(c.append_domain);
+        const err = validateAppendDomain(c.append_domain, t);
         if (err) return err;
       }
       if (isPresent(c.outgoing_address)) {
-        const err = validateIPv4(c.outgoing_address);
+        const err = validateIPv4(c.outgoing_address, t);
         if (err) return err;
       }
-      let listErr = validateList(c.safe_ports, validateSafePort);
-      if (listErr) return `安全端口: ${listErr}`;
-      listErr = validateList(c.ssl_safe_ports, validateSSLSafePort);
-      if (listErr) return `SSL 安全端口: ${listErr}`;
+      let listErr = validateList(c.safe_ports, (v) => validateSafePort(v, t));
+      if (listErr) return t('webproxy.validation.safePortsError', { error: listErr });
+      listErr = validateList(c.ssl_safe_ports, (v) => validateSSLSafePort(v, t));
+      if (listErr) return t('webproxy.validation.sslSafePortsError', { error: listErr });
 
       for (const item of c.listen_addresses || []) {
-        const err = validateIPv4(item.address) || (item.port ? validateRange(item.port, 1025, 65535, '监听端口') : '');
-        if (err) return `监听地址 ${item.address}: ${err}`;
+        const err = validateIPv4(item.address, t) || (item.port ? validateRange(item.port, 1025, 65535, 'webproxy.validation.listenPortRange', t) : '');
+        if (err) return t('webproxy.validation.listenAddressError', { address: item.address, error: err });
       }
       for (const item of c.cache_peers || []) {
-        const err = validateHostOrIPv4(item.address)
-          || (item.http_port ? validateRange(item.http_port, 1025, 65535, 'HTTP 端口') : '')
-          || validateRange(item.icp_port, 0, 65535, 'ICP 端口');
-        if (err) return `缓存对等体 ${item.name}: ${err}`;
+        const err = validateHostOrIPv4(item.address, t)
+          || (item.http_port ? validateRange(item.http_port, 1025, 65535, 'webproxy.validation.httpPortRange', t) : '')
+          || validateRange(item.icp_port, 0, 65535, 'webproxy.validation.icpPortRange', t);
+        if (err) return t('webproxy.validation.cachePeerError', { name: item.name, error: err });
       }
 
       const auth = c.authentication;
       if (auth.method === 'ldap') {
-        if (!isPresent(auth.ldap.server)) return 'LDAP 认证需要服务器地址';
-        if (!isPresent(auth.ldap.base_dn)) return 'LDAP 认证需要 Base DN';
+        if (!isPresent(auth.ldap.server)) return t('webproxy.validation.ldapServerRequired');
+        if (!isPresent(auth.ldap.base_dn)) return t('webproxy.validation.ldapBaseDnRequired');
         if (isPresent(auth.ldap.port)) {
-          const err = validateRange(auth.ldap.port, 1, 65535, 'LDAP 端口');
+          const err = validateRange(auth.ldap.port, 1, 65535, 'webproxy.validation.ldapPortRange', t);
           if (err) return err;
         }
         if (isPresent(auth.ldap.version)) {
-          const err = validateRange(auth.ldap.version, 2, 3, 'LDAP 版本');
+          const err = validateRange(auth.ldap.version, 2, 3, 'webproxy.validation.ldapVersionRange', t);
           if (err) return err;
         }
         if ((isPresent(auth.ldap.bind_dn) || isPresent(auth.ldap.password)) && !(isPresent(auth.ldap.bind_dn) && isPresent(auth.ldap.password))) {
-          return 'LDAP bind-dn 和 password 必须同时设置';
+          return t('webproxy.validation.ldapBindDnAndPasswordRequired');
         }
       }
       if (isPresent(auth.children)) {
-        const err = validateRange(auth.children, 1, 500, '认证子进程数');
+        const err = validateRange(auth.children, 1, 500, 'webproxy.validation.authChildrenRange', t);
         if (err) return err;
       }
       if (isPresent(auth.credentials_ttl)) {
-        const err = validateRange(auth.credentials_ttl, 1, 600, '凭证有效期');
+        const err = validateRange(auth.credentials_ttl, 1, 600, 'webproxy.validation.credentialsTtlRange', t);
         if (err) return err;
       }
 
       const sg = c.url_filtering?.squidguard;
       if (sg) {
         if (isPresent(sg.auto_update?.update_hour)) {
-          const err = validateRange(sg.auto_update.update_hour, 0, 23, '更新小时');
+          const err = validateRange(sg.auto_update.update_hour, 0, 23, 'webproxy.validation.updateHourRange', t);
           if (err) return err;
         }
-        listErr = validateList(sg.local_block, validateIPv4OrFQDN);
-        if (listErr) return `本地阻断域名: ${listErr}`;
-        listErr = validateList(sg.local_ok, validateIPv4OrFQDN);
-        if (listErr) return `本地允许域名: ${listErr}`;
-        listErr = validateList(sg.local_block_url, validateURL);
-        if (listErr) return `本地阻断 URL: ${listErr}`;
-        listErr = validateList(sg.local_ok_url, validateURL);
-        if (listErr) return `本地允许 URL: ${listErr}`;
-        listErr = validateList(sg.local_block_keyword, validateKeyword);
-        if (listErr) return `本地阻断关键字: ${listErr}`;
+        listErr = validateList(sg.local_block, (v) => validateIPv4OrFQDN(v, t));
+        if (listErr) return t('webproxy.validation.localBlockError', { error: listErr });
+        listErr = validateList(sg.local_ok, (v) => validateIPv4OrFQDN(v, t));
+        if (listErr) return t('webproxy.validation.localOkError', { error: listErr });
+        listErr = validateList(sg.local_block_url, (v) => validateURL(v, t));
+        if (listErr) return t('webproxy.validation.localBlockUrlError', { error: listErr });
+        listErr = validateList(sg.local_ok_url, (v) => validateURL(v, t));
+        if (listErr) return t('webproxy.validation.localOkUrlError', { error: listErr });
+        listErr = validateList(sg.local_block_keyword, (v) => validateKeyword(v, t));
+        if (listErr) return t('webproxy.validation.localBlockKeywordError', { error: listErr });
         for (const item of sg.rules || []) {
-          const err = validateRuleNumber(item.number)
-            || validateRequired(item.source_group, '请选择源组')
-            || (sourceGroupOptions.value.includes(item.source_group) ? '' : '源组不存在');
-          if (err) return `规则 ${item.number}: ${err}`;
+          const err = validateRuleNumber(item.number, t)
+            || validateRequired(item.source_group, t('webproxy.validation.sourceGroupRequired'))
+            || (sourceGroupOptions.value.includes(item.source_group) ? '' : t('webproxy.validation.sourceGroupNotFound'));
+          if (err) return t('webproxy.validation.ruleError', { number: item.number, error: err });
         }
       }
       return '';
@@ -824,7 +870,7 @@ export default defineComponent({
 
     async function save() {
       const err = validate();
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       saving.value = true;
       try {
         const value = webproxyToConfig(config.value);
@@ -837,6 +883,7 @@ export default defineComponent({
         if (Object.keys(value).length) {
           await configApi.set('service webproxy', value);
         }
+        configStore.markPending();
         saved.value = true;
         await load();
       } catch (e) {
@@ -846,13 +893,22 @@ export default defineComponent({
       }
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
     return {
+      t,
       loading, saving, saved, config, activeTab, writeDisabled, commandPath,
       listenColumns, peerColumns, ruleColumns, sourceGroupColumns, timePeriodColumns,
       listenRows, peerRows, ruleRows, sourceGroupRows, timePeriodRows, sourceGroupOptions, timePeriodOptions,
       modals, titles, editing,
+      deleteListenModalVisible, pendingDeleteListenNames, confirmDeleteListenAddress,
+      deleteCachePeerModalVisible, pendingDeleteCachePeerNames, confirmDeleteCachePeer,
+      deleteRuleModalVisible, pendingDeleteRuleNumbers, confirmDeleteRule,
+      deleteSourceGroupModalVisible, pendingDeleteSourceGroupNames, confirmDeleteSourceGroup,
+      deleteTimePeriodModalVisible, pendingDeleteTimePeriodNames, confirmDeleteTimePeriod,
       load, save,
       openModal,
       saveListenAddress, deleteListenAddress,
@@ -866,73 +922,76 @@ export default defineComponent({
   components: { TabGroup, ToolbarButton, DraggableModal, DataTable },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('webproxy.messages.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本' },
-        { key: 'listen', title: '监听地址' },
-        { key: 'auth', title: '认证' },
-        { key: 'peers', title: '缓存对等体' },
-        { key: 'url-filter', title: 'URL 过滤' }
+        { key: 'basic', title: t('webproxy.tabs.basic') },
+        { key: 'listen', title: t('webproxy.tabs.listen') },
+        { key: 'auth', title: t('webproxy.tabs.auth') },
+        { key: 'peers', title: t('webproxy.tabs.peers') },
+        { key: 'url-filter', title: t('webproxy.tabs.urlFilter') }
       ]">
 
         <template #basic>
-          <div class="form-row"><label class="form-label">默认端口</label><input type="number" min="1025" max="65535" class="form-control" v-model="config.default_port" placeholder="3128" /></div>
-          <div class="form-row"><label class="form-label">缓存大小 (MB)</label><input type="number" min="0" class="form-control" v-model="config.cache_size" placeholder="100 (0 表示禁用)" /></div>
-          <div class="form-row"><label class="form-label">内存缓存 (MB)</label><input type="number" min="1" max="100000" class="form-control" v-model="config.mem_cache_size" placeholder="20" /></div>
-          <div class="form-row"><label class="form-label">最大对象大小 (KB)</label><input type="number" min="1" max="1000000" class="form-control" v-model="config.maximum_object_size" placeholder="1-1000000" /></div>
-          <div class="form-row"><label class="form-label">最小对象大小 (KB)</label><input type="number" min="1" max="100000" class="form-control" v-model="config.minimum_object_size" placeholder="1-100000" /></div>
-          <div class="form-row"><label class="form-label">回复体最大大小 (KB)</label><input type="number" min="1" max="100000" class="form-control" v-model="config.reply_body_max_size" placeholder="1-100000" /></div>
-          <div class="form-row"><label class="form-label">默认域名</label><input class="form-control" v-model="config.append_domain" placeholder=".example.com" /></div>
-          <div class="form-row"><label class="form-label">外出地址</label><input class="form-control" v-model="config.outgoing_address" placeholder="IPv4 地址" /></div>
+          <div class="form-row"><label class="form-label">{{ t('webproxy.labels.defaultPort') }}</label><input type="number" min="1025" max="65535" class="form-control" v-model="config.default_port" placeholder="3128" /></div>
+          <div class="form-row"><label class="form-label">{{ t('webproxy.labels.cacheSize') }}</label><input type="number" min="0" class="form-control" v-model="config.cache_size" :placeholder="t('webproxy.placeholders.cacheSize')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('webproxy.labels.memCacheSize') }}</label><input type="number" min="1" max="100000" class="form-control" v-model="config.mem_cache_size" placeholder="20" /></div>
+          <div class="form-row"><label class="form-label">{{ t('webproxy.labels.maxObjectSize') }}</label><input type="number" min="1" max="1000000" class="form-control" v-model="config.maximum_object_size" placeholder="1-1000000" /></div>
+          <div class="form-row"><label class="form-label">{{ t('webproxy.labels.minObjectSize') }}</label><input type="number" min="1" max="100000" class="form-control" v-model="config.minimum_object_size" placeholder="1-100000" /></div>
+          <div class="form-row"><label class="form-label">{{ t('webproxy.labels.replyBodyMaxSize') }}</label><input type="number" min="1" max="100000" class="form-control" v-model="config.reply_body_max_size" placeholder="1-100000" /></div>
+          <div class="form-row"><label class="form-label">{{ t('webproxy.labels.appendDomain') }}</label><input class="form-control" v-model="config.append_domain" placeholder=".example.com" /></div>
+          <div class="form-row"><label class="form-label">{{ t('webproxy.labels.outgoingAddress') }}</label><input class="form-control" v-model="config.outgoing_address" :placeholder="t('webproxy.placeholders.ipv4Address')" /></div>
           <div class="form-row">
-            <label class="form-label">禁用访问日志</label>
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="config.disable_access_log" /> 禁用</label>
+            <label class="form-label">{{ t('webproxy.labels.disableAccessLog') }}</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="config.disable_access_log" /> {{ t('webproxy.labels.disabled') }}</label>
           </div>
-          <div class="form-row"><label class="form-label">阻断域名</label><textarea class="form-control" v-model="config.domain_block" rows="3" placeholder="每行一个域名"></textarea></div>
-          <div class="form-row"><label class="form-label">不缓存域名</label><textarea class="form-control" v-model="config.domain_noncache" rows="3" placeholder="每行一个域名"></textarea></div>
-          <div class="form-row"><label class="form-label">阻断 MIME 类型</label><textarea class="form-control" v-model="config.reply_block_mime" rows="3" placeholder="每行一个 MIME 类型"></textarea></div>
-          <div class="form-row"><label class="form-label">安全端口</label><textarea class="form-control" v-model="config.safe_ports" rows="2" placeholder="每行一个端口"></textarea></div>
-          <div class="form-row"><label class="form-label">SSL 安全端口</label><textarea class="form-control" v-model="config.ssl_safe_ports" rows="2" placeholder="每行一个端口"></textarea></div>
+          <div class="form-row"><label class="form-label">{{ t('webproxy.labels.domainBlock') }}</label><textarea class="form-control" v-model="config.domain_block" rows="3" :placeholder="t('webproxy.placeholders.onePerLineDomain')"></textarea></div>
+          <div class="form-row"><label class="form-label">{{ t('webproxy.labels.domainNoncache') }}</label><textarea class="form-control" v-model="config.domain_noncache" rows="3" :placeholder="t('webproxy.placeholders.onePerLineDomain')"></textarea></div>
+          <div class="form-row"><label class="form-label">{{ t('webproxy.labels.replyBlockMime') }}</label><textarea class="form-control" v-model="config.reply_block_mime" rows="3" :placeholder="t('webproxy.placeholders.onePerLineMime')"></textarea></div>
+          <div class="form-row"><label class="form-label">{{ t('webproxy.labels.safePorts') }}</label><textarea class="form-control" v-model="config.safe_ports" rows="2" :placeholder="t('webproxy.placeholders.onePerLinePort')"></textarea></div>
+          <div class="form-row"><label class="form-label">{{ t('webproxy.labels.sslSafePorts') }}</label><textarea class="form-control" v-model="config.ssl_safe_ports" rows="2" :placeholder="t('webproxy.placeholders.onePerLinePort')"></textarea></div>
         </template>
 
         <template #listen>
           <div class="data-table-wrapper">
             <DataTable :columns="listenColumns" :data="listenRows" row-key="address" :selectable="true"
               :actions="['create','edit','delete','refresh']"
-              @create="openModal('listen', null, '创建监听地址')" @edit="row => openModal('listen', config.listen_addresses.find(x => x.address === row.address), '编辑监听地址')" @delete="deleteListenAddress" @refresh="load" />
+              @create="openModal('listen', null, t('webproxy.modals.createListen'))" @edit="row => openModal('listen', config.listen_addresses.find(x => x.address === row.address), t('webproxy.modals.editListen'))" @delete="deleteListenAddress" @refresh="load" />
           </div>
         </template>
 
         <template #auth>
           <div class="form-row">
-            <label class="form-label">认证方式</label>
+            <label class="form-label">{{ t('webproxy.labels.authMethod') }}</label>
             <select class="form-control" v-model="config.authentication.method">
-              <option value="">无</option>
+              <option value="">{{ t('webproxy.labels.none') }}</option>
               <option v-for="m in AUTH_METHOD_OPTIONS.slice(1)" :key="m" :value="m">{{ m }}</option>
             </select>
           </div>
           <template v-if="config.authentication.method">
-            <div class="form-row"><label class="form-label">认证子进程数</label><input type="number" min="1" max="500" class="form-control" v-model="config.authentication.children" placeholder="5" /></div>
-            <div class="form-row"><label class="form-label">凭证有效期 (分钟)</label><input type="number" min="1" max="600" class="form-control" v-model="config.authentication.credentials_ttl" placeholder="60" /></div>
-            <div class="form-row"><label class="form-label">认证域</label><input class="form-control" v-model="config.authentication.realm" placeholder="My Company proxy server" /></div>
+            <div class="form-row"><label class="form-label">{{ t('webproxy.labels.authChildren') }}</label><input type="number" min="1" max="500" class="form-control" v-model="config.authentication.children" placeholder="5" /></div>
+            <div class="form-row"><label class="form-label">{{ t('webproxy.labels.credentialsTtl') }}</label><input type="number" min="1" max="600" class="form-control" v-model="config.authentication.credentials_ttl" placeholder="60" /></div>
+            <div class="form-row"><label class="form-label">{{ t('webproxy.labels.authRealm') }}</label><input class="form-control" v-model="config.authentication.realm" placeholder="My Company proxy server" /></div>
           </template>
           <template v-if="config.authentication.method === 'ldap'">
-            <div class="form-section"><div class="form-section-title">LDAP 设置</div>
-              <div class="form-row"><label class="form-label">服务器</label><input class="form-control" v-model="config.authentication.ldap.server" placeholder="ldap.example.com" /></div>
-              <div class="form-row"><label class="form-label">端口</label><input type="number" min="1" max="65535" class="form-control" v-model="config.authentication.ldap.port" placeholder="389" /></div>
-              <div class="form-row"><label class="form-label">Base DN</label><input class="form-control" v-model="config.authentication.ldap.base_dn" placeholder="dc=example,dc=com" /></div>
-              <div class="form-row"><label class="form-label">Bind DN</label><input class="form-control" v-model="config.authentication.ldap.bind_dn" /></div>
-              <div class="form-row"><label class="form-label">密码</label><input type="password" class="form-control" v-model="config.authentication.ldap.password" /></div>
-              <div class="form-row"><label class="form-label">过滤表达式</label><input class="form-control" v-model="config.authentication.ldap.filter_expression" /></div>
-              <div class="form-row"><label class="form-label">用户名属性</label><input class="form-control" v-model="config.authentication.ldap.username_attribute" placeholder="uid" /></div>
-              <div class="form-row"><label class="form-label">协议版本</label><input type="number" min="2" max="3" class="form-control" v-model="config.authentication.ldap.version" placeholder="3" /></div>
-              <div class="form-row">
-                <label class="form-label">使用 SSL/TLS</label>
-                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="config.authentication.ldap.use_ssl" /> 启用</label>
-              </div>
-              <div class="form-row">
-                <label class="form-label">持久连接</label>
-                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="config.authentication.ldap.persistent_connection" /> 启用</label>
+            <div class="form-group">
+              <div class="form-group-title">{{ t('webproxy.sections.ldapSettings') }}</div>
+              <div class="form-group-content">
+                <div class="form-row"><label class="form-label">{{ t('webproxy.labels.server') }}</label><input class="form-control" v-model="config.authentication.ldap.server" placeholder="ldap.example.com" /></div>
+                <div class="form-row"><label class="form-label">{{ t('webproxy.labels.port') }}</label><input type="number" min="1" max="65535" class="form-control" v-model="config.authentication.ldap.port" placeholder="389" /></div>
+                <div class="form-row"><label class="form-label">Base DN</label><input class="form-control" v-model="config.authentication.ldap.base_dn" placeholder="dc=example,dc=com" /></div>
+                <div class="form-row"><label class="form-label">Bind DN</label><input class="form-control" v-model="config.authentication.ldap.bind_dn" /></div>
+                <div class="form-row"><label class="form-label">{{ t('webproxy.labels.password') }}</label><input type="password" class="form-control" v-model="config.authentication.ldap.password" /></div>
+                <div class="form-row"><label class="form-label">{{ t('webproxy.labels.filterExpression') }}</label><input class="form-control" v-model="config.authentication.ldap.filter_expression" /></div>
+                <div class="form-row"><label class="form-label">{{ t('webproxy.labels.usernameAttribute') }}</label><input class="form-control" v-model="config.authentication.ldap.username_attribute" placeholder="uid" /></div>
+                <div class="form-row"><label class="form-label">{{ t('webproxy.labels.protocolVersion') }}</label><input type="number" min="2" max="3" class="form-control" v-model="config.authentication.ldap.version" placeholder="3" /></div>
+                <div class="form-row">
+                  <label class="form-label">{{ t('webproxy.labels.useSslTls') }}</label>
+                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="config.authentication.ldap.use_ssl" /> {{ t('webproxy.labels.enabled') }}</label>
+                </div>
+                <div class="form-row">
+                  <label class="form-label">{{ t('webproxy.labels.persistentConnection') }}</label>
+                  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="config.authentication.ldap.persistent_connection" /> {{ t('webproxy.labels.enabled') }}</label>
+                </div>
               </div>
             </div>
           </template>
@@ -942,145 +1001,136 @@ export default defineComponent({
           <div class="data-table-wrapper">
             <DataTable :columns="peerColumns" :data="peerRows" row-key="name" :selectable="true"
               :actions="['create','edit','delete','refresh']"
-              @create="openModal('peer', null, '创建缓存对等体')" @edit="row => openModal('peer', config.cache_peers.find(x => x.name === row.name), '编辑缓存对等体')" @delete="deleteCachePeer" @refresh="load" />
+              @create="openModal('peer', null, t('webproxy.modals.createPeer'))" @edit="row => openModal('peer', config.cache_peers.find(x => x.name === row.name), t('webproxy.modals.editPeer'))" @delete="deleteCachePeer" @refresh="load" />
           </div>
         </template>
 
         <template #url-filter>
-          <div class="form-section"><div class="form-section-title">SquidGuard 设置</div>
-            <div class="form-row">
-              <label class="form-label">默认动作</label>
-              <select class="form-control" v-model="config.url_filtering.squidguard.default_action">
-                <option v-for="a in DEFAULT_ACTION_OPTIONS" :key="a" :value="a">{{ a }}</option>
-              </select>
-            </div>
-            <div class="form-row"><label class="form-label">重定向 URL</label><input class="form-control" v-model="config.url_filtering.squidguard.redirect_url" placeholder="block.vyos.net" /></div>
-            <div class="form-row">
-              <label class="form-label">允许 IP 地址 URL</label>
-              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="config.url_filtering.squidguard.allow_ipaddr_url" /> 启用</label>
-            </div>
-            <div class="form-row">
-              <label class="form-label">启用安全搜索</label>
-              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="config.url_filtering.squidguard.enable_safe_search" /> 启用</label>
-            </div>
-            <div class="form-row"><label class="form-label">允许分类</label><textarea class="form-control" v-model="config.url_filtering.squidguard.allow_category" rows="2" placeholder="每行一个分类"></textarea></div>
-            <div class="form-row"><label class="form-label">阻断分类</label><textarea class="form-control" v-model="config.url_filtering.squidguard.block_category" rows="2" placeholder="每行一个分类"></textarea></div>
-            <div class="form-row"><label class="form-label">日志分类</label><textarea class="form-control" v-model="config.url_filtering.squidguard.log" rows="2" placeholder="每行一个分类"></textarea></div>
-            <div class="form-row"><label class="form-label">本地阻断域名</label><textarea class="form-control" v-model="config.url_filtering.squidguard.local_block" rows="2" placeholder="每行一个域名"></textarea></div>
-            <div class="form-row"><label class="form-label">本地阻断关键字</label><textarea class="form-control" v-model="config.url_filtering.squidguard.local_block_keyword" rows="2" placeholder="每行一个关键字"></textarea></div>
-            <div class="form-row"><label class="form-label">本地阻断 URL</label><textarea class="form-control" v-model="config.url_filtering.squidguard.local_block_url" rows="2" placeholder="每行一个 URL"></textarea></div>
-            <div class="form-row"><label class="form-label">本地允许域名</label><textarea class="form-control" v-model="config.url_filtering.squidguard.local_ok" rows="2" placeholder="每行一个域名"></textarea></div>
-            <div class="form-row"><label class="form-label">本地允许 URL</label><textarea class="form-control" v-model="config.url_filtering.squidguard.local_ok_url" rows="2" placeholder="每行一个 URL"></textarea></div>
-          </div>
-
-          <div class="form-section"><div class="form-section-title">自动更新</div>
-            <div class="form-row"><label class="form-label">更新小时</label><input type="number" min="0" max="23" class="form-control" v-model="config.url_filtering.squidguard.auto_update.update_hour" placeholder="0-23" /></div>
-          </div>
-
-          <div class="form-section"><div class="form-section-title">源组</div>
-            <div class="data-table-wrapper">
-              <DataTable :columns="sourceGroupColumns" :data="sourceGroupRows" row-key="name" :selectable="true"
-                :actions="['create','edit','delete','refresh']"
-                @create="openModal('sourceGroup', null, '创建源组')" @edit="row => openModal('sourceGroup', config.url_filtering.squidguard.source_groups.find(x => x.name === row.name), '编辑源组')" @delete="deleteSourceGroup" @refresh="load" />
+          <div class="form-group">
+            <div class="form-group-title">{{ t('webproxy.sections.squidGuardSettings') }}</div>
+            <div class="form-group-content">
+              <div class="form-row">
+                <label class="form-label">{{ t('webproxy.labels.defaultAction') }}</label>
+                <select class="form-control" v-model="config.url_filtering.squidguard.default_action">
+                  <option v-for="a in DEFAULT_ACTION_OPTIONS" :key="a" :value="a">{{ a }}</option>
+                </select>
+              </div>
+              <div class="form-row"><label class="form-label">{{ t('webproxy.labels.redirectUrl') }}</label><input class="form-control" v-model="config.url_filtering.squidguard.redirect_url" placeholder="block.vyos.net" /></div>
+              <div class="form-row">
+                <label class="form-label">{{ t('webproxy.labels.allowIpaddrUrl') }}</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="config.url_filtering.squidguard.allow_ipaddr_url" /> {{ t('webproxy.labels.enabled') }}</label>
+              </div>
+              <div class="form-row">
+                <label class="form-label">{{ t('webproxy.labels.enableSafeSearch') }}</label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="config.url_filtering.squidguard.enable_safe_search" /> {{ t('webproxy.labels.enabled') }}</label>
+              </div>
+              <div class="form-row"><label class="form-label">{{ t('webproxy.labels.allowCategory') }}</label><textarea class="form-control" v-model="config.url_filtering.squidguard.allow_category" rows="2" :placeholder="t('webproxy.placeholders.onePerLineCategory')"></textarea></div>
+              <div class="form-row"><label class="form-label">{{ t('webproxy.labels.blockCategory') }}</label><textarea class="form-control" v-model="config.url_filtering.squidguard.block_category" rows="2" :placeholder="t('webproxy.placeholders.onePerLineCategory')"></textarea></div>
+              <div class="form-row"><label class="form-label">{{ t('webproxy.labels.logCategory') }}</label><textarea class="form-control" v-model="config.url_filtering.squidguard.log" rows="2" :placeholder="t('webproxy.placeholders.onePerLineCategory')"></textarea></div>
+              <div class="form-row"><label class="form-label">{{ t('webproxy.labels.localBlock') }}</label><textarea class="form-control" v-model="config.url_filtering.squidguard.local_block" rows="2" :placeholder="t('webproxy.placeholders.onePerLineDomain')"></textarea></div>
+              <div class="form-row"><label class="form-label">{{ t('webproxy.labels.localBlockKeyword') }}</label><textarea class="form-control" v-model="config.url_filtering.squidguard.local_block_keyword" rows="2" :placeholder="t('webproxy.placeholders.onePerLineKeyword')"></textarea></div>
+              <div class="form-row"><label class="form-label">{{ t('webproxy.labels.localBlockUrl') }}</label><textarea class="form-control" v-model="config.url_filtering.squidguard.local_block_url" rows="2" :placeholder="t('webproxy.placeholders.onePerLineUrl')"></textarea></div>
+              <div class="form-row"><label class="form-label">{{ t('webproxy.labels.localOk') }}</label><textarea class="form-control" v-model="config.url_filtering.squidguard.local_ok" rows="2" :placeholder="t('webproxy.placeholders.onePerLineDomain')"></textarea></div>
+              <div class="form-row"><label class="form-label">{{ t('webproxy.labels.localOkUrl') }}</label><textarea class="form-control" v-model="config.url_filtering.squidguard.local_ok_url" rows="2" :placeholder="t('webproxy.placeholders.onePerLineUrl')"></textarea></div>
             </div>
           </div>
 
-          <div class="form-section"><div class="form-section-title">时间段</div>
-            <div class="data-table-wrapper">
-              <DataTable :columns="timePeriodColumns" :data="timePeriodRows" row-key="name" :selectable="true"
-                :actions="['create','edit','delete','refresh']"
-                @create="openModal('timePeriod', null, '创建时间段')" @edit="row => openModal('timePeriod', config.url_filtering.squidguard.time_periods.find(x => x.name === row.name), '编辑时间段')" @delete="deleteTimePeriod" @refresh="load" />
+          <div class="form-group">
+            <div class="form-group-title">{{ t('webproxy.sections.autoUpdate') }}</div>
+            <div class="form-group-content">
+              <div class="form-row"><label class="form-label">{{ t('webproxy.labels.updateHour') }}</label><input type="number" min="0" max="23" class="form-control" v-model="config.url_filtering.squidguard.auto_update.update_hour" placeholder="0-23" /></div>
             </div>
           </div>
 
-          <div class="form-section"><div class="form-section-title">规则</div>
-            <div class="data-table-wrapper">
-              <DataTable :columns="ruleColumns" :data="ruleRows" row-key="number" :selectable="true"
-                :actions="['create','edit','delete','refresh']"
-                @create="openModal('rule', null, '创建规则')" @edit="row => openModal('rule', config.url_filtering.squidguard.rules.find(x => x.number === row.number), '编辑规则')" @delete="deleteRule" @refresh="load" />
+          <div class="form-group">
+            <div class="form-group-title">{{ t('webproxy.sections.sourceGroups') }}</div>
+            <div class="form-group-content">
+              <div class="data-table-wrapper">
+                <DataTable :columns="sourceGroupColumns" :data="sourceGroupRows" row-key="name" :selectable="true"
+                  :actions="['create','edit','delete','refresh']"
+                  @create="openModal('sourceGroup', null, t('webproxy.modals.createSourceGroup'))" @edit="row => openModal('sourceGroup', config.url_filtering.squidguard.source_groups.find(x => x.name === row.name), t('webproxy.modals.editSourceGroup'))" @delete="deleteSourceGroup" @refresh="load" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-group-title">{{ t('webproxy.sections.timePeriods') }}</div>
+            <div class="form-group-content">
+              <div class="data-table-wrapper">
+                <DataTable :columns="timePeriodColumns" :data="timePeriodRows" row-key="name" :selectable="true"
+                  :actions="['create','edit','delete','refresh']"
+                  @create="openModal('timePeriod', null, t('webproxy.modals.createTimePeriod'))" @edit="row => openModal('timePeriod', config.url_filtering.squidguard.time_periods.find(x => x.name === row.name), t('webproxy.modals.editTimePeriod'))" @delete="deleteTimePeriod" @refresh="load" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-group-title">{{ t('webproxy.sections.rules') }}</div>
+            <div class="form-group-content">
+              <div class="data-table-wrapper">
+                <DataTable :columns="ruleColumns" :data="ruleRows" row-key="number" :selectable="true"
+                  :actions="['create','edit','delete','refresh']"
+                  @create="openModal('rule', null, t('webproxy.modals.createRule'))" @edit="row => openModal('rule', config.url_filtering.squidguard.rules.find(x => x.number === row.number), t('webproxy.modals.editRule'))" @delete="deleteRule" @refresh="load" />
+              </div>
             </div>
           </div>
         </template>
       </TabGroup>
 
-      <DraggableModal v-model:visible="modals.listen" :title="titles.listen">
-        <div class="form-row"><label class="form-label">监听地址</label><input class="form-control" v-model="editing.listen.address" placeholder="IPv4 地址" /></div>
-        <div class="form-row"><label class="form-label">端口</label><input type="number" min="1" max="65535" class="form-control" v-model="editing.listen.port" placeholder="留空使用默认端口" /></div>
-        <div class="form-row"><label class="form-label">非透明模式</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="editing.listen.disable_transparent" /> 启用</label></div>
-        <div class="form-actions">
-          <ToolbarButton @click="modals.listen = false">取消</ToolbarButton>
-          <ToolbarButton icon="save" primary @click="saveListenAddress">保存</ToolbarButton>
-        </div>
+      <DraggableModal v-model:visible="modals.listen" :title="titles.listen" @confirm="saveListenAddress">
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.listenAddress') }}</label><input class="form-control" v-model="editing.listen.address" :placeholder="t('webproxy.placeholders.ipv4Address')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.port') }}</label><input type="number" min="1" max="65535" class="form-control" v-model="editing.listen.port" :placeholder="t('webproxy.placeholders.leaveEmptyForDefault')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.nonTransparentMode') }}</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="editing.listen.disable_transparent" /> {{ t('webproxy.labels.enabled') }}</label></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="modals.peer" :title="titles.peer">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editing.peer.name" placeholder="FQDN" /></div>
-        <div class="form-row"><label class="form-label">地址</label><input class="form-control" v-model="editing.peer.address" placeholder="IP 地址或主机名" /></div>
-        <div class="form-row"><label class="form-label">类型</label><select class="form-control" v-model="editing.peer.type"><option v-for="t in CACHE_PEER_TYPE_OPTIONS" :key="t" :value="t">{{ t }}</option></select></div>
-        <div class="form-row"><label class="form-label">HTTP 端口</label><input type="number" min="1025" max="65535" class="form-control" v-model="editing.peer.http_port" placeholder="1025-65535" /></div>
-        <div class="form-row"><label class="form-label">ICP 端口</label><input type="number" min="0" max="65535" class="form-control" v-model="editing.peer.icp_port" placeholder="0-65535 (0 表示禁用)" /></div>
-        <div class="form-row"><label class="form-label">选项</label><input class="form-control" v-model="editing.peer.options" placeholder="例如 default" /></div>
-        <div class="form-actions">
-          <ToolbarButton @click="modals.peer = false">取消</ToolbarButton>
-          <ToolbarButton icon="save" primary @click="saveCachePeer">保存</ToolbarButton>
-        </div>
+      <DraggableModal v-model:visible="modals.peer" :title="titles.peer" @confirm="saveCachePeer">
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.name') }}</label><input class="form-control" v-model="editing.peer.name" placeholder="FQDN" /></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.address') }}</label><input class="form-control" v-model="editing.peer.address" :placeholder="t('webproxy.placeholders.ipOrHostname')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.type') }}</label><select class="form-control" v-model="editing.peer.type"><option v-for="opt in CACHE_PEER_TYPE_OPTIONS" :key="opt" :value="opt">{{ opt }}</option></select></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.httpPort') }}</label><input type="number" min="1025" max="65535" class="form-control" v-model="editing.peer.http_port" placeholder="1025-65535" /></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.icpPort') }}</label><input type="number" min="0" max="65535" class="form-control" v-model="editing.peer.icp_port" :placeholder="t('webproxy.placeholders.icpPort')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.options') }}</label><input class="form-control" v-model="editing.peer.options" :placeholder="t('webproxy.placeholders.optionsExample')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="modals.sourceGroup" :title="titles.sourceGroup">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editing.sourceGroup.name" /></div>
-        <div class="form-row"><label class="form-label">地址列表</label><textarea class="form-control" v-model="editing.sourceGroup.address" rows="4" placeholder="每行一个 IP 或子网"></textarea></div>
-        <div class="form-row"><label class="form-label">域名列表</label><textarea class="form-control" v-model="editing.sourceGroup.domain" rows="3" placeholder="每行一个域名"></textarea></div>
-        <div class="form-row"><label class="form-label">用户列表</label><textarea class="form-control" v-model="editing.sourceGroup.user" rows="3" placeholder="每行一个用户名"></textarea></div>
-        <div class="form-row"><label class="form-label">LDAP IP 搜索</label><textarea class="form-control" v-model="editing.sourceGroup.ldap_ip_search" rows="2" placeholder="每行一个 LDAP 搜索表达式"></textarea></div>
-        <div class="form-row"><label class="form-label">LDAP 用户搜索</label><textarea class="form-control" v-model="editing.sourceGroup.ldap_user_search" rows="2" placeholder="每行一个 LDAP 搜索表达式"></textarea></div>
-        <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editing.sourceGroup.description" placeholder="最多 255 字符" /></div>
-        <div class="form-actions">
-          <ToolbarButton @click="modals.sourceGroup = false">取消</ToolbarButton>
-          <ToolbarButton icon="save" primary @click="saveSourceGroup">保存</ToolbarButton>
-        </div>
+      <DraggableModal v-model:visible="modals.sourceGroup" :title="titles.sourceGroup" @confirm="saveSourceGroup">
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.name') }}</label><input class="form-control" v-model="editing.sourceGroup.name" /></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.addressList') }}</label><textarea class="form-control" v-model="editing.sourceGroup.address" rows="4" :placeholder="t('webproxy.placeholders.onePerLineIpSubnet')"></textarea></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.domainList') }}</label><textarea class="form-control" v-model="editing.sourceGroup.domain" rows="3" :placeholder="t('webproxy.placeholders.onePerLineDomain')"></textarea></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.userList') }}</label><textarea class="form-control" v-model="editing.sourceGroup.user" rows="3" :placeholder="t('webproxy.placeholders.onePerLineUsername')"></textarea></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.ldapIpSearch') }}</label><textarea class="form-control" v-model="editing.sourceGroup.ldap_ip_search" rows="2" :placeholder="t('webproxy.placeholders.onePerLineLdapExpr')"></textarea></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.ldapUserSearch') }}</label><textarea class="form-control" v-model="editing.sourceGroup.ldap_user_search" rows="2" :placeholder="t('webproxy.placeholders.onePerLineLdapExpr')"></textarea></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.description') }}</label><input class="form-control" v-model="editing.sourceGroup.description" :placeholder="t('webproxy.placeholders.maxChars255')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="modals.timePeriod" :title="titles.timePeriod">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editing.timePeriod.name" /></div>
-        <div class="form-row"><label class="form-label">时间段</label><textarea class="form-control" v-model="editing.timePeriod.ranges" rows="5" placeholder="每行一个，示例：&#10;Sun 09:00-17:00&#10;Mon 09:00-17:00"></textarea></div>
-        <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editing.timePeriod.description" placeholder="最多 255 字符" /></div>
-        <div class="form-actions">
-          <ToolbarButton @click="modals.timePeriod = false">取消</ToolbarButton>
-          <ToolbarButton icon="save" primary @click="saveTimePeriod">保存</ToolbarButton>
-        </div>
+      <DraggableModal v-model:visible="modals.timePeriod" :title="titles.timePeriod" @confirm="saveTimePeriod">
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.name') }}</label><input class="form-control" v-model="editing.timePeriod.name" /></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.timePeriod') }}</label><textarea class="form-control" v-model="editing.timePeriod.ranges" rows="5" :placeholder="t('webproxy.placeholders.timePeriodExample')"></textarea></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.description') }}</label><input class="form-control" v-model="editing.timePeriod.description" :placeholder="t('webproxy.placeholders.maxChars255')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="modals.rule" :title="titles.rule">
-        <div class="form-row"><label class="form-label">规则编号</label><input type="number" min="1" max="1024" class="form-control" v-model="editing.rule.number" placeholder="1-1024" /></div>
-        <div class="form-row"><label class="form-label">源组</label><select class="form-control" v-model="editing.rule.source_group"><option value="">请选择</option><option v-for="g in sourceGroupOptions" :key="g" :value="g">{{ g }}</option></select></div>
-        <div class="form-row"><label class="form-label">默认动作</label><select class="form-control" v-model="editing.rule.default_action"><option v-for="a in DEFAULT_ACTION_OPTIONS" :key="a" :value="a">{{ a }}</option></select></div>
-        <div class="form-row"><label class="form-label">时间段</label><select class="form-control" v-model="editing.rule.time_period"><option value="">无</option><option v-for="p in timePeriodOptions" :key="p" :value="p">{{ p }}</option></select></div>
+      <DraggableModal v-model:visible="modals.rule" :title="titles.rule" @confirm="saveRule">
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.ruleNumber') }}</label><input type="number" min="1" max="1024" class="form-control" v-model="editing.rule.number" placeholder="1-1024" /></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.sourceGroup') }}</label><select class="form-control" v-model="editing.rule.source_group"><option value="">{{ t('webproxy.labels.pleaseSelect') }}</option><option v-for="g in sourceGroupOptions" :key="g" :value="g">{{ g }}</option></select></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.defaultAction') }}</label><select class="form-control" v-model="editing.rule.default_action"><option v-for="a in DEFAULT_ACTION_OPTIONS" :key="a" :value="a">{{ a }}</option></select></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.timePeriod') }}</label><select class="form-control" v-model="editing.rule.time_period"><option value="">{{ t('webproxy.labels.none') }}</option><option v-for="p in timePeriodOptions" :key="p" :value="p">{{ p }}</option></select></div>
         <div class="form-row">
-          <label class="form-label">允许 IP 地址 URL</label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="editing.rule.allow_ipaddr_url" /> 启用</label>
+          <label class="form-label">{{ t('webproxy.labels.allowIpaddrUrl') }}</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="editing.rule.allow_ipaddr_url" /> {{ t('webproxy.labels.enabled') }}</label>
         </div>
         <div class="form-row">
-          <label class="form-label">启用安全搜索</label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="editing.rule.enable_safe_search" /> 启用</label>
+          <label class="form-label">{{ t('webproxy.labels.enableSafeSearch') }}</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" v-model="editing.rule.enable_safe_search" /> {{ t('webproxy.labels.enabled') }}</label>
         </div>
-        <div class="form-row"><label class="form-label">允许分类</label><textarea class="form-control" v-model="editing.rule.allow_category" rows="2" placeholder="每行一个分类"></textarea></div>
-        <div class="form-row"><label class="form-label">阻断分类</label><textarea class="form-control" v-model="editing.rule.block_category" rows="2" placeholder="每行一个分类"></textarea></div>
-        <div class="form-row"><label class="form-label">本地阻断域名</label><textarea class="form-control" v-model="editing.rule.local_block" rows="2" placeholder="每行一个域名"></textarea></div>
-        <div class="form-row"><label class="form-label">本地阻断关键字</label><textarea class="form-control" v-model="editing.rule.local_block_keyword" rows="2" placeholder="每行一个关键字"></textarea></div>
-        <div class="form-row"><label class="form-label">本地阻断 URL</label><textarea class="form-control" v-model="editing.rule.local_block_url" rows="2" placeholder="每行一个 URL"></textarea></div>
-        <div class="form-row"><label class="form-label">本地允许域名</label><textarea class="form-control" v-model="editing.rule.local_ok" rows="2" placeholder="每行一个域名"></textarea></div>
-        <div class="form-row"><label class="form-label">本地允许 URL</label><textarea class="form-control" v-model="editing.rule.local_ok_url" rows="2" placeholder="每行一个 URL"></textarea></div>
-        <div class="form-row"><label class="form-label">日志分类</label><textarea class="form-control" v-model="editing.rule.log" rows="2" placeholder="每行一个分类"></textarea></div>
-        <div class="form-row"><label class="form-label">重定向 URL</label><input class="form-control" v-model="editing.rule.redirect_url" placeholder="block.vyos.net" /></div>
-        <div class="form-actions">
-          <ToolbarButton @click="modals.rule = false">取消</ToolbarButton>
-          <ToolbarButton icon="save" primary @click="saveRule">保存</ToolbarButton>
-        </div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.allowCategory') }}</label><textarea class="form-control" v-model="editing.rule.allow_category" rows="2" :placeholder="t('webproxy.placeholders.onePerLineCategory')"></textarea></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.blockCategory') }}</label><textarea class="form-control" v-model="editing.rule.block_category" rows="2" :placeholder="t('webproxy.placeholders.onePerLineCategory')"></textarea></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.localBlock') }}</label><textarea class="form-control" v-model="editing.rule.local_block" rows="2" :placeholder="t('webproxy.placeholders.onePerLineDomain')"></textarea></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.localBlockKeyword') }}</label><textarea class="form-control" v-model="editing.rule.local_block_keyword" rows="2" :placeholder="t('webproxy.placeholders.onePerLineKeyword')"></textarea></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.localBlockUrl') }}</label><textarea class="form-control" v-model="editing.rule.local_block_url" rows="2" :placeholder="t('webproxy.placeholders.onePerLineUrl')"></textarea></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.localOk') }}</label><textarea class="form-control" v-model="editing.rule.local_ok" rows="2" :placeholder="t('webproxy.placeholders.onePerLineDomain')"></textarea></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.localOkUrl') }}</label><textarea class="form-control" v-model="editing.rule.local_ok_url" rows="2" :placeholder="t('webproxy.placeholders.onePerLineUrl')"></textarea></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.logCategory') }}</label><textarea class="form-control" v-model="editing.rule.log" rows="2" :placeholder="t('webproxy.placeholders.onePerLineCategory')"></textarea></div>
+        <div class="form-row"><label class="form-label">{{ t('webproxy.labels.redirectUrl') }}</label><input class="form-control" v-model="editing.rule.redirect_url" placeholder="block.vyos.net" /></div>
       </DraggableModal>
-
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
     </div>
   `,
 });

@@ -1,10 +1,12 @@
 import { defineComponent, ref, computed } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { systemApi } from '/src/api/index.js';
+import { useI18n } from '/src/i18n/index.js';
 
 export default defineComponent({
   name: 'ToolPage',
   setup() {
+    const { t } = useI18n();
     const route = useRoute();
     const tool = computed(() => route.path.split('/').pop());
     const host = ref('8.8.8.8');
@@ -26,13 +28,13 @@ export default defineComponent({
         else if (tool.value === 'mtr') res = await systemApi.mtr(host.value, count.value, true);
         else if (tool.value === 'tcpdump') res = await systemApi.tcpdump(iface.value, count.value, options.value);
         else if (tool.value === 'reboot') {
-          if (!confirm('确认重启系统？')) return;
+          if (!confirm(t('tool.confirmReboot'))) return;
           res = await systemApi.reboot();
         } else if (tool.value === 'poweroff') {
-          if (!confirm('确认关闭系统？')) return;
+          if (!confirm(t('tool.confirmPoweroff'))) return;
           res = await systemApi.poweroff();
         } else if (tool.value === 'reset') {
-          if (!confirm('确认重置系统？')) return;
+          if (!confirm(t('tool.confirmReset'))) return;
           res = await systemApi.reset();
         } else if (tool.value === 'date') {
           res = await systemApi.date(dateValue.value);
@@ -47,7 +49,7 @@ export default defineComponent({
       }
     }
 
-    return { tool, host, iface, count, options, output, loading, dateValue, terminal, run };
+    return { tool, host, iface, count, options, output, loading, dateValue, terminal, run, t };
   },
   template: `
     <div>
@@ -68,7 +70,7 @@ export default defineComponent({
         </div>
       </div>
       <div class="page-section">
-        <pre style="background:#f5f5f5;padding:12px;border:1px solid #ddd;min-height:200px;white-space:pre-wrap;">{{ output || '点击执行...' }}</pre>
+        <pre style="background:#f5f5f5;padding:12px;border:1px solid #ddd;min-height:200px;white-space:pre-wrap;">{{ output || t('tool.clickToExecute') }}</pre>
       </div>
     </div>
   `,

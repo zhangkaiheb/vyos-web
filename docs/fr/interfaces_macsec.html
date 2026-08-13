@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="macsec">
+<h1>MACsec</h1>
+<p>MACsec est une norme IEEE (IEEE 802.1AE) pour la sécurité MAC, introduite en
+2006. Elle permet une connectivité protocol-independent entre deux hôtes, fournissant
+la confidentialité des données, l'authenticité et l'intégrité à l'aide de chiffrements GCM-AES. MACsec
+fonctionne au niveau Ethernet comme un protocole de couche 2 et sécurise le trafic dans
+les réseaux de couche 2, y compris les demandes DHCP et ARP. Elle ne compete pas avec
+d'autres solutions de sécurité, telles que IPsec (couche 3) ou TLS (couche 4), car chacune
+traite des cas d'utilisation distincts.</p>
+<section id="configuration">
+<h2>Configuration</h2>
+<section id="common-interface-configuration">
+<h3>Configuration commune de l'interface</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; address &lt;address | dhcp |  dhcpv6&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-address-address-dhcp-dhcpv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface avec une ou plusieurs adresses IP.</strong></p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>address:</strong> Attribuez une ou plusieurs adresses IPv4 ou IPv6 à l'interface.
+Par exemple, utilisez 192.0.2.1/24 pour IPv4 ou 2001:db8::1/64 pour IPv6.</p></li>
+<li><p><strong>dhcp:</strong> L'interface obtient une adresse IPv4 d'un serveur DHCP sur le même segment réseau.</p></li>
+<li><p><strong>dhcpv6:</strong> L'interface obtient une adresse IPv6 d'un serveur DHCPv6 sur le même segment réseau.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Remarque</p>
+<p>Si l'interface obtient une adresse IPv4 via DHCP, et qu'il faut apporter des ajustements spécifiques avant/après l'obtention de l'adresse IP, utilisez les scripts de raccordement :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/pre-hooks.d/</code></p></li>
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/post-hooks.d/</code></p></li>
+</ul>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 address 192.0.2.1/24
+set interfaces macsec macsec0 address 2001:db8::1/64
+set interfaces macsec macsec0 address dhcp
+set interfaces macsec macsec0 address dhcpv6
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un alias clair et descriptif pour l'interface.</strong></p>
+<p>Cet alias apparaît dans la commande <code class="docutils literal notranslate">show interfaces</code> et les outils de surveillance basés sur SNMP.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez l'interface.</strong></p>
+<p>L'interface sera définie à l'état administrativement down (<code class="docutils literal notranslate">A/D</code>).</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt;  disable-flow-control
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-disable-flow-control" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez le contrôle de flux Ethernet (IEEE 802.3x frames de pause) sur l'interface.</strong></p>
+<blockquote>
+<div><p>Le contrôle de flux Ethernet, défini par la norme IEEE 802.3x, temporairement arrête
+la transmission des données pour éviter la perte de paquets pendant la congestion du réseau. Par
+exemple, lorsqu'un émetteur transmet des données plus rapidement que le récepteur ne peut les traiter.</p>
+<p>La désactivation du contrôle de flux Ethernet signifie que l'interface ne signalera pas à l'appareil connecté de suspendre la transmission et supprimera les paquets si elle est submergée.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 disable-flow-control
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; disable-link-detect
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-disable-link-detect" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez la détection d'état de lien physique sur l'interface, telle que
+lorsqu'un câble est débranché.</strong></p>
+<p>Par défaut, l'interface détecte les changements d'état de lien physique.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 disable-link-detect
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; mac &lt;xx:xx:xx:xx:xx:xx&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-mac-xx-xx-xx-xx-xx-xx" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez une adresse MAC personnalisée sur l'interface.</strong></p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 mac &#39;00:53:01:02:03:04&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le MTU sur l'interface.</strong></p>
+<p>Cette valeur définit la taille maximale des paquets, en octets, que l'interface
+transmet sans fragmentation.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la</strong> <abbr title="Taille maximale de segment">MSS</abbr> <strong>annoncée dans les paquets TCP SYN sortants sur l'interface spécifiée.</strong></p>
+<p>En limitant la valeur MSS dans les paquets TCP SYN, vous informez explicitement l'autre côté qu'il ne doit pas envoyer des paquets plus grands que cette taille. Cela empêche les problèmes de connexion qui surviennent lorsque la découverte du MTU de chemin (PMTUD) échoue.</p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Définissez la MSS à une valeur spécifique, en octets. Utilisez cette option si
+vous avez besoin d'imposer une MSS spécifique, par exemple pour résoudre des problèmes de connectivité
+ou satisfaire des exigences réseau spécifiques.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> Le routeur calcule automatiquement la MSS à être
+la MTU de l'interface moins 40 octets pour le trafic IPv4 (20 octets pour l'en-tête IPv4
+et 20 octets pour l'en-tête TCP). Cette option est recommandée pour configurer automatiquement la bonne valeur.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-arp-cache-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez pendant combien de temps une entrée ARP reste valide après avoir appris une correspondance entre une adresse IP et une adresse MAC sur cette interface.</strong></p>
+<p>La durée par défaut est de 30 secondes.</p>
+<p>Une entrée ARP reste valide si elle reçoit un feedback positif des protocoles de niveau supérieur.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-disable-arp-filter" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le filtrage ARP sur cette interface.</strong></p>
+<p><strong>Comportement par défaut :</strong> Le noyau répond aux demandes ARP sur cette interface
+seulement si le trafic serait routé de retour à l'expéditeur ARP via cette interface spécifique.</p>
+<p><strong>Si configuré :</strong> Le noyau répond aux demandes ARP sur cette interface pour toute
+adresse IP configurée sur l'hôte local, indépendamment de l'interface spécifique à laquelle cette adresse IP est assignée, et indépendamment de la table de routage. Cela reflète le concept Linux selon lequel les adresses IP appartiennent à l'hôte, et non à des interfaces individuelles.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip disable-arp-filter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le comportement de l'interface en tant qu'hôte ou routeur.</strong></p>
+<p>Si configuré, l'interface passe en mode hôte, et le transfert IPv4 est désactivé sur celle-ci.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez si les paquets broadcast directs IP reçus sur cette interface doivent être transmis.</strong></p>
+<p><strong>Comportement par défaut :</strong> Les paquets broadcast directs IP sont supprimés.</p>
+<p><strong>Si configuré :</strong> Les paquets broadcast directs IP sont transmis à tous les hôtes
+sur le sous-réseau de destination, conformément à <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> et <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-enable-arp-accept" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez comment traiter les ARPs gratuits sur cette interface.</strong></p>
+<p>Si configuré, une correspondance IP-MAC est ajoutée au tableau ARP en fonction
+des demandes ou réponses ARP gratuit.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Si le tableau ARP contient déjà l'adresse IP provenant d'un ARP gratuit,
+son entrée est mise à jour, indépendamment du fait que cette configuration soit activée.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-enable-arp-announce" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la sélection de l'adresse IP source pour les demandes ARP sur cette interface.</strong></p>
+<p><strong>Comportement par défaut :</strong> Le noyau peut utiliser n'importe quelle adresse IP possédée par l'hôte comme adresse IP source dans les demandes ARP sur cette interface.</p>
+<p><strong>Si configuré :</strong> Le noyau essaie d'abord de sélectionner une adresse IP source configurée sur l'interface partageant un sous-réseau commun avec l'adresse IP cible. Si aucun tel sous-réseau n'existe, le noyau sélectionne l'adresse IP qu'il utiliserait normalement (en fonction de la table de routage pour atteindre la destination cible).</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-enable-arp-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez quelles demandes ARP seront ignorées sur cette interface.</strong></p>
+<p><strong>Comportement par défaut :</strong> Le noyau répond aux demandes ARP pour toutes les adresses IP locales, indépendamment de l'interface à laquelle elles sont assignées.</p>
+<p><strong>Si configuré :</strong> Le noyau répond aux demandes ARP uniquement si l'adresse IP cible est assignée à cette interface spécifique.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-enable-proxy-arp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le proxy ARP sur cette interface.</strong></p>
+<p>Si configuré, le routeur (noyau) intercepte les demandes ARP pour des adresses IP non locales et répond avec l'<abbr title="Adresse MAC">MAC</abbr> de l'interface qui a reçu la demande. Les paquets ultérieurs destinés à ces adresses IP sont acheminés vers leurs destinations réelles sur les sous-réseaux distants.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip enable-proxy-arp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-proxy-arp-pvlan" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le proxy ARP local sur l'interface.</strong></p>
+<p>Si configuré, le routeur (noyau) répond aux demandes ARP sur cette interface VLAN même si l'adresse IP cible se trouve sur le même sous-réseau et interface.</p>
+<p>Cela est utilisé pour soutenir les exigences de isolation réseau (RFC 3069) pour les VLAN privés (PVLANs). Dans les configurations PVLAN, les hôtes sur les ports isolés ne sont PAS autorisés à communiquer directement entre eux au niveau 2, mais ils peuvent communiquer avec le routeur upstream.</p>
+<p>En répondant aux demandes ARP inter-hôtes avec sa propre adresse <abbr title="Adresse MAC">MAC</abbr>, le routeur (noyau) dirige le trafic inter-hôtes via lui-même plutôt que directement entre les hôtes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette commande fonctionne indépendamment et ne nécessite pas l'activation
+du proxy ARP standard sur l'interface.</p>
+</div>
+<p>Le proxy ARP local est également connu sous les noms suivants :</p>
+<ul class="simple">
+<li><p>VLAN agrégé (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>VLAN privé (Cisco, Allied Telesyn).</p></li>
+<li><p>Filtrage de port source ou isolation de port (Hewlett-Packard).</p></li>
+<li><p>Transfert forcé MAC (Ericsson).</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la validation de l'adresse IP source à l'aide de</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>sur cette interface, comme spécifié dans</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>strict :</strong> Chaque paquet entrant est vérifié contre la base de données de routage (FIB). Si l'interface n'est pas le meilleur chemin de retour vers cette source, la validation échoue et le paquet est supprimé.</p></li>
+<li><p><strong>loose :</strong> Chaque paquet entrant est vérifié contre la base de données de routage (FIB). Si l'adresse IP source est inatteignable via n'importe quelle interface, la validation échoue.</p></li>
+<li><p><strong>disable :</strong> Aucune validation de l'adresse IP source n'est effectuée. Tous les paquets entrants sont acceptés.</p></li>
+</ul>
+<p>Le RFC 3704 recommande d'activer le mode strict pour empêcher le spoofing d'IP, comme les attaques DDoS. Pour des scénarios de routage asymétrique ou autres complexes, utilisez le mode loose.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour obtenir automatiquement une adresse IPv6 à l'aide de</strong>
+<abbr title="Autoconfiguration d'adresse sans état">SLAAC</abbr>, <strong>comme spécifié dans</strong>
+<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<p>Les hôtes IPv6 peuvent se configurer automatiquement lorsqu'ils sont connectés à un réseau IPv6 en utilisant le protocole de découverte des voisins via ICMPv6. Lorsqu'ils se connectent pour la première fois à un réseau, un hôte envoie une requête multicast de sollicitation de routeur pour ses paramètres de configuration. Le routeur répond avec un paquet d'annonce de routeur contenant les paramètres de configuration du niveau Internet.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette méthode désactive automatiquement le transfert de trafic IPv6
+sur l'interface.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ipv6 address autoconf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-address-eui64-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour lui attribuer une adresse IPv6 à l'aide de la méthode</strong>
+<abbr title="64-bit Extended Unique Identifier">EUI-64</abbr> <strong>, comme spécifié</strong> dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ipv6 address eui64 2001:db8:beef::/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ipv6 address no-default-link-local
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-address-no-default-link-local" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez l'attribution automatique d'une adresse IPv6 link-local à
+cette interface.</strong></p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ipv6 address no-default-link-local
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour un comportement d'hôte ou de routeur.</strong></p>
+<p>Si configuré, l'interface passe en mode hôte, et le transfert IPv6 est désactivé sur celle-ci.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ipv6 disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ipv6 adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la</strong> <abbr title="Taille maximale de segment">MSS</abbr> <strong>annoncée dans les paquets TCP SYN sortants sur l'interface spécifiée.</strong></p>
+<p>En limitant la valeur MSS dans les paquets TCP SYN, vous informez explicitement
+l'autre côté qu'il ne doit pas envoyer des paquets plus grands que cette taille. Cela empêche
+les problèmes de connexion lorsqu'une découverte de MTU de chemin (PMTUD) échoue.</p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>mss :</strong> Définissez la MSS à une valeur spécifique, en octets. Utilisez cette option pour
+forcer une MSS spécifique, par exemple, pour résoudre des problèmes de connectivité
+ou satisfaire des exigences réseau spécifiques.</p></li>
+<li><p><strong>clamp-mss-to-pmtu :</strong> Le routeur calcule la MSS à être la MTU de l'interface
+moins 60 octets pour le trafic IPv6 (40 octets pour l'en-tête IPv6 et 20 octets
+pour l'en-tête TCP). Cette option est recommandée pour configurer automatiquement
+la bonne valeur.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ipv6 accept-dad &lt;0 | 1 | 2&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-accept-dad-0-1-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le</strong> <abbr title="Détection de duplication d'adresse">DAD</abbr> <strong>IPv6 sur l'
+interface.</strong></p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>0 :</strong> Désactive le DAD. Aucune détection de duplication d'adresse n'est effectuée.</p></li>
+<li><p><strong>1 :</strong> Active le DAD (par défaut). Les adresses dupliquées sont détectées. L'
+opération IPv6 de l'interface continue pour les adresses IPv6 valides.</p></li>
+<li><p><strong>2 :</strong> Active le DAD et, si une adresse link-local dupliquée basée sur la MAC est trouvée, désactive l'opération IPv6 sur cette interface.</p></li>
+</ul>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ipv6 accept-dad 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ipv6 dup-addr-detect-transmits &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-dup-addr-detect-transmits-n" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le nombre de</strong> <abbr title="Détection de duplication d'adresse">DAD</abbr>
+<strong>messages que le routeur (noyau) envoie pendant l'attribution d'adresse IPv6
+sur cette interface.</strong></p>
+<p>La valeur par défaut est 1.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ipv6 dup-addr-detect-transmits 5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; vrf &lt;vrf&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-vrf-vrf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Affectez l'interface à une instance spécifique de</strong> <abbr title="Virtual Routing and Forwarding">VRF</abbr> <strong>.</strong></p>
+<div class="admonition seealso">
+<p class="admonition-title">Voir aussi</p>
+<p>Pour plus d'informations sur la configuration d'un VRF, consultez la section <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 vrf red
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>DHCP(v6)</strong></p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcp-options client-id &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcp-options-client-id-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un identifiant client DHCP pour l'interface, comme spécifié dans</strong>
+<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2131.html"><strong>RFC 2131</strong></a>.</p>
+<p>Le <code class="docutils literal notranslate">client-id</code> est un identifiant que le client DHCP envoie au serveur DHCP pour identifier uniquement son propre appareil pour l'attribution d'adresse IP. Par défaut, le client utilise son adresse MAC. La chaîne <code class="docutils literal notranslate">&lt;description&gt;</code> est un identifiant utilisateur qui sera envoyé au serveur DHCP comme identifiant client DHCP.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcp-options client-id &#39;foo-bar&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcp-options host-name &lt;hostname&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcp-options-host-name-hostname" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un nom d'hôte spécifique pour l'interface.</strong></p>
+<p>À la place du vrai nom d'hôte, le client DHCP enverra le nom d'hôte spécifique
+au serveur DHCP lors de la demande d'une adresse IP.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcp-options host-name &#39;VyOS&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcp-options vendor-class-id &lt;vendor-id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcp-options-vendor-class-id-vendor-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le client DHCP pour inclure un identifiant de classe de fabricant dans ses demandes DHCP sur cette interface.</strong></p>
+<p>L'identifiant de classe de fabricant est une chaîne de bytes spécifique au fabricant qui permet au serveur DHCP d'identifier l'appareil et, dans certains cas, de fournir des options de configuration.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcp-options vendor-class-id &#39;VyOS&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcp-options no-default-route
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcp-options-no-default-route" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le client DHCP pour obtenir une adresse IP, mais ignorer toute passerelle par défaut fournie par le serveur DHCP sur cette interface.</strong></p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcp-options no-default-route
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcp-options default-route-distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcp-options-default-route-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la distance pour la route par défaut obtenue du serveur DHCP
+sur cette interface.</strong></p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcp-options default-route-distance 220
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcp-options reject &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcp-options-reject-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le client DHCP pour rejeter l'adresse IP spécifique ou la plage d'adresses IP du serveur DHCP sur cette interface.</strong></p>
+<p>Cela est utile lorsqu'un modem attribue une adresse IP locale au démarrage. Pour rejeter
+plusieurs adresses, exécutez cette commande plusieurs fois avec différentes valeurs.
+Vous pouvez rejeter des adresses individuelles (192.168.100.1) ou des sous-réseaux entiers
+(192.168.100.0/24).</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcp-options reject 192.168.100.0/24
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcp-options user-class &lt;string&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcp-options-user-class-string" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le client DHCP pour envoyer un identifiant de classe d'utilisateur spécifique dans ses demandes DHCP sur cette interface.</strong></p>
+<p>Le serveur DHCP peut interpréter cet identifiant et fournir des options de configuration spécifiques en fonction de celui-ci (par exemple, des routes par défaut).
+La valeur de la classe d'utilisateur regroupe généralement les clients DHCP ayant des besoins de configuration similaires (par exemple, employés, invités ou imprimantes).</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcp-options user-class VyOS
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options duid &lt;duid&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-duid-duid" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un</strong> <abbr title="Identifiant unique DHCP">DUID</abbr> <strong>spécifique pour le client DHCPv6 sur cette interface.</strong></p>
+<p>Le DUID est un identifiant utilisé par un client DHCPv6 pour obtenir une adresse IPv6 d'un serveur DHCPv6. Il se compose d'un champ de type de 2 octets, suivi d'un champ d'identifiant variable de longueur allant jusqu'à 128 octets. Le format de la partie identifiant dépend du type de DUID :</p>
+<ul class="simple">
+<li><p><strong>DUID-LLT :</strong> Le type le plus courant, qui inclut un type matériel, une horodatage et une adresse MAC.</p></li>
+<li><p><strong>DUID-EN :</strong> Basé sur un numéro d'entreprise d'un fabricant et un identifiant unique attribué par le fabricant.</p></li>
+<li><p><strong>DUID-LL :</strong> Inclut uniquement une adresse MAC.</p></li>
+</ul>
+<p>Le serveur DHCP compare le DUID à sa base de données et fournit
+des données de configuration (telles que l'adresse, les durées de bail, les serveurs DNS, etc.)
+au client DHCP.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 duid &#39;0e:00:00:01:00:01:27:71:db:f0:00:50:56:bf:c5:6d&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options no-release
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-no-release" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le client DHCP pour ne pas envoyer un message de libération lorsqu'il s'arrête sur cette interface.</strong></p>
+<p>Cela aide à conserver l'adresse ou le préfixe assigné.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcpv6-options no-release
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options parameters-only
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-parameters-only" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activez un mode client DHCPv6 sans état sur cette interface.</strong></p>
+<p>En mode sans état, le client DHCPv6 demande uniquement des paramètres de configuration sans état au serveur DHCP (par exemple, les adresses des serveurs DNS). Il ne demande pas de configuration avec état, telle que des adresses IPv6 ou des préfixes.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcpv6-options parameters-only
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options rapid-commit
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-rapid-commit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activez le commit rapide DHCPv6 sur cette interface.</strong></p>
+<p>Lorsqu'elle est activée, le client DHCP et le serveur sautent les étapes de négociation
+(Advertise et Request), terminant le processus de configuration DHCPv6 en seulement deux messages (Solicit et réponse finale).</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcpv6-options rapid-commit
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options temporary
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-temporary" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le client DHCPv6 pour demander une adresse IPv6 temporaire sur cette
+interface.</strong></p>
+<p>Lorsqu'elle est configurée, le client DHCP ne forme pas une association d'identité pour
+les adresses non temporaires (IA_NA). En conséquence, il n'obtient qu'une adresse IPv6 temporaire et n'obtient pas une adresse permanente.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcpv6-options temporary
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>DHCPv6 Prefix Delegation (PD)</strong></p>
+<p>VyOS prend en charge la délégation de préfixe DHCPv6 (DHCPv6-PD) comme décrit dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3633.html"><strong>RFC 3633</strong></a>.
+La délégation de préfixe DHCPv6-PD est prise en charge par la plupart des FAI qui fournissent IPv6 natif aux consommateurs sur des réseaux fixes.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options pd &lt;id&gt; length &lt;length&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-pd-id-length-length" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez une longueur de préfixe spécifique pour les demandes DHCPv6-PD sur cette
+interface.</strong></p>
+<p>Certaines FAI fournissent uniquement un préfixe /64 par défaut. Utilisez cette commande pour
+demander une autre longueur de préfixe pour une demande DHCPv6-PD spécifique,
+allant de /32 (si autorisé par votre FAI) à /64. &lt;id&gt; est un
+identifiant unique pour la demande DHCPv6-PD.</p>
+<p>La valeur par défaut est 64.</p>
+<p>Pour demander un préfixe /56 à votre FAI, utilisez :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcpv6-options pd 0 length 56
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options pd &lt;id&gt; interface &lt;delegatee&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-pd-id-interface-delegatee-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'identifiant d'interface IPv6 (partie hôte) pour l'interface déléguée.</strong></p>
+<p>La valeur doit être un entier décimal. Elle est ajoutée au préfixe délégué
+et à l'ID SLA pour former l'adresse IPv6 finale.</p>
+<p>Par défaut, la partie hôte est générée en fonction de l'adresse MAC de l'interface parente
+(en format EUI-64).</p>
+<blockquote>
+<div></div></blockquote>
+<p><strong>Exemple :</strong></p>
+<p>Si un préfixe /64 est délégué à l'interface eth8 et que vous configurez la partie hôte
+à 65535, l'adresse IPv6 résultante se terminera par ::ffff, car
+65535 correspond à ffff en notation hexadécimale.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcpv6-options pd 0 interface eth8 address 65534
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options pd &lt;id&gt; interface &lt;delegatee&gt; sla-id &lt;id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-pd-id-interface-delegatee-sla-id-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'</strong> <abbr title="Identifiant de regroupement de site">SLA ID</abbr> <strong>pour l'
+interface déléguée.</strong></p>
+<p>La valeur doit être un entier décimal supérieur à 0 et convenir à la longueur des IDs SLA.
+Elle est convertie en hexadécimal et ajoutée au préfixe délégué pour former le préfixe de sous-réseau spécifique pour l'interface déléguée.</p>
+<p><strong>Exemple :</strong></p>
+<p>Si l'ID SLA est 1 et que le préfixe délégué est <code class="docutils literal notranslate">2001:db8:ffff::/48</code>, le
+préfixe de sous-réseau résultant pour l'interface déléguée sera
+<code class="docutils literal notranslate">2001:db8:ffff:1::/64</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcpv6-options pd 0 interface eth8 sla-id 1
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="macsec-options">
+<h3>Options MACsec</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; security cipher &lt;gcm-aes-128|gcm-aes-256&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-security-cipher-gcm-aes-128-gcm-aes-256" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le suite de chiffrement pour l'interface MACsec.</strong></p>
+<p>Ce paramètre de configuration est obligatoire.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; security encrypt
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-security-encrypt" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activer le chiffrement sur l'interface MACsec.</strong></p>
+<p>Par défaut, les interfaces MACsec ne fournissent que l'authentification ; le chiffrement est
+optionnel.
+Lorsqu'il est activé, les paquets sortants sont chiffrés à l'aide de la suite de chiffrement configurée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; source-interface &lt;physical-source&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-source-interface-physical-source" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez une interface source physique pour l'interface MACsec.</strong></p>
+<p>Le trafic transmis à travers cette interface est authentifié et, si configuré,
+chiffré.</p>
+</div>
+</div>
+<section id="macsec-key-management">
+<h4>Gestion des clés MACsec</h4>
+<p><strong>Mode SAK statique</strong></p>
+<p>Dans le mode SAK statique, les administrateurs doivent configurer manuellement et mettre à jour les SAKs sur
+chaque pair MACsec. Le protocole MKA ne peut pas être utilisé dans
+ce mode.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; security static key &lt;key&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-security-static-key-key" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la clé TX (SAK) pour l'interface MACsec.</strong></p>
+<p>La clé doit être une chaîne hexadécimale de 16 octets (GCM-AES-128) ou 64 octets (GCM-AES-256).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; security static peer &lt;peer&gt; mac &lt;mac address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-security-static-peer-peer-mac-mac-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'adresse MAC associée au pair MACsec.</strong></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; security static peer &lt;peer&gt; key &lt;key&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-security-static-peer-peer-key-key" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure</span>
+</title="Config</label>
+="Config</label="="label:="code="=
+="section>
+="label{:="</0
+="09.1</:="p>
+   1.193.=="1</333:</="1</3</3133:</1</p>
+</div>
+</section>
+<section id="replay-protection</11</code</p</code="type="code:</p>
+code:</</1</3</p2</:</4</p</code</code</1</code</code:4</code:code</p1</1</code><code</1</code</p>
+1</1</p</code</code:1</1</1</p>
+1</199</code:</code>
+code1</1</code</p10</1</code</1</1</code1</p:1</code</19</code</1119</code</1999199</code><code199</code</11</1990</19</code><code><code199</19</code><code>19911919999</1999199999999999</19</1999</19</199999</code199</199999999</199199999999</19</19</1</99</99</199</1</9</code49999</code</9</code</199091999</code</9999
+</div>
+ 999999999990999999999999999999919999</199999199999901999999999999999999999999999999999999999999999999999999999999999099999999999999099999999999999999999999999999999099999999999991999999090999999999999099999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999</199</99999999999999999999999939999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+</div>
+</section>
+<section id="replay-protection">
+<h9999999999999999999999999999999999999999999</9999999999999999999999999999999999999999999909999909999999999999999
+</div>
+</section>
+</section>
+</section>
+<section id="99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999199999999399999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999929999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999939999999999999999999999999999999999999999999999999999999999999999999999999999999990999999999990999999999999999999999999999999999999991991999999999991919999119111999999991999999999999999199999199119

@@ -1,0 +1,359 @@
+{
+  "zh-CN": {
+    "systemIp": {
+      "tabs": {
+        "basic": "基本设置",
+        "arp": "ARP 缓存",
+        "multipath": "多路径",
+        "nht": "NHT",
+        "protocol": "协议",
+        "tcp": "TCP"
+      },
+      "labels": {
+        "disableForwarding": "禁用 IPv4 转发",
+        "arpTableSize": "ARP 表大小",
+        "ignoreUnreachableNexthops": "忽略不可达下一跳",
+        "layer4Hashing": "Layer4 哈希",
+        "noResolveViaDefault": "不通过默认路由解析",
+        "mssBase": "MSS Base",
+        "mssFloor": "MSS Floor",
+        "mssProbing": "MSS 探测",
+        "importRouteTable": "导入路由表",
+        "tableNumber": "表编号",
+        "actions": "操作"
+      },
+      "hints": {
+        "disableForwarding": "禁用所有接口的 IPv4 转发",
+        "arpTableSize": "ARP 缓存最大条目数（默认: 8192）",
+        "ignoreUnreachableNexthops": "忽略不在 ARP 表中的下一跳",
+        "layer4Hashing": "使用 Layer 4 信息进行 ECMP 哈希",
+        "noResolveViaDefault": "不通过默认路由解析下一跳",
+        "mssBase": "探测起始 MSS（默认: 1024）",
+        "mssFloor": "探测最小 MSS（默认: 48）"
+      },
+      "placeholders": {
+        "routeMapName": "Route-map 名称"
+      },
+      "options": {
+        "disabled": "禁用",
+        "onIcmpBlackHole": "ICMP 黑洞时探测",
+        "force": "强制探测"
+      },
+      "buttons": {
+        "addRouteTable": "添加路由表",
+        "delete": "删除"
+      },
+      "messages": {
+        "loadFailed": "加载失败",
+        "saveFailed": "保存失败",
+        "enterRouteTableNumber": "请输入路由表编号 (1-252)"
+      }
+    }
+  },
+  "en": {
+    "systemIp": {
+      "tabs": {
+        "basic": "Basic",
+        "arp": "ARP Cache",
+        "multipath": "Multipath",
+        "nht": "NHT",
+        "protocol": "Protocol",
+        "tcp": "TCP"
+      },
+      "labels": {
+        "disableForwarding": "Disable IPv4 Forwarding",
+        "arpTableSize": "ARP Table Size",
+        "ignoreUnreachableNexthops": "Ignore Unreachable Nexthops",
+        "layer4Hashing": "Layer4 Hashing",
+        "noResolveViaDefault": "No Resolve via Default",
+        "mssBase": "MSS Base",
+        "mssFloor": "MSS Floor",
+        "mssProbing": "MSS Probing",
+        "importRouteTable": "Import Route Table",
+        "tableNumber": "Table Number",
+        "actions": "Actions"
+      },
+      "hints": {
+        "disableForwarding": "Disable IPv4 forwarding on all interfaces",
+        "arpTableSize": "Maximum ARP cache entries (default: 8192)",
+        "ignoreUnreachableNexthops": "Ignore nexthops not in ARP table",
+        "layer4Hashing": "Use Layer 4 information for ECMP hashing",
+        "noResolveViaDefault": "Do not resolve nexthops via default route",
+        "mssBase": "Probing start MSS (default: 1024)",
+        "mssFloor": "Probing minimum MSS (default: 48)"
+      },
+      "placeholders": {
+        "routeMapName": "Route-map name"
+      },
+      "options": {
+        "disabled": "Disabled",
+        "onIcmpBlackHole": "Probe on ICMP black hole",
+        "force": "Force probing"
+      },
+      "buttons": {
+        "addRouteTable": "Add Route Table",
+        "delete": "Delete"
+      },
+      "messages": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "enterRouteTableNumber": "Please enter route table number (1-252)"
+      }
+    }
+  },
+  "zh-TW": {
+    "systemIp": {
+      "tabs": {
+        "basic": "Basic",
+        "arp": "ARP Cache",
+        "multipath": "Multipath",
+        "nht": "NHT",
+        "protocol": "Protocol",
+        "tcp": "TCP"
+      },
+      "labels": {
+        "disableForwarding": "Disable IPv4 Forwarding",
+        "arpTableSize": "ARP Table Size",
+        "ignoreUnreachableNexthops": "Ignore Unreachable Nexthops",
+        "layer4Hashing": "Layer4 Hashing",
+        "noResolveViaDefault": "No Resolve via Default",
+        "mssBase": "MSS Base",
+        "mssFloor": "MSS Floor",
+        "mssProbing": "MSS Probing",
+        "importRouteTable": "Import Route Table",
+        "tableNumber": "Table Number",
+        "actions": "Actions"
+      },
+      "hints": {
+        "disableForwarding": "Disable IPv4 forwarding on all interfaces",
+        "arpTableSize": "Maximum ARP cache entries (default: 8192)",
+        "ignoreUnreachableNexthops": "Ignore nexthops not in ARP table",
+        "layer4Hashing": "Use Layer 4 information for ECMP hashing",
+        "noResolveViaDefault": "Do not resolve nexthops via default route",
+        "mssBase": "Probing start MSS (default: 1024)",
+        "mssFloor": "Probing minimum MSS (default: 48)"
+      },
+      "placeholders": {
+        "routeMapName": "Route-map name"
+      },
+      "options": {
+        "disabled": "Disabled",
+        "onIcmpBlackHole": "Probe on ICMP black hole",
+        "force": "Force probing"
+      },
+      "buttons": {
+        "addRouteTable": "Add Route Table",
+        "delete": "Delete"
+      },
+      "messages": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "enterRouteTableNumber": "Please enter route table number (1-252)"
+      }
+    }
+  },
+  "ru": {
+    "systemIp": {
+      "tabs": {
+        "basic": "Basic",
+        "arp": "ARP Cache",
+        "multipath": "Multipath",
+        "nht": "NHT",
+        "protocol": "Protocol",
+        "tcp": "TCP"
+      },
+      "labels": {
+        "disableForwarding": "Disable IPv4 Forwarding",
+        "arpTableSize": "ARP Table Size",
+        "ignoreUnreachableNexthops": "Ignore Unreachable Nexthops",
+        "layer4Hashing": "Layer4 Hashing",
+        "noResolveViaDefault": "No Resolve via Default",
+        "mssBase": "MSS Base",
+        "mssFloor": "MSS Floor",
+        "mssProbing": "MSS Probing",
+        "importRouteTable": "Import Route Table",
+        "tableNumber": "Table Number",
+        "actions": "Actions"
+      },
+      "hints": {
+        "disableForwarding": "Disable IPv4 forwarding on all interfaces",
+        "arpTableSize": "Maximum ARP cache entries (default: 8192)",
+        "ignoreUnreachableNexthops": "Ignore nexthops not in ARP table",
+        "layer4Hashing": "Use Layer 4 information for ECMP hashing",
+        "noResolveViaDefault": "Do not resolve nexthops via default route",
+        "mssBase": "Probing start MSS (default: 1024)",
+        "mssFloor": "Probing minimum MSS (default: 48)"
+      },
+      "placeholders": {
+        "routeMapName": "Route-map name"
+      },
+      "options": {
+        "disabled": "Disabled",
+        "onIcmpBlackHole": "Probe on ICMP black hole",
+        "force": "Force probing"
+      },
+      "buttons": {
+        "addRouteTable": "Add Route Table",
+        "delete": "Delete"
+      },
+      "messages": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "enterRouteTableNumber": "Please enter route table number (1-252)"
+      }
+    }
+  },
+  "de": {
+    "systemIp": {
+      "tabs": {
+        "basic": "Basic",
+        "arp": "ARP Cache",
+        "multipath": "Multipath",
+        "nht": "NHT",
+        "protocol": "Protocol",
+        "tcp": "TCP"
+      },
+      "labels": {
+        "disableForwarding": "Disable IPv4 Forwarding",
+        "arpTableSize": "ARP Table Size",
+        "ignoreUnreachableNexthops": "Ignore Unreachable Nexthops",
+        "layer4Hashing": "Layer4 Hashing",
+        "noResolveViaDefault": "No Resolve via Default",
+        "mssBase": "MSS Base",
+        "mssFloor": "MSS Floor",
+        "mssProbing": "MSS Probing",
+        "importRouteTable": "Import Route Table",
+        "tableNumber": "Table Number",
+        "actions": "Actions"
+      },
+      "hints": {
+        "disableForwarding": "Disable IPv4 forwarding on all interfaces",
+        "arpTableSize": "Maximum ARP cache entries (default: 8192)",
+        "ignoreUnreachableNexthops": "Ignore nexthops not in ARP table",
+        "layer4Hashing": "Use Layer 4 information for ECMP hashing",
+        "noResolveViaDefault": "Do not resolve nexthops via default route",
+        "mssBase": "Probing start MSS (default: 1024)",
+        "mssFloor": "Probing minimum MSS (default: 48)"
+      },
+      "placeholders": {
+        "routeMapName": "Route-map name"
+      },
+      "options": {
+        "disabled": "Disabled",
+        "onIcmpBlackHole": "Probe on ICMP black hole",
+        "force": "Force probing"
+      },
+      "buttons": {
+        "addRouteTable": "Add Route Table",
+        "delete": "Delete"
+      },
+      "messages": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "enterRouteTableNumber": "Please enter route table number (1-252)"
+      }
+    }
+  },
+  "fr": {
+    "systemIp": {
+      "tabs": {
+        "basic": "Basic",
+        "arp": "ARP Cache",
+        "multipath": "Multipath",
+        "nht": "NHT",
+        "protocol": "Protocol",
+        "tcp": "TCP"
+      },
+      "labels": {
+        "disableForwarding": "Disable IPv4 Forwarding",
+        "arpTableSize": "ARP Table Size",
+        "ignoreUnreachableNexthops": "Ignore Unreachable Nexthops",
+        "layer4Hashing": "Layer4 Hashing",
+        "noResolveViaDefault": "No Resolve via Default",
+        "mssBase": "MSS Base",
+        "mssFloor": "MSS Floor",
+        "mssProbing": "MSS Probing",
+        "importRouteTable": "Import Route Table",
+        "tableNumber": "Table Number",
+        "actions": "Actions"
+      },
+      "hints": {
+        "disableForwarding": "Disable IPv4 forwarding on all interfaces",
+        "arpTableSize": "Maximum ARP cache entries (default: 8192)",
+        "ignoreUnreachableNexthops": "Ignore nexthops not in ARP table",
+        "layer4Hashing": "Use Layer 4 information for ECMP hashing",
+        "noResolveViaDefault": "Do not resolve nexthops via default route",
+        "mssBase": "Probing start MSS (default: 1024)",
+        "mssFloor": "Probing minimum MSS (default: 48)"
+      },
+      "placeholders": {
+        "routeMapName": "Route-map name"
+      },
+      "options": {
+        "disabled": "Disabled",
+        "onIcmpBlackHole": "Probe on ICMP black hole",
+        "force": "Force probing"
+      },
+      "buttons": {
+        "addRouteTable": "Add Route Table",
+        "delete": "Delete"
+      },
+      "messages": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "enterRouteTableNumber": "Please enter route table number (1-252)"
+      }
+    }
+  },
+  "ko": {
+    "systemIp": {
+      "tabs": {
+        "basic": "Basic",
+        "arp": "ARP Cache",
+        "multipath": "Multipath",
+        "nht": "NHT",
+        "protocol": "Protocol",
+        "tcp": "TCP"
+      },
+      "labels": {
+        "disableForwarding": "Disable IPv4 Forwarding",
+        "arpTableSize": "ARP Table Size",
+        "ignoreUnreachableNexthops": "Ignore Unreachable Nexthops",
+        "layer4Hashing": "Layer4 Hashing",
+        "noResolveViaDefault": "No Resolve via Default",
+        "mssBase": "MSS Base",
+        "mssFloor": "MSS Floor",
+        "mssProbing": "MSS Probing",
+        "importRouteTable": "Import Route Table",
+        "tableNumber": "Table Number",
+        "actions": "Actions"
+      },
+      "hints": {
+        "disableForwarding": "Disable IPv4 forwarding on all interfaces",
+        "arpTableSize": "Maximum ARP cache entries (default: 8192)",
+        "ignoreUnreachableNexthops": "Ignore nexthops not in ARP table",
+        "layer4Hashing": "Use Layer 4 information for ECMP hashing",
+        "noResolveViaDefault": "Do not resolve nexthops via default route",
+        "mssBase": "Probing start MSS (default: 1024)",
+        "mssFloor": "Probing minimum MSS (default: 48)"
+      },
+      "placeholders": {
+        "routeMapName": "Route-map name"
+      },
+      "options": {
+        "disabled": "Disabled",
+        "onIcmpBlackHole": "Probe on ICMP black hole",
+        "force": "Force probing"
+      },
+      "buttons": {
+        "addRouteTable": "Add Route Table",
+        "delete": "Delete"
+      },
+      "messages": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "enterRouteTableNumber": "Please enter route table number (1-252)"
+      }
+    }
+  }
+}

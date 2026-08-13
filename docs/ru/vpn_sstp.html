@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="sstp-server">
+<h1>SSTP сервер</h1>
+<p><abbr title="Secure Socket Tunneling Protocol">SSTP</abbr> — это форма <abbr title="Virtual Private Network">VPN</abbr> туннеля, которая предоставляет механизм для транспортировки PPP-трафика через канал SSL/TLS. SSL/TLS обеспечивает транспортный уровень безопасности с согласованием ключей, шифрованием и проверкой целостности трафика. Использование SSL/TLS на TCP-порт 443 позволяет SSTP проходить практически через все брандмауэры и прокси-серверы, за исключением аутентифицированных веб-прокси.</p>
+<p>SSTP доступен для Linux, BSD и Windows.</p>
+<p>VyOS использует <a class="reference external" href="https://accel-ppp.org/">accel-ppp</a>, чтобы предоставить функциональность сервера SSTP. Мы поддерживаем как локальную, так и RADIUS-аутентификацию.</p>
+<p>Поскольку SSTP предоставляет PPP через канал SSL/TLS, требуется использование либо сертификатов, подписанных публично, либо частной PKI.</p>
+<section id="configuring-sstp-server">
+<h2>Настройка SSTP сервера</h2>
+<section id="certificates">
+<h3>Сертификаты</h3>
+<p>Используйте наш раздел документации — <a class="reference internal" href="../pki/index.html#pki">PKI</a> чтобы создать и установить CA и серверный сертификат</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ generate pki ca install CA
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ generate pki certificate sign CA install Server
+</pre></div>
+</div>
+</section>
+<section id="configuration">
+<h3>Конфигурация</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn sstp authentication local-users username test password &#39;test&#39;
+set vpn sstp authentication mode &#39;local&#39;
+set vpn sstp client-ip-pool SSTP-POOL range &#39;10.0.0.2-10.0.0.100&#39;
+set vpn sstp default-pool &#39;SSTP-POOL&#39;
+set vpn sstp gateway-address &#39;10.0.0.1&#39;
+set vpn sstp ssl ca-certificate &#39;CA1&#39;
+set vpn sstp ssl certificate &#39;Server&#39;
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication mode &lt;local | radius&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-mode-local-radius" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Установите backend-авторизацию. Настроенный backend-авторизации используется для всех запросов.</p>
+<ul class="simple">
+<li><p><strong>radius</strong>: Все запросы на аутентификацию обрабатываются конфигурированным сервером RADIUS.</p></li>
+<li><p><strong>local</strong>: Все запросы на аутентификацию обрабатываются локально.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication local-users username &lt;user&gt; password &lt;pass&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-local-users-username-user-password-pass" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Создайте <code class="docutils literal notranslate">&lt;user&gt;</code> для локальной аутентификации на этом устройстве. Пароль пользователя будет установлен на <code class="docutils literal notranslate">&lt;pass&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp client-ip-pool &lt;POOL-NAME&gt; range &lt;x.x.x.x-x.x.x.x | x.x.x.x/x&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-client-ip-pool-pool-name-range-x-x-x-x-x-x-x-x-x-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду, чтобы определить первый IP-адрес пула адресов, которые будут предоставлены клиентам SSTP. Если используется обозначение <code class="docutils literal notranslate">x.x.x.x-x.x.x.x</code>, оно должно находиться в подсети /24. Если используется обозначение <code class="docutils literal notranslate">x.x.x.x/x</code>, возможно задание хоста/сетевого маски.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp default-pool &lt;POOL-NAME&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-default-pool-pool-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду, чтобы определить имя пула адресов по умолчанию.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp gateway-address &lt;gateway&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-gateway-address-gateway" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает единственный <code class="docutils literal notranslate">&lt;gateway&gt;</code> IP-адрес, который будет использоваться как локальный адрес интерфейсов PPP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp ssl ca-certificate &lt;file&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-ssl-ca-certificate-file" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Имя сертификата авторитета, установленного.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp ssl certificate &lt;file&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-ssl-certificate-file" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Имя установленного серверного сертификата.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="configuring-radius-authentication">
+<h2>Настройка RADIUS-аутентификации</h2>
+<p>Для включения аутентификации на основе RADIUS необходимо изменить режим аутентификации в конфигурации. Предыдущие настройки, такие как локальные пользователи, все еще существуют в конфигурации, однако они не используются, если режим был изменен с локального на RADIUS. После возврата к локальному режиму будут использоваться все локальные учетные записи.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn sstp authentication mode radius
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius server &lt;server&gt; key &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-server-server-key-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Настройте RADIUS <code class="docutils literal notranslate">&lt;server&gt;</code> и его необходимый общий <code class="docutils literal notranslate">&lt;secret&gt;</code> для общения с сервером RADIUS.</p>
+</div>
+</div>
+<p>Поскольку RADIUS-сервер является точкой отказа, можно настроить несколько RADIUS-серверов, которые будут использоваться последовательно.
+Например:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn sstp authentication radius server 10.0.0.1 key &#39;foo&#39;
+set vpn sstp authentication radius server 10.0.0.2 key &#39;foo&#39;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Некоторые RADIUS-серверы используют список контроля доступа, который разрешает или запрещает запросы, убедитесь, что ваш роутер VyOS добавлен в список разрешенных клиентов.</p>
+</div>
+<section id="radius-source-address">
+<h3>Исходный адрес RADIUS</h3>
+<p>Если вы используете OSPF как ваш IGP, используйте интерфейс, наиболее близкий к RADIUS-серверу. Вы можете привязать все исходящие запросы RADIUS к одному исходному IP-адресу, например, к циклическому интерфейсу.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Исходный IPv4-адрес, используемый во всех запросах к серверу RADIUS.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Параметр <code class="docutils literal notranslate">source-address</code> должен быть настроен на интерфейсе. Лучшей практикой будет использование циклического или фиктивного интерфейса.</p>
+</div>
+</section>
+<section id="radius-advanced-options">
+<h3>Дополнительные параметры RADIUS</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius server &lt;server&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-server-server-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Настройте RADIUS <code class="docutils literal notranslate">&lt;server&gt;</code> и его необходимый порт для запросов аутентификации.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius server &lt;server&gt; fail-time &lt;time&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-server-server-fail-time-time" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Отметьте RADIUS-сервер как недоступный на заданное количество <code class="docutils literal notranslate">&lt;time&gt;</code> секунд.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius server &lt;server&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-server-server-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Временно отключите этот RADIUS-сервер.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius acct-timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-acct-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Время ожидания ответа для пакетов Interim-Update. (по умолчанию 3 секунды)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius dynamic-author server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-dynamic-author-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает IP-адрес сервера расширения динамической авторизации (DM/CoA). Этот IP-адрес должен существовать на любом интерфейсе VyOS или может быть <code class="docutils literal notranslate">0.0.0.0</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius dynamic-author port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-dynamic-author-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>UDP-порт для сервера расширения динамической авторизации (DM/CoA)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius dynamic-author key &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-dynamic-author-key-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Секрет для сервера расширения динамической авторизации (DM/CoA)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius max-try &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-max-try-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Максимальное количество попыток отправить запросы Access-Request/Accounting-Request</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Время ожидания ответа от сервера (в секундах)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius nas-identifier &lt;identifier&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-nas-identifier-identifier" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Значение, отправляемое на RADIUS-сервер в атрибуте NAS-Identifier и которое должно совпадать в запросах DM/CoA.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius nas-ip-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-nas-ip-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Значение, отправляемое на RADIUS-сервер в атрибуте NAS-IP-Address и которое должно совпадать в запросах DM/CoA. Также сервер DM/CoA будет привязан к этому адресу.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Исходный IPv4-адрес, используемый во всех запросах к серверу RADIUS.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius rate-limit attribute &lt;attribute&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-rate-limit-attribute-attribute" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает, какой атрибут сервера RADIUS содержит информацию о скорости ограничения. По умолчанию используется атрибут <code class="docutils literal notranslate">Filter-Id</code>.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если вы установите пользовательский атрибут RADIUS, вы должны определить его как на сервере RADIUS, так и на клиенте.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius rate-limit enable
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-rate-limit-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Включает регулирование пропускной способности через RADIUS.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication radius rate-limit vendor
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-radius-rate-limit-vendor" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает словарь производителя. Этот словарь должен быть присутствующим в /usr/share/accel-ppp/radius.</p>
+</div>
+</div>
+<p>Полученные атрибуты RADIUS имеют более высокий приоритет, чем параметры, определенные в конфигурации CLI, см. объяснение ниже.</p>
+</section>
+<section id="allocation-clients-ip-addresses-by-radius">
+<h3>Выделение клиентских IP-адресов через RADIUS</h3>
+<p>Если RADIUS-сервер отправляет атрибут <code class="docutils literal notranslate">Framed-IP-Address</code>, то этот IP-адрес будет выделен клиенту, а параметр <code class="docutils literal notranslate">default-pool</code> в конфигурации CLI будет игнорироваться.</p>
+<p>Если RADIUS-сервер отправляет атрибут <code class="docutils literal notranslate">Framed-Pool</code>, то IP-адрес будет выделен из предопределенного пула адресов, имя которого равно значению атрибута.</p>
+<p>Если RADIUS-сервер отправляет атрибут <code class="docutils literal notranslate">Stateful-IPv6-Address-Pool</code>, то IPv6-адрес будет выделен из предопределенного пула IPv6 <code class="docutils literal notranslate">prefix</code>, имя которого равно значению атрибута.</p>
+<p>Если RADIUS-сервер отправляет атрибут <code class="docutils literal notranslate">Delegated-IPv6-Prefix-Pool</code>, то префикс делегирования IPv6 будет выделен из предопределенного пула IPv6 <code class="docutils literal notranslate">delegate</code>, имя которого равно значению атрибута.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p><code class="docutils literal notranslate">Stateful-IPv6-Address-Pool</code> и <code class="docutils literal notranslate">Delegated-IPv6-Prefix-Pool</code> определены в RFC6911. Если они не определены на вашем RADIUS-сервере, добавьте новый <a class="reference external" href="https://github.com/accel-ppp/accel-ppp/blob/master/accel-pppd/radius/dict/dictionary.rfc6911">словарь</a>.</p>
+</div>
+<p>Интерфейс клиента может быть помещен в контекст VRF через пакет Access-Accept RADIUS или изменен через RADIUS CoA. <code class="docutils literal notranslate">Accel-VRF-Name</code> используется для этих целей. Это является пользовательским <a class="reference external" href="https://github.com/accel-ppp/accel-ppp/blob/master/accel-pppd/radius/dict/dictionary.accel">атрибутом ACCEL-PPP</a>. Определите его на вашем RADIUS-сервере.</p>
+</section>
+<section id="renaming-clients-interfaces-by-radius">
+<h3>Переименование интерфейсов клиентов через RADIUS</h3>
+<p>Если RADIUS-сервер использует атрибут <code class="docutils literal notranslate">NAS-Port-Id</code>, то туннели PPP будут переименованы.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Значение атрибута <code class="docutils literal notranslate">NAS-Port-Id</code> должно быть меньше 16 символов, иначе интерфейс не будет переименован.</p>
+</div>
+</section>
+</section>
+<section id="ipv6">
+<h2>IPv6</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp ppp-options ipv6 &lt;require | prefer | allow | deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-ppp-options-ipv6-require-prefer-allow-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает предпочтение согласования IPv6.</p>
+<ul class="simple">
+<li><p><strong>require</strong> - Требуется согласование IPv6</p></li>
+<li><p><strong>prefer</strong> - Запросите клиента о согласовании IPv6, не завершайте, если он отклоняет</p></li>
+<li><p><strong>allow</strong> - Согласование IPv6 только при запросе клиента (значение по умолчанию)</p></li>
+<li><p><strong>deny</strong> - Не согласовывать IPv6</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp client-ipv6-pool &lt;IPv6-POOL-NAME&gt; prefix &lt;address&gt; mask &lt;number-of-bits&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-client-ipv6-pool-ipv6-pool-name-prefix-address-mask-number-of-bits" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду, чтобы установить пул IPv6, из которого клиент SSTP получит префикс IPv6 вашего определенного размера (маска), чтобы завершить точку подключения SSTP на их стороне. Длина маски может быть установлена между 48 и 128 битами, значение по умолчанию — 64.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp client-ipv6-pool &lt;IPv6-POOL-NAME&gt; delegate &lt;address&gt; delegation-prefix &lt;number-of-bits&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-client-ipv6-pool-ipv6-pool-name-delegate-address-delegation-prefix-number-of-bits" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду, чтобы настроить DHCPv6 Prefix Delegation (RFC3633) на SSTP. Вам нужно будет установить ваш пул IPv6 и длину префикса делегирования. Из определенного пула IPv6 вы будете выдавать сети заданной длины (префикс делегирования). Длина префикса делегирования может быть установлена между 32 и 64 битами.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp default-ipv6-pool &lt;IPv6-POOL-NAME&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-default-ipv6-pool-ipv6-pool-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду, чтобы определить имя пула IPv6 по умолчанию.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn sstp ppp-options ipv6 allow
+set vpn sstp client-ipv6-pool IPv6-POOL delegate &#39;2001:db8:8003::/48&#39; delegation-prefix &#39;56&#39;
+set vpn sstp client-ipv6-pool IPv6-POOL prefix &#39;2001:db8:8002::/48&#39; mask &#39;64&#39;
+set vpn sstp default-ipv6-pool IPv6-POOL
+</pre></div>
+</div>
+<section id="ipv6-advanced-options">
+<h3>Дополнительные параметры IPv6</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp ppp-options ipv6-accept-peer-interface-id
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-ppp-options-ipv6-accept-peer-interface-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Принять идентификатор интерфейса абонента. По умолчанию это не определено.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp ppp-options ipv6-interface-id &lt;random | x:x:x:x&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-ppp-options-ipv6-interface-id-random-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Определяет, используется ли фиксированный или случайный идентификатор интерфейса для IPv6. По умолчанию используется фиксированный.</p>
+<ul class="simple">
+<li><p><strong>random</strong> - Случайный идентификатор интерфейса для IPv6</p></li>
+<li><p><strong>x:x:x:x</strong> - Укажите идентификатор интерфейса для IPv6</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp ppp-options ipv6-interface-id &lt;random | x:x:x:x&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-ppp-options-ipv6-interface-id-random-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Определяет идентификатор интерфейса абонента для IPv6. По умолчанию используется фиксированный.</p>
+<ul class="simple">
+<li><p><strong>random</strong> - Случайный идентификатор интерфейса для IPv6</p></li>
+<li><p><strong>x:x:x:x</strong> - Укажите идентификатор интерфейса для IPv6</p></li>
+<li><p><strong>ipv4-addr</strong> - Рассчитайте идентификатор интерфейса из IPv4-адреса.</p></li>
+<li><p><strong>calling-sid</strong> - Рассчитайте идентификатор интерфейса из вызывающего станционного идентификатора.</p></li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="scripting">
+<h2>Скрипты</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp extended-scripts on-change &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-extended-scripts-on-change-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Скрипт, который запускается, когда интерфейс сессии изменяется обработкой RADIUS CoA</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp extended-scripts on-down &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-extended-scripts-on-down-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Скрипт, который запускается, когда интерфейс сессии готов к завершению</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp extended-scripts on-pre-up &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-extended-scripts-on-pre-up-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Скрипт, который запускается перед тем, как интерфейс сессии станет активным</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp extended-scripts on-up &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-extended-scripts-on-up-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Скрипт, который запускается, когда интерфейс сессии полностью настроен и запущен</p>
+</div>
+</div>
+</section>
+<section id="advanced-options">
+<h2>Дополнительные параметры</h2>
+<section id="authentication-advanced-options">
+<h3>Дополнительные параметры аутентификации</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication local-users username &lt;user&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-local-users-username-user-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Отключить учетную запись <code class="docutils literal notranslate">&lt;user&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication local-users username &lt;user&gt; static-ip &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-local-users-username-user-static-ip-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Назначьте статический IP-адрес <code class="docutils literal notranslate">&lt;user&gt;</code> учетной записи.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication local-users username &lt;user&gt; rate-limit download &lt;bandwidth&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-local-users-username-user-rate-limit-download-bandwidth" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Ограничьте пропускную способность загрузки для <code class="docutils literal notranslate">&lt;user&gt;</code> до <code class="docutils literal notranslate">&lt;bandwidth&gt;</code> кбит/с.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication local-users username &lt;user&gt; rate-limit upload &lt;bandwidth&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-local-users-username-user-rate-limit-upload-bandwidth" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Ограничьте пропускную способность загрузки для <code class="docutils literal notranslate">&lt;user&gt;</code> до <code class="docutils literal notranslate">&lt;bandwidth&gt;</code> кбит/с.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp authentication protocols &lt;pap | chap | mschap | mschap-v2&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-authentication-protocols-pap-chap-mschap-mschap-v2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Требуется, чтобы абонент аутентифицировался с использованием одного из следующих протоколов: pap, chap, mschap, mschap-v2.</p>
+</div>
+</div>
+</section>
+<section id="client-ip-pool-advanced-options">
+<h3>Дополнительные параметры пула IP-адресов клиентов</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp client-ip-pool &lt;POOL-NAME&gt; next-pool &lt;NEXT-POOL-NAME&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-client-ip-pool-pool-name-next-pool-next-pool-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду, чтобы определить имя следующего пула адресов.</p>
+</div>
+</div>
+</section>
+<section id="ppp-advanced-options">
+<h3>Дополнительные параметры PPP</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp ppp-options disable-ccp
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-ppp-options-disable-ccp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Отключить протокол управления сжатием (CCP).
+CCP включен по умолчанию.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp ppp-options interface-cache &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-ppp-options-interface-cache-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает количество интерфейсов, которые нужно кэшировать. Это предотвращает удаление интерфейсов после уничтожения соответствующей сессии. Вместо этого интерфейсы кэшируются для использования в новых сессиях. Это должно снизить частоту создания/удаления интерфейсов на уровне ядра.
+Значение по умолчанию — <strong>0</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp ppp-options ipv4 &lt;require | prefer | allow | deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-ppp-options-ipv4-require-prefer-allow-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает предпочтение согласования IPv4.</p>
+<ul class="simple">
+<li><p><strong>require</strong> - Требуется согласование IPv4</p></li>
+<li><p><strong>prefer</strong> - Запросите клиента о согласовании IPv4, не завершайте, если он отклоняет</p></li>
+<li><p><strong>allow</strong> - Согласование IPv4 только при запросе клиента (значение по умолчанию)</p></li>
+<li><p><strong>deny</strong> - Не согласовывать IPv4</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp ppp-options lcp-echo-failure &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-ppp-options-lcp-echo-failure-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Определяет максимальное количество <code class="docutils literal notranslate">&lt;number&gt;</code> неподтвержденных эхо-запросов. При достижении значения <code class="docutils literal notranslate">&lt;number&gt;</code>, сессия будет перезапущена. Значение по умолчанию — <strong>3</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp ppp-options lcp-echo-interval &lt;interval&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-ppp-options-lcp-echo-interval-interval" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Если эта опция указана и больше 0, модуль PPP будет отправлять эхо-запросы LCP каждые <code class="docutils literal notranslate">&lt;interval&gt;</code> секунд.
+Значение по умолчанию — <strong>30</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp ppp-options lcp-echo-timeout
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-ppp-options-lcp-echo-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает время ожидания в секундах для любого активности со стороны абонента. Если эта опция указана, она включает адаптивную функцию эхо-запроса LCP и «lcp-echo-failure» не используется. Значение по умолчанию — <strong>0</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp ppp-options min-mtu &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-ppp-options-min-mtu-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Определяет минимально допустимый MTU. Если клиент пытается согласовать MTU ниже этого, он будет NAKed, и отключен, если он отклоняет больший MTU.
+Значение по умолчанию — <strong>100</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp ppp-options mppe &lt;require | prefer | deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-ppp-options-mppe-require-prefer-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает предпочтение согласования <abbr title="Microsoft Point-to-Point Encryption">MPPE</abbr>.</p>
+<ul class="simple">
+<li><p><strong>require</strong> - Запросите клиента о MPPE, если он отклоняет, завершите соединение</p></li>
+<li><p><strong>prefer</strong> - Запросите клиента о MPPE, если он отклоняет, не завершайте. (Значение по умолчанию)</p></li>
+<li><p><strong>deny</strong> - Отказаться от MPPE</p></li>
+</ul>
+<p>По умолчанию — не запрашивать клиента о MPPE, но разрешить, если клиент хочет. Обратите внимание, что RADIUS может переопределить этот параметр атрибутом MS-MPPE-Encryption-Policy.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp ppp-options mru &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-ppp-options-mru-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Определяет предпочитаемый MRU. По умолчанию не определен.</p>
+</div>
+</div>
+</section>
+<section id="global-advanced-options">
+<h3>Дополнительные глобальные параметры</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Установите описание.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp limits burst &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-limits-burst-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Количество пакетов</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp limits connection-limit &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-limits-connection-limit-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Максимальное количество принимаемых соединений (например, 1/мин, 60/сек)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp limits timeout &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-limits-timeout-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Время ожидания в секундах</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp mtu
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Максимальный размер передачи (MTU) (по умолчанию: <strong>1500</strong>)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp max-concurrent-sessions
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-max-concurrent-sessions" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Максимальное количество одновременных попыток запуска сессии</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-name-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Подключенные клиенты должны использовать <code class="docutils literal notranslate">&lt;address&gt;</code> как сервер DNS. Эта команда принимает как IPv4, так и IPv6-адреса. Для IPv4 можно настроить до двух серверов имен, для IPv6 — до трех.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp shaper fwmark &lt;1-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-shaper-fwmark-1-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Совпадение значения метки брандмауэра</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp snmp master-agent
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-snmp-master-agent" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Включить SNMP</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp wins-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-wins-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Серверы WINS, распространяемые клиенту</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn sstp host-name &lt;hostname&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-sstp-host-name-hostname" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Если эта опция задана, будут разрешены только соединения SSTP с указанным хостом и тем же TLS SNI.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="configuring-sstp-client">
+<h2>Настройка клиента SSTP</h2>
+<p>После настройки вашего сервера SSTP наступает время основного тестирования. Клиент Linux, используемый для тестирования, называется <a class="reference external" href="https://github.com/reliablehosting/sstp-client">sstpc</a>. <a class="reference external" href="https://github.com/reliablehosting/sstp-client">sstpc</a> требует файла конфигурации PPP/peer.</p>
+<p>Если вы используете самоподписанный сертификат, не забудьте установить CA на стороне клиента.</p>
+<p>Следующая конфигурация PPP тестирует MSCHAP-v2:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>$ cat /etc/ppp/peers/vyos
+usepeerdns
+#require-mppe
+#require-pap
+require-mschap-v2
+noauth
+lock
+refuse-pap
+refuse-eap
+refuse-chap
+refuse-mschap
+#refuse-mschap-v2
+nobsdcomp
+nodeflate
+debug
+</pre></div>
+</div>
+<p>Теперь вы можете «дial» peer следующей командой: <code class="docutils literal notranslate">sstpc --log-level 4 --log-stderr --user vyos --password vyos vpn.example.com -- call vyos</code>.</p>
+<p>Попытка подключения будет отображаться следующим образом:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>$ sstpc --log-level 4 --log-stderr --user vyos --password vyos vpn.example.com -- call vyos
+
+Mar 22 13:29:12 sstpc[12344]: Resolved vpn.example.com to 192.0.2.1
+Mar 22 13:29:12 sstpc[12344]: Connected to vpn.example.com
+Mar 22 13:29:12 sstpc[12344]: Sending Connect-Request Message
+Mar 22 13:29:12 sstpc[12344]: SEND SSTP CRTL PKT(14)
+Mar 22 13:29:12 sstpc[12344]:   TYPE(1): CONNECT REQUEST, ATTR(1):
+Mar 22 13:29:12 sstpc[12344]:     ENCAP PROTO(1): 6
+Mar 22 13:29:12 sstpc[12344]: RECV SSTP CRTL PKT(48)
+Mar 22 13:29:12 sstpc[12344]:   TYPE(2): CONNECT ACK, ATTR(1):
+Mar 22 13:29:12 sstpc[12344]:     CRYPTO BIND REQ(4): 40
+Mar 22 13:29:12 sstpc[12344]: Started PPP Link Negotiation
+Mar 22 13:29:15 sstpc[12344]: Sending Connected Message
+Mar 22 13:29:15 sstpc[12344]: SEND SSTP CRTL PKT(112)
+Mar 22 13:29:15 sstpc[12344]:   TYPE(4): CONNECTED, ATTR(1):
+Mar 22 13:29:15 sstpc[12344]:     CRYPTO BIND(3): 104
+Mar 22 13:29:15 sstpc[12344]: Connection Established
+
+$ ip addr show ppp0
+164: ppp0: &lt;POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP&gt; mtu 1452 qdisc fq_codel state UNKNOWN group default qlen 3
+     link/ppp  promiscuity 0
+     inet 100.64.2.2 peer 100.64.1.1/32 scope global ppp0
+        valid_lft forever preferred_lft forever
+</pre></div>
+</div>
+</section>
+<section id="monitoring">
+<h2>Мониторинг</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show sstp-server sessions
+<a class="cmdlink" href="#opcmd-show-sstp-server-sessions" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Используйте эту команду, чтобы локально проверить активные сессии на сервере SSTP.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show sstp-server sessions
+ ifname | username |    ip    | ip6 | ip6-dp |   calling-sid  | rate-limit | state  |  uptime  | rx-bytes | tx-bytes
+--------+----------+----------+-----+--------+----------------+------------+--------+----------+----------+----------
+ sstp0  | test     | 10.0.0.2 |     |        | 192.168.10.100 |            | active | 00:15:46 | 16.3 KiB | 210 B
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show sstp-server statistics
+ uptime: 0.01:21:54
+cpu: 0%
+mem(rss/virt): 6688/100464 kB
+core:
+  mempool_allocated: 149420
+  mempool_available: 146092
+  thread_count: 1
+  thread_active: 1
+  context_count: 6
+  context_sleeping: 0
+  context_pending: 0
+  md_handler_count: 7
+  md_handler_pending: 0
+  timer_count: 2
+  timer_pending: 0
+sessions:
+  starting: 0
+  active: 1
+  finishing: 0
+sstp:
+  starting: 0
+  active: 1
+</pre></div>
+</div>
+</section>
+<section id="troubleshooting">
+<h2>Устранение неполадок</h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$sudo journalctl -u accel-ppp@sstp -b 0
+
+Feb 28 17:03:04 vyos accel-sstp[2492]: sstp: new connection from 192.168.10.100:49852
+Feb 28 17:03:04 vyos accel-sstp[2492]: sstp: starting
+Feb 28 17:03:04 vyos accel-sstp[2492]: sstp: started
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: recv [HTTP &lt;SSTP_DUPLEX_POST /sra_{BA195980-CD49-458b-9E23-C84EE0ADCD75}/ HTTP/1.1&gt;]
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: recv [HTTP &lt;SSTPCORRELATIONID: {48B82435-099A-4158-A987-052E7570CFAA}&gt;]
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: recv [HTTP &lt;Content-Length: 18446744073709551615&gt;]
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: recv [HTTP &lt;Host: vyos.io&gt;]
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: send [HTTP &lt;HTTP/1.1 200 OK&gt;]
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: send [HTTP &lt;Date: Wed, 28 Feb 2024 17:03:04 GMT&gt;]
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: send [HTTP &lt;Content-Length: 18446744073709551615&gt;]
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: recv [SSTP SSTP_MSG_CALL_CONNECT_REQUEST]
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: send [SSTP SSTP_MSG_CALL_CONNECT_ACK]
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: lcp_layer_init
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: auth_layer_init
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: ccp_layer_init
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: ipcp_layer_init
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: ipv6cp_layer_init
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: ppp establishing
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: lcp_layer_start
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: send [LCP ConfReq id=56 &lt;auth PAP&gt; &lt;mru 1452&gt; &lt;magic 1cd9ad05&gt;]
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: recv [LCP ConfReq id=0 &lt;mru 4091&gt; &lt;magic 345f64ca&gt; &lt;pcomp&gt; &lt;accomp&gt; &lt; d 3 6 &gt;]
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: send [LCP ConfRej id=0 &lt;pcomp&gt; &lt;accomp&gt; &lt; d 3 6 &gt;]
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: recv [LCP ConfReq id=1 &lt;mru 4091&gt; &lt;magic 345f64ca&gt;]
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: send [LCP ConfNak id=1 &lt;mru 1452&gt;]
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: recv [LCP ConfReq id=2 &lt;mru 1452&gt; &lt;magic 345f64ca&gt;]
+Feb 28 17:03:04 vyos accel-sstp[2492]: :: send [LCP ConfAck id=2]
+Feb 28 17:03:07 vyos accel-sstp[2492]: :: fsm timeout 9
+Feb 28 17:03:07 vyos accel-sstp[2492]: :: send [LCP ConfReq id=56 &lt;auth PAP&gt; &lt;mru 1452&gt; &lt;magic 1cd9ad05&gt;]
+Feb 28 17:03:07 vyos accel-sstp[2492]: :: recv [LCP ConfAck id=56 &lt;auth PAP&gt; &lt;mru 1452&gt; &lt;magic 1cd9ad05&gt;]
+Feb 28 17:03:07 vyos accel-sstp[2492]: :: lcp_layer_started
+Feb 28 17:03:07 vyos accel-sstp[2492]: :: auth_layer_start
+Feb 28 17:03:07 vyos accel-sstp[2492]: :: recv [LCP Ident id=3 &lt;MSRASV5.20&gt;]
+Feb 28 17:03:07 vyos accel-sstp[2492]: :: recv [LCP Ident id=4 &lt;MSRAS-0-MSEDGEWIN10&gt;]
+Feb 28 17:03:07 vyos accel-sstp[2492]: [50B blob data]
+Feb 28 17:03:07 vyos accel-sstp[2492]: :: recv [PAP AuthReq id=3]
+Feb 28 17:03:07 vyos accel-sstp[2492]: ppp0:test: connect: ppp0 &lt;--&gt; sstp(192.168.10.100:49852)
+Feb 28 17:03:07 vyos accel-sstp[2492]: ppp0:test: ppp connected
+Feb 28 17:03:07 vyos accel-sstp[2492]: ppp0:test: send [PAP AuthAck id=3 &quot;Authentication succeeded&quot;]
+Feb 28 17:03:07 vyos accel-sstp[2492]: ppp0:test: test: authentication succeeded
+Feb 28 17:03:07 vyos accel-sstp[2492]: ppp0:test: auth_layer_started
+Feb 28 17:03:07 vyos accel-sstp[2492]: ppp0:test: ccp_layer_start
+Feb 28 17:03

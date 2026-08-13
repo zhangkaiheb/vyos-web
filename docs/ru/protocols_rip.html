@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="rip">
+<h1>RIP</h1>
+<p>Разработан в 1970-х годах в лаборатории Xerox, RIP — это протокол маршрутизации на основе вектора расстояния, основанный на алгоритме Беллмана-Форда.</p>
+<p>RIP определяет лучший маршрут на основе количества промежуточных узлов (количества маршрутизаторов, через которые проходит путь). Маршрутизаторы, поддерживающие RIP, периодически объявляют свою всю таблицу маршрутизации соседям, а также метрику (количество промежуточных узлов) для каждого назначения.</p>
+<p>Поддерживаемые версии:</p>
+<ul class="simple">
+<li><p>RIPv1: как описано в
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc1058">RFC 1058</a></p></li>
+<li><p>RIPv2: как описано в
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc2453">RFC 2453</a></p></li>
+</ul>
+<section id="general-configuration">
+<h2>Общая конфигурация</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip network &lt;A.B.C.D/M&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-network-a-b-c-d-m" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить RIP на всех интерфейсах, IP-адреса которых находятся в указанной сети.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip network 192.0.2.0/24
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-interface-interface" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить RIP на указанном интерфейсе.</strong></p>
+<p>После применения интерфейс отправляет и получает пакеты RIP.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip interface eth0
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip neighbor &lt;A.B.C.D&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-neighbor-a-b-c-d" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить соседа RIP с использованием его IP-адреса.</strong></p>
+<p>Используйте эту команду, когда сосед не может обрабатывать многоадресные обновления RIP. После настройки локальный маршрутизатор отправляет обновления напрямую указанному соседу в виде одноадресных пакетов.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip neighbor 192.0.2.2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip passive-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-passive-interface-interface" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить пассивный режим для указанного интерфейса.</strong></p>
+<p>Это предотвращает отправку исходящих обновлений RIP на интерфейсе, за исключением явно настроенных соседей. Входящие обновления RIP все еще принимаются и обрабатываются.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip passive-interface eth0
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip passive-interface default
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-passive-interface-default" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить пассивный режим для всех интерфейсов.</strong></p>
+<p>Это предотвращает отправку исходящих обновлений RIP на всех интерфейсах, за исключением явно настроенных соседей. Маршрутизатор по-прежнему получает и обрабатывает входящие обновления RIP в обычном порядке.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip passive-interface default
+</pre></div>
+</div>
+</section>
+<section id="optional-configuration">
+<h2>Дополнительная конфигурация</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip default-distance &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-default-distance-1-255" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить административное расстояние для всех маршрутов, изученных через RIP.</strong></p>
+<p>Административное расстояние определяет, как маршруты, изученные через RIP, приоритизируются относительно маршрутов, изученных из других источников (например, BGP, OSPF или статических маршрутов), когда существует несколько путей к одному и тому же назначению.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Маршруты, которым присвоено расстояние 255, отключены и не будут установлены в таблице маршрутизации ядра.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip default-distance 100
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip network-distance &lt;A.B.C.D/M&gt; distance &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-network-distance-a-b-c-d-m-distance-1-255" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить административное расстояние для маршрутов RIP, чей адрес источника находится в указанной сети.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip network-distance 192.0.2.0/24 distance 80
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip network-distance &lt;A.B.C.D/M&gt; access-list &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-network-distance-a-b-c-d-m-access-list-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Ограничить назначение административных расстояний для маршрутов RIP, чей адрес источника соответствует указанной сети и сам маршрут соответствует указанному списку доступа.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip network-distance 192.0.2.0/24 distance 80
+set protocols rip network-distance 192.0.2.0/24 access-list 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip default-information originate
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-default-information-originate" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Создать и объявить маршрут по умолчанию (<code class="docutils literal notranslate">0.0.0.0/0</code>) всем соседям RIP.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip default-information originate
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip distribute-list access-list &lt;in|out&gt; &lt;0-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-distribute-list-access-list-in-out-0-4294967295" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Применить список доступа для фильтрации маршрутов RIP в направлении входящего или исходящего.</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">in</code>: Фильтрует маршруты, полученные от соседей RIP.</p></li>
+<li><p><code class="docutils literal notranslate">out</code>: Фильтрует маршруты, объявленные соседям RIP.</p></li>
+</ul>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip distribute-list access-list in 20
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip distribute-list interface &lt;interface&gt; access-list &lt;in|out&gt; &lt;0-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-distribute-list-interface-interface-access-list-in-out-0-4294967295" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Применить список доступа для фильтрации маршрутов RIP в направлении входящего или исходящего на указанном интерфейсе.</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">in</code>: Фильтрует маршруты, полученные от соседей RIP на этом интерфейсе.</p></li>
+<li><p><code class="docutils literal notranslate">out</code>: Фильтрует маршруты, объявленные соседям RIP на этом интерфейсе.</p></li>
+</ul>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip distribute-list interface eth0 access-list in 20
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip distribute-list prefix-list &lt;in|out&gt; &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-distribute-list-prefix-list-in-out-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Применить префикс-лист для фильтрации маршрутов RIP в направлении входящего или исходящего.</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">in</code>: Фильтрует маршруты, полученные от соседей RIP.</p></li>
+<li><p><code class="docutils literal notranslate">out</code>: Фильтрует маршруты, объявленные соседям RIP.</p></li>
+</ul>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip distribute-list prefix-list in INBOUND-FILTER
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip distribute-list interface &lt;interface&gt; prefix-list &lt;in|out&gt; &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-distribute-list-interface-interface-prefix-list-in-out-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Применить префикс-лист для фильтрации маршрутов RIP на указанном интерфейсе в направлении входящего или исходящего.</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">in</code>: Фильтрует маршруты, полученные от соседей RIP на этом интерфейсе.</p></li>
+<li><p><code class="docutils literal notranslate">out</code>: Фильтрует маршруты, объявленные соседям RIP на этом интерфейсе.</p></li>
+</ul>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip distribute-list interface eth0 prefix-list in RIP-IN
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip route &lt;A.B.C.D/M&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-route-a-b-c-d-m" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Добавить статический маршрут в процесс маршрутизации RIP.</strong></p>
+<p>Маршрут создается только внутри RIP.</p>
+<p>Эта команда специфична для FRR и VyOS и должна использоваться только продвинутыми пользователями, имеющими глубокое понимание протокола RIP.</p>
+<p>Для большинства развертываний рекомендуется создать обычный статический маршрут и перераспределить его в RIP с помощью
+<code class="docutils literal notranslate">set protocols rip redistribute static</code>.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip route 192.0.2.0/24
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip timers update &lt;5-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-timers-update-5-2147483647" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить таймер обновления RIP, в секундах.</strong></p>
+<p>Таймер обновления определяет, как часто маршрутизатор отправляет неожиданные сообщения ответа своим соседям RIP. Каждый ответ содержит полную таблицу маршрутизации RIP.</p>
+<p>Значение по умолчанию — 30 секунд.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip timers update 60
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip timers timeout &lt;5-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-timers-timeout-5-2147483647" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить таймер истечения времени действия маршрута RIP, в секундах.</strong></p>
+<p>Если маршрут не обновляется входящим обновлением в течение этого интервала, он становится недействительным. Маршрутизатор временно сохраняет недействительный маршрут в таблице маршрутизации RIP, чтобы соседи узнали, что маршрут был удален.</p>
+<p>Значение по умолчанию — 180 секунд.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip timers timeout 300
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip timers garbage-collection &lt;5-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-timers-garbage-collection-5-2147483647" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить таймер сбора мусора RIP, в секундах.</strong></p>
+<p>Этот таймер начинает работать, когда маршрут становится недействительным. Когда таймер истекает, маршрут удаляется из таблицы маршрутизации.</p>
+<p>Значение по умолчанию — 120 секунд.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip timers garbage-collection 60
+</pre></div>
+</div>
+</section>
+<section id="redistribution-configuration">
+<h2>Конфигурация перераспределения</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip redistribute &lt;babel|bgp|connected|isis|kernel|nhrp|ospf|static&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-redistribute-babel-bgp-connected-isis-kernel-nhrp-ospf-static" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Перераспределить маршруты из указанного источника в RIP.</strong></p>
+<p>Маршруты, изученные из выбранного источника, импортируются в таблицу маршрутизации RIP и объявляются соседям RIP, как если бы они были изучены через RIP.</p>
+<p>Поддерживаемые источники:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">babel</code>: Маршруты, изученные через Babel.</p></li>
+<li><p><code class="docutils literal notranslate">bgp</code>: Маршруты, изученные через BGP.</p></li>
+<li><p><code class="docutils literal notranslate">connected</code>: Непосредственно подключенные маршруты.</p></li>
+<li><p><code class="docutils literal notranslate">isis</code>: Маршруты, изученные через IS-IS.</p></li>
+<li><p><code class="docutils literal notranslate">kernel</code>: Маршруты, установленные в таблице маршрутизации ядра.</p></li>
+<li><p><code class="docutils literal notranslate">nhrp</code>: Маршруты, изученные через NHRP.</p></li>
+<li><p><code class="docutils literal notranslate">ospf</code>: Маршруты, изученные через OSPF.</p></li>
+<li><p><code class="docutils literal notranslate">static</code>: Статические маршруты.</p></li>
+</ul>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip redistribute static
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip redistribute &lt;babel|bgp|connected|isis|kernel|nhrp|ospf|static&gt; metric &lt;1-16&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-redistribute-babel-bgp-connected-isis-kernel-nhrp-ospf-static-metric-1-16" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить метрику для маршрутов, перераспределенных из указанного источника.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip redistribute static metric 5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip redistribute &lt;babel|bgp|connected|isis|kernel|nhrp|ospf|static&gt; route-map &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-redistribute-babel-bgp-connected-isis-kernel-nhrp-ospf-static-route-map-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Применить маршрут-карту для фильтрации маршрутов, перераспределенных из указанного источника.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip redistribute static route-map RIP-REDISTRIBUTE
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip default-metric &lt;1-16&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-default-metric-1-16" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить значение метрики по умолчанию (количество промежуточных узлов) для перераспределенных маршрутов.</strong></p>
+<p>Значение по умолчанию — 1.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Эта команда не влияет на прямые маршруты, перераспределенные через
+<code class="docutils literal notranslate">set protocols rip redistribute connected</code>. Чтобы настроить метрику для прямых маршрутов, используйте <code class="docutils literal notranslate">set protocols rip redistribute connected metric</code>
+явно.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip default-metric 5
+</pre></div>
+</div>
+</section>
+<section id="interfaces-configuration">
+<h2>Конфигурация интерфейсов</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip interface &lt;interface&gt; authentication plaintext-password &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-interface-interface-authentication-plaintext-password-text" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить простую аутентификацию паролем для RIPv2 на указанном интерфейсе и установить пароль.</strong></p>
+<p>Пароль не должен превышать 16 символов.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip interface eth0 authentication plaintext-password vyos-secret
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip interface &lt;interface&gt; authentication md5 &lt;id&gt; password &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-interface-interface-authentication-md5-id-password-text" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить аутентификацию MD5 для RIPv2
+на указанном интерфейсе и установить ключ MD5.</strong></p>
+<p>Ключ MD5 не должен превышать 16 символов.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip interface eth0 authentication md5 1 password vyos-secret
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip interface &lt;interface&gt; split-horizon disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-interface-interface-split-horizon-disable" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Отключить разделение горизонта на указанном интерфейсе.</strong></p>
+<p>По умолчанию VyOS не объявляет маршруты RIP обратно через интерфейс, на котором они были изучены (разделение горизонта). Эта команда отключает это поведение по умолчанию.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip interface eth0 split-horizon disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols rip interface &lt;interface&gt; split-horizon poison-reverse
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-interface-interface-split-horizon-poison-reverse" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить разделение горизонта с обратной помойкой на указанном интерфейсе.</strong></p>
+<p>Если включено, маршрутизатор объявляет изученные маршруты как недоступные на интерфейсе, на котором они были изучены.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip interface eth0 split-horizon poison-reverse
+</pre></div>
+</div>
+</section>
+<section id="operational-mode-commands">
+<h2>Команды режима операционного режима</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show ip rip
+<a class="cmdlink" href="#opcmd-show-ip-rip" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p><strong>Показать все маршруты RIP.</strong></p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos-1:~$ show ip rip
+Codes: K - kernel route, C - connected, L - local, S - static,
+       R - RIP, O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric, t - Table-Direct
+Sub-codes:
+      (n) - normal, (s) - static, (d) - default, (r) - redistribute,
+      (i) - interface
+
+Network            Next Hop         Metric From            Tag Time
+C(i) 192.0.2.0/24       0.0.0.0               1 self              0
+C(i) 198.51.100.0/24    0.0.0.0               1 self              0
+R(n) 203.0.113.0/24     192.0.2.2             2 192.0.2.2         0 02:53
+</pre></div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show ip rip status
+<a class="cmdlink" href="#opcmd-show-ip-rip-status" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p><strong>Показать текущее состояние RIP.</strong></p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Routing Protocol is &quot;rip&quot;
+  Sending updates every 30 seconds with +/-50%, next due in 11 seconds
+  Timeout after 180 seconds, garbage collect after 120 seconds
+  Outgoing update filter list for all interface is not set
+  Incoming update filter list for all interface is not set
+  Default redistribution metric is 1
+  Redistributing:
+  Default version control: send version 2, receive any version
+    Interface        Send  Recv   Key-chain
+    eth0             2     1 2
+    eth2             2     1 2
+  Routing for Networks:
+    192.0.2.0/24
+    eth0
+  Routing Information Sources:
+    Gateway          BadPackets BadRoutes  Distance Last Update
+    192.0.2.2               0         0       120   00:00:11
+  Distance: (default is 120)
+</pre></div>
+</div>
+</section>
+<section id="example">
+<h2>Пример</h2>
+<p>Следующий пример демонстрирует базовую конфигурацию RIP между двумя
+маршрутизаторами, где непосредственно подключенные сети перераспределяются в RIP.</p>
+<p><strong>Узел 1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address &#39;198.51.100.1/24&#39;
+set interfaces loopback lo address &#39;192.0.2.1/32&#39;
+set protocols rip network 198.51.100.0/24
+set protocols rip redistribute connected
+</pre></div>
+</div>
+<p><strong>Узел 2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address &#39;198.51.100.2/24&#39;
+set interfaces loopback lo address &#39;192.0.2.2/32&#39;
+set protocols rip network 198.51.100.0/24
+set protocols rip redistribute connected
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

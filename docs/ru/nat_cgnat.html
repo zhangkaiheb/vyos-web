@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3480; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="cgnat">
+<h1>CGNAT</h1>
+<p><abbr title="Carrier-Grade Network Address Translation">CGNAT</abbr>, также известный как
+Large-Scale NAT (LSN), представляет собой тип трансляции сетевых адресов, используемый
+поставщиками интернет-услуг (ISP) для того, чтобы несколько частных IP-адресов могли
+разделять один публичный IP-адрес. Этот метод помогает сэкономить ограниченное пространство IPv4-адресов.
+Блок адресов 100.64.0.0/10 зарезервирован для использования в CGNAT</p>
+<section id="overview">
+<h2>Обзор</h2>
+<p>CGNAT работает, размещая устройство NAT в сети провайдера. Это устройство
+переводит частные IP-адреса из сетей клиентов в ограниченный набор публичных IP-адресов,
+присвоенных провайдеру. Это позволяет многим клиентам делиться меньшим количеством публичных IP-адресов.</p>
+<p>Не все <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6888.html"><strong>RFC 6888</strong></a> требования реализованы в CGNAT.</p>
+<p>Реализованы следующие <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6888.html"><strong>RFC 6888</strong></a> требования:</p>
+<ul class="simple">
+<li><p>REQ 2: CGN должен иметь поведение по умолчанию "IP-адресного пула" в виде "Пары".
+CGN должен использовать одно и то же сопоставление внешних IP-адресов для всех сессий, связанных
+с одним внутренним IP-адресом, независимо от того, являются ли они TCP, UDP, ICMP, чем-то еще
+или комбинацией различных протоколов.</p></li>
+<li><p>REQ 3: Функция CGN не должна иметь ограничений на размер или непрерывность внешнего адресного пула.</p></li>
+<li><p>REQ 4: CGN должен поддерживать ограничение количества внешних портов (или, эквивалентно, "идентификаторов" для ICMP), которые назначаются каждому абоненту</p></li>
+</ul>
+<section id="advantages-of-cgnat">
+<h3>Преимущества CGNAT</h3>
+<ul class="simple">
+<li><p><strong>Сохранение IPv4-адресов</strong>: CGNAT помогает снизить истощение IPv4-адресов, позволяя нескольким клиентам делиться одним публичным IP-адресом.</p></li>
+<li><p><strong>Масштабируемость</strong>: Провайдеры могут обслуживать больше клиентов без необходимости пропорционального увеличения публичных IP-адресов.</p></li>
+<li><p><strong>Экономичность</strong>: Уменьшает затраты, связанные с приобретением дополнительных публичных IPv4-адресов.</p></li>
+</ul>
+</section>
+<section id="considerations">
+<h3>Важные моменты</h3>
+<ul class="simple">
+<li><p><strong>Проблемы с трассировкой</strong>: Поскольку несколько пользователей делят один и тот же публичный IP-адрес, отслеживание отдельных пользователей для целей безопасности и законности может быть сложным.</p></li>
+<li><p><strong>Нагрузка на производительность</strong>: Процесс трансляции может вызывать задержки и потенциальные узкие места производительности, особенно при высокой нагрузке.</p></li>
+<li><p><strong>Совместимость приложений</strong>: Некоторые приложения и протоколы могут плохо работать с CGNAT из-за их зависимости от уникальных публичных IP-адресов.</p></li>
+<li><p><strong>Ограничения выделения портов</strong>: У каждого публичного IP-адреса есть ограниченное количество портов, которое может исчерпаться, влияя на возможность установления новых соединений.</p></li>
+<li><p><strong>Протокол управления портами</strong>: PCP не реализован.</p></li>
+</ul>
+</section>
+</section>
+<section id="port-calculation">
+<h2>Расчет портов</h2>
+<p>При реализации CGNAT важно обеспечить достаточное количество портов, выделяемых каждому абоненту. Ниже приведено краткое описание на основе RFC 6888.</p>
+<ol class="arabic simple">
+<li><p><strong>Общее количество доступных портов</strong>:</p>
+<ul class="simple">
+<li><p>Общее количество портов: 65536 (0 до 65535)</p></li>
+<li><p>Зарезервированные порты: Предположим, что 1024 порта зарезервированы для известных служб и административных целей.</p></li>
+<li><p>Доступные порты: 65536 - 1024 = 64512</p></li>
+</ul>
+</li>
+<li><p><strong>Оценка необходимых портов на абонента</strong>:</p>
+<ul class="simple">
+<li><p>Пример: В домашней сети может потребоваться 1000 портов для обеспечения бесперебойной работы нескольких устройств и приложений.</p></li>
+</ul>
+</li>
+<li><p><strong>Расчет количества абонентов на публичный IP-адрес</strong>:</p>
+<ul class="simple">
+<li><p>Доступные порты / Порты на абонента</p></li>
+<li><p>64512 / 1000 ≈ 64 абонента на публичный IP-адрес</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set nat cgnat pool external &lt;pool-name&gt; external-port-range &lt;port-range&gt;
+<a class="cmdlink" href="#cfgcmd-set-nat-cgnat-pool-external-pool-name-external-port-range-port-range" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установите диапазон внешних портов для внешнего пула, по умолчанию диапазон равен
+1024-65535. Можно добавить несколько записей в один и тот же пул.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set nat cgnat pool external &lt;pool-name&gt; per-user-limit port &lt;num&gt;
+<a class="cmdlink" href="#cfgcmd-set-nat-cgnat-pool-external-pool-name-per-user-limit-port-num" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установите ограничения на внешние исходные порты, которые будут выделяться каждому абоненту
+индивидуально. Значение по умолчанию равно 2000.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set nat cgnat pool external &lt;pool-name&gt; range [address | address range | network] [seq]
+<a class="cmdlink" href="#cfgcmd-set-nat-cgnat-pool-external-pool-name-range-address-address-range-network-seq" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установите диапазон внешних IP-адресов для пула CGNAT.
+Последовательность является необязательной; если она установлена, более низкое значение означает более высокий приоритет.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set nat cgnat pool internal &lt;pool-name&gt; range [address range | network]
+<a class="cmdlink" href="#cfgcmd-set-nat-cgnat-pool-internal-pool-name-range-address-range-network" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установите диапазон внутренних IP-адресов для пула CGNAT.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set nat cgnat rule &lt;num&gt; source pool &lt;internal-pool-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-nat-cgnat-rule-num-source-pool-internal-pool-name" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установите правило для источника пула.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set nat cgnat rule &lt;num&gt; translation pool &lt;external-pool-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-nat-cgnat-rule-num-translation-pool-external-pool-name" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p>Установите правило для пула перевода.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set nat cgnat log-allocation
+<a class="cmdlink" href="#cfgcmd-set-nat-cgnat-log-allocation" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p>Включить логирование выделения IP-адресов и портов.</p>
+</div>
+</div>
+</section>
+<section id="configuration-examples">
+<h2>Примеры конфигурации</h2>
+<section id="single-external-address">
+<h3>Один внешний адрес</h3>
+<p>Пример базовой конфигурации CGNAT:
+В следующем примере мы определяем внешний пул с именем <code class="docutils literal notranslate">ext-1</code>, содержащий один
+внешний IP-адрес.</p>
+<p>Каждому абоненту будет выделяться максимум 2000 портов из внешнего пула.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat cgnat pool external ext1 external-port-range &#39;1024-65535&#39;
+set nat cgnat pool external ext1 per-user-limit port &#39;2000&#39;
+set nat cgnat pool external ext1 range &#39;192.0.2.222/32&#39;
+set nat cgnat pool internal int1 range &#39;100.64.0.0/28&#39;
+set nat cgnat rule 10 source pool &#39;int1&#39;
+set nat cgnat rule 10 translation pool &#39;ext1&#39;
+</pre></div>
+</div>
+</section>
+<section id="multiple-external-addresses">
+<h3>Несколько внешних адресов</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat cgnat pool external ext1 external-port-range &#39;1024-65535&#39;
+set nat cgnat pool external ext1 per-user-limit port &#39;8000&#39;
+set nat cgnat pool external ext1 range &#39;192.0.2.1-192.0.2.2&#39;
+set nat cgnat pool external ext1 range &#39;203.0.113.253-203.0.113.254&#39;
+set nat cgnat pool internal int1 range &#39;100.64.0.1-100.64.0.32&#39;
+set nat cgnat rule 10 source pool &#39;int1&#39;
+set nat cgnat rule 10 translation pool &#39;ext1&#39;
+</pre></div>
+</div>
+</section>
+<section id="external-address-sequences">
+<h3>Последовательности внешних адресов</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat cgnat pool external ext-01 per-user-limit port &#39;16000&#39;
+set nat cgnat pool external ext-01 range 203.0.113.1/32 seq &#39;10&#39;
+set nat cgnat pool external ext-01 range 192.0.2.1/32 seq &#39;20&#39;
+set nat cgnat pool internal int-01 range &#39;100.64.0.0/29&#39;
+set nat cgnat rule 10 source pool &#39;int-01&#39;
+set nat cgnat rule 10 translation pool &#39;ext-01&#39;
+</pre></div>
+</div>
+</section>
+</section>
+<section id="operation-commands">
+<h2>Команды операций</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show nat cgnat allocation
+<a class="cmdlink" href="#opcmd-show-nat-cgnat-allocation" title="Переход к этой команде"></a></div><div class="opcmd-body">
+<p>Показать выделение адресов и портов</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show nat cgnat allocation external-address &lt;address&gt;
+<a class="cmdlink" href="#opcmd-show-nat-cgnat-allocation-external-address-address" title="Переход к этой команде"></a></div><div class="opcmd-body">
+<p>Показать все выделения для внешнего IP-адреса</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show nat cgnat allocation internal-address &lt;address&gt;
+<a class="cmdlink" href="#opcmd-show-nat-cgnat-allocation-internal-address-address" title="Переход к этой команде"></a></div><div class="opcmd-body">
+<p>Показать все выделения для внутреннего IP-адреса</p>
+</div>
+</div>
+<section id="show-cgnat-allocations">
+<h3>Показать выделения CGNAT</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show nat cgnat allocation
+Internal IP    External IP    Port range
+-------------  -------------  ------------
+100.64.0.0     203.0.113.1    1024-17023
+100.64.0.1     203.0.113.1    17024-33023
+100.64.0.2     203.0.113.1    33024-49023
+100.64.0.3     203.0.113.1    49024-65023
+100.64.0.4     192.0.2.1      1024-17023
+100.64.0.5     192.0.2.1      17024-33023
+100.64.0.6     192.0.2.1      33024-49023
+100.64.0.7     192.0.2.1      49024-65023
+
+vyos@vyos:~$ show nat cgnat allocation internal-address 100.64.0.4
+Internal IP    External IP    Port range
+-------------  -------------  ------------
+100.64.0.4     192.0.2.1      1024-17023
+</pre></div>
+</div>
+</section>
+</section>
+<section id="further-reading">
+<h2>Дополнительная литература</h2>
+<ul class="simple">
+<li><p><a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6598.html"><strong>RFC 6598</strong></a> - IANA-Reserved IPv4 Prefix for Shared Address Space</p></li>
+<li><p><a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6888.html"><strong>RFC 6888</strong></a> - Requirements for CGNAT</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

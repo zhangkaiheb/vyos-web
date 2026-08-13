@@ -1,0 +1,212 @@
+{
+  "zh-CN": {
+    "importExport": {
+      "title": {
+        "configImportExport": "整机配置导入/导出",
+        "firewallImportExport": "防火墙规则导入/导出"
+      },
+      "label": {
+        "password": "密码",
+        "configContent": "配置内容",
+        "rulePath": "规则路径",
+        "exportFormat": "导出格式",
+        "importFile": "导入文件"
+      },
+      "button": {
+        "exportRule": "导出规则",
+        "importRule": "导入规则"
+      },
+      "message": {
+        "exportSuccess": "导出成功",
+        "importSuccess": "导入成功",
+        "ruleExportSuccess": "规则导出成功",
+        "ruleImportSuccess": "规则导入成功",
+        "selectFile": "请选择文件"
+      },
+      "option": {
+        "excel": "Excel (.xlsx)",
+        "csv": "CSV (.csv)"
+      }
+    }
+  },
+  "en": {
+    "importExport": {
+      "title": {
+        "configImportExport": "Full Config Import/Export",
+        "firewallImportExport": "Firewall Rules Import/Export"
+      },
+      "label": {
+        "password": "Password",
+        "configContent": "Config Content",
+        "rulePath": "Rule Path",
+        "exportFormat": "Export Format",
+        "importFile": "Import File"
+      },
+      "button": {
+        "exportRule": "Export Rules",
+        "importRule": "Import Rules"
+      },
+      "message": {
+        "exportSuccess": "Exported successfully",
+        "importSuccess": "Imported successfully",
+        "ruleExportSuccess": "Rules exported successfully",
+        "ruleImportSuccess": "Rules imported successfully",
+        "selectFile": "Please select a file"
+      },
+      "option": {
+        "excel": "Excel (.xlsx)",
+        "csv": "CSV (.csv)"
+      }
+    }
+  },
+  "zh-TW": {
+    "importExport": {
+      "title": {
+        "configImportExport": "Full Config Import/Export",
+        "firewallImportExport": "Firewall Rules Import/Export"
+      },
+      "label": {
+        "password": "Password",
+        "configContent": "Config Content",
+        "rulePath": "Rule Path",
+        "exportFormat": "Export Format",
+        "importFile": "Import File"
+      },
+      "button": {
+        "exportRule": "Export Rules",
+        "importRule": "Import Rules"
+      },
+      "message": {
+        "exportSuccess": "Exported successfully",
+        "importSuccess": "Imported successfully",
+        "ruleExportSuccess": "Rules exported successfully",
+        "ruleImportSuccess": "Rules imported successfully",
+        "selectFile": "Please select a file"
+      },
+      "option": {
+        "excel": "Excel (.xlsx)",
+        "csv": "CSV (.csv)"
+      }
+    }
+  },
+  "ru": {
+    "importExport": {
+      "title": {
+        "configImportExport": "Full Config Import/Export",
+        "firewallImportExport": "Firewall Rules Import/Export"
+      },
+      "label": {
+        "password": "Password",
+        "configContent": "Config Content",
+        "rulePath": "Rule Path",
+        "exportFormat": "Export Format",
+        "importFile": "Import File"
+      },
+      "button": {
+        "exportRule": "Export Rules",
+        "importRule": "Import Rules"
+      },
+      "message": {
+        "exportSuccess": "Exported successfully",
+        "importSuccess": "Imported successfully",
+        "ruleExportSuccess": "Rules exported successfully",
+        "ruleImportSuccess": "Rules imported successfully",
+        "selectFile": "Please select a file"
+      },
+      "option": {
+        "excel": "Excel (.xlsx)",
+        "csv": "CSV (.csv)"
+      }
+    }
+  },
+  "de": {
+    "importExport": {
+      "title": {
+        "configImportExport": "Full Config Import/Export",
+        "firewallImportExport": "Firewall Rules Import/Export"
+      },
+      "label": {
+        "password": "Password",
+        "configContent": "Config Content",
+        "rulePath": "Rule Path",
+        "exportFormat": "Export Format",
+        "importFile": "Import File"
+      },
+      "button": {
+        "exportRule": "Export Rules",
+        "importRule": "Import Rules"
+      },
+      "message": {
+        "exportSuccess": "Exported successfully",
+        "importSuccess": "Imported successfully",
+        "ruleExportSuccess": "Rules exported successfully",
+        "ruleImportSuccess": "Rules imported successfully",
+        "selectFile": "Please select a file"
+      },
+      "option": {
+        "excel": "Excel (.xlsx)",
+        "csv": "CSV (.csv)"
+      }
+    }
+  },
+  "fr": {
+    "importExport": {
+      "title": {
+        "configImportExport": "Full Config Import/Export",
+        "firewallImportExport": "Firewall Rules Import/Export"
+      },
+      "label": {
+        "password": "Password",
+        "configContent": "Config Content",
+        "rulePath": "Rule Path",
+        "exportFormat": "Export Format",
+        "importFile": "Import File"
+      },
+      "button": {
+        "exportRule": "Export Rules",
+        "importRule": "Import Rules"
+      },
+      "message": {
+        "exportSuccess": "Exported successfully",
+        "importSuccess": "Imported successfully",
+        "ruleExportSuccess": "Rules exported successfully",
+        "ruleImportSuccess": "Rules imported successfully",
+        "selectFile": "Please select a file"
+      },
+      "option": {
+        "excel": "Excel (.xlsx)",
+        "csv": "CSV (.csv)"
+      }
+    }
+  },
+  "ko": {
+    "importExport": {
+      "title": {
+        "configImportExport": "Full Config Import/Export",
+        "firewallImportExport": "Firewall Rules Import/Export"
+      },
+      "label": {
+        "password": "Password",
+        "configContent": "Config Content",
+        "rulePath": "Rule Path",
+        "exportFormat": "Export Format",
+        "importFile": "Import File"
+      },
+      "button": {
+        "exportRule": "Export Rules",
+        "importRule": "Import Rules"
+      },
+      "message": {
+        "exportSuccess": "Exported successfully",
+        "importSuccess": "Imported successfully",
+        "ruleExportSuccess": "Rules exported successfully",
+        "ruleImportSuccess": "Rules imported successfully",
+        "selectFile": "Please select a file"
+      },
+      "option": {
+        "excel": "Excel (.xlsx)",
+        "csv": "CSV (.csv)"
+      }
+    }
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "zh-CN": {
+    "vppSflow": {
+      "labels": {
+        "headerBytes": "Header字节数",
+        "interfaces": "接口"
+      },
+      "tips": {
+        "headerBytes": "sFlow采样头部字节数，默认128",
+        "interfaces": "启用sFlow的接口列表"
+      },
+      "placeholders": {
+        "interfaces": "每行一个接口名称"
+      },
+      "options": {
+        "default": "默认"
+      },
+      "errors": {
+        "loadFailed": "加载失败",
+        "saveFailed": "保存失败"
+      }
+    }
+  },
+  "en": {
+    "vppSflow": {
+      "labels": {
+        "headerBytes": "Header Bytes",
+        "interfaces": "Interfaces"
+      },
+      "tips": {
+        "headerBytes": "sFlow sampling header bytes, default 128",
+        "interfaces": "List of interfaces with sFlow enabled"
+      },
+      "placeholders": {
+        "interfaces": "One interface name per line"
+      },
+      "options": {
+        "default": "default"
+      },
+      "errors": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed"
+      }
+    }
+  },
+  "zh-TW": {
+    "vppSflow": {
+      "labels": {
+        "headerBytes": "Header Bytes",
+        "interfaces": "Interfaces"
+      },
+      "tips": {
+        "headerBytes": "sFlow sampling header bytes, default 128",
+        "interfaces": "List of interfaces with sFlow enabled"
+      },
+      "placeholders": {
+        "interfaces": "One interface name per line"
+      },
+      "options": {
+        "default": "default"
+      },
+      "errors": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed"
+      }
+    }
+  },
+  "ru": {
+    "vppSflow": {
+      "labels": {
+        "headerBytes": "Header Bytes",
+        "interfaces": "Interfaces"
+      },
+      "tips": {
+        "headerBytes": "sFlow sampling header bytes, default 128",
+        "interfaces": "List of interfaces with sFlow enabled"
+      },
+      "placeholders": {
+        "interfaces": "One interface name per line"
+      },
+      "options": {
+        "default": "default"
+      },
+      "errors": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed"
+      }
+    }
+  },
+  "de": {
+    "vppSflow": {
+      "labels": {
+        "headerBytes": "Header Bytes",
+        "interfaces": "Interfaces"
+      },
+      "tips": {
+        "headerBytes": "sFlow sampling header bytes, default 128",
+        "interfaces": "List of interfaces with sFlow enabled"
+      },
+      "placeholders": {
+        "interfaces": "One interface name per line"
+      },
+      "options": {
+        "default": "default"
+      },
+      "errors": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed"
+      }
+    }
+  },
+  "fr": {
+    "vppSflow": {
+      "labels": {
+        "headerBytes": "Header Bytes",
+        "interfaces": "Interfaces"
+      },
+      "tips": {
+        "headerBytes": "sFlow sampling header bytes, default 128",
+        "interfaces": "List of interfaces with sFlow enabled"
+      },
+      "placeholders": {
+        "interfaces": "One interface name per line"
+      },
+      "options": {
+        "default": "default"
+      },
+      "errors": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed"
+      }
+    }
+  },
+  "ko": {
+    "vppSflow": {
+      "labels": {
+        "headerBytes": "Header Bytes",
+        "interfaces": "Interfaces"
+      },
+      "tips": {
+        "headerBytes": "sFlow sampling header bytes, default 128",
+        "interfaces": "List of interfaces with sFlow enabled"
+      },
+      "placeholders": {
+        "interfaces": "One interface name per line"
+      },
+      "options": {
+        "default": "default"
+      },
+      "errors": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed"
+      }
+    }
+  }
+}

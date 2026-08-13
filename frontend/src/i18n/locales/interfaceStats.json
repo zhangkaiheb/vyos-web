@@ -1,0 +1,121 @@
+{
+  "zh-CN": {
+    "interfaceStats": {
+      "fetch_failed": "fetch_失败",
+      "non_physical_interfaces": "non_physical_接口s",
+      "physical_interfaces": "physical_接口s",
+      "rx_bytes": "rx_bytes",
+      "rx_dropped": "rx_dropped",
+      "rx_errors": "rx_错误",
+      "rx_overruns": "rx_overruns",
+      "rx_packets": "rx_packets",
+      "tx_bytes": "tx_bytes",
+      "tx_dropped": "tx_dropped",
+      "tx_errors": "tx_错误",
+      "tx_overruns": "tx_overruns",
+      "tx_packets": "tx_packets"
+    }
+  },
+  "en": {
+    "interfaceStats": {
+      "fetch_failed": "Fetch_failed",
+      "non_physical_interfaces": "Non_physical_interfaces",
+      "physical_interfaces": "Physical_interfaces",
+      "rx_bytes": "Rx_bytes",
+      "rx_dropped": "Rx_dropped",
+      "rx_errors": "Rx_errors",
+      "rx_overruns": "Rx_overruns",
+      "rx_packets": "Rx_packets",
+      "tx_bytes": "Tx_bytes",
+      "tx_dropped": "Tx_dropped",
+      "tx_errors": "Tx_errors",
+      "tx_overruns": "Tx_overruns",
+      "tx_packets": "Tx_packets"
+    }
+  },
+  "zh-TW": {
+    "interfaceStats": {
+      "fetch_failed": "Fetch_failed",
+      "non_physical_interfaces": "Non_physical_interfaces",
+      "physical_interfaces": "Physical_interfaces",
+      "rx_bytes": "Rx_bytes",
+      "rx_dropped": "Rx_dropped",
+      "rx_errors": "Rx_errors",
+      "rx_overruns": "Rx_overruns",
+      "rx_packets": "Rx_packets",
+      "tx_bytes": "Tx_bytes",
+      "tx_dropped": "Tx_dropped",
+      "tx_errors": "Tx_errors",
+      "tx_overruns": "Tx_overruns",
+      "tx_packets": "Tx_packets"
+    }
+  },
+  "ru": {
+    "interfaceStats": {
+      "fetch_failed": "Fetch_failed",
+      "non_physical_interfaces": "Non_physical_interfaces",
+      "physical_interfaces": "Physical_interfaces",
+      "rx_bytes": "Rx_bytes",
+      "rx_dropped": "Rx_dropped",
+      "rx_errors": "Rx_errors",
+      "rx_overruns": "Rx_overruns",
+      "rx_packets": "Rx_packets",
+      "tx_bytes": "Tx_bytes",
+      "tx_dropped": "Tx_dropped",
+      "tx_errors": "Tx_errors",
+      "tx_overruns": "Tx_overruns",
+      "tx_packets": "Tx_packets"
+    }
+  },
+  "de": {
+    "interfaceStats": {
+      "fetch_failed": "Fetch_failed",
+      "non_physical_interfaces": "Non_physical_interfaces",
+      "physical_interfaces": "Physical_interfaces",
+      "rx_bytes": "Rx_bytes",
+      "rx_dropped": "Rx_dropped",
+      "rx_errors": "Rx_errors",
+      "rx_overruns": "Rx_overruns",
+      "rx_packets": "Rx_packets",
+      "tx_bytes": "Tx_bytes",
+      "tx_dropped": "Tx_dropped",
+      "tx_errors": "Tx_errors",
+      "tx_overruns": "Tx_overruns",
+      "tx_packets": "Tx_packets"
+    }
+  },
+  "fr": {
+    "interfaceStats": {
+      "fetch_failed": "Fetch_failed",
+      "non_physical_interfaces": "Non_physical_interfaces",
+      "physical_interfaces": "Physical_interfaces",
+      "rx_bytes": "Rx_bytes",
+      "rx_dropped": "Rx_dropped",
+      "rx_errors": "Rx_errors",
+      "rx_overruns": "Rx_overruns",
+      "rx_packets": "Rx_packets",
+      "tx_bytes": "Tx_bytes",
+      "tx_dropped": "Tx_dropped",
+      "tx_errors": "Tx_errors",
+      "tx_overruns": "Tx_overruns",
+      "tx_packets": "Tx_packets"
+    }
+  },
+  "ko": {
+    "interfaceStats": {
+      "fetch_failed": "Fetch_failed",
+      "non_physical_interfaces": "Non_physical_interfaces",
+      "physical_interfaces": "Physical_interfaces",
+      "rx_bytes": "Rx_bytes",
+      "rx_dropped": "Rx_dropped",
+      "rx_errors": "Rx_errors",
+      "rx_overruns": "Rx_overruns",
+      "rx_packets": "Rx_packets",
+      "tx_bytes": "Tx_bytes",
+      "tx_dropped": "Tx_dropped",
+      "tx_errors": "Tx_errors",
+      "tx_overruns": "Tx_overruns",
+      "tx_packets": "Tx_packets"
+    }
+  }
+}

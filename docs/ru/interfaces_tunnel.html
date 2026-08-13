@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="tunnel">
+<h1>Туннель</h1>
+<p>Интерфейсы туннелей — это виртуальные связи, которые передают инкапсулированный трафик между частными сетями или хостами через общественную инфраструктуру, например, интернет. Они работают с использованием протоколов инкапсуляции для упаковки исходного трафика для транспортировки. Поддерживаемые протоколы включают <abbr title="Generic Routing Encapsulation">GRE</abbr>, IPIP, IPIP6, IP6IP6 и 6in4 (SIT).</p>
+<p>Хотя <abbr title="Generic Routing Encapsulation">GRE</abbr> часто является предпочтительным универсальным решением благодаря своей гибкости, другие протоколы инкапсуляции могут быть более подходящими для конкретных случаев.</p>
+<p>VyOS использует один тип интерфейса туннеля для всех этих протоколов. Нет отдельных интерфейсов <abbr title="Generic Routing Encapsulation">GRE</abbr>, IPIP или IP6IP6; вместо этого выбирается нужный протокол инкапсуляции в конфигурации <code class="docutils literal notranslate">set interfaces tunnel</code>.</p>
+<p>Опции конфигурации для каждого протокола описаны ниже.</p>
+<div class="admonition warning">
+<p class="admonition-title">Предупреждение</p>
+<p>Не изменяйте тип инкапсуляции уже настроенных интерфейсов туннеля, так как это может нарушить их зависимые настройки.</p>
+</div>
+<section id="common-interface-configuration">
+<h2>Общая конфигурация интерфейса</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-address-address" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте одно или несколько IP-адресов интерфейса.</strong></p>
+<p><code class="docutils literal notranslate">&lt;address&gt;</code> поддерживает IPv4 и IPv6 в формате CIDR. Например, используйте <code class="docutils literal notranslate">192.0.2.1/24</code> для IPv4 или <code class="docutils literal notranslate">2001:db8::1/64</code> для IPv6.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 address 192.0.2.1/24
+set interfaces tunnel tun0 address 2001:db8::1/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-description-description" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте ясное и описательное имя для интерфейса.</strong></p>
+<p>Это имя появляется в команде <code class="docutils literal notranslate">show interfaces</code> и инструментах мониторинга на основе SNMP.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-disable" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите интерфейс.</strong></p>
+<p>Интерфейс будет установлен в состояние административно выключенное (<code class="docutils literal notranslate">A/D</code>).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt;  disable-flow-control
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-disable-flow-control" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите управление потоком Ethernet (IEEE 802.3x pause frames) на интерфейсе.</strong></p>
+<blockquote>
+<div><p>Управление потоком Ethernet, определенное стандартом IEEE 802.3x, временно прекращает передачу данных, чтобы предотвратить потерю пакетов при перегрузке сети. Например, когда отправитель передает данные быстрее, чем получатель может их обработать.</p>
+<p>Отключение управления потоком Ethernet означает, что интерфейс не будет сигнализировать подключенному устройству о приостановке передачи и будет удалять пакеты, если он перегружен.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 disable-flow-control
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; disable-link-detect
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-disable-link-detect" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите обнаружение изменения состояния физической линии на интерфейсе, например, когда кабель отсоединен.</strong></p>
+<p>По умолчанию интерфейс обнаруживает изменения состояния физической линии.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 disable-link-detect
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-mtu-mtu" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте MTU на интерфейсе.</strong></p>
+<p>Это значение определяет максимальный размер пакета в байтах, который интерфейс передает без фрагментации.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>, объявляемый в исходящих пакетах TCP SYN на указанном интерфейсе.</strong></p>
+<p>Путем ограничения значения MSS в пакетах TCP SYN, вы явно информируете удаленный сторону не отправлять пакеты большего размера, чем этот. Это предотвращает проблемы с соединением, возникающие при неудачной проверке PMTUD.</p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Устанавливает MSS в определенное значение, в байтах. Используйте этот вариант, если нужно зафиксировать определенный MSS, например, для устранения проблем с доступностью или соответствия специфическим требованиям сети.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> Рouters автоматически рассчитывает MSS, равный MTU интерфейса минус 40 байт для IPv4 (20 байт для заголовка IPv4 и 20 байт для заголовка TCP). Этот вариант рекомендуется для автоматического установления правильного значения.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-arp-cache-timeout" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, как долго ARP-запись остается действительной после изучения сопоставления IP-адреса и MAC-адреса на этом интерфейсе.</strong></p>
+<p>По умолчанию длительность составляет 30 секунд.</p>
+<p>ARP-запись остается действительной, если она получает положительный ответ от верхних уровней протоколов.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-disable-arp-filter" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте фильтрацию ARP на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> Ядро отвечает на запросы ARP на этом интерфейсе только в том случае, если трафик будет маршрутизирован обратно к отправителю ARP через этот конкретный интерфейс.</p>
+<p><strong>Если настроено:</strong> Ядро отвечает на запросы ARP на этом интерфейсе для любого IP-адреса, настроенного на локальном хосте, независимо от того, какой конкретный интерфейс этому IP-адресу принадлежит, и независимо от таблицы маршрутизации. Это отражает концепцию Linux, согласно которой IP-адреса принадлежат хосту, а не отдельным интерфейсам.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip disable-arp-filter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-disable-forwarding" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс на работу в режиме хоста или роутера.</strong></p>
+<p>Если настроено, интерфейс переключается в режим хоста, и IPv4-пересылка отключается на нем.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-enable-directed-broadcast" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, будут ли передаваться пакеты IP-направленного широковещания, полученные на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> Пакеты IP-направленного широковещания отбрасываются.</p>
+<p><strong>Если настроено:</strong> Пакеты IP-направленного широковещания передаются всем хостам на подсети назначения, как определено в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> и <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-enable-arp-accept" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, как обрабатывать бесплатные ARP на этом интерфейсе.</strong></p>
+<p>Если настроено, сопоставление IP-адреса и MAC-адреса добавляется в таблицу ARP на основе бесплатных ARP-запросов или ответов.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если в таблице ARP уже есть IP-адрес из бесплатного ARP, его запись обновляется независимо от того, настроено ли это настройка.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-enable-arp-announce" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте выбор источника IP-адреса для ARP-запросов на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> Ядро может использовать любой IP-адрес, которым владеет хост, в качестве исходного IP-адреса в ARP-запросах на этом интерфейсе.</p>
+<p><strong>Если настроено:</strong> Ядро сначала пытается выбрать исходный IP-адрес, настроенный на интерфейсе, который имеет общую подсеть с целевым IP-адресом. Если такой подсети нет, ядро выбирает IP-адрес, который обычно используется (на основе таблицы маршрутизации для достижения целевой цели).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-enable-arp-ignore" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, какие ARP-запросы будут игнорироваться на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> Ядро отвечает на ARP-запросы для любых локальных IP-адресов, независимо от того, к какому интерфейсу они привязаны.</p>
+<p><strong>Если настроено:</strong> Ядро отвечает на ARP-запросы только в том случае, если целевой IP-адрес привязан к этому конкретному интерфейсу.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-enable-proxy-arp" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте proxy ARP на этом интерфейсе.</strong></p>
+<p>Если настроено, роутер (ядро) перехватывает ARP-запросы для нелокальных IP-адресов и отвечает с MAC-адресом интерфейса, который получил запрос. Последующие пакеты, предназначенные для этих IP-адресов, перенаправляются на их фактические цели на удаленных подсетях.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip enable-proxy-arp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-proxy-arp-pvlan" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте локальный proxy ARP на интерфейсе.</strong></p>
+<p>Если настроено, роутер (ядро) отвечает на ARP-запросы на этом VLAN-интерфейсе, даже если целевой IP-адрес находится на той же подсети и интерфейсе.</p>
+<p>Это используется для поддержки требований изоляции сети (RFC 3069) для частных VLAN (PVLAN). В конфигурациях PVLAN хосты на изолированных портах НЕ разрешены к прямой коммуникации друг с другом на уровне 2, но они могут общаться с верхним роутером.</p>
+<p>Путем ответа на ARP-запросы между хостами своим собственным MAC-адресом, роутер (ядро) направляет трафик между хостами через себя вместо прямой передачи между хостами.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Эта команда работает независимо и не требует включения обычного proxy ARP на интерфейсе.</p>
+</div>
+<p>Локальный proxy ARP также известен как:</p>
+<ul class="simple">
+<li><p>Агрегация VLAN (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>Частная VLAN (Cisco, Allied Telesyn).</p></li>
+<li><p>Фильтрация по источнику или изоляция порта (Hewlett-Packard).</p></li>
+<li><p>Перенаправление по MAC-адресу (Ericsson).</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-source-validation-strict-loose-disable" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте проверку исходного IP-адреса с использованием</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>на этом интерфейсе, как указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>strict:</strong> Каждый входящий пакет проверяет исходный IP-адрес против FIB. Если интерфейс не является лучшим маршрутом обратно к этому источнику, проверка не проходит, и пакет удаляется.</p></li>
+<li><p><strong>loose:</strong> Каждый входящий пакет проверяет исходный IP-адрес против FIB. Если исходный IP-адрес недоступен через любой интерфейс, проверка не проходит.</p></li>
+<li><p><strong>disable:</strong> Не производится проверка исходного IP-адреса. Все входящие пакеты принимаются.</p></li>
+</ul>
+<p>RFC 3704 рекомендует включить строгий режим для предотвращения подделки IP-адресов, таких как DDoS-атаки. Для асимметричных или других сложных сценариев маршрутизации используйте режим loose.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ipv6-address-autoconf" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс для автоматического получения IPv6-адреса с использованием</strong> <abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>как указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<p>Хосты IPv6 могут самостоятельно настраивать себя, когда подключены к IPv6-сети с помощью протокола обнаружения соседей через ICMPv6 сообщения о маршрутизаторе. При первом подключении к сети хост отправляет многоадресный запрос на маршрутизатор для получения параметров своей конфигурации. Маршрутизатор отвечает пакетом объявлений маршрутизатора, содержащим параметры конфигурации уровня Интернета.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Этот метод автоматически отключает передачу IPv6-трафика на интерфейсе.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ipv6 address autoconf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ipv6-address-eui64-prefix" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс для присвоения себе IPv6-адреса с использованием метода</strong> <abbr title="64-Bit Extended Unique Identifier">EUI-64</abbr> <strong>, как указано</strong> в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ipv6 address eui64 2001:db8:beef::/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ipv6 address no-default-link-local
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ipv6-address-no-default-link-local" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите автоматическое присвоение ссылочного IPv6-адреса этому интерфейсу.</strong></p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ipv6 address no-default-link-local
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ipv6-disable-forwarding" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс на работу в режиме хоста или роутера.</strong></p>
+<p>Если настроено, интерфейс переключается в режим хоста, и IPv6-передача отключается на нем.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ipv6 disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ipv6 adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>, объявляемый в исходящих пакетах TCP SYN на указанном интерфейсе.</strong></p>
+<p>Путем ограничения значения MSS в пакетах TCP SYN, вы явно информируете удаленный сторону не отправлять пакеты большего размера, чем этот. Это предотвращает проблемы с соединением, возникающие при неудачной проверке PMTUD.</p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Установите MSS в определенное значение, в байтах. Используйте этот вариант, чтобы зафиксировать определенный MSS, например, для устранения проблем с доступностью или соответствия специфическим требованиям сети.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> Роутер рассчитывает MSS, равный MTU интерфейса минус 60 байт для IPv6 (40 байт для заголовка IPv6 и 20 байт для заголовка TCP). Этот вариант рекомендуется для автоматического установления правильного значения.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ipv6 accept-dad &lt;0 | 1 | 2&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ipv6-accept-dad-0-1-2" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IPv6</strong> <abbr title="Duplicate Address Detection">DAD</abbr> <strong>на интерфейсе.</strong></p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>0:</strong> Отключает DAD. Не выполняется обнаружение дублирующих адресов.</p></li>
+<li><p><strong>1:</strong> Включает DAD (по умолчанию). Обнаруживаются дублирующиеся адреса. Работа интерфейса с IPv6 продолжается для действительных IPv6-адресов.</p></li>
+<li><p><strong>2:</strong> Включает DAD и, если найден дублирующийся локальный адрес, связанный с MAC-адресом, отключает работу IPv6 на этом интерфейсе.</p></li>
+</ul>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ipv6 accept-dad 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ipv6 dup-addr-detect-transmits &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ipv6-dup-addr-detect-transmits-n" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте количество</strong> <abbr title="Duplicate Address Detection">DAD</abbr> <strong>сообщений, которые роутер (ядро) отправляет во время назначения IPv6-адреса на этом интерфейсе.</strong></p>
+<p>Значение по умолчанию равно 1.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ipv6 dup-addr-detect-transmits 5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; vrf &lt;vrf&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-vrf-vrf" title="Переход к этой команде"></a></div><div class="cfgcmd-body">
+<p><strong>Назначьте интерфейс определенному экземпляру</strong> <abbr title="Virtual Routing and Forwarding">VRF</abbr> <strong>.</strong></p>
+<div class="admonition seealso">
+<p class="admonition-title">См. также</p>
+<p>Для информации о настройке VRF см. раздел <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 vrf red
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="ipip">
+<h2>IPIP</h2>
+<p>IPIP — это простой протокол инкапсуляции, определенный в RFC 2003. Он инкапсулирует один пакет IPv4 внутри другого пакета IPv4.</p>
+<p>Туннели с инкапсуляцией IPIP не имеют специфичных для протокола опций конфигурации, кроме явного указания типа инкапсуляции как IPIP (см. пример ниже).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 encapsulation ipip
+set interfaces tunnel tun0 source-address 192.0.2.10
+set interfaces tunnel tun0 remote 203.0.113.20
+set interfaces tunnel tun0 address 192.168.100.200/24
+</pre></div>
+</div>
+</section>
+<section id="ip6ip6">
+<h2>IP6IP6</h2>
+<p>IP6IP6 — это IPv6-аналог IPIP. Он инкапсулирует один пакет IPv6 внутри другого пакета IPv6.</p>
+<p>Подобно их IPIP-аналогам, туннели с инкапсуляцией IP6IP6 не имеют специфичных для протокола опций конфигурации, кроме явного указания типа инкапсуляции как IP6IP6.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 encapsulation ip6ip6
+set interfaces tunnel tun0 source-address 2001:db8:aa::1
+set interfaces tunnel tun0 remote 2001:db8:aa::2
+set interfaces tunnel tun0 address 2001:db8:bb::1/64
+</pre></div>
+</div>
+</section>
+<section id="ipip6">
+<h2>IPIP6</h2>
+<p>IPIP6 — это протокол инкапсуляции, который оборачивает пакеты IPv4 в пакеты IPv6.</p>
+<p>Подобно IPIP и IP6IP6, специфичные для протокола настройки для туннелей с инкапсуляцией IPIP6 требуют только указания типа инкапсуляции как IP6IP6.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 encapsulation ipip6
+set interfaces tunnel tun0 source-address 2001:db8:aa::1
+set interfaces tunnel tun0 remote 2001:db8:aa::2
+set interfaces tunnel tun0 address 192.168.70.80/24
+</pre></div>
+</div>
+</section>
+<section id="in4-sit">
+<h2>6in4 (SIT)</h2>
+<p>6in4, также известный как <abbr title="Simple Internet Transition">SIT</abbr>, — это протокол инкапсуляции, определенный в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4213.html"><strong>RFC 4213</strong></a>, который оборачивает пакеты IPv6 в пакеты IPv4. Инкапсулирующие заголовки IPv4 используют номер протокола IP 41, который зарезервирован исключительно для инкапсуляции IPv6.</p>
+<p>Процесс инкапсуляции добавляет 20-байтовый заголовок IPv4 к каждому пакету IPv6. Следовательно, интерфейсы туннелей 6in4 могут передавать пакеты IPv6 до 1480 байт через базовую сеть с обычным MTU 1500 байт без фрагментации.</p>
+<p>Интерфейсы туннелей 6in4 часто используются IPv6-брокерами туннелей (например, <a class="reference external" href="https://tunnelbroker.net/">Hurricane Electric</a>) для подключения изолированных IPv6-сетей или отдельных хостов к IPv6-интернету.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 encapsulation sit
+set interfaces tunnel tun0 source-address 192.0.2.10
+set interfaces tunnel tun0 remote 192.0.2.20
+set interfaces tunnel tun0 address 2001:db8:bb::1/64
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">См. также</p>
+<p>Для практического примера конфигурации см. раздел <a class="reference internal" href="../../configexamples/autotest/tunnelbroker/tunnelbroker.html#examples-tunnelbroker-ipv6">Tunnelbroker.net (IPv6)</a>.</p>
+</div>
+</section>
+<section id="generic-routing-encapsulation-gre">
+<h2>Общий маршрутный протокол инкапсуляции (GRE)</h2>
+<p><abbr title="Generic Routing Encapsulation">GRE</abbr> — это универсальный протокол инкапсуляции, определенный в RFC 2784. В отличие от более простых протоколов, таких как IPIP, он позволяет транспортировать как IPv4, так и IPv6 через один и тот же туннель.</p>
+<p><abbr title="Generic Routing Encapsulation">GRE</abbr> инкапсулирует исходные пакеты данных, добавляя заголовок <abbr title="Generic Routing Encapsulation">GRE</abbr>, за которым следует IP-заголовок (доставочный заголовок). Доставочный заголовок использует номер протокола IP 47 для идентификации трафика, инкапсулированного в <abbr title="Generic Routing Encapsulation">GRE</abbr>.</p>
+<p>В VyOS туннели <abbr title="Generic Routing Encapsulation">GRE</abbr> могут быть установлены как над IPv4 (инкапсуляция <code class="docutils literal notranslate">gre</code>), так и над IPv6 (инкапсуляция <code class="docutils literal notranslate">ip6gre</code>).</p>
+<section id="configuration">
+<h3>Конфигурация</h3>
+<p>Для настройки туннеля <abbr title="Generic Routing Encapsulation">GRE</abbr> необходимо определить IP-адрес источника туннеля, IP-адрес назначения туннеля, тип инкапсуляции (<abbr title="Generic Routing Encapsulation">GRE</abbr>) и IP-адрес интерфейса туннеля.</p>
+<p>Пример:</p>
+<p>В следующем примере показано, как настроить IPv4/IPv6-туннель GRE между роутером VyOS и хостом Linux, работающим с <code class="docutils literal notranslate">systemd-networkd</code>.</p>
+<p><strong>Роутер VyOS:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun101 address &#39;2001:db8:feed:beef::1/126&#39;
+set interfaces tunnel tun101 address &#39;192.168.5.1/30&#39;
+set interfaces tunnel tun101 encapsulation &#39;ip6gre&#39;
+set interfaces tunnel tun101 source-address &#39;2001:db8:babe:face::3afe:3&#39;
+set interfaces tunnel tun101 remote &#39;2001:db8:9bb:3ce::5&#39;
+</pre></div>
+</div>
+<p><strong>Linux</strong> <code class="docutils literal notranslate">systemd-networkd</code>:</p>
+<p>Настройка <code class="docutils literal notranslate">systemd-networkd</code> требует двух файлов конфигурации: <code class="docutils literal notranslate">xxx.netdev</code> для создания интерфейса туннеля <abbr title="Generic Routing Encapsulation">GRE</abbr>, и <code class="docutils literal notranslate">xxx.network</code> для присвоения IP-адресов ему.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># cat /etc/systemd/network/gre-example.netdev
+[NetDev]
+Name=gre-example
+Kind=ip6gre
+MTUBytes=14180
+
+[Tunnel]
+Remote=2001:db8:babe:face::3afe:3
+
+
+# cat /etc/systemd/network/gre-example.network
+[Match]
+Name=gre-example
+
+[Network]
+Address=2001:db8:feed:beef::2/126
+
+[Address]
+Address=192.168.5.2/30
+</pre></div>
+</div>
+</section>
+<section id="gre-keys">
+<h3>Ключи GRE</h3>
+<p>Ключ GRE — это необязательное 32-битное поле в заголовке GRE, которое позволяет нескольким туннелям GRE работать между одними и теми же точками назначения и источника. При получении пакета приемник проверяет ключ GRE, чтобы определить, какой интерфейс туннеля должен его обработать.</p>
+<p>Хотя это звучит как безопасность, ключ GRE — это просто идентификатор и не предоставляет шифрования или защиты данных.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 source-address 192.0.2.10
+set interfaces tunnel tun0 remote 192.0.2.20
+set interfaces tunnel tun0 address 10.40.50.60/24
+set interfaces tunnel tun0 parameters ip key 10
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun1 source-address 192.0.2.10
+set interfaces tunnel tun1 remote 192.0.2.20
+set interfaces tunnel tun1 address 172.16.17.18/24
+set interfaces tunnel tun1 parameters ip key 20
+</pre></div>
+</div>
+</section>
+<section id="gretap">
+<h3>GRETAP</h3>
+<p>В отличие от GRE, который инкапсулирует только трафик уровня 3 (IP), GRETAP инкапсулирует кадры уровня 2 (Ethernet).</p>
+<p>Это означает, что интерфейсы туннелей GRETAP могут быть участниками интерфейса моста. Это позволяет двум географически удаленным сайтам соединяться, как будто они находятся на одном локальном LAN.</p>
+<p>Туннели GRETAP могут быть установлены как над сетью IPv4, так и над сетью IPv6.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bridge br0 member interface eth0
+set interfaces bridge br0 member interface tun0
+set interfaces tunnel tun0 encapsulation gretap
+set interfaces tunnel tun0 source-address 198.51.100.2
+set interfaces tunnel tun0 remote 203.0.113.10
+</pre></div>
+</div>
+</section>
+<section id="troubleshooting">
+<h3>Устранение неполадок</h3>
+<p>GRE — это стандартизированный протокол туннелирования, используемый во многих сетевых средах.</p>
+<p>Хотя настройка туннеля GRE проста, частые сбои в подключении происходят потому, что ACL или правила фаервола блокируют протокол IP 47 или препятствуют прямой коммуникации между точками назначения туннеля.</p>
+<p>Если ваш туннель GRE не удается установить, выполните эти диагностические шаги:</p>
+<p>1. Убедитесь, что удаленный узел достижим из настроенного <code class="docutils literal notranslate">source-address</code>.</p>
+<p>Это гарантирует, что физический путь между двумя точками назначения функционален.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ ping 203.0.113.10 interface 198.51.100.2 count 4
+PING 203.0.113.10 (203.0.113.10) from 198.51.100.2 : 56(84) bytes of data.
+64 bytes from 203.0.113.10: icmp_seq=1 ttl=254 time=0.807 ms
+64 bytes from 203.0.113.10: icmp_seq=2 ttl=254 time=1.50 ms
+64 bytes from 203.0.113.10: icmp_seq=3 ttl=254 time=0.624 ms
+64 bytes from 203.0.113.10: icmp_seq=4 ttl=254 time=1.41 ms
+
+--- 203.0.113.10 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3007ms
+rtt min/avg/max/mdev = 0.624/1.087/1.509/0.381 ms
+</pre></div>
+</div>
+<p>2. Убедитесь, что интерфейс туннеля правильно настроен (с типом связи GRE) и активно обрабатывает трафик.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show interfaces tunnel tun100
+tun100@NONE: &lt;POINTOPOINT,NOARP,UP,LOWER_UP&gt; mtu 1476 qdisc noqueue state UNKNOWN group default qlen 1000
+  link/gre 198.51.100.2 peer 203.0.113.10
+  inet 10.0.0.1/30 brd 10.0.0.3 scope global tun100
+     valid_lft forever preferred_lft forever
+  inet6 fe80::5efe:c612:2/64 scope link
+     valid_lft forever preferred_lft forever
+
+  RX:  bytes    packets     errors    dropped    overrun      mcast
+        2183         27          0          0          0          0
+  TX:  bytes    packets     errors    dropped    carrier collisions
+         836          9          0          0          0          0
+</pre></div>
+</div>
+<p>3. Протестируйте соединение через туннель, используя частные IP-адреса, присвоенные каждому концу туннеля.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ ping 10.0.0.2 interface 10.0.0.1 count 4
+PING 10.0.0.2 (10.0.0.2) from 10.0.0.1 : 56(84) bytes of data.
+64 bytes from 10.0.0.2: icmp_seq=1 ttl=255 time=1.05 ms
+64 bytes from 10.0.0.2: icmp_seq=2 ttl=255 time=1.88 ms
+64 bytes from 10.0.0.2: icmp_seq=3 ttl=255 time=1.98 ms
+64 bytes from 10.0.0.2: icmp_seq=4 ttl=255 time=1.98 ms
+
+--- 10.0.0.2 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3008ms
+rtt min/avg/max/mdev = 1.055/1.729/1.989/0.395 ms
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

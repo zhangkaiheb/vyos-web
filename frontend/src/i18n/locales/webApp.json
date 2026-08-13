@@ -1,0 +1,163 @@
+{
+  "zh-CN": {
+    "webApp": {
+      "title": "Web应用",
+      "version": "版本",
+      "updateMode": "更新方式",
+      "updateUrl": "更新URL",
+      "updateFile": "更新文件",
+      "checkUpdate": "检查更新",
+      "update": "更新",
+      "rollback": "回滚",
+      "history": "历史记录",
+      "hasNewVersion": "有新版本 {version}",
+      "latestVersion": "当前已是最新版本",
+      "confirmRollback": "确认回滚到上一版本？",
+      "noHistory": "暂无历史",
+      "columns": {
+        "version": "版本",
+        "time": "时间",
+        "action": "操作",
+        "status": "状态"
+      }
+    }
+  },
+  "en": {
+    "webApp": {
+      "title": "Web App",
+      "version": "Version",
+      "updateMode": "Update Mode",
+      "updateUrl": "Update URL",
+      "updateFile": "Update File",
+      "checkUpdate": "Check Update",
+      "update": "Update",
+      "rollback": "Rollback",
+      "history": "History",
+      "hasNewVersion": "New version {version} available",
+      "latestVersion": "Already up to date",
+      "confirmRollback": "Confirm rollback to previous version?",
+      "noHistory": "No history",
+      "columns": {
+        "version": "Version",
+        "time": "Time",
+        "action": "Action",
+        "status": "Status"
+      }
+    }
+  },
+  "zh-TW": {
+    "webApp": {
+      "title": "Web App",
+      "version": "Version",
+      "updateMode": "Update Mode",
+      "updateUrl": "Update URL",
+      "updateFile": "Update File",
+      "checkUpdate": "Check Update",
+      "update": "Update",
+      "rollback": "Rollback",
+      "history": "History",
+      "hasNewVersion": "New version {version} available",
+      "latestVersion": "Already up to date",
+      "confirmRollback": "Confirm rollback to previous version?",
+      "noHistory": "No history",
+      "columns": {
+        "version": "Version",
+        "time": "Time",
+        "action": "Action",
+        "status": "Status"
+      }
+    }
+  },
+  "ru": {
+    "webApp": {
+      "title": "Web App",
+      "version": "Version",
+      "updateMode": "Update Mode",
+      "updateUrl": "Update URL",
+      "updateFile": "Update File",
+      "checkUpdate": "Check Update",
+      "update": "Update",
+      "rollback": "Rollback",
+      "history": "History",
+      "hasNewVersion": "New version {version} available",
+      "latestVersion": "Already up to date",
+      "confirmRollback": "Confirm rollback to previous version?",
+      "noHistory": "No history",
+      "columns": {
+        "version": "Version",
+        "time": "Time",
+        "action": "Action",
+        "status": "Status"
+      }
+    }
+  },
+  "de": {
+    "webApp": {
+      "title": "Web App",
+      "version": "Version",
+      "updateMode": "Update Mode",
+      "updateUrl": "Update URL",
+      "updateFile": "Update File",
+      "checkUpdate": "Check Update",
+      "update": "Update",
+      "rollback": "Rollback",
+      "history": "History",
+      "hasNewVersion": "New version {version} available",
+      "latestVersion": "Already up to date",
+      "confirmRollback": "Confirm rollback to previous version?",
+      "noHistory": "No history",
+      "columns": {
+        "version": "Version",
+        "time": "Time",
+        "action": "Action",
+        "status": "Status"
+      }
+    }
+  },
+  "fr": {
+    "webApp": {
+      "title": "Web App",
+      "version": "Version",
+      "updateMode": "Update Mode",
+      "updateUrl": "Update URL",
+      "updateFile": "Update File",
+      "checkUpdate": "Check Update",
+      "update": "Update",
+      "rollback": "Rollback",
+      "history": "History",
+      "hasNewVersion": "New version {version} available",
+      "latestVersion": "Already up to date",
+      "confirmRollback": "Confirm rollback to previous version?",
+      "noHistory": "No history",
+      "columns": {
+        "version": "Version",
+        "time": "Time",
+        "action": "Action",
+        "status": "Status"
+      }
+    }
+  },
+  "ko": {
+    "webApp": {
+      "title": "Web App",
+      "version": "Version",
+      "updateMode": "Update Mode",
+      "updateUrl": "Update URL",
+      "updateFile": "Update File",
+      "checkUpdate": "Check Update",
+      "update": "Update",
+      "rollback": "Rollback",
+      "history": "History",
+      "hasNewVersion": "New version {version} available",
+      "latestVersion": "Already up to date",
+      "confirmRollback": "Confirm rollback to previous version?",
+      "noHistory": "No history",
+      "columns": {
+        "version": "Version",
+        "time": "Time",
+        "action": "Action",
+        "status": "Status"
+      }
+    }
+  }
+}

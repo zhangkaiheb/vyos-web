@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="virtual-ethernet">
+<h1>Виртуальный Ethernet</h1>
+<p>Виртуальные интерфейсы Ethernet (veth) — это программные интерфейсы, которые работают парами, создавая туннель между собой. Трафик, переданный в один из интерфейсов пары (например, <code class="docutils literal notranslate">veth0</code>), доставляется напрямую к его соседнему интерфейсу (например, <code class="docutils literal notranslate">veth1</code>).</p>
+<p>Интерфейсы veth часто используются для подключения сетевых пространств имен или VRF, но они также могут функционировать как самостоятельные виртуальные сетевые интерфейсы.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Интерфейсы veth должны быть созданы парами, где каждый интерфейс выступает в роли соседа другого.</p>
+</div>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<section id="common-interface-configuration">
+<h3>Общая конфигурация интерфейса</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; address &lt;address | dhcp |  dhcpv6&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-address-address-dhcp-dhcpv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс с одним или несколькими IP-адресами.</strong></p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>address:</strong> Назначьте один или несколько IPv4 или IPv6 адресов интерфейсу.
+Например, используйте 192.0.2.1/24 для IPv4 или 2001:db8::1/64 для IPv6.</p></li>
+<li><p><strong>dhcp:</strong> Интерфейс получает IPv4-адрес от сервера DHCP на том же сегменте сети.</p></li>
+<li><p><strong>dhcpv6:</strong> Интерфейс получает IPv6-адрес от сервера DHCPv6 на том же сегменте сети.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если интерфейс получает IPv4-адрес через DHCP, и необходимы определенные настройки до/после получения IP-адреса, используйте предоставленные скрипты-хуки:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/pre-hooks.d/</code></p></li>
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/post-hooks.d/</code></p></li>
+</ul>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 address 192.0.2.1/24
+set interfaces virtual-ethernet veth0 address 2001:db8::1/64
+set interfaces virtual-ethernet veth0 address dhcp
+set interfaces virtual-ethernet veth0 address dhcpv6
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте понятное, описательное имя интерфейса.</strong></p>
+<p>Это имя появляется в команде <code class="docutils literal notranslate">show interfaces</code> и в инструментах мониторинга на основе SNMP.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="vlan">
+<h3>VLAN</h3>
+<section id="regular-vlans-802-1q">
+<h4>Регулярные VLANs (802.1q)</h4>
+<p>IEEE <a class="reference internal" href="#q">802.1q</a>, часто называемый Dot1q, является стандартом отрасли для реализации VLAN на Ethernet-сетях. Он определяет тегирование VLAN для кадров Ethernet и описывает процедуры для коммутаторов и мостов. Стандарт также включает приоритизацию качества обслуживания (IEEE 802.1p) и определяет протокол общих атрибутов регистрации.</p>
+<p>Сегменты сетей, совместимые с IEEE <a class="reference internal" href="#q">802.1q</a>, используют теги VLAN. Когда кадр попадает в такой сегмент, добавляется тег для указания принадлежности к VLAN. Каждый кадр может принадлежать только одному VLAN. Если кадр приходит без тега, предполагается, что он относится к базовому VLAN.</p>
+<p>IEEE 802.1, рабочая группа IEEE 802, разработала стандарт и продолжает его обновлять. Одним из известных обновлений является 802.1Q-2014, который включил IEEE 802.1aq (Shortest Path Bridging) и большую часть стандарта IEEE 802.1d.</p>
+<p>В VyOS, интерфейсы VLAN 802.1q представлены как виртуальные подинтерфейсы, называемые <code class="docutils literal notranslate">vif</code>.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; vif &lt;vlan-id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-vif-vlan-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте VLAN-интерфейс с уникальным идентификатором VLAN.</strong></p>
+<p>ID VLAN идентифицирует конкретный VLAN и находится в диапазоне от 0 до 4094.</p>
+<p>Вы можете настроить несколько VLAN-интерфейсов на одном физическом интерфейсе.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>На Ethernet vifs принимаются только тегированные пакеты 802.1Q.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; vif &lt;vlan-id&gt; address &lt;address | dhcp |  dhcpv6&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-vif-vlan-id-address-address-dhcp-dhcpv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс с одним или несколькими IP-адресами.</strong></p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>address:</strong> Назначьте один или несколько IPv4 или IPv6 адресов интерфейсу.
+Например, используйте 192.0.2.1/24 для IPv4 или 2001:db8::1/64 для IPv6.</p></li>
+<li><p><strong>dhcp:</strong> Интерфейс получает IPv4-адрес от сервера DHCP на том же сегменте сети.</p></li>
+<li><p><strong>dhcpv6:</strong> Интерфейс получает IPv6-адрес от сервера DHCPv6 на том же сегменте сети.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если интерфейс получает IPv4-адрес через DHCP, и необходимы определенные настройки до/после получения IP-адреса, используйте предоставленные скрипты-хуки:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/pre-hooks.d/</code></p></li>
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/post-hooks.d/</code></p></li>
+</ul>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 address 192.0.2.1/24
+set interfaces virtual-ethernet veth0 vif 10 address 2001:db8::1/64
+set interfaces virtual-ethernet veth0 vif 10 address dhcp
+set interfaces virtual-ethernet veth0 vif 10 address dhcpv6
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; vif &lt;vlan-id&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-vif-vlan-id-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте понятное, описательное имя интерфейса.</strong></p>
+<p>Это имя появляется в команде <code class="docutils literal notranslate">show interfaces</code> и в инструментах мониторинга на основе SNMP.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; vif &lt;vlan-id&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-vif-vlan-id-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите интерфейс.</strong></p>
+<p>Интерфейс будет установлен в состояние административно отключен (<code class="docutils literal notranslate">A/D</code>).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; vif &lt;vlan-id&gt; disable-link-detect
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-vif-vlan-id-disable-link-detect" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите обнаружение изменений состояния физической линии на интерфейсе, например, когда кабель отсоединен.</strong></p>
+<p>По умолчанию интерфейс обнаруживает изменения состояния физической линии.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 disable-link-detect
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; vif &lt;vlan-id&gt; mac &lt;xx:xx:xx:xx:xx:xx&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-vif-vlan-id-mac-xx-xx-xx-xx-xx-xx" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте пользовательский MAC-адрес на интерфейсе.</strong></p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 mac &#39;00:53:01:02:03:04&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; vif &lt;vlan-id&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-vif-vlan-id-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте MTU настройка интерфейса</p>
+<p>Если настроен, интерфейс переключается в режим хоста, и IPv4-пересылка отключена на нем.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; vif &lt;vlan-id&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-vif-vlan-id-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, чтобы передавать IP-направленные широковещательные пакеты, полученные на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> IP-направленные широковещательные пакеты отбрасываются.</p>
+<p><strong>Если настроен:</strong> IP-направленные широковещательные пакеты передаются всем хостам на целевом подсети, как указано в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> и <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; vif &lt;vlan-id&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-vif-vlan-id-ip-arp-cache-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, как обрабатывать бесплатные ARP на этом интерфейсе.</strong></p>
+<p>Если настроен, IP-адрес-MAC-interface-vif-vlan-id-ip-arp-cache-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, как долго ARP-запись остается действительной после обучения IP-адреса-адреса на этом интерфейсе.</strong></p>
+<p>По умоланию длительность составляет 30 секунд.</p>
+<p>ARP-запись остается действительной, если она получает положительный ответ от более высокого уровня протоколов.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; vif &lt;vlan-id&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-vif-vlan-id-ip-disable-arp-filter" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте фильтрацию ARP на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> ядро отвечает на запросы ARP на этом интерфейсе только тогда, когда трафик будет маршрутироваться обратно к отправителю ARP через этот конкретный интерфейс.</p>
+<p><strong>Если настроен:</strong> ядро отвечает на запросы ARP на этом интерфейсе для любого IP-адреса, настроенного на локальном хосте, независимо от того, какой конкретный интеррес назначен на интерфейсе, и независимо от таблицы маршрутизации. Это отражает концепцию Linux, что IP-адреса принадлежат хосту, а не отдельным интерфейсам.</p>
+<p>Пр><span>...</p>
+</p>
+</code>div>
+</p>
+</p>
+<p><strong>Пример:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 ip disable-arp-filter
+</pre></div>
+</p>
+code: 
+</p>
+code> 
+</p>
+code>
+</p>
+div>
+div>
+</code</p>
+div>
+</code</p>
+</code</p>
+div>
+</code>
+p>
+</code>
+</p>
+</code>
+div>
+code>0
+</code>
+</code</code>
+</code>
+</code>
+code>
+</code>
+</code0
+</code>
+code0:
+p>
+</code00
+</code>
+</p>
+div0x2:code>
+</code0:p>
+</code:000
+</code00
+</code30
+</code</code>
+<p><strong>Настройте, как обрабатывать бесплатные ARP на этом интерфейсе.</strong></p>
+<p>Если настроен
+</code0
+</code0
+</code00
+</code="code000x>
+</code0002:code0
+</00
+</code0x20
+0</code0x0x00x0x0</code0x0
+<p><strong>Пример:</strong></p>
+<div class="highlight-none not="00x
+</code0x
+code0x0x000x10
+</code0x0x00x00000x2x0x0x0
+00x000x0
+<p><strong>Настройте, какие запросы ARP будут игнорироваться на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> ядро отвечает на запросы ARP для любых локальных IP-адресов, независимо от того, какой интерфейс привязан к этому IP-адресу.</p>
+<p><strong>Если настроен:</strong> ядро отвечает на запросы ARP только в том случае, если целевой IP-адрес привязан к этому конкретному интерфейсу.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="0x10000x0x0x0x0
+0x00
+0x0x0x0x0x0
+</p>
+0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0000x0x0x0x00x0x0x0x0p00x0x0x000p0x0x0x0x0x0x0x0x0x0x0x00x0x000x0x000x0x00x0x000x0x0x0x0x0x0x0x000x00x0x0x0x0x0x0x0x0
+<p><strong>Настройте, как выбирается0x0x0x0x00x0000000x0x0x00x0x0x0x0x0
+<p><strong>Настройте,0x0x0x0x0x0x0x00x0x0x0x0x0x0x0x0x0x0x0x00x00x00x0x0x0x0x000x0x0x0x0x0000000x00x0x0x0x0x0x0x0x0x0x0x0x0x00x0x0x0x0x00x0x000x0x0x0x0x0x00x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x00x0x0x0x0x0x0x0x0x00x0x0x0x0x0x0x0x0x0x0x0x00x0x0x0x0x0x0x0x0x0x0x0x0x0x0x00x0x0x0x0x0x0x0x0x0x0x0000x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0x0
+<p><strong>Настройте, как обрабатывать бесплатные ARP на этом интерфейсе.</strong></p>
+<p>Если настроен, IP-адрес-МАК-адресная связь добавляется в ARP-таблицу на основе бесплатных ARP-запросов или ответов.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если ARP-таблица уже содержит IP-адрес из бесплатного ARP, его запись обновляется независимо от того, настроен ли этот параметр.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p><strong>Настройте, обрабатывать ARP-запросы.</strong></p>
+<p>Если настроен, IP-адрес-МАК-адресная связь добавляется в ARP-таблицу на основе бесплатных ARP-запросов или ответов.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если ARP-таблица уже содержит IP-адрес из бесплатного ARP, его запись обновляется независимо от того, настроен ли этот параметр.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd:0x00x000x0x0x0x0x0x0x0x0x00x0000000x0x0x0x0x000x0x0000x0x0x0x0x00x0x000x00x0000x00000000000x000000x0x000x0x00x0x0x0x00x0x0x0x0000x0x0000x0x000000000000000x00000000000000000000x0x0x0x0x0x0x0x0x0x0x0x000000000000000x00000x00x00x0x00x0x0x0x0x0000x0000x000000x0x00x0x00000x000x000000x00x00000x0000x000x00x000000000000x000x0x0000x000000x00x00x000x0x0x00x0x000x0x00x000000x0x0000x0x000x0x00x0x0x000x00x0x0x0x0x0x0x0x00x0000x00000x00x0x0x0x00x0x000000000x0x0000x0x0x000x0x00000x000000x000x0x000x0x0000x000x0x0x0x00x0x000x00000x0x0000x00000x00000x00000x0x000x0x0000x000000000000x00x00x0x0x0x0x000x0x0x0x0x000x00
+<p><strong>Настройте, как обрабатывать ARP-запросы на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> ядро отвечает на ARP-запросы для любого00x0x00x000x0x0x0x00000x0x00x0x00x00000000000x00x0x0000000x00x0x0x0x00x00000x0x00x0x000000x000000x0x00000000000x0x0x0x00x00x000x00000x0x0x0x000000x00x00x0x0x0x00x000x00x00x000x00000x00x00000000x000000000x0x000x0000000000000000x00x00000000000000x000000000000000000000000000x00000000000000000000000x00000000000000000000x000x0000x0000x0x0000x00000000000x000000000000x000x0000000000000000000000000000000000000000000000x000000000000x00000x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0000000x0000
+</000000000000000000000000000000000x000000000x000000000000000000000000
+</00000000000000000000000x000000000x000x0000000000000000000000000000000000000000000000000000000000000000000000000000000x0000000x000000000000000x00x0000000000000000000x00000x000x000x000000000000000000000000000000000000000000000000000x0000000000000000000x000000000000000000000000000000x00000000000000000000000000000
+</000000000000000x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+<p><strong>Настройте, как обрабатывать ARP-з0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+<p><strong>Настройте, как обрабатывать ARP-запросы на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> ядро отвечает на ARP-запросы для любого локального IP-адреса, независимо от00000000000000000000000000000000000000000000000000000000000
+<p><strong>Настройте, как обрабатывать ARP-з00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000x0000x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+<p><strong>Настрой</000x0x00000x00000000000000x0000000000000000000000000000000000000000x000000x00000000000000x00000000000000000000000000000000000x000x0000000000000x0000000000000000000000000000000000000000000000000000000000000000x000000000000000000000000x000000000000000000x000000000000x000
+0000000000000000000000000000000000000000000000000000000000000000
+<p><strong>Настройте, как обрабатывать ARP-запросы на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> ядро может использовать любой IP-адрес, который принадлежит хосту, в качестве исходного IP-адреса в ARP-запросах на этом интерфейсе.</p>
+<p><strong>Если настроен:</strong> ядро сначала пытается выбрать исходный IP-адрес, настроенный на интерфейсе, который имеет общую подсеть с целевым IP-адресом. Если такой подсети нет, ядро выбирает IP-адрес, который обычно используется (на основе таблицы маршрутизации для достижения целевого назначения).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+0
+<p><strong>Настройте, какие ARP-запросы будут игнорироваться на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> ядро отвечает на ARP-запросы для любых локальных IP-адресов, независимо от того, к какому интерфейсу они привязаны.</p>
+<p><strong>Если настроен:</strong> ядро отвечает на ARP-запросы только в том случае0000000000000000000000000000000000000
+<p><strong>Настройте,000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+<p><strong>На000000000000000000000000000000000000000000000000000000000000000000000
+00000000000
+000
+000000000
+00000000000000
+<p><strong>Настройте, как обрабатывать ARP-запросы на этом000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+<p><strong>Настройте, как обрабатывать ARP000000000000000000000000000000000000000000000000
+<p><strong>Настройте, как обрабатывать ARP-запросы на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> ядро отвечает на ARP-запросы для любых локальных IP-адресов, независимо от того, к какому интерфейсу они привязаны.</p>
+<p><strong>Если настроен:</strong> ядро отвечает на ARP-запросы только в том случае, если целевой IP-адрес привязан к этому конкретному интерфейсу.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading0000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000
+000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+<p><strong>Настройте, как обрабатывать ARP-запросы на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> ядро отвечает на ARP-запросы для любых локальных IP-адресов,0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000x0000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000000000000000x00
+<p><strong>Настройте, как обрабатывать ARP-запросы на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> ядро отвечает на ARP-запросы для любых локальных IP-адресов, независимо от того, к какому интерфейсу они привязаны.</p>
+<p><strong>Если настроен:</strong> ядро отвечает на ARP-запросы только в том случае, если целевой IP-адрес привязан к этому конкретному интерфейсу.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class0000000000000x000000000000000000000000000
+<p><strong>Настройте, как обрабатывать ARP-запросы на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> ядро отвечает на ARP-з000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+<p><strong>Настройте0000000x0000000000000000000000000000000000000000000000000000000000000x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+<p><strong>Настройте, как обрабатывать ARP-запросы на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> ядро отвечает на ARP-запросы для любых локальных IP-адресов, независимо от того, к какому интерфейсу они привязаны.</p>
+<p><strong>Если настроен:</strong> ядро отвечает на ARP-запросы только в том случае, если целевой IP-адрес привязан к этому конкретному интерфейсу.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+0
+<p><strong>Настройте, как обрабатывать ARP-запросы на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> ядро отвечает на ARP-запросы для любых локальных IP-адресов, независимо от того, к какому интерфейцу они привязаны.</p>
+<p><strong>Если настроен:</strong> ядро отвечает на ARP-запросы только в том случае, если целевой IP-адрес привязан к этому конкретному интерфейсу.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+0
+<p><strong>Настройте, как обрабатывать ARP-запросы на этом интерф00000000000000000000000000000000000000000000x0000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000x0000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000
+<p><strong>Настройте, как000
+00000000000000000000
+00000000000000000000000000000000000000000
+00000
+00000000
+0000000000000
+0
+000000000000
+000000000000000000000000000000
+00000
+0
+000000000
+0
+00000000000
+000000
+0000000
+00
+0
+0000
+000
+0
+00000000000
+000000
+00000
+0000000
+000
+0
+000
+0
+00000x0000000000000000000
+0000000000
+0000000000
+00
+00000000000
+00000
+0000
+00000000
+000
+000000000000000000000000
+0
+000
+00000000000000000000000000000000000000
+000000000000000000000
+000000000000000000000
+0000
+00000000000
+00000
+0
+00
+0
+0
+0000000
+0
+00000
+00
+000
+000000000
+00000000000
+000000000000000000000000000000000000000
+00000
+00000000000
+0
+00000
+000000000
+0
+000
+<p><strong>Настройте, как об00
+000000
+000000
+00000000000
+0
+000000000000
+000000000
+0
+0000
+000x0
+0000
+00
+00000
+00000
+00000
+00
+0
+0
+000
+00000
+000000
+0
+000
+0x000
+00000000000
+0000000
+0
+00
+000
+000
+00000
+<p><strong>Настройте, как обрабатывать ARP-запросы на этом интерфейсе.</strong></p>
+<p><strong>Стандартное поведение:</strong> ядр0000000000
+0000
+0
+000000
+00000
+0000
+000000
+000000000000000000
+000000000000
+000000000000000000000000
+0000
+0
+00000000000000000
+00000000000000000000000000
+000000000
+00000
+000000
+0000000
+00000000000000000000000000000000000000000
+00000000000000
+00000000000000000000000000000
+000000000000000000000000
+000000000000
+000000000000000000000000
+0000
+00000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000000000000

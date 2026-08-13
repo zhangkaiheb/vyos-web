@@ -1,0 +1,130 @@
+{
+  "zh-CN": {
+    "nat64": {
+      "source": {
+        "field": {
+          "ruleNumber": "规则编号",
+          "description": "描述",
+          "matchMark": "匹配标记",
+          "sourcePrefix": "源前缀",
+          "disable": "禁用"
+        },
+        "help": {
+          "ruleNumber": "规则编号"
+        },
+        "placeholder": {
+          "matchMark": "匹配标记",
+          "sourcePrefix": "源前缀"
+        },
+        "column": {
+          "ruleNumber": "规则编号",
+          "description": "描述",
+          "sourcePrefix": "源前缀",
+          "fwmark": "防火墙标记",
+          "disable": "禁用"
+        },
+        "pool": {
+          "field": {
+            "poolId": "池 ID",
+            "description": "描述",
+            "address": "地址",
+            "port": "端口",
+            "protocol": "协议",
+            "disable": "禁用"
+          },
+          "help": {
+            "poolId": "池 ID"
+          },
+          "placeholder": {
+            "address": "地址",
+            "port": "端口"
+          },
+          "column": {
+            "poolId": "池 ID",
+            "description": "描述",
+            "address": "地址",
+            "port": "端口",
+            "protocol": "协议",
+            "disable": "禁用"
+          },
+          "createPool": "创建池",
+          "editPool": "编辑池",
+          "poolIdRequired": "池 ID 为必填项",
+          "selectPool": "请选择池"
+        },
+        "loadFailed": "加载 NAT64 源规则失败",
+        "saveFailed": "保存 NAT64 源规则失败",
+        "deleteFailed": "删除 NAT64 源规则失败",
+        "editRule": "编辑 NAT64 源规则",
+        "createRule": "创建 NAT64 源规则",
+        "ruleNumberRequired": "规则编号为必填项",
+        "confirmDelete": "确定要删除选中的规则吗？",
+        "translationPool": "转换池"
+      }
+    }
+  },
+  "en": {
+    "nat64": {
+      "source": {
+        "field": {
+          "ruleNumber": "Rule Number",
+          "description": "Description",
+          "matchMark": "Match Mark",
+          "sourcePrefix": "Source Prefix",
+          "disable": "Disable"
+        },
+        "help": {
+          "ruleNumber": "Rule number"
+        },
+        "placeholder": {
+          "matchMark": "Match mark",
+          "sourcePrefix": "Source prefix"
+        },
+        "column": {
+          "ruleNumber": "Rule Number",
+          "description": "Description",
+          "sourcePrefix": "Source Prefix",
+          "fwmark": "FW Mark",
+          "disable": "Disable"
+        },
+        "pool": {
+          "field": {
+            "poolId": "Pool ID",
+            "description": "Description",
+            "address": "Address",
+            "port": "Port",
+            "protocol": "Protocol",
+            "disable": "Disable"
+          },
+          "help": {
+            "poolId": "Pool ID"
+          },
+          "placeholder": {
+            "address": "Address",
+            "port": "Port"
+          },
+          "column": {
+            "poolId": "Pool ID",
+            "description": "Description",
+            "address": "Address",
+            "port": "Port",
+            "protocol": "Protocol",
+            "disable": "Disable"
+          },
+          "createPool": "Create Pool",
+          "editPool": "Edit Pool",
+          "poolIdRequired": "Pool ID is required",
+          "selectPool": "Please select a pool"
+        },
+        "loadFailed": "Failed to load NAT64 source rules",
+        "saveFailed": "Failed to save NAT64 source rule",
+        "deleteFailed": "Failed to delete NAT64 source rule",
+        "editRule": "Edit NAT64 Source Rule",
+        "createRule": "Create NAT64 Source Rule",
+        "ruleNumberRequired": "Rule number is required",
+        "confirmDelete": "Are you sure you want to delete the selected rule(s)?",
+        "translationPool": "Translation Pool"
+      }
+    }
+  }
+}

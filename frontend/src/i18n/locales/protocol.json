@@ -1,0 +1,121 @@
+{
+  "zh-CN": {
+    "protocol": {
+      "columns": {
+        "aliases": "aliases",
+        "description": "描述",
+        "name": "名称",
+        "number": "number"
+      },
+      "data": {
+        "source": "source"
+      },
+      "search": {
+        "placeholder": "placeholder"
+      },
+      "title": "title"
+    }
+  },
+  "en": {
+    "protocol": {
+      "columns": {
+        "aliases": "Aliases",
+        "description": "Description",
+        "name": "Name",
+        "number": "Number"
+      },
+      "data": {
+        "source": "Source"
+      },
+      "search": {
+        "placeholder": "Placeholder"
+      },
+      "title": "Title"
+    }
+  },
+  "zh-TW": {
+    "protocol": {
+      "columns": {
+        "aliases": "Aliases",
+        "description": "Description",
+        "name": "Name",
+        "number": "Number"
+      },
+      "data": {
+        "source": "Source"
+      },
+      "search": {
+        "placeholder": "Placeholder"
+      },
+      "title": "Title"
+    }
+  },
+  "ru": {
+    "protocol": {
+      "columns": {
+        "aliases": "Aliases",
+        "description": "Description",
+        "name": "Name",
+        "number": "Number"
+      },
+      "data": {
+        "source": "Source"
+      },
+      "search": {
+        "placeholder": "Placeholder"
+      },
+      "title": "Title"
+    }
+  },
+  "de": {
+    "protocol": {
+      "columns": {
+        "aliases": "Aliases",
+        "description": "Description",
+        "name": "Name",
+        "number": "Number"
+      },
+      "data": {
+        "source": "Source"
+      },
+      "search": {
+        "placeholder": "Placeholder"
+      },
+      "title": "Title"
+    }
+  },
+  "fr": {
+    "protocol": {
+      "columns": {
+        "aliases": "Aliases",
+        "description": "Description",
+        "name": "Name",
+        "number": "Number"
+      },
+      "data": {
+        "source": "Source"
+      },
+      "search": {
+        "placeholder": "Placeholder"
+      },
+      "title": "Title"
+    }
+  },
+  "ko": {
+    "protocol": {
+      "columns": {
+        "aliases": "Aliases",
+        "description": "Description",
+        "name": "Name",
+        "number": "Number"
+      },
+      "data": {
+        "source": "Source"
+      },
+      "search": {
+        "placeholder": "Placeholder"
+      },
+      "title": "Title"
+    }
+  }
+}

@@ -8,6 +8,7 @@ import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -31,6 +32,7 @@ export default defineComponent({
   name: 'ContainerNamePage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
+    const { t } = useI18n();
     const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
@@ -42,78 +44,78 @@ export default defineComponent({
     const editingContainer = ref(null);
 
     const columns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 150 },
-      { key: 'image', title: '镜像', dataIndex: 'image', width: 200 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-      { key: 'disable', title: '禁用', dataIndex: 'disable', width: 60 },
-      { key: 'restart', title: '重启策略', dataIndex: 'restart', width: 120 },
-      { key: 'memory', title: '内存(MB)', dataIndex: 'memory', width: 100 },
-      { key: 'cpu_quota', title: 'CPU配额', dataIndex: 'cpu_quota', width: 100 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'name', title: t('container.columns.name'), dataIndex: 'name', width: 150 },
+      { key: 'image', title: t('container.columns.image'), dataIndex: 'image', width: 200 },
+      { key: 'description', title: t('container.columns.description'), dataIndex: 'description', width: 200 },
+      { key: 'disable', title: t('container.columns.disable'), dataIndex: 'disable', width: 60 },
+      { key: 'restart', title: t('container.columns.restart'), dataIndex: 'restart', width: 120 },
+      { key: 'memory', title: t('container.columns.memory'), dataIndex: 'memory', width: 100 },
+      { key: 'cpu_quota', title: t('container.columns.cpuQuota'), dataIndex: 'cpu_quota', width: 100 },
+      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     // Sub-table columns
     const capabilityColumns = [
-      { key: 'capability', title: 'Capability', dataIndex: 'capability', width: 300 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'capability', title: t('container.subColumns.capability'), dataIndex: 'capability', width: 300 },
+      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const environmentColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 150 },
-      { key: 'value', title: '值', dataIndex: 'value', width: 250 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'name', title: t('container.subColumns.name'), dataIndex: 'name', width: 150 },
+      { key: 'value', title: t('container.subColumns.value'), dataIndex: 'value', width: 250 },
+      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const labelColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 150 },
-      { key: 'value', title: '值', dataIndex: 'value', width: 250 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'name', title: t('container.subColumns.name'), dataIndex: 'name', width: 150 },
+      { key: 'value', title: t('container.subColumns.value'), dataIndex: 'value', width: 250 },
+      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const nameServerColumns = [
-      { key: 'server', title: 'DNS服务器', dataIndex: 'server', width: 300 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'server', title: t('container.subColumns.dnsServer'), dataIndex: 'server', width: 300 },
+      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const sysctlColumns = [
-      { key: 'name', title: '参数', dataIndex: 'name', width: 200 },
-      { key: 'value', title: '值', dataIndex: 'value', width: 200 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'name', title: t('container.subColumns.parameter'), dataIndex: 'name', width: 200 },
+      { key: 'value', title: t('container.subColumns.value'), dataIndex: 'value', width: 200 },
+      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const tmpfsColumns = [
-      { key: 'name', title: '路径', dataIndex: 'name', width: 200 },
-      { key: 'size', title: '大小', dataIndex: 'size', width: 150 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'name', title: t('container.subColumns.path'), dataIndex: 'name', width: 200 },
+      { key: 'size', title: t('container.subColumns.size'), dataIndex: 'size', width: 150 },
+      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const deviceColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 120 },
-      { key: 'source', title: '源设备', dataIndex: 'source', width: 200 },
-      { key: 'destination', title: '目标设备', dataIndex: 'destination', width: 200 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'name', title: t('container.subColumns.name'), dataIndex: 'name', width: 120 },
+      { key: 'source', title: t('container.subColumns.sourceDevice'), dataIndex: 'source', width: 200 },
+      { key: 'destination', title: t('container.subColumns.destinationDevice'), dataIndex: 'destination', width: 200 },
+      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const networkColumns = [
-      { key: 'name', title: '网络', dataIndex: 'name', width: 150 },
-      { key: 'address', title: '地址', dataIndex: 'address', width: 200 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'name', title: t('container.subColumns.network'), dataIndex: 'name', width: 150 },
+      { key: 'address', title: t('container.subColumns.address'), dataIndex: 'address', width: 200 },
+      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const portColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 120 },
-      { key: 'source', title: '源端口', dataIndex: 'source', width: 100 },
-      { key: 'destination', title: '目标端口', dataIndex: 'destination', width: 100 },
-      { key: 'protocol', title: '协议', dataIndex: 'protocol', width: 80 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'name', title: t('container.subColumns.name'), dataIndex: 'name', width: 120 },
+      { key: 'source', title: t('container.subColumns.sourcePort'), dataIndex: 'source', width: 100 },
+      { key: 'destination', title: t('container.subColumns.destinationPort'), dataIndex: 'destination', width: 100 },
+      { key: 'protocol', title: t('container.subColumns.protocol'), dataIndex: 'protocol', width: 80 },
+      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const volumeColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 120 },
-      { key: 'source', title: '源', dataIndex: 'source', width: 200 },
-      { key: 'destination', title: '目标', dataIndex: 'destination', width: 200 },
-      { key: 'readonly', title: '只读', dataIndex: 'readonly', width: 60 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'name', title: t('container.subColumns.name'), dataIndex: 'name', width: 120 },
+      { key: 'source', title: t('container.subColumns.source'), dataIndex: 'source', width: 200 },
+      { key: 'destination', title: t('container.subColumns.destination'), dataIndex: 'destination', width: 200 },
+      { key: 'readonly', title: t('container.subColumns.readonly'), dataIndex: 'readonly', width: 60 },
+      { key: 'actions', title: t('app.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     // Sub-item selection states
@@ -324,13 +326,12 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('container name', true);
         const data = res.data || {};
         containerList.value = Object.entries(data).map(([name, cfg]) => containerToForm(name, cfg));
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('container.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -348,11 +349,10 @@ export default defineComponent({
         if (Object.keys(payload).length) {
           await configApi.set('container name', payload);
         }
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('container.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -371,21 +371,21 @@ export default defineComponent({
     }
 
     function editContainer() {
-      if (!selectedContainers.value.length) return alert('请选择要编辑的容器');
+      if (!selectedContainers.value.length) return showError({ message: t('container.selectContainerFirst') });
       const row = containerList.value.find(c => c.name === selectedContainers.value[0]);
-      if (!row) return alert('未找到选中的容器');
+      if (!row) return showError({ message: t('container.containerNotFound') });
       editingContainer.value = JSON.parse(JSON.stringify(row));
       showEditModal.value = true;
     }
 
     function removeContainer() {
-      if (!selectedContainers.value.length) return alert('请选择要删除的容器');
+      if (!selectedContainers.value.length) return showError({ message: t('container.selectContainerFirst') });
       containerList.value = containerList.value.filter(c => c.name !== selectedContainers.value[0]);
       selectedContainers.value = [];
     }
 
     function saveContainer() {
-      if (!editingContainer.value.name) return alert('请输入容器名称');
+      if (!editingContainer.value.name) return showError({ message: t('container.nameRequired') });
       const list = containerList.value;
       const idx = list.findIndex(c => c._name === editingContainer.value._name);
       if (idx >= 0) list.splice(idx, 1, { ...editingContainer.value });
@@ -410,21 +410,21 @@ export default defineComponent({
     }
 
     function editSubItem(selectedRef, list, modalRef, editingRef, keyField) {
-      if (!selectedRef.value.length) return alert('请选择要编辑的项目');
+      if (!selectedRef.value.length) return showError({ message: t('container.selectItemFirst') });
       const row = list.find(item => item[keyField] === selectedRef.value[0]);
-      if (!row) return alert('未找到选中的项目');
+      if (!row) return showError({ message: t('container.itemNotFound') });
       editingRef.value = JSON.parse(JSON.stringify(row));
       modalRef.value = true;
     }
 
     function removeSubItem(selectedRef, listKey, keyField) {
-      if (!selectedRef.value.length) return alert('请选择要删除的项目');
+      if (!selectedRef.value.length) return showError({ message: t('container.selectItemFirst') });
       editingContainer.value[listKey] = editingContainer.value[listKey].filter(item => item[keyField] !== selectedRef.value[0]);
       selectedRef.value = [];
     }
 
     function saveSubItem(modalRef, editingRef, listKey, keyField, validateField) {
-      if (!editingRef.value[validateField]) return alert('请输入' + validateField);
+      if (!editingRef.value[validateField]) return showError({ message: t('container.fieldRequired') + validateField });
       const list = editingContainer.value[listKey];
       const idx = list.findIndex(item => item['_' + keyField] === editingRef.value['_' + keyField]);
       if (idx >= 0) list.splice(idx, 1, { ...editingRef.value });
@@ -447,7 +447,8 @@ export default defineComponent({
       onMenuRefresh(load);
     });
 
-    return {
+    return {t,
+      
       loading, saving, saved, containerList, columns, commandPath,
       selectedContainers, showEditModal, editingContainer,
       capabilityColumns, environmentColumns, labelColumns, nameServerColumns,
@@ -536,282 +537,276 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
-
       <div class="toolbar">
-        <ToolbarButton icon="create" @click="createContainer">创建</ToolbarButton>
-        <ToolbarButton icon="edit" @click="editContainer" :disabled="!selectedContainers.length || selectedContainers.length > 1">编辑</ToolbarButton>
-        <ToolbarButton icon="delete" @click="removeContainer" :disabled="!selectedContainers.length">删除</ToolbarButton>
+        <ToolbarButton icon="create" @click="createContainer">{{ t('container.buttons.create') }}</ToolbarButton>
+        <ToolbarButton icon="edit" @click="editContainer" :disabled="!selectedContainers.length || selectedContainers.length > 1">{{ t('container.buttons.edit') }}</ToolbarButton>
+        <ToolbarButton icon="delete" @click="removeContainer" :disabled="!selectedContainers.length">{{ t('container.buttons.delete') }}</ToolbarButton>
       </div>
       <DataTable :columns="columns" :data="containerList" rowKey="name" :externalToolbar="true" @selection-change="selectedContainers = $event" :selectable="true">
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'disable'">
-            <span>{{ record.disable ? '是' : '否' }}</span>
+            <span>{{ record.disable ? t('container.yes') : t('container.no') }}</span>
           </template>
           <template v-if="column.key === 'actions'">
-            <a @click="editContainerByRecord(record)" style="margin-right:8px">编辑</a>
-            <a @click="removeContainerByRecord(record)" style="color:#ff4d4f">删除</a>
+            <a @click="editContainerByRecord(record)" style="margin-right:8px">{{ t('container.buttons.edit') }}</a>
+            <a @click="removeContainerByRecord(record)" style="color:#ff4d4f">{{ t('container.buttons.delete') }}</a>
           </template>
         </template>
       </DataTable>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="saveConfig" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-      </div>
-
-      <!-- Main Edit Modal -->
-      <DraggableModal v-model:visible="showEditModal" :title="editingContainer && editingContainer._name ? '编辑容器: ' + editingContainer._name : '新建容器'" @confirm="saveContainer" @close="showEditModal = false" width="900px">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingContainer.name" :disabled="editingContainer._name" title="容器实例名称" /></div>
-        <div class="form-row"><label class="form-label">镜像</label><input class="form-control" v-model="editingContainer.image" title="容器镜像" /></div>
-        <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingContainer.description" title="描述" /></div>
-        <div class="form-row"><label class="form-label">主机名</label><input class="form-control" v-model="editingContainer.host_name" title="容器主机名" /></div>
-        <div class="form-row"><label class="form-label">命令</label><input class="form-control" v-model="editingContainer.command" title="覆盖默认 CMD" /></div>
-        <div class="form-row"><label class="form-label">入口点</label><input class="form-control" v-model="editingContainer.entrypoint" title="覆盖默认 ENTRYPOINT" /></div>
-        <div class="form-row"><label class="form-label">参数</label><textarea class="form-control" v-model="editingContainer.arguments" rows="3" placeholder="每行一个参数" title="命令参数" /></div>
-        <div class="form-row"><label class="form-label">CPU 配额</label><input class="form-control" v-model="editingContainer.cpu_quota" title="CPU 时间配额，0=无限制" /></div>
-        <div class="form-row"><label class="form-label">内存 (MB)</label><input class="form-control" type="number" min="4" v-model="editingContainer.memory" title="可用内存，默认 512MB" /></div>
-        <div class="form-row"><label class="form-label">共享内存 (MB)</label><input class="form-control" type="number" min="1" v-model="editingContainer.shared_memory" title="共享内存，默认 64MB" /></div>
-        <div class="form-row"><label class="form-label">UID</label><input class="form-control" type="number" min="0" max="65535" v-model="editingContainer.uid" title="运行用户 ID" /></div>
-        <div class="form-row"><label class="form-label">GID</label><input class="form-control" type="number" min="0" max="65535" v-model="editingContainer.gid" title="运行组 ID" /></div>
-        <div class="form-row"><label class="form-label">日志驱动</label><input class="form-control" v-model="editingContainer.log_driver" title="日志驱动，默认 journald" /></div>
-        <div class="form-row"><label class="form-label">重启策略</label>
-          <select class="form-control" v-model="editingContainer.restart" title="重启策略">
-            <option value="no">不重启</option>
-            <option value="on-failure">失败时重启</option>
-            <option value="always">总是重启</option>
-            <option value="unless-stopped">除非停止</option>
+      <!-- Edit Modal -->
+      <DraggableModal v-model:visible="showEditModal" :title="editingContainer && editingContainer._name ? t('container.modal.editContainer') + editingContainer._name : t('container.modal.createContainer')" @confirm="saveContainer" @close="showEditModal = false" width="900px">
+        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><input class="form-control" v-model="editingContainer.name" :disabled="editingContainer._name" :title="t('container.form.nameHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.image') }}</label><input class="form-control" v-model="editingContainer.image" :title="t('container.form.imageHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.description') }}</label><input class="form-control" v-model="editingContainer.description" :title="t('container.form.descriptionHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.hostName') }}</label><input class="form-control" v-model="editingContainer.host_name" :title="t('container.form.hostNameHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.command') }}</label><input class="form-control" v-model="editingContainer.command" :title="t('container.form.commandHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.entrypoint') }}</label><input class="form-control" v-model="editingContainer.entrypoint" :title="t('container.form.entrypointHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.arguments') }}</label><textarea class="form-control" v-model="editingContainer.arguments" rows="3" :placeholder="t('container.form.argumentsPlaceholder')" :title="t('container.form.argumentsHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.cpuQuota') }}</label><input class="form-control" v-model="editingContainer.cpu_quota" :title="t('container.form.cpuQuotaHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.memory') }}</label><input class="form-control" type="number" min="4" v-model="editingContainer.memory" :title="t('container.form.memoryHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.sharedMemory') }}</label><input class="form-control" type="number" min="1" v-model="editingContainer.shared_memory" :title="t('container.form.sharedMemoryHelp')" /></div>
+        <div class="form-row"><label class="form-label">UID</label><input class="form-control" type="number" min="0" max="65535" v-model="editingContainer.uid" :title="t('container.form.uidHelp')" /></div>
+        <div class="form-row"><label class="form-label">GID</label><input class="form-control" type="number" min="0" max="65535" v-model="editingContainer.gid" :title="t('container.form.gidHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.logDriver') }}</label><input class="form-control" v-model="editingContainer.log_driver" :title="t('container.form.logDriverHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.restartPolicy') }}</label>
+          <select class="form-control" v-model="editingContainer.restart" :title="t('container.form.restartPolicyHelp')">
+            <option value="no">{{ t('container.restart.no') }}</option>
+            <option value="on-failure">{{ t('container.restart.onFailure') }}</option>
+            <option value="always">{{ t('container.restart.always') }}</option>
+            <option value="unless-stopped">{{ t('container.restart.unlessStopped') }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">特权模式</label><input type="checkbox" v-model="editingContainer.privileged" title="授予容器 root 权限" /></div>
-        <div class="form-row"><label class="form-label">共享主机网络</label><input type="checkbox" v-model="editingContainer.allow_host_networks" title="允许共享主机网络" /></div>
-        <div class="form-row"><label class="form-label">共享主机 PID</label><input type="checkbox" v-model="editingContainer.allow_host_pid" title="允许共享主机进程命名空间" /></div>
-        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingContainer.disable" title="禁用此容器实例" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.privileged') }}</label><input type="checkbox" v-model="editingContainer.privileged" :title="t('container.form.privilegedHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.allowHostNetworks') }}</label><input type="checkbox" v-model="editingContainer.allow_host_networks" :title="t('container.form.allowHostNetworksHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.allowHostPid') }}</label><input type="checkbox" v-model="editingContainer.allow_host_pid" :title="t('container.form.allowHostPidHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.disable') }}</label><input type="checkbox" v-model="editingContainer.disable" :title="t('container.form.disableHelp')" /></div>
 
         <!-- Health Check -->
-        <div style="font-weight:bold;margin:16px 0 8px;">健康检查</div>
-        <div class="form-row"><label class="form-label">检查命令</label><input class="form-control" v-model="editingContainer.health_check.command" title="健康检查命令" /></div>
-        <div class="form-row"><label class="form-label">间隔</label><input class="form-control" v-model="editingContainer.health_check.interval" placeholder="disable 或 1-16384 秒" title="检查间隔" /></div>
-        <div class="form-row"><label class="form-label">重试次数</label><input class="form-control" type="number" min="0" max="255" v-model="editingContainer.health_check.retry" title="重试次数，0=不重试" /></div>
-        <div class="form-row"><label class="form-label">超时 (秒)</label><input class="form-control" type="number" min="1" max="16384" v-model="editingContainer.health_check.timeout" title="检查超时时间" /></div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('container.sections.healthCheck') }}</div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.healthCheckCommand') }}</label><input class="form-control" v-model="editingContainer.health_check.command" :title="t('container.form.healthCheckCommandHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.interval') }}</label><input class="form-control" v-model="editingContainer.health_check.interval" :placeholder="t('container.form.intervalPlaceholder')" :title="t('container.form.intervalHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.retryCount') }}</label><input class="form-control" type="number" min="0" max="255" v-model="editingContainer.health_check.retry" :title="t('container.form.retryCountHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.timeout') }}</label><input class="form-control" type="number" min="1" max="16384" v-model="editingContainer.health_check.timeout" :title="t('container.form.timeoutHelp')" /></div>
 
         <!-- Capability -->
         <div style="font-weight:bold;margin:16px 0 8px;">Capabilities</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createCapability">添加</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editCapability" :disabled="!selectedCapabilities.length || selectedCapabilities.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeCapability" :disabled="!selectedCapabilities.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createCapability">{{ t('container.buttons.add') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editCapability" :disabled="!selectedCapabilities.length || selectedCapabilities.length > 1">{{ t('container.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeCapability" :disabled="!selectedCapabilities.length">{{ t('container.buttons.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="capabilityColumns" :data="editingContainer.capability" rowKey="capability" :externalToolbar="true" @selection-change="selectedCapabilities = $event" :selectable="true">
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'actions'">
-              <a @click="editCapabilityByRecord(record)" style="margin-right:8px">编辑</a>
-              <a @click="removeCapabilityByRecord(record)" style="color:#ff4d4f">删除</a>
+              <a @click="editCapabilityByRecord(record)" style="margin-right:8px">{{ t('container.buttons.edit') }}</a>
+              <a @click="removeCapabilityByRecord(record)" style="color:#ff4d4f">{{ t('container.buttons.delete') }}</a>
             </template>
           </template>
         </DataTable>
 
         <!-- Environment -->
-        <div style="font-weight:bold;margin:16px 0 8px;">环境变量</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('container.sections.environment') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createEnvironment">添加</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editEnvironment" :disabled="!selectedEnvironments.length || selectedEnvironments.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeEnvironment" :disabled="!selectedEnvironments.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createEnvironment">{{ t('container.buttons.add') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editEnvironment" :disabled="!selectedEnvironments.length || selectedEnvironments.length > 1">{{ t('container.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeEnvironment" :disabled="!selectedEnvironments.length">{{ t('container.buttons.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="environmentColumns" :data="editingContainer.environment" rowKey="name" :externalToolbar="true" @selection-change="selectedEnvironments = $event" :selectable="true">
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'actions'">
-              <a @click="editEnvironmentByRecord(record)" style="margin-right:8px">编辑</a>
-              <a @click="removeEnvironmentByRecord(record)" style="color:#ff4d4f">删除</a>
+              <a @click="editEnvironmentByRecord(record)" style="margin-right:8px">{{ t('container.buttons.edit') }}</a>
+              <a @click="removeEnvironmentByRecord(record)" style="color:#ff4d4f">{{ t('container.buttons.delete') }}</a>
             </template>
           </template>
         </DataTable>
 
         <!-- Label -->
-        <div style="font-weight:bold;margin:16px 0 8px;">标签</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('container.sections.label') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createLabel">添加</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editLabel" :disabled="!selectedLabels.length || selectedLabels.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeLabel" :disabled="!selectedLabels.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createLabel">{{ t('container.buttons.add') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editLabel" :disabled="!selectedLabels.length || selectedLabels.length > 1">{{ t('container.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeLabel" :disabled="!selectedLabels.length">{{ t('container.buttons.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="labelColumns" :data="editingContainer.label" rowKey="name" :externalToolbar="true" @selection-change="selectedLabels = $event" :selectable="true">
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'actions'">
-              <a @click="editLabelByRecord(record)" style="margin-right:8px">编辑</a>
-              <a @click="removeLabelByRecord(record)" style="color:#ff4d4f">删除</a>
+              <a @click="editLabelByRecord(record)" style="margin-right:8px">{{ t('container.buttons.edit') }}</a>
+              <a @click="removeLabelByRecord(record)" style="color:#ff4d4f">{{ t('container.buttons.delete') }}</a>
             </template>
           </template>
         </DataTable>
 
         <!-- Name Server -->
-        <div style="font-weight:bold;margin:16px 0 8px;">DNS 服务器</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('container.sections.dnsServer') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createNameServer">添加</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editNameServer" :disabled="!selectedNameServers.length || selectedNameServers.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeNameServer" :disabled="!selectedNameServers.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createNameServer">{{ t('container.buttons.add') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editNameServer" :disabled="!selectedNameServers.length || selectedNameServers.length > 1">{{ t('container.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeNameServer" :disabled="!selectedNameServers.length">{{ t('container.buttons.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="nameServerColumns" :data="editingContainer.name_server" rowKey="server" :externalToolbar="true" @selection-change="selectedNameServers = $event" :selectable="true">
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'actions'">
-              <a @click="editNameServerByRecord(record)" style="margin-right:8px">编辑</a>
-              <a @click="removeNameServerByRecord(record)" style="color:#ff4d4f">删除</a>
+              <a @click="editNameServerByRecord(record)" style="margin-right:8px">{{ t('container.buttons.edit') }}</a>
+              <a @click="removeNameServerByRecord(record)" style="color:#ff4d4f">{{ t('container.buttons.delete') }}</a>
             </template>
           </template>
         </DataTable>
 
         <!-- Sysctl -->
-        <div style="font-weight:bold;margin:16px 0 8px;">Sysctl 参数</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('container.sections.sysctl') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createSysctl">添加</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editSysctl" :disabled="!selectedSysctls.length || selectedSysctls.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeSysctl" :disabled="!selectedSysctls.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createSysctl">{{ t('container.buttons.add') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editSysctl" :disabled="!selectedSysctls.length || selectedSysctls.length > 1">{{ t('container.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeSysctl" :disabled="!selectedSysctls.length">{{ t('container.buttons.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="sysctlColumns" :data="editingContainer.sysctl" rowKey="name" :externalToolbar="true" @selection-change="selectedSysctls = $event" :selectable="true">
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'actions'">
-              <a @click="editSysctlByRecord(record)" style="margin-right:8px">编辑</a>
-              <a @click="removeSysctlByRecord(record)" style="color:#ff4d4f">删除</a>
+              <a @click="editSysctlByRecord(record)" style="margin-right:8px">{{ t('container.buttons.edit') }}</a>
+              <a @click="removeSysctlByRecord(record)" style="color:#ff4d4f">{{ t('container.buttons.delete') }}</a>
             </template>
           </template>
         </DataTable>
 
         <!-- Tmpfs -->
-        <div style="font-weight:bold;margin:16px 0 8px;">Tmpfs 挂载</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('container.sections.tmpfs') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createTmpfs">添加</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editTmpfs" :disabled="!selectedTmpfs.length || selectedTmpfs.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeTmpfs" :disabled="!selectedTmpfs.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createTmpfs">{{ t('container.buttons.add') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editTmpfs" :disabled="!selectedTmpfs.length || selectedTmpfs.length > 1">{{ t('container.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeTmpfs" :disabled="!selectedTmpfs.length">{{ t('container.buttons.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="tmpfsColumns" :data="editingContainer.tmpfs" rowKey="name" :externalToolbar="true" @selection-change="selectedTmpfs = $event" :selectable="true">
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'actions'">
-              <a @click="editTmpfsByRecord(record)" style="margin-right:8px">编辑</a>
-              <a @click="removeTmpfsByRecord(record)" style="color:#ff4d4f">删除</a>
+              <a @click="editTmpfsByRecord(record)" style="margin-right:8px">{{ t('container.buttons.edit') }}</a>
+              <a @click="removeTmpfsByRecord(record)" style="color:#ff4d4f">{{ t('container.buttons.delete') }}</a>
             </template>
           </template>
         </DataTable>
 
         <!-- Device -->
-        <div style="font-weight:bold;margin:16px 0 8px;">设备</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('container.sections.device') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createDevice">添加</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editDevice" :disabled="!selectedDevices.length || selectedDevices.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeDevice" :disabled="!selectedDevices.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createDevice">{{ t('container.buttons.add') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editDevice" :disabled="!selectedDevices.length || selectedDevices.length > 1">{{ t('container.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeDevice" :disabled="!selectedDevices.length">{{ t('container.buttons.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="deviceColumns" :data="editingContainer.device" rowKey="name" :externalToolbar="true" @selection-change="selectedDevices = $event" :selectable="true">
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'actions'">
-              <a @click="editDeviceByRecord(record)" style="margin-right:8px">编辑</a>
-              <a @click="removeDeviceByRecord(record)" style="color:#ff4d4f">删除</a>
+              <a @click="editDeviceByRecord(record)" style="margin-right:8px">{{ t('container.buttons.edit') }}</a>
+              <a @click="removeDeviceByRecord(record)" style="color:#ff4d4f">{{ t('container.buttons.delete') }}</a>
             </template>
           </template>
         </DataTable>
 
         <!-- Network -->
-        <div style="font-weight:bold;margin:16px 0 8px;">网络</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('container.sections.network') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createNetwork">添加</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editNetwork" :disabled="!selectedNetworks.length || selectedNetworks.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeNetwork" :disabled="!selectedNetworks.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createNetwork">{{ t('container.buttons.add') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editNetwork" :disabled="!selectedNetworks.length || selectedNetworks.length > 1">{{ t('container.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeNetwork" :disabled="!selectedNetworks.length">{{ t('container.buttons.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="networkColumns" :data="editingContainer.network" rowKey="name" :externalToolbar="true" @selection-change="selectedNetworks = $event" :selectable="true">
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'actions'">
-              <a @click="editNetworkByRecord(record)" style="margin-right:8px">编辑</a>
-              <a @click="removeNetworkByRecord(record)" style="color:#ff4d4f">删除</a>
+              <a @click="editNetworkByRecord(record)" style="margin-right:8px">{{ t('container.buttons.edit') }}</a>
+              <a @click="removeNetworkByRecord(record)" style="color:#ff4d4f">{{ t('container.buttons.delete') }}</a>
             </template>
           </template>
         </DataTable>
 
         <!-- Port -->
-        <div style="font-weight:bold;margin:16px 0 8px;">端口映射</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('container.sections.portMapping') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createPort">添加</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editPort" :disabled="!selectedPorts.length || selectedPorts.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removePort" :disabled="!selectedPorts.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createPort">{{ t('container.buttons.add') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editPort" :disabled="!selectedPorts.length || selectedPorts.length > 1">{{ t('container.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removePort" :disabled="!selectedPorts.length">{{ t('container.buttons.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="portColumns" :data="editingContainer.port" rowKey="name" :externalToolbar="true" @selection-change="selectedPorts = $event" :selectable="true">
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'actions'">
-              <a @click="editPortByRecord(record)" style="margin-right:8px">编辑</a>
-              <a @click="removePortByRecord(record)" style="color:#ff4d4f">删除</a>
+              <a @click="editPortByRecord(record)" style="margin-right:8px">{{ t('container.buttons.edit') }}</a>
+              <a @click="removePortByRecord(record)" style="color:#ff4d4f">{{ t('container.buttons.delete') }}</a>
             </template>
           </template>
         </DataTable>
 
         <!-- Volume -->
-        <div style="font-weight:bold;margin:16px 0 8px;">卷挂载</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('container.sections.volumeMount') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createVolume">添加</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editVolume" :disabled="!selectedVolumes.length || selectedVolumes.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeVolume" :disabled="!selectedVolumes.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createVolume">{{ t('container.buttons.add') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editVolume" :disabled="!selectedVolumes.length || selectedVolumes.length > 1">{{ t('container.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeVolume" :disabled="!selectedVolumes.length">{{ t('container.buttons.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="volumeColumns" :data="editingContainer.volume" rowKey="name" :externalToolbar="true" @selection-change="selectedVolumes = $event" :selectable="true">
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'readonly'">
-              <span>{{ record.readonly ? '是' : '否' }}</span>
+              <span>{{ record.readonly ? t('container.yes') : t('container.no') }}</span>
             </template>
             <template v-if="column.key === 'actions'">
-              <a @click="editVolumeByRecord(record)" style="margin-right:8px">编辑</a>
-              <a @click="removeVolumeByRecord(record)" style="color:#ff4d4f">删除</a>
+              <a @click="editVolumeByRecord(record)" style="margin-right:8px">{{ t('container.buttons.edit') }}</a>
+              <a @click="removeVolumeByRecord(record)" style="color:#ff4d4f">{{ t('container.buttons.delete') }}</a>
             </template>
           </template>
         </DataTable>
       </DraggableModal>
 
       <!-- Capability Modal -->
-      <DraggableModal v-model:visible="showCapabilityModal" :title="editingCapability && editingCapability._capability ? '编辑 Capability' : '添加 Capability'" @confirm="saveCapability" @close="showCapabilityModal = false">
-        <div class="form-row"><label class="form-label">Capability</label><input class="form-control" v-model="editingCapability.capability" :disabled="editingCapability._capability" title="Linux capability" /></div>
+      <DraggableModal v-model:visible="showCapabilityModal" :title="editingCapability && editingCapability._capability ? t('container.modal.editCapability') : t('container.modal.addCapability')" @confirm="saveCapability" @close="showCapabilityModal = false">
+        <div class="form-row"><label class="form-label">Capability</label><input class="form-control" v-model="editingCapability.capability" :disabled="editingCapability._capability" :title="t('container.form.capabilityHelp')" /></div>
       </DraggableModal>
 
       <!-- Environment Modal -->
-      <DraggableModal v-model:visible="showEnvironmentModal" :title="editingEnvironment && editingEnvironment._name ? '编辑环境变量' : '添加环境变量'" @confirm="saveEnvironment" @close="showEnvironmentModal = false">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingEnvironment.name" :disabled="editingEnvironment._name" title="环境变量名称" /></div>
-        <div class="form-row"><label class="form-label">值</label><input class="form-control" v-model="editingEnvironment.value" title="环境变量值" /></div>
+      <DraggableModal v-model:visible="showEnvironmentModal" :title="editingEnvironment && editingEnvironment._name ? t('container.modal.editEnvironment') : t('container.modal.addEnvironment')" @confirm="saveEnvironment" @close="showEnvironmentModal = false">
+        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><input class="form-control" v-model="editingEnvironment.name" :disabled="editingEnvironment._name" :title="t('container.form.environmentNameHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.value') }}</label><input class="form-control" v-model="editingEnvironment.value" :title="t('container.form.environmentValueHelp')" /></div>
       </DraggableModal>
 
       <!-- Label Modal -->
-      <DraggableModal v-model:visible="showLabelModal" :title="editingLabel && editingLabel._name ? '编辑标签' : '添加标签'" @confirm="saveLabel" @close="showLabelModal = false">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingLabel.name" :disabled="editingLabel._name" title="标签名称" /></div>
-        <div class="form-row"><label class="form-label">值</label><input class="form-control" v-model="editingLabel.value" title="标签值" /></div>
+      <DraggableModal v-model:visible="showLabelModal" :title="editingLabel && editingLabel._name ? t('container.modal.editLabel') : t('container.modal.addLabel')" @confirm="saveLabel" @close="showLabelModal = false">
+        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><input class="form-control" v-model="editingLabel.name" :disabled="editingLabel._name" :title="t('container.form.labelNameHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.value') }}</label><input class="form-control" v-model="editingLabel.value" :title="t('container.form.labelValueHelp')" /></div>
       </DraggableModal>
 
       <!-- NameServer Modal -->
-      <DraggableModal v-model:visible="showNameServerModal" :title="editingNameServer && editingNameServer._server ? '编辑 DNS 服务器' : '添加 DNS 服务器'" @confirm="saveNameServer" @close="showNameServerModal = false">
-        <div class="form-row"><label class="form-label">DNS 服务器</label><input class="form-control" v-model="editingNameServer.server" :disabled="editingNameServer._server" placeholder="x.x.x.x" title="DNS 服务器地址" /></div>
+      <DraggableModal v-model:visible="showNameServerModal" :title="editingNameServer && editingNameServer._server ? t('container.modal.editDnsServer') : t('container.modal.addDnsServer')" @confirm="saveNameServer" @close="showNameServerModal = false">
+        <div class="form-row"><label class="form-label">{{ t('container.form.dnsServer') }}</label><input class="form-control" v-model="editingNameServer.server" :disabled="editingNameServer._server" placeholder="x.x.x.x" :title="t('container.form.dnsServerHelp')" /></div>
       </DraggableModal>
 
       <!-- Sysctl Modal -->
-      <DraggableModal v-model:visible="showSysctlModal" :title="editingSysctl && editingSysctl._name ? '编辑 Sysctl' : '添加 Sysctl'" @confirm="saveSysctl" @close="showSysctlModal = false">
-        <div class="form-row"><label class="form-label">参数名</label><input class="form-control" v-model="editingSysctl.name" :disabled="editingSysctl._name" title="Sysctl 参数名" /></div>
-        <div class="form-row"><label class="form-label">值</label><input class="form-control" v-model="editingSysctl.value" title="Sysctl 参数值" /></div>
+      <DraggableModal v-model:visible="showSysctlModal" :title="editingSysctl && editingSysctl._name ? t('container.modal.editSysctl') : t('container.modal.addSysctl')" @confirm="saveSysctl" @close="showSysctlModal = false">
+        <div class="form-row"><label class="form-label">{{ t('container.form.parameterName') }}</label><input class="form-control" v-model="editingSysctl.name" :disabled="editingSysctl._name" :title="t('container.form.sysctlNameHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.value') }}</label><input class="form-control" v-model="editingSysctl.value" :title="t('container.form.sysctlValueHelp')" /></div>
       </DraggableModal>
 
       <!-- Tmpfs Modal -->
-      <DraggableModal v-model:visible="showTmpfsModal" :title="editingTmpfs && editingTmpfs._name ? '编辑 Tmpfs' : '添加 Tmpfs'" @confirm="saveTmpfs" @close="showTmpfsModal = false">
-        <div class="form-row"><label class="form-label">路径</label><input class="form-control" v-model="editingTmpfs.name" :disabled="editingTmpfs._name" title="挂载路径" /></div>
-        <div class="form-row"><label class="form-label">大小</label><input class="form-control" v-model="editingTmpfs.size" title="Tmpfs 大小" /></div>
+      <DraggableModal v-model:visible="showTmpfsModal" :title="editingTmpfs && editingTmpfs._name ? t('container.modal.editTmpfs') : t('container.modal.addTmpfs')" @confirm="saveTmpfs" @close="showTmpfsModal = false">
+        <div class="form-row"><label class="form-label">{{ t('container.form.path') }}</label><input class="form-control" v-model="editingTmpfs.name" :disabled="editingTmpfs._name" :title="t('container.form.mountPathHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.size') }}</label><input class="form-control" v-model="editingTmpfs.size" :title="t('container.form.tmpfsSizeHelp')" /></div>
       </DraggableModal>
 
       <!-- Device Modal -->
-      <DraggableModal v-model:visible="showDeviceModal" :title="editingDevice && editingDevice._name ? '编辑设备' : '添加设备'" @confirm="saveDevice" @close="showDeviceModal = false">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingDevice.name" :disabled="editingDevice._name" title="设备名称" /></div>
-        <div class="form-row"><label class="form-label">源设备</label><input class="form-control" v-model="editingDevice.source" placeholder="/dev/x" title="源设备路径" /></div>
-        <div class="form-row"><label class="form-label">目标设备</label><input class="form-control" v-model="editingDevice.destination" placeholder="/dev/x" title="目标设备路径" /></div>
+      <DraggableModal v-model:visible="showDeviceModal" :title="editingDevice && editingDevice._name ? t('container.modal.editDevice') : t('container.modal.addDevice')" @confirm="saveDevice" @close="showDeviceModal = false">
+        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><input class="form-control" v-model="editingDevice.name" :disabled="editingDevice._name" :title="t('container.form.deviceNameHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.sourceDevice') }}</label><input class="form-control" v-model="editingDevice.source" placeholder="/dev/x" :title="t('container.form.sourceDeviceHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.destinationDevice') }}</label><input class="form-control" v-model="editingDevice.destination" placeholder="/dev/x" :title="t('container.form.destinationDeviceHelp')" /></div>
       </DraggableModal>
 
       <!-- Network Modal -->
-      <DraggableModal v-model:visible="showNetworkModal" :title="editingNetwork && editingNetwork._name ? '编辑网络' : '添加网络'" @confirm="saveNetwork" @close="showNetworkModal = false">
-        <div class="form-row"><label class="form-label">网络名称</label><input class="form-control" v-model="editingNetwork.name" :disabled="editingNetwork._name" title="用户定义网络名称" /></div>
-        <div class="form-row"><label class="form-label">IP 地址</label><input class="form-control" v-model="editingNetwork.address" title="IP 地址" /></div>
+      <DraggableModal v-model:visible="showNetworkModal" :title="editingNetwork && editingNetwork._name ? t('container.modal.editNetwork') : t('container.modal.addNetwork')" @confirm="saveNetwork" @close="showNetworkModal = false">
+        <div class="form-row"><label class="form-label">{{ t('container.form.networkName') }}</label><input class="form-control" v-model="editingNetwork.name" :disabled="editingNetwork._name" :title="t('container.form.networkNameHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.ipAddress') }}</label><input class="form-control" v-model="editingNetwork.address" :title="t('container.form.ipAddressHelp')" /></div>
       </DraggableModal>
 
       <!-- Port Modal -->
-      <DraggableModal v-model:visible="showPortModal" :title="editingPort && editingPort._name ? '编辑端口映射' : '添加端口映射'" @confirm="savePort" @close="showPortModal = false">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingPort.name" :disabled="editingPort._name" title="端口映射名称" /></div>
-        <div class="form-row"><label class="form-label">源端口</label><input class="form-control" type="number" min="1" max="65535" v-model="editingPort.source" title="源端口" /></div>
-        <div class="form-row"><label class="form-label">目标端口</label><input class="form-control" type="number" min="1" max="65535" v-model="editingPort.destination" title="目标端口" /></div>
-        <div class="form-row"><label class="form-label">协议</label>
-          <select class="form-control" v-model="editingPort.protocol" title="协议">
+      <DraggableModal v-model:visible="showPortModal" :title="editingPort && editingPort._name ? t('container.modal.editPort') : t('container.modal.addPort')" @confirm="savePort" @close="showPortModal = false">
+        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><input class="form-control" v-model="editingPort.name" :disabled="editingPort._name" :title="t('container.form.portNameHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.sourcePort') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="editingPort.source" :title="t('container.form.sourcePortHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.destinationPort') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="editingPort.destination" :title="t('container.form.destinationPortHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.protocol') }}</label>
+          <select class="form-control" v-model="editingPort.protocol" :title="t('container.form.protocolHelp')">
             <option value="tcp">TCP</option>
             <option value="udp">UDP</option>
           </select>
@@ -819,11 +814,11 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Volume Modal -->
-      <DraggableModal v-model:visible="showVolumeModal" :title="editingVolume && editingVolume._name ? '编辑卷挂载' : '添加卷挂载'" @confirm="saveVolume" @close="showVolumeModal = false">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingVolume.name" :disabled="editingVolume._name" title="卷名称" /></div>
-        <div class="form-row"><label class="form-label">源</label><input class="form-control" v-model="editingVolume.source" title="源卷路径" /></div>
-        <div class="form-row"><label class="form-label">目标</label><input class="form-control" v-model="editingVolume.destination" title="容器内挂载点" /></div>
-        <div class="form-row"><label class="form-label">只读</label><input type="checkbox" v-model="editingVolume.readonly" title="以只读方式挂载" /></div>
+      <DraggableModal v-model:visible="showVolumeModal" :title="editingVolume && editingVolume._name ? t('container.modal.editVolume') : t('container.modal.addVolume')" @confirm="saveVolume" @close="showVolumeModal = false">
+        <div class="form-row"><label class="form-label">{{ t('container.form.name') }}</label><input class="form-control" v-model="editingVolume.name" :disabled="editingVolume._name" :title="t('container.form.volumeNameHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.source') }}</label><input class="form-control" v-model="editingVolume.source" :title="t('container.form.sourceVolumeHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.destination') }}</label><input class="form-control" v-model="editingVolume.destination" :title="t('container.form.destinationMountHelp')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('container.form.readonly') }}</label><input type="checkbox" v-model="editingVolume.readonly" :title="t('container.form.readonlyHelp')" /></div>
       </DraggableModal>
     </div>
   `,

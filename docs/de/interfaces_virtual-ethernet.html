@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="virtual-ethernet">
+<h1>Virtual Ethernet</h1>
+<p>Virtual Ethernet (veth) interfaces are software-based interfaces that operate
+in pairs, creating a tunnel between each other. Traffic transmitted into one
+interface of the pair (e.g., <code class="docutils literal notranslate">veth0</code>) is delivered directly to its peer
+interface (e.g., <code class="docutils literal notranslate">veth1</code>).</p>
+<p>Veth interfaces are commonly used to connect network namespaces or VRFs, but
+they can also function as standalone virtual network interfaces.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Veth interfaces must be created in pairs, where each interface acts
+as the peer of the other.</p>
+</div>
+<section id="configuration">
+<h2>Konfiguration</h2>
+<section id="common-interface-configuration">
+<h3>Gemeinsame Schnittstellenkonfiguration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; address &lt;address | dhcp |  dhcpv6&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-address-address-dhcp-dhcpv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Schnittstelle mit einer oder mehreren IP-Adressen.</strong></p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><strong>address:</strong> Weisen Sie der Schnittstelle eine oder mehrere IPv4- oder IPv6-Adressen zu.
+Zum Beispiel verwenden Sie 192.0.2.1/24 für IPv4 oder 2001:db8::1/64 für IPv6.</p></li>
+<li><p><strong>dhcp:</strong> Die Schnittstelle erhält eine IPv4-Adresse von einem DHCP-Server im gleichen Netzsegment.</p></li>
+<li><p><strong>dhcpv6:</strong> Die Schnittstelle erhält eine IPv6-Adresse von einem DHCPv6-Server im gleichen Netzsegment.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Wenn die Schnittstelle eine IPv4-Adresse über DHCP erhält und spezifische Anpassungen vor/ nach Erhalt der IP-Adresse erforderlich sind, verwenden Sie die bereitgestellten Hook-Skripte:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/pre-hooks.d/</code></p></li>
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/post-hooks.d/</code></p></li>
+</ul>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 address 192.0.2.1/24
+set interfaces virtual-ethernet veth0 address 2001:db8::1/64
+set interfaces virtual-ethernet veth0 address dhcp
+set interfaces virtual-ethernet veth0 address dhcpv6
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine klare, beschreibende Alias für die Schnittstelle.</strong></p>
+<p>Dieser Alias erscheint im Befehl <code class="docutils literal notranslate">show interfaces</code> und in SNMP-basierten Überwachungstools.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="vlan">
+<h3>VLAN</h3>
+<section id="regular-vlans-802-1q">
+<h4>Reguläre VLANs (802.1q)</h4>
+<p>IEEE <a class="reference internal" href="#q">802.1q</a>, oft als Dot1q bezeichnet, ist der Industriestandard für
+die Implementierung von VLANs auf Ethernet-Netzwerken. Es definiert VLAN-Tags für
+Ethernet-Frames und legt Verfahren für Brücken und Switches fest. Der Standard
+enthält auch Qualitäts-of-Service-Priorisierung (IEEE 802.1p) und definiert das
+Generische Attributregistrierungsprotokoll.</p>
+<p>VLAN-konforme Netzsegments (d.h. IEEE <a class="reference internal" href="#q">802.1q</a> konform) verwenden VLAN-Tags.
+Wenn ein Frame in ein solches Segment eingeht, wird ein Tag hinzugefügt, um die VLAN-Zugehörigkeit anzugeben.
+Jeder Frame kann nur einem VLAN angehören. Wenn ein Frame ohne Tag eingeht, wird angenommen, dass er dem
+Standard-VLAN angehört.</p>
+<p>IEEE 802.1, ein Arbeitskreis der IEEE 802-Standardskommission, hat den Standard entwickelt und
+verfeinert ihn weiter. Eine bemerkenswerte Überarbeitung ist 802.1Q-2014, die IEEE 802.1aq (Shortest Path Bridging)
+und viel von IEEE 802.1d integriert.</p>
+<p>In VyOS werden 802.1q VLAN-Schnittstellen als virtuelle Subschnittstellen dargestellt, die als
+<code class="docutils literal notranslate">vif</code> bezeichnet werden.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; vif &lt;vlan-id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-vif-vlan-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine VLAN-Schnittstelle mit einer eindeutigen VLAN-ID.</strong></p>
+<p>VLAN-ID identifiziert ein bestimmtes VLAN und reicht von 0 bis 4094.</p>
+<p>Sie können mehrere VLAN-Schnittstellen auf einer physischen Schnittstelle konfigurieren.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Nur 802.1Q-getaggte Pakete werden auf Ethernet vifs akzeptiert.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; vif &lt;vlan-id&gt; address &lt;address | dhcp |  dhcpv6&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-vif-vlan-id-address-address-dhcp-dhcpv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Schnittstelle mit einer oder mehreren IP-Adressen.</strong></p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><strong>address:</strong> Weisen Sie der Schnittstelle eine oder mehrere IPv4- oder IPv6-Adressen zu.
+Zum Beispiel verwenden Sie 192.0.2.1/24 für IPv4 oder 2001:db8::1/64 für IPv6.</p></li>
+<li><p><strong>dhcp:</strong> Die Schnittstelle erhält eine IPv4-Adresse von einem DHCP-Server im gleichen Netzsegment.</p></li>
+<li><p><strong>dhcpv6:</strong> Die Schnittstelle erhält eine IPv6-Adresse von einem DHCPv6-Server im gleichen Netzsegment.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Wenn die Schnittstelle eine IPv4-Adresse über DHCP erhält und spezifische Anpassungen vor/ nach Erhalt der IP-Adresse erforderlich sind, verwenden Sie die bereitgestellten Hook-Skripte:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/pre-hooks.d/</code></p></li>
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/post-hooks.d/</code></p></li>
+</ul>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 address 192.0.2.1/24
+set interfaces virtual-ethernet veth0 vif 10 address 2001:db8::1/64
+set interfaces virtual-ethernet veth0 vif 10 address dhcp
+set interfaces virtual-ethernet veth0 vif 10 address dhcpv6
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; vif &lt;vlan-id&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-vif-vlan-id-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine klare, beschreibende Alias für die Schnittstelle.</strong></p>
+<p>Dieser Alias erscheint im Befehl <code class="docutils literal notranslate">show interfaces</code> und in SNMP-basierten Überwachungstools.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; vif &lt;vlan-id&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-vif-vlan-id-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie die Schnittstelle.</strong></p>
+<p>Die Schnittstelle wird auf den administrativ heruntergefahrenen Zustand (<code class="docutils literal notranslate">A/D</code>) gesetzt.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces virtual-ethernet veth0 vif 10 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces virtual-ethernet &lt;interface&gt; vif &lt;vlan-id&gt; disable-link-detect
+<a class="cmdlink" href="#cfgcmd-set-interfaces-virtual-ethernet-interface-vif-vlan-id-disable-link-detect" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie die Erkennung von physischen Linkzustandsänderungen auf dieserext:p>
+<a href="1>
+   =
+</1</code="1>
+</p>
+</1>
+   ="="br="1}
+</1</p>
+</code=">
+p>
+</1</p>
+</1"
+</code</=
+=
+   1>
+</code="1>
+</>
+199:
+1</code>
+code:
+span=">
+1>
+1:
+code1>
+1
+</2
+1
+</>
+code:
+code>
+1
+1
+</code
+</1
+</code
+"
+</code>
+1>
+code
+1
+</code="class="=">
+</code
+|
+</code>
+</span>
+1</code>
+$$1>
+1>
+1
+="
+</code>
+code>
+code>
+</=
+</code</span1</p>
+</body>
+</html>

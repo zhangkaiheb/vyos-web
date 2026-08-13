@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="zone-based-firewall">
+<h1>Firewall basé sur les zones</h1>
+<section id="overview">
+<h2>Aperçu</h2>
+<div class="admonition note">
+<p class="admonition-title">Remarque</p>
+<p>Toutes les versions de VyOS construites après le 22 octobre 2023 (VyOS 1.4 et 1.5) prennent en charge
+cette fonctionnalité.</p>
+</div>
+<p>Cette section fournit des informations sur la configuration du pare-feu pour le
+pare-feu basé sur les zones. Cette section couvre les commandes de configuration suivantes :</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone …
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone" title="Permalink to this Command"></a></div></div>
+<p>Pour en savoir plus sur le flux général du trafic dans les pare-feux VyOS,
+voir <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Pare-feu</a>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
+    * zone
+         - custom_zone_name
+            + ...
+</pre></div>
+</div>
+<p>Dans une politique basée sur les zones, vous attribuez des interfaces aux zones et appliquez une politique d'inspection
+au trafic se déplaçant entre les zones. Le pare-feu agit sur le trafic
+selon les règles. Une zone est un groupe d'interfaces ayant des fonctions ou des caractéristiques similaires.
+Elle établit les frontières de sécurité d'un réseau. Une zone définit une limite où le système soumet le trafic à des restrictions de politique
+lorsqu'il traverse vers une autre région du réseau.</p>
+<p>Points clés :</p>
+<ul class="simple">
+<li><p>Une zone doit être configurée avant d'attribuer une interface à celle-ci, et vous
+ne pouvez attribuer une interface qu'à une seule zone.</p></li>
+<li><p>Tout le trafic entrant et sortant d'une interface au sein d'une zone circule librement.</p></li>
+<li><p>Les politiques existantes affectent tout le trafic entre les zones.</p></li>
+<li><p>Le trafic ne peut pas circuler entre une interface membre d'une zone et toute interface qui
+n'est pas membre d'une zone.</p></li>
+<li><p>Vous devez définir 2 pare-feux distincts pour définir le trafic : un pour chaque
+direction.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Dans <a class="reference external" href="https://vyos.dev/T2199">T2199</a>, la syntaxe de la configuration de la zone a été modifiée.
+La configuration de la zone a été passée de <code class="docutils literal notranslate">zone-policy zone &lt;name&gt;</code> à
+<code class="docutils literal notranslate">firewall zone &lt;name&gt;</code>.</p>
+</div>
+</section>
+<section id="configuration">
+<h2>Configuration</h2>
+<p>En tant qu'alternative à l'application de la politique à une interface directement, vous pouvez
+créer un pare-feu basé sur les zones pour simplifier la configuration lorsqu'il y a plusieurs
+interfaces appartenant à la même zone de sécurité. Au lieu d'appliquer des jeux de règles
+aux interfaces, vous les appliquez aux paires source-destination de zones.</p>
+<p>Vous trouverez une introduction de base aux pare-feux basés sur les zones dans la
+<a class="reference external" href="https://support.vyos.io/en/kb/articles/a-primer-to-zone-based-firewall">Base de connaissances VyOS</a>,
+et un exemple à <a class="reference internal" href="../../configexamples/zone-policy.html#examples-zone-policy">Exemple de politique de zone</a>.</p>
+<p>Les étapes suivantes sont nécessaires pour créer un pare-feu basé sur les zones :</p>
+<ol class="arabic simple">
+<li><p>Définir à la fois les zones source et destination</p></li>
+<li><p>Définir le jeu de règles</p></li>
+<li><p>Appliquer le jeu de règles aux zones</p></li>
+</ol>
+<section id="define-a-zone">
+<h3>Définir une zone</h3>
+<p>Pour définir une zone, configurez soit une avec des interfaces, soit comme la zone locale.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;name&gt; interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Attribuez des interfaces en tant que membre d'une zone.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>Une interface ne peut être membre qu'une seule zone.</p></li>
+<li><p>Vous pouvez avoir plusieurs interfaces dans une zone. Le trafic entre
+les interfaces de la même zone suit la politique de filtrage inter-zone
+(autorisée par défaut).</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;name&gt; local-zone
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-local-zone" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définissez la zone comme la zone locale pour le trafic provenant ou destiné à la propre passerelle.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>Une zone locale ne peut pas avoir d'interfaces membres</p></li>
+<li><p>Vous ne pouvez pas avoir plusieurs zones locales</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;name&gt; default-action [drop | reject]
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-default-action-drop-reject" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Modifiez l'action par défaut de la zone, qui s'applique au trafic destiné à cette
+zone qui ne correspond à aucun des jeux de règles source appliqués.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;name&gt; default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-default-log" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Activez la journalisation des paquets correspondant à l'action par défaut de cette zone (désactivée
+par défaut).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;name&gt; description
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Ajoutez une description pertinente.</p>
+</div>
+</div>
+</section>
+<section id="defining-a-rule-set">
+<h3>Définition d'un jeu de règles</h3>
+<p>Les jeux de règles du pare-feu basé sur les zones définissent le trafic provenant d'une <em>zone source</em> vers une
+<em>zone de destination</em>.</p>
+<p>Vous créez des jeux de règles en tant que chaîne de pare-feu personnalisée en utilisant les commandes ci-dessous
+(référez-vous aux sections IPv4/IPv6 du pare-feu pour la syntaxe complète) :</p>
+<ul class="simple">
+<li><p>Pour <a class="reference internal" href="ipv4.html#firewall-ipv4-rules">IPv4</a> :
+<code class="docutils literal notranslate">set firewall ipv4 name &lt;name&gt; ...</code></p></li>
+<li><p>Pour <a class="reference internal" href="ipv6.html#firewall-ipv6-rules">IPv6</a> :
+<code class="docutils literal notranslate">set firewall ipv6 name &lt;name&gt; ...</code></p></li>
+</ul>
+<p>Il est utile de nommer les jeux de règles au format
+<code class="docutils literal notranslate">&lt;Source Zone&gt;-&lt;Destination Zone&gt;-&lt;v4 | v6&gt;</code> pour les rendre facilement identifiables.</p>
+</section>
+<section id="applying-a-rule-set-to-a-zone">
+<h3>Application d'un jeu de règles à une zone</h3>
+<p>Après avoir défini un jeu de règles, appliquez-le aux zones source et destination.
+La syntaxe de configuration s'ancrée à la zone de destination, avec chaque jeu de règles source listé contre la destination.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;Destination Zone&gt; from &lt;Source Zone&gt; firewall name &lt;ipv4-rule-set-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-from-source-zone-firewall-name-ipv4-rule-set-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;Destination Zone&gt; from &lt;Source Zone&gt; firewall ipv6-name &lt;ipv6-rule-set-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-from-source-zone-firewall-ipv6-name-ipv6-rule-set-name" title="Permalink to this Command"></a></div></div>
+<p>Vous devriez créer deux jeux de règles pour chaque paire de zones source-destination.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall zone DMZ from LAN firewall name LAN-DMZ-v4
+set firewall zone LAN from DMZ firewall name DMZ-LAN-v4
+</pre></div>
+</div>
+</section>
+<section id="applying-a-default-rule-set-to-a-zone">
+<h3>Application d'un jeu de règles par défaut à une zone</h3>
+<p>Lorsqu'une zone de destination partage un jeu de règles commun pour plusieurs zones sources,
+ou lorsque vous avez besoin d'un ensemble complexe de politiques par défaut, vous pouvez appliquer un
+jeu de règles par défaut optionnel. Le jeu de règles par défaut s'applique à toutes les zones qui ne
+disposent pas d'un jeu de règles configuré tel que défini dans
+<a class="reference internal" href="#applying-a-rule-set-to-a-zone">IPv4</a></p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;Destination Zone&gt; default-firewall name &lt;ipv4-rule-set-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-default-firewall-name-ipv4-rule-set-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone &lt;Destination Zone&gt; default-firewall ipv6-name &lt;ipv6-rule-set-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-default-firewall-ipv6-name-ipv6-rule-set-name" title="Permalink to this Command"></a></div></div>
+</section>
+</section>
+<section id="operation-mode">
+<h2>Mode d'opération</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall zone-policy
+<a class="cmdlink" href="#opcmd-show-firewall-zone-policy" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Affiche un résumé de base de la configuration de la zone.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show firewall zone-policy
+Zone    Interfaces    From Zone    Firewall IPv4    Firewall IPv6
+------  ------------  -----------  ---------------  ---------------
+LAN     eth1          WAN          WAN-LAN-v4
+eth2
+LOCAL   LOCAL         LAN          LAN-LOCAL-v4
+WAN          WAN-LOCAL-v4     WAN-LOCAL-v6
+WAN     eth3          LAN          LAN-WAN-v4
+eth0          LOCAL        LOCAL-WAN-v4
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall zone-policy zone &lt;zone&gt;
+<a class="cmdlink" href="#opcmd-show-firewall-zone-policy-zone-zone" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Affiche un résumé de base d'une zone particulière.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show firewall zone-policy zone WAN
+Zone    Interfaces    From Zone    Firewall IPv4    Firewall IPv6
+------  ------------  -----------  ---------------  ---------------
+WAN     eth3          LAN          LAN-WAN-v4
+eth0          LOCAL        LOCAL-WAN-v4
+vyos@vyos:~$ show firewall zone-policy zone LOCAL
+Zone    Interfaces    From Zone    Firewall IPv4    Firewall IPv6
+------  ------------  -----------  ---------------  ---------------
+LOCAL   LOCAL         LAN          LAN-LOCAL-v4
+WAN          WAN-LOCAL-v4     WAN-LOCAL-v6
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

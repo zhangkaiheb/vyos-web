@@ -1,0 +1,93 @@
+{
+  "zh-CN": {
+    "arp": {
+      "columns": {
+        "address": "地址",
+        "hwtype": "硬件类型",
+        "hwaddress": "MAC 地址",
+        "flags_mask": "标志掩码",
+        "iface": "接口"
+      },
+      "filterByInterface": "按接口过滤",
+      "allInterfaces": "全部接口"
+    }
+  },
+  "zh-TW": {
+    "arp": {
+      "columns": {
+        "address": "位址",
+        "hwtype": "硬體類型",
+        "hwaddress": "MAC 位址",
+        "flags_mask": "標誌遮罩",
+        "iface": "介面"
+      },
+      "filterByInterface": "依介面篩選",
+      "allInterfaces": "全部介面"
+    }
+  },
+  "en": {
+    "arp": {
+      "columns": {
+        "address": "Address",
+        "hwtype": "Hardware Type",
+        "hwaddress": "MAC Address",
+        "flags_mask": "Flags Mask",
+        "iface": "Interface"
+      },
+      "filterByInterface": "Filter by Interface",
+      "allInterfaces": "All Interfaces"
+    }
+  },
+  "ru": {
+    "arp": {
+      "columns": {
+        "address": "Адрес",
+        "hwtype": "Тип оборудования",
+        "hwaddress": "MAC-адрес",
+        "flags_mask": "Маска флагов",
+        "iface": "Интерфейс"
+      },
+      "filterByInterface": "Фильтр по интерфейсу",
+      "allInterfaces": "Все интерфейсы"
+    }
+  },
+  "de": {
+    "arp": {
+      "columns": {
+        "address": "Adresse",
+        "hwtype": "Hardwaretyp",
+        "hwaddress": "MAC-Adresse",
+        "flags_mask": "Flags-Maske",
+        "iface": "Schnittstelle"
+      },
+      "filterByInterface": "Nach Schnittstelle filtern",
+      "allInterfaces": "Alle Schnittstellen"
+    }
+  },
+  "fr": {
+    "arp": {
+      "columns": {
+        "address": "Adresse",
+        "hwtype": "Type de matériel",
+        "hwaddress": "Adresse MAC",
+        "flags_mask": "Masque de drapeaux",
+        "iface": "Interface"
+      },
+      "filterByInterface": "Filtrer par interface",
+      "allInterfaces": "Toutes les interfaces"
+    }
+  },
+  "ko": {
+    "arp": {
+      "columns": {
+        "address": "주소",
+        "hwtype": "하드웨어 유형",
+        "hwaddress": "MAC 주소",
+        "flags_mask": "플래그 마스크",
+        "iface": "인터페이스"
+      },
+      "filterByInterface": "인터페이스별 필터링",
+      "allInterfaces": "모든 인터페이스"
+    }
+  }
+}

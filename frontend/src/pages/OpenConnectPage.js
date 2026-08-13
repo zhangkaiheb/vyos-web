@@ -8,6 +8,7 @@ import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -31,10 +32,10 @@ export default defineComponent({
   name: 'OpenConnectPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
+    const { t } = useI18n();
     const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
     const config = ref({
       listen_address: '',
       listen_ports: { tcp: '443', udp: '443' },
@@ -71,18 +72,18 @@ export default defineComponent({
     const activeTab = ref('basic');
 
     const userColumns = [
-      { key: 'username', title: '用户名', dataIndex: 'username', width: 150 },
-      { key: 'password', title: '密码', dataIndex: 'password', width: 150 },
+      { key: 'username', title: t('openconnect.columns.username'), dataIndex: 'username', width: 150 },
+      { key: 'password', title: t('openconnect.columns.password'), dataIndex: 'password', width: 150 },
       { key: 'otp', title: 'OTP', dataIndex: 'otp', width: 80 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'actions', title: t('openconnect.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const radiusServerColumns = [
-      { key: 'address', title: '地址', dataIndex: 'address', width: 150 },
-      { key: 'key', title: '密钥', dataIndex: 'key', width: 150 },
-      { key: 'port', title: '端口', dataIndex: 'port', width: 80 },
-      { key: 'disable', title: '禁用', dataIndex: 'disable', width: 60 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'address', title: t('openconnect.columns.address'), dataIndex: 'address', width: 150 },
+      { key: 'key', title: t('openconnect.columns.key'), dataIndex: 'key', width: 150 },
+      { key: 'port', title: t('openconnect.columns.port'), dataIndex: 'port', width: 80 },
+      { key: 'disable', title: t('openconnect.columns.disable'), dataIndex: 'disable', width: 60 },
+      { key: 'actions', title: t('openconnect.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
     const selectedUsers = ref([]);
@@ -273,12 +274,11 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('vpn openconnect', true);
         config.value = openconnectToForm(res.data || {});
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('openconnect.errors.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -289,11 +289,10 @@ export default defineComponent({
       try {
         const payload = formToOpenconnect(config.value);
         await configApi.set('vpn openconnect', payload);
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('openconnect.errors.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -305,21 +304,21 @@ export default defineComponent({
     }
 
     function editUser() {
-      if (!selectedUsers.value.length) return alert('请选择要编辑的用户');
+      if (!selectedUsers.value.length) return showError({ message: t('openconnect.errors.selectUserToEdit') });
       const row = config.value.authentication.local_users.find(u => u.username === selectedUsers.value[0]);
-      if (!row) return alert('未找到选中的用户');
+      if (!row) return showError({ message: t('openconnect.errors.userNotFound') });
       editingUser.value = JSON.parse(JSON.stringify(row));
       showUserModal.value = true;
     }
 
     function removeUser() {
-      if (!selectedUsers.value.length) return alert('请选择要删除的用户');
+      if (!selectedUsers.value.length) return showError({ message: t('openconnect.errors.selectUserToDelete') });
       config.value.authentication.local_users = config.value.authentication.local_users.filter(u => u.username !== selectedUsers.value[0]);
       selectedUsers.value = [];
     }
 
     function saveUser() {
-      if (!editingUser.value.username) return alert('请输入用户名');
+      if (!editingUser.value.username) return showError({ message: t('openconnect.errors.usernameRequired') });
       const list = config.value.authentication.local_users;
       const idx = list.findIndex(u => u._username === editingUser.value._username);
       if (idx >= 0) list.splice(idx, 1, { ...editingUser.value });
@@ -334,21 +333,21 @@ export default defineComponent({
     }
 
     function editRadiusServer() {
-      if (!selectedRadiusServers.value.length) return alert('请选择要编辑的服务器');
+      if (!selectedRadiusServers.value.length) return showError({ message: t('openconnect.errors.selectServerToEdit') });
       const row = config.value.authentication.radius.servers.find(s => s.address === selectedRadiusServers.value[0]);
-      if (!row) return alert('未找到选中的服务器');
+      if (!row) return showError({ message: t('openconnect.errors.serverNotFound') });
       editingRadiusServer.value = JSON.parse(JSON.stringify(row));
       showRadiusModal.value = true;
     }
 
     function removeRadiusServer() {
-      if (!selectedRadiusServers.value.length) return alert('请选择要删除的服务器');
+      if (!selectedRadiusServers.value.length) return showError({ message: t('openconnect.errors.selectServerToDelete') });
       config.value.authentication.radius.servers = config.value.authentication.radius.servers.filter(s => s.address !== selectedRadiusServers.value[0]);
       selectedRadiusServers.value = [];
     }
 
     function saveRadiusServer() {
-      if (!editingRadiusServer.value.address) return alert('请输入服务器地址');
+      if (!editingRadiusServer.value.address) return showError({ message: t('openconnect.errors.serverAddressRequired') });
       const list = config.value.authentication.radius.servers;
       const idx = list.findIndex(s => s._address === editingRadiusServer.value._address);
       if (idx >= 0) list.splice(idx, 1, { ...editingRadiusServer.value });
@@ -381,7 +380,7 @@ export default defineComponent({
     });
 
     return {
-      loading, saving, saved, config, activeTab, commandPath,
+      t, loading, saving, config, activeTab, commandPath,
       userColumns, radiusServerColumns,
       selectedUsers, selectedRadiusServers,
       showUserModal, editingUser, showRadiusModal, editingRadiusServer,
@@ -392,53 +391,52 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本' },
-        { key: 'listen', title: '监听' },
+        { key: 'basic', title: t('openconnect.tabs.basic') },
+        { key: 'listen', title: t('openconnect.tabs.listen') },
         { key: 'ssl', title: 'SSL' },
-        { key: 'auth', title: '认证' },
-        { key: 'network', title: '网络设置' }
+        { key: 'auth', title: t('openconnect.tabs.auth') },
+        { key: 'network', title: t('openconnect.tabs.network') }
       ]">
 
       <template #basic>
-        <div class="form-row"><label class="form-label">TLS 最低版本</label>
-          <select class="form-control" v-model="config.tls_version_min" title="最低 TLS 版本，默认 1.2">
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.tlsVersionMin') }}</label>
+          <select class="form-control" v-model="config.tls_version_min" :title="t('openconnect.tips.tlsVersionMin')">
             <option value="1.0">TLS 1.0</option>
             <option value="1.1">TLS 1.1</option>
-            <option value="1.2">TLS 1.2 (默认)</option>
+            <option value="1.2">TLS 1.2 ({{ t('openconnect.options.default') }})</option>
             <option value="1.3">TLS 1.3</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">HTTP 安全头</label><input type="checkbox" v-model="config.http_security_headers" title="启用 HTTP 安全响应头" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.httpSecurityHeaders') }}</label><input type="checkbox" v-model="config.http_security_headers" :title="t('openconnect.tips.httpSecurityHeaders')" /></div>
       </template>
 
       <template #listen>
-        <div class="form-row"><label class="form-label">监听地址</label><input class="form-control" v-model="config.listen_address" placeholder="x.x.x.x" title="监听连接的 IPv4 地址" /></div>
-        <div class="form-row"><label class="form-label">TCP 端口</label><input class="form-control" type="number" min="1" max="65535" v-model="config.listen_ports.tcp" title="TCP 监听端口，默认 443" /></div>
-        <div class="form-row"><label class="form-label">UDP 端口</label><input class="form-control" type="number" min="1" max="65535" v-model="config.listen_ports.udp" title="UDP 监听端口，默认 443" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.listenAddress') }}</label><input class="form-control" v-model="config.listen_address" placeholder="x.x.x.x" :title="t('openconnect.tips.listenAddress')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.tcpPort') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="config.listen_ports.tcp" :title="t('openconnect.tips.tcpPort')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.udpPort') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="config.listen_ports.udp" :title="t('openconnect.tips.udpPort')" /></div>
       </template>
 
       <template #ssl>
-        <div class="form-row"><label class="form-label">CA 证书</label><input class="form-control" v-model="config.ssl.ca_certificate" title="PKI 配置中的 CA 证书链" /></div>
-        <div class="form-row"><label class="form-label">证书</label><input class="form-control" v-model="config.ssl.certificate" title="PKI 配置中的证书名称" /></div>
-        <div class="form-row"><label class="form-label">密码短语</label><input class="form-control" v-model="config.ssl.passphrase" title="私钥解密密码短语" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.caCertificate') }}</label><input class="form-control" v-model="config.ssl.ca_certificate" :title="t('openconnect.tips.caCertificate')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.certificate') }}</label><input class="form-control" v-model="config.ssl.certificate" :title="t('openconnect.tips.certificate')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.passphrase') }}</label><input class="form-control" v-model="config.ssl.passphrase" :title="t('openconnect.tips.passphrase')" /></div>
       </template>
 
       <template #auth>
-        <div class="form-row"><label class="form-label">认证模式</label>
-          <select class="form-control" v-model="config.authentication.mode" title="认证模式">
-            <option value="">未选择</option>
-            <option value="certificate">证书认证</option>
-            <option value="local">本地用户认证</option>
-            <option value="radius">RADIUS 认证</option>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.authMode') }}</label>
+          <select class="form-control" v-model="config.authentication.mode" :title="t('openconnect.tips.authMode')">
+            <option value="">{{ t('openconnect.options.none') }}</option>
+            <option value="certificate">{{ t('openconnect.options.certificateAuth') }}</option>
+            <option value="local">{{ t('openconnect.options.localAuth') }}</option>
+            <option value="radius">{{ t('openconnect.options.radiusAuth') }}</option>
           </select>
         </div>
 
         <div v-if="config.authentication.mode === 'certificate'">
-          <div class="form-row"><label class="form-label">用户标识字段</label>
-            <select class="form-control" v-model="config.authentication.certificate_user_identifier_field" title="证书中用于标识用户的字段">
-              <option value="">未选择</option>
+          <div class="form-row"><label class="form-label">{{ t('openconnect.labels.userIdentifierField') }}</label>
+            <select class="form-control" v-model="config.authentication.certificate_user_identifier_field" :title="t('openconnect.tips.userIdentifierField')">
+              <option value="">{{ t('openconnect.options.none') }}</option>
               <option value="cn">CN (Common Name)</option>
               <option value="uid">UID</option>
             </select>
@@ -446,105 +444,101 @@ export default defineComponent({
         </div>
 
         <div v-if="config.authentication.mode === 'local' || config.authentication.mode === ''">
-          <div style="font-weight:bold;margin:16px 0 8px;">本地用户</div>
+          <div style="font-weight:bold;margin:16px 0 8px;">{{ t('openconnect.sections.localUsers') }}</div>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createUser">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editUser" :disabled="!selectedUsers.length || selectedUsers.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeUser" :disabled="!selectedUsers.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createUser">{{ t('openconnect.buttons.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editUser" :disabled="!selectedUsers.length || selectedUsers.length > 1">{{ t('openconnect.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeUser" :disabled="!selectedUsers.length">{{ t('openconnect.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="userColumns" :data="config.authentication.local_users" rowKey="username" :externalToolbar="true" @selection-change="selectedUsers = $event" :selectable="true">
             <template #bodyCell="{ column, record }">
               <template v-if="column.key === 'actions'">
-                <a @click="editUserByRecord(record)" style="margin-right:8px">编辑</a>
-                <a @click="removeUserByRecord(record)" style="color:#ff4d4f">删除</a>
+                <a @click="editUserByRecord(record)" style="margin-right:8px">{{ t('openconnect.buttons.edit') }}</a>
+                <a @click="removeUserByRecord(record)" style="color:#ff4d4f">{{ t('openconnect.buttons.delete') }}</a>
               </template>
             </template>
           </DataTable>
         </div>
 
         <div v-if="config.authentication.mode === 'radius'">
-          <div class="form-row"><label class="form-label">组配置</label><input class="form-control" v-model="config.authentication.radius.groupconfig" title="RADIUS 组配置覆盖" /></div>
-          <div class="form-row"><label class="form-label">源地址</label><input class="form-control" v-model="config.authentication.radius.source_address" placeholder="x.x.x.x" title="发起连接的 IPv4 源地址" /></div>
-          <div class="form-row"><label class="form-label">超时</label><input class="form-control" type="number" min="1" max="240" v-model="config.authentication.radius.timeout" title="会话超时，默认 2" /></div>
+          <div class="form-row"><label class="form-label">{{ t('openconnect.labels.groupConfig') }}</label><input class="form-control" v-model="config.authentication.radius.groupconfig" :title="t('openconnect.tips.groupConfig')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('openconnect.labels.sourceAddress') }}</label><input class="form-control" v-model="config.authentication.radius.source_address" placeholder="x.x.x.x" :title="t('openconnect.tips.sourceAddress')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('openconnect.labels.timeout') }}</label><input class="form-control" type="number" min="1" max="240" v-model="config.authentication.radius.timeout" :title="t('openconnect.tips.timeout')" /></div>
 
-          <div style="font-weight:bold;margin:16px 0 8px;">RADIUS 服务器</div>
+          <div style="font-weight:bold;margin:16px 0 8px;">{{ t('openconnect.sections.radiusServers') }}</div>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createRadiusServer">添加</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editRadiusServer" :disabled="!selectedRadiusServers.length || selectedRadiusServers.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeRadiusServer" :disabled="!selectedRadiusServers.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createRadiusServer">{{ t('openconnect.buttons.add') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editRadiusServer" :disabled="!selectedRadiusServers.length || selectedRadiusServers.length > 1">{{ t('openconnect.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeRadiusServer" :disabled="!selectedRadiusServers.length">{{ t('openconnect.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="radiusServerColumns" :data="config.authentication.radius.servers" rowKey="address" :externalToolbar="true" @selection-change="selectedRadiusServers = $event" :selectable="true">
             <template #bodyCell="{ column, record }">
               <template v-if="column.key === 'actions'">
-                <a @click="editRadiusByRecord(record)" style="margin-right:8px">编辑</a>
-                <a @click="removeRadiusByRecord(record)" style="color:#ff4d4f">删除</a>
+                <a @click="editRadiusByRecord(record)" style="margin-right:8px">{{ t('openconnect.buttons.edit') }}</a>
+                <a @click="removeRadiusByRecord(record)" style="color:#ff4d4f">{{ t('openconnect.buttons.delete') }}</a>
               </template>
             </template>
           </DataTable>
         </div>
 
-        <div style="font-weight:bold;margin:16px 0 8px;">基于身份的配置</div>
-        <div class="form-row"><label class="form-label">默认配置</label><input class="form-control" v-model="config.authentication.identity_based_config.default_config" title="默认配置文件名，必须在 /config/auth 下" /></div>
-        <div class="form-row"><label class="form-label">配置目录</label><input class="form-control" v-model="config.authentication.identity_based_config.directory" title="配置文件目录，必须在 /config/auth 下" /></div>
-        <div class="form-row"><label class="form-label">模式</label>
-          <select class="form-control" v-model="config.authentication.identity_based_config.mode" title="配置文件匹配模式">
-            <option value="">未选择</option>
-            <option value="user">按用户名匹配</option>
-            <option value="group">按 RADIUS 组属性匹配</option>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('openconnect.sections.identityBasedConfig') }}</div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.defaultConfig') }}</label><input class="form-control" v-model="config.authentication.identity_based_config.default_config" :title="t('openconnect.tips.defaultConfig')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.configDirectory') }}</label><input class="form-control" v-model="config.authentication.identity_based_config.directory" :title="t('openconnect.tips.configDirectory')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.mode') }}</label>
+          <select class="form-control" v-model="config.authentication.identity_based_config.mode" :title="t('openconnect.tips.mode')">
+            <option value="">{{ t('openconnect.options.none') }}</option>
+            <option value="user">{{ t('openconnect.options.matchByUsername') }}</option>
+            <option value="group">{{ t('openconnect.options.matchByRadiusGroup') }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="config.authentication.identity_based_config.disable" title="禁用基于身份的配置" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.disable') }}</label><input type="checkbox" v-model="config.authentication.identity_based_config.disable" :title="t('openconnect.tips.disableIdentityBasedConfig')" /></div>
       </template>
 
       <template #network>
-        <div style="font-weight:bold;margin-bottom:8px;">客户端 IP 设置</div>
-        <div class="form-row"><label class="form-label">子网</label><input class="form-control" v-model="config.network_settings.client_ip_subnet" placeholder="x.x.x.x/x" title="客户端 IP 子网（CIDR）" /></div>
+        <div style="font-weight:bold;margin-bottom:8px;">{{ t('openconnect.sections.clientIpSettings') }}</div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.subnet') }}</label><input class="form-control" v-model="config.network_settings.client_ip_subnet" placeholder="x.x.x.x/x" :title="t('openconnect.tips.subnet')" /></div>
 
-        <div style="font-weight:bold;margin:16px 0 8px;">客户端 IPv6 池</div>
-        <div class="form-row"><label class="form-label">前缀</label><input class="form-control" v-model="config.network_settings.client_ipv6_pool.prefix" placeholder="h:h:h:h:h:h:h:h/x" title="分配给客户端的 IPv6 地址池" /></div>
-        <div class="form-row"><label class="form-label">掩码长度</label><input class="form-control" type="number" min="48" max="128" v-model="config.network_settings.client_ipv6_pool.mask" title="单个客户端前缀长度，默认 64" /></div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('openconnect.sections.clientIpv6Pool') }}</div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.prefix') }}</label><input class="form-control" v-model="config.network_settings.client_ipv6_pool.prefix" placeholder="h:h:h:h:h:h:h:h/x" :title="t('openconnect.tips.prefix')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.maskLength') }}</label><input class="form-control" type="number" min="48" max="128" v-model="config.network_settings.client_ipv6_pool.mask" :title="t('openconnect.tips.maskLength')" /></div>
 
-        <div style="font-weight:bold;margin:16px 0 8px;">DNS 设置</div>
-        <div class="form-row"><label class="form-label">DNS 服务器</label><textarea class="form-control" v-model="config.network_settings.name_servers" rows="3" placeholder="每行一个 DNS 地址" title="域名服务器地址" /></div>
-        <div class="form-row"><label class="form-label">推送路由</label><textarea class="form-control" v-model="config.network_settings.push_routes" rows="3" placeholder="每行一个路由，如 10.0.0.0/8" title="推送给客户端的路由" /></div>
-        <div class="form-row"><label class="form-label">分离 DNS</label><textarea class="form-control" v-model="config.network_settings.split_dns" rows="3" placeholder="每行一个域名" title="使用 VPN DNS 的域名" /></div>
-        <div class="form-row"><label class="form-label">隧道所有 DNS</label><input type="checkbox" v-model="config.network_settings.tunnel_all_dns" title="将所有 DNS 查询通过 VPN 隧道" /></div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('openconnect.sections.dnsSettings') }}</div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.dnsServer') }}</label><textarea class="form-control" v-model="config.network_settings.name_servers" rows="3" :placeholder="t('openconnect.placeholders.dnsServer')" :title="t('openconnect.tips.dnsServer')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.pushRoutes') }}</label><textarea class="form-control" v-model="config.network_settings.push_routes" rows="3" :placeholder="t('openconnect.placeholders.pushRoutes')" :title="t('openconnect.tips.pushRoutes')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.splitDns') }}</label><textarea class="form-control" v-model="config.network_settings.split_dns" rows="3" :placeholder="t('openconnect.placeholders.splitDns')" :title="t('openconnect.tips.splitDns')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.tunnelAllDns') }}</label><input type="checkbox" v-model="config.network_settings.tunnel_all_dns" :title="t('openconnect.tips.tunnelAllDns')" /></div>
       </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="showUserModal" :title="editingUser && editingUser._username ? '编辑本地用户' : '新建本地用户'" @confirm="saveUser" @close="showUserModal = false" width="600px">
-        <div class="form-row"><label class="form-label">用户名</label><input class="form-control" v-model="editingUser.username" :disabled="editingUser._username" title="认证用户名" /></div>
-        <div class="form-row"><label class="form-label">密码</label><input class="form-control" type="password" v-model="editingUser.password" title="认证密码" /></div>
-        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingUser.disable" title="禁用该用户" /></div>
-        <div class="form-row"><label class="form-label">启用 OTP</label><input type="checkbox" v-model="editingUser.has_otp" title="启用双因素 OTP 认证" /></div>
+      <DraggableModal v-model:visible="showUserModal" :title="editingUser && editingUser._username ? t('openconnect.modals.editUser') : t('openconnect.modals.createUser')" @confirm="saveUser" @close="showUserModal = false" width="600px">
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.username') }}</label><input class="form-control" v-model="editingUser.username" :disabled="editingUser._username" :title="t('openconnect.tips.username')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.password') }}</label><input class="form-control" type="password" v-model="editingUser.password" :title="t('openconnect.tips.password')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.disable') }}</label><input type="checkbox" v-model="editingUser.disable" :title="t('openconnect.tips.disableUser')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.enableOtp') }}</label><input type="checkbox" v-model="editingUser.has_otp" :title="t('openconnect.tips.enableOtp')" /></div>
         <div v-if="editingUser.has_otp">
-          <div class="form-row"><label class="form-label">OTP 密钥</label><input class="form-control" v-model="editingUser.otp.key" title="OTP 密钥（十六进制）" /></div>
-          <div class="form-row"><label class="form-label">OTP 长度</label>
-            <select class="form-control" v-model="editingUser.otp.otp_length" title="OTP 代码位数，默认 6">
+          <div class="form-row"><label class="form-label">{{ t('openconnect.labels.otpKey') }}</label><input class="form-control" v-model="editingUser.otp.key" :title="t('openconnect.tips.otpKey')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('openconnect.labels.otpLength') }}</label>
+            <select class="form-control" v-model="editingUser.otp.otp_length" :title="t('openconnect.tips.otpLength')">
               <option value="6">6</option>
               <option value="7">7</option>
               <option value="8">8</option>
             </select>
           </div>
-          <div class="form-row"><label class="form-label">令牌间隔</label><input class="form-control" type="number" min="5" max="86400" v-model="editingUser.otp.interval" title="令牌间隔（秒），默认 30" /></div>
-          <div class="form-row"><label class="form-label">令牌类型</label>
-            <select class="form-control" v-model="editingUser.otp.token_type" title="令牌类型">
-              <option value="hotp-time">基于时间 (HOTP-Time)</option>
-              <option value="hotp-event">基于事件 (HOTP-Event)</option>
+          <div class="form-row"><label class="form-label">{{ t('openconnect.labels.tokenInterval') }}</label><input class="form-control" type="number" min="5" max="86400" v-model="editingUser.otp.interval" :title="t('openconnect.tips.tokenInterval')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('openconnect.labels.tokenType') }}</label>
+            <select class="form-control" v-model="editingUser.otp.token_type" :title="t('openconnect.tips.tokenType')">
+              <option value="hotp-time">{{ t('openconnect.options.hotpTime') }}</option>
+              <option value="hotp-event">{{ t('openconnect.options.hotpEvent') }}</option>
             </select>
           </div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showRadiusModal" :title="editingRadiusServer && editingRadiusServer._address ? '编辑 RADIUS 服务器' : '添加 RADIUS 服务器'" @confirm="saveRadiusServer" @close="showRadiusModal = false">
-        <div class="form-row"><label class="form-label">地址</label><input class="form-control" v-model="editingRadiusServer.address" :disabled="editingRadiusServer._address" placeholder="x.x.x.x" title="RADIUS 服务器 IPv4 地址" /></div>
-        <div class="form-row"><label class="form-label">共享密钥</label><input class="form-control" v-model="editingRadiusServer.key" title="共享密钥" /></div>
-        <div class="form-row"><label class="form-label">端口</label><input class="form-control" type="number" min="1" max="65535" v-model="editingRadiusServer.port" title="端口，默认 1812" /></div>
-        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingRadiusServer.disable" title="禁用该服务器" /></div>
+      <DraggableModal v-model:visible="showRadiusModal" :title="editingRadiusServer && editingRadiusServer._address ? t('openconnect.modals.editRadiusServer') : t('openconnect.modals.addRadiusServer')" @confirm="saveRadiusServer" @close="showRadiusModal = false">
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.address') }}</label><input class="form-control" v-model="editingRadiusServer.address" :disabled="editingRadiusServer._address" placeholder="x.x.x.x" :title="t('openconnect.tips.radiusServerAddress')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.sharedKey') }}</label><input class="form-control" v-model="editingRadiusServer.key" :title="t('openconnect.tips.sharedKey')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.port') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="editingRadiusServer.port" :title="t('openconnect.tips.radiusPort')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.disable') }}</label><input type="checkbox" v-model="editingRadiusServer.disable" :title="t('openconnect.tips.disableServer')" /></div>
       </DraggableModal>
     </div>
   `,

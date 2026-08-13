@@ -1,0 +1,2366 @@
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="is-is">
+<h1>IS-IS</h1>
+<p>Intermediate System-to-Intermediate System (IS-IS) is a link-state
+<abbr title="Interior Gateway Protocol">IGP</abbr> described in ISO/IEC 10589,
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc1195">RFC 1195</a>, and
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5308">RFC 5308</a>. It uses
+Dijkstra’s <abbr title="Shortest Path First">SPF</abbr> algorithm to build a network
+topology database (<abbr title="Link State Database">LSDB</abbr>) and compute the
+shortest path to each destination.</p>
+<p>In an IS-IS network, routers are called Intermediate Systems (ISs). They
+exchange topology information with directly connected neighbors via the
+IS-IS protocol, whose PDUs are carried directly in Layer 2 frames rather
+than over IP. IS-IS routers are identified by a
+<abbr title="Network Entity Title">NET</abbr>, which ranges from 8 to 20 bytes
+(typically 10 bytes).</p>
+<section id="is-is-vs-ospf">
+<h2>IS-IS vs OSPF</h2>
+<p>IS-IS builds an LSDB from link-state information flooded by other routers
+and computes routing paths using Dijkstra’s algorithm, just like OSPF.
+Because both protocols share the same link-state architecture, they make
+nearly identical path-selection decisions. Given the similarities between
+IS-IS and OSPF, comparing their routing behaviors is an effective way to
+understand how a network will respond with either IGP.</p>
+</section>
+<section id="configuration">
+<h2>Configuration</h2>
+<section id="mandatory-settings">
+<h3>Mandatory settings</h3>
+<p>Each IS-IS router must be configured with a unique NET, the
+<abbr title="Connectionless Network Service">CLNS</abbr> equivalent of a Router ID.
+The 6-byte system identifier portion of the NET must be unique across the
+IS-IS routing domain.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis net <network-entity-title>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-net-network-entity-title" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the Network Entity Title (NET) for the router.</strong></p>
+<p>A typical NET looks like <code class="docutils literal notranslate">49.0001.1921.6800.1002.00</code>.</p>
+<p>The NET consists of the following parts:</p>
+<ul class="simple">
+<li><p><abbr title="Authority and Format Identifier">AFI</abbr> (<code class="docutils literal notranslate">49</code>): IS-IS
+conventionally uses AFI value 49 for private addressing.</p></li>
+<li><p>Area identifier (<code class="docutils literal notranslate">0001</code>): The area number within the IS-IS routing
+domain (in this example, Area 1).</p></li>
+<li><p>System identifier (<code class="docutils literal notranslate">1921.6800.1002</code>): Uniquely identifies the router
+within the IS-IS routing domain. We recommend deriving this value from
+the router IP address or MAC address. To construct the system identifier
+from an IPv4 address (for example, <code class="docutils literal notranslate">192.168.1.2</code>):</p>
+<ul>
+<li><p>Pad each octet with leading zeros: <code class="docutils literal notranslate">192.168.1.2</code> → <code class="docutils literal notranslate">192.168.001.002</code>.</p></li>
+<li><p>Regroup the digits into three 4-digit blocks: <code class="docutils literal notranslate">192.168.001.002</code> →
+<code class="docutils literal notranslate">1921.6800.1002</code>.</p></li>
+</ul>
+</li>
+<li><p>NET selector (<code class="docutils literal notranslate">00</code>): Must always be <code class="docutils literal notranslate">00</code> to indicate the local system.</p></li>
+</ul>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis net 49.0001.1921.6800.1002.00
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable IS-IS on the specified interface.</strong></p>
+<p>This enables the router to form adjacencies with directly connected peers.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth0
+</pre></div>
+</div>
+</section>
+<section id="is-is-global-configuration">
+<h3>IS-IS global configuration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis dynamic-hostname
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-dynamic-hostname" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable Dynamic Hostname <abbr title="Type-Length-Value">TLV</abbr> support on the
+router (<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5301">RFC 5301</a>).</strong></p>
+<p>This enables the router to include its human-readable system name
+alongside its System ID in IS-IS advertisements for easier peer
+identification.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis dynamic-hostname
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis level <level-1 | level-1-2 | level-2>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-level-level-1-level-1-2-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IS-IS level at which the router operates:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">level-1</code>: Participates exclusively in Level-1 (intra-area) routing.</p></li>
+<li><p><code class="docutils literal notranslate">level-1-2</code>: Participates in both Level-1 (intra-area) and Level-2
+(inter-area) routing.</p></li>
+<li><p><code class="docutils literal notranslate">level-2</code>: Participates exclusively in Level-2 (inter-area) routing.</p></li>
+</ul>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis level level-1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis lsp-mtu <128-4352>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-lsp-mtu-128-4352" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the <abbr title="Maximum Transmission Unit">MTU</abbr> size, in bytes,
+for originating or receiving IS-IS <abbr title="Link State PDUs">LSPs</abbr>.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis lsp-mtu 1400
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis metric-style <narrow | transition | wide>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-metric-style-narrow-transition-wide" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the TLV format (metric style) the router uses when originating
+or processing IS-IS LSPs:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">narrow</code>: Originates and processes only the original ISO/IEC 10589 TLVs.</p></li>
+<li><p><code class="docutils literal notranslate">transition</code>: Originates and processes both narrow and wide TLV formats.</p></li>
+<li><p><code class="docutils literal notranslate">wide</code>: Originates and processes only extended TLVs.</p></li>
+</ul>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis metric-style wide
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis purge-originator
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-purge-originator" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable <abbr title="Purge Originator Identification">POI</abbr>
+(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6232">RFC 6232</a>) for IS-IS
+purges triggered by the router.</strong></p>
+<p>When enabled, the router includes the POI TLV with its System ID in each
+purge it triggers. This identifies which
+<abbr title="Intermediate System">IS</abbr> triggered the purge.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis purge-originator
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis set-attached-bit
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-set-attached-bit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the L1/L2 IS-IS router to set the ATT (Attached) bit in the
+Level-1 LSPs it originates
+(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc3787">RFC 3787</a>).</strong></p>
+<p>This signals to pure Level-1 routers that this L1/L2 router has Level-2
+reachability.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis set-attached-bit
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis set-overload-bit
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-set-overload-bit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the router to set the OL (LSP Database Overload) bit in LSPs
+it originates (<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc3787">RFC 3787</a>).</strong></p>
+<p>When configured, other IS-IS routers stop sending transit traffic through
+this router but can still reach its directly connected networks.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis set-overload-bit
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis advertise-high-metrics
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-advertise-high-metrics" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the router to advertise a high metric value on all of its IS-IS
+interfaces, regardless of the metric configured on each interface.</strong></p>
+<p>The advertised value depends on the metric style: 63 for <code class="docutils literal notranslate">narrow</code>, 16777215
+for <code class="docutils literal notranslate">wide</code>, and 62 for <code class="docutils literal notranslate">transition</code>.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis advertise-high-metrics
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis advertise-passive-only
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-advertise-passive-only" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the router to advertise in its LSPs only the IP prefixes of
+passive interfaces.</strong></p>
+<p>Prefixes of non-passive interfaces are not advertised, but those interfaces
+are still used to form adjacencies and participate in SPF.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis advertise-passive-only
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis log-adjacency-changes
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-log-adjacency-changes" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the router to log IS-IS adjacency state changes to syslog.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis log-adjacency-changes
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis topology <ipv4-multicast | ipv4-mgmt | ipv6-unicast | ipv6-multicast | ipv6-mgmt | ipv6-dstsrc>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-topology-ipv4-multicast-ipv4-mgmt-ipv6-unicast-ipv6-multicast-ipv6-mgmt-ipv6-dstsrc" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable an additional IS-IS Multi-Topology for the router:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">ipv4-multicast</code>: IPv4 multicast topology (MT 3).</p></li>
+<li><p><code class="docutils literal notranslate">ipv4-mgmt</code>: IPv4 management topology (MT 1).</p></li>
+<li><p><code class="docutils literal notranslate">ipv6-unicast</code>: IPv6 unicast topology (MT 2).</p></li>
+<li><p><code class="docutils literal notranslate">ipv6-multicast</code>: IPv6 multicast topology (MT 4).</p></li>
+<li><p><code class="docutils literal notranslate">ipv6-mgmt</code>: IPv6 management topology (MT 5).</p></li>
+<li><p><code class="docutils literal notranslate">ipv6-dstsrc</code>: IPv6 destination/source routing topology.</p></li>
+</ul>
+<p>The default IPv4-unicast topology (MT 0) is always present and does not
+need to be explicitly configured.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis topology ipv6-unicast
+</pre></div>
+</div>
+<section id="authentication">
+<h4>Authentication</h4>
+<p>IS-IS supports two protocol-wide passwords:</p>
+<ul class="simple">
+<li><p><strong>area-password</strong>: applied to Level-1 LSPs/SNPs (within the area).</p></li>
+<li><p><strong>domain-password</strong>: applied to Level-2 LSPs/SNPs (across the Level-2
+backbone).</p></li>
+</ul>
+<p>These are distinct from the per-interface <code class="docutils literal notranslate">password</code> command (see
+<a class="reference internal" href="#interface-configuration">Interface configuration</a>). That command
+authenticates only the Hello (IIH) PDUs exchanged with the neighbor on the
+interface where it is configured.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis area-password plaintext-password <text>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-area-password-plaintext-password-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a plaintext password used to authenticate Level-1 LSPs and
+SNPs originated and received by this router.</strong></p>
+<p>All Level-1 routers in the area must be configured with the same
+password.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis area-password plaintext-password mysharedsecret
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis area-password md5 <text>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-area-password-md5-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure an HMAC-MD5 key used to authenticate Level-1 LSPs and SNPs
+originated and received by this router.</strong></p>
+<p>All Level-1 routers in the area must be configured with the same key.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For each of <code class="docutils literal notranslate">area-password</code> and <code class="docutils literal notranslate">domain-password</code>, configure either
+<code class="docutils literal notranslate">plaintext-password</code> or <code class="docutils literal notranslate">md5</code>, but not both.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis area-password md5 mysharedsecret
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis domain-password plaintext-password <text>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-domain-password-plaintext-password-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a plaintext password used to authenticate Level-2 LSPs and
+SNPs originated and received by this router.</strong></p>
+<p>All Level-2 routers in the routing domain must be configured with the
+same password.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis domain-password plaintext-password mysharedsecret
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis domain-password md5 <text>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-domain-password-md5-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure an HMAC-MD5 key used to authenticate Level-2 LSPs and SNPs
+originated and received by this router.</strong></p>
+<p>All Level-2 routers in the routing domain must be configured with the
+same key.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis domain-password md5 mysharedsecret
+</pre></div>
+</div>
+</section>
+<section id="default-route-advertisement">
+<h4>Default route advertisement</h4>
+<section id="level-1-ipv4">
+<h5>Level-1 IPv4</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv4 level-1
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the router to originate the IPv4 default route (<code class="docutils literal notranslate">0.0.0.0/0</code>)
+and advertise it in locally generated LSPs throughout the Level-1 area.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv4 level-1 always
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-1-always" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the router to unconditionally originate the IPv4 default route
+and advertise it throughout the Level-1 area, even if the router lacks a
+default route in its <abbr title="Routing Information Base">RIB</abbr>.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-1 always
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv4 level-1 metric <0-16777215>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-1-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IS-IS metric for the IPv4 default route advertised at
+Level 1.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-1 metric 100
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv4 level-1 route-map <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-1-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Apply a route-map to the IPv4 default route advertised at Level 1.</strong></p>
+<p>The route-map can permit or deny the advertisement and, if permitted,
+modify the route’s metric.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-1 route-map ISIS-DEFAULT
+</pre></div>
+</div>
+</section>
+<section id="level-1-ipv6">
+<h5>Level-1 IPv6</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv6 level-1
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the router to originate the IPv6 default route (<code class="docutils literal notranslate">::/0</code>) and
+advertise it in locally generated LSPs throughout the Level-1 area.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv6 level-1 always
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-1-always" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the router to unconditionally originate the IPv6 default route
+and advertise it throughout the Level-1 area, even if the router lacks a
+default route in its RIB.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-1 always
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv6 level-1 metric <0-16777215>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-1-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IS-IS metric for the IPv6 default route advertised at
+Level 1.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-1 metric 100
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv6 level-1 route-map <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-1-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Apply a route-map to the IPv6 default route advertised at Level 1.</strong></p>
+<p>The route-map can permit or deny the advertisement and, if permitted,
+modify the route’s metric.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-1 route-map ISIS-DEFAULT
+</pre></div>
+</div>
+</section>
+<section id="level-2-ipv4">
+<h5>Level-2 IPv4</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv4 level-2
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the router to originate the IPv4 default route (<code class="docutils literal notranslate">0.0.0.0/0</code>)
+and advertise it in locally generated LSPs throughout the Level-2
+backbone.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv4 level-2 always
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-2-always" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the router to unconditionally originate the IPv4 default route
+and advertise it throughout the Level-2 backbone, even if the router lacks
+a default route in its RIB.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-2 always
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv4 level-2 metric <0-16777215>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-2-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IS-IS metric for the IPv4 default route advertised into
+the Level-2 backbone.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-2 metric 100
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv4 level-2 route-map <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-2-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Apply a route-map to the IPv4 default route advertised into the Level-2
+backbone.</strong></p>
+<p>The route-map can permit or deny the advertisement and, if permitted,
+modify the route’s metric.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-2 route-map ISIS-DEFAULT
+</pre></div>
+</div>
+</section>
+<section id="level-2-ipv6">
+<h5>Level-2 IPv6</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv6 level-2
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the router to originate the IPv6 default route (<code class="docutils literal notranslate">::/0</code>) and
+advertise it in locally generated LSPs throughout the Level-2 backbone.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv6 level-2 always
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-2-always" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the router to unconditionally originate the IPv6 default route
+and advertise it throughout the Level-2 backbone, even if the router lacks
+a default route in its RIB.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-2 always
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv6 level-2 metric <0-16777215>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-2-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IS-IS metric for the IPv6 default route advertised into
+the Level-2 backbone.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-2 metric 100
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis default-information originate ipv6 level-2 route-map <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-2-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Apply a route-map to the IPv6 default route advertised into the Level-2
+backbone.</strong></p>
+<p>The route-map can permit or deny the advertisement and, if permitted,
+modify the route’s metric.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-2 route-map ISIS-DEFAULT
+</pre></div>
+</div>
+</section>
+</section>
+<section id="ldp-synchronization">
+<h4>LDP synchronization</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis ldp-sync
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-ldp-sync" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable LDP IGP synchronization
+(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5443">RFC 5443</a>) for the IS-IS
+routing process.</strong></p>
+<p>When enabled, all operational IS-IS interfaces automatically participate
+in synchronization, except for loopback interfaces.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>LDP must be configured and functional on the router for synchronization
+to operate.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis ldp-sync
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis ldp-sync holddown <0-10000>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-ldp-sync-holddown-0-10000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the time, in seconds, that IS-IS keeps any of its interfaces
+at max-metric while waiting for LDP-IGP synchronization to complete.</strong></p>
+<p>When this time expires on an interface, IS-IS restores the configured
+interface metric even if LDP-IGP synchronization has not completed.</p>
+<p>The default value is 0, which causes IS-IS to wait indefinitely.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis ldp-sync holddown 60
+</pre></div>
+</div>
+</section>
+</section>
+<section id="interface-configuration">
+<h3>Interface configuration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> circuit-type <level-1 | level-1-2 | level-2-only>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-circuit-type-level-1-level-1-2-level-2-only" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IS-IS level at which the router can form adjacencies on
+the specified interface:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">level-1</code>: Permits only Level-1 (intra-area) adjacencies.</p></li>
+<li><p><code class="docutils literal notranslate">level-2-only</code>: Permits only Level-2 (inter-area) adjacencies.</p></li>
+<li><p><code class="docutils literal notranslate">level-1-2</code>: Permits both Level-1 (intra-area) and Level-2 (inter-area)
+adjacencies.</p></li>
+</ul>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The selected level must be supported by the router’s IS-IS process.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth0 circuit-type level-1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> hello-interval <1-600>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-hello-interval-1-600" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interval, in seconds, between successive IS-IS Hello PDUs
+(IIH) sent on the specified interface.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 hello-interval 5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> hello-multiplier <2-100>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-hello-multiplier-2-100" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the multiplier applied to the Hello interval to derive the
+Holding Time advertised in IS-IS Hello PDUs (IIH) sent on the specified
+interface.</strong></p>
+<p>The receiving neighbor uses the advertised Holding Time as its adjacency
+timeout. Si no IIH arrives within that period, the adjacency is declared
+down.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 hello-multiplier 5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> hello-padding
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-hello-padding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable padding of IS-IS Hello PDUs (IIH) sent on the specified interface
+to that interface’s full MTU
+(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc3719">RFC 3719</a>).</strong></p>
+<p>This ensures that neighbors with asymmetric MTUs cannot establish an
+adjacency. Without padding, asymmetric MTUs bypass detection during
+adjacency setup.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth0 hello-padding
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> metric <0-16777215>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IS-IS metric (cost) advertised for the specified
+interface.</strong></p>
+<p>The SPF algorithm uses this value to calculate the optimal routing path
+to destinations.</p>
+<p>The valid range depends on the configured metric style: <code class="docutils literal notranslate">narrow</code> limits
+the metric to 0-63, while <code class="docutils literal notranslate">wide</code> extends it to 0-16777215.</p>
+<p>The default value is 10.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 metric 100
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> network point-to-point
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-network-point-to-point" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IS-IS network type for the specified interface as
+point-to-point.</strong></p>
+<p>The default network type is broadcast.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The neighboring interface must be configured with the same network type;
+otherwise, the adjacency does not form.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 network point-to-point
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> passive
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-passive" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable passive mode for the specified interface.</strong></p>
+<p>On a passive interface, the router neither sends nor processes IS-IS Hello
+PDUs (IIH), so no adjacency forms. The interface’s IP prefix is still
+advertised in this router’s LSP.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface lo passive
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> password plaintext-password <text>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-password-plaintext-password-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the plaintext authentication password for the specified
+interface.</strong></p>
+<p>This password is included in IS-IS Hello (IIH) PDUs sent on the interface
+and validated on IIH PDUs received from neighbors.</p>
+<p>A mismatch prevents adjacency formation and tears down an established
+adjacency.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 password plaintext-password mysharedsecret
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> password md5 <text>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-password-md5-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the MD5 authentication key for the specified interface.</strong></p>
+<p>This key is used to generate a cryptographic hash that is included in
+IS-IS Hello (IIH) PDUs sent on the interface and validated in IIH PDUs
+received from neighbors.</p>
+<p>A mismatch prevents adjacency formation and tears down an established
+adjacency.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 password md5 mysharedsecret
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> priority <0-127>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-priority-0-127" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IS-IS <abbr title="Designated Intermediate System">DIS</abbr>
+election priority for the specified interface.</strong></p>
+<p>The priority is used in DIS election on the broadcast (LAN) segment. The
+router whose interface advertises the highest priority wins.</p>
+<p>The default priority is 64.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The configured value applies only to broadcast interfaces and has no
+effect on point-to-point interfaces.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 priority 100
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> psnp-interval <0-127>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-psnp-interval-0-127" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interval, in seconds, between successive IS-IS
+<abbr title="Partial Sequence Number PDU">PSNP</abbr> transmissions on the
+specified interface.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 psnp-interval 2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> no-three-way-handshake
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-no-three-way-handshake" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable the Three-Way Handshake for Point-to-Point (P2P) adjacencies
+(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5303">RFC 5303</a>).</strong></p>
+<p>The three-way handshake is enabled by default.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command applies only to point-to-point interfaces and has no effect
+on broadcast interfaces.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 no-three-way-handshake
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> ldp-sync disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-ldp-sync-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable LDP-IGP synchronization on the specified IS-IS interface.</strong></p>
+<p>With LDP-IGP synchronization enabled, IS-IS advertises a maximum metric
+on the interface while LDP is not yet synchronized on it.</p>
+<p>Disabling it on this interface causes IS-IS to advertise the configured
+metric regardless of LDP synchronization state.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command applies only if LDP-IGP synchronization is enabled for the
+IS-IS routing process.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 ldp-sync disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> ldp-sync holddown <0-10000>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-ldp-sync-holddown-0-10000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the time, in seconds, that IS-IS keeps the specified interface
+at max-metric while waiting for LDP-IGP synchronization to complete.</strong></p>
+<p>When this time expires, IS-IS restores the configured interface metric
+even if LDP-IGP synchronization has not completed.</p>
+<p>The default value is 0, which causes IS-IS to wait indefinitely.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This setting overrides the LDP-IGP synchronization hold-down time
+configured for the IS-IS routing process.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 ldp-sync holddown 60
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> bfd profile <profile-name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-bfd-profile-profile-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Attach a BFD profile to the IS-IS adjacency on the specified
+interface.</strong></p>
+<p>When configured, IS-IS uses the BFD session described by the named
+profile to detect adjacency failure. Si BFD reports the session down,
+the IS-IS adjacency is torn down immediately rather than waiting for
+the Hello holding time to expire.</p>
+<p>The profile itself is configured under
+<code class="docutils literal notranslate">set protocols bfd profile <profile-name></code>.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 bfd profile ISIS-FAST
+</pre></div>
+</div>
+<section id="level-1-fast-reroute">
+<h4>Level-1 fast-reroute</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> fast-reroute lfa level-1 enable
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-lfa-level-1-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable Level-1 <abbr title="Loop-Free Alternate">LFA</abbr> computation on the
+specified interface.</strong></p>
+<p>When enabled, IS-IS precomputes a backup next-hop for each Level-1
+destination reached through this interface. Si the primary next-hop
+fails, the router uses the precomputed backup instead.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute lfa level-1 enable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface-1> fast-reroute lfa level-1 exclude interface <interface-2>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-1-fast-reroute-lfa-level-1-exclude-interface-interface-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Exclude an interface from being selected as a Level-1 LFA backup
+next-hop on the specified interface.</strong></p>
+<p>In the command syntax, <code class="docutils literal notranslate"><interface-1></code> identifies the protected interface,
+and <code class="docutils literal notranslate"><interface-2></code> identifies the interface that must not be used as an
+LFA backup next-hop.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute lfa level-1 exclude interface eth2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> fast-reroute remote-lfa level-1 tunnel mpls-ldp
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-remote-lfa-level-1-tunnel-mpls-ldp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable Level-1 remote LFA computation using MPLS-LDP tunnels on the
+specified interface.</strong></p>
+<p>Remote LFA provides backup paths when local LFA cannot find a loop-free
+alternate neighbor.</p>
+<p>Si the primary next-hop fails, the router sends traffic into an MPLS-LDP
+tunnel to a precomputed remote LFA node. From there, normal IS-IS
+forwarding delivers it to the destination.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Remote LFA requires the corresponding local LFA to be configured on this
+interface.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Remote LFA requires all potential remote LFA endpoints in the IS-IS
+routing instance to accept targeted LDP Hello messages.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute remote-lfa level-1 tunnel mpls-ldp
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> fast-reroute remote-lfa level-1 maximum-metric <1-16777215>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-remote-lfa-level-1-maximum-metric-1-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the maximum metric for Level-1 remote LFA node selection on
+the specified interface.</strong></p>
+<p>Remote LFA nodes with a metric exceeding this value are excluded from
+selection.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The maximum metric applies only when the corresponding remote LFA is
+enabled on this interface.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute remote-lfa level-1 maximum-metric 100
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> fast-reroute ti-lfa level-1
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-ti-lfa-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable Level-1 <abbr title="Topology Independent Loop-Free Alternate">TI-LFA</abbr>
+computation on the specified interface.</strong></p>
+<p>By default, TI-LFA operates in link protection mode, computing backup
+paths that protect against the failure of this interface’s link.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>LFA and TI-LFA cannot be configured at the same level on the same
+interface.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute ti-lfa level-1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> fast-reroute ti-lfa level-1 node-protection
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-ti-lfa-level-1-node-protection" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable node protection mode for Level-1 TI-LFA on the specified
+interface.</strong></p>
+<p>In node protection mode, TI-LFA computes backup paths that protect
+against the failure of the next-hop node.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>LFA and TI-LFA cannot be configured at the same level on the same
+interface.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth0 fast-reroute ti-lfa level-1 node-protection
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> fast-reroute ti-lfa level-1 node-protection link-fallback
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-ti-lfa-level-1-node-protection-link-fallback" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable link-protection fallback for Level-1 TI-LFA on the specified
+interface.</strong></p>
+<p>When node protection cannot compute a backup path, the computation falls
+back to link protection.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute ti-lfa level-1 node-protection link-fallback
+</pre></div>
+</div>
+</section>
+<section id="level-2-fast-reroute">
+<h4>Level-2 fast-reroute</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> fast-reroute lfa level-2 enable
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-lfa-level-2-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable Level-2 LFA computation on the specified interface.</strong></p>
+<p>When enabled, IS-IS precomputes a backup next-hop for each Level-2
+destination reached through this interface. Si the primary next-hop
+fails, the router uses the precomputed backup instead.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute lfa level-2 enable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface-1> fast-reroute lfa level-2 exclude interface <interface-2>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-1-fast-reroute-lfa-level-2-exclude-interface-interface-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Exclude an interface from being selected as a Level-2 LFA backup
+next-hop on the specified interface.</strong></p>
+<p>In the command syntax, <code class="docutils literal notranslate"><interface-1></code> identifies the protected interface,
+and <code class="docutils literal notranslate"><interface-2></code> identifies the interface that must not be used as an
+LFA backup next-hop.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute lfa level-2 exclude interface eth2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> fast-reroute remote-lfa level-2 tunnel mpls-ldp
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-remote-lfa-level-2-tunnel-mpls-ldp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable Level-2 remote LFA computation using MPLS-LDP tunnels on the
+specified interface.</strong></p>
+<p>Remote LFA provides backup paths when local LFA cannot find a loop-free
+alternate neighbor.</p>
+<p>Si the primary next-hop fails, the router sends traffic into an MPLS-LDP
+tunnel to a precomputed remote LFA node. From there, normal IS-IS
+forwarding delivers it to the destination.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Remote LFA requires the corresponding local LFA to be configured on this
+interface.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Remote LFA requires all potential remote LFA endpoints in the IS-IS
+routing instance to accept targeted LDP Hello messages.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute remote-lfa level-2 tunnel mpls-ldp
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> fast-reroute remote-lfa level-2 maximum-metric <1-16777215>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-remote-lfa-level-2-maximum-metric-1-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the maximum metric for Level-2 remote LFA node selection on
+the specified interface.</strong></p>
+<p>Remote LFA nodes with a metric exceeding this value are excluded from
+selection.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The maximum metric applies only when the corresponding remote LFA is
+enabled on this interface.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute remote-lfa level-2 maximum-metric 100
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> fast-reroute ti-lfa level-2
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-ti-lfa-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable Level-2 TI-LFA computation on the specified interface.</strong></p>
+<p>By default, TI-LFA operates in link protection mode, computing backup
+paths that protect against the failure of this interface’s link.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>LFA and TI-LFA cannot be configured at the same level on the same
+interface.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute ti-lfa level-2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> fast-reroute ti-lfa level-2 node-protection
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-ti-lfa-level-2-node-protection" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable node protection mode for Level-2 TI-LFA on the specified
+interface.</strong></p>
+<p>In node protection mode, TI-LFA computes backup paths that protect
+against the failure of the next-hop node.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>LFA and TI-LFA cannot be configured at the same level on the same
+interface.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth0 fast-reroute ti-lfa level-2 node-protection
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis interface <interface> fast-reroute ti-lfa level-2 node-protection link-fallback
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-ti-lfa-level-2-node-protection-link-fallback" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable link-protection fallback for Level-2 TI-LFA on the specified
+interface.</strong></p>
+<p>When node protection cannot compute a backup path, the computation falls
+back to link protection.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>LFA and TI-LFA cannot be configured at the same level on the same
+interface.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute ti-lfa level-2 node-protection link-fallback
+</pre></div>
+</div>
+</section>
+</section>
+<section id="route-redistribution">
+<h3>Route redistribution</h3>
+<section id="id1">
+<h4>Level-1 IPv4</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis redistribute ipv4 <bgp | connected | kernel | nhrp | ospf | rip | babel | static> level-1
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv4-bgp-connected-kernel-nhrp-ospf-rip-babel-static-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the redistribution of IPv4 routing information from the
+specified route source into IS-IS Level-1.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv4 bgp level-1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis redistribute ipv4 <bgp | connected | kernel | nhrp | ospf | rip | babel | static> level-1 metric <0-16777215>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv4-bgp-connected-kernel-nhrp-ospf-rip-babel-static-level-1-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IS-IS metric for IPv4 routes redistributed from the
+specified route source into IS-IS Level-1.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv4 bgp level-1 metric 50
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis redistribute ipv4 <bgp | connected | kernel | nhrp | ospf | rip | babel | static> level-1 route-map <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv4-bgp-connected-kernel-nhrp-ospf-rip-babel-static-level-1-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Apply a route-map to IPv4 routes redistributed from the specified route
+source into IS-IS Level-1.</strong></p>
+<p>Only routes permitted by the route-map are redistributed. The route-map
+can modify the metric and tag of permitted routes.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv4 bgp level-1 route-map BGP-TO-ISIS
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h4>Level-1 IPv6</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis redistribute ipv6 <bgp | connected | kernel | ospf6 | ripng | babel | static> level-1
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv6-bgp-connected-kernel-ospf6-ripng-babel-static-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the redistribution of IPv6 routing information from the
+specified route source into IS-IS Level-1.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv6 bgp level-1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis redistribute ipv6 <bgp | connected | kernel | ospf6 | ripng | babel | static> level-1 metric <0-16777215>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv6-bgp-connected-kernel-ospf6-ripng-babel-static-level-1-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IS-IS metric for IPv6 routes redistributed from the
+specified route source into IS-IS Level-1.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv6 bgp level-1 metric 50
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis redistribute ipv6 <bgp | connected | kernel | ospf6 | ripng | babel | static> level-1 route-map <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv6-bgp-connected-kernel-ospf6-ripng-babel-static-level-1-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Apply a route-map to IPv6 routes redistributed from the specified route
+source into IS-IS Level-1.</strong></p>
+<p>Only routes permitted by the route-map are redistributed. The route-map
+can modify the metric and tag of permitted routes.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv6 bgp level-1 route-map BGP-TO-ISIS
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h4>Level-2 IPv4</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis redistribute ipv4 <bgp | connected | kernel | nhrp | ospf | rip | babel | static> level-2
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv4-bgp-connected-kernel-nhrp-ospf-rip-babel-static-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the redistribution of IPv4 routing information from the
+specified route source into IS-IS Level-2.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv4 bgp level-2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis redistribute ipv4 <bgp | connected | kernel | nhrp | ospf | rip | babel | static> level-2 metric <0-16777215>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv4-bgp-connected-kernel-nhrp-ospf-rip-babel-static-level-2-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IS-IS metric for IPv4 routes redistributed from the
+specified route source into IS-IS Level-2.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv4 bgp level-2 metric 50
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis redistribute ipv4 <bgp | connected | kernel | nhrp | ospf | rip | babel | static> level-2 route-map <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv4-bgp-connected-kernel-nhrp-ospf-rip-babel-static-level-2-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Apply a route-map to IPv4 routes redistributed from the specified route
+source into IS-IS Level-2.</strong></p>
+<p>Only routes permitted by the route-map are redistributed. The route-map
+can modify the metric and tag of permitted routes.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv4 bgp level-2 route-map BGP-TO-ISIS
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h4>Level-2 IPv6</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis redistribute ipv6 <bgp | connected | kernel | ospf6 | ripng | babel | static> level-2
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv6-bgp-connected-kernel-ospf6-ripng-babel-static-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the redistribution of IPv6 routing information from the
+specified route source into IS-IS Level-2.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv6 bgp level-2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis redistribute ipv6 <bgp | connected | kernel | ospf6 | ripng | babel | static> level-2 metric <0-16777215>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv6-bgp-connected-kernel-ospf6-ripng-babel-static-level-2-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IS-IS metric for IPv6 routes redistributed from the
+specified route source into IS-IS Level-2.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv6 bgp level-2 metric 50
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis redistribute ipv6 <bgp | connected | kernel | ospf6 | ripng | babel | static> level-2 route-map <name>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv6-bgp-connected-kernel-ospf6-ripng-babel-static-level-2-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Apply a route-map to IPv6 routes redistributed from the specified route
+source into IS-IS Level-2.</strong></p>
+<p>Only routes permitted by the route-map are redistributed. The route-map
+can modify the metric and tag of permitted routes.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
+<code class="docutils literal notranslate">level-1-2</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv6 bgp level-2 route-map BGP-TO-ISIS
+</pre></div>
+</div>
+</section>
+</section>
+<section id="timers">
+<h3>Timers</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis lsp-gen-interval <1-120>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-lsp-gen-interval-1-120" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the minimum interval, in seconds, between consecutive
+regenerations of this router’s own LSP.</strong></p>
+<p>Regenerations triggered by events, such as network topology changes, are
+postponed until the specified interval has elapsed since the previous
+regeneration.</p>
+<p>The default interval is 30 seconds.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis lsp-gen-interval 5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis lsp-refresh-interval <2-65235>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-lsp-refresh-interval-2-65235" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the maximum interval, in seconds, between consecutive
+regenerations of this router’s own LSP.</strong></p>
+<p>When this interval elapses, the router regenerates its LSP even if no
+event has triggered a regeneration.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The value must be less than the configured <code class="docutils literal notranslate">max-lsp-lifetime</code> so that the
+LSP is refreshed before its remaining lifetime expires.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis lsp-refresh-interval 600
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis max-lsp-lifetime <350-65535>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-max-lsp-lifetime-350-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the lifetime, in seconds, of LSPs originated by this router.</strong></p>
+<p>The default is 1200 seconds.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This value must be greater than <code class="docutils literal notranslate">lsp-refresh-interval</code> so that LSPs are
+refreshed before their lifetime expires.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis max-lsp-lifetime 1500
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis spf-interval <1-120>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-spf-interval-1-120" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interval, in seconds, between consecutive SPF calculations
+on this router.</strong></p>
+<p>SPF calculations triggered by events, such as network topology changes,
+are postponed until the specified interval has elapsed since the previous
+calculation.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis spf-interval 5
+</pre></div>
+</div>
+<p>The following commands implement the IETF SPF delay algorithm for IS-IS
+described in <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc8405">RFC 8405</a>.
+They control how quickly the router runs the SPF calculation after topology
+changes are detected.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All five <code class="docutils literal notranslate">spf-delay-ietf</code> parameters must be configured; setting only some
+of them causes a commit failure.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis spf-delay-ietf holddown <0-60000>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-spf-delay-ietf-holddown-0-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interval, in milliseconds, that must elapse without
+topology changes before the router considers the network stable.</strong></p>
+<p>Once this time passes, the router returns to its initial response state
+and applies <code class="docutils literal notranslate">init-delay</code> to the next SPF calculation.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis spf-delay-ietf holddown 10000
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis spf-delay-ietf init-delay <0-60000>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-spf-delay-ietf-init-delay-0-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interval, in milliseconds, that the router waits before
+running the first SPF calculation when a new topology change arrives
+after the network is considered stable.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis spf-delay-ietf init-delay 500
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis spf-delay-ietf time-to-learn <0-60000>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-spf-delay-ietf-time-to-learn-0-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the learning interval, in milliseconds, that begins when the
+first topology change is received.</strong></p>
+<p>Within this window, the router applies the <code class="docutils literal notranslate">short-delay</code> before performing
+SPF recalculations triggered by additional topology changes.</p>
+<p>Si topology changes continue to arrive after this window expires, the
+router considers the network unstable and delays subsequent SPF
+recalculations by the configured <code class="docutils literal notranslate">long-delay</code>.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis spf-delay-ietf time-to-learn 5000
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis spf-delay-ietf long-delay <0-60000>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-spf-delay-ietf-long-delay-0-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interval, in milliseconds, the router applies before
+running an SPF calculation when topology changes arrive after the
+<code class="docutils literal notranslate">time-to-learn</code> window expires.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis spf-delay-ietf long-delay 10000
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis spf-delay-ietf short-delay <0-60000>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-spf-delay-ietf-short-delay-0-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interval, in milliseconds, the router applies before
+running subsequent SPF calculations triggered by additional topology
+changes within the <code class="docutils literal notranslate">time-to-learn</code> window.</strong></p>
+<p>The first SPF in the window is delayed by <code class="docutils literal notranslate">init-delay</code>.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis spf-delay-ietf short-delay 1000
+</pre></div>
+</div>
+</section>
+<section id="loop-free-alternate-lfa">
+<h3>Loop-Free Alternate (LFA)</h3>
+<section id="level-1">
+<h4>Level-1</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis fast-reroute lfa remote prefix-list <name> level-1
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-remote-prefix-list-name-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Filter which PQ nodes the router evaluates as Remote LFA tunnel
+endpoints for IS-IS Level-1 using the specified prefix-list.</strong></p>
+<p>Only PQ nodes permitted by the prefix-list are evaluated as potential
+backup routers.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa remote prefix-list CRITICAL-ROUTES level-1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis fast-reroute lfa local load-sharing disable level-1
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-local-load-sharing-disable-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable load sharing across multiple local LFAs for IS-IS Level-1.</strong></p>
+<p>When multiple LFAs are available to back up a given destination, the
+router uses only one LFA instead of distributing rerouted traffic across
+all of them.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa local load-sharing disable level-1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis fast-reroute lfa local tiebreaker <downstream | lowest-backup-metric | node-protecting> index <1-255> level-1
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-local-tiebreaker-downstream-lowest-backup-metric-node-protecting-index-1-255-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a tiebreaker rule for selecting a single LFA when multiple
+local LFAs exist for an IS-IS Level-1 prefix.</strong></p>
+<p>Tiebreaker rules with lower index numbers are evaluated first. You can
+choose one of the following tiebreaker behaviors:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">downstream</code>: Prefers an alternate that is closer to the destination
+than this router.</p></li>
+<li><p><code class="docutils literal notranslate">lowest-backup-metric</code>: Prefers the alternate with the shortest path to
+the destination.</p></li>
+<li><p><code class="docutils literal notranslate">node-protecting</code>: Prefers an alternate that bypasses the primary
+next-hop router, protecting against a complete node failure rather than
+just link failure.</p></li>
+</ul>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa local tiebreaker node-protecting index 10 level-1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis fast-reroute lfa local priority-limit <critical | high | medium> level-1
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-local-priority-limit-critical-high-medium-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the priority limit for calculating local LFAs in IS-IS
+Level-1.</strong></p>
+<p>The router calculates LFAs only for prefixes with a priority greater than
+or equal to the specified limit. Par exemple, setting the limit to <code class="docutils literal notranslate">high</code>
+protects both <code class="docutils literal notranslate">high</code> and <code class="docutils literal notranslate">critical</code> prefixes.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Prefixes carry one of the following priorities: <code class="docutils literal notranslate">low</code>, <code class="docutils literal notranslate">medium</code>, <code class="docutils literal notranslate">high</code>,
+or <code class="docutils literal notranslate">critical</code>. By default, the router assigns <code class="docutils literal notranslate">medium</code> priority to
+loopbacks and <code class="docutils literal notranslate">low</code> priority to all other prefixes. The limit itself
+accepts only <code class="docutils literal notranslate">medium</code>, <code class="docutils literal notranslate">high</code>, or <code class="docutils literal notranslate">critical</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa local priority-limit critical level-1
+</pre></div>
+</div>
+</section>
+<section id="level-2">
+<h4>Level-2</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis fast-reroute lfa remote prefix-list <name> level-2
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-remote-prefix-list-name-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Filter which PQ nodes the router evaluates as Remote LFA tunnel
+endpoints for IS-IS Level-2 using the specified prefix-list.</strong></p>
+<p>Only PQ nodes permitted by the prefix-list are evaluated as potential
+backup routers.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa remote prefix-list CRITICAL-ROUTES level-2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis fast-reroute lfa local load-sharing disable level-2
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-local-load-sharing-disable-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable load sharing across multiple local LFAs for IS-IS Level-2.</strong></p>
+<p>When multiple LFAs are available to back up a given destination, the
+router uses only one LFA instead of distributing rerouted traffic across
+all of them.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa local load-sharing disable level-2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis fast-reroute lfa local tiebreaker <downstream | lowest-backup-metric | node-protecting> index <1-255> level-2
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-local-tiebreaker-downstream-lowest-backup-metric-node-protecting-index-1-255-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a tiebreaker rule for selecting a single LFA when multiple
+local LFAs exist for an IS-IS Level-2 prefix.</strong></p>
+<p>Tiebreaker rules with lower index numbers are evaluated first. You can
+choose one of the following tiebreaker behaviors:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">downstream</code>: Prefers an alternate that is closer to the destination
+than this router.</p></li>
+<li><p><code class="docutils literal notranslate">lowest-backup-metric</code>: Prefers the alternate with the shortest path to
+the destination.</p></li>
+<li><p><code class="docutils literal notranslate">node-protecting</code>: Prefers an alternate that bypasses the primary
+next-hop router, protecting against a complete node failure rather than
+just link failure.</p></li>
+</ul>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa local tiebreaker node-protecting index 10 level-2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis fast-reroute lfa local priority-limit <critical | high | medium> level-2
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-local-priority-limit-critical-high-medium-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the priority limit for calculating local LFAs in IS-IS
+Level-2.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Prefixes carry one of the following priorities: <code class="docutils literal notranslate">low</code>, <code class="docutils literal notranslate">medium</code>, <code class="docutils literal notranslate">high</code>,
+or <code class="docutils literal notranslate">critical</code>. By default, the router assigns <code class="docutils literal notranslate">medium</code> priority to
+loopbacks and <code class="docutils literal notranslate">low</code> priority to all other prefixes. The limit itself
+accepts only <code class="docutils literal notranslate">medium</code>, <code class="docutils literal notranslate">high</code>, or <code class="docutils literal notranslate">critical</code>.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa local priority-limit critical level-2
+</pre></div>
+</div>
+</section>
+</section>
+<section id="segment-routing-over-ipv6-srv6">
+<h3>Segment Routing over IPv6 (SRv6)</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis segment-routing srv6 interface <interface>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-srv6-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable IS-IS Segment Routing over IPv6 (SRv6) on the specified
+interface.</strong></p>
+<p>Once enabled, IS-IS allocates and advertises an adjacency SID for each
+IS-IS neighbor reached through this interface, so other routers can steer
+SRv6 traffic over it.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing srv6 interface eth1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis segment-routing srv6 locator <locator>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-srv6-locator-locator" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure IS-IS to use a globally defined SRv6 locator.</strong></p>
+<p>The locator itself must be configured separately using
+<code class="docutils literal notranslate">set protocols segment-routing srv6 locator <name> prefix <ipv6-prefix></code>.</p>
+<p>Once you attach the locator to IS-IS, the routing process automatically:</p>
+<ul class="simple">
+<li><p>Allocates a node SID for the router and an adjacency SID for each of
+its IS-IS neighbors.</p></li>
+<li><p>Advertises the locator and these SIDs to the network so other routers
+can route SRv6 traffic through this node.</p></li>
+</ul>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing srv6 locator MAIN-LOCATOR
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis segment-routing srv6 node-msd max-end-d <0-255>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-srv6-node-msd-max-end-d-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the Maximum End D MSD value advertised by the router
+(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc9352">RFC 9352</a>).</strong></p>
+<p>This value indicates the maximum number of SIDs in the SRH that this
+router can handle when performing a decapsulation behavior (e.g.,
+<code class="docutils literal notranslate">End.DX6</code>, <code class="docutils literal notranslate">End.DT4</code>, <code class="docutils literal notranslate">End.DT46</code>, <code class="docutils literal notranslate">End with USD</code>, <code class="docutils literal notranslate">End.X with USD</code>)
+defined in <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc8986">RFC 8986</a>.</p>
+<p>Si this value is set to 0 or left unconfigured, the router advertises
+that it cannot decapsulate and forward packets when an SRH is present.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing srv6 node-msd max-end-d 8
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis segment-routing srv6 node-msd max-end-pop <0-255>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-srv6-node-msd-max-end-pop-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the Maximum End Pop MSD value advertised by the router
+(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc9352">RFC 9352</a>).</strong></p>
+<p>This value indicates the maximum number of SIDs in the received SRH to
+which this router can apply the PSP (Penultimate Segment Pop) or USP
+(Ultimate Segment Pop) flavors defined in
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc8986#section-4.16">RFC 8986, §4.16</a>.</p>
+<p>Si this value is set to 0 or left unconfigured, the router advertises
+that it cannot apply the PSP or USP flavors.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing srv6 node-msd max-end-pop 16
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis segment-routing srv6 node-msd max-h-encaps <0-255>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-srv6-node-msd-max-h-encaps-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the Maximum H.Encaps MSD value advertised by the router
+(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc9352">RFC 9352</a>).</strong></p>
+<p>This value indicates the maximum number of SIDs that this router can
+insert into a new <abbr title="Segment Routing Header">SRH</abbr> when encapsulating
+traffic (the H.Encaps behavior), as defined in
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc8986">RFC 8986</a>.</p>
+<p>Si set to 0 or left unconfigured, the router advertises that it can only
+apply an SR Policy containing a single segment, without inserting an SRH.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing srv6 node-msd max-h-encaps 8
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis segment-routing srv6 node-msd max-segs-left <0-255>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-srv6-node-msd-max-segs-left-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the Maximum Segments Left MSD value advertised by the router
+(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc9352">RFC 9352</a>).</strong></p>
+<p>This value indicates the maximum Segments Left value
+(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc8754">RFC 8754</a>) in the SRH of
+a received packet that this router can process before applying the
+Endpoint behavior associated with a SID.</p>
+<p>Si set to 0 or left unconfigured, the router advertises that it can only
+be the last segment of an SRv6 path. Set a value greater than 0 to also
+allow the router to be used as a segment in the middle of a path.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing srv6 node-msd max-segs-left 8
+</pre></div>
+</div>
+</section>
+</section>
+<section id="examples">
+<h2>Examples</h2>
+<section id="enable-is-is">
+<h3>Enable IS-IS</h3>
+<p>The following example demonstrates a basic IS-IS routing protocol setup between
+two VyOS routers.</p>
+<p><strong>Node 1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address '198.51.100.1/32'
+set interfaces ethernet eth1 address '192.0.2.1/24'
+
+set protocols isis interface eth1
+set protocols isis interface lo
+set protocols isis net '49.0001.1980.5110.0001.00'
+</pre></div>
+</div>
+<p><strong>Node 2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address '198.51.100.2/32'
+set interfaces ethernet eth1 address '192.0.2.2/24'
+
+set protocols isis interface eth1
+set protocols isis interface lo
+set protocols isis net '49.0001.1980.5110.0002.00'
+</pre></div>
+</div>
+<p>This gives us the following neighborships, Level 1 and Level 2:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show isis neighbor
+Area VyOS:
+ System Id           Interface   L  State        Holdtime SNPA
+ vyos                eth1        1  Up            28       0c87.6c09.0001
+ vyos                eth1        2  Up            28       0c87.6c09.0001
+
+Node-2@vyos:~$ show isis neighbor
+Area VyOS:
+ System Id           Interface   L  State        Holdtime SNPA
+ vyos                eth1        1  Up            29       0c33.0280.0001
+ vyos                eth1        2  Up            28       0c33.0280.0001
+</pre></div>
+</div>
+<p>Here’s the IP routes that are populated. Just the loopback:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show ip route isis
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric,
+       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+I   192.0.2.0/24 [115/20] via 192.0.2.2, eth1 inactive, weight 1, 00:02:22
+I>* 198.51.100.2/32 [115/20] via 192.0.2.2, eth1, weight 1, 00:02:22
+
+Node-2@vyos:~$ show ip route isis
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric,
+       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+I   192.0.2.0/24 [115/20] via 192.0.2.1, eth1 inactive, weight 1, 00:02:21
+I>* 198.51.100.1/32 [115/20] via 192.0.2.1, eth1, weight 1, 00:02:21
+</pre></div>
+</div>
+</section>
+<section id="enable-is-is-and-redistribute-routes-not-natively-in-is-is">
+<h3>Enable IS-IS and redistribute routes not natively in IS-IS</h3>
+<p>The following example demonstrates a basic IS-IS setup between two VyOS
+routers, with Node 1 also redistributing a connected network that isn’t running
+IS-IS.</p>
+<p><strong>Node 1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum0 address '203.0.113.1/24'
+set interfaces ethernet eth1 address '192.0.2.1/24'
+
+set policy prefix-list EXPORT-ISIS rule 10 action 'permit'
+set policy prefix-list EXPORT-ISIS rule 10 prefix '203.0.113.0/24'
+set policy route-map EXPORT-ISIS rule 10 action 'permit'
+set policy route-map EXPORT-ISIS rule 10 match ip address prefix-list 'EXPORT-ISIS'
+
+set protocols isis interface eth1
+set protocols isis net '49.0001.2030.0011.3001.00'
+set protocols isis redistribute ipv4 connected level-2 route-map 'EXPORT-ISIS'
+</pre></div>
+</div>
+<p><strong>Node 2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address '192.0.2.2/24'
+
+set protocols isis interface eth1
+set protocols isis net '49.0001.1920.0000.2002.00'
+</pre></div>
+</div>
+<p>Routes on Node 2:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Node-2@r2:~$ show ip route isis
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, D - SHARP,
+       F - PBR, f - OpenFabric,
+       > - selected route, * - FIB route, q - queued route, r - rejected route
+
+I   203.0.113.0/24 [115/10] via 192.0.2.1, eth1, 00:03:42
+</pre></div>
+</div>
+</section>
+<section id="enable-is-is-and-igp-ldp-synchronization">
+<h3>Enable IS-IS and IGP-LDP synchronization</h3>
+<p>The following example demonstrates an IS-IS setup with IGP-LDP synchronization
+enabled on Node 1.</p>
+<p><strong>Node 1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address 198.51.100.1/32
+set interfaces ethernet eth0 address 192.0.2.1/24
+
+set protocols isis interface eth0
+set protocols isis interface lo passive
+set protocols isis ldp-sync
+set protocols isis net 49.0001.1980.5110.0001.00
+
+set protocols mpls interface eth0
+set protocols mpls ldp discovery transport-ipv4-address 198.51.100.1
+set protocols mpls ldp interface lo
+set protocols mpls ldp interface eth0
+set protocols mpls ldp parameters transport-prefer-ipv4
+set protocols mpls ldp router-id 198.51.100.1
+</pre></div>
+</div>
+<p>This gives us IGP-LDP synchronization for all non-loopback interfaces with
+a holddown timer of zero seconds:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$  show isis mpls ldp-sync
+eth0
+  LDP-IGP Synchronization enabled: yes
+  holddown timer in seconds: 0
+  State: Sync achieved
+</pre></div>
+</div>
+</section>
+<section id="enable-is-is-with-segment-routing-experimental">
+<h3>Enable IS-IS with Segment Routing (experimental)</h3>
+<p>The following example demonstrates IS-IS with segment routing between two VyOS
+routers.</p>
+<p><strong>Node 1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address '198.51.100.1/32'
+set interfaces ethernet eth1 address '192.0.2.1/24'
+
+set protocols isis interface eth1
+set protocols isis interface lo
+set protocols isis net '49.0001.1980.5110.0001.00'
+set protocols isis segment-routing global-block high-label-value '599'
+set protocols isis segment-routing global-block low-label-value '550'
+set protocols isis segment-routing prefix 198.51.100.1/32 index value '1'
+set protocols isis segment-routing prefix 198.51.100.1/32 index explicit-null
+set protocols mpls interface 'eth1'
+</pre></div>
+</div>
+<p><strong>Node 2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address '198.51.100.2/32'
+set interfaces ethernet eth1 address '192.0.2.2/24'
+
+set protocols isis interface eth1
+set protocols isis interface lo
+set protocols isis net '49.0001.1980.5110.0002.00'
+set protocols isis segment-routing global-block high-label-value '599'
+set protocols isis segment-routing global-block low-label-value '550'
+set protocols isis segment-routing prefix 198.51.100.2/32 index value '2'
+set protocols isis segment-routing prefix 198.51.100.2/32 index explicit-null
+set protocols mpls interface 'eth1'
+</pre></div>
+</div>
+<p>This gives us MPLS segment routing enabled and labels for far end loopbacks:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show mpls table
+ Inbound Label  Type        Nexthop                Outbound Label
+ ----------------------------------------------------------------------
+ 552            SR (IS-IS)  192.0.2.2              IPv4 Explicit Null <-- Node-2 loopback learned on Node-1
+ 15000          SR (IS-IS)  192.0.2.2              implicit-null
+ 15001          SR (IS-IS)  fe80::e87:6cff:fe09:1  implicit-null
+ 15002          SR (IS-IS)  192.0.2.2              implicit-null
+ 15003          SR (IS-IS)  fe80::e87:6cff:fe09:1  implicit-null
+
+Node-2@vyos:~$ show mpls table
+ Inbound Label  Type        Nexthop               Outbound Label
+ ---------------------------------------------------------------------
+ 551            SR (IS-IS)  192.0.2.1             IPv4 Explicit Null <-- Node-1 loopback learned on Node-2
+ 15000          SR (IS-IS)  192.0.2.1             implicit-null
+ 15001          SR (IS-IS)  fe80::e33:2ff:fe80:1  implicit-null
+ 15002          SR (IS-IS)  192.0.2.1             implicit-null
+ 15003          SR (IS-IS)  fe80::e33:2ff:fe80:1  implicit-null
+</pre></div>
+</div>
+<p>Here is the routing tables showing the MPLS segment routing label operations:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show ip route isis
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric,
+       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+I   192.0.2.0/24 [115/20] via 192.0.2.2, eth1 inactive, weight 1, 00:07:48
+I>* 198.51.100.2/32 [115/20] via 192.0.2.2, eth1, label IPv4 Explicit Null, weight 1, 00:03:39
+
+Node-2@vyos:~$ show ip route isis
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric,
+       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+I   192.0.2.0/24 [115/20] via 192.0.2.1, eth1 inactive, weight 1, 00:07:46
+I>* 198.51.100.1/32 [115/20] via 192.0.2.1, eth1, label IPv4 Explicit Null, weight 1, 00:03:43
+</pre></div>
+</div>
+</section>
+<section id="enable-is-is-with-segment-routing-over-ipv6-experimental">
+<h3>Enable IS-IS with Segment Routing over IPv6 (experimental)</h3>
+<p>The following example demonstrates IS-IS with Segment Routing over IPv6
+between two VyOS routers.</p>
+<p><strong>Node 1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum6 description "SRv6 IS-IS"
+set interfaces ethernet eth1 address '192.0.2.1/24'
+set interfaces loopback lo address '198.51.100.1/32'
+
+set protocols segment-routing srv6 locator MAIN prefix 2001:db8:1::/64
+set protocols segment-routing interface eth1
+
+set protocols isis interface eth1
+set protocols isis interface lo
+set protocols isis net '49.0001.1980.5110.0001.00'
+set protocols isis segment-routing srv6 locator MAIN
+set protocols isis segment-routing srv6 interface dum6
+</pre></div>
+</div>
+<p><strong>Node 2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum6 description "SRv6 IS-IS"
+set interfaces ethernet eth1 address '192.0.2.2/24'
+set interfaces loopback lo address '198.51.100.2/32'
+
+set protocols segment-routing srv6 locator MAIN prefix 2001:db8:2::/64
+set protocols segment-routing interface eth1
+
+set protocols isis interface eth1
+set protocols isis interface lo
+set protocols isis net '49.0001.1980.5110.0002.00'
+set protocols isis segment-routing srv6 locator MAIN
+set protocols isis segment-routing srv6 interface dum6
+</pre></div>
+</div>
+</section>
+<section id="enable-is-is-with-segment-routing-over-ipv6-usid-experimental">
+<h3>Enable IS-IS with Segment Routing over IPv6 (uSID) (experimental)</h3>
+<p>The following example demonstrates IS-IS with SRv6 uSID (micro-SID) between two
+VyOS routers.</p>
+<p><strong>Node 1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum6 description "SRv6 IS-IS"
+set interfaces ethernet eth1 address '192.0.2.1/24'
+set interfaces loopback lo address '198.51.100.1/32'
+
+set protocols segment-routing interface eth1
+set protocols segment-routing srv6 locator MAIN prefix 2001:db8:1::/48
+set protocols segment-routing srv6 locator MAIN behavior-usid
+set protocols segment-routing srv6 locator MAIN block-len 32
+set protocols segment-routing srv6 locator MAIN format usid-f3216
+set protocols segment-routing srv6 locator MAIN func-bits 16
+set protocols segment-routing srv6 locator MAIN node-len 16
+
+set protocols isis interface eth1
+set protocols isis interface lo
+set protocols isis net '49.0001.1980.5110.0001.00'
+set protocols isis segment-routing srv6 interface dum6
+set protocols isis segment-routing srv6 locator MAIN
+</pre></div>
+</div>
+<p><strong>Node 2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum6 description "SRv6 IS-IS"
+set interfaces ethernet eth1 address '192.0.2.2/24'
+set interfaces loopback lo address '198.51.100.2/32'
+
+set protocols segment-routing interface eth1
+set protocols segment-routing srv6 locator MAIN prefix 2001:db8:2::/48
+set protocols segment-routing srv6 locator MAIN behavior-usid
+set protocols segment-routing srv6 locator MAIN block-len 32
+set protocols segment-routing srv6 locator MAIN format usid-f3216
+set protocols segment-routing srv6 locator MAIN func-bits 16
+set protocols segment-routing srv6 locator MAIN node-len 16
+
+set protocols isis interface eth1
+set protocols isis interface lo
+set protocols isis net '49.0001.1980.5110.0002.00'
+set protocols isis segment-routing srv6 interface dum6
+set protocols isis segment-routing srv6 locator MAIN
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="igmp-proxy">
+<h1>Proxy IGMP</h1>
+<p>Le <abbr title="Internet Group Management Protocol">IGMP</abbr> proxy permet aux routeurs de
+transférer le trafic multicast, comme l'IPTV ou les flux vidéo, entre différents
+réseaux, tels que les réseaux domestiques et les fournisseurs d'accès Internet (FAI). Le proxy IGMP repose sur une interface en amont qui fait face aux sources multicast en amont, et une ou plusieurs interfaces en aval qui font face aux réseaux locaux ou aux hôtes et transmettent le trafic aux clients demandeurs.</p>
+<p>La configuration du proxy IGMP nécessite exactement une interface en amont et au moins une interface en aval.</p>
+<section id="configuration">
+<h2>Configuration</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols igmp-proxy interface &lt;interface&gt; role &lt;upstream | downstream&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-igmp-proxy-interface-interface-role-upstream-downstream" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le rôle opérationnel pour l'interface IGMP proxy spécifiée.</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">upstream</code>: Communique avec les sources multicast en amont pour récupérer le
+trafic multicast. Une configuration valide nécessite exactement une interface en amont.</p></li>
+<li><p><code class="docutils literal notranslate">downstream</code>: Communique avec les sous-réseaux locaux ou les hôtes en aval pour
+diffuser le trafic demandé. Une configuration valide nécessite au moins une interface en aval.</p></li>
+</ul>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols igmp-proxy interface eth0 role upstream
+set protocols igmp-proxy interface eth1 role downstream
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols igmp-proxy interface &lt;interface&gt; alt-subnet &lt;network&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-igmp-proxy-interface-interface-alt-subnet-network" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un sous-réseau distant autorisé pour le trafic multicast entrant
+sur l'interface IGMP proxy spécifiée</strong></p>
+<p>Par défaut, le proxy IGMP accepte uniquement le trafic multicast provenant des sous-réseaux directement connectés. Si une source multicast se trouve sur un réseau distant, vous devez définir explicitement le sous-réseau distant autorisé pour permettre le trafic.</p>
+<p>Vous pouvez configurer plusieurs sous-réseaux distants pour une interface IGMP proxy <strong>en amont</strong>.</p>
+<p>Les interfaces en amont nécessitent souvent cette configuration car les sources multicast résident généralement sur des sous-réseaux externes.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols igmp-proxy interface eth0 alt-subnet 10.0.0.0/8
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols igmp-proxy interface &lt;interface&gt; whitelist &lt;network&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-igmp-proxy-interface-interface-whitelist-network" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un réseau de destination autorisé pour les demandes de trafic multicast
+sur l'interface IGMP proxy spécifiée.</strong></p>
+<p>Par défaut, le proxy IGMP accepte les demandes pour tous les réseaux de destination multicast. Lorsque vous définissez une liste blanche, le proxy IGMP ne transfère les demandes que pour les réseaux multicast spécifiés.</p>
+<p>Vous pouvez configurer plusieurs entrées de liste blanche par interface IGMP proxy <strong>en aval</strong>.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols igmp-proxy interface eth1 whitelist 239.0.0.0/8
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols igmp-proxy interface &lt;interface&gt; threshold &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-igmp-proxy-interface-interface-threshold-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la limite TTL (Time-to-Live) pour l'interface IGMP proxy spécifiée.</strong></p>
+<p>Le proxy IGMP supprime tout paquet multicast ayant une valeur TTL inférieure à la limite configurée.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols igmp-proxy interface eth0 threshold 5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols igmp-proxy disable-quickleave
+<a class="cmdlink" href="#cfgcmd-set-protocols-igmp-proxy-disable-quickleave" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez le mode quickleave pour le proxy IGMP.</strong></p>
+<p>Si désactivé, le proxy IGMP ne transmet pas de message Leave en amont lorsqu'un message Leave en aval est reçu, empêchant ainsi la fin immédiate du trafic multicast en amont. Le proxy IGMP cesse également de interroger les interfaces en aval pour les rapports de membres. Si un client en aval soumet un nouveau rapport, le proxy IGMP ignore le message et ne reprend pas la distribution du trafic demandé.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Remarque</p>
+<p>Désactiver le mode quickleave force le proxy IGMP à fonctionner exactement comme un client multicast standard sur l'interface en amont.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Remarque</p>
+<p>Désactiver le mode quickleave augmente le risque de saturation de la bande passante du réseau.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols igmp-proxy disable-quickleave
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols igmp-proxy disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-igmp-proxy-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez le proxy IGMP sur le routeur.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols igmp-proxy disable
+</pre></div>
+</div>
+</section>
+<section id="operation">
+<h2>Fonctionnement</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+restart igmp-proxy
+<a class="cmdlink" href="#opcmd-restart-igmp-proxy" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Redémarrez le processus de proxy IGMP.</p>
+</div>
+</div>
+</section>
+<section id="example">
+<h2>Exemple</h2>
+<p>Dans cet exemple, le LAN local sur l'interface eth1 fonctionne derrière un NAT. Pour permettre aux clients locaux de recevoir le trafic multicast provenant du réseau source 198.51.100.0/24 sur l'interface WAN (eth0), configurez le proxy IGMP comme suit :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols igmp-proxy interface eth0 role upstream
+set protocols igmp-proxy interface eth0 alt-subnet 198.51.100.0/24
+set protocols igmp-proxy interface eth1 role downstream
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

@@ -1,0 +1,177 @@
+{
+  "zh-CN": {
+    "log": {
+      "columns": {
+        "actionMessage": "actionMessage",
+        "details": "details",
+        "level": "level",
+        "timestamp": "timestamp",
+        "userUnit": "userUnit"
+      },
+      "filters": {
+        "keyword": "密钥word"
+      },
+      "messages": {
+        "noLogs": "noLogs"
+      },
+      "pagination": {
+        "first": "first",
+        "items": "items",
+        "last": "last",
+        "next": "next",
+        "perPage": "perPage",
+        "previous": "previous"
+      }
+    }
+  },
+  "en": {
+    "log": {
+      "columns": {
+        "actionMessage": "Action Message",
+        "details": "Details",
+        "level": "Level",
+        "timestamp": "Timestamp",
+        "userUnit": "User Unit"
+      },
+      "filters": {
+        "keyword": "Keyword"
+      },
+      "messages": {
+        "noLogs": "No Logs"
+      },
+      "pagination": {
+        "first": "First",
+        "items": "Items",
+        "last": "Last",
+        "next": "Next",
+        "perPage": "Per Page",
+        "previous": "Previous"
+      }
+    }
+  },
+  "zh-TW": {
+    "log": {
+      "columns": {
+        "actionMessage": "Action Message",
+        "details": "Details",
+        "level": "Level",
+        "timestamp": "Timestamp",
+        "userUnit": "User Unit"
+      },
+      "filters": {
+        "keyword": "Keyword"
+      },
+      "messages": {
+        "noLogs": "No Logs"
+      },
+      "pagination": {
+        "first": "First",
+        "items": "Items",
+        "last": "Last",
+        "next": "Next",
+        "perPage": "Per Page",
+        "previous": "Previous"
+      }
+    }
+  },
+  "ru": {
+    "log": {
+      "columns": {
+        "actionMessage": "Action Message",
+        "details": "Details",
+        "level": "Level",
+        "timestamp": "Timestamp",
+        "userUnit": "User Unit"
+      },
+      "filters": {
+        "keyword": "Keyword"
+      },
+      "messages": {
+        "noLogs": "No Logs"
+      },
+      "pagination": {
+        "first": "First",
+        "items": "Items",
+        "last": "Last",
+        "next": "Next",
+        "perPage": "Per Page",
+        "previous": "Previous"
+      }
+    }
+  },
+  "de": {
+    "log": {
+      "columns": {
+        "actionMessage": "Action Message",
+        "details": "Details",
+        "level": "Level",
+        "timestamp": "Timestamp",
+        "userUnit": "User Unit"
+      },
+      "filters": {
+        "keyword": "Keyword"
+      },
+      "messages": {
+        "noLogs": "No Logs"
+      },
+      "pagination": {
+        "first": "First",
+        "items": "Items",
+        "last": "Last",
+        "next": "Next",
+        "perPage": "Per Page",
+        "previous": "Previous"
+      }
+    }
+  },
+  "fr": {
+    "log": {
+      "columns": {
+        "actionMessage": "Action Message",
+        "details": "Details",
+        "level": "Level",
+        "timestamp": "Timestamp",
+        "userUnit": "User Unit"
+      },
+      "filters": {
+        "keyword": "Keyword"
+      },
+      "messages": {
+        "noLogs": "No Logs"
+      },
+      "pagination": {
+        "first": "First",
+        "items": "Items",
+        "last": "Last",
+        "next": "Next",
+        "perPage": "Per Page",
+        "previous": "Previous"
+      }
+    }
+  },
+  "ko": {
+    "log": {
+      "columns": {
+        "actionMessage": "Action Message",
+        "details": "Details",
+        "level": "Level",
+        "timestamp": "Timestamp",
+        "userUnit": "User Unit"
+      },
+      "filters": {
+        "keyword": "Keyword"
+      },
+      "messages": {
+        "noLogs": "No Logs"
+      },
+      "pagination": {
+        "first": "First",
+        "items": "Items",
+        "last": "Last",
+        "next": "Next",
+        "perPage": "Per Page",
+        "previous": "Previous"
+      }
+    }
+  }
+}

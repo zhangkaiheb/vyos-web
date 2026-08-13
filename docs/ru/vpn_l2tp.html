@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="l2tp">
+<h1>L2TP</h1>
+<p>VyOS использует <a class="reference external" href="https://accel-ppp.org/">accel-ppp</a>, чтобы предоставить функции сервера L2TP. Он может использоваться
+с локальной аутентификацией или подключенным сервером RADIUS.</p>
+<section id="configuring-l2tp-server">
+<h2>Настройка сервера L2TP</h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn l2tp remote-access authentication mode local
+set vpn l2tp remote-access authentication local-users username test password &#39;test&#39;
+set vpn l2tp remote-access client-ip-pool L2TP-POOL range 192.168.255.2-192.168.255.254
+set vpn l2tp remote-access default-pool &#39;L2TP-POOL&#39;
+set vpn l2tp remote-access outside-address 192.0.2.2
+set vpn l2tp remote-access gateway-address 192.168.255.1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication mode &lt;local | radius&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-mode-local-radius" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Установите систему аутентификации. Настроенный механизм аутентификации используется
+для всех запросов.</p>
+<ul class="simple">
+<li><p><strong>radius</strong>: Все запросы аутентификации обрабатываются конфигурированным сервером RADIUS.</p></li>
+<li><p><strong>local</strong>: Все запросы аутентификации обрабатываются локально.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication local-users username &lt;user&gt; password &lt;pass&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-local-users-username-user-password-pass" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Создайте <code class="docutils literal notranslate">&lt;user&gt;</code> для локальной аутентификации на этом компьютере. Пароль пользователя
+будет установлен на <code class="docutils literal notranslate">&lt;pass&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access client-ip-pool &lt;POOL-NAME&gt; range &lt;x.x.x.x-x.x.x.x | x.x.x.x/x&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-client-ip-pool-pool-name-range-x-x-x-x-x-x-x-x-x-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду, чтобы определить первый IP-адрес пула
+адресов, которые будут предоставлены клиентам L2TP. Если используется обозначение <code class="docutils literal notranslate">x.x.x.x-x.x.x.x</code>,
+он должен находиться в подсети /24. Если используется обозначение <code class="docutils literal notranslate">x.x.x.x/x</code>,
+возможно установить хост/сетевой маску.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access default-pool &lt;POOL-NAME&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-default-pool-pool-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду, чтобы определить имя пула адресов по умолчанию.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access gateway-address &lt;gateway&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-gateway-address-gateway" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает единственный <code class="docutils literal notranslate">&lt;gateway&gt;</code> IP-адрес, который будет использоваться как локальный адрес интерфейсов PPP.</p>
+</div>
+</div>
+</section>
+<section id="configuring-ipsec">
+<h2>Настройка IPsec</h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn ipsec interface eth0
+set vpn l2tp remote-access ipsec-settings authentication mode pre-shared-secret
+set vpn l2tp remote-access ipsec-settings authentication pre-shared-secret secret
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn ipsec interface &lt;INTERFACE&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-ipsec-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду, чтобы определить интерфейс IPsec.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ipsec-settings authentication mode &lt;pre-shared-secret | x509&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ipsec-settings-authentication-mode-pre-shared-secret-x509" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Установите режим аутентификации IPsec между VyOS и клиентами L2TP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ipsec-settings authentication pre-shared-secret &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ipsec-settings-authentication-pre-shared-secret-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Установите предопределенную общую секретную фразу.</p>
+</div>
+</div>
+<p>Если на вашем внешнем интерфейсе есть политика локального брандмауэра, вам нужно
+разрешить следующие порты:</p>
+<ul class="simple">
+<li><p>UDP порт 500 (IKE)</p></li>
+<li><p>Номер протокола IP 50 (ESP)</p></li>
+<li><p>UDP порт 1701 для IPsec</p></li>
+</ul>
+<p>Также необходимо разрешить следующее, чтобы позволить NAT-проход (когда NAT обнаруживается клиентом
+VPN, ESP инкапсулируется в UDP для NAT-прохода):</p>
+<ul class="simple">
+<li><p>UDP порт 4500 (NAT-T)</p></li>
+</ul>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv4 name OUTSIDE-LOCAL rule 40 action &#39;accept&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 40 protocol &#39;esp&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 41 action &#39;accept&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 41 destination port &#39;500&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 41 protocol &#39;udp&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 42 action &#39;accept&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 42 destination port &#39;4500&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 42 protocol &#39;udp&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 43 action &#39;accept&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 43 destination port &#39;1701&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 43 ipsec &#39;match-ipsec&#39;
+set firewall ipv4 name OUTSIDE-LOCAL rule 43 protocol &#39;udp&#39;
+</pre></div>
+</div>
+<p>Чтобы разрешить доступ к клиентам VPN через ваш внешний адрес, требуется правило NAT:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat source rule 110 outbound-interface name &#39;eth0&#39;
+set nat source rule 110 source address &#39;192.168.255.0/24&#39;
+set nat source rule 110 translation address masquerade
+</pre></div>
+</div>
+</section>
+<section id="configuring-radius-authentication">
+<h2>Настройка аутентификации RADIUS</h2>
+<p>Для включения аутентификации на основе RADIUS, режим аутентификации должен быть изменен
+в конфигурации. Предыдущие настройки, такие как локальные пользователи, все еще существуют
+в конфигурации, однако они не используются, если режим был изменен с локального на RADIUS. После изменения обратно на локальный, он снова будет использовать все локальные учетные записи.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn l2tp remote-access authentication mode radius
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius server &lt;server&gt; key &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-server-server-key-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Настройте RADIUS <code class="docutils literal notranslate">&lt;server&gt;</code> и его необходимый общий <code class="docutils literal notranslate">&lt;secret&gt;</code> для
+обмена данными с сервером RADIUS.</p>
+</div>
+</div>
+<p>Поскольку сервер RADIUS является единственной точкой отказа, можно настроить несколько серверов RADIUS, которые будут использоваться последовательно.
+Например:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn l2tp remote-access authentication radius server 10.0.0.1 key &#39;foo&#39;
+set vpn l2tp remote-access authentication radius server 10.0.0.2 key &#39;foo&#39;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Некоторые серверы RADIUS используют список контроля доступа, который разрешает или запрещает
+запросы, убедитесь, что добавили ваш маршрутизатор VyOS в список разрешенных клиентов.</p>
+</div>
+<section id="radius-source-address">
+<h3>IP-адрес источника RADIUS</h3>
+<p>Если вы используете OSPF в качестве вашего IGP, используйте интерфейс, наиболее близкий к
+серверу RADIUS. Вы можете привязать все исходящие запросы RADIUS к одному исходному IP-адресу,
+например, к интерфейсу loopback.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Исходный IPv4-адрес, используемый во всех запросах к серверу RADIUS.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Параметр <code class="docutils literal notranslate">source-address</code> должен быть настроен на IP-адрес интерфейса.
+Лучшей практикой будет использование loopback или dummy интерфейса.</p>
+</div>
+</section>
+<section id="radius-advanced-options">
+<h3>Дополнительные параметры RADIUS</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius server &lt;server&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-server-server-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Настройте RADIUS <code class="docutils literal notranslate">&lt;server&gt;</code> и его необходимый порт для запросов аутентификации.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius server &lt;server&gt; fail-time &lt;time&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-server-server-fail-time-time" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Пометьте сервер RADIUS как недоступный на заданное количество <code class="docutils literal notranslate">&lt;time&gt;</code> секунд.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius server &lt;server&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-server-server-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Временно отключите этот сервер RADIUS.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius acct-timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-acct-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Время ожидания ответа для пакетов Interim-Update. (по умолчанию 3 секунды)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius dynamic-author server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-dynamic-author-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает IP-адрес сервера расширения динамической авторизации (DM/CoA).
+Этот IP-адрес должен существовать на любом интерфейсе VyOS или может быть <code class="docutils literal notranslate">0.0.0.0</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius dynamic-author port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-dynamic-author-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>UDP-порт для сервера расширения динамической авторизации (DM/CoA)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius dynamic-author key &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-dynamic-author-key-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Секрет для сервера расширения динамической авторизации (DM/CoA)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius max-try &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-max-try-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Максимальное количество попыток отправить запросы Access-Request/Accounting-Request</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Время ожидания ответа от сервера (секунды)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius nas-identifier &lt;identifier&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-nas-identifier-identifier" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Значение, отправляемое серверу RADIUS в атрибуте NAS-Identifier и совпадающее
+в запросах DM/CoA.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius nas-ip-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-nas-ip-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Значение, отправляемое серверу RADIUS в атрибуте NAS-IP-Address и совпадающее
+в запросах DM/CoA. Также сервер DM/CoA будет привязан к этому адресу.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Исходный IPv4-адрес, используемый во всех запросах к серверу RADIUS.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius rate-limit attribute &lt;attribute&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-rate-limit-attribute-attribute" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает, какой атрибут сервера RADIUS содержит информацию о ограничении скорости.
+По умолчанию атрибут — <code class="docutils literal notranslate">Filter-Id</code>.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если вы установите пользовательский атрибут RADIUS, вы должны определить его на обоих
+словарях на сервере RADIUS и клиенте.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius rate-limit enable
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-rate-limit-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Включает регулирование пропускной способности через RADIUS.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication radius rate-limit vendor
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-radius-rate-limit-vendor" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает словарь производителя. Этот словарь должен присутствовать в
+/usr/share/accel-ppp/radius.</p>
+</div>
+</div>
+<p>Полученные атрибуты RADIUS имеют более высокий приоритет, чем параметры, определенные в
+конфигурации CLI, см. объяснение ниже.</p>
+</section>
+<section id="allocation-clients-ip-addresses-by-radius">
+<h3>Выделение IP-адресов клиентам через RADIUS</h3>
+<p>Если сервер RADIUS отправляет атрибут <code class="docutils literal notranslate">Framed-IP-Address</code>, то этот IP-адрес будет выделен клиенту, и параметр <code class="docutils literal notranslate">default-pool</code> в
+конфигурации CLI будет проигнорирован.</p>
+<p>Если сервер RADIUS отправляет атрибут <code class="docutils literal notranslate">Framed-Pool</code>, то IP-адрес будет выделен из заранее определенного пула IP-адресов, имя которого равно значению атрибута.</p>
+<p>Если сервер RADIUS отправляет атрибут <code class="docutils literal notranslate">Stateful-IPv6-Address-Pool</code>, то IPv6-адрес будет выделен из заранее определенного пула IPv6 <code class="docutils literal notranslate">prefix</code>, имя которого равно значению атрибута.</p>
+<p>Если сервер RADIUS отправляет атрибут <code class="docutils literal notranslate">Delegated-IPv6-Prefix-Pool</code>, то префикс делегирования IPv6 будет выделен из заранее определенного пула IPv6 <code class="docutils literal notranslate">delegate</code>, имя которого равно значению атрибута.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p><code class="docutils literal notranslate">Stateful-IPv6-Address-Pool</code> и <code class="docutils literal notranslate">Delegated-IPv6-Prefix-Pool</code> определены в
+RFC6911. Если они не определены на вашем сервере RADIUS, добавьте новый <a class="reference external" href="https://github.com/accel-ppp/accel-ppp/blob/master/accel-pppd/radius/dict/dictionary.rfc6911">словарь</a>.</p>
+</div>
+<p>Интерфейс клиента может быть помещен в контекст VRF через пакет Access-Accept RADIUS,
+или изменен через RADIUS CoA. <code class="docutils literal notranslate">Accel-VRF-Name</code> используется для этих целей. Это является пользовательским <a class="reference external" href="https://github.com/accel-ppp/accel-ppp/blob/master/accel-pppd/radius/dict/dictionary.accel">атрибутом ACCEL-PPP</a>. Определите его на вашем сервере RADIUS.</p>
+</section>
+<section id="renaming-clients-interfaces-by-radius">
+<h3>Переименование интерфейсов клиентов через RADIUS</h3>
+<p>Если сервер RADIUS использует атрибут <code class="docutils literal notranslate">NAS-Port-Id</code>, то туннели ppp будут переименованы.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Значение атрибута <code class="docutils literal notranslate">NAS-Port-Id</code> должно быть меньше 16
+символов, иначе интерфейс не будет переименован.</p>
+</div>
+</section>
+</section>
+<section id="configuring-lns-l2tp-network-server">
+<h2>Настройка LNS (сетевого сервера L2TP)</h2>
+<p>LNS часто используется для подключения к LAC (L2TP-концентратору).</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access lns host-name &lt;hostname&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-lns-host-name-hostname" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Отправляемое клиенту (LAC) в атрибуте Host-Name</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access lns shared-secret &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-lns-shared-secret-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Пароль туннеля, используемый для аутентификации клиента (LAC)</p>
+</div>
+</div>
+<p>Для объяснения использования LNS следуйте нашему примеру <a class="reference internal" href="../../configexamples/lac-lns.html#examples-lac-lns">PPPoE через L2TP</a>.</p>
+</section>
+<section id="ipv6">
+<h2>IPv6</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options ipv6 &lt;require | prefer | allow | deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-ipv6-require-prefer-allow-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает предпочтение согласования IPv6.</p>
+<ul class="simple">
+<li><p><strong>require</strong> - Требуется согласование IPv6</p></li>
+<li><p><strong>prefer</strong> - Запросить клиента о согласовании IPv6, не завершать, если он отклоняет</p></li>
+<li><p><strong>allow</strong> - Согласование IPv6 только если клиент запрашивает (значение по умолчанию)</p></li>
+<li><p><strong>deny</strong> - Не согласовывать IPv6 (значение по умолчанию)</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access client-ipv6-pool &lt;IPv6-POOL-NAME&gt; prefix &lt;address&gt; mask &lt;number-of-bits&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-client-ipv6-pool-ipv6-pool-name-prefix-address-mask-number-of-bits" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду, чтобы установить пул IPv6, из которого клиент L2TP получит префикс IPv6 заданной длины (маски), чтобы завершить точку подключения L2TP на их стороне. Длина маски может быть установлена между 48 и 128 битами, значение по умолчанию — 64.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access client-ipv6-pool &lt;IPv6-POOL-NAME&gt; delegate &lt;address&gt; delegation-prefix &lt;number-of-bits&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-client-ipv6-pool-ipv6-pool-name-delegate-address-delegation-prefix-number-of-bits" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду, чтобы настроить делегирование префикса DHCPv6 (RFC3633) на L2TP.
+Вам нужно будет установить ваш пул IPv6 и длину префикса делегирования. Из определенного пула IPv6 вы будете выдавать сети заданной длины (префикс делегирования). Длина префикса делегирования может быть установлена между 32 и 64 битами.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access default-ipv6-pool &lt;IPv6-POOL-NAME&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-default-ipv6-pool-ipv6-pool-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду, чтобы определить имя пула IPv6 по умолчанию.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn l2tp remote-access ppp-options ipv6 allow
+set vpn l2tp remote-access client-ipv6-pool IPv6-POOL delegate &#39;2001:db8:8003::/48&#39; delegation-prefix &#39;56&#39;
+set vpn l2tp remote-access client-ipv6-pool IPv6-POOL prefix &#39;2001:db8:8002::/48&#39; mask &#39;64&#39;
+set vpn l2tp remote-access default-ipv6-pool IPv6-POOL
+</pre></div>
+</div>
+<section id="ipv6-advanced-options">
+<h3>Дополнительные параметры IPv6</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options ipv6-accept-peer-interface-id
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-ipv6-accept-peer-interface-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Принять идентификатор интерфейса партнера. По умолчанию это не определено.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options ipv6-interface-id &lt;random | x:x:x:x&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-ipv6-interface-id-random-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Определяет, используется ли фиксированный или случайный идентификатор интерфейса для IPv6. По умолчанию используется фиксированный.</p>
+<ul class="simple">
+<li><p><strong>random</strong> - Случайный идентификатор интерфейса для IPv6</p></li>
+<li><p><strong>x:x:x:x</strong> - Указать идентификатор интерфейса для IPv6</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options ipv6-interface-id &lt;random | x:x:x:x&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-ipv6-interface-id-random-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Определяет идентификатор интерфейса партнера для IPv6. По умолчанию используется фиксированный.</p>
+<ul class="simple">
+<li><p><strong>random</strong> - Случайный идентификатор интерфейса для IPv6</p></li>
+<li><p><strong>x:x:x:x</strong> - Указать идентификатор интерфейса для IPv6</p></li>
+<li><p><strong>ipv4-addr</strong> - Вычислить идентификатор интерфейса из IPv4-адреса.</p></li>
+<li><p><strong>calling-sid</strong> - Вычислить идентификатор интерфейса из вызывающего станционного идентификатора.</p></li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="scripting">
+<h2>Скриптовое программирование</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access extended-scripts on-change &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-extended-scripts-on-change-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Скрипт, который запускается, когда интерфейс сессии изменяется обработкой RADIUS CoA</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access extended-scripts on-down &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-extended-scripts-on-down-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Скрипт, который запускается, когда интерфейс сессии готов к завершению</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access extended-scripts on-pre-up &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-extended-scripts-on-pre-up-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Скрипт, который запускается перед тем, как интерфейс сессии станет активным</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access extended-scripts on-up &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-extended-scripts-on-up-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Скрипт, который запускается, когда интерфейс сессии полностью настроен и запущен</p>
+</div>
+</div>
+</section>
+<section id="advanced-options">
+<h2>Дополнительные параметры</h2>
+<section id="authentication-advanced-options">
+<h3>Дополнительные параметры аутентификации</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication local-users username &lt;user&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-local-users-username-user-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Отключить <code class="docutils literal notranslate">&lt;user&gt;</code> учетную запись.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication local-users username &lt;user&gt; static-ip &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-local-users-username-user-static-ip-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Назначить статический IP-адрес <code class="docutils literal notranslate">&lt;user&gt;</code> учетной записи.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication local-users username &lt;user&gt; rate-limit download &lt;bandwidth&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-local-users-username-user-rate-limit-download-bandwidth" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Ограничить пропускную способность загрузки для <code class="docutils literal notranslate">&lt;user&gt;</code> до <code class="docutils literal notranslate">&lt;bandwidth&gt;</code> кбит/с.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication local-users username &lt;user&gt; rate-limit upload &lt;bandwidth&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-local-users-username-user-rate-limit-upload-bandwidth" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Ограничить пропускную способность загрузки для <code class="docutils literal notranslate">&lt;user&gt;</code> до <code class="docutils literal notranslate">&lt;bandwidth&gt;</code> кбит/с</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access authentication protocols &lt;pap | chap | mschap | mschap-v2&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-authentication-protocols-pap-chap-mschap-mschap-v2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Требуется, чтобы абонент аутентифицировался, используя один из следующих протоколов:
+pap, chap, mschap, mschap-v2.</p>
+</div>
+</div>
+</section>
+<section id="client-ip-pool-advanced-options">
+<h3>Дополнительные параметры пула IP-адресов клиентов</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access client-ip-pool &lt;POOL-NAME&gt; next-pool &lt;NEXT-POOL-NAME&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-client-ip-pool-pool-name-next-pool-next-pool-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду, чтобы определить имя следующего пула адресов.</p>
+</div>
+</div>
+</section>
+<section id="ppp-advanced-options">
+<h3>Дополнительные параметры PPP</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options disable-ccp
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-disable-ccp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Отключить протокол управления сжатием (CCP).
+CCP включен по умолчанию.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options interface-cache &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-interface-cache-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Определяет количество интерфейсов, которые будут кэшироваться. Это предотвращает удаление интерфейсов после уничтожения соответствующей сессии. Вместо этого интерфейсы будут кэшироваться для использования в новых сессиях. Это должно снизить частоту создания/удаления интерфейсов на уровне ядра.
+Значение по умолчанию — <strong>0</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options ipv4 &lt;require | prefer | allow | deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-ipv4-require-prefer-allow-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает предпочтение согласования IPv4.</p>
+<ul class="simple">
+<li><p><strong>require</strong> - Требуется согласование IPv4</p></li>
+<li><p><strong>prefer</strong> - Запросить клиента о согласовании IPv4, не завершать, если он отклоняет</p></li>
+<li><p><strong>allow</strong> - Согласование IPv4 только если клиент запрашивает (значение по умолчанию)</p></li>
+<li><p><strong>deny</strong> - Не согласовывать IPv4</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options lcp-echo-failure &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-lcp-echo-failure-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Определяет максимальное количество <code class="docutils literal notranslate">&lt;number&gt;</code> неподтвержденных эхо-запросов. При достижении значения <code class="docutils literal notranslate">&lt;number&gt;</code>, сессия будет перезапущена. Значение по умолчанию — <strong>3</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options lcp-echo-interval &lt;interval&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-lcp-echo-interval-interval" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Если эта опция указана и больше 0, то модуль PPP будет отправлять запросы LCP echo каждые <code class="docutils literal notranslate">&lt;interval&gt;</code> секунд.
+Значение по умолчанию — <strong>30</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options lcp-echo-timeout
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-lcp-echo-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает время ожидания в секундах для любого активного действия партнера. Если эта опция указана, она включает адаптивную функцию эха LCP и «lcp-echo-failure» не используется. Значение по умолчанию — <strong>0</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options min-mtu &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-min-mtu-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Определяет минимально допустимый MTU. Если клиент пытается согласовать MTU меньше этого, он будет NAKed, и отключен, если он отклоняет больший MTU.
+Значение по умолчанию — <strong>100</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options mppe &lt;require | prefer | deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-mppe-require-prefer-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Указывает предпочтение согласования <abbr title="Microsoft Point-to-Point Encryption">MPPE</abbr>.</p>
+<ul class="simple">
+<li><p><strong>require</strong> - запросить клиента о mppe, если он отклоняет, завершить соединение</p></li>
+<li><p><strong>prefer</strong> - запросить клиента о mppe, если он отклоняет, не завершать. (Значение по умолчанию)</p></li>
+<li><p><strong>deny</strong> - запретить mppe</p></li>
+</ul>
+<p>Поведение по умолчанию — не запрашивать клиента о mppe, но разрешить, если клиент хочет. Обратите внимание, что RADIUS может переопределить этот параметр с помощью атрибута MS-MPPE-Encryption-Policy.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access ppp-options mru &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-ppp-options-mru-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Определяет предпочитаемый MRU. По умолчанию не определено.</p>
+</div>
+</div>
+</section>
+<section id="global-advanced-options">
+<h3>Дополнительные глобальные параметры</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Установите описание.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access limits burst &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-limits-burst-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Количество пакетов</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access limits connection-limit &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-limits-connection-limit-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Максимальное количество принимаемых соединений (например, 1/мин, 60/сек)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access limits timeout &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-limits-timeout-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Время ожидания в секундах</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access mtu
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Максимальный размер передачи (MTU) (по умолчанию: <strong>1436</strong>)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access max-concurrent-sessions
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-max-concurrent-sessions" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Максимальное количество одновременных попыток запуска сессии</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-name-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Подключенные клиенты должны использовать <code class="docutils literal notranslate">&lt;address&gt;</code> как сервер DNS. Эта команда
+принимает как IPv4, так и IPv6 адреса. Для IPv4 можно настроить до двух серверов имен, для IPv6 до трех.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access shaper fwmark &lt;1-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-shaper-fwmark-1-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Совпадение значения метки брандмауэра</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access snmp master-agent
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-snmp-master-agent" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Включить SNMP</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vpn l2tp remote-access wins-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-vpn-l2tp-remote-access-wins-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Серверы WINS, распространяемые клиенту</p>
+</div>
+</div>
+</section>
+</section>
+<section id="monitoring">
+<h2>Мониторинг</h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show l2tp-server sessions
+ ifname | username |      ip       | ip6 | ip6-dp | calling-sid | rate-limit | state  |  uptime  | rx-bytes | tx-bytes
+--------+----------+---------------+-----+--------+-------------+------------+--------+----------+----------+----------
+ l2tp0  | test     | 192.168.255.3 |     |        | 192.168.0.36 |            | active | 02:01:47 | 7.7 KiB  | 1.2 KiB
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show l2tp-server statistics
+ uptime: 0.02:49:49
+cpu: 0%
+mem(rss/virt): 5920/100892 kB
+core:
+  mempool_allocated: 133202
+  mempool_available: 131770
+  thread_count: 1
+  thread_active: 1
+  context_count: 5
+  context_sleeping: 0
+  context_pending: 0
+  md_handler_count: 3
+  md_handler_pending: 0
+  timer_count: 0
+  timer_pending: 0
+sessions:
+  starting: 0
+  active: 0
+  finishing: 0
+l2tp:
+  tunnels:
+    starting: 0
+    active: 0
+    finishing: 0
+  sessions (control channels):
+    starting: 0
+    active: 0
+    finishing: 0
+  sessions (data channels):
+    starting: 0
+    active: 0
+    finishing: 0
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="vrf">
+<h1>VRF</h1>
+<p><abbr title="Virtual Routing and Forwarding">VRF</abbr> Geräte in Verbindung mit IP-Regeln
+ermöglichen die Erstellung von virtuellen Routen und Weiterleitungsdomänen (auch
+VRFs, VRF-Lite im Speziellen) im Linux-Netzwerkstack. Ein Anwendungsfall ist das
+Problem der Multi-Tenancy, bei dem jeder Mieter über eigene eindeutige Routing-Tabellen
+verfügt und zumindest unterschiedliche Standard-Gateways benötigt.</p>
+<section id="configuration">
+<h2>Konfiguration</h2>
+<p>Eine VRF-Gerät wird mit einer zugehörigen Route-Tabelle erstellt. Netzwerkschnittstellen
+werden dann an ein VRF-Gerät gebunden.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vrf name &lt;name&gt; table &lt;id&gt;
+<a class="cmdlink" href="#cfgcmd-set-vrf-name-name-table-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Erstellt eine neue VRF-Instanz mit <code class="docutils literal notranslate">&lt;name&gt;</code> und <code class="docutils literal notranslate">&lt;id&gt;</code>. Der Name wird verwendet, um
+individuelle Schnittstellen in die VRF einzufügen.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Eine Routing-Tabellen-ID kann nicht geändert werden, nachdem sie zugewiesen wurde.
+Sie kann nur geändert werden, indem die VRF-Instanz gelöscht und neu hinzugefügt wird.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vrf bind-to-all
+<a class="cmdlink" href="#cfgcmd-set-vrf-bind-to-all" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Standardmäßig ist der Umfang der Port-Bindungen für ungebundene Sockets auf
+die Standard-VRF beschränkt. Das heißt, es wird nicht durch Pakete übereinstimmen,
+die auf Schnittstellen angemeldet sind, die zu einer VRF gehören, und Prozesse können
+auf denselben Port binden, wenn sie sich auf eine VRF beziehen.</p>
+<p>TCP- und UDP-Dienste, die im Standard-VRF-Kontext laufen (dh nicht an eine
+VRF-Schnittstelle gebunden), können über alle VRF-Bereiche arbeiten, indem diese
+Option aktiviert wird.</p>
+</div>
+</div>
+<section id="zebra-kernel-route-filtering">
+<h3>Zebra/Kernel route filtering</h3>
+<p>Zebra unterstützt Präfixlisten und Route Maps, um Routen zu filtern, die aus anderen FRR-Komponenten empfangen werden. Die erlaubten/verbotenen Funktionen, die durch diese Befehle bereitgestellt werden, können verwendet werden, um zu filtern, welche Routen Zebra in den Kernel installiert.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vrf &lt;name&gt; ip protocol &lt;protocol&gt; route-map &lt;route-map&gt;
+<a class="cmdlink" href="#cfgcmd-set-vrf-name-ip-protocol-protocol-route-map-route-map" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Anwenden eines Route-Map-Filter auf Routen für das angegebene Protokoll.</p>
+<p>Folgende Protokolle können verwendet werden: any, babel, bgp, eigrp,
+isis, ospf, rip, static</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Wenn Sie any als Option wählen, wird dies alle Protokolle bewirken, die Routen an Zebra senden.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vrf &lt;name&gt; ipv6 protocol &lt;protocol&gt; route-map &lt;route-map&gt;
+<a class="cmdlink" href="#cfgcmd-set-vrf-name-ipv6-protocol-protocol-route-map-route-map" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Anwenden eines Route-Map-Filter auf Routen für das angegebene Protokoll.</p>
+<p>Folgende Protokolle können verwendet werden: any, babel, bgp, isis,
+ospfv3, ripng, static</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Wenn Sie any als Option wählen, wird dies alle Protokolle bewirken, die Routen an Zebra senden.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="nexthop-tracking">
+<h3>Nexthop Tracking</h3>
+<p>Nexthop Tracking löst Nexthops standardmäßig über die Standardroute auf. Dies ist standardmäßig für ein traditionelles Profil von FRR aktiviert, das wir verwenden. Es kann deaktiviert werden, wenn Sie z.B. nicht möchten, dass BGP über die Standardroute peert.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vrf name &lt;name&gt; ip nht no-resolve-via-default
+<a class="cmdlink" href="#cfgcmd-set-vrf-name-name-ip-nht-no-resolve-via-default" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Erlaubt nicht, dass IPv4-Nexthop-Tracking über die Standardroute aufgelöst wird. Dieser Parameter wird pro-VRF konfiguriert, sodass der Befehl auch im VRF-Unterknoten verfügbar ist.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vrf name &lt;name&gt; ipv6 nht no-resolve-via-default
+<a class="cmdlink" href="#cfgcmd-set-vrf-name-name-ipv6-nht-no-resolve-via-default" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Erlaubt nicht, dass IPv6-Nexthop-Tracking über die Standardroute aufgelöst wird. Dieser Parameter wird pro-VRF konfiguriert, sodass der Befehl auch im VRF-Unterknoten verfügbar ist.</p>
+</div>
+</div>
+</section>
+<section id="interfaces">
+<h3>Schnittstellen</h3>
+<p>Wenn VRFs verwendet werden, ist es nicht nur erforderlich, eine VRF zu erstellen, sondern die VRF selbst muss auch einer Schnittstelle zugewiesen werden.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces &lt;dummy | ethernet | bonding | bridge | pppoe&gt; &lt;interface&gt; vrf &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-dummy-ethernet-bonding-bridge-pppoe-interface-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Weist die Schnittstelle, die durch <code class="docutils literal notranslate">&lt;interface&gt;</code> identifiziert wird, der VRF mit dem Namen <code class="docutils literal notranslate">&lt;name&gt;</code> zu.</p>
+</div>
+</div>
+</section>
+<section id="routing">
+<h3>Routing</h3>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>VyOS 1.4 (sagitta) hat dynamisches Routing für VRFs eingeführt.</p>
+</div>
+<p>Derzeit wird dynamisches Routing für folgende Protokolle unterstützt:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../protocols/bgp.html#routing-bgp">BGP</a></p></li>
+<li><p>routing-isis</p></li>
+<li><p><a class="reference internal" href="../protocols/ospf.html#routing-ospf">OSPF</a></p></li>
+<li><p><a class="reference internal" href="../protocols/ospf.html#routing-ospfv3">OSPFv3 (IPv6)</a></p></li>
+<li><p><a class="reference internal" href="../protocols/static.html#routing-static">Static</a></p></li>
+</ul>
+<p>Die CLI-Konfiguration ist dieselbe wie in oben genannten Artikeln erwähnt. Der einzige
+Unterschied besteht darin, dass jedes verwendete Routing-Protokoll mit dem Befehl <code class="docutils literal notranslate">vrf name &lt;name&gt;</code> präfixiert werden muss.</p>
+<section id="example">
+<h4>Beispiel</h4>
+<p>Die folgenden Befehle sind erforderlich, um Optionen für ein bestimmtes dynamisches
+Routing-Protokoll innerhalb eines bestimmten VRF festzulegen:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../protocols/bgp.html#routing-bgp">BGP</a>: <code class="docutils literal notranslate">set vrf name &lt;name&gt; protocols bgp ...</code></p></li>
+<li><p>routing-isis: <code class="docutils literal notranslate">set vrf name &lt;name&gt; protocols isis ...</code></p></li>
+<li><p><a class="reference internal" href="../protocols/ospf.html#routing-ospf">OSPF</a>: <code class="docutils literal notranslate">set vrf name &lt;name&gt; protocols ospf ...</code></p></li>
+<li><p><a class="reference internal" href="../protocols/ospf.html#routing-ospfv3">OSPFv3 (IPv6)</a>: <code class="docutils literal notranslate">set vrf name &lt;name&gt; protocols ospfv3 ...</code></p></li>
+<li><p><a class="reference internal" href="../protocols/static.html#routing-static">Static</a>: <code class="docutils literal notranslate">set vrf name &lt;name&gt; protocols static ...</code></p></li>
+</ul>
+</section>
+</section>
+<section id="services">
+<h3>Dienste</h3>
+<p>Derzeit können folgende Dienste isoliert in VRFs erstellt werden</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../service/dhcp-server.html#dhcp-server">DHCP Server</a></p></li>
+</ul>
+<p>Die CLI-Konfiguration ist dieselbe wie in oben genannten Artikeln erwähnt. Der einzige
+Unterschied besteht darin, dass jeder verwendete Dienst mit dem Befehl <code class="docutils literal notranslate">vrf name &lt;name&gt;</code> präfixiert werden muss.</p>
+<section id="id2">
+<h4>Beispiel</h4>
+<p>Die folgenden Befehle sind erforderlich, um Optionen für einen bestimmten Dienst
+innerhalb eines bestimmten VRF festzulegen:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../service/dhcp-server.html#dhcp-server">DHCP Server</a>: <code class="docutils literal notranslate">set vrf name &lt;name&gt; service dhcp-server ...</code></p></li>
+<li><p><a class="reference internal" href="../service/dhcp-server.html#dhcp-server">DHCP Server</a>: <code class="docutils literal notranslate">set vrf name &lt;name&gt; service dhcpv6-server ...</code></p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="operation">
+<h2>Betrieb</h2>
+<p>Es reicht nicht aus, nur eine VRF zu konfigurieren, sondern auch VRFs müssen gewartet werden. Für die Wartung von VRFs sind folgende Betriebsbefehle vorhanden.</p>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show vrf
+<a class="cmdlink" href="#opcmd-show-vrf" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Listet VRFs auf, die erstellt wurden</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show vrf
+VRF name          state     mac address        flags                     interfaces
+--------          -----     -----------        -----                     ----------
+blue              up        00:53:12:d8:74:24  noarp,master,up,lower_up  dum200,eth0.302
+red               up        00:53:de:02:df:aa  noarp,master,up,lower_up  dum100,eth0.300,bond0.100,peth0
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Der Befehl sollte wahrscheinlich erweitert werden, um auch die tatsächlichen
+Schnittstellen aufzulisten, die dieser VRF zugewiesen sind, um eine bessere Übersicht zu erhalten.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show vrf &lt;name&gt;
+<a class="cmdlink" href="#opcmd-show-vrf-name" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show vrf name blue
+VRF name          state     mac address        flags                     interfaces
+--------          -----     -----------        -----                     ----------
+blue              up        00:53:12:d8:74:24  noarp,master,up,lower_up  dum200,eth0.302
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show ip route vrf &lt;name&gt;
+<a class="cmdlink" href="#opcmd-show-ip-route-vrf-name" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Anzeige der IPv4-Routentabelle für VRF, identifiziert durch <code class="docutils literal notranslate">&lt;name&gt;</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show ip route vrf blue
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, D - SHARP,
+       F - PBR, f - OpenFabric,
+       &gt; - selected route, * - FIB route, q - queued route, r - rejected route
+
+VRF blue:
+K   0.0.0.0/0 [255/8192] unreachable (ICMP unreachable), 00:00:50
+S&gt;* 172.16.0.0/16 [1/0] via 192.0.2.1, dum1, 00:00:02
+C&gt;* 192.0.2.0/24 is directly connected, dum1, 00:00:06
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show ipv6 route vrf &lt;name&gt;
+<a class="cmdlink" href="#opcmd-show-ipv6-route-vrf-name" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Anzeige der IPv6-Routentabelle für VRF, identifiziert durch <code class="docutils literal notranslate">&lt;name&gt;</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show ipv6 route vrf red
+Codes: K - kernel route, C - connected, S - static, R - RIPng,
+       O - OSPFv3, I - IS-IS, B - BGP, N - NHRP, T - Table,
+       v - VNC, V - VNC-Direct, A - Babel, D - SHARP, F - PBR,
+       f - OpenFabric,
+       &gt; - selected route, * - FIB route, q - queued route, r - rejected route
+
+VRF red:
+K   ::/0 [255/8192] unreachable (ICMP unreachable), 00:43:20
+C&gt;* 2001:db8::/64 is directly connected, dum1, 00:02:19
+C&gt;* fe80::/64 is directly connected, dum1, 00:43:19
+K&gt;* ff00::/8 [0/256] is directly connected, dum1, 00:43:19
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+ping &lt;host&gt; vrf &lt;name&gt;
+<a class="cmdlink" href="#opcmd-ping-host-vrf-name" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Der ping-Befehl wird verwendet, um zu testen, ob ein Netzwerkhost erreichbar ist oder nicht.</p>
+<p>Ping verwendet das obligatorische ECHO_REQUEST-Datagramm des ICMP-Protokolls, um ein
+ICMP ECHO_RESPONSE von einem Host oder Gateway zu erzeugen. ECHO_REQUEST-Datagramme (Pings)
+werden einen IP- und ICMP-Header haben, gefolgt von „struct timeval“ und einer beliebigen
+Anzahl von Füllbytes, um das Paket zu vervollständigen.</p>
+<p>Bei der Fehlerisolierung mit ping sollten Sie zunächst auf dem lokalen Host laufen,
+um sicherzustellen, dass die lokale Netzwerkschnittstelle aktiv und in Betrieb ist. Dann
+weiter mit Hosts und Gateways weiter unten auf dem Weg zu Ihrem Ziel. Round-trip-Zeit
+und Paketverluststatistiken werden berechnet.</p>
+<p>Doppelte Pakete werden nicht in die Berechnung des Paketverlusts einbezogen, obwohl
+die Round-trip-Zeit dieser Pakete zur Berechnung der minimalen/average/maximalen
+Round-trip-Zeit-Werte verwendet wird.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Der Ping-Befehl kann jederzeit mit <code class="docutils literal notranslate">&lt;Ctrl&gt;+c</code> unterbrochen werden.
+Danach wird eine kurze Statistik angezeigt.</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ ping 192.0.2.1 vrf red
+PING 192.0.2.1 (192.0.2.1) 56(84) bytes of data.
+64 bytes from 192.0.2.1: icmp_seq=1 ttl=64 time=0.070 ms
+64 bytes from 192.0.2.1: icmp_seq=2 ttl=64 time=0.078 ms
+^C
+--- 192.0.2.1 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 4ms
+rtt min/avg/max/mdev = 0.070/0.074/0.078/0.004 ms
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+traceroute vrf &lt;name&gt; [ipv4 | ipv6] &lt;host&gt;
+<a class="cmdlink" href="#opcmd-traceroute-vrf-name-ipv4-ipv6-host" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Zeigt den Weg an, den Pakete nehmen, um einen Netzwerkhost mit Hilfe der VRF-Instanz
+zu erreichen, die durch <code class="docutils literal notranslate">&lt;name&gt;</code> identifiziert wird. Wenn die IPv4- oder IPv6-Option verwendet wird, zeigt es den Weg an, den Pakete nehmen, um die angegebene Host-IP-Adressfamilie zu erreichen. Diese Option ist nützlich, wenn der Host als Hostname statt als IP-Adresse angegeben wird.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+force vrf &lt;name&gt;
+<a class="cmdlink" href="#opcmd-force-vrf-name" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Verbindet mit einem gegebenen VRF. Dies öffnet eine neue Subshell innerhalb des angegebenen VRF.</p>
+<p>Das Prompt wird entsprechend geändert, sowohl in der Konfigurations- als auch in der Betriebsmodus.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ force vrf blue
+vyos@vyos(vrf:blue):~$
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="vrf-example">
+<h2>Beispiel</h2>
+<section id="vrf-route-leaking">
+<h3>VRF Route Leaking</h3>
+<p>Das folgende Beispiel-Topologie wurde mit EVE-NG erstellt.</p>
+<figure class="align-default" id="id10">
+<img alt="VRF topology example" src="https://docs.vyos.io/en/rolling/_images/vrf-example-topology-01.webp" />
+<figcaption>
+<p>VRF route leaking</p>
+</figcaption>
+</figure>
+<ul class="simple">
+<li><p>PC1 befindet sich in der <code class="docutils literal notranslate">default</code> VRF und fungiert als z.B. „fileserver“</p></li>
+<li><p>PC2 befindet sich in der VRF <code class="docutils literal notranslate">blue</code>, was der Entwicklungsabteilung entspricht</p></li>
+<li><p>PC3 und PC4 sind an einem Brückengerät auf Router <code class="docutils literal notranslate">R1</code> angeschlossen, das in der VRF
+<code class="docutils literal notranslate">red</code> ist. Sagen wir, dies ist die HR-Abteilung.</p></li>
+<li><p>R1 wird über ein Out-of-band-Netzwerk verwaltet, das in der VRF <code class="docutils literal notranslate">mgmt</code> liegt</p></li>
+</ul>
+<section id="vrf-example-configuration">
+<h4>Konfiguration</h4>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bridge br10 address &#39;10.30.0.254/24&#39;
+set interfaces bridge br10 member interface eth3
+set interfaces bridge br10 member interface eth4
+set interfaces bridge br10 vrf &#39;red&#39;
+
+set interfaces ethernet eth0 address &#39;dhcp&#39;
+set interfaces ethernet eth0 vrf &#39;mgmt&#39;
+set interfaces ethernet eth1 address &#39;10.0.0.254/24&#39;
+set interfaces ethernet eth2 address &#39;10.20.0.254/24&#39;
+set interfaces ethernet eth2 vrf &#39;blue&#39;
+
+set protocols static route 10.20.0.0/24 interface eth2 vrf &#39;blue&#39;
+set protocols static route 10.30.0.0/24 interface br10 vrf &#39;red&#39;
+
+set service ssh disable-host-validation
+set service ssh vrf &#39;mgmt&#39;
+
+set system name-server &#39;eth0&#39;
+
+set vrf name blue protocols static route 10.0.0.0/24 interface eth1 vrf &#39;default&#39;
+set vrf name blue table &#39;3000&#39;
+set vrf name mgmt table &#39;1000&#39;
+set vrf name red protocols static route 10.0.0.0/24 interface eth1 vrf &#39;default&#39;
+set vrf name red table &#39;2000&#39;
+</pre></div>
+</div>
+</section>
+</section>
+<section id="vrf-and-nat">
+<h3>VRF und NAT</h3>
+<section id="vrf-nat-configuration">
+<h4>Konfiguration</h4>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address &#39;172.16.50.12/24&#39;
+set interfaces ethernet eth0 vrf &#39;red&#39;
+
+set interfaces ethernet eth1 address &#39;192.168.130.100/24&#39;
+set interfaces ethernet eth1 vrf &#39;blue&#39;
+
+set nat destination rule 110 description &#39;NAT ssh- INSIDE&#39;
+set nat destination rule 110 destination port &#39;2022&#39;
+set nat destination rule 110 inbound-interface name &#39;eth0&#39;
+set nat destination rule 110 protocol &#39;tcp&#39;
+set nat destination rule 110 translation address &#39;192.168.130.40&#39;
+
+set nat source rule 100 outbound-interface name &#39;eth0&#39;
+set nat source rule 100 protocol &#39;all&#39;
+set nat source rule 100 source address &#39;192.168.130.0/24&#39;
+set nat source rule 100 translation address &#39;masquerade&#39;
+
+set service ssh vrf &#39;red&#39;
+
+set vrf bind-to-all
+set vrf name blue protocols static route 0.0.0.0/0 next-hop 172.16.50.1 vrf &#39;red&#39;
+set vrf name blue protocols static route 172.16.50.0/24 interface eth0 vrf &#39;red&#39;
+set vrf name blue table &#39;1010&#39;
+
+set vrf name red protocols static route 0.0.0.0/0 next-hop 172.16.50.1
+set vrf name red protocols static route 192.168.130.0/24 interface eth1 vrf &#39;blue&#39;
+set vrf name red table &#39;2020&#39;
+</pre></div>
+</div>
+</section>
+<section id="vrf-example-operation">
+<h4>Betrieb</h4>
+<p>Nach dem Commit der Konfiguration können wir alle geleakten Routen überprüfen und versuchen, von PC3 aus PC1 zu ICMP-pingen.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>PCS&gt; ping 10.0.0.1
+
+84 bytes from 10.0.0.1 icmp_seq=1 ttl=63 time=1.943 ms
+84 bytes from 10.0.0.1 icmp_seq=2 ttl=63 time=1.618 ms
+84 bytes from 10.0.0.1 icmp_seq=3 ttl=63 time=1.745 ms
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>VPCS&gt; show ip
+NAME        : VPCS[1]
+IP/MASK     : 10.30.0.1/24
+GATEWAY     : 10.30.0.254
+DNS         :
+MAC         : 00:50:79:66:68:0f
+</pre></div>
+</div>
+<section id="vrf-default-routing-table">
+<h5>VRF Default Routing Table</h5>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@R1:~$ show ip route
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, D - SHARP,
+       F - PBR, f - OpenFabric,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+
+C&gt;* 10.0.0.0/24 is directly connected, eth1, 00:07:44
+S&gt;* 10.20.0.0/24 [1/0] is directly connected, eth2 (vrf blue), weight 1, 00:07:38
+S&gt;* 10.30.0.0/24 [1/0] is directly connected, br10 (vrf red), weight 1, 00:07:38
+</pre></div>
+</div>
+</section>
+<section id="vrf-red-routing-table">
+<h5>VRF red routing table</h5>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@R1:~$ show ip route vrf red
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, D - SHARP,
+       F - PBR, f - OpenFabric,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+
+VRF red:
+K&gt;* 0.0.0.0/0 [255/8192] unreachable (ICMP unreachable), 00:07:57
+S&gt;* 10.0.0.0/24 [1/0] is directly connected, eth1 (vrf default), weight 1, 00:07:40
+C&gt;* 10.30.0.0/24 is directly connected, br10, 00:07:54
+</pre></div>
+</div>
+</section>
+<section id="vrf-blue-routing-table">
+<h5>VRF blue routing table</h5>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@R1:~$ show ip route vrf blue
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, D - SHARP,
+       F - PBR, f - OpenFabric,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+
+VRF blue:
+K&gt;* 0.0.0.0/0 [255/8192] unreachable (ICMP unreachable), 00:08:00
+S&gt;* 10.0.0.0/24 [1/0] is directly connected, eth1 (vrf default), weight 1, 00:07:44
+C&gt;* 10.20.0.0/24 is directly connected, eth2, 00:07:53
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section id="l3vpn-vrfs">
+<h1>L3VPN VRFs</h1>
+<p><abbr title=" Layer 3 Virtual Private Networks ">L3VPN VRFs</abbr> bgpd supports for
+IPv4 RFC 4364 and IPv6 RFC 4659. L3VPN routes, and their associated VRF
+MPLS labels, can be distributed to VPN SAFI neighbors in the default, i.e.,
+non VRF, BGP instance. VRF MPLS labels are reached using core MPLS labels
+which are distributed using LDP or BGP labeled unicast.
+bgpd also supports inter-VRF route leaking.</p>
+<section id="l3vpn-vrf-route-leaking">
+<h2>VRF Route Leaking</h2>
+<p>BGP routes may be leaked (i.e. copied) between a unicast VRF RIB and the VPN
+SAFI RIB of the default VRF for use in MPLS-based L3VPNs. Unicast routes may
+also be leaked between any VRFs (including the unicast RIB of the default BGP
+instance). A shortcut syntax is also available for specifying leaking from
+one VRF to another VRF using the default instance’s VPN RIB as the intermediary.
+A common application of the VRF-VRF feature is to connect a customer’s private
+routing domain to a provider’s VPN service. Leaking is configured from
+the point of view of an individual VRF: import refers to routes leaked from VPN
+to a unicast VRF, whereas export refers to routes leaked from a unicast VRF to
+VPN.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Routes exported from a unicast VRF to the VPN RIB must be augmented
+by two parameters:</p>
+<blockquote>
+<div><p>an RD / RTLIST</p>
+</div></blockquote>
+<p>Configuration for these exported routes must, at a minimum, specify
+these two parameters.</p>
+</div>
+</section>
+<section id="l3vpn-vrf-example-configuration">
+<h2>Konfiguration</h2>
+<p>Configuration of route leaking between a unicast VRF RIB and the VPN SAFI RIB
+of the default VRF is accomplished via commands in the context of a VRF
+address-family.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vrf name &lt;name&gt; protocols bgp address-family &lt;ipv4-unicast|ipv6-unicast&gt; rd vpn export &lt;asn:nn|address:nn&gt;
+<a class="cmdlink" href="#cfgcmd-set-vrf-name-name-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-rd-vpn-export-asn-nn-address-nn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specifies the route distinguisher to be added to a route exported from the
+current unicast VRF to VPN.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vrf name &lt;name&gt; protocols bgp address-family &lt;ipv4-unicast|ipv6-unicast&gt; route-target vpn &lt;import|export|both&gt; [RTLIST]
+<a class="cmdlink" href="#cfgcmd-set-vrf-name-name-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-route-target-vpn-import-export-both-rtlist" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specifies the route-target list to be attached to a route (export) or the
+route-target list to match against (import) when exporting/importing
+between the current unicast VRF and VPN.The RTLIST is a space-separated
+list of route-targets, which are BGP extended community values as
+described in Extended Communities Attribute.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vrf name &lt;name&gt; protocols bgp address-family &lt;ipv4-unicast|ipv6-unicast&gt; label vpn export &lt;0-1048575|auto&gt;
+<a class="cmdlink" href="#cfgcmd-set-vrf-name-name-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-label-vpn-export-0-1048575-auto" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Enables an MPLS label to be attached to a route exported from the current
+unicast VRF to VPN. If the value specified is auto, the label value is
+automatically assigned from a pool maintained.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vrf name &lt;name&gt; protocols bgp address-family &lt;ipv4-unicast|ipv6-unicast&gt; label vpn allocation-mode per-nexthop
+<a class="cmdlink" href="#cfgcmd-set-vrf-name-name-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-label-vpn-allocation-mode-per-nexthop" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Select how labels are allocated in the given VRF. By default, the per-vrf
+mode is selected, and one label is used for all prefixes from the VRF. The
+per-nexthop will use a unique label for all prefixes that are reachable via
+the same nexthop.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vrf name &lt;name&gt; protocols bgp address-family &lt;ipv4-unicast|ipv6-unicast&gt; route-map vpn &lt;import|export&gt; [route-map &lt;name&gt;]
+<a class="cmdlink" href="#cfgcmd-set-vrf-name-name-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-route-map-vpn-import-export-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specifies an optional route-map to be applied to routes imported or
+exported between the current unicast VRF and VPN.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vrf name &lt;name&gt; protocols bgp address-family &lt;ipv4-unicast|ipv6-unicast&gt; &lt;import|export&gt; vpn
+<a class="cmdlink" href="#cfgcmd-set-vrf-name-name-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-import-export-vpn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Enables import or export of routes between the current unicast VRF and VPN.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vrf name &lt;name&gt; protocols bgp address-family &lt;ipv4-unicast|ipv6-unicast&gt; import vrf &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-vrf-name-name-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-import-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Shortcut syntax for specifying automatic leaking from vrf VRFNAME to the
+current VRF using the VPN RIB as intermediary. The RD and RT are auto
+derived and should not be specified explicitly for either the source or
+destination VRF’s.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vrf name &lt;name&gt; protocols bgp address-family &lt;ipv4-unicast|ipv6-unicast&gt; route-map vrf import [route-map &lt;name&gt;]
+<a class="cmdlink" href="#cfgcmd-set-vrf-name-name-protocols-bgp-address-family-ipv4-unicast-ipv6-unicast-route-map-vrf-import-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specifies an optional route-map to be applied to routes imported from VRFs.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set vrf name &lt;name&gt; protocols bgp interface &lt;interface&gt; mpls forwarding
+<a class="cmdlink" href="#cfgcmd-set-vrf-name-name-protocols-bgp-interface-interface-mpls-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>It is possible to permit BGP install VPN prefixes without transport labels.
+This configuration will install VPN prefixes originated from an e-bgp session,
+and with the next-hop directly connected.</p>
+</div>
+</div>
+</section>
+<section id="l3vpn-vrf-example-operation">
+<h2>Betrieb</h2>
+<p>Es ist nicht ausreichend, nur eine L3VPN VRFs zu konfigurieren, sondern L3VPN VRFs müssen ebenfalls gewartet werden. Für die Wartung von L3VPN VRFs sind folgende Betriebsbefehle vorhanden.</p>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp &lt;ipv4|ipv6&gt; vpn
+<a class="cmdlink" href="#opcmd-show-bgp-ipv4-ipv6-vpn" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Druckt aktive IPV4 oder IPV6 Routen, die über den VPN SAFI vertrieben werden.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>BGP table version is 2, local router ID is 10.0.1.1, vrf id 0
+Default local pref 100, local AS 65001
+Status codes:  s suppressed, d damped, h history, * valid, &gt; best, = multipath,
+i internal, r RIB-failure, S Stale, R Removed
+Nexthop codes: @NNN nexthop&#39;s vrf id, &lt; announce-nh-self
+Origin codes:  i - IGP, e - EGP, ? - incomplete
+
+Network          Next Hop            Metric LocPrf Weight Path
+Route Distinguisher: 10.50.50.1:1011
+*&gt;i10.50.50.0/24    10.0.0.7                  0    100      0 i
+UN=10.0.0.7 EC{65035:1011} label=80 type=bgp, subtype=0
+Route Distinguisher: 10.60.60.1:1011
+*&gt;i10.60.60.0/24    10.0.0.10              0    100      0 i
+UN=10.0.0.10  EC{65035:1011} label=80 type=bgp, subtype=0
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show bgp &lt;ipv4|ipv6&gt; vpn summary
+<a class="cmdlink" href="#opcmd-show-bgp-ipv4-ipv6-vpn-summary" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Print a summary of neighbor connections for the specified AFI/SAFI
+combination.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>BGP router identifier 10.0.1.1, local AS number 65001 vrf-id 0
+BGP table version 0
+RIB entries 9, using 1728 bytes of memory
+Peers 4, using 85 KiB of memory
+Peer groups 1, using 64 bytes of memory
+
+Neighbor        V         AS   MsgRcvd   MsgSent   TblVer  InQ OutQ  Up/Down State/PfxRcd   PfxSnt
+10.0.0.7        4      65001      2860      2870        0    0    0 1d23h34m            2       10
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

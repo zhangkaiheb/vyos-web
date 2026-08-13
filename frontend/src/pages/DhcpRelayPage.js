@@ -1,8 +1,11 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const RELAY_AGENTS_PACKETS_OPTIONS = ['append', 'replace', 'forward', 'discard'];
 
@@ -29,10 +32,10 @@ function splitMembers(text) {
   return String(text || '').split('\n').map(s => s.trim()).filter(Boolean);
 }
 
-function validateIPv4(value) {
+function validateIPv4(value, t) {
   if (!value) return '';
-  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return 'IPv4 地址格式错误';
-  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return 'IPv4 地址格式错误';
+  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return t('dhcprelay.validation.ipv4Format');
+  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return t('dhcprelay.validation.ipv4Format');
   return '';
 }
 
@@ -80,6 +83,8 @@ function dhcpRelayToConfig(form) {
 export default defineComponent({
   name: 'DhcpRelayPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -120,21 +125,22 @@ export default defineComponent({
     async function save() {
       const servers = splitMembers(config.value.servers);
       for (const ip of servers) {
-        const err = validateIPv4(ip);
-        if (err) return alert(`DHCP 服务器地址 ${ip} 格式错误`);
+        const err = validateIPv4(ip, t);
+        if (err) return showError({ message: t('dhcprelay.validation.serverAddressInvalid', { ip }) });
       }
       if (isPresent(config.value.relay_options?.hop_count)) {
         const hop = parseInt(config.value.relay_options.hop_count, 10);
-        if (isNaN(hop) || hop < 1 || hop > 255) return alert('Hop Count 范围为 1-255');
+        if (isNaN(hop) || hop < 1 || hop > 255) return showError({ message: t('dhcprelay.validation.hopCountRange') });
       }
       if (isPresent(config.value.relay_options?.max_size)) {
         const size = parseInt(config.value.relay_options.max_size, 10);
-        if (isNaN(size) || size < 64 || size > 1400) return alert('最大报文大小范围为 64-1400 字节，默认 576');
+        if (isNaN(size) || size < 64 || size > 1400) return showError({ message: t('dhcprelay.validation.maxSizeRange') });
       }
 
       saving.value = true;
       try {
         await configApi.set('service dhcp-relay', dhcpRelayToConfig(config.value));
+        configStore.markPending();
         saved.value = true;
         await load();
       } catch (e) {
@@ -144,9 +150,13 @@ export default defineComponent({
       }
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
     return {
+      t,
       loading, saving, saved, config, activeTab, writeDisabled, interfaces, commandPath,
       load, save, RELAY_AGENTS_PACKETS_OPTIONS,
     };
@@ -154,56 +164,52 @@ export default defineComponent({
   components: { TabGroup, ToolbarButton },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('dhcprelay.messages.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本' },
-        { key: 'relay-options', title: '中继选项' }
+        { key: 'basic', title: t('dhcprelay.tabs.basic') },
+        { key: 'relay-options', title: t('dhcprelay.tabs.relayOptions') }
       ]">
 
         <template #basic>
-          <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="config.disable" title="禁用 DHCP 中继实例" /></div>
+          <div class="form-row"><label class="form-label">{{ t('dhcprelay.labels.disable') }}</label><input type="checkbox" v-model="config.disable" :title="t('dhcprelay.tips.disable')" /></div>
           <div class="form-row">
-            <label class="form-label">接口</label>
-            <select class="form-control" v-model="config.interface" title="接口用于 DHCP 中继">
-              <option value="">未选择</option>
+            <label class="form-label">{{ t('dhcprelay.labels.interface') }}</label>
+            <select class="form-control" v-model="config.interface" :title="t('dhcprelay.tips.interface')">
+              <option value="">{{ t('dhcprelay.options.notSelected') }}</option>
               <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
             </select>
           </div>
           <div class="form-row">
-            <label class="form-label">监听接口</label>
-            <select class="form-control" v-model="config.listen_interface" title="DHCP Relay Agent 监听请求的接口">
-              <option value="">未选择</option>
+            <label class="form-label">{{ t('dhcprelay.labels.listenInterface') }}</label>
+            <select class="form-control" v-model="config.listen_interface" :title="t('dhcprelay.tips.listenInterface')">
+              <option value="">{{ t('dhcprelay.options.notSelected') }}</option>
               <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
             </select>
           </div>
           <div class="form-row">
-            <label class="form-label">上游接口</label>
-            <select class="form-control" v-model="config.upstream_interface" title="DHCP Relay Agent 转发请求的接口">
-              <option value="">未选择</option>
+            <label class="form-label">{{ t('dhcprelay.labels.upstreamInterface') }}</label>
+            <select class="form-control" v-model="config.upstream_interface" :title="t('dhcprelay.tips.upstreamInterface')">
+              <option value="">{{ t('dhcprelay.options.notSelected') }}</option>
               <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
             </select>
           </div>
           <div class="form-row">
-            <label class="form-label">DHCP 服务器</label>
-            <textarea class="form-control" v-model="config.servers" rows="3" placeholder="每行一个 DHCP 服务器 IPv4 地址" title="DHCP 服务器地址列表" />
+            <label class="form-label">{{ t('dhcprelay.labels.dhcpServer') }}</label>
+            <textarea class="form-control" v-model="config.servers" rows="3" :placeholder="t('dhcprelay.placeholders.dhcpServer')" :title="t('dhcprelay.tips.dhcpServer')" />
           </div>
         </template>
 
         <template #relay-options>
-          <div class="form-row"><label class="form-label">最大跳数 (Hop Count)</label><input type="number" min="1" max="255" class="form-control" v-model="config.relay_options.hop_count" placeholder="1-255，默认 10" title="报文最大跳数，默认 10" /></div>
-          <div class="form-row"><label class="form-label">最大报文大小</label><input type="number" min="64" max="1400" class="form-control" v-model="config.relay_options.max_size" placeholder="64-1400，默认 576" title="最大报文大小（字节），范围 64-1400，默认 576" /></div>
-          <div class="form-row"><label class="form-label">Relay Agent 选项处理策略</label>
-            <select class="form-control" v-model="config.relay_options.relay_agents_packets" title="已携带 Relay Agent 选项的报文处理策略，默认 forward">
-              <option value="">未选择（默认 forward）</option>
+          <div class="form-row"><label class="form-label">{{ t('dhcprelay.labels.hopCount') }}</label><input type="number" min="1" max="255" class="form-control" v-model="config.relay_options.hop_count" :placeholder="t('dhcprelay.placeholders.hopCount')" :title="t('dhcprelay.tips.hopCount')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('dhcprelay.labels.maxPacketSize') }}</label><input type="number" min="64" max="1400" class="form-control" v-model="config.relay_options.max_size" :placeholder="t('dhcprelay.placeholders.maxSize')" :title="t('dhcprelay.tips.maxSize')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('dhcprelay.labels.relayAgentsPackets') }}</label>
+            <select class="form-control" v-model="config.relay_options.relay_agents_packets" :title="t('dhcprelay.tips.relayAgentsPackets')">
+              <option value="">{{ t('dhcprelay.options.notSelectedDefaultForward') }}</option>
               <option v-for="o in RELAY_AGENTS_PACKETS_OPTIONS" :key="o" :value="o">{{ o }}</option>
             </select>
           </div>
         </template>
       </TabGroup>
-
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
     </div>
   `,
 });

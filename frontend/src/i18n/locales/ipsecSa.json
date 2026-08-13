@@ -1,0 +1,114 @@
+{
+  "zh-CN": {
+    "ipsecSa": {
+      "title": "IPsec 安全关联",
+      "columns": {
+        "connection": "连接",
+        "state": "状态",
+        "uptime": "运行时间",
+        "bytes": "字节 In/Out",
+        "packets": "包 In/Out",
+        "remoteAddress": "远端地址",
+        "remoteId": "远端 ID",
+        "proposal": "提议"
+      },
+      "rawOutput": "原始输出"
+    }
+  },
+  "en": {
+    "ipsecSa": {
+      "title": "IPsec Security Associations",
+      "columns": {
+        "connection": "Connection",
+        "state": "State",
+        "uptime": "Uptime",
+        "bytes": "Bytes In/Out",
+        "packets": "Packets In/Out",
+        "remoteAddress": "Remote Address",
+        "remoteId": "Remote ID",
+        "proposal": "Proposal"
+      },
+      "rawOutput": "Raw Output"
+    }
+  },
+  "zh-TW": {
+    "ipsecSa": {
+      "title": "IPsec Security Associations",
+      "columns": {
+        "connection": "Connection",
+        "state": "State",
+        "uptime": "Uptime",
+        "bytes": "Bytes In/Out",
+        "packets": "Packets In/Out",
+        "remoteAddress": "Remote Address",
+        "remoteId": "Remote ID",
+        "proposal": "Proposal"
+      },
+      "rawOutput": "Raw Output"
+    }
+  },
+  "ru": {
+    "ipsecSa": {
+      "title": "IPsec Security Associations",
+      "columns": {
+        "connection": "Connection",
+        "state": "State",
+        "uptime": "Uptime",
+        "bytes": "Bytes In/Out",
+        "packets": "Packets In/Out",
+        "remoteAddress": "Remote Address",
+        "remoteId": "Remote ID",
+        "proposal": "Proposal"
+      },
+      "rawOutput": "Raw Output"
+    }
+  },
+  "de": {
+    "ipsecSa": {
+      "title": "IPsec Security Associations",
+      "columns": {
+        "connection": "Connection",
+        "state": "State",
+        "uptime": "Uptime",
+        "bytes": "Bytes In/Out",
+        "packets": "Packets In/Out",
+        "remoteAddress": "Remote Address",
+        "remoteId": "Remote ID",
+        "proposal": "Proposal"
+      },
+      "rawOutput": "Raw Output"
+    }
+  },
+  "fr": {
+    "ipsecSa": {
+      "title": "IPsec Security Associations",
+      "columns": {
+        "connection": "Connection",
+        "state": "State",
+        "uptime": "Uptime",
+        "bytes": "Bytes In/Out",
+        "packets": "Packets In/Out",
+        "remoteAddress": "Remote Address",
+        "remoteId": "Remote ID",
+        "proposal": "Proposal"
+      },
+      "rawOutput": "Raw Output"
+    }
+  },
+  "ko": {
+    "ipsecSa": {
+      "title": "IPsec Security Associations",
+      "columns": {
+        "connection": "Connection",
+        "state": "State",
+        "uptime": "Uptime",
+        "bytes": "Bytes In/Out",
+        "packets": "Packets In/Out",
+        "remoteAddress": "Remote Address",
+        "remoteId": "Remote ID",
+        "proposal": "Proposal"
+      },
+      "rawOutput": "Raw Output"
+    }
+  }
+}

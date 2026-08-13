@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="conntrack">
+<h1>Conntrack</h1>
+<p>VyOS peut être configuré pour suivre les connexions à l'aide du sous-système de suivi des connexions. Le suivi des connexions devient opérationnel une fois que soit un pare-feu stateful, soit le NAT est configuré.</p>
+<section id="configure">
+<h2>Configurer</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack table-size &lt;1-50000000&gt; 
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-table-size-1-50000000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Le tableau de suivi des connexions contient une entrée pour chaque connexion suivie par le système.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack expect-table-size &lt;1-50000000&gt; 
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-expect-table-size-1-50000000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Le tableau de suivi des connexions attendues contient une entrée pour chaque connexion attendue liée à une connexion existante. Ces connexions sont généralement utilisées par les modules « helper de suivi de connexion » tels que FTP.
+La taille par défaut du tableau d'attente est de 2048 entrées.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack hash-size &lt;1-50000000&gt; 
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-hash-size-1-50000000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la taille du tableau de hachage. Le tableau de hachage de suivi des connexions accélère la recherche dans le tableau de suivi des connexions. Le tableau de hachage utilise des « buckets » pour enregistrer les entrées dans le tableau de suivi des connexions.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack modules ftp
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-modules-ftp" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack modules h323
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-modules-h323" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack modules nfs
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-modules-nfs" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack modules pptp
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-modules-pptp" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack modules sip
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-modules-sip" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack modules sqlnet
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-modules-sqlnet" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack modules tftp
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-modules-tftp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez les modules de gestion des protocoles de suivi des connexions.
+Tous les modules sont activés par défaut.</p>
+<div class="line-block">
+<div class="line">Utilisez <cite>delete system conntrack modules</cite> pour désactiver tous les modules.</div>
+<div class="line">Ou, par exemple pour ftp, <cite>delete system conntrack modules ftp</cite>.</div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack tcp half-open-connections &lt;1-21474836&gt; 
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-tcp-half-open-connections-1-21474836" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le nombre maximum de connexions TCP demi-ouvertes.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack tcp loose &lt;enable | disable&gt; 
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-tcp-loose-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Politique pour suivre les connexions précédemment établies.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack tcp max-retrans &lt;1-2147483647&gt; 
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-tcp-max-retrans-1-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le nombre maximal de tentatives de rétransmission TCP.</p>
+</div>
+</div>
+<section id="contrack-timeouts">
+<h3>Timeouts Conntrack</h3>
+<p>Vous pouvez définir des valeurs de timeout personnalisées à appliquer à un sous-ensemble spécifique de connexions, en fonction d'un sélecteur de paquet et de flux. Pour cela, vous devez créer une règle définissant le sélecteur de paquet et de flux.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack timeout custom [ipv4 | ipv6] rule &lt;1-999999&gt; description &lt;test&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-timeout-custom-ipv4-ipv6-rule-1-999999-description-test" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<blockquote>
+<div><p>Définir une description de règle.</p>
+</div></blockquote>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack timeout custom [ipv4 | ipv6] rule &lt;1-999999&gt; destination address &lt;ip-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-timeout-custom-ipv4-ipv6-rule-1-999999-destination-address-ip-address" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack timeout custom [ipv4 | ipv6] rule &lt;1-999999&gt; source address &lt;ip-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-timeout-custom-ipv4-ipv6-rule-1-999999-source-address-ip-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<blockquote>
+<div><p>Définir une adresse de destination et/ou source. Entrée acceptée pour ipv4 :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system conntrack timeout custom ipv4 rule &lt;1-999999&gt; [source | destination] address
+Complétions possibles :
+   &lt;x.x.x.x&gt;            Adresse IPv4 à correspondre
+   &lt;x.x.x.x/x&gt;          Préfixe IPv4 à correspondre
+   &lt;x.x.x.x&gt;-&lt;x.x.x.x&gt;  Plage d'adresses IPv4 à correspondre
+   !&lt;x.x.x.x&gt;           Correspondre à tout sauf l'adresse spécifiée
+   !&lt;x.x.x.x/x&gt;         Correspondre à tout sauf le préfixe spécifié
+   !&lt;x.x.x.x&gt;-&lt;x.x.x.x&gt; Correspondre à tout sauf la plage spécifiée
+
+set system conntrack timeout custom ipv6 rule &lt;1-999999&gt; [source | destination] address
+Complétions possibles :
+   &lt;h:h:h:h:h:h:h:h&gt;    Adresse IP à correspondre
+   &lt;h:h:h:h:h:h:h:h/x&gt;  Sous-réseau à correspondre
+   &lt;h:h:h:h:h:h:h:h&gt;-&lt;h:h:h:h:h:h:h:h&gt;
+                        Plage d'adresses IP à correspondre
+   !&lt;h:h:h:h:h:h:h:h&gt;   Correspondre à tout sauf l'adresse spécifiée
+   !&lt;h:h:h:h:h:h:h:h/x&gt; Correspondre à tout sauf le préfixe spécifié
+   !&lt;h:h:h:h:h:h:h:h&gt;-&lt;h:h:h:h:h:h:h:h&gt;
+                        Correspondre à tout sauf la plage spécifiée
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack timeout custom [ipv4 | ipv6] rule &lt;1-999999&gt; destination port &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-timeout-custom-ipv4-ipv6-rule-1-999999-destination-port-value" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack timeout custom [ipv4 | ipv6] rule &lt;1-999999&gt; source port &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-timeout-custom-ipv4-ipv6-rule-1-999999-source-port-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<blockquote>
+<div><p>Définir une destination et/ou une porte source. Entrée acceptée :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>&lt;nom de port&gt;    Port nommé (n'importe quel nom dans /etc/services, par exemple http)
+&lt;1-65535&gt;        Numéro de port
+&lt;start&gt;-&lt;end&gt;  Plage de numéros de port (par exemple 1001-1005)
+</pre></div>
+</div>
+<p>Plusieurs ports de destination peuvent être spécifiés sous forme d'une liste séparée par des virgules.
+L'ensemble de la liste peut également être « négatif » en utilisant « ! ». Par exemple :
+<cite>!22,telnet,http,123,1001-1005`</cite></p>
+</div></blockquote>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack timeout custom [ipv4 | ipv6] rule &lt;1-999999&gt; protocol tcp close &lt;1-21474836&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-timeout-custom-ipv4-ipv6-rule-1-999999-protocol-tcp-close-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack timeout custom [ipv4 | ipv6] rule &lt;1-999999&gt; protocol tcp close-wait &lt;1-21474836&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-timeout-custom-ipv4-ipv6-rule-1-999999-protocol-tcp-close-wait-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack timeout custom [ipv4 | ipv6] rule &lt;1-999999&gt; protocol tcp established &lt;1-21474836&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-timeout-custom-ipv4-ipv6-rule-1-999999-protocol-tcp-established-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack timeout custom [ipv4 | ipv6] rule &lt;1-999999&gt; protocol tcp fin-wait &lt;1-21474836&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-timeout-custom-ipv4-ipv6-rule-1-999999-protocol-tcp-fin-wait-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack timeout custom [ipv4 | ipv6] rule &lt;1-999999&gt; protocol tcp last-ack &lt;1-21474836&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-timeout-custom-ipv4-ipv6-rule-1-999999-protocol-tcp-last-ack-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack timeout custom [ipv4 | ipv6] rule &lt;1-999999&gt; protocol tcp syn-recv &lt;1-21474836&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-timeout-custom-ipv4-ipv6-rule-1-999999-protocol-tcp-syn-recv-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack timeout custom [ipv4 | ipv6] rule &lt;1-999999&gt; protocol tcp syn-sent &lt;1-21474836&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-timeout-custom-ipv4-ipv6-rule-1-999999-protocol-tcp-syn-sent-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack timeout custom [ipv4 | ipv6] rule &lt;1-999999&gt; protocol tcp time-wait &lt;1-21474836&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-timeout-custom-ipv4-ipv6-rule-1-999999-protocol-tcp-time-wait-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack timeout custom [ipv4 | ipv6] rule &lt;1-999999&gt; protocol udp replied &lt;1-21474836&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-timeout-custom-ipv4-ipv6-rule-1-999999-protocol-udp-replied-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack timeout custom [ipv4 | ipv6] rule &lt;1-999999&gt; protocol udp unreplied &lt;1-21474836&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-timeout-custom-ipv4-ipv6-rule-1-999999-protocol-udp-unreplied-1-21474836" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<blockquote>
+<div><p>Définir le délai d'attente en secondes pour un protocole ou un état dans une règle personnalisée.</p>
+</div></blockquote>
+</div>
+</div>
+</section>
+<section id="conntrack-ignore-rules">
+<h3>Règles d'ignorance Conntrack</h3>
+<div class="admonition note">
+<p class="admonition-title">Remarque</p>
+<p><strong>Important sur les règles d'ignorance Conntrack :</strong>
+À partir de vyos-1.5-rolling-202406120020, les règles d'ignorance peuvent être définies dans
+<code class="docutils literal notranslate">set firewall [ipv4 | ipv6] prerouting raw ...</code>. Il est prévu que dans le futur, les règles d'ignorance Conntrack seront supprimées.</p>
+<blockquote>
+<div><p>Règles d'ignorance personnalisées, basées sur un sélecteur de paquet et de flux.</p>
+</div></blockquote>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack ignore [ipv4 | ipv6] rule &lt;1-999999&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-ignore-ipv4-ipv6-rule-1-999999-description-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack ignore [ipv4 | ipv6] rule &lt;1-999999&gt; destination address &lt;ip-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-ignore-ipv4-ipv6-rule-1-999999-destination-address-ip-address" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack ignore [ipv4 | ipv6] rule &lt;1-999999&gt; destination port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-ignore-ipv4-ipv6-rule-1-999999-destination-port-port" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack ignore [ipv4 | ipv6] rule &lt;1-999999&gt; inbound-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-ignore-ipv4-ipv6-rule-1-999999-inbound-interface-interface" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack ignore [ipv4 | ipv6] rule &lt;1-999999&gt; protocol &lt;protocol&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-ignore-ipv4-ipv6-rule-1-999999-protocol-protocol" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack ignore [ipv4 | ipv6] rule &lt;1-999999&gt; source address &lt;ip-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-ignore-ipv4-ipv6-rule-1-999999-source-address-ip-address" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack ignore [ipv4 | ipv6] rule &lt;1-999999&gt; source port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-ignore-ipv4-ipv6-rule-1-999999-source-port-port" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack ignore [ipv4 | ipv6] rule &lt;1-999999&gt; tcp flags [not] &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-ignore-ipv4-ipv6-rule-1-999999-tcp-flags-not-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Valeurs autorisées pour les drapeaux TCP : <code class="docutils literal notranslate">ack</code>, <code class="docutils literal notranslate">cwr</code>, <code class="docutils literal notranslate">ecn</code>, <code class="docutils literal notranslate">fin</code>, <code class="docutils literal notranslate">psh</code>,
+<code class="docutils literal notranslate">rst</code>, <code class="docutils literal notranslate">syn</code> et <code class="docutils literal notranslate">urg</code>. Des valeurs multiples sont prises en charge, et pour une sélection inversée, utiliser <code class="docutils literal notranslate">not</code>, comme indiqué dans l'exemple.</p>
+</div>
+</div>
+</section>
+<section id="conntrack-log">
+<h3>Journal Conntrack</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log event destroy
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-event-destroy" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log event new
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-event-new" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log event update
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-event-update" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Enregistrer les événements de suivi des connexions par type.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log event destroy icmp
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-event-destroy-icmp" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log event destroy other
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-event-destroy-other" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log event destroy tcp
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-event-destroy-tcp" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log event destroy udp
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-event-destroy-udp" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log event new icmp
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-event-new-icmp" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log event new other
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-event-new-other" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log event new tcp
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-event-new-tcp" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log event new udp
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-event-new-udp" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log event update icmp
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-event-update-icmp" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log event update other
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-event-update-other" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log event update tcp
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-event-update-tcp" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log event update udp
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-event-update-udp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Enregistrer les événements de suivi des connexions par protocole.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log timestamp
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-timestamp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Activer l'extension de l'horodatage basée sur le flux.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log queue-size &lt;100-999999&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-queue-size-100-999999" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gérer la taille de la file d'attente interne, la taille par défaut est de 4096 événements.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system conntrack log log-level &lt;info | debug&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-conntrack-log-log-level-info-debug" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gérer le niveau de journalisation</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, watch, inject } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
 import { useConfigStore } from '/src/stores/config.js';
@@ -9,6 +9,7 @@ import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import SourceDestMatchCards from '/src/components/Form/SourceDestMatchCards.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 
 const PACKET_TYPE_OPTIONS = [
   { value: 'broadcast', label: 'broadcast' },
@@ -28,15 +29,16 @@ const HASH_OPTIONS = [
 ];
 
 const GROUP_TYPE_OPTIONS = [
-  { value: 'address', label: '地 址' },
-  { value: 'address-group', label: '地址组' },
-  { value: 'network-group', label: '网络组' },
-  { value: 'domain-group', label: '域名组' },
+  { value: 'address', labelKey: 'destinationNat.groupType.address' },
+  { value: 'address-group', labelKey: 'destinationNat.groupType.addressGroup' },
+  { value: 'network-group', labelKey: 'destinationNat.groupType.networkGroup' },
+  { value: 'domain-group', labelKey: 'destinationNat.groupType.domainGroup' },
 ];
 
 export default defineComponent({
   name: 'DestinationNatPage',
   setup() {
+    const { t } = inject('i18n');
     const route = useRoute();
     const configStore = useConfigStore();
     const path = 'nat destination';
@@ -48,6 +50,8 @@ export default defineComponent({
     const modalKey = ref(0);
     const editingRule = ref(null);
     const editingOriginalId = ref(null);
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
 
     // Dynamic options
     const interfaces = ref([]);
@@ -66,75 +70,85 @@ export default defineComponent({
     const editingBackend = ref(null);
     const editingBackendIndex = ref(-1);
 
-    const backendColumns = [
-      { key: 'address', title: '后端地址' },
-      { key: 'weight', title: '权重' },
-    ];
+    const backendColumns = computed(() => [
+      { key: 'address', title: t('destinationNat.backendAddress') },
+      { key: 'weight', title: t('destinationNat.weight') },
+    ]);
 
-    const tabs = [
-      { key: 'basic', title: '基本' },
-      { key: 'source', title: '源' },
-      { key: 'destination', title: '目的' },
-      { key: 'inbound', title: '入站接口' },
-      { key: 'translation', title: '翻译' },
-    ];
+    const tabs = computed(() => [
+      { key: 'basic', title: t('destinationNat.tab.basic') },
+      { key: 'source', title: t('destinationNat.tab.source') },
+      { key: 'destination', title: t('destinationNat.tab.destination') },
+      { key: 'inbound', title: t('destinationNat.tab.inbound') },
+      { key: 'translation', title: t('destinationNat.tab.translation') },
+    ]);
     const activeTab = ref('basic');
 
     const tabSchemas = computed(() => ({
       basic: [
-        { key: 'id', title: '规则编号', type: 'number', min: 1, max: 999999, required: true, help: '范围: 1-999999' },
-        { key: 'description', title: '描述', type: 'text', help: '规则描述信息' },
-        { key: 'protocol', title: '协议', type: 'select', help: '匹配的协议类型（默认: all）',
+        { key: 'id', title: t('destinationNat.field.ruleNumber'), type: 'number', min: 1, max: 999999, required: true, help: t('destinationNat.help.ruleNumber') },
+        { key: 'description', title: t('destinationNat.field.description'), type: 'text', help: t('destinationNat.help.description') },
+        { key: 'protocol', title: t('destinationNat.field.protocol'), type: 'select', help: t('destinationNat.help.protocol'),
           options: protocols.value.length ? protocols.value.map(p => ({ value: p, label: p })) : [] },
-        { key: 'packetType', title: '包类型', type: 'select', help: '数据包类型',
+        { key: 'packetType', title: t('destinationNat.field.packetType'), type: 'select', help: t('destinationNat.help.packetType'),
           options: PACKET_TYPE_OPTIONS.map(o => ({ value: o.value, label: o.label })) },
-        { key: 'log', title: '日志', type: 'checkbox', defaultValue: false, help: '记录匹配此规则的数据包' },
-        { key: 'exclude', title: '排除', type: 'checkbox', defaultValue: false, help: '排除匹配此规则的数据包' },
-        { key: 'disable', title: '禁用', type: 'checkbox', defaultValue: false, help: '禁用此规则' },
+        { key: 'log', title: t('destinationNat.field.log'), type: 'checkbox', defaultValue: false, help: t('destinationNat.help.log') },
+        { key: 'exclude', title: t('destinationNat.field.exclude'), type: 'checkbox', defaultValue: false, help: t('destinationNat.help.exclude') },
+        { key: 'disable', title: t('destinationNat.field.disable'), type: 'checkbox', defaultValue: false, help: t('destinationNat.help.disable') },
       ],
       source: [
-        { key: 'sourcePort', title: '端口', type: 'text', placeholder: '端口号/范围', help: '范围: 1-65535，支持端口范围如 1024-65535' },
+        { key: 'sourcePort', title: t('destinationNat.field.port'), type: 'text', placeholder: t('destinationNat.placeholder.port'), help: t('destinationNat.help.sourcePort') },
       ],
       destination: [
-        { key: 'destinationPort', title: '端口', type: 'text', placeholder: '端口号/范围', help: '范围: 1-65535，支持端口范围如 80-443' },
+        { key: 'destinationPort', title: t('destinationNat.field.port'), type: 'text', placeholder: t('destinationNat.placeholder.port'), help: t('destinationNat.help.destinationPort') },
       ],
       inbound: [
-        { key: 'inboundInterfaceName', title: '接口名称', type: 'select', help: '入站接口名称',
+        { key: 'inboundInterfaceName', title: t('destinationNat.field.interfaceName'), type: 'select', help: t('destinationNat.help.inboundInterfaceName'),
           options: ['any', ...interfaces.value].map(n => ({ value: n, label: n })) },
-        { key: 'inboundInterfaceGroup', title: '接口组', type: 'select', help: '接口组名称',
+        { key: 'inboundInterfaceGroup', title: t('destinationNat.field.interfaceGroup'), type: 'select', help: t('destinationNat.help.inboundInterfaceGroup'),
           options: interfaceGroups.value.map(g => ({ value: g, label: g })) },
       ],
       translation: [
-        { key: 'translationAddress', title: '翻译地址', type: 'text', placeholder: 'IP地址/网段/地址范围', help: '支持 x.x.x.x, x.x.x.x/x, x.x.x.x-x.x.x.x' },
-        { key: 'translationPort', title: '翻译端口', type: 'text', placeholder: '端口号或范围', help: '范围: 1-65535，支持端口范围如 1001-1005' },
-        { key: 'translationRedirect', title: '重定向到本地主机', type: 'checkbox', defaultValue: false, help: '重定向流量到本地主机' },
-        { key: 'translationRedirectPort', title: '重定向端口', type: 'number', min: 1, max: 65535, placeholder: '端口号', help: '范围: 1-65535' },
-        { key: 'translationAddressMapping', title: '地址映射', type: 'select', help: '地址映射方式（默认: random）',
+        { key: 'translationAddress', title: t('destinationNat.field.translationAddress'), type: 'text', placeholder: t('destinationNat.placeholder.translationAddress'), help: t('destinationNat.help.translationAddress') },
+        { key: 'translationPort', title: t('destinationNat.field.translationPort'), type: 'text', placeholder: t('destinationNat.placeholder.translationPort'), help: t('destinationNat.help.translationPort') },
+        { key: 'translationRedirect', title: t('destinationNat.field.redirectToLocalhost'), type: 'checkbox', defaultValue: false, help: t('destinationNat.help.redirectToLocalhost') },
+        { key: 'translationRedirectPort', title: t('destinationNat.field.redirectPort'), type: 'number', min: 1, max: 65535, placeholder: t('destinationNat.placeholder.redirectPort'), help: t('destinationNat.help.redirectPort') },
+        { key: 'translationAddressMapping', title: t('destinationNat.field.addressMapping'), type: 'select', help: t('destinationNat.help.addressMapping'),
           options: [
-            { value: 'persistent', label: 'persistent - 为每个连接提供相同的地址' },
-            { value: 'random', label: 'random - 随机分配地址（默认）' },
+            { value: 'persistent', label: t('destinationNat.mapping.persistent') },
+            { value: 'random', label: t('destinationNat.mapping.random') },
           ] },
-        { key: 'translationPortMapping', title: '端口映射', type: 'select', help: '端口映射方式（默认: none）',
+        { key: 'translationPortMapping', title: t('destinationNat.field.portMapping'), type: 'select', help: t('destinationNat.help.portMapping'),
           options: [
-            { value: 'random', label: 'random - 随机化源端口映射' },
-            { value: 'none', label: 'none - 不应用端口随机化（默认）' },
+            { value: 'random', label: t('destinationNat.mapping.randomPort') },
+            { value: 'none', label: t('destinationNat.mapping.nonePort') },
           ] },
-        { key: 'loadBalanceHash', title: '负载均衡哈希', type: 'select', help: '负载均衡使用的哈希算法',
+        { key: 'loadBalanceHash', title: t('destinationNat.field.loadBalanceHash'), type: 'select', help: t('destinationNat.help.loadBalanceHash'),
           options: HASH_OPTIONS.map(o => ({ value: o.value, label: o.label })) },
       ],
     }));
 
-    const columns = [
-      { key: 'id', title: '规则编号' },
-      { key: 'description', title: '描述' },
-      { key: 'protocol', title: '协议' },
-      { key: 'sourceValue', title: '源地址' },
-      { key: 'destinationValue', title: '目的地址' },
-      { key: 'inboundInterfaceName', title: '入站接口' },
-      { key: 'translationAddress', title: '翻译地址' },
-      { key: 'log', title: '日志' },
-      { key: 'disable', title: '禁用' },
-    ];
+    const columns = computed(() => [
+      { key: 'id', title: t('destinationNat.column.ruleNumber') },
+      { key: 'description', title: t('destinationNat.column.description') },
+      { key: 'protocol', title: t('destinationNat.column.protocol') },
+      { key: 'sourceValue', title: t('destinationNat.column.sourceAddress'), render: (val, row) => {
+        if (row.sourceGroupType === 'address-group') return row.sourceGroupValue || '';
+        if (row.sourceGroupType === 'network-group') return row.sourceGroupValue || '';
+        if (row.sourceGroupType === 'domain-group') return row.sourceGroupValue || '';
+        return val || '';
+      }},
+      { key: 'destinationValue', title: t('destinationNat.column.destinationAddress'), render: (val, row) => {
+        if (row.destinationGroupType === 'address-group') return row.destinationGroupValue || '';
+        if (row.destinationGroupType === 'network-group') return row.destinationGroupValue || '';
+        if (row.destinationGroupType === 'domain-group') return row.destinationGroupValue || '';
+        return val || '';
+      }},
+      { key: 'inboundInterfaceName', title: t('destinationNat.column.inboundInterface') },
+      { key: 'translationAddress', title: t('destinationNat.column.translationAddress') },
+      { key: 'log', title: t('destinationNat.column.log') },
+      { key: 'disable', title: t('destinationNat.column.disable') },
+    ]);
 
     async function loadDynamicOptions() {
       const fetchSuggestions = async (path, field) => {
@@ -210,7 +224,7 @@ export default defineComponent({
           });
         }
       } catch (e) {
-        showError('加载目的 NAT 配置失败', e);
+        showError(t('destinationNat.loadFailed'), e);
       } finally {
         loading.value = false;
       }
@@ -400,9 +414,9 @@ export default defineComponent({
 
     function saveBackend() {
       const backend = editingBackend.value;
-      if (!backend.address) return showError({ message: '请输入后端地址' });
+      if (!backend.address) return showError({ message: t('destinationNat.backendAddressRequired') });
       if (!backend.weight || backend.weight < 1 || backend.weight > 100) {
-        return showError({ message: '权重范围为 1-100' });
+        return showError({ message: t('destinationNat.weightRange') });
       }
       if (editingBackendIndex.value >= 0) {
         loadBalanceBackends.value[editingBackendIndex.value] = { ...backend };
@@ -448,12 +462,12 @@ export default defineComponent({
     async function saveRule() {
       try {
         const rule = editingRule.value;
-        if (!rule.id) return showError({ message: '请输入规则编号' });
+        if (!rule.id) return showError({ message: t('destinationNat.ruleNumberRequired') });
 
         const portFields = ['sourcePort', 'destinationPort', 'translationPort'];
         for (const field of portFields) {
           if (rule[field] && rule.protocol && !['tcp', 'udp', 'tcp_udp'].includes(rule.protocol)) {
-            return showError({ message: '端口只能在协议为 tcp、udp 或 tcp_udp 时指定' });
+            return showError({ message: t('destinationNat.portProtocolError') });
           }
         }
 
@@ -463,25 +477,36 @@ export default defineComponent({
         const value = buildRuleValue(rule);
         if (editingOriginalId.value && editingOriginalId.value !== rule.id) {
           await configStore.deleteConfig(`${path} rule ${editingOriginalId.value}`);
+          configStore.markPending();
         }
         await configStore.setConfig(`${path} rule ${rule.id}`, value);
+        configStore.markPending();
         modalVisible.value = false;
         await load();
-      } catch (e) {
-        showError('保存目的 NAT 规则失败', e);
+      } catch (error) {
+        showError(t('error.saveFailed'), error);
       }
     }
 
-    async function deleteRule(index) {
+    function deleteRule(index) {
       const row = rules.value[index];
       if (!row) return;
-      if (!confirm('确认删除此目的 NAT 规则？')) return;
-      try {
-        await configStore.deleteConfig(`${path} rule ${row.id}`);
-        await load();
-      } catch (e) {
-        showError('删除目的 NAT 规则失败', e);
+      pendingDeleteNames.value = [row.id];
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemove() {
+      deleteModalVisible.value = false;
+      for (const id of pendingDeleteNames.value) {
+        try {
+          await configStore.deleteConfig(`${path} rule ${id}`);
+          configStore.markPending();
+        } catch (e) {
+          showError(t('destinationNat.deleteRuleFailed'), e);
+        }
       }
+      pendingDeleteNames.value = [];
+      await load();
     }
 
     function handleSourceTypeChange(newType) {
@@ -500,12 +525,14 @@ export default defineComponent({
       }
     }
 
-    onMounted(async () => { load(); await loadDynamicOptions(); optionsLoaded = true; });
+    onMounted(async () => { load(); await loadDynamicOptions(); optionsLoaded = true; onMenuRefresh(load); });
     watch(() => route.path, async () => { load(); await loadDynamicOptions(); optionsLoaded = true; });
 
-    return {
+    return {t,
+      
       path, writeDisabled, rules, loading, modalVisible, modalKey, editingRule, editingOriginalId,
-      tabs, activeTab, tabSchemas, columns, openModal, saveRule, deleteRule, load,
+      deleteModalVisible, pendingDeleteNames,
+      tabs, activeTab, tabSchemas, columns, openModal, saveRule, deleteRule, confirmRemove, load,
       GROUP_TYPE_OPTIONS, addressGroups, networkGroups, domainGroups, macGroups, portGroups,
       loadBalanceBackends, backendColumns, backendModalVisible, backendModalKey,
       editingBackend, editingBackendIndex, openBackendModal, saveBackend, deleteBackend,
@@ -518,19 +545,15 @@ export default defineComponent({
       <DataTable :columns="columns" :data="rules" :loading="loading" :disabled="writeDisabled"
                  rowKey="id" :actions="['create', 'edit', 'delete']"
                  @create="openModal(-1)" @edit="openModal(rules.findIndex(r => r.id === $event.id))" @delete="deleteRule" />
-      <div style="height:32px;"></div>
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
-      </div>
-      <DraggableModal v-model:visible="modalVisible" :title="editingOriginalId ? '编辑目的 NAT 规则' : '创建目的 NAT 规则'" width="820px" :key="modalKey" @confirm="saveRule">
+      <DraggableModal v-model:visible="modalVisible" :title="editingOriginalId ? $t('destinationNat.editRule') : $t('destinationNat.createRule')" width="820px" :key="modalKey" @confirm="saveRule">
         <TabGroup v-model="activeTab" :tabs="tabs">
           <template #source>
             <SourceDestMatchCards
-              title="源地址"
-              :groupOptions="GROUP_TYPE_OPTIONS"
-              placeholder="IP地址/组名称"
-              macPlaceholder="MAC组名称"
-              portGroupPlaceholder="端口组名称"
+              :title="$t('destinationNat.sourceAddress')"
+              :groupOptions="GROUP_TYPE_OPTIONS.map(o => ({ value: o.value, label: t(o.labelKey) }))"
+              :placeholder="$t('destinationNat.placeholder.ipOrGroup')"
+              :macPlaceholder="$t('destinationNat.placeholder.macGroup')"
+              :portGroupPlaceholder="$t('destinationNat.placeholder.portGroup')"
               :groupType="editingRule?.sourceGroupType || 'address'"
               :addressValue="editingRule?.sourceValue || ''"
               :groupValue="editingRule?.sourceGroupValue || ''"
@@ -552,11 +575,11 @@ export default defineComponent({
           </template>
           <template #destination>
             <SourceDestMatchCards
-              title="目的地址"
-              :groupOptions="GROUP_TYPE_OPTIONS"
-              placeholder="IP地址/组名称"
-              macPlaceholder="MAC组名称"
-              portGroupPlaceholder="端口组名称"
+              :title="$t('destinationNat.destinationAddress')"
+              :groupOptions="GROUP_TYPE_OPTIONS.map(o => ({ value: o.value, label: t(o.labelKey) }))"
+              :placeholder="$t('destinationNat.placeholder.ipOrGroup')"
+              :macPlaceholder="$t('destinationNat.placeholder.macGroup')"
+              :portGroupPlaceholder="$t('destinationNat.placeholder.portGroup')"
               :groupType="editingRule?.destinationGroupType || 'address'"
               :addressValue="editingRule?.destinationValue || ''"
               :groupValue="editingRule?.destinationGroupValue || ''"
@@ -585,7 +608,7 @@ export default defineComponent({
           <template #translation>
             <ConfigForm v-model="editingRule" :schema="tabSchemas.translation" :showAdvanced="true" :formKey="'destination_nat_rule_translation'" />
             <div style="margin-top:16px;">
-              <div style="font-weight:bold; font-size:14px; margin-bottom:8px;">负载均衡后端</div>
+              <div style="font-weight:bold; font-size:14px; margin-bottom:8px;">{{ $t('destinationNat.loadBalanceBackends') }}</div>
               <DataTable :columns="backendColumns" :data="loadBalanceBackends" rowKey="address"
                          :actions="['create', 'edit', 'delete']" :disabled="writeDisabled"
                          @create="openBackendModal(-1)" @edit="openBackendModal" @delete="deleteBackend" />
@@ -593,18 +616,24 @@ export default defineComponent({
           </template>
         </TabGroup>
       </DraggableModal>
-      <DraggableModal v-model:visible="backendModalVisible" :title="editingBackendIndex >= 0 ? '编辑后端' : '添加后端'" width="400px" :key="backendModalKey" @confirm="saveBackend">
+      <DraggableModal v-model:visible="backendModalVisible" :title="editingBackendIndex >= 0 ? $t('destinationNat.editBackend') : $t('destinationNat.addBackend')" width="400px" :key="backendModalKey" @confirm="saveBackend">
         <div style="padding:16px;">
           <div style="margin-bottom:16px;">
-            <label style="display:block; margin-bottom:6px; font-size:13px; color:#666;">后端地址</label>
-            <input type="text" v-model="editingBackend.address" placeholder="IP地址"
+            <label style="display:block; margin-bottom:6px; font-size:13px; color:#666;">{{ $t('destinationNat.backendAddress') }}</label>
+            <input type="text" v-model="editingBackend.address" :placeholder="$t('destinationNat.placeholder.backendAddress')"
                    style="width:100%; border:1px solid #d9d9d9; border-radius:2px; padding:6px 8px; font-size:13px;" />
           </div>
           <div style="margin-bottom:16px;">
-            <label style="display:block; margin-bottom:6px; font-size:13px; color:#666;">权重 (1-100)</label>
+            <label style="display:block; margin-bottom:6px; font-size:13px; color:#666;">{{ $t('destinationNat.weightRangeLabel') }}</label>
             <input type="number" v-model.number="editingBackend.weight" min="1" max="100" placeholder="1"
                    style="width:100%; border:1px solid #d9d9d9; border-radius:2px; padding:6px 8px; font-size:13px;" />
           </div>
+        </div>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="$t('config.confirmDelete')" width="400px" @confirm="confirmRemove">
+        <div>{{ $t('destinationNat.confirmDelete') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="id in pendingDeleteNames" :key="id" style="padding:2px 0;">{{ id }}</div>
         </div>
       </DraggableModal>
     </div>

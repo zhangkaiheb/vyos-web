@@ -1,0 +1,1080 @@
+{
+  "zh-CN": {
+    "geneve": {
+      "columns": {
+        "name": "接口名称",
+        "description": "描述",
+        "vni": "VNI",
+        "remote": "远程地址",
+        "port": "端口",
+        "mtu": "MTU",
+        "disable": "禁用",
+        "actions": "操作"
+      },
+      "options": {
+        "sourceValidationStrict": "严格 (strict)",
+        "sourceValidationLoose": "宽松 (loose)",
+        "sourceValidationDisable": "禁用 (disable)",
+        "acceptDad0": "0 - 禁用",
+        "acceptDad1": "1 - 仅接收",
+        "acceptDad2": "2 - 接收并检测"
+      },
+      "schema": {
+        "basic": {
+          "name": "接口名称",
+          "namePlaceholder": "例如: gnv0",
+          "nameHelp": "GENEVE 接口名称",
+          "description": "描述",
+          "descriptionPlaceholder": "接口描述",
+          "vni": "VNI",
+          "vniHelp": "虚拟网络标识符 (0-16777214)",
+          "remote": "远程地址",
+          "remotePlaceholder": "IPv4 地址",
+          "remoteHelp": "对端 GENEVE 隧道地址",
+          "port": "端口",
+          "portHelp": "UDP 端口号 (1-65535)",
+          "mac": "MAC 地址",
+          "macPlaceholder": "例如: 00:11:22:33:44:55",
+          "macHelp": "接口 MAC 地址",
+          "mtu": "MTU",
+          "mtuHelp": "最大传输单元 (68-16000)",
+          "disable": "禁用接口",
+          "disableHelp": "管理性禁用此接口"
+        },
+        "parameters": {
+          "key": "Key",
+          "keyHelp": "隧道密钥 (0-4294967295)",
+          "tos": "TOS",
+          "tosHelp": "服务类型 (0-99)",
+          "ttl": "TTL",
+          "ttlHelp": "生存时间 (0-255)",
+          "flowlabel": "Flow Label",
+          "flowlabelPlaceholder": "IPv6 流标签",
+          "flowlabelHelp": "IPv6 流标签值"
+        },
+        "ip": {
+          "adjustMss": "调整 MSS",
+          "adjustMssPlaceholder": "例如: clamp-mss-to-pmtu",
+          "adjustMssHelp": "TCP MSS 调整策略",
+          "arpCacheTimeout": "ARP 缓存超时",
+          "arpCacheTimeoutHelp": "ARP 缓存超时时间 (1-86400 秒)",
+          "disableArpFilter": "禁用 ARP 过滤",
+          "disableArpFilterHelp": "禁用 ARP 过滤器",
+          "disableForwarding": "禁用转发",
+          "disableForwardingHelp": "禁用 IP 转发",
+          "enableArpAccept": "启用 ARP 接受",
+          "enableArpAcceptHelp": "启用 ARP 接受",
+          "enableArpAnnounce": "启用 ARP 通告",
+          "enableArpAnnounceHelp": "启用 ARP 通告",
+          "enableArpIgnore": "启用 ARP 忽略",
+          "enableArpIgnoreHelp": "启用 ARP 忽略",
+          "enableDirectedBroadcast": "启用定向广播",
+          "enableDirectedBroadcastHelp": "启用定向广播接收",
+          "enableProxyArp": "启用代理 ARP",
+          "enableProxyArpHelp": "启用代理 ARP",
+          "proxyArpPvlan": "代理 ARP PVLAN",
+          "proxyArpPvlanHelp": "启用代理 ARP PVLAN",
+          "sourceValidation": "源验证",
+          "sourceValidationPlaceholder": "选择源验证模式",
+          "sourceValidationHelp": "IP 源地址验证模式"
+        },
+        "ipv6": {
+          "acceptDad": "接受 DAD",
+          "acceptDadHelp": "重复地址检测模式",
+          "autoconf": "自动配置",
+          "autoconfHelp": "启用 IPv6 自动配置",
+          "eui64": "EUI-64",
+          "eui64Placeholder": "EUI-64 接口标识符",
+          "eui64Help": "使用 EUI-64 生成接口标识符",
+          "interfaceIdentifier": "接口标识符",
+          "interfaceIdentifierPlaceholder": "例如: ::1",
+          "interfaceIdentifierHelp": "IPv6 接口标识符",
+          "noDefaultLinkLocal": "禁用默认链路本地",
+          "noDefaultLinkLocalHelp": "不生成默认链路本地地址",
+          "adjustMss": "调整 MSS",
+          "adjustMssPlaceholder": "例如: clamp-mss-to-pmtu",
+          "adjustMssHelp": "TCP MSS 调整策略",
+          "baseReachableTime": "基础可达时间",
+          "baseReachableTimeHelp": "邻居可达基础时间 (1-86400 秒)",
+          "disableForwarding": "禁用转发",
+          "disableForwardingHelp": "禁用 IPv6 转发",
+          "dupAddrDetectTransmits": "重复地址检测传输",
+          "dupAddrDetectTransmitsHelp": "重复地址检测传输次数 (0-100)",
+          "sourceValidation": "源验证",
+          "sourceValidationPlaceholder": "选择源验证模式",
+          "sourceValidationHelp": "IPv6 源地址验证模式"
+        },
+        "mirror": {
+          "egress": "出口镜像",
+          "targetPlaceholder": "选择目标接口",
+          "egressHelp": "镜像出口流量到目标接口",
+          "ingress": "入口镜像",
+          "ingressHelp": "镜像入口流量到目标接口"
+        },
+        "other": {
+          "redirect": "重定向",
+          "redirectPlaceholder": "选择重定向目标",
+          "redirectHelp": "将流量重定向到指定接口",
+          "vrf": "VRF",
+          "vrfPlaceholder": "VRF 实例名称",
+          "vrfHelp": "将此接口绑定到 VRF 实例"
+        }
+      },
+      "command": {
+        "noConfig": "# 未配置任何参数"
+      },
+      "tabs": {
+        "basic": "基本设置",
+        "parameters": "参数",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "镜像",
+        "other": "其他",
+        "command": "命令预览"
+      },
+      "error": {
+        "code": "错误码",
+        "message": "错误信息",
+        "nameRequired": "请输入接口名称",
+        "selectForDeletes": "请先选择要删除的接口",
+        "selectForDelete": "请选择 for 删除"
+      },
+      "modal": {
+        "editTitle": "编辑 GENEVE 接口",
+        "createTitle": "创建 GENEVE 接口"
+      },
+      "delete": {
+        "title": "确认删除",
+        "confirmMessage": "确认删除以下 GENEVE 接口？"
+      },
+      "buttons": {
+        "cancel": "取消",
+        "confirm": "确定"
+      }
+    }
+  },
+  "en": {
+    "geneve": {
+      "columns": {
+        "name": "Interface Name",
+        "description": "Description",
+        "vni": "VNI",
+        "remote": "Remote Address",
+        "port": "Port",
+        "mtu": "MTU",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "options": {
+        "sourceValidationStrict": "Strict",
+        "sourceValidationLoose": "Loose",
+        "sourceValidationDisable": "Disable",
+        "acceptDad0": "0 - Disabled",
+        "acceptDad1": "1 - Receive Only",
+        "acceptDad2": "2 - Receive and Detect"
+      },
+      "schema": {
+        "basic": {
+          "name": "Interface Name",
+          "namePlaceholder": "e.g., gnv0",
+          "nameHelp": "GENEVE interface name",
+          "description": "Description",
+          "descriptionPlaceholder": "Interface description",
+          "vni": "VNI",
+          "vniHelp": "Virtual Network Identifier (0-16777214)",
+          "remote": "Remote Address",
+          "remotePlaceholder": "IPv4 address",
+          "remoteHelp": "Peer GENEVE tunnel address",
+          "port": "Port",
+          "portHelp": "UDP port number (1-65535)",
+          "mac": "MAC Address",
+          "macPlaceholder": "e.g., 00:11:22:33:44:55",
+          "macHelp": "Interface MAC address",
+          "mtu": "MTU",
+          "mtuHelp": "Maximum Transmission Unit (68-16000)",
+          "disable": "Disable Interface",
+          "disableHelp": "Administratively disable this interface"
+        },
+        "parameters": {
+          "key": "Key",
+          "keyHelp": "Tunnel key (0-4294967295)",
+          "tos": "TOS",
+          "tosHelp": "Type of Service (0-99)",
+          "ttl": "TTL",
+          "ttlHelp": "Time to Live (0-255)",
+          "flowlabel": "Flow Label",
+          "flowlabelPlaceholder": "IPv6 flow label",
+          "flowlabelHelp": "IPv6 flow label value"
+        },
+        "ip": {
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., clamp-mss-to-pmtu",
+          "adjustMssHelp": "TCP MSS adjustment policy",
+          "arpCacheTimeout": "ARP Cache Timeout",
+          "arpCacheTimeoutHelp": "ARP cache timeout (1-86400 seconds)",
+          "disableArpFilter": "Disable ARP Filter",
+          "disableArpFilterHelp": "Disable ARP filter",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IP forwarding",
+          "enableArpAccept": "Enable ARP Accept",
+          "enableArpAcceptHelp": "Enable ARP accept",
+          "enableArpAnnounce": "Enable ARP Announce",
+          "enableArpAnnounceHelp": "Enable ARP announce",
+          "enableArpIgnore": "Enable ARP Ignore",
+          "enableArpIgnoreHelp": "Enable ARP ignore",
+          "enableDirectedBroadcast": "Enable Directed Broadcast",
+          "enableDirectedBroadcastHelp": "Enable directed broadcast reception",
+          "enableProxyArp": "Enable Proxy ARP",
+          "enableProxyArpHelp": "Enable proxy ARP",
+          "proxyArpPvlan": "Proxy ARP PVLAN",
+          "proxyArpPvlanHelp": "Enable proxy ARP PVLAN",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select source validation mode",
+          "sourceValidationHelp": "IP source address validation mode"
+        },
+        "ipv6": {
+          "acceptDad": "Accept DAD",
+          "acceptDadHelp": "Duplicate Address Detection mode",
+          "autoconf": "Autoconf",
+          "autoconfHelp": "Enable IPv6 autoconfiguration",
+          "eui64": "EUI-64",
+          "eui64Placeholder": "EUI-64 interface identifier",
+          "eui64Help": "Use EUI-64 to generate interface identifier",
+          "interfaceIdentifier": "Interface Identifier",
+          "interfaceIdentifierPlaceholder": "e.g., ::1",
+          "interfaceIdentifierHelp": "IPv6 interface identifier",
+          "noDefaultLinkLocal": "No Default Link-Local",
+          "noDefaultLinkLocalHelp": "Do not generate default link-local address",
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., clamp-mss-to-pmtu",
+          "adjustMssHelp": "TCP MSS adjustment policy",
+          "baseReachableTime": "Base Reachable Time",
+          "baseReachableTimeHelp": "Neighbor reachability base time (1-86400 seconds)",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IPv6 forwarding",
+          "dupAddrDetectTransmits": "Duplicate Address Detect Transmits",
+          "dupAddrDetectTransmitsHelp": "Duplicate address detection transmit count (0-100)",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select source validation mode",
+          "sourceValidationHelp": "IPv6 source address validation mode"
+        },
+        "mirror": {
+          "egress": "Egress Mirror",
+          "targetPlaceholder": "Select target interface",
+          "egressHelp": "Mirror egress traffic to target interface",
+          "ingress": "Ingress Mirror",
+          "ingressHelp": "Mirror ingress traffic to target interface"
+        },
+        "other": {
+          "redirect": "Redirect",
+          "redirectPlaceholder": "Select redirect target",
+          "redirectHelp": "Redirect traffic to specified interface",
+          "vrf": "VRF",
+          "vrfPlaceholder": "VRF instance name",
+          "vrfHelp": "Bind this interface to a VRF instance"
+        }
+      },
+      "command": {
+        "noConfig": "# No parameters configured"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "parameters": "Parameters",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "error": {
+        "code": "Error Code",
+        "message": "Error Message",
+        "nameRequired": "Please enter interface name",
+        "selectForDeletes": "Please select interfaces to delete first",
+        "selectForDelete": "Select For Delete"
+      },
+      "modal": {
+        "editTitle": "Edit GENEVE Interface",
+        "createTitle": "Create GENEVE Interface"
+      },
+      "delete": {
+        "title": "Confirm Delete",
+        "confirmMessage": "Confirm delete the following GENEVE interfaces?"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      }
+    }
+  },
+  "zh-TW": {
+    "geneve": {
+      "columns": {
+        "name": "Interface Name",
+        "description": "Description",
+        "vni": "VNI",
+        "remote": "Remote Address",
+        "port": "Port",
+        "mtu": "MTU",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "options": {
+        "sourceValidationStrict": "Strict",
+        "sourceValidationLoose": "Loose",
+        "sourceValidationDisable": "Disable",
+        "acceptDad0": "0 - Disabled",
+        "acceptDad1": "1 - Receive Only",
+        "acceptDad2": "2 - Receive and Detect"
+      },
+      "schema": {
+        "basic": {
+          "name": "Interface Name",
+          "namePlaceholder": "e.g., gnv0",
+          "nameHelp": "GENEVE interface name",
+          "description": "Description",
+          "descriptionPlaceholder": "Interface description",
+          "vni": "VNI",
+          "vniHelp": "Virtual Network Identifier (0-16777214)",
+          "remote": "Remote Address",
+          "remotePlaceholder": "IPv4 address",
+          "remoteHelp": "Peer GENEVE tunnel address",
+          "port": "Port",
+          "portHelp": "UDP port number (1-65535)",
+          "mac": "MAC Address",
+          "macPlaceholder": "e.g., 00:11:22:33:44:55",
+          "macHelp": "Interface MAC address",
+          "mtu": "MTU",
+          "mtuHelp": "Maximum Transmission Unit (68-16000)",
+          "disable": "Disable Interface",
+          "disableHelp": "Administratively disable this interface"
+        },
+        "parameters": {
+          "key": "Key",
+          "keyHelp": "Tunnel key (0-4294967295)",
+          "tos": "TOS",
+          "tosHelp": "Type of Service (0-99)",
+          "ttl": "TTL",
+          "ttlHelp": "Time to Live (0-255)",
+          "flowlabel": "Flow Label",
+          "flowlabelPlaceholder": "IPv6 flow label",
+          "flowlabelHelp": "IPv6 flow label value"
+        },
+        "ip": {
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., clamp-mss-to-pmtu",
+          "adjustMssHelp": "TCP MSS adjustment policy",
+          "arpCacheTimeout": "ARP Cache Timeout",
+          "arpCacheTimeoutHelp": "ARP cache timeout (1-86400 seconds)",
+          "disableArpFilter": "Disable ARP Filter",
+          "disableArpFilterHelp": "Disable ARP filter",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IP forwarding",
+          "enableArpAccept": "Enable ARP Accept",
+          "enableArpAcceptHelp": "Enable ARP accept",
+          "enableArpAnnounce": "Enable ARP Announce",
+          "enableArpAnnounceHelp": "Enable ARP announce",
+          "enableArpIgnore": "Enable ARP Ignore",
+          "enableArpIgnoreHelp": "Enable ARP ignore",
+          "enableDirectedBroadcast": "Enable Directed Broadcast",
+          "enableDirectedBroadcastHelp": "Enable directed broadcast reception",
+          "enableProxyArp": "Enable Proxy ARP",
+          "enableProxyArpHelp": "Enable proxy ARP",
+          "proxyArpPvlan": "Proxy ARP PVLAN",
+          "proxyArpPvlanHelp": "Enable proxy ARP PVLAN",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select source validation mode",
+          "sourceValidationHelp": "IP source address validation mode"
+        },
+        "ipv6": {
+          "acceptDad": "Accept DAD",
+          "acceptDadHelp": "Duplicate Address Detection mode",
+          "autoconf": "Autoconf",
+          "autoconfHelp": "Enable IPv6 autoconfiguration",
+          "eui64": "EUI-64",
+          "eui64Placeholder": "EUI-64 interface identifier",
+          "eui64Help": "Use EUI-64 to generate interface identifier",
+          "interfaceIdentifier": "Interface Identifier",
+          "interfaceIdentifierPlaceholder": "e.g., ::1",
+          "interfaceIdentifierHelp": "IPv6 interface identifier",
+          "noDefaultLinkLocal": "No Default Link-Local",
+          "noDefaultLinkLocalHelp": "Do not generate default link-local address",
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., clamp-mss-to-pmtu",
+          "adjustMssHelp": "TCP MSS adjustment policy",
+          "baseReachableTime": "Base Reachable Time",
+          "baseReachableTimeHelp": "Neighbor reachability base time (1-86400 seconds)",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IPv6 forwarding",
+          "dupAddrDetectTransmits": "Duplicate Address Detect Transmits",
+          "dupAddrDetectTransmitsHelp": "Duplicate address detection transmit count (0-100)",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select source validation mode",
+          "sourceValidationHelp": "IPv6 source address validation mode"
+        },
+        "mirror": {
+          "egress": "Egress Mirror",
+          "targetPlaceholder": "Select target interface",
+          "egressHelp": "Mirror egress traffic to target interface",
+          "ingress": "Ingress Mirror",
+          "ingressHelp": "Mirror ingress traffic to target interface"
+        },
+        "other": {
+          "redirect": "Redirect",
+          "redirectPlaceholder": "Select redirect target",
+          "redirectHelp": "Redirect traffic to specified interface",
+          "vrf": "VRF",
+          "vrfPlaceholder": "VRF instance name",
+          "vrfHelp": "Bind this interface to a VRF instance"
+        }
+      },
+      "command": {
+        "noConfig": "# No parameters configured"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "parameters": "Parameters",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "error": {
+        "code": "Error Code",
+        "message": "Error Message",
+        "nameRequired": "Please enter interface name",
+        "selectForDeletes": "Please select interfaces to delete first",
+        "selectForDelete": "Select For Delete"
+      },
+      "modal": {
+        "editTitle": "Edit GENEVE Interface",
+        "createTitle": "Create GENEVE Interface"
+      },
+      "delete": {
+        "title": "Confirm Delete",
+        "confirmMessage": "Confirm delete the following GENEVE interfaces?"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      }
+    }
+  },
+  "ru": {
+    "geneve": {
+      "columns": {
+        "name": "Interface Name",
+        "description": "Description",
+        "vni": "VNI",
+        "remote": "Remote Address",
+        "port": "Port",
+        "mtu": "MTU",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "options": {
+        "sourceValidationStrict": "Strict",
+        "sourceValidationLoose": "Loose",
+        "sourceValidationDisable": "Disable",
+        "acceptDad0": "0 - Disabled",
+        "acceptDad1": "1 - Receive Only",
+        "acceptDad2": "2 - Receive and Detect"
+      },
+      "schema": {
+        "basic": {
+          "name": "Interface Name",
+          "namePlaceholder": "e.g., gnv0",
+          "nameHelp": "GENEVE interface name",
+          "description": "Description",
+          "descriptionPlaceholder": "Interface description",
+          "vni": "VNI",
+          "vniHelp": "Virtual Network Identifier (0-16777214)",
+          "remote": "Remote Address",
+          "remotePlaceholder": "IPv4 address",
+          "remoteHelp": "Peer GENEVE tunnel address",
+          "port": "Port",
+          "portHelp": "UDP port number (1-65535)",
+          "mac": "MAC Address",
+          "macPlaceholder": "e.g., 00:11:22:33:44:55",
+          "macHelp": "Interface MAC address",
+          "mtu": "MTU",
+          "mtuHelp": "Maximum Transmission Unit (68-16000)",
+          "disable": "Disable Interface",
+          "disableHelp": "Administratively disable this interface"
+        },
+        "parameters": {
+          "key": "Key",
+          "keyHelp": "Tunnel key (0-4294967295)",
+          "tos": "TOS",
+          "tosHelp": "Type of Service (0-99)",
+          "ttl": "TTL",
+          "ttlHelp": "Time to Live (0-255)",
+          "flowlabel": "Flow Label",
+          "flowlabelPlaceholder": "IPv6 flow label",
+          "flowlabelHelp": "IPv6 flow label value"
+        },
+        "ip": {
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., clamp-mss-to-pmtu",
+          "adjustMssHelp": "TCP MSS adjustment policy",
+          "arpCacheTimeout": "ARP Cache Timeout",
+          "arpCacheTimeoutHelp": "ARP cache timeout (1-86400 seconds)",
+          "disableArpFilter": "Disable ARP Filter",
+          "disableArpFilterHelp": "Disable ARP filter",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IP forwarding",
+          "enableArpAccept": "Enable ARP Accept",
+          "enableArpAcceptHelp": "Enable ARP accept",
+          "enableArpAnnounce": "Enable ARP Announce",
+          "enableArpAnnounceHelp": "Enable ARP announce",
+          "enableArpIgnore": "Enable ARP Ignore",
+          "enableArpIgnoreHelp": "Enable ARP ignore",
+          "enableDirectedBroadcast": "Enable Directed Broadcast",
+          "enableDirectedBroadcastHelp": "Enable directed broadcast reception",
+          "enableProxyArp": "Enable Proxy ARP",
+          "enableProxyArpHelp": "Enable proxy ARP",
+          "proxyArpPvlan": "Proxy ARP PVLAN",
+          "proxyArpPvlanHelp": "Enable proxy ARP PVLAN",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select source validation mode",
+          "sourceValidationHelp": "IP source address validation mode"
+        },
+        "ipv6": {
+          "acceptDad": "Accept DAD",
+          "acceptDadHelp": "Duplicate Address Detection mode",
+          "autoconf": "Autoconf",
+          "autoconfHelp": "Enable IPv6 autoconfiguration",
+          "eui64": "EUI-64",
+          "eui64Placeholder": "EUI-64 interface identifier",
+          "eui64Help": "Use EUI-64 to generate interface identifier",
+          "interfaceIdentifier": "Interface Identifier",
+          "interfaceIdentifierPlaceholder": "e.g., ::1",
+          "interfaceIdentifierHelp": "IPv6 interface identifier",
+          "noDefaultLinkLocal": "No Default Link-Local",
+          "noDefaultLinkLocalHelp": "Do not generate default link-local address",
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., clamp-mss-to-pmtu",
+          "adjustMssHelp": "TCP MSS adjustment policy",
+          "baseReachableTime": "Base Reachable Time",
+          "baseReachableTimeHelp": "Neighbor reachability base time (1-86400 seconds)",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IPv6 forwarding",
+          "dupAddrDetectTransmits": "Duplicate Address Detect Transmits",
+          "dupAddrDetectTransmitsHelp": "Duplicate address detection transmit count (0-100)",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select source validation mode",
+          "sourceValidationHelp": "IPv6 source address validation mode"
+        },
+        "mirror": {
+          "egress": "Egress Mirror",
+          "targetPlaceholder": "Select target interface",
+          "egressHelp": "Mirror egress traffic to target interface",
+          "ingress": "Ingress Mirror",
+          "ingressHelp": "Mirror ingress traffic to target interface"
+        },
+        "other": {
+          "redirect": "Redirect",
+          "redirectPlaceholder": "Select redirect target",
+          "redirectHelp": "Redirect traffic to specified interface",
+          "vrf": "VRF",
+          "vrfPlaceholder": "VRF instance name",
+          "vrfHelp": "Bind this interface to a VRF instance"
+        }
+      },
+      "command": {
+        "noConfig": "# No parameters configured"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "parameters": "Parameters",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "error": {
+        "code": "Error Code",
+        "message": "Error Message",
+        "nameRequired": "Please enter interface name",
+        "selectForDeletes": "Please select interfaces to delete first",
+        "selectForDelete": "Select For Delete"
+      },
+      "modal": {
+        "editTitle": "Edit GENEVE Interface",
+        "createTitle": "Create GENEVE Interface"
+      },
+      "delete": {
+        "title": "Confirm Delete",
+        "confirmMessage": "Confirm delete the following GENEVE interfaces?"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      }
+    }
+  },
+  "de": {
+    "geneve": {
+      "columns": {
+        "name": "Interface Name",
+        "description": "Description",
+        "vni": "VNI",
+        "remote": "Remote Address",
+        "port": "Port",
+        "mtu": "MTU",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "options": {
+        "sourceValidationStrict": "Strict",
+        "sourceValidationLoose": "Loose",
+        "sourceValidationDisable": "Disable",
+        "acceptDad0": "0 - Disabled",
+        "acceptDad1": "1 - Receive Only",
+        "acceptDad2": "2 - Receive and Detect"
+      },
+      "schema": {
+        "basic": {
+          "name": "Interface Name",
+          "namePlaceholder": "e.g., gnv0",
+          "nameHelp": "GENEVE interface name",
+          "description": "Description",
+          "descriptionPlaceholder": "Interface description",
+          "vni": "VNI",
+          "vniHelp": "Virtual Network Identifier (0-16777214)",
+          "remote": "Remote Address",
+          "remotePlaceholder": "IPv4 address",
+          "remoteHelp": "Peer GENEVE tunnel address",
+          "port": "Port",
+          "portHelp": "UDP port number (1-65535)",
+          "mac": "MAC Address",
+          "macPlaceholder": "e.g., 00:11:22:33:44:55",
+          "macHelp": "Interface MAC address",
+          "mtu": "MTU",
+          "mtuHelp": "Maximum Transmission Unit (68-16000)",
+          "disable": "Disable Interface",
+          "disableHelp": "Administratively disable this interface"
+        },
+        "parameters": {
+          "key": "Key",
+          "keyHelp": "Tunnel key (0-4294967295)",
+          "tos": "TOS",
+          "tosHelp": "Type of Service (0-99)",
+          "ttl": "TTL",
+          "ttlHelp": "Time to Live (0-255)",
+          "flowlabel": "Flow Label",
+          "flowlabelPlaceholder": "IPv6 flow label",
+          "flowlabelHelp": "IPv6 flow label value"
+        },
+        "ip": {
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., clamp-mss-to-pmtu",
+          "adjustMssHelp": "TCP MSS adjustment policy",
+          "arpCacheTimeout": "ARP Cache Timeout",
+          "arpCacheTimeoutHelp": "ARP cache timeout (1-86400 seconds)",
+          "disableArpFilter": "Disable ARP Filter",
+          "disableArpFilterHelp": "Disable ARP filter",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IP forwarding",
+          "enableArpAccept": "Enable ARP Accept",
+          "enableArpAcceptHelp": "Enable ARP accept",
+          "enableArpAnnounce": "Enable ARP Announce",
+          "enableArpAnnounceHelp": "Enable ARP announce",
+          "enableArpIgnore": "Enable ARP Ignore",
+          "enableArpIgnoreHelp": "Enable ARP ignore",
+          "enableDirectedBroadcast": "Enable Directed Broadcast",
+          "enableDirectedBroadcastHelp": "Enable directed broadcast reception",
+          "enableProxyArp": "Enable Proxy ARP",
+          "enableProxyArpHelp": "Enable proxy ARP",
+          "proxyArpPvlan": "Proxy ARP PVLAN",
+          "proxyArpPvlanHelp": "Enable proxy ARP PVLAN",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select source validation mode",
+          "sourceValidationHelp": "IP source address validation mode"
+        },
+        "ipv6": {
+          "acceptDad": "Accept DAD",
+          "acceptDadHelp": "Duplicate Address Detection mode",
+          "autoconf": "Autoconf",
+          "autoconfHelp": "Enable IPv6 autoconfiguration",
+          "eui64": "EUI-64",
+          "eui64Placeholder": "EUI-64 interface identifier",
+          "eui64Help": "Use EUI-64 to generate interface identifier",
+          "interfaceIdentifier": "Interface Identifier",
+          "interfaceIdentifierPlaceholder": "e.g., ::1",
+          "interfaceIdentifierHelp": "IPv6 interface identifier",
+          "noDefaultLinkLocal": "No Default Link-Local",
+          "noDefaultLinkLocalHelp": "Do not generate default link-local address",
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., clamp-mss-to-pmtu",
+          "adjustMssHelp": "TCP MSS adjustment policy",
+          "baseReachableTime": "Base Reachable Time",
+          "baseReachableTimeHelp": "Neighbor reachability base time (1-86400 seconds)",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IPv6 forwarding",
+          "dupAddrDetectTransmits": "Duplicate Address Detect Transmits",
+          "dupAddrDetectTransmitsHelp": "Duplicate address detection transmit count (0-100)",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select source validation mode",
+          "sourceValidationHelp": "IPv6 source address validation mode"
+        },
+        "mirror": {
+          "egress": "Egress Mirror",
+          "targetPlaceholder": "Select target interface",
+          "egressHelp": "Mirror egress traffic to target interface",
+          "ingress": "Ingress Mirror",
+          "ingressHelp": "Mirror ingress traffic to target interface"
+        },
+        "other": {
+          "redirect": "Redirect",
+          "redirectPlaceholder": "Select redirect target",
+          "redirectHelp": "Redirect traffic to specified interface",
+          "vrf": "VRF",
+          "vrfPlaceholder": "VRF instance name",
+          "vrfHelp": "Bind this interface to a VRF instance"
+        }
+      },
+      "command": {
+        "noConfig": "# No parameters configured"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "parameters": "Parameters",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "error": {
+        "code": "Error Code",
+        "message": "Error Message",
+        "nameRequired": "Please enter interface name",
+        "selectForDeletes": "Please select interfaces to delete first",
+        "selectForDelete": "Select For Delete"
+      },
+      "modal": {
+        "editTitle": "Edit GENEVE Interface",
+        "createTitle": "Create GENEVE Interface"
+      },
+      "delete": {
+        "title": "Confirm Delete",
+        "confirmMessage": "Confirm delete the following GENEVE interfaces?"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      }
+    }
+  },
+  "fr": {
+    "geneve": {
+      "columns": {
+        "name": "Interface Name",
+        "description": "Description",
+        "vni": "VNI",
+        "remote": "Remote Address",
+        "port": "Port",
+        "mtu": "MTU",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "options": {
+        "sourceValidationStrict": "Strict",
+        "sourceValidationLoose": "Loose",
+        "sourceValidationDisable": "Disable",
+        "acceptDad0": "0 - Disabled",
+        "acceptDad1": "1 - Receive Only",
+        "acceptDad2": "2 - Receive and Detect"
+      },
+      "schema": {
+        "basic": {
+          "name": "Interface Name",
+          "namePlaceholder": "e.g., gnv0",
+          "nameHelp": "GENEVE interface name",
+          "description": "Description",
+          "descriptionPlaceholder": "Interface description",
+          "vni": "VNI",
+          "vniHelp": "Virtual Network Identifier (0-16777214)",
+          "remote": "Remote Address",
+          "remotePlaceholder": "IPv4 address",
+          "remoteHelp": "Peer GENEVE tunnel address",
+          "port": "Port",
+          "portHelp": "UDP port number (1-65535)",
+          "mac": "MAC Address",
+          "macPlaceholder": "e.g., 00:11:22:33:44:55",
+          "macHelp": "Interface MAC address",
+          "mtu": "MTU",
+          "mtuHelp": "Maximum Transmission Unit (68-16000)",
+          "disable": "Disable Interface",
+          "disableHelp": "Administratively disable this interface"
+        },
+        "parameters": {
+          "key": "Key",
+          "keyHelp": "Tunnel key (0-4294967295)",
+          "tos": "TOS",
+          "tosHelp": "Type of Service (0-99)",
+          "ttl": "TTL",
+          "ttlHelp": "Time to Live (0-255)",
+          "flowlabel": "Flow Label",
+          "flowlabelPlaceholder": "IPv6 flow label",
+          "flowlabelHelp": "IPv6 flow label value"
+        },
+        "ip": {
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., clamp-mss-to-pmtu",
+          "adjustMssHelp": "TCP MSS adjustment policy",
+          "arpCacheTimeout": "ARP Cache Timeout",
+          "arpCacheTimeoutHelp": "ARP cache timeout (1-86400 seconds)",
+          "disableArpFilter": "Disable ARP Filter",
+          "disableArpFilterHelp": "Disable ARP filter",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IP forwarding",
+          "enableArpAccept": "Enable ARP Accept",
+          "enableArpAcceptHelp": "Enable ARP accept",
+          "enableArpAnnounce": "Enable ARP Announce",
+          "enableArpAnnounceHelp": "Enable ARP announce",
+          "enableArpIgnore": "Enable ARP Ignore",
+          "enableArpIgnoreHelp": "Enable ARP ignore",
+          "enableDirectedBroadcast": "Enable Directed Broadcast",
+          "enableDirectedBroadcastHelp": "Enable directed broadcast reception",
+          "enableProxyArp": "Enable Proxy ARP",
+          "enableProxyArpHelp": "Enable proxy ARP",
+          "proxyArpPvlan": "Proxy ARP PVLAN",
+          "proxyArpPvlanHelp": "Enable proxy ARP PVLAN",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select source validation mode",
+          "sourceValidationHelp": "IP source address validation mode"
+        },
+        "ipv6": {
+          "acceptDad": "Accept DAD",
+          "acceptDadHelp": "Duplicate Address Detection mode",
+          "autoconf": "Autoconf",
+          "autoconfHelp": "Enable IPv6 autoconfiguration",
+          "eui64": "EUI-64",
+          "eui64Placeholder": "EUI-64 interface identifier",
+          "eui64Help": "Use EUI-64 to generate interface identifier",
+          "interfaceIdentifier": "Interface Identifier",
+          "interfaceIdentifierPlaceholder": "e.g., ::1",
+          "interfaceIdentifierHelp": "IPv6 interface identifier",
+          "noDefaultLinkLocal": "No Default Link-Local",
+          "noDefaultLinkLocalHelp": "Do not generate default link-local address",
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., clamp-mss-to-pmtu",
+          "adjustMssHelp": "TCP MSS adjustment policy",
+          "baseReachableTime": "Base Reachable Time",
+          "baseReachableTimeHelp": "Neighbor reachability base time (1-86400 seconds)",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IPv6 forwarding",
+          "dupAddrDetectTransmits": "Duplicate Address Detect Transmits",
+          "dupAddrDetectTransmitsHelp": "Duplicate address detection transmit count (0-100)",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select source validation mode",
+          "sourceValidationHelp": "IPv6 source address validation mode"
+        },
+        "mirror": {
+          "egress": "Egress Mirror",
+          "targetPlaceholder": "Select target interface",
+          "egressHelp": "Mirror egress traffic to target interface",
+          "ingress": "Ingress Mirror",
+          "ingressHelp": "Mirror ingress traffic to target interface"
+        },
+        "other": {
+          "redirect": "Redirect",
+          "redirectPlaceholder": "Select redirect target",
+          "redirectHelp": "Redirect traffic to specified interface",
+          "vrf": "VRF",
+          "vrfPlaceholder": "VRF instance name",
+          "vrfHelp": "Bind this interface to a VRF instance"
+        }
+      },
+      "command": {
+        "noConfig": "# No parameters configured"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "parameters": "Parameters",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "error": {
+        "code": "Error Code",
+        "message": "Error Message",
+        "nameRequired": "Please enter interface name",
+        "selectForDeletes": "Please select interfaces to delete first",
+        "selectForDelete": "Select For Delete"
+      },
+      "modal": {
+        "editTitle": "Edit GENEVE Interface",
+        "createTitle": "Create GENEVE Interface"
+      },
+      "delete": {
+        "title": "Confirm Delete",
+        "confirmMessage": "Confirm delete the following GENEVE interfaces?"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      }
+    }
+  },
+  "ko": {
+    "geneve": {
+      "columns": {
+        "name": "Interface Name",
+        "description": "Description",
+        "vni": "VNI",
+        "remote": "Remote Address",
+        "port": "Port",
+        "mtu": "MTU",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "options": {
+        "sourceValidationStrict": "Strict",
+        "sourceValidationLoose": "Loose",
+        "sourceValidationDisable": "Disable",
+        "acceptDad0": "0 - Disabled",
+        "acceptDad1": "1 - Receive Only",
+        "acceptDad2": "2 - Receive and Detect"
+      },
+      "schema": {
+        "basic": {
+          "name": "Interface Name",
+          "namePlaceholder": "e.g., gnv0",
+          "nameHelp": "GENEVE interface name",
+          "description": "Description",
+          "descriptionPlaceholder": "Interface description",
+          "vni": "VNI",
+          "vniHelp": "Virtual Network Identifier (0-16777214)",
+          "remote": "Remote Address",
+          "remotePlaceholder": "IPv4 address",
+          "remoteHelp": "Peer GENEVE tunnel address",
+          "port": "Port",
+          "portHelp": "UDP port number (1-65535)",
+          "mac": "MAC Address",
+          "macPlaceholder": "e.g., 00:11:22:33:44:55",
+          "macHelp": "Interface MAC address",
+          "mtu": "MTU",
+          "mtuHelp": "Maximum Transmission Unit (68-16000)",
+          "disable": "Disable Interface",
+          "disableHelp": "Administratively disable this interface"
+        },
+        "parameters": {
+          "key": "Key",
+          "keyHelp": "Tunnel key (0-4294967295)",
+          "tos": "TOS",
+          "tosHelp": "Type of Service (0-99)",
+          "ttl": "TTL",
+          "ttlHelp": "Time to Live (0-255)",
+          "flowlabel": "Flow Label",
+          "flowlabelPlaceholder": "IPv6 flow label",
+          "flowlabelHelp": "IPv6 flow label value"
+        },
+        "ip": {
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., clamp-mss-to-pmtu",
+          "adjustMssHelp": "TCP MSS adjustment policy",
+          "arpCacheTimeout": "ARP Cache Timeout",
+          "arpCacheTimeoutHelp": "ARP cache timeout (1-86400 seconds)",
+          "disableArpFilter": "Disable ARP Filter",
+          "disableArpFilterHelp": "Disable ARP filter",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IP forwarding",
+          "enableArpAccept": "Enable ARP Accept",
+          "enableArpAcceptHelp": "Enable ARP accept",
+          "enableArpAnnounce": "Enable ARP Announce",
+          "enableArpAnnounceHelp": "Enable ARP announce",
+          "enableArpIgnore": "Enable ARP Ignore",
+          "enableArpIgnoreHelp": "Enable ARP ignore",
+          "enableDirectedBroadcast": "Enable Directed Broadcast",
+          "enableDirectedBroadcastHelp": "Enable directed broadcast reception",
+          "enableProxyArp": "Enable Proxy ARP",
+          "enableProxyArpHelp": "Enable proxy ARP",
+          "proxyArpPvlan": "Proxy ARP PVLAN",
+          "proxyArpPvlanHelp": "Enable proxy ARP PVLAN",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select source validation mode",
+          "sourceValidationHelp": "IP source address validation mode"
+        },
+        "ipv6": {
+          "acceptDad": "Accept DAD",
+          "acceptDadHelp": "Duplicate Address Detection mode",
+          "autoconf": "Autoconf",
+          "autoconfHelp": "Enable IPv6 autoconfiguration",
+          "eui64": "EUI-64",
+          "eui64Placeholder": "EUI-64 interface identifier",
+          "eui64Help": "Use EUI-64 to generate interface identifier",
+          "interfaceIdentifier": "Interface Identifier",
+          "interfaceIdentifierPlaceholder": "e.g., ::1",
+          "interfaceIdentifierHelp": "IPv6 interface identifier",
+          "noDefaultLinkLocal": "No Default Link-Local",
+          "noDefaultLinkLocalHelp": "Do not generate default link-local address",
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., clamp-mss-to-pmtu",
+          "adjustMssHelp": "TCP MSS adjustment policy",
+          "baseReachableTime": "Base Reachable Time",
+          "baseReachableTimeHelp": "Neighbor reachability base time (1-86400 seconds)",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IPv6 forwarding",
+          "dupAddrDetectTransmits": "Duplicate Address Detect Transmits",
+          "dupAddrDetectTransmitsHelp": "Duplicate address detection transmit count (0-100)",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select source validation mode",
+          "sourceValidationHelp": "IPv6 source address validation mode"
+        },
+        "mirror": {
+          "egress": "Egress Mirror",
+          "targetPlaceholder": "Select target interface",
+          "egressHelp": "Mirror egress traffic to target interface",
+          "ingress": "Ingress Mirror",
+          "ingressHelp": "Mirror ingress traffic to target interface"
+        },
+        "other": {
+          "redirect": "Redirect",
+          "redirectPlaceholder": "Select redirect target",
+          "redirectHelp": "Redirect traffic to specified interface",
+          "vrf": "VRF",
+          "vrfPlaceholder": "VRF instance name",
+          "vrfHelp": "Bind this interface to a VRF instance"
+        }
+      },
+      "command": {
+        "noConfig": "# No parameters configured"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "parameters": "Parameters",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "error": {
+        "code": "Error Code",
+        "message": "Error Message",
+        "nameRequired": "Please enter interface name",
+        "selectForDeletes": "Please select interfaces to delete first",
+        "selectForDelete": "Select For Delete"
+      },
+      "modal": {
+        "editTitle": "Edit GENEVE Interface",
+        "createTitle": "Create GENEVE Interface"
+      },
+      "delete": {
+        "title": "Confirm Delete",
+        "confirmMessage": "Confirm delete the following GENEVE interfaces?"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      }
+    }
+  }
+}

@@ -4,34 +4,40 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import { api, interfaceApi } from '/src/api/index.js';
-
-const COLUMNS = [
-  { key: 'name', title: '接口名称', width: 120 },
-  { key: 'description', title: '描述', width: 160 },
-  { key: 'vni', title: 'VNI', width: 100 },
-  { key: 'remote', title: '远端地址', width: 140 },
-  { key: 'port', title: '端口', width: 80 },
-  { key: 'mtu', title: 'MTU', width: 80 },
-  { key: 'disable', title: '禁用', width: 80 },
-  { key: 'actions', title: '操作', width: 100 },
-];
-
-const SOURCE_VALIDATION_OPTIONS = [
-  { value: 'strict', label: 'strict (严格)' },
-  { value: 'loose', label: 'loose (宽松)' },
-  { value: 'disable', label: 'disable (禁用)' },
-];
-
-const ACCEPT_DAD_OPTIONS = [
-  { value: '0', label: '0 (禁用 DAD)' },
-  { value: '1', label: '1 (启用 DAD - 默认)' },
-  { value: '2', label: '2 (启用 DAD - MAC 重复时禁用 IPv6)' },
-];
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { showError } from '/src/components/Layout/ErrorDisplay.js';
+import { useI18n } from '/src/i18n/index.js';
 
 export default defineComponent({
   name: 'GenevePage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
+    const { t } = useI18n();
+
+    const COLUMNS = [
+      { key: 'name', title: t('geneve.columns.name'), width: 120 },
+      { key: 'description', title: t('geneve.columns.description'), width: 160 },
+      { key: 'vni', title: t('geneve.columns.vni'), width: 100 },
+      { key: 'remote', title: t('geneve.columns.remote'), width: 140 },
+      { key: 'port', title: t('geneve.columns.port'), width: 80 },
+      { key: 'mtu', title: t('geneve.columns.mtu'), width: 80 },
+      { key: 'disable', title: t('geneve.columns.disable'), width: 80 },
+      { key: 'actions', title: t('geneve.columns.actions'), width: 100 },
+    ];
+
+    const SOURCE_VALIDATION_OPTIONS = [
+      { value: 'strict', label: t('geneve.options.sourceValidationStrict') },
+      { value: 'loose', label: t('geneve.options.sourceValidationLoose') },
+      { value: 'disable', label: t('geneve.options.sourceValidationDisable') },
+    ];
+
+    const ACCEPT_DAD_OPTIONS = [
+      { value: '0', label: t('geneve.options.acceptDad0') },
+      { value: '1', label: t('geneve.options.acceptDad1') },
+      { value: '2', label: t('geneve.options.acceptDad2') },
+    ];
+
     const loading = ref(false);
     const geneves = ref([]);
     const modalVisible = ref(false);
@@ -39,61 +45,63 @@ export default defineComponent({
     const interfaceOptions = ref([]);
     const activeTab = ref('basic');
     const selectedGeneve = ref([]);
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
 
     // Schema definitions
     const basicSchema = computed(() => [
-      { key: 'name', title: '接口名称', type: 'text', required: true, placeholder: '如 gnv0, gnv1', help: '格式: gnvN' },
-      { key: 'description', title: '描述', type: 'text', placeholder: '接口描述' },
-      { key: 'vni', title: 'VNI', type: 'number', min: 0, max: 16777214, placeholder: '0-16777214', help: '虚拟网络标识符' },
-      { key: 'remote', title: '远端地址', type: 'text', placeholder: 'IPv4 或 IPv6 地址', help: '隧道远端地址' },
-      { key: 'port', title: '端口', type: 'number', min: 1, max: 65535, placeholder: '1-65535', help: '连接使用的端口号 (默认: 6081)' },
-      { key: 'mac', title: 'MAC 地址', type: 'text', placeholder: '如 00:11:22:33:44:55', help: '硬件 MAC 地址' },
-      { key: 'mtu', title: 'MTU', type: 'number', min: 68, max: 16000, placeholder: '68-16000', help: '最大传输单元 (默认: 1500)' },
-      { key: 'disable', title: '禁用接口', type: 'checkbox', help: '管理性禁用接口' },
+      { key: 'name', title: t('geneve.schema.basic.name'), type: 'text', required: true, placeholder: t('geneve.schema.basic.namePlaceholder'), help: t('geneve.schema.basic.nameHelp') },
+      { key: 'description', title: t('geneve.schema.basic.description'), type: 'text', placeholder: t('geneve.schema.basic.descriptionPlaceholder') },
+      { key: 'vni', title: t('geneve.schema.basic.vni'), type: 'number', min: 0, max: 16777214, placeholder: '0-16777214', help: t('geneve.schema.basic.vniHelp') },
+      { key: 'remote', title: t('geneve.schema.basic.remote'), type: 'text', placeholder: t('geneve.schema.basic.remotePlaceholder'), help: t('geneve.schema.basic.remoteHelp') },
+      { key: 'port', title: t('geneve.schema.basic.port'), type: 'number', min: 1, max: 65535, placeholder: '1-65535', help: t('geneve.schema.basic.portHelp') },
+      { key: 'mac', title: t('geneve.schema.basic.mac'), type: 'text', placeholder: t('geneve.schema.basic.macPlaceholder'), help: t('geneve.schema.basic.macHelp') },
+      { key: 'mtu', title: t('geneve.schema.basic.mtu'), type: 'number', min: 68, max: 16000, placeholder: '68-16000', help: t('geneve.schema.basic.mtuHelp') },
+      { key: 'disable', title: t('geneve.schema.basic.disable'), type: 'checkbox', help: t('geneve.schema.basic.disableHelp') },
     ]);
 
     const parametersSchema = computed(() => [
-      { key: 'param_ip_key', title: '隧道密钥', type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: '隧道密钥' },
-      { key: 'param_ip_tos', title: 'TOS 值', type: 'number', min: 0, max: 99, placeholder: '0-99', help: '出站数据包的 TOS 值' },
-      { key: 'param_ip_ttl', title: 'TTL', type: 'number', min: 0, max: 255, placeholder: '0-255', help: '出站数据包的 TTL (0=继承, 默认: 64)' },
-      { key: 'param_ipv6_flowlabel', title: '流标签', type: 'text', placeholder: 'inherit 或 0x0-0x0fffff', help: '出站数据包的流标签' },
+      { key: 'param_ip_key', title: t('geneve.schema.parameters.key'), type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: t('geneve.schema.parameters.keyHelp') },
+      { key: 'param_ip_tos', title: t('geneve.schema.parameters.tos'), type: 'number', min: 0, max: 99, placeholder: '0-99', help: t('geneve.schema.parameters.tosHelp') },
+      { key: 'param_ip_ttl', title: t('geneve.schema.parameters.ttl'), type: 'number', min: 0, max: 255, placeholder: '0-255', help: t('geneve.schema.parameters.ttlHelp') },
+      { key: 'param_ipv6_flowlabel', title: t('geneve.schema.parameters.flowlabel'), type: 'text', placeholder: t('geneve.schema.parameters.flowlabelPlaceholder'), help: t('geneve.schema.parameters.flowlabelHelp') },
     ]);
 
     const ipSchema = computed(() => [
-      { key: 'ip_adjust_mss', title: '调整 MSS', type: 'text', placeholder: 'clamp-mss-to-pmtu 或 536-65535', help: 'TCP MSS 值' },
-      { key: 'ip_arp_cache_timeout', title: 'ARP 缓存超时', type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: 'ARP 缓存条目超时 (秒, 默认: 30)' },
-      { key: 'ip_disable_arp_filter', title: '禁用 ARP 过滤', type: 'checkbox', help: '禁用 ARP 过滤' },
-      { key: 'ip_disable_forwarding', title: '禁用转发', type: 'checkbox', help: '禁用 IP 转发' },
-      { key: 'ip_enable_arp_accept', title: '启用 ARP 接受', type: 'checkbox', help: '启用 ARP 接受' },
-      { key: 'ip_enable_arp_announce', title: '启用 ARP 通告', type: 'checkbox', help: '启用 ARP 通告' },
-      { key: 'ip_enable_arp_ignore', title: '启用 ARP 忽略', type: 'checkbox', help: '启用 ARP 忽略' },
-      { key: 'ip_enable_directed_broadcast', title: '启用定向广播', type: 'checkbox', help: '启用定向广播转发' },
-      { key: 'ip_enable_proxy_arp', title: '启用代理 ARP', type: 'checkbox', help: '启用代理 ARP' },
-      { key: 'ip_proxy_arp_pvlan', title: '私有 VLAN 代理 ARP', type: 'checkbox', help: '启用私有 VLAN 代理 ARP' },
-      { key: 'ip_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
+      { key: 'ip_adjust_mss', title: t('geneve.schema.ip.adjustMss'), type: 'text', placeholder: t('geneve.schema.ip.adjustMssPlaceholder'), help: t('geneve.schema.ip.adjustMssHelp') },
+      { key: 'ip_arp_cache_timeout', title: t('geneve.schema.ip.arpCacheTimeout'), type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: t('geneve.schema.ip.arpCacheTimeoutHelp') },
+      { key: 'ip_disable_arp_filter', title: t('geneve.schema.ip.disableArpFilter'), type: 'checkbox', help: t('geneve.schema.ip.disableArpFilterHelp') },
+      { key: 'ip_disable_forwarding', title: t('geneve.schema.ip.disableForwarding'), type: 'checkbox', help: t('geneve.schema.ip.disableForwardingHelp') },
+      { key: 'ip_enable_arp_accept', title: t('geneve.schema.ip.enableArpAccept'), type: 'checkbox', help: t('geneve.schema.ip.enableArpAcceptHelp') },
+      { key: 'ip_enable_arp_announce', title: t('geneve.schema.ip.enableArpAnnounce'), type: 'checkbox', help: t('geneve.schema.ip.enableArpAnnounceHelp') },
+      { key: 'ip_enable_arp_ignore', title: t('geneve.schema.ip.enableArpIgnore'), type: 'checkbox', help: t('geneve.schema.ip.enableArpIgnoreHelp') },
+      { key: 'ip_enable_directed_broadcast', title: t('geneve.schema.ip.enableDirectedBroadcast'), type: 'checkbox', help: t('geneve.schema.ip.enableDirectedBroadcastHelp') },
+      { key: 'ip_enable_proxy_arp', title: t('geneve.schema.ip.enableProxyArp'), type: 'checkbox', help: t('geneve.schema.ip.enableProxyArpHelp') },
+      { key: 'ip_proxy_arp_pvlan', title: t('geneve.schema.ip.proxyArpPvlan'), type: 'checkbox', help: t('geneve.schema.ip.proxyArpPvlanHelp') },
+      { key: 'ip_source_validation', title: t('geneve.schema.ip.sourceValidation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: t('geneve.schema.ip.sourceValidationPlaceholder'), help: t('geneve.schema.ip.sourceValidationHelp') },
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: '接受 DAD', type: 'select', options: ACCEPT_DAD_OPTIONS, help: '重复地址检测 (默认: 1)' },
-      { key: 'ipv6_autoconf', title: '自动配置', type: 'checkbox', help: '使用 SLAAC 获取 IPv6 地址' },
-      { key: 'ipv6_eui64', title: 'EUI-64 前缀', type: 'text', placeholder: 'IPv6 前缀', help: '基于 MAC 的 EUI-64 地址前缀' },
-      { key: 'ipv6_interface_identifier', title: '接口标识符', type: 'text', placeholder: '如 ::1:2:3:4', help: 'SLAAC 接口标识符' },
-      { key: 'ipv6_no_default_link_local', title: '无默认链路本地地址', type: 'checkbox', help: '移除默认链路本地地址' },
-      { key: 'ipv6_adjust_mss', title: '调整 MSS', type: 'text', placeholder: 'clamp-mss-to-pmtu 或 536-65535', help: 'TCP MSS 值' },
-      { key: 'ipv6_base_reachable_time', title: '基础可达时间', type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: '基础可达时间 (秒, 默认: 30)' },
-      { key: 'ipv6_disable_forwarding', title: '禁用转发', type: 'checkbox', help: '禁用 IPv6 转发' },
-      { key: 'ipv6_dup_addr_detect_transmits', title: 'DAD 传输次数', type: 'number', min: 0, max: 100, placeholder: '0-100', help: 'DAD 期间发送的 NS 消息数 (默认: 1, 0=禁用)' },
-      { key: 'ipv6_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
+      { key: 'ipv6_accept_dad', title: t('geneve.schema.ipv6.acceptDad'), type: 'select', options: ACCEPT_DAD_OPTIONS, help: t('geneve.schema.ipv6.acceptDadHelp') },
+      { key: 'ipv6_autoconf', title: t('geneve.schema.ipv6.autoconf'), type: 'checkbox', help: t('geneve.schema.ipv6.autoconfHelp') },
+      { key: 'ipv6_eui64', title: t('geneve.schema.ipv6.eui64'), type: 'text', placeholder: t('geneve.schema.ipv6.eui64Placeholder'), help: t('geneve.schema.ipv6.eui64Help') },
+      { key: 'ipv6_interface_identifier', title: t('geneve.schema.ipv6.interfaceIdentifier'), type: 'text', placeholder: t('geneve.schema.ipv6.interfaceIdentifierPlaceholder'), help: t('geneve.schema.ipv6.interfaceIdentifierHelp') },
+      { key: 'ipv6_no_default_link_local', title: t('geneve.schema.ipv6.noDefaultLinkLocal'), type: 'checkbox', help: t('geneve.schema.ipv6.noDefaultLinkLocalHelp') },
+      { key: 'ipv6_adjust_mss', title: t('geneve.schema.ipv6.adjustMss'), type: 'text', placeholder: t('geneve.schema.ipv6.adjustMssPlaceholder'), help: t('geneve.schema.ipv6.adjustMssHelp') },
+      { key: 'ipv6_base_reachable_time', title: t('geneve.schema.ipv6.baseReachableTime'), type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: t('geneve.schema.ipv6.baseReachableTimeHelp') },
+      { key: 'ipv6_disable_forwarding', title: t('geneve.schema.ipv6.disableForwarding'), type: 'checkbox', help: t('geneve.schema.ipv6.disableForwardingHelp') },
+      { key: 'ipv6_dup_addr_detect_transmits', title: t('geneve.schema.ipv6.dupAddrDetectTransmits'), type: 'number', min: 0, max: 100, placeholder: '0-100', help: t('geneve.schema.ipv6.dupAddrDetectTransmitsHelp') },
+      { key: 'ipv6_source_validation', title: t('geneve.schema.ipv6.sourceValidation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: t('geneve.schema.ipv6.sourceValidationPlaceholder'), help: t('geneve.schema.ipv6.sourceValidationHelp') },
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: '镜像出方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像出方向流量到目标接口' },
-      { key: 'mirror_ingress', title: '镜像入方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像入方向流量到目标接口' },
+      { key: 'mirror_egress', title: t('geneve.schema.mirror.egress'), type: 'select', options: interfaceOptions.value, placeholder: t('geneve.schema.mirror.targetPlaceholder'), help: t('geneve.schema.mirror.egressHelp') },
+      { key: 'mirror_ingress', title: t('geneve.schema.mirror.ingress'), type: 'select', options: interfaceOptions.value, placeholder: t('geneve.schema.mirror.targetPlaceholder'), help: t('geneve.schema.mirror.ingressHelp') },
     ]);
 
     const otherSchema = computed(() => [
-      { key: 'redirect', title: '重定向目标', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '重定向入站数据包到目标接口' },
-      { key: 'vrf', title: 'VRF 实例', type: 'text', placeholder: 'VRF 实例名称', help: 'VRF 实例名称' },
+      { key: 'redirect', title: t('geneve.schema.other.redirect'), type: 'select', options: interfaceOptions.value, placeholder: t('geneve.schema.other.redirectPlaceholder'), help: t('geneve.schema.other.redirectHelp') },
+      { key: 'vrf', title: t('geneve.schema.other.vrf'), type: 'text', placeholder: t('geneve.schema.other.vrfPlaceholder'), help: t('geneve.schema.other.vrfHelp') },
     ]);
 
     // Command text
@@ -150,17 +158,16 @@ export default defineComponent({
       if (g.redirect) lines.push(`set interfaces geneve ${name} redirect ${g.redirect}`);
       if (g.vrf) lines.push(`set interfaces geneve ${name} vrf ${g.vrf}`);
 
-      return lines.length ? lines.join('\n') : '# 未配置任何参数';
+      return lines.length ? lines.join('\n') : t('geneve.command.noConfig');
     });
 
     const modalTabs = computed(() => [
-      { key: 'basic', title: '基本配置' },
-      { key: 'parameters', title: '隧道参数' },
-      { key: 'ip', title: 'IPv4 参数' },
-      { key: 'ipv6', title: 'IPv6 参数' },
-      { key: 'mirror', title: '流量镜像' },
-      { key: 'other', title: '其他' },
-      { key: 'command', title: '命令预览' },
+      { key: 'basic', title: t('geneve.tabs.basic') },
+      { key: 'parameters', title: t('geneve.tabs.parameters') },
+      { key: 'ip', title: t('geneve.tabs.ip') },
+      { key: 'ipv6', title: t('geneve.tabs.ipv6') },
+      { key: 'mirror', title: t('geneve.tabs.mirror') },
+      { key: 'other', title: t('geneve.tabs.other') },
     ]);
 
     function getDefaultForm() {
@@ -316,14 +323,14 @@ export default defineComponent({
           label: iface.name || iface,
         }));
       } catch (err) {
-        showError(err);
+        handleError(err);
       } finally {
         loading.value = false;
       }
     }
 
-    function showError(err) {
-      alert(`错误码: ${err.code || 'ERROR'}\n错误信息: ${err.message || err}`);
+    function handleError(err) {
+      showError({ message: `${t('geneve.error.code')}: ${err.code || 'ERROR'}\n${t('geneve.error.message')}: ${err.message || err}` });
     }
 
     function openModal(index = -1) {
@@ -340,43 +347,55 @@ export default defineComponent({
       try {
         const form = editingGeneve.value;
         const name = form.name;
-        if (!name) { alert('请输入接口名称'); return; }
+        if (!name) return showError({ message: t('geneve.error.nameRequired') });
 
         const config = formToGeneve(form);
-        console.log('[Geneve] 保存配置:', JSON.stringify(config, null, 2));
+        console.log('[Geneve] Save config:', JSON.stringify(config, null, 2));
 
         const path = `interfaces geneve ${name}`;
-        await api.put('/config', { path, value: config });
+        await configStore.setConfig(path, config);
+        configStore.markPending();
 
         modalVisible.value = false;
         await load();
       } catch (err) {
-        showError(err);
+        handleError(err);
       }
     }
 
-    async function remove() {
-      if (!selectedGeneve.value.length) { alert('请先选择要删除的 Geneve 接口'); return; }
-      if (!confirm(`确定删除选中的 ${selectedGeneve.value.length} 个 Geneve 接口?`)) return;
+    function remove() {
+      if (!selectedGeneve.value.length) return showError({ message: t('geneve.error.selectForDelete') });
+      pendingDeleteNames.value = selectedGeneve.value.map(g => g.name);
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemove() {
+      deleteModalVisible.value = false;
       try {
-        for (const g of selectedGeneve.value) {
-          await api.delete('/config', { path: `interfaces geneve ${g.name}` });
+        for (const name of pendingDeleteNames.value) {
+          await configStore.deleteConfig(`interfaces geneve ${name}`);
+          configStore.markPending();
         }
         selectedGeneve.value = [];
+        pendingDeleteNames.value = [];
         await load();
       } catch (err) {
-        showError(err);
+        handleError(err);
       }
     }
 
-    onMounted(() => { load(); });
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
     return {
       loading, geneves, selected: selectedGeneve, modalVisible, editingGeneve, interfaceOptions, activeTab,
+      deleteModalVisible, pendingDeleteNames,
       COLUMNS,
       basicSchema, parametersSchema, ipSchema, ipv6Schema, mirrorSchema, otherSchema,
       commandText, modalTabs,
-      openModal, save, remove, load,
+      openModal, save, remove, confirmRemove, load, t,
     };
   },
   template: `
@@ -394,7 +413,7 @@ export default defineComponent({
         @selection-change="selected = $event"
       />
 
-      <DraggableModal v-model:visible="modalVisible" :title="editingGeneve?.name ? '编辑 Geneve 接口' : '创建 Geneve 接口'" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingGeneve?.name ? t('geneve.modal.editTitle') : t('geneve.modal.createTitle')" width="900px">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic>
@@ -415,15 +434,18 @@ export default defineComponent({
             <template #other>
               <ConfigForm :schema="otherSchema" :model="editingGeneve" />
             </template>
-            <template #command>
-              <pre style="background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;font-size:13px;">{{ commandText }}</pre>
-            </template>
           </TabGroup>
         </template>
         <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">取消</button>
-          <button type="button" class="btn btn-primary" @click="save">确定</button>
+          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('geneve.buttons.cancel') }}</button>
+          <button type="button" class="btn btn-primary" @click="save">{{ t('geneve.buttons.confirm') }}</button>
         </template>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('geneve.delete.title')" width="400px" @confirm="confirmRemove">
+        <div>{{ t('geneve.delete.confirmMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

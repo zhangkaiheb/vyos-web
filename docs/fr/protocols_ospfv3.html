@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="ospf">
+<h1>OSPF</h1>
+<p><abbr title="Open Shortest Path First">OSPF</abbr> est un protocole de routage pour les réseaux de protocole Internet (IP). Il utilise un algorithme de routage d'état de lien (LSR) et appartient au groupe des protocoles de passerelle intérieure (IGP), fonctionnant dans un seul système autonome (AS). Il est défini comme OSPF Version 2 dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2328.html"><strong>RFC 2328</strong></a> (1998) pour IPv4. Les mises à jour pour IPv6 sont spécifiées comme OSPF Version 3 dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5340.html"><strong>RFC 5340</strong></a> (2008). OSPF prend en charge le modèle d'adressage CIDR.</p>
+<p>OSPF est un IGP largement utilisé dans les réseaux d'entreprises de grande taille.</p>
+<section id="ospfv2-ipv4">
+<h2>OSPFv2 (IPv4)</h2>
+<section id="configuration">
+<h3>Configuration</h3>
+<section id="general">
+<h4>Général</h4>
+<p>VyOS n'a pas de commande spécifique pour démarrer le processus OSPF. Le processus OSPF démarre lorsqu'une interface OSPF activée est configurée.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf area &lt;number&gt; network &lt;A.B.C.D/M&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-network-a-b-c-d-m" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande spécifie l'interface OSPF activée. Si l'interface a une adresse provenant de la plage définie, alors la commande active OSPF sur cette interface, afin que le routeur puisse fournir les informations de réseau aux autres routeurs OSPF via cette interface.</p>
+<p>Cette commande est également utilisée pour activer le processus OSPF. Le numéro de zone peut être spécifié en notation décimale dans la plage de 0 à 4294967295. Ou il peut être spécifié en notation décimale pointée similaire à une adresse IP.</p>
+<p>La longueur du préfixe dans l'interface doit être égale ou supérieure (c'est-à-dire plus petit réseau) à la longueur du préfixe dans l'instruction réseau. Par exemple, l'instruction ci-dessus ne permet pas d'activer OSPF sur une interface avec l'adresse 192.168.1.1/23, mais elle le fait sur une interface avec l'adresse 192.168.1.129/25.</p>
+<p>Dans certains cas, il peut être plus pratique d'activer OSPF par interface/sous-réseau <code class="docutils literal notranslate">set protocols ospf interface &lt;interface&gt; area &lt;x.x.x.x | x&gt;</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf auto-cost reference-bandwidth &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-auto-cost-reference-bandwidth-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande définit la bande passante de référence pour les calculs de coût, où la bande passante peut être comprise entre 1 et 4294967, spécifiée en Mbits/s. La valeur par défaut est 100 Mbit/s (c'est-à-dire qu'un lien avec une bande passante de 100 Mbit/s ou plus aura un coût de 1. Le coût des liens avec une bande passante inférieure sera mis à l'échelle par rapport à ce coût).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf parameters router-id &lt;rid&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-parameters-router-id-rid" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande définit l'identifiant de routeur du processus OSPF. L'identifiant de routeur peut être une adresse IP du routeur, mais il n'en est pas obligatoirement. Il peut être n'importe quel nombre de 32 bits arbitraire. Cependant, il doit être unique dans tout le domaine OSPF pour le speaker OSPF – des choses mauvaises se produiront si plusieurs speakers OSPF sont configurés avec le même identifiant de routeur !</p>
+</div>
+</div>
+</section>
+<section id="optional">
+<h4>Optionnel</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf default-information originate [always] [metric &lt;number&gt;] [metric-type &lt;1|2&gt;] [route-map &lt;name&gt;]
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-default-information-originate-always-metric-number-metric-type-1-2-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Origine d'une LSA AS-External (type-5) décrivant une route par défaut dans toutes les zones capables de routage externe, avec la métrique et le type de métrique spécifiés. Si le mot-clé <code class="docutils literal notranslate">always</code> est donné, alors la route par défaut est toujours annoncée, même lorsqu'il n'y a pas de route par défaut présente dans le tableau de routage. L'argument <code class="docutils literal notranslate">route-map</code> spécifie d'annoncer la route par défaut si la route-map est satisfaite.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf distance global &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-distance-global-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande modifie la valeur de distance d'OSPF globalement.
+La plage de distance est de 1 à 255.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf distance ospf &lt;external|inter-area|intra-area&gt; &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-distance-ospf-external-inter-area-intra-area-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande modifie la valeur de distance d'OSPF. Les arguments sont les valeurs de distance pour les routes externes, les routes inter-zone et les routes intra-zone respectivement. La plage de distance est de 1 à 255.
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Les routes avec une distance de 255 sont effectivement désactivées et ne sont pas installées dans le noyau.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf log-adjacency-changes [detail]
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-log-adjacency-changes-detail" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet d'enregistrer les changements d'adjacence. Avec l'argument <code class="docutils literal notranslate">detail</code> optionnel, tous les changements d'état d'adjacence sont affichés.
+Sans <code class="docutils literal notranslate">detail</code>, seuls les changements vers un état complet ou des régressions sont affichés.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf max-metric router-lsa &lt;administrative|on-shutdown &lt;seconds&gt;|on-startup &lt;seconds&gt;&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-max-metric-router-lsa-administrative-on-shutdown-seconds-on-startup-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cela active le support de <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3137.html"><strong>RFC 3137</strong></a>, où le processus OSPF décrit ses liens de transit dans son router-LSA comme ayant une distance infinie afin que les autres routeurs évitent de calculer des chemins de transit à travers le routeur pendant qu'ils peuvent encore atteindre les réseaux à travers le routeur.</p>
+<p>Ce support peut être activé administrativement (et indéfiniment) avec la commande <code class="docutils literal notranslate">administrative</code>. Il peut également être activé de manière conditionnelle.
+L'activation conditionnelle des router-lsas de métrique maximale peut être effectuée pendant une période de secondes après le démarrage avec la commande <code class="docutils literal notranslate">on-startup &lt;seconds&gt;</code> et/ou pendant une période de secondes avant l'arrêt avec la commande <code class="docutils literal notranslate">on-shutdown &lt;seconds&gt;</code>. La plage de temps est de 5 à 86400.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf parameters abr-type &lt;cisco|ibm|shortcut|standard&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-parameters-abr-type-cisco-ibm-shortcut-standard" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande sélectionne le modèle ABR. Le routeur OSPF prend en charge quatre modèles ABR :</p>
+<p><strong>cisco</strong> – un routeur sera considéré comme ABR s'il a plusieurs interfaces configurées vers des réseaux dans différentes zones, dont l'une est une zone principale. De plus, le lien vers la zone principale doit être actif (en fonctionnement).
+<strong>ibm</strong> – identique au modèle « cisco » mais dans ce cas, le lien vers la zone principale peut ne pas être actif.
+<strong>standard</strong> – le routeur a plusieurs liens actifs vers différentes zones.
+<strong>shortcut</strong> – identique au modèle « standard », mais dans ce modèle, un routeur est autorisé à utiliser une topologie de zones connectées sans impliquer une zone principale pour les connexions inter-zones.</p>
+<p>Des informations détaillées sur les différences entre les modèles « cisco » et « ibm » peuvent être trouvées dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3509.html"><strong>RFC 3509</strong></a>. Un modèle « shortcut » permet aux ABR de créer des routes entre des zones basées sur la topologie des zones connectées à ce routeur mais sans utiliser une zone principale si le chemin non principal est moins coûteux. Pour plus d'informations sur le modèle « shortcut », voir ospf-shortcut-abr-02.txt</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf parameters rfc1583-compatibility
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-parameters-rfc1583-compatibility" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2328.html"><strong>RFC 2328</strong></a>, successeur de <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1583.html"><strong>RFC 1583</strong></a>, suggère selon la section G.2 (changements) dans la section 16.4.1 un changement dans l'algorithme de préférence des chemins qui empêche les boucles de routage possibles dans la version ancienne d'OSPFv2. Plus précisément, il exige que les chemins inter-zone et les chemins de la zone principale intra-zone soient maintenant de préférence égale mais toujours préférés aux chemins externes.</p>
+<p>Cette commande ne doit pas normalement être configurée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf interface &lt;interface&gt; passive [disable]
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-passive-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande spécifie l'interface comme passive. Une interface passive publie son adresse, mais ne lance pas le protocole OSPF (les adjacences ne sont pas formées et les paquets Hello ne sont pas générés).</p>
+<p>L'option disable permet d'exclure l'interface de l'état passif. Cette commande est utilisée si la commande <code class="docutils literal notranslate">passive-interface default</code> a été configurée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf passive-interface default
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-passive-interface-default" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande spécifie toutes les interfaces comme passives par défaut. Comme cette commande change la logique de configuration vers une interface passive par défaut ; donc, les interfaces où des adjacences de routeurs sont attendues doivent être configurées avec la commande <code class="docutils literal notranslate">passive-interface-exclude</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf maximum-paths &lt;1-64&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-maximum-paths-1-64" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour contrôler le nombre maximum de chemins de même coût pour atteindre une destination spécifique. La limite supérieure peut différer si vous modifiez la valeur de MULTIPATH_NUM pendant la compilation. La valeur par défaut est MULTIPATH_NUM (64).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf refresh timers &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-refresh-timers-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Le routeur met à jour automatiquement les informations d'état de lien avec ses voisins.
+Seules les informations obsolètes sont mises à jour, qui ont dépassé une certaine limite. Cette paramètre change la valeur de seuil, qui par défaut est de 1800 secondes (demi-heure). La valeur est appliquée à tout le routeur OSPF.
+La plage des compteurs est de 10 à 1800.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf timers throttle spf &lt;delay|initial-holdtime|max-holdtime&gt; &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-timers-throttle-spf-delay-initial-holdtime-max-holdtime-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande définit le délai initial, le délai initial et le délai maximal entre le moment où SPF est calculé et l'événement qui a déclenché le calcul. Les temps sont spécifiés en millisecondes et doivent être dans la plage de 0 à 600000 millisecondes. <code class="docutils literal notranslate">delay</code> définit le délai initial de planification SPF en millisecondes. La valeur par défaut est de 200 ms. <code class="docutils literal notranslate">initial-holdtime</code> définit le délai minimum entre deux calculs consécutifs de SPF. La valeur par défaut est de 1000 ms. <code class="docutils literal notranslate">max-holdtime</code> définit le délai maximum entre deux calculs consécutifs de SPF. La valeur par défaut est de 10000 ms.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf ldp-sync
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-ldp-sync" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande activera la synchronisation IGP-LDP globalement pour OSPF. Cela nécessite que LDP soit fonctionnel. Cela est décrit dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5443.html"><strong>RFC 5443</strong></a>. Par défaut, toutes les interfaces opérationnelles en OSPF sont activées pour la synchronisation. Les boucles sont exclues.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf ldp-sync holddown &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-ldp-sync-holddown-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande modifiera la valeur de délai d'attente globalement pour la synchronisation IGP-LDP pendant les événements de convergence/flash d'interface.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf capability opaque
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-capability-opaque" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>ospfd prend en charge les LSAs Opaque <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2370.html"><strong>RFC 2370</strong></a> en tant que support partiel pour les LSAs de Ingénierie de trafic MPLS. La capacité opaque-lsa doit être activée dans la configuration.</p>
+<p>Une autre commande pourrait être « mpls-te on » (Ingénierie de trafic)</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>FRR propose uniquement un support partiel pour certaines extensions de protocole de routage utilisées avec MPLS-TE ; il ne prend pas en charge une solution complète RSVP-TE.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="area-configuration">
+<h4>Configuration de zone</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf area &lt;number&gt; area-type stub
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-stub" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande spécifie la zone comme étant une zone Stub. C'est-à-dire, une zone où aucun routeur ne génère des routes externes à OSPF et donc une zone où toutes les routes externes sont via les ABR(s). Ainsi, les ABR pour une telle zone n'ont pas besoin de transmettre des LSAs AS-External (type-5) ou des LSAs ASBR-Summary (type-4) dans la zone. Ils doivent seulement transmettre des LSAs Network-Summary (type-3) dans une telle zone, ainsi qu'une route par défaut.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf area &lt;number&gt; area-type stub no-summary
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-stub-no-summary" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande spécifie la zone comme étant une zone Totally Stub. En plus des limites de zone Stub, cette zone empêche un ABR de transmettre des LSAs Network-Summary (type-3) dans la zone Stub spécifiée. Seule la route par défaut est autorisée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf area &lt;number&gt; area-type stub default-cost &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-stub-default-cost-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande spécifie la zone comme étant une zone Stub. C'est-à-dire, une zone où aucun routeur ne génère de routes externes à OSPF et donc une zone où toutes les routes externes sont via les ABR (Routeurs de bord de zone). Ainsi, les ABR de cette zone n'ont pas besoin de transmettre des LSAs de type 5 ou 4 dans la zone. Ils doivent transmettre des LSAs de type 3, ainsi qu'une route par défaut.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf area &lt;number&gt; area-type stub no-summary
+<a class="cmdlink" href="#cfgcmd-set-">
+<p>Cette commande permet de spécifier le type de distribution pour le réseau connecté à cette interface :</p>
+<p><strong>broadcast</strong> – distribution d'adresses IP broadcast.
+<strong>set protocols ospf area &lt;number&gt; area-type nssa
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-nssa" title="Permalink to this Command"></a></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf area &lt;number&gt; range &lt;A.B.C.D/M [cost &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-range-A.B.C.D/M-cost-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande résume les chemins intra-areas depuis la zone spécifiée dans une LSA (Type-3) announced à d'autres zones. Cette commande peut être utilisée uniquement dans un ABR et seulement les LSAs (Type-1) et (Type-2)" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3) </div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filter les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSas (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de spécifier le type de connexion pour le réseau connecté à cette interface :</</p>
+<p><strong>point-to-multipoint</strong> – distribution d'adresses dans des réseaux point-multippoint.
+<p><strong>point-to-point</strong> – distribution d'écaces dans des réseaux point-to-point.</</div>
+</</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les-3" title="Permalink to this Command"></a></div><div>
+<p>Cette commande permet de spécifier le type de distribution pour le réseau connecté à cette interface:</</p>
+<p><strong>broadcast</strong> – distribution d'adresses IP broadcast.
+<strong>non-broadcast</strong>
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permlink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Per-link to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de spécifier le type de distribution pour le réseau connecté à cette interface:</</p>
+<p><strong>broadcast</strong> – distribution d'adresses IP broadcast.
+<strong>non-broadcast</<strong> - distribution d'adresses dans la topologie de réseaux NBMA.
+<strong>commande permet de filtrer les LSAs (Type-3" title="Permlink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSas (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSas (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSas (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSas (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSas (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSas (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSas (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSas (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSas (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSas (Type-3" title="Permalink to this Command"></a></div><div class="1-64" title="Permlink to this Command"></a></div><</div>
+</div>
+</div>
+<p>Cette commande permet de spécifier le type de distribution pour le réseau connecté à cette interface :</</p>
+<p><div class="cfgcmd-body">
+<p><strong>broadcast</strong> – distribution d'adresses IP broadcast.
+<p><strong>non-broadcast</strong> - distribution d'resseaux dans une zone de type Stub. C'est-à-dire, une zone où aucun routeur ne génliques pour les réseaux dans la topologie NBMA.
+<p><strong>point-to-multipoint</strong> - distribution d'adresses de la zone. C'est-à-dire, une zone où aucun routeur ne génère de routes externes à OSPF et donc une zone où toutes les routes externes sont via les ABR (routeurs de bord de zone. C'est-à-dire, une zone où aucun routeur ne génère de routes externes à OSPF et donc une zone où toutes les routes externes sont via les ABR-3" title="Permalink to this Command"></a></div><</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf area &lt;A.B.C.D/M
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-stub" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (A.B.C.D/M" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-stub-no-summary" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type="la <p> <span> <p> <p> <p> <p> <p> <p><div class="cfg> <p>p>p> <p> <p>p> <p>p>p>p>p>p>p>p>
+</p>p>p>p>
+<p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p> 
+</p>p>p>p>
+</p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p> <p> <p><p>p>p>p>p>p>p>p>p>p>p> <p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>l> <p>p>p>
+</>p>p>p>p>p>p>p>
+<p>p>>>>p>p>
+</p>p>p>p>p>
+<p>p>p>p>p>p>
+</p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>>p> 
+<p>Cette commande>p>p>p>
+</p>
+</p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>
+</p>p>
+p>p>p>p>p>
+</p>p>p>p>
+</p>
+</p"p">
+<p>p>
+</p>
+</p>
+</p>
+</p>p>p>p>p>p>p>
+<p>p>
+</p>p>p>p>
+</p>
+<p>p>p> <p>p>
+p>
+p>p>p>p>p>
+</p>
+p>
+<p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p"p>p>p>p>p>p>p>p>p>p>
+<p>p>p>p>p>p>
+p>
+ p>p>
+</p>p>p>p>p>p>p>
+</p>
+</p>p>p>p>p>p>p>
+</p>p>p>
+</p>p>
+</p>p>p>p>
+p>p>
+</p>p>
+</p>p>
+</p>p>p>p>p>
+</p>p>p>p>p>
+</p>p>p>p>p>
+</p>p>p>
+</p>
+p>
+p>p>
+</p>p>p>p>p>
+</p>p>
+</p>
+</p>
+</p>p>p>
+</p>p>p>p">
+</p>p>p>
+p">
+p>
+</p>
+</p>p>
+</p>p">p>p>p>p>p>p>p>
+p>p>p>p> 
+</p>p>p>
+</p>p>p>class="p>p>p>p>p>p>p>p>p>p>p>p>C">p>p>
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command=">
+>p>p>p>p>p>p>p>p>p>p>p"p>p"p>p>
+</p>p>p>p>p>
+</p>p>p>p">p">p>p>p>p>p>p>p>p>p>p>p>p>p>p>p>p">
+</p>p>p>p>p">p>p>p>p>p>p>p>p>p>
+</p>p>p>p>p>p>p>p>p>p>p"
+</p>p>p>p>p>p>p>p>p>p>p>p>p>p>p"p">
+</p"p"p"p"p>p>p"p">"p>p"p"p"p">p"p"p"p"p"p">p">p"p"p>p"p"p"p"p"p"p"p"p>p"p"p"p>p>p"p>p>p>p>p"p"p>p>p"p>p>p"p>p">p>p>p>p>p>p>p>p"p>p>p"p>p>p">
+<p>p">
+<p>p>p>p>
+</p"p">p>p>p>p>p"p"p>p"p>">
+</p"p"p>p" class="p>
+</p"p>p"p>
+</p"p"p>p"p"p"p"p"p"p>p" title="Permalink to>
+</p"p>
+</p"p">
+p"p"p">
+p>p"p"p"p"p" class="p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p">p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p">p">p"p>p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p">p"p"p"p"p"p"p"p"p"p"p"p"p"p>p"p>p"p"p"p>
+<p"p"p"p"p"p"p"p"p"p"p"p"p"p">
+</p"p"p"p"p"p"p"p"p>p"p"p"p"p"p"p>p"p"p"p"p>p"p"p>
+<p>Cette commande"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p""p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p>
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div>
+<p>Cette commande permet de filtrer lesp"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p""p"p"p"p"p"p"p""p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p>
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de filtrer les LSAs (Type-3" title="Permalink to this Command"></a></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p""p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p""p"p"p"p"p">
+</p""p"p""p"p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</="p">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</="p">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</p"p"p"p"p""p"="p"p"p"p"p"p"p"p"p"p"p"p"p"p"p""p"p"p"p"p"p"p"p"p"p"p"p""p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p""p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p""p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p""p"p"p"p"p"p"p"p"p"p"p"p">
+</div>
+</div>
+</p>
+</div"p"p>
+</div>
+</div>
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</="p">
+</div>
+</div>
+</div>
+</div>
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div">
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div">
+</p>
+</div">
+</p>
+</div>
+</div>
+</div>
+</div>
+</="p">
+</div>
+</div>
+</div>
+</p>
+</div>
+</div">
+</p>
+</div">
+</div>
+</div>
+</div>
+</="p">
+</div>
+</="p">
+</p>
+</div>
+</p>
+</div>
+</div>
+</div>
+</div>
+</p">
+</div>
+</div>
+</div>
+</div>
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</="p">
+</div>
+</div>
+</">
+</p>
+</div>
+</div>
+</div>
+</="p">
+</div>
+</="p">
+</p>
+</">
+</p>
+</div">
+</div">
+</p>
+</div>
+</div">
+</p">
+</div>
+</div>
+</p">
+</div">
+</p>
+</div>
+</div">
+</p">
+</div>
+</p>
+</div">
+</p">
+</div>
+</p">
+</div>
+</="p">
+</div>
+</p">
+</div>
+</div>
+</p>
+</div>
+</p">
+</div>
+</p>
+</div>
+</p">
+</div>
+</p">
+</div>
+</="p">
+</div>
+</p">
+</div>
+</p">
+</div>
+</p">
+</div">
+</p">
+</div>
+</="p">
+</div>
+</div>
+</p">
+</div>
+</div>
+</p">
+</div>
+</p">
+</div">
+</p">
+</p">
+</div">
+</p">
+</div>
+</p">
+</p>
+</p">
+</div>
+</="p">
+</p>
+</p">
+</">
+</p">
+</p">
+</p">
+</div>
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+p">
+</p">
+</="p">
+</p">
+</p">
+</p">
+</">
+</p">
+</p">
+</p">
+</p">
+</">
+</p">
+</p">
+</="p">
+</p">
+</p">
+</="p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</="p">
+</p">
+</="p">
+</p">
+</p">
+</p">
+</">
+</p">
+</p">
+</p">
+</p">
+</="p">
+</p">
+</p">
+</="p">
+</">
+</">
+</p">
+</">
+</p">
+</p">
+</="p">
+</p">
+</="p">
+</p">
+</="p">
+</p">
+</="p">
+</p">
+</p">
+</="p">
+</p">
+</="p">
+</="p">
+</">
+</="p">
+</="p">
+</p">
+</="p>
+</p"p"p"p">
+</p">
+</="p">
+</="p">
+</p">
+</="p">
+</="p">
+</="p">
+</p">
+</="p">
+</p">
+</="p">
+</="p">
+</="p">
+</p">
+</="p">
+</="p">
+</="p">
+</="p">
+</p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</p">
+</p>
+</="p">
+</p">
+</="p">
+</="p">
+</p>
+</="p">
+</p">
+</="p">
+</="p">
+</="p">
+</p">
+</="p">
+</="p">
+</="p">
+</p>
+</="p">
+</="p">
+</="p">
+</p">
+</="p">
+</p">
+</="p">
+</="p">
+</p">
+</="p">
+</p">
+</="p">
+</="p">
+</p">
+</="p">
+</p>
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</p">
+</="p">
+</p>
+</p>
+</p>
+</="p">
+</="p">
+</p>
+</p>
+</p">
+</="p">
+</p>
+</p>
+</p>
+</="p">
+</p">
+</="p">
+</="p">
+</p>
+</="p">
+</="p">
+</p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</p>
+</="p">
+</p>
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</="p">
+</p>
+</="p">
+</="p">
+</="p">
+</p"p">
+p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p>
+p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p>
+<p"p"p"p"p"p"p"p"p"p"p"p"p"p>"p"p"p"p"p"p"p"p>p"p"p"p"p"pp"p"p"p"p"p"pp"p"p"p"p"p"p"p"p"p"p"p"pp"p"p"pp"p"p"pp"p"pppp"ppppp"p>
+</p"p"pp"p="p"ppppp"ppp"p"pp"pp"p"p"p"p"ppp"p"pppp"p"p"p"p"p"pp"p"ppp="p"ppp"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"pp"p"p"p"p"p"p"p"p"p>
+</p>
+</p>
+</p>
+</p>
+p>
+</p"p>
+</p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p"p>
+</p"p>
+</p"p"p"p"p"p"p">
+</p">
+</p>
+</p">
+</p"p"p"p"p"p"p"p"p"p"p"p"p"p"p>
+</p>
+</div>
+</p>
+</div>
+</p>
+</p>
+</p>
+</p>
+</p">
+</p>
+</p>
+</p>
+</p">
+</p>
+</p>
+</p">
+</p">
+</p>
+</p>
+</p>
+</p>
+</p">
+</p>
+</p">
+</p">
+</p>
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p">
+</p

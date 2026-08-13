@@ -1,0 +1,114 @@
+{
+  "zh-CN": {
+    "dnsForwardingStatistics": {
+      "title": "DNS 转发统计",
+      "columns": {
+        "cacheEntries": "缓存条目",
+        "maxCacheEntries": "最大缓存条目",
+        "cacheSize": "缓存大小"
+      },
+      "sections": {
+        "rawOutput": "原始输出"
+      },
+      "buttons": {
+        "refresh": "刷新"
+      }
+    }
+  },
+  "en": {
+    "dnsForwardingStatistics": {
+      "title": "DNS Forwarding Statistics",
+      "columns": {
+        "cacheEntries": "Cache Entries",
+        "maxCacheEntries": "Max Cache Entries",
+        "cacheSize": "Cache Size"
+      },
+      "sections": {
+        "rawOutput": "Raw Output"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "zh-TW": {
+    "dnsForwardingStatistics": {
+      "title": "DNS Forwarding Statistics",
+      "columns": {
+        "cacheEntries": "Cache Entries",
+        "maxCacheEntries": "Max Cache Entries",
+        "cacheSize": "Cache Size"
+      },
+      "sections": {
+        "rawOutput": "Raw Output"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "ru": {
+    "dnsForwardingStatistics": {
+      "title": "DNS Forwarding Statistics",
+      "columns": {
+        "cacheEntries": "Cache Entries",
+        "maxCacheEntries": "Max Cache Entries",
+        "cacheSize": "Cache Size"
+      },
+      "sections": {
+        "rawOutput": "Raw Output"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "de": {
+    "dnsForwardingStatistics": {
+      "title": "DNS Forwarding Statistics",
+      "columns": {
+        "cacheEntries": "Cache Entries",
+        "maxCacheEntries": "Max Cache Entries",
+        "cacheSize": "Cache Size"
+      },
+      "sections": {
+        "rawOutput": "Raw Output"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "fr": {
+    "dnsForwardingStatistics": {
+      "title": "DNS Forwarding Statistics",
+      "columns": {
+        "cacheEntries": "Cache Entries",
+        "maxCacheEntries": "Max Cache Entries",
+        "cacheSize": "Cache Size"
+      },
+      "sections": {
+        "rawOutput": "Raw Output"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "ko": {
+    "dnsForwardingStatistics": {
+      "title": "DNS Forwarding Statistics",
+      "columns": {
+        "cacheEntries": "Cache Entries",
+        "maxCacheEntries": "Max Cache Entries",
+        "cacheSize": "Cache Size"
+      },
+      "sections": {
+        "rawOutput": "Raw Output"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  }
+}

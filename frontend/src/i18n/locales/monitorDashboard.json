@@ -1,0 +1,324 @@
+{
+  "zh-CN": {
+    "monitorDashboard": {
+      "title": "监控仪表盘",
+      "widgets": {
+        "cpu": "CPU 使用率",
+        "memory": "内存 使用率",
+        "conntrack": "Conntrack 数量",
+        "conntrackIpv6": "IPv6 Conntrack 数量",
+        "interfaceTraffic": "接口流量"
+      },
+      "chart": {
+        "noData": "暂无数据",
+        "interfaceLabel": "接口: {iface}",
+        "uploadTraffic": "{iface}上行流量",
+        "downloadTraffic": "{iface}下行流量",
+        "uploadTrafficValue": "{iface}上行流量 {value}",
+        "downloadTrafficValue": "{iface}下行流量 {value}",
+        "bitsPerSecond": "比特每秒",
+        "quantity": "数量",
+        "quantityWithLabel": "{label}数量"
+      },
+      "labels": {
+        "history": "历史",
+        "historyTitle": "{title} 历史",
+        "interfaceTrafficWithIface": "接口流量 {iface}",
+        "start": "开始: {time}",
+        "end": "结束: {time}",
+        "selectInterface": "选择接口",
+        "editInterface": "编辑接口",
+        "addWidget": "添加控件",
+        "widget": "控件",
+        "refresh": "刷新",
+        "edit": "编辑",
+        "close": "关闭"
+      },
+      "durations": {
+        "past60Minutes": "过去60分钟",
+        "24hours": "24小时",
+        "30days": "30天"
+      },
+      "messages": {
+        "canAddMultiple": "可添加多个",
+        "canOnlyAddOne": "仅可添加一个"
+      }
+    }
+  },
+  "en": {
+    "monitorDashboard": {
+      "title": "Monitor Dashboard",
+      "widgets": {
+        "cpu": "CPU Usage",
+        "memory": "Memory Usage",
+        "conntrack": "Conntrack Count",
+        "conntrackIpv6": "IPv6 Conntrack Count",
+        "interfaceTraffic": "Interface Traffic"
+      },
+      "chart": {
+        "noData": "No data",
+        "interfaceLabel": "Interface: {iface}",
+        "uploadTraffic": "{iface} Upload",
+        "downloadTraffic": "{iface} Download",
+        "uploadTrafficValue": "{iface} Upload {value}",
+        "downloadTrafficValue": "{iface} Download {value}",
+        "bitsPerSecond": "Bits per Second",
+        "quantity": "Quantity",
+        "quantityWithLabel": "{label} Quantity"
+      },
+      "labels": {
+        "history": "History",
+        "historyTitle": "{title} History",
+        "interfaceTrafficWithIface": "Interface Traffic {iface}",
+        "start": "Start: {time}",
+        "end": "End: {time}",
+        "selectInterface": "Select Interface",
+        "editInterface": "Edit Interface",
+        "addWidget": "Add Widget",
+        "widget": "Widget",
+        "refresh": "Refresh",
+        "edit": "Edit",
+        "close": "Close"
+      },
+      "durations": {
+        "past60Minutes": "Past 60 Minutes",
+        "24hours": "24 Hours",
+        "30days": "30 Days"
+      },
+      "messages": {
+        "canAddMultiple": "Can add multiple",
+        "canOnlyAddOne": "Can only add one"
+      }
+    }
+  },
+  "zh-TW": {
+    "monitorDashboard": {
+      "title": "Monitor Dashboard",
+      "widgets": {
+        "cpu": "CPU Usage",
+        "memory": "Memory Usage",
+        "conntrack": "Conntrack Count",
+        "conntrackIpv6": "IPv6 Conntrack Count",
+        "interfaceTraffic": "Interface Traffic"
+      },
+      "chart": {
+        "noData": "No data",
+        "interfaceLabel": "Interface: {iface}",
+        "uploadTraffic": "{iface} Upload",
+        "downloadTraffic": "{iface} Download",
+        "uploadTrafficValue": "{iface} Upload {value}",
+        "downloadTrafficValue": "{iface} Download {value}",
+        "bitsPerSecond": "Bits per Second",
+        "quantity": "Quantity",
+        "quantityWithLabel": "{label} Quantity"
+      },
+      "labels": {
+        "history": "History",
+        "historyTitle": "{title} History",
+        "interfaceTrafficWithIface": "Interface Traffic {iface}",
+        "start": "Start: {time}",
+        "end": "End: {time}",
+        "selectInterface": "Select Interface",
+        "editInterface": "Edit Interface",
+        "addWidget": "Add Widget",
+        "widget": "Widget",
+        "refresh": "Refresh",
+        "edit": "Edit",
+        "close": "Close"
+      },
+      "durations": {
+        "past60Minutes": "Past 60 Minutes",
+        "24hours": "24 Hours",
+        "30days": "30 Days"
+      },
+      "messages": {
+        "canAddMultiple": "Can add multiple",
+        "canOnlyAddOne": "Can only add one"
+      }
+    }
+  },
+  "ru": {
+    "monitorDashboard": {
+      "title": "Monitor Dashboard",
+      "widgets": {
+        "cpu": "CPU Usage",
+        "memory": "Memory Usage",
+        "conntrack": "Conntrack Count",
+        "conntrackIpv6": "IPv6 Conntrack Count",
+        "interfaceTraffic": "Interface Traffic"
+      },
+      "chart": {
+        "noData": "No data",
+        "interfaceLabel": "Interface: {iface}",
+        "uploadTraffic": "{iface} Upload",
+        "downloadTraffic": "{iface} Download",
+        "uploadTrafficValue": "{iface} Upload {value}",
+        "downloadTrafficValue": "{iface} Download {value}",
+        "bitsPerSecond": "Bits per Second",
+        "quantity": "Quantity",
+        "quantityWithLabel": "{label} Quantity"
+      },
+      "labels": {
+        "history": "History",
+        "historyTitle": "{title} History",
+        "interfaceTrafficWithIface": "Interface Traffic {iface}",
+        "start": "Start: {time}",
+        "end": "End: {time}",
+        "selectInterface": "Select Interface",
+        "editInterface": "Edit Interface",
+        "addWidget": "Add Widget",
+        "widget": "Widget",
+        "refresh": "Refresh",
+        "edit": "Edit",
+        "close": "Close"
+      },
+      "durations": {
+        "past60Minutes": "Past 60 Minutes",
+        "24hours": "24 Hours",
+        "30days": "30 Days"
+      },
+      "messages": {
+        "canAddMultiple": "Can add multiple",
+        "canOnlyAddOne": "Can only add one"
+      }
+    }
+  },
+  "de": {
+    "monitorDashboard": {
+      "title": "Monitor Dashboard",
+      "widgets": {
+        "cpu": "CPU Usage",
+        "memory": "Memory Usage",
+        "conntrack": "Conntrack Count",
+        "conntrackIpv6": "IPv6 Conntrack Count",
+        "interfaceTraffic": "Interface Traffic"
+      },
+      "chart": {
+        "noData": "No data",
+        "interfaceLabel": "Interface: {iface}",
+        "uploadTraffic": "{iface} Upload",
+        "downloadTraffic": "{iface} Download",
+        "uploadTrafficValue": "{iface} Upload {value}",
+        "downloadTrafficValue": "{iface} Download {value}",
+        "bitsPerSecond": "Bits per Second",
+        "quantity": "Quantity",
+        "quantityWithLabel": "{label} Quantity"
+      },
+      "labels": {
+        "history": "History",
+        "historyTitle": "{title} History",
+        "interfaceTrafficWithIface": "Interface Traffic {iface}",
+        "start": "Start: {time}",
+        "end": "End: {time}",
+        "selectInterface": "Select Interface",
+        "editInterface": "Edit Interface",
+        "addWidget": "Add Widget",
+        "widget": "Widget",
+        "refresh": "Refresh",
+        "edit": "Edit",
+        "close": "Close"
+      },
+      "durations": {
+        "past60Minutes": "Past 60 Minutes",
+        "24hours": "24 Hours",
+        "30days": "30 Days"
+      },
+      "messages": {
+        "canAddMultiple": "Can add multiple",
+        "canOnlyAddOne": "Can only add one"
+      }
+    }
+  },
+  "fr": {
+    "monitorDashboard": {
+      "title": "Monitor Dashboard",
+      "widgets": {
+        "cpu": "CPU Usage",
+        "memory": "Memory Usage",
+        "conntrack": "Conntrack Count",
+        "conntrackIpv6": "IPv6 Conntrack Count",
+        "interfaceTraffic": "Interface Traffic"
+      },
+      "chart": {
+        "noData": "No data",
+        "interfaceLabel": "Interface: {iface}",
+        "uploadTraffic": "{iface} Upload",
+        "downloadTraffic": "{iface} Download",
+        "uploadTrafficValue": "{iface} Upload {value}",
+        "downloadTrafficValue": "{iface} Download {value}",
+        "bitsPerSecond": "Bits per Second",
+        "quantity": "Quantity",
+        "quantityWithLabel": "{label} Quantity"
+      },
+      "labels": {
+        "history": "History",
+        "historyTitle": "{title} History",
+        "interfaceTrafficWithIface": "Interface Traffic {iface}",
+        "start": "Start: {time}",
+        "end": "End: {time}",
+        "selectInterface": "Select Interface",
+        "editInterface": "Edit Interface",
+        "addWidget": "Add Widget",
+        "widget": "Widget",
+        "refresh": "Refresh",
+        "edit": "Edit",
+        "close": "Close"
+      },
+      "durations": {
+        "past60Minutes": "Past 60 Minutes",
+        "24hours": "24 Hours",
+        "30days": "30 Days"
+      },
+      "messages": {
+        "canAddMultiple": "Can add multiple",
+        "canOnlyAddOne": "Can only add one"
+      }
+    }
+  },
+  "ko": {
+    "monitorDashboard": {
+      "title": "Monitor Dashboard",
+      "widgets": {
+        "cpu": "CPU Usage",
+        "memory": "Memory Usage",
+        "conntrack": "Conntrack Count",
+        "conntrackIpv6": "IPv6 Conntrack Count",
+        "interfaceTraffic": "Interface Traffic"
+      },
+      "chart": {
+        "noData": "No data",
+        "interfaceLabel": "Interface: {iface}",
+        "uploadTraffic": "{iface} Upload",
+        "downloadTraffic": "{iface} Download",
+        "uploadTrafficValue": "{iface} Upload {value}",
+        "downloadTrafficValue": "{iface} Download {value}",
+        "bitsPerSecond": "Bits per Second",
+        "quantity": "Quantity",
+        "quantityWithLabel": "{label} Quantity"
+      },
+      "labels": {
+        "history": "History",
+        "historyTitle": "{title} History",
+        "interfaceTrafficWithIface": "Interface Traffic {iface}",
+        "start": "Start: {time}",
+        "end": "End: {time}",
+        "selectInterface": "Select Interface",
+        "editInterface": "Edit Interface",
+        "addWidget": "Add Widget",
+        "widget": "Widget",
+        "refresh": "Refresh",
+        "edit": "Edit",
+        "close": "Close"
+      },
+      "durations": {
+        "past60Minutes": "Past 60 Minutes",
+        "24hours": "24 Hours",
+        "30days": "30 Days"
+      },
+      "messages": {
+        "canAddMultiple": "Can add multiple",
+        "canOnlyAddOne": "Can only add one"
+      }
+    }
+  }
+}

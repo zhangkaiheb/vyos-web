@@ -1,0 +1,1521 @@
+{
+  "zh-CN": {
+    "tab": {
+      "basic": "基本设置",
+      "interfaces": "接口",
+      "neighbors": "邻居",
+      "networks": "网络",
+      "networkDist": "网络距离",
+      "routes": "路由",
+      "redistribute": "重分发",
+      "passive": "被动接口",
+      "timers": "定时器",
+      "defaultInfo": "默认信息"
+    },
+    "basic": {
+      "title": "基本设置",
+      "defaultDistance": "默认距离",
+      "defaultMetric": "默认度量值",
+      "routeMap": "路由映射",
+      "routeMapPlaceholder": "路由映射名称",
+      "version": "版本",
+      "distributeList": "分发列表",
+      "accessListIn": "访问列表入站",
+      "accessListOut": "访问列表出站",
+      "accessListPlaceholder": "访问列表名称",
+      "prefixListIn": "前缀列表入站",
+      "prefixListOut": "前缀列表出站",
+      "prefixListPlaceholder": "前缀列表名称"
+    },
+    "col": {
+      "interfaceName": "接口名称",
+      "receiveVersion": "接收版本",
+      "sendVersion": "发送版本",
+      "splitHorizon": "水平分割",
+      "network": "网络",
+      "accessList": "访问列表",
+      "distance": "距离",
+      "protocol": "协议",
+      "metric": "度量值",
+      "routeMap": "路由映射"
+    },
+    "neighbors": {
+      "address": "邻居地址",
+      "addressPlaceholder": "IPv4 地址"
+    },
+    "networks": {
+      "label": "网络",
+      "placeholder": "例如: 192.168.1.0/24"
+    },
+    "routes": {
+      "label": "路由",
+      "placeholder": "例如: 10.0.0.0/8"
+    },
+    "passive": {
+      "label": "被动接口",
+      "selectPlaceholder": "选择接口"
+    },
+    "timers": {
+      "garbageCollection": "垃圾回收",
+      "garbageCollectionPlaceholder": "1-65535",
+      "timeout": "超时",
+      "timeoutPlaceholder": "1-65535",
+      "update": "更新",
+      "updatePlaceholder": "1-65535"
+    },
+    "defaultInfo": {
+      "originate": "发起默认路由"
+    },
+    "modal": {
+      "confirmDelete": "确认删除"
+    },
+    "delete": {
+      "confirmInterface": "确认删除此接口？",
+      "confirmNetworkDist": "确认删除此网络距离？",
+      "confirmRedistribute": "确认删除此重分发？"
+    },
+    "error": {
+      "defaultDistance": "默认距离: ",
+      "defaultMetric": "默认度量值: ",
+      "network": "网络 {index}: ",
+      "neighbor": "邻居 {index}: ",
+      "interfaceNameRequired": "接口名称为必填项",
+      "networkRequired": "网络为必填项",
+      "protocolRequired": "协议为必填项"
+    },
+    "routing": {
+      "rip": {
+        "tab": {
+          "basic": "基本设置",
+          "interfaces": "接口",
+          "neighbors": "邻居",
+          "networks": "网络",
+          "networkDist": "网络距离",
+          "routes": "路由",
+          "redistribute": "重分发",
+          "passive": "被动接口",
+          "timers": "定时器",
+          "defaultInfo": "默认信息"
+        },
+        "basic": {
+          "title": "基本设置",
+          "defaultDistance": "默认距离",
+          "defaultMetric": "默认度量值",
+          "routeMap": "路由映射",
+          "routeMapPlaceholder": "路由映射名称",
+          "version": "版本",
+          "distributeList": "分发列表",
+          "accessListIn": "访问列表入站",
+          "accessListOut": "访问列表出站",
+          "accessListPlaceholder": "访问列表名称",
+          "prefixListIn": "前缀列表入站",
+          "prefixListOut": "前缀列表出站",
+          "prefixListPlaceholder": "前缀列表名称"
+        },
+        "col": {
+          "interfaceName": "接口名称",
+          "receiveVersion": "接收版本",
+          "sendVersion": "发送版本",
+          "splitHorizon": "水平分割",
+          "network": "网络",
+          "accessList": "访问列表",
+          "distance": "距离",
+          "protocol": "协议",
+          "metric": "度量值",
+          "routeMap": "路由映射"
+        },
+        "neighbors": {
+          "address": "邻居地址",
+          "addressPlaceholder": "IPv4 地址"
+        },
+        "networks": {
+          "label": "网络",
+          "placeholder": "例如: 192.168.1.0/24"
+        },
+        "routes": {
+          "label": "路由",
+          "placeholder": "例如: 10.0.0.0/8"
+        },
+        "passive": {
+          "label": "被动接口",
+          "selectPlaceholder": "选择接口"
+        },
+        "timers": {
+          "garbageCollection": "垃圾回收",
+          "garbageCollectionPlaceholder": "1-65535",
+          "timeout": "超时",
+          "timeoutPlaceholder": "1-65535",
+          "update": "更新",
+          "updatePlaceholder": "1-65535"
+        },
+        "defaultInfo": {
+          "originate": "发起默认路由"
+        },
+        "modal": {
+          "editInterface": "编辑接口",
+          "addInterface": "添加接口",
+          "interfaceName": "接口名称",
+          "selectInterface": "选择接口",
+          "plaintextPassword": "明文密码",
+          "passwordPlaceholder": "密码",
+          "md5Keys": "MD5 密钥",
+          "keyId": "密钥 ID",
+          "password": "密码",
+          "addMd5Key": "添加 MD5 密钥",
+          "receiveVersion": "接收版本",
+          "sendVersion": "发送版本",
+          "splitHorizon": "水平分割",
+          "editNetworkDist": "编辑网络距离",
+          "addNetworkDist": "添加网络距离",
+          "network": "网络",
+          "networkPlaceholder": "例如: 192.168.1.0/24",
+          "accessList": "访问列表",
+          "accessListPlaceholder": "访问列表名称",
+          "distance": "距离",
+          "editRedistribute": "编辑重分发",
+          "addRedistribute": "添加重分发",
+          "protocol": "协议",
+          "metric": "度量值",
+          "routeMap": "路由映射",
+          "routeMapPlaceholder": "路由映射名称"
+        },
+        "delete": {
+          "confirmInterface": "确认删除此接口？",
+          "confirmNetworkDist": "确认删除此网络距离？",
+          "confirmRedistribute": "确认删除此重分发？"
+        },
+        "error": {
+          "defaultDistance": "默认距离: ",
+          "defaultMetric": "默认度量值: ",
+          "network": "网络 {index}: ",
+          "neighbor": "邻居 {index}: ",
+          "interfaceNameRequired": "接口名称为必填项",
+          "networkRequired": "网络为必填项",
+          "protocolRequired": "协议为必填项"
+        }
+      }
+    },
+    "validation": {
+      "ipv4Format": "IPv4 地址格式错误",
+      "networkFormat": "网络格式错误 (例如: 192.168.1.0/24)",
+      "prefixLengthRange": "前缀长度必须在 0-32 之间",
+      "metricRange": "度量值必须在 0-16 之间",
+      "distanceRange": "距离必须在 1-255 之间",
+      "timerRange": "定时器值超出范围",
+      "versionInvalid": "版本无效 (必须是 1, 2 或 2R)"
+    },
+    "option": {
+      "default": "默认",
+      "disable": "禁用"
+    },
+    "btn": {
+      "add": "添加",
+      "delete": "删除"
+    },
+    "msg": {
+      "saved": "保存成功"
+    }
+  },
+  "en": {
+    "tab": {
+      "basic": "Basic",
+      "interfaces": "Interfaces",
+      "neighbors": "Neighbors",
+      "networks": "Networks",
+      "networkDist": "Network Distance",
+      "routes": "Routes",
+      "redistribute": "Redistribute",
+      "passive": "Passive Interfaces",
+      "timers": "Timers",
+      "defaultInfo": "Default Information"
+    },
+    "basic": {
+      "title": "Basic Settings",
+      "defaultDistance": "Default Distance",
+      "defaultMetric": "Default Metric",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name",
+      "version": "Version",
+      "distributeList": "Distribute List",
+      "accessListIn": "Access List In",
+      "accessListOut": "Access List Out",
+      "accessListPlaceholder": "Access list name",
+      "prefixListIn": "Prefix List In",
+      "prefixListOut": "Prefix List Out",
+      "prefixListPlaceholder": "Prefix list name"
+    },
+    "col": {
+      "interfaceName": "Interface Name",
+      "receiveVersion": "Receive Version",
+      "sendVersion": "Send Version",
+      "splitHorizon": "Split Horizon",
+      "network": "Network",
+      "accessList": "Access List",
+      "distance": "Distance",
+      "protocol": "Protocol",
+      "metric": "Metric",
+      "routeMap": "Route Map"
+    },
+    "neighbors": {
+      "address": "Neighbor Address",
+      "addressPlaceholder": "IPv4 address"
+    },
+    "networks": {
+      "label": "Network",
+      "placeholder": "e.g., 192.168.1.0/24"
+    },
+    "routes": {
+      "label": "Route",
+      "placeholder": "e.g., 10.0.0.0/8"
+    },
+    "passive": {
+      "label": "Passive Interface",
+      "selectPlaceholder": "Select interface"
+    },
+    "timers": {
+      "garbageCollection": "Garbage Collection",
+      "garbageCollectionPlaceholder": "1-65535",
+      "timeout": "Timeout",
+      "timeoutPlaceholder": "1-65535",
+      "update": "Update",
+      "updatePlaceholder": "1-65535"
+    },
+    "defaultInfo": {
+      "originate": "Originate Default Route"
+    },
+    "modal": {
+      "confirmDelete": "Confirm Delete"
+    },
+    "delete": {
+      "confirmInterface": "Confirm delete this interface?",
+      "confirmNetworkDist": "Confirm delete this network distance?",
+      "confirmRedistribute": "Confirm delete this redistribute?"
+    },
+    "error": {
+      "defaultDistance": "Default distance: ",
+      "defaultMetric": "Default metric: ",
+      "network": "Network {index}: ",
+      "neighbor": "Neighbor {index}: ",
+      "interfaceNameRequired": "Interface name is required",
+      "networkRequired": "Network is required",
+      "protocolRequired": "Protocol is required"
+    },
+    "routing": {
+      "rip": {
+        "tab": {
+          "basic": "Basic",
+          "interfaces": "Interfaces",
+          "neighbors": "Neighbors",
+          "networks": "Networks",
+          "networkDist": "Network Distance",
+          "routes": "Routes",
+          "redistribute": "Redistribute",
+          "passive": "Passive Interfaces",
+          "timers": "Timers",
+          "defaultInfo": "Default Information"
+        },
+        "basic": {
+          "title": "Basic Settings",
+          "defaultDistance": "Default Distance",
+          "defaultMetric": "Default Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name",
+          "version": "Version",
+          "distributeList": "Distribute List",
+          "accessListIn": "Access List In",
+          "accessListOut": "Access List Out",
+          "accessListPlaceholder": "Access list name",
+          "prefixListIn": "Prefix List In",
+          "prefixListOut": "Prefix List Out",
+          "prefixListPlaceholder": "Prefix list name"
+        },
+        "col": {
+          "interfaceName": "Interface Name",
+          "receiveVersion": "Receive Version",
+          "sendVersion": "Send Version",
+          "splitHorizon": "Split Horizon",
+          "network": "Network",
+          "accessList": "Access List",
+          "distance": "Distance",
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "routeMap": "Route Map"
+        },
+        "neighbors": {
+          "address": "Neighbor Address",
+          "addressPlaceholder": "IPv4 address"
+        },
+        "networks": {
+          "label": "Network",
+          "placeholder": "e.g., 192.168.1.0/24"
+        },
+        "routes": {
+          "label": "Route",
+          "placeholder": "e.g., 10.0.0.0/8"
+        },
+        "passive": {
+          "label": "Passive Interface",
+          "selectPlaceholder": "Select interface"
+        },
+        "timers": {
+          "garbageCollection": "Garbage Collection",
+          "garbageCollectionPlaceholder": "1-65535",
+          "timeout": "Timeout",
+          "timeoutPlaceholder": "1-65535",
+          "update": "Update",
+          "updatePlaceholder": "1-65535"
+        },
+        "defaultInfo": {
+          "originate": "Originate Default Route"
+        },
+        "modal": {
+          "editInterface": "Edit Interface",
+          "addInterface": "Add Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select interface",
+          "plaintextPassword": "Plaintext Password",
+          "passwordPlaceholder": "Password",
+          "md5Keys": "MD5 Keys",
+          "keyId": "Key ID",
+          "password": "Password",
+          "addMd5Key": "Add MD5 Key",
+          "receiveVersion": "Receive Version",
+          "sendVersion": "Send Version",
+          "splitHorizon": "Split Horizon",
+          "editNetworkDist": "Edit Network Distance",
+          "addNetworkDist": "Add Network Distance",
+          "network": "Network",
+          "networkPlaceholder": "e.g., 192.168.1.0/24",
+          "accessList": "Access List",
+          "accessListPlaceholder": "Access list name",
+          "distance": "Distance",
+          "editRedistribute": "Edit Redistribute",
+          "addRedistribute": "Add Redistribute",
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "delete": {
+          "confirmInterface": "Confirm delete this interface?",
+          "confirmNetworkDist": "Confirm delete this network distance?",
+          "confirmRedistribute": "Confirm delete this redistribute?"
+        },
+        "error": {
+          "defaultDistance": "Default distance: ",
+          "defaultMetric": "Default metric: ",
+          "network": "Network {index}: ",
+          "neighbor": "Neighbor {index}: ",
+          "interfaceNameRequired": "Interface name is required",
+          "networkRequired": "Network is required",
+          "protocolRequired": "Protocol is required"
+        }
+      }
+    },
+    "validation": {
+      "ipv4Format": "Invalid IPv4 address format",
+      "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
+      "prefixLengthRange": "Prefix length must be between 0-32",
+      "metricRange": "Metric must be between 0-16",
+      "distanceRange": "Distance must be between 1-255",
+      "timerRange": "Timer value out of range",
+      "versionInvalid": "Invalid version (must be 1, 2 or 2R)"
+    },
+    "option": {
+      "default": "Default",
+      "disable": "Disable"
+    },
+    "btn": {
+      "add": "Add",
+      "delete": "Delete"
+    },
+    "msg": {
+      "saved": "Saved successfully"
+    }
+  },
+  "zh-TW": {
+    "tab": {
+      "basic": "Basic",
+      "interfaces": "Interfaces",
+      "neighbors": "Neighbors",
+      "networks": "Networks",
+      "networkDist": "Network Distance",
+      "routes": "Routes",
+      "redistribute": "Redistribute",
+      "passive": "Passive Interfaces",
+      "timers": "Timers",
+      "defaultInfo": "Default Information"
+    },
+    "basic": {
+      "title": "Basic Settings",
+      "defaultDistance": "Default Distance",
+      "defaultMetric": "Default Metric",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name",
+      "version": "Version",
+      "distributeList": "Distribute List",
+      "accessListIn": "Access List In",
+      "accessListOut": "Access List Out",
+      "accessListPlaceholder": "Access list name",
+      "prefixListIn": "Prefix List In",
+      "prefixListOut": "Prefix List Out",
+      "prefixListPlaceholder": "Prefix list name"
+    },
+    "col": {
+      "interfaceName": "Interface Name",
+      "receiveVersion": "Receive Version",
+      "sendVersion": "Send Version",
+      "splitHorizon": "Split Horizon",
+      "network": "Network",
+      "accessList": "Access List",
+      "distance": "Distance",
+      "protocol": "Protocol",
+      "metric": "Metric",
+      "routeMap": "Route Map"
+    },
+    "neighbors": {
+      "address": "Neighbor Address",
+      "addressPlaceholder": "IPv4 address"
+    },
+    "networks": {
+      "label": "Network",
+      "placeholder": "e.g., 192.168.1.0/24"
+    },
+    "routes": {
+      "label": "Route",
+      "placeholder": "e.g., 10.0.0.0/8"
+    },
+    "passive": {
+      "label": "Passive Interface",
+      "selectPlaceholder": "Select interface"
+    },
+    "timers": {
+      "garbageCollection": "Garbage Collection",
+      "garbageCollectionPlaceholder": "1-65535",
+      "timeout": "Timeout",
+      "timeoutPlaceholder": "1-65535",
+      "update": "Update",
+      "updatePlaceholder": "1-65535"
+    },
+    "defaultInfo": {
+      "originate": "Originate Default Route"
+    },
+    "modal": {
+      "confirmDelete": "Confirm Delete"
+    },
+    "delete": {
+      "confirmInterface": "Confirm delete this interface?",
+      "confirmNetworkDist": "Confirm delete this network distance?",
+      "confirmRedistribute": "Confirm delete this redistribute?"
+    },
+    "error": {
+      "defaultDistance": "Default distance: ",
+      "defaultMetric": "Default metric: ",
+      "network": "Network {index}: ",
+      "neighbor": "Neighbor {index}: ",
+      "interfaceNameRequired": "Interface name is required",
+      "networkRequired": "Network is required",
+      "protocolRequired": "Protocol is required"
+    },
+    "routing": {
+      "rip": {
+        "tab": {
+          "basic": "Basic",
+          "interfaces": "Interfaces",
+          "neighbors": "Neighbors",
+          "networks": "Networks",
+          "networkDist": "Network Distance",
+          "routes": "Routes",
+          "redistribute": "Redistribute",
+          "passive": "Passive Interfaces",
+          "timers": "Timers",
+          "defaultInfo": "Default Information"
+        },
+        "basic": {
+          "title": "Basic Settings",
+          "defaultDistance": "Default Distance",
+          "defaultMetric": "Default Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name",
+          "version": "Version",
+          "distributeList": "Distribute List",
+          "accessListIn": "Access List In",
+          "accessListOut": "Access List Out",
+          "accessListPlaceholder": "Access list name",
+          "prefixListIn": "Prefix List In",
+          "prefixListOut": "Prefix List Out",
+          "prefixListPlaceholder": "Prefix list name"
+        },
+        "col": {
+          "interfaceName": "Interface Name",
+          "receiveVersion": "Receive Version",
+          "sendVersion": "Send Version",
+          "splitHorizon": "Split Horizon",
+          "network": "Network",
+          "accessList": "Access List",
+          "distance": "Distance",
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "routeMap": "Route Map"
+        },
+        "neighbors": {
+          "address": "Neighbor Address",
+          "addressPlaceholder": "IPv4 address"
+        },
+        "networks": {
+          "label": "Network",
+          "placeholder": "e.g., 192.168.1.0/24"
+        },
+        "routes": {
+          "label": "Route",
+          "placeholder": "e.g., 10.0.0.0/8"
+        },
+        "passive": {
+          "label": "Passive Interface",
+          "selectPlaceholder": "Select interface"
+        },
+        "timers": {
+          "garbageCollection": "Garbage Collection",
+          "garbageCollectionPlaceholder": "1-65535",
+          "timeout": "Timeout",
+          "timeoutPlaceholder": "1-65535",
+          "update": "Update",
+          "updatePlaceholder": "1-65535"
+        },
+        "defaultInfo": {
+          "originate": "Originate Default Route"
+        },
+        "modal": {
+          "editInterface": "Edit Interface",
+          "addInterface": "Add Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select interface",
+          "plaintextPassword": "Plaintext Password",
+          "passwordPlaceholder": "Password",
+          "md5Keys": "MD5 Keys",
+          "keyId": "Key ID",
+          "password": "Password",
+          "addMd5Key": "Add MD5 Key",
+          "receiveVersion": "Receive Version",
+          "sendVersion": "Send Version",
+          "splitHorizon": "Split Horizon",
+          "editNetworkDist": "Edit Network Distance",
+          "addNetworkDist": "Add Network Distance",
+          "network": "Network",
+          "networkPlaceholder": "e.g., 192.168.1.0/24",
+          "accessList": "Access List",
+          "accessListPlaceholder": "Access list name",
+          "distance": "Distance",
+          "editRedistribute": "Edit Redistribute",
+          "addRedistribute": "Add Redistribute",
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "delete": {
+          "confirmInterface": "Confirm delete this interface?",
+          "confirmNetworkDist": "Confirm delete this network distance?",
+          "confirmRedistribute": "Confirm delete this redistribute?"
+        },
+        "error": {
+          "defaultDistance": "Default distance: ",
+          "defaultMetric": "Default metric: ",
+          "network": "Network {index}: ",
+          "neighbor": "Neighbor {index}: ",
+          "interfaceNameRequired": "Interface name is required",
+          "networkRequired": "Network is required",
+          "protocolRequired": "Protocol is required"
+        }
+      }
+    },
+    "validation": {
+      "ipv4Format": "Invalid IPv4 address format",
+      "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
+      "prefixLengthRange": "Prefix length must be between 0-32",
+      "metricRange": "Metric must be between 0-16",
+      "distanceRange": "Distance must be between 1-255",
+      "timerRange": "Timer value out of range",
+      "versionInvalid": "Invalid version (must be 1, 2 or 2R)"
+    },
+    "option": {
+      "default": "Default",
+      "disable": "Disable"
+    },
+    "btn": {
+      "add": "Add",
+      "delete": "Delete"
+    },
+    "msg": {
+      "saved": "Saved successfully"
+    }
+  },
+  "ru": {
+    "tab": {
+      "basic": "Basic",
+      "interfaces": "Interfaces",
+      "neighbors": "Neighbors",
+      "networks": "Networks",
+      "networkDist": "Network Distance",
+      "routes": "Routes",
+      "redistribute": "Redistribute",
+      "passive": "Passive Interfaces",
+      "timers": "Timers",
+      "defaultInfo": "Default Information"
+    },
+    "basic": {
+      "title": "Basic Settings",
+      "defaultDistance": "Default Distance",
+      "defaultMetric": "Default Metric",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name",
+      "version": "Version",
+      "distributeList": "Distribute List",
+      "accessListIn": "Access List In",
+      "accessListOut": "Access List Out",
+      "accessListPlaceholder": "Access list name",
+      "prefixListIn": "Prefix List In",
+      "prefixListOut": "Prefix List Out",
+      "prefixListPlaceholder": "Prefix list name"
+    },
+    "col": {
+      "interfaceName": "Interface Name",
+      "receiveVersion": "Receive Version",
+      "sendVersion": "Send Version",
+      "splitHorizon": "Split Horizon",
+      "network": "Network",
+      "accessList": "Access List",
+      "distance": "Distance",
+      "protocol": "Protocol",
+      "metric": "Metric",
+      "routeMap": "Route Map"
+    },
+    "neighbors": {
+      "address": "Neighbor Address",
+      "addressPlaceholder": "IPv4 address"
+    },
+    "networks": {
+      "label": "Network",
+      "placeholder": "e.g., 192.168.1.0/24"
+    },
+    "routes": {
+      "label": "Route",
+      "placeholder": "e.g., 10.0.0.0/8"
+    },
+    "passive": {
+      "label": "Passive Interface",
+      "selectPlaceholder": "Select interface"
+    },
+    "timers": {
+      "garbageCollection": "Garbage Collection",
+      "garbageCollectionPlaceholder": "1-65535",
+      "timeout": "Timeout",
+      "timeoutPlaceholder": "1-65535",
+      "update": "Update",
+      "updatePlaceholder": "1-65535"
+    },
+    "defaultInfo": {
+      "originate": "Originate Default Route"
+    },
+    "modal": {
+      "confirmDelete": "Confirm Delete"
+    },
+    "delete": {
+      "confirmInterface": "Confirm delete this interface?",
+      "confirmNetworkDist": "Confirm delete this network distance?",
+      "confirmRedistribute": "Confirm delete this redistribute?"
+    },
+    "error": {
+      "defaultDistance": "Default distance: ",
+      "defaultMetric": "Default metric: ",
+      "network": "Network {index}: ",
+      "neighbor": "Neighbor {index}: ",
+      "interfaceNameRequired": "Interface name is required",
+      "networkRequired": "Network is required",
+      "protocolRequired": "Protocol is required"
+    },
+    "routing": {
+      "rip": {
+        "tab": {
+          "basic": "Basic",
+          "interfaces": "Interfaces",
+          "neighbors": "Neighbors",
+          "networks": "Networks",
+          "networkDist": "Network Distance",
+          "routes": "Routes",
+          "redistribute": "Redistribute",
+          "passive": "Passive Interfaces",
+          "timers": "Timers",
+          "defaultInfo": "Default Information"
+        },
+        "basic": {
+          "title": "Basic Settings",
+          "defaultDistance": "Default Distance",
+          "defaultMetric": "Default Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name",
+          "version": "Version",
+          "distributeList": "Distribute List",
+          "accessListIn": "Access List In",
+          "accessListOut": "Access List Out",
+          "accessListPlaceholder": "Access list name",
+          "prefixListIn": "Prefix List In",
+          "prefixListOut": "Prefix List Out",
+          "prefixListPlaceholder": "Prefix list name"
+        },
+        "col": {
+          "interfaceName": "Interface Name",
+          "receiveVersion": "Receive Version",
+          "sendVersion": "Send Version",
+          "splitHorizon": "Split Horizon",
+          "network": "Network",
+          "accessList": "Access List",
+          "distance": "Distance",
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "routeMap": "Route Map"
+        },
+        "neighbors": {
+          "address": "Neighbor Address",
+          "addressPlaceholder": "IPv4 address"
+        },
+        "networks": {
+          "label": "Network",
+          "placeholder": "e.g., 192.168.1.0/24"
+        },
+        "routes": {
+          "label": "Route",
+          "placeholder": "e.g., 10.0.0.0/8"
+        },
+        "passive": {
+          "label": "Passive Interface",
+          "selectPlaceholder": "Select interface"
+        },
+        "timers": {
+          "garbageCollection": "Garbage Collection",
+          "garbageCollectionPlaceholder": "1-65535",
+          "timeout": "Timeout",
+          "timeoutPlaceholder": "1-65535",
+          "update": "Update",
+          "updatePlaceholder": "1-65535"
+        },
+        "defaultInfo": {
+          "originate": "Originate Default Route"
+        },
+        "modal": {
+          "editInterface": "Edit Interface",
+          "addInterface": "Add Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select interface",
+          "plaintextPassword": "Plaintext Password",
+          "passwordPlaceholder": "Password",
+          "md5Keys": "MD5 Keys",
+          "keyId": "Key ID",
+          "password": "Password",
+          "addMd5Key": "Add MD5 Key",
+          "receiveVersion": "Receive Version",
+          "sendVersion": "Send Version",
+          "splitHorizon": "Split Horizon",
+          "editNetworkDist": "Edit Network Distance",
+          "addNetworkDist": "Add Network Distance",
+          "network": "Network",
+          "networkPlaceholder": "e.g., 192.168.1.0/24",
+          "accessList": "Access List",
+          "accessListPlaceholder": "Access list name",
+          "distance": "Distance",
+          "editRedistribute": "Edit Redistribute",
+          "addRedistribute": "Add Redistribute",
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "delete": {
+          "confirmInterface": "Confirm delete this interface?",
+          "confirmNetworkDist": "Confirm delete this network distance?",
+          "confirmRedistribute": "Confirm delete this redistribute?"
+        },
+        "error": {
+          "defaultDistance": "Default distance: ",
+          "defaultMetric": "Default metric: ",
+          "network": "Network {index}: ",
+          "neighbor": "Neighbor {index}: ",
+          "interfaceNameRequired": "Interface name is required",
+          "networkRequired": "Network is required",
+          "protocolRequired": "Protocol is required"
+        }
+      }
+    },
+    "validation": {
+      "ipv4Format": "Invalid IPv4 address format",
+      "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
+      "prefixLengthRange": "Prefix length must be between 0-32",
+      "metricRange": "Metric must be between 0-16",
+      "distanceRange": "Distance must be between 1-255",
+      "timerRange": "Timer value out of range",
+      "versionInvalid": "Invalid version (must be 1, 2 or 2R)"
+    },
+    "option": {
+      "default": "Default",
+      "disable": "Disable"
+    },
+    "btn": {
+      "add": "Add",
+      "delete": "Delete"
+    },
+    "msg": {
+      "saved": "Saved successfully"
+    }
+  },
+  "de": {
+    "tab": {
+      "basic": "Basic",
+      "interfaces": "Interfaces",
+      "neighbors": "Neighbors",
+      "networks": "Networks",
+      "networkDist": "Network Distance",
+      "routes": "Routes",
+      "redistribute": "Redistribute",
+      "passive": "Passive Interfaces",
+      "timers": "Timers",
+      "defaultInfo": "Default Information"
+    },
+    "basic": {
+      "title": "Basic Settings",
+      "defaultDistance": "Default Distance",
+      "defaultMetric": "Default Metric",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name",
+      "version": "Version",
+      "distributeList": "Distribute List",
+      "accessListIn": "Access List In",
+      "accessListOut": "Access List Out",
+      "accessListPlaceholder": "Access list name",
+      "prefixListIn": "Prefix List In",
+      "prefixListOut": "Prefix List Out",
+      "prefixListPlaceholder": "Prefix list name"
+    },
+    "col": {
+      "interfaceName": "Interface Name",
+      "receiveVersion": "Receive Version",
+      "sendVersion": "Send Version",
+      "splitHorizon": "Split Horizon",
+      "network": "Network",
+      "accessList": "Access List",
+      "distance": "Distance",
+      "protocol": "Protocol",
+      "metric": "Metric",
+      "routeMap": "Route Map"
+    },
+    "neighbors": {
+      "address": "Neighbor Address",
+      "addressPlaceholder": "IPv4 address"
+    },
+    "networks": {
+      "label": "Network",
+      "placeholder": "e.g., 192.168.1.0/24"
+    },
+    "routes": {
+      "label": "Route",
+      "placeholder": "e.g., 10.0.0.0/8"
+    },
+    "passive": {
+      "label": "Passive Interface",
+      "selectPlaceholder": "Select interface"
+    },
+    "timers": {
+      "garbageCollection": "Garbage Collection",
+      "garbageCollectionPlaceholder": "1-65535",
+      "timeout": "Timeout",
+      "timeoutPlaceholder": "1-65535",
+      "update": "Update",
+      "updatePlaceholder": "1-65535"
+    },
+    "defaultInfo": {
+      "originate": "Originate Default Route"
+    },
+    "modal": {
+      "confirmDelete": "Confirm Delete"
+    },
+    "delete": {
+      "confirmInterface": "Confirm delete this interface?",
+      "confirmNetworkDist": "Confirm delete this network distance?",
+      "confirmRedistribute": "Confirm delete this redistribute?"
+    },
+    "error": {
+      "defaultDistance": "Default distance: ",
+      "defaultMetric": "Default metric: ",
+      "network": "Network {index}: ",
+      "neighbor": "Neighbor {index}: ",
+      "interfaceNameRequired": "Interface name is required",
+      "networkRequired": "Network is required",
+      "protocolRequired": "Protocol is required"
+    },
+    "routing": {
+      "rip": {
+        "tab": {
+          "basic": "Basic",
+          "interfaces": "Interfaces",
+          "neighbors": "Neighbors",
+          "networks": "Networks",
+          "networkDist": "Network Distance",
+          "routes": "Routes",
+          "redistribute": "Redistribute",
+          "passive": "Passive Interfaces",
+          "timers": "Timers",
+          "defaultInfo": "Default Information"
+        },
+        "basic": {
+          "title": "Basic Settings",
+          "defaultDistance": "Default Distance",
+          "defaultMetric": "Default Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name",
+          "version": "Version",
+          "distributeList": "Distribute List",
+          "accessListIn": "Access List In",
+          "accessListOut": "Access List Out",
+          "accessListPlaceholder": "Access list name",
+          "prefixListIn": "Prefix List In",
+          "prefixListOut": "Prefix List Out",
+          "prefixListPlaceholder": "Prefix list name"
+        },
+        "col": {
+          "interfaceName": "Interface Name",
+          "receiveVersion": "Receive Version",
+          "sendVersion": "Send Version",
+          "splitHorizon": "Split Horizon",
+          "network": "Network",
+          "accessList": "Access List",
+          "distance": "Distance",
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "routeMap": "Route Map"
+        },
+        "neighbors": {
+          "address": "Neighbor Address",
+          "addressPlaceholder": "IPv4 address"
+        },
+        "networks": {
+          "label": "Network",
+          "placeholder": "e.g., 192.168.1.0/24"
+        },
+        "routes": {
+          "label": "Route",
+          "placeholder": "e.g., 10.0.0.0/8"
+        },
+        "passive": {
+          "label": "Passive Interface",
+          "selectPlaceholder": "Select interface"
+        },
+        "timers": {
+          "garbageCollection": "Garbage Collection",
+          "garbageCollectionPlaceholder": "1-65535",
+          "timeout": "Timeout",
+          "timeoutPlaceholder": "1-65535",
+          "update": "Update",
+          "updatePlaceholder": "1-65535"
+        },
+        "defaultInfo": {
+          "originate": "Originate Default Route"
+        },
+        "modal": {
+          "editInterface": "Edit Interface",
+          "addInterface": "Add Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select interface",
+          "plaintextPassword": "Plaintext Password",
+          "passwordPlaceholder": "Password",
+          "md5Keys": "MD5 Keys",
+          "keyId": "Key ID",
+          "password": "Password",
+          "addMd5Key": "Add MD5 Key",
+          "receiveVersion": "Receive Version",
+          "sendVersion": "Send Version",
+          "splitHorizon": "Split Horizon",
+          "editNetworkDist": "Edit Network Distance",
+          "addNetworkDist": "Add Network Distance",
+          "network": "Network",
+          "networkPlaceholder": "e.g., 192.168.1.0/24",
+          "accessList": "Access List",
+          "accessListPlaceholder": "Access list name",
+          "distance": "Distance",
+          "editRedistribute": "Edit Redistribute",
+          "addRedistribute": "Add Redistribute",
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "delete": {
+          "confirmInterface": "Confirm delete this interface?",
+          "confirmNetworkDist": "Confirm delete this network distance?",
+          "confirmRedistribute": "Confirm delete this redistribute?"
+        },
+        "error": {
+          "defaultDistance": "Default distance: ",
+          "defaultMetric": "Default metric: ",
+          "network": "Network {index}: ",
+          "neighbor": "Neighbor {index}: ",
+          "interfaceNameRequired": "Interface name is required",
+          "networkRequired": "Network is required",
+          "protocolRequired": "Protocol is required"
+        }
+      }
+    },
+    "validation": {
+      "ipv4Format": "Invalid IPv4 address format",
+      "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
+      "prefixLengthRange": "Prefix length must be between 0-32",
+      "metricRange": "Metric must be between 0-16",
+      "distanceRange": "Distance must be between 1-255",
+      "timerRange": "Timer value out of range",
+      "versionInvalid": "Invalid version (must be 1, 2 or 2R)"
+    },
+    "option": {
+      "default": "Default",
+      "disable": "Disable"
+    },
+    "btn": {
+      "add": "Add",
+      "delete": "Delete"
+    },
+    "msg": {
+      "saved": "Saved successfully"
+    }
+  },
+  "fr": {
+    "tab": {
+      "basic": "Basic",
+      "interfaces": "Interfaces",
+      "neighbors": "Neighbors",
+      "networks": "Networks",
+      "networkDist": "Network Distance",
+      "routes": "Routes",
+      "redistribute": "Redistribute",
+      "passive": "Passive Interfaces",
+      "timers": "Timers",
+      "defaultInfo": "Default Information"
+    },
+    "basic": {
+      "title": "Basic Settings",
+      "defaultDistance": "Default Distance",
+      "defaultMetric": "Default Metric",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name",
+      "version": "Version",
+      "distributeList": "Distribute List",
+      "accessListIn": "Access List In",
+      "accessListOut": "Access List Out",
+      "accessListPlaceholder": "Access list name",
+      "prefixListIn": "Prefix List In",
+      "prefixListOut": "Prefix List Out",
+      "prefixListPlaceholder": "Prefix list name"
+    },
+    "col": {
+      "interfaceName": "Interface Name",
+      "receiveVersion": "Receive Version",
+      "sendVersion": "Send Version",
+      "splitHorizon": "Split Horizon",
+      "network": "Network",
+      "accessList": "Access List",
+      "distance": "Distance",
+      "protocol": "Protocol",
+      "metric": "Metric",
+      "routeMap": "Route Map"
+    },
+    "neighbors": {
+      "address": "Neighbor Address",
+      "addressPlaceholder": "IPv4 address"
+    },
+    "networks": {
+      "label": "Network",
+      "placeholder": "e.g., 192.168.1.0/24"
+    },
+    "routes": {
+      "label": "Route",
+      "placeholder": "e.g., 10.0.0.0/8"
+    },
+    "passive": {
+      "label": "Passive Interface",
+      "selectPlaceholder": "Select interface"
+    },
+    "timers": {
+      "garbageCollection": "Garbage Collection",
+      "garbageCollectionPlaceholder": "1-65535",
+      "timeout": "Timeout",
+      "timeoutPlaceholder": "1-65535",
+      "update": "Update",
+      "updatePlaceholder": "1-65535"
+    },
+    "defaultInfo": {
+      "originate": "Originate Default Route"
+    },
+    "modal": {
+      "confirmDelete": "Confirm Delete"
+    },
+    "delete": {
+      "confirmInterface": "Confirm delete this interface?",
+      "confirmNetworkDist": "Confirm delete this network distance?",
+      "confirmRedistribute": "Confirm delete this redistribute?"
+    },
+    "error": {
+      "defaultDistance": "Default distance: ",
+      "defaultMetric": "Default metric: ",
+      "network": "Network {index}: ",
+      "neighbor": "Neighbor {index}: ",
+      "interfaceNameRequired": "Interface name is required",
+      "networkRequired": "Network is required",
+      "protocolRequired": "Protocol is required"
+    },
+    "routing": {
+      "rip": {
+        "tab": {
+          "basic": "Basic",
+          "interfaces": "Interfaces",
+          "neighbors": "Neighbors",
+          "networks": "Networks",
+          "networkDist": "Network Distance",
+          "routes": "Routes",
+          "redistribute": "Redistribute",
+          "passive": "Passive Interfaces",
+          "timers": "Timers",
+          "defaultInfo": "Default Information"
+        },
+        "basic": {
+          "title": "Basic Settings",
+          "defaultDistance": "Default Distance",
+          "defaultMetric": "Default Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name",
+          "version": "Version",
+          "distributeList": "Distribute List",
+          "accessListIn": "Access List In",
+          "accessListOut": "Access List Out",
+          "accessListPlaceholder": "Access list name",
+          "prefixListIn": "Prefix List In",
+          "prefixListOut": "Prefix List Out",
+          "prefixListPlaceholder": "Prefix list name"
+        },
+        "col": {
+          "interfaceName": "Interface Name",
+          "receiveVersion": "Receive Version",
+          "sendVersion": "Send Version",
+          "splitHorizon": "Split Horizon",
+          "network": "Network",
+          "accessList": "Access List",
+          "distance": "Distance",
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "routeMap": "Route Map"
+        },
+        "neighbors": {
+          "address": "Neighbor Address",
+          "addressPlaceholder": "IPv4 address"
+        },
+        "networks": {
+          "label": "Network",
+          "placeholder": "e.g., 192.168.1.0/24"
+        },
+        "routes": {
+          "label": "Route",
+          "placeholder": "e.g., 10.0.0.0/8"
+        },
+        "passive": {
+          "label": "Passive Interface",
+          "selectPlaceholder": "Select interface"
+        },
+        "timers": {
+          "garbageCollection": "Garbage Collection",
+          "garbageCollectionPlaceholder": "1-65535",
+          "timeout": "Timeout",
+          "timeoutPlaceholder": "1-65535",
+          "update": "Update",
+          "updatePlaceholder": "1-65535"
+        },
+        "defaultInfo": {
+          "originate": "Originate Default Route"
+        },
+        "modal": {
+          "editInterface": "Edit Interface",
+          "addInterface": "Add Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select interface",
+          "plaintextPassword": "Plaintext Password",
+          "passwordPlaceholder": "Password",
+          "md5Keys": "MD5 Keys",
+          "keyId": "Key ID",
+          "password": "Password",
+          "addMd5Key": "Add MD5 Key",
+          "receiveVersion": "Receive Version",
+          "sendVersion": "Send Version",
+          "splitHorizon": "Split Horizon",
+          "editNetworkDist": "Edit Network Distance",
+          "addNetworkDist": "Add Network Distance",
+          "network": "Network",
+          "networkPlaceholder": "e.g., 192.168.1.0/24",
+          "accessList": "Access List",
+          "accessListPlaceholder": "Access list name",
+          "distance": "Distance",
+          "editRedistribute": "Edit Redistribute",
+          "addRedistribute": "Add Redistribute",
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "delete": {
+          "confirmInterface": "Confirm delete this interface?",
+          "confirmNetworkDist": "Confirm delete this network distance?",
+          "confirmRedistribute": "Confirm delete this redistribute?"
+        },
+        "error": {
+          "defaultDistance": "Default distance: ",
+          "defaultMetric": "Default metric: ",
+          "network": "Network {index}: ",
+          "neighbor": "Neighbor {index}: ",
+          "interfaceNameRequired": "Interface name is required",
+          "networkRequired": "Network is required",
+          "protocolRequired": "Protocol is required"
+        }
+      }
+    },
+    "validation": {
+      "ipv4Format": "Invalid IPv4 address format",
+      "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
+      "prefixLengthRange": "Prefix length must be between 0-32",
+      "metricRange": "Metric must be between 0-16",
+      "distanceRange": "Distance must be between 1-255",
+      "timerRange": "Timer value out of range",
+      "versionInvalid": "Invalid version (must be 1, 2 or 2R)"
+    },
+    "option": {
+      "default": "Default",
+      "disable": "Disable"
+    },
+    "btn": {
+      "add": "Add",
+      "delete": "Delete"
+    },
+    "msg": {
+      "saved": "Saved successfully"
+    }
+  },
+  "ko": {
+    "tab": {
+      "basic": "Basic",
+      "interfaces": "Interfaces",
+      "neighbors": "Neighbors",
+      "networks": "Networks",
+      "networkDist": "Network Distance",
+      "routes": "Routes",
+      "redistribute": "Redistribute",
+      "passive": "Passive Interfaces",
+      "timers": "Timers",
+      "defaultInfo": "Default Information"
+    },
+    "basic": {
+      "title": "Basic Settings",
+      "defaultDistance": "Default Distance",
+      "defaultMetric": "Default Metric",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name",
+      "version": "Version",
+      "distributeList": "Distribute List",
+      "accessListIn": "Access List In",
+      "accessListOut": "Access List Out",
+      "accessListPlaceholder": "Access list name",
+      "prefixListIn": "Prefix List In",
+      "prefixListOut": "Prefix List Out",
+      "prefixListPlaceholder": "Prefix list name"
+    },
+    "col": {
+      "interfaceName": "Interface Name",
+      "receiveVersion": "Receive Version",
+      "sendVersion": "Send Version",
+      "splitHorizon": "Split Horizon",
+      "network": "Network",
+      "accessList": "Access List",
+      "distance": "Distance",
+      "protocol": "Protocol",
+      "metric": "Metric",
+      "routeMap": "Route Map"
+    },
+    "neighbors": {
+      "address": "Neighbor Address",
+      "addressPlaceholder": "IPv4 address"
+    },
+    "networks": {
+      "label": "Network",
+      "placeholder": "e.g., 192.168.1.0/24"
+    },
+    "routes": {
+      "label": "Route",
+      "placeholder": "e.g., 10.0.0.0/8"
+    },
+    "passive": {
+      "label": "Passive Interface",
+      "selectPlaceholder": "Select interface"
+    },
+    "timers": {
+      "garbageCollection": "Garbage Collection",
+      "garbageCollectionPlaceholder": "1-65535",
+      "timeout": "Timeout",
+      "timeoutPlaceholder": "1-65535",
+      "update": "Update",
+      "updatePlaceholder": "1-65535"
+    },
+    "defaultInfo": {
+      "originate": "Originate Default Route"
+    },
+    "modal": {
+      "confirmDelete": "Confirm Delete"
+    },
+    "delete": {
+      "confirmInterface": "Confirm delete this interface?",
+      "confirmNetworkDist": "Confirm delete this network distance?",
+      "confirmRedistribute": "Confirm delete this redistribute?"
+    },
+    "error": {
+      "defaultDistance": "Default distance: ",
+      "defaultMetric": "Default metric: ",
+      "network": "Network {index}: ",
+      "neighbor": "Neighbor {index}: ",
+      "interfaceNameRequired": "Interface name is required",
+      "networkRequired": "Network is required",
+      "protocolRequired": "Protocol is required"
+    },
+    "routing": {
+      "rip": {
+        "tab": {
+          "basic": "Basic",
+          "interfaces": "Interfaces",
+          "neighbors": "Neighbors",
+          "networks": "Networks",
+          "networkDist": "Network Distance",
+          "routes": "Routes",
+          "redistribute": "Redistribute",
+          "passive": "Passive Interfaces",
+          "timers": "Timers",
+          "defaultInfo": "Default Information"
+        },
+        "basic": {
+          "title": "Basic Settings",
+          "defaultDistance": "Default Distance",
+          "defaultMetric": "Default Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name",
+          "version": "Version",
+          "distributeList": "Distribute List",
+          "accessListIn": "Access List In",
+          "accessListOut": "Access List Out",
+          "accessListPlaceholder": "Access list name",
+          "prefixListIn": "Prefix List In",
+          "prefixListOut": "Prefix List Out",
+          "prefixListPlaceholder": "Prefix list name"
+        },
+        "col": {
+          "interfaceName": "Interface Name",
+          "receiveVersion": "Receive Version",
+          "sendVersion": "Send Version",
+          "splitHorizon": "Split Horizon",
+          "network": "Network",
+          "accessList": "Access List",
+          "distance": "Distance",
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "routeMap": "Route Map"
+        },
+        "neighbors": {
+          "address": "Neighbor Address",
+          "addressPlaceholder": "IPv4 address"
+        },
+        "networks": {
+          "label": "Network",
+          "placeholder": "e.g., 192.168.1.0/24"
+        },
+        "routes": {
+          "label": "Route",
+          "placeholder": "e.g., 10.0.0.0/8"
+        },
+        "passive": {
+          "label": "Passive Interface",
+          "selectPlaceholder": "Select interface"
+        },
+        "timers": {
+          "garbageCollection": "Garbage Collection",
+          "garbageCollectionPlaceholder": "1-65535",
+          "timeout": "Timeout",
+          "timeoutPlaceholder": "1-65535",
+          "update": "Update",
+          "updatePlaceholder": "1-65535"
+        },
+        "defaultInfo": {
+          "originate": "Originate Default Route"
+        },
+        "modal": {
+          "editInterface": "Edit Interface",
+          "addInterface": "Add Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select interface",
+          "plaintextPassword": "Plaintext Password",
+          "passwordPlaceholder": "Password",
+          "md5Keys": "MD5 Keys",
+          "keyId": "Key ID",
+          "password": "Password",
+          "addMd5Key": "Add MD5 Key",
+          "receiveVersion": "Receive Version",
+          "sendVersion": "Send Version",
+          "splitHorizon": "Split Horizon",
+          "editNetworkDist": "Edit Network Distance",
+          "addNetworkDist": "Add Network Distance",
+          "network": "Network",
+          "networkPlaceholder": "e.g., 192.168.1.0/24",
+          "accessList": "Access List",
+          "accessListPlaceholder": "Access list name",
+          "distance": "Distance",
+          "editRedistribute": "Edit Redistribute",
+          "addRedistribute": "Add Redistribute",
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "delete": {
+          "confirmInterface": "Confirm delete this interface?",
+          "confirmNetworkDist": "Confirm delete this network distance?",
+          "confirmRedistribute": "Confirm delete this redistribute?"
+        },
+        "error": {
+          "defaultDistance": "Default distance: ",
+          "defaultMetric": "Default metric: ",
+          "network": "Network {index}: ",
+          "neighbor": "Neighbor {index}: ",
+          "interfaceNameRequired": "Interface name is required",
+          "networkRequired": "Network is required",
+          "protocolRequired": "Protocol is required"
+        }
+      }
+    },
+    "validation": {
+      "ipv4Format": "Invalid IPv4 address format",
+      "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
+      "prefixLengthRange": "Prefix length must be between 0-32",
+      "metricRange": "Metric must be between 0-16",
+      "distanceRange": "Distance must be between 1-255",
+      "timerRange": "Timer value out of range",
+      "versionInvalid": "Invalid version (must be 1, 2 or 2R)"
+    },
+    "option": {
+      "default": "Default",
+      "disable": "Disable"
+    },
+    "btn": {
+      "add": "Add",
+      "delete": "Delete"
+    },
+    "msg": {
+      "saved": "Saved successfully"
+    }
+  }
+}

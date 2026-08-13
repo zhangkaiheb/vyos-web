@@ -6,6 +6,9 @@ import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const LEAP_SECOND_OPTIONS = ['ignore', 'smear', 'system', 'timezone'];
 
@@ -40,43 +43,6 @@ function splitMembers(text) {
 function firstValue(val) {
   const arr = toArray(val);
   return arr.length ? String(arr[0]) : '';
-}
-
-function validateIPv4(value) {
-  if (!value) return '';
-  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return 'IPv4 地址格式错误';
-  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return 'IPv4 地址格式错误';
-  return '';
-}
-
-function validateIPv6(value) {
-  if (!value) return '';
-  const re = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}$|^(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}$|^(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}$|^:(?::[0-9a-fA-F]{1,4}){1,7}$|^::$/;
-  if (!re.test(value)) return 'IPv6 地址格式错误';
-  return '';
-}
-
-function validateIP(value) {
-  if (!value) return '';
-  if (!validateIPv4(value)) return '';
-  if (!validateIPv6(value)) return '';
-  return 'IP 地址格式错误';
-}
-
-function validateIPPrefix(value) {
-  if (!value) return '';
-  if (value.includes('/')) {
-    const [ip, prefix] = value.split('/');
-    const p = parseInt(prefix, 10);
-    if (isNaN(p)) return '前缀必须为数字';
-    const v4Err = validateIPv4(ip);
-    const v6Err = validateIPv6(ip);
-    if (!v4Err && (p < 0 || p > 32)) return 'IPv4 前缀范围 0-32';
-    if (!v6Err && (p < 0 || p > 128)) return 'IPv6 前缀范围 0-128';
-    if (v4Err && v6Err) return 'IP 地址或前缀格式错误';
-    return '';
-  }
-  return validateIP(value);
 }
 
 function ntpToForm(data = {}) {
@@ -130,6 +96,46 @@ function ntpToConfig(form) {
 export default defineComponent({
   name: 'NtpPage',
   setup() {
+    const configStore = useConfigStore();
+    const { t } = useI18n();
+
+    function validateIPv4(value) {
+      if (!value) return '';
+      if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return t('ntp.validation.ipv4Format');
+      if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return t('ntp.validation.ipv4Format');
+      return '';
+    }
+
+    function validateIPv6(value) {
+      if (!value) return '';
+      const re = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}$|^(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}$|^(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}$|^:(?::[0-9a-fA-F]{1,4}){1,7}$|^::$/;
+      if (!re.test(value)) return t('ntp.validation.ipv6Format');
+      return '';
+    }
+
+    function validateIP(value) {
+      if (!value) return '';
+      if (!validateIPv4(value)) return '';
+      if (!validateIPv6(value)) return '';
+      return t('ntp.validation.ipFormat');
+    }
+
+    function validateIPPrefix(value) {
+      if (!value) return '';
+      if (value.includes('/')) {
+        const [ip, prefix] = value.split('/');
+        const p = parseInt(prefix, 10);
+        if (isNaN(p)) return t('ntp.validation.prefixMustBeNumber');
+        const v4Err = validateIPv4(ip);
+        const v6Err = validateIPv6(ip);
+        if (!v4Err && (p < 0 || p > 32)) return t('ntp.validation.ipv4PrefixRange');
+        if (!v6Err && (p < 0 || p > 128)) return t('ntp.validation.ipv6PrefixRange');
+        if (v4Err && v6Err) return t('ntp.validation.ipOrPrefixFormat');
+        return '';
+      }
+      return validateIP(value);
+    }
+
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -141,6 +147,8 @@ export default defineComponent({
     const modalVisible = ref(false);
     const editingIndex = ref(-1);
     const serverForm = ref({ name: '', prefer: false, noselect: false, pool: false, nts: false });
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
 
     const localAddresses = computed(() => {
       const addresses = new Set();
@@ -172,10 +180,10 @@ export default defineComponent({
     });
 
     const serverColumns = [
-      { key: 'name', title: '地址' },
-      { key: 'prefer', title: '首选', render: v => v ? '✓' : '' },
-      { key: 'noselect', title: '不选用', render: v => v ? '✓' : '' },
-      { key: 'pool', title: '池', render: v => v ? '✓' : '' },
+      { key: 'name', title: t('ntp.columns.address') },
+      { key: 'prefer', title: t('ntp.columns.prefer'), render: v => v ? '✓' : '' },
+      { key: 'noselect', title: t('ntp.columns.noselect'), render: v => v ? '✓' : '' },
+      { key: 'pool', title: t('ntp.columns.pool'), render: v => v ? '✓' : '' },
       { key: 'nts', title: 'NTS', render: v => v ? '✓' : '' },
     ];
 
@@ -196,17 +204,18 @@ export default defineComponent({
     async function save() {
       for (const ip of config.value.listen_address || []) {
         const err = validateIP(ip);
-        if (err) return alert(`监听地址 ${ip}：${err}`);
+        if (err) return showError({ message: t('ntp.validation.listenAddressError', { ip, err }) });
       }
 
       for (const item of config.value.allow_client || []) {
         const err = validateIPPrefix(item);
-        if (err) return alert(`允许客户端 ${item}：${err}`);
+        if (err) return showError({ message: t('ntp.validation.allowClientError', { item, err }) });
       }
 
       saving.value = true;
       try {
-        await configApi.set('service ntp', ntpToConfig(config.value));
+        await configStore.setConfig('service ntp', ntpToConfig(config.value));
+        configStore.markPending();
         saved.value = true;
         await load();
       } catch (e) {
@@ -230,17 +239,23 @@ export default defineComponent({
 
     function deleteServer(selectedNames) {
       if (!selectedNames.length) return;
-      if (!confirm('确认删除选中的 NTP 服务器？')) return;
-      const toDelete = new Set(selectedNames);
+      pendingDeleteNames.value = [...selectedNames];
+      deleteModalVisible.value = true;
+    }
+
+    function confirmDeleteServer() {
+      deleteModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteNames.value);
       config.value.servers = config.value.servers.filter(s => !toDelete.has(s.name));
+      pendingDeleteNames.value = [];
     }
 
     function saveServer() {
       const name = String(serverForm.value.name || '').trim();
-      if (!name) return alert('请输入 NTP 服务器地址');
+      if (!name) return showError({ message: t('ntp.validation.enterServerAddress') });
 
       const duplicate = config.value.servers.find((s, i) => s.name === name && i !== editingIndex.value);
-      if (duplicate) return alert('该地址已存在');
+      if (duplicate) return showError({ message: t('ntp.validation.addressAlreadyExists') });
 
       const newServer = {
         name,
@@ -258,90 +273,94 @@ export default defineComponent({
       modalVisible.value = false;
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
-    return {
+    return {t,
+      
       loading, saving, saved, config, activeTab, writeDisabled, interfaces, localAddresses, commandPath,
-      serverColumns, modalVisible, serverForm,
-      load, save, createServer, editServer, deleteServer, saveServer,
+      serverColumns, modalVisible, serverForm, deleteModalVisible, pendingDeleteNames,
+      load, save, createServer, editServer, deleteServer, confirmDeleteServer, saveServer,
       LEAP_SECOND_OPTIONS, ALLOW_CLIENT_OPTIONS,
     };
   },
   components: { DualListSelector, TabGroup, ToolbarButton, DataTable, DraggableModal },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('ntp.messages.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本' },
-        { key: 'server', title: 'NTP服务器' }
+        { key: 'basic', title: t('ntp.tabs.basic') },
+        { key: 'server', title: t('ntp.tabs.server') }
       ]">
-
-        <template #basic>
+        <template v-slot:basic>
           <div class="form-row">
-            <label class="form-label" title="NTP 闰秒处理方式，默认 timezone">闰秒处理</label>
+            <label class="form-label" :title="t('ntp.labels.leapSecondTitle')">{{ t('ntp.labels.leapSecond') }}</label>
             <div style="flex:1;">
-              <select class="form-control" v-model="config.leap_second" title="NTP 闰秒处理方式，默认 timezone">
+              <select class="form-control" v-model="config.leap_second" :title="t('ntp.labels.leapSecondTitle')">
                 <option v-for="o in LEAP_SECOND_OPTIONS" :key="o" :value="o">{{ o }}</option>
               </select>
-              <div class="form-hint">默认：timezone（使用 UTC 时区数据库判断下一次闰秒）</div>
+              <div class="form-hint">{{ t('ntp.hints.leapSecondDefault') }}</div>
             </div>
           </div>
           <div class="form-row">
-            <label class="form-label">接口</label>
-            <select class="form-control" v-model="config.interface" title="NTP 服务绑定的接口">
-              <option value="">未选择</option>
+            <label class="form-label">{{ t('ntp.labels.interface') }}</label>
+            <select class="form-control" v-model="config.interface" :title="t('ntp.labels.interfaceTitle')">
+              <option value="">{{ t('ntp.labels.notSelected') }}</option>
               <option v-for="iface in interfaces" :key="iface.name" :value="iface.name">{{ iface.name }}</option>
             </select>
           </div>
           <div class="form-row">
-            <label class="form-label" title="NTP 服务监听的本地地址">监听地址</label>
+            <label class="form-label" :title="t('ntp.labels.listenAddressTitle')">{{ t('ntp.labels.listenAddress') }}</label>
             <div style="flex:1;max-width:600px;">
-              <DualListSelector v-model="config.listen_address" :options="localAddresses" title-left="可选" title-right="已选" />
+              <DualListSelector v-model="config.listen_address" :options="localAddresses" :title-left="t('ntp.labels.available')" :title-right="t('ntp.labels.selected')" />
             </div>
           </div>
           <div class="form-row">
-            <label class="form-label" title="允许访问 NTP 服务的客户端地址或网络">允许客户端</label>
+            <label class="form-label" :title="t('ntp.labels.allowClientTitle')">{{ t('ntp.labels.allowClient') }}</label>
             <div style="flex:1;max-width:600px;">
-              <DualListSelector v-model="config.allow_client" :options="ALLOW_CLIENT_OPTIONS" title-left="可选" title-right="已选" />
+              <DualListSelector v-model="config.allow_client" :options="ALLOW_CLIENT_OPTIONS" :title-left="t('ntp.labels.available')" :title-right="t('ntp.labels.selected')" />
             </div>
           </div>
           <div class="form-row">
             <label class="form-label">VRF</label>
-            <input type="text" class="form-control" v-model="config.vrf" placeholder="VRF 名称" title="NTP 服务所属 VRF" />
+            <input type="text" class="form-control" v-model="config.vrf" :placeholder="t('ntp.placeholders.vrfName')" :title="t('ntp.labels.vrfTitle')" />
           </div>
         </template>
-
-        <template #server>
+        <template v-slot:server>
           <DataTable :columns="serverColumns" :data="config.servers" :loading="loading" :disabled="writeDisabled"
                      rowKey="name" :actions="['create', 'edit', 'delete']"
                      @create="createServer" @edit="editServer" @delete="deleteServer" />
         </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="modalVisible" :title="editingIndex >= 0 ? '编辑 NTP 服务器' : '添加 NTP 服务器'" width="500px" @confirm="saveServer">
+      <DraggableModal v-model:visible="modalVisible" :title="editingIndex >= 0 ? t('ntp.modals.editServer') : t('ntp.modals.addServer')" width="500px" @confirm="saveServer">
         <div class="form-row">
-          <label class="form-label">地址</label>
-          <input type="text" class="form-control" v-model="serverForm.name" placeholder="NTP 服务器地址" />
+          <label class="form-label">{{ t('ntp.labels.address') }}</label>
+          <input type="text" class="form-control" v-model="serverForm.name" :placeholder="t('ntp.placeholders.serverAddress')" />
         </div>
         <div class="form-row">
-          <label class="form-label">首选</label>
-          <input type="checkbox" v-model="serverForm.prefer" title="优先使用此服务器" />
+          <label class="form-label">{{ t('ntp.labels.prefer') }}</label>
+          <input type="checkbox" v-model="serverForm.prefer" :title="t('ntp.labels.preferTitle')" />
         </div>
         <div class="form-row">
-          <label class="form-label">不选用</label>
-          <input type="checkbox" v-model="serverForm.noselect" title="不选用此服务器" />
+          <label class="form-label">{{ t('ntp.labels.noselect') }}</label>
+          <input type="checkbox" v-model="serverForm.noselect" :title="t('ntp.labels.noselectTitle')" />
         </div>
         <div class="form-row">
-          <label class="form-label">池</label>
-          <input type="checkbox" v-model="serverForm.pool" title="此地址为 NTP 服务器池" />
+          <label class="form-label">{{ t('ntp.labels.pool') }}</label>
+          <input type="checkbox" v-model="serverForm.pool" :title="t('ntp.labels.poolTitle')" />
         </div>
         <div class="form-row">
           <label class="form-label">NTS</label>
-          <input type="checkbox" v-model="serverForm.nts" title="使用 Network Time Security" />
+          <input type="checkbox" v-model="serverForm.nts" :title="t('ntp.labels.ntsTitle')" />
+        </div>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('ntp.modals.confirmDelete')" width="400px" @confirm="confirmDeleteServer">
+        <div>{{ t('ntp.messages.confirmDeleteServers') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
     </div>

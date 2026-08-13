@@ -1,18 +1,20 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useConfigStore } from '/src/stores/config.js';
 
 const ENCAPSULATION_OPTIONS = [
   { value: 'erspan', label: 'erspan (Encapsulated Remote SPAN)' },
-  { value: 'gre', label: 'gre (Generic Routing Encapsulation - 网络层)' },
-  { value: 'gretap', label: 'gretap (Generic Routing Encapsulation - 数据链路层)' },
+  { value: 'gre', label: 'gre (Generic Routing Encapsulation - Network Layer)' },
+  { value: 'gretap', label: 'gretap (Generic Routing Encapsulation - Data Link Layer)' },
   { value: 'ip6erspan', label: 'ip6erspan (ERSPAN over IPv6)' },
-  { value: 'ip6gre', label: 'ip6gre (GRE over IPv6 - 网络层)' },
-  { value: 'ip6gretap', label: 'ip6gretap (GRE over IPv6 - 数据链路层)' },
+  { value: 'ip6gre', label: 'ip6gre (GRE over IPv6 - Network Layer)' },
+  { value: 'ip6gretap', label: 'ip6gretap (GRE over IPv6 - Data Link Layer)' },
   { value: 'ip6ip6', label: 'ip6ip6 (IPv6 in IPv6)' },
   { value: 'ipip', label: 'ipip (IPv4 in IPv4)' },
   { value: 'ipip6', label: 'ipip6 (IPv4 in IPv6)' },
@@ -20,54 +22,59 @@ const ENCAPSULATION_OPTIONS = [
 ];
 
 const SOURCE_VALIDATION_OPTIONS = [
-  { value: 'strict', label: 'strict (严格反向路径转发 RFC3704)' },
-  { value: 'loose', label: 'loose (宽松反向路径转发 RFC3704)' },
-  { value: 'disable', label: 'disable (无源验证)' },
+  { value: 'strict', label: 'strict (Strict Reverse Path Forwarding RFC3704)' },
+  { value: 'loose', label: 'loose (Loose Reverse Path Forwarding RFC3704)' },
+  { value: 'disable', label: 'disable (No source validation)' },
 ];
 
 const ACCEPT_DAD_OPTIONS = [
-  { value: '0', label: '0 (禁用 DAD)' },
-  { value: '1', label: '1 (启用 DAD - 默认)' },
-  { value: '2', label: '2 (启用 DAD - 发现 MAC 重复时禁用 IPv6)' },
+  { value: '0', label: '0 (Disable DAD)' },
+  { value: '1', label: '1 (Enable DAD)' },
+  { value: '2', label: '2 (Enable DAD, disable if duplicate MAC found)' },
 ];
 
 const ERSPAN_DIRECTION_OPTIONS = [
-  { value: 'ingress', label: 'ingress (镜像入方向流量)' },
-  { value: 'egress', label: 'egress (镜像出方向流量)' },
+  { value: 'ingress', label: 'ingress (Mirror ingress traffic)' },
+  { value: 'egress', label: 'egress (Mirror egress traffic)' },
 ];
 
 const ERSPAN_VERSION_OPTIONS = [
-  { value: '1', label: '1 (ERSPAN Type II - 默认)' },
+  { value: '1', label: '1 (ERSPAN Type II)' },
   { value: '2', label: '2 (ERSPAN Type III)' },
 ];
 
 const TOS_OPTIONS = [
-  { value: 'inherit', label: 'inherit (继承 - 默认)' },
+  { value: 'inherit', label: 'inherit' },
   ...Array.from({ length: 100 }, (_, i) => ({ value: String(i), label: String(i) })),
 ];
 
 const ENCAPLIMIT_OPTIONS = [
-  { value: 'none', label: 'none (禁用封装限制)' },
+  { value: 'none', label: 'none' },
   ...Array.from({ length: 256 }, (_, i) => ({ value: String(i), label: String(i) })),
 ];
 
-const COLUMNS = [
-  { key: 'name', title: '接口名称', width: 120 },
-  { key: 'description', title: '描述', width: 150 },
-  { key: 'encapsulation', title: '封装类型', width: 120 },
-  { key: 'remote', title: '远端地址', width: 150 },
-  { key: 'source_address', title: '源地址', width: 150 },
-  { key: 'source_interface', title: '源接口', width: 120 },
-  { key: 'mtu', title: 'MTU', width: 80 },
-  { key: 'address', title: 'IP 地址', width: 200 },
-  { key: 'disable', title: '禁用', width: 80 },
-  { key: 'actions', title: '操作', width: 120, fixed: 'right' },
-];
+
 
 export default defineComponent({
   name: 'TunnelPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
+    const configStore = useConfigStore();
+    const { t } = inject('i18n');
+
+    const COLUMNS = computed(() => [
+      { key: 'name', title: t('interface.tunnel.name'), width: 120 },
+      { key: 'description', title: t('interface.tunnel.description'), width: 150 },
+      { key: 'encapsulation', title: t('interface.tunnel.encapsulation'), width: 120 },
+      { key: 'remote', title: t('interface.tunnel.remote'), width: 150 },
+      { key: 'source_address', title: t('interface.tunnel.source_address'), width: 150 },
+      { key: 'source_interface', title: t('interface.tunnel.source_interface'), width: 120 },
+      { key: 'mtu', title: t('interface.tunnel.mtu'), width: 80 },
+      { key: 'address', title: t('interface.tunnel.address'), width: 200 },
+      { key: 'disable', title: t('interface.tunnel.disable'), width: 80 },
+      { key: 'actions', title: t('interface.tunnel.actions'), width: 120, fixed: 'right' },
+    ]);
+
     const loading = ref(false);
     const tunnels = ref([]);
     const selected = ref([]);
@@ -77,78 +84,78 @@ export default defineComponent({
     const activeTab = ref('basic');
 
     const schema = computed(() => [
-      { key: 'name', title: '接口名称', type: 'text', required: true, placeholder: '如 tun0, tun1', disabled: !!editingTunnel.value?.name },
-      { key: 'description', title: '描述', type: 'text' },
-      { key: 'encapsulation', title: '封装类型', type: 'select', options: ENCAPSULATION_OPTIONS, required: true },
-      { key: 'remote', title: '远端地址', type: 'text', placeholder: 'IPv4 或 IPv6 地址' },
-      { key: 'source_address', title: '源地址', type: 'text', placeholder: '本地源 IP 地址' },
-      { key: 'source_interface', title: '源接口', type: 'select', options: interfaceOptions.value, placeholder: '选择接口' },
-      { key: 'address', title: 'IP 地址', type: 'textarea', placeholder: '每行一个地址，如 10.0.0.1/24', help: '支持 IPv4/IPv6 地址和前缀' },
-      { key: 'mtu', title: 'MTU', type: 'number', min: 68, max: 16000, placeholder: '默认: 1476', help: '最大传输单元 (68-16000 字节, 默认: 1476)' },
-      { key: '6rd_prefix', title: '6RD 前缀', type: 'text', placeholder: 'IPv6 地址和前缀长度，如 2001:db8::/32' },
-      { key: '6rd_relay_prefix', title: '6RD 中继前缀', type: 'text', placeholder: 'IPv4 前缀，如 192.168.0.0/16' },
-      { key: 'disable', title: '禁用接口', type: 'checkbox' },
-      { key: 'disable_link_detect', title: '忽略链路状态', type: 'checkbox' },
-      { key: 'enable_multicast', title: '启用多播', type: 'checkbox', help: '在隧道上启用多播操作' },
-      { key: 'redirect', title: '重定向目标', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口' },
-      { key: 'vrf', title: 'VRF 实例', type: 'text', placeholder: 'VRF 名称' },
+      { key: 'name', title: t('interface.tunnel.name'), type: 'text', required: true, placeholder: t('interface.tunnel.name_placeholder'), disabled: !!editingTunnel.value?.name },
+      { key: 'description', title: t('interface.tunnel.description'), type: 'text' },
+      { key: 'encapsulation', title: t('interface.tunnel.encapsulation'), type: 'select', options: ENCAPSULATION_OPTIONS, required: true },
+      { key: 'remote', title: t('interface.tunnel.remote'), type: 'text', placeholder: t('interface.tunnel.remote_placeholder') },
+      { key: 'source_address', title: t('interface.tunnel.source_address'), type: 'text', placeholder: t('interface.tunnel.source_address_placeholder') },
+      { key: 'source_interface', title: t('interface.tunnel.source_interface'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.tunnel.source_interface_placeholder') },
+      { key: 'address', title: t('interface.tunnel.address'), type: 'textarea', placeholder: t('interface.tunnel.address_placeholder'), help: t('interface.tunnel.address_help') },
+      { key: 'mtu', title: t('interface.tunnel.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('interface.tunnel.mtu_placeholder'), help: t('interface.tunnel.mtu_help') },
+      { key: '6rd_prefix', title: t('interface.tunnel.6rd_prefix'), type: 'text', placeholder: t('interface.tunnel.6rd_prefix_placeholder') },
+      { key: '6rd_relay_prefix', title: t('interface.tunnel.6rd_relay_prefix'), type: 'text', placeholder: t('interface.tunnel.6rd_relay_prefix_placeholder') },
+      { key: 'disable', title: t('interface.tunnel.disable_interface'), type: 'checkbox' },
+      { key: 'disable_link_detect', title: t('interface.tunnel.disable_link_detect'), type: 'checkbox' },
+      { key: 'enable_multicast', title: t('interface.tunnel.enable_multicast'), type: 'checkbox', help: t('interface.tunnel.enable_multicast_help') },
+      { key: 'redirect', title: t('interface.tunnel.redirect'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.tunnel.redirect_placeholder') },
+      { key: 'vrf', title: t('interface.tunnel.vrf'), type: 'text', placeholder: t('interface.tunnel.vrf_placeholder') },
     ]);
 
     const ipSchema = computed(() => [
-      { key: 'ip_adjust_mss', title: '调整 TCP MSS', type: 'text', placeholder: '536-65535 或 clamp-mss-to-pmtu', help: '自动设置为 PMTU 值或指定字节数' },
-      { key: 'ip_arp_cache_timeout', title: 'ARP 缓存超时', type: 'number', min: 1, max: 86400, placeholder: '默认: 30', help: 'ARP 缓存条目超时时间 (秒)' },
-      { key: 'ip_disable_arp_filter', title: '禁用 ARP 过滤', type: 'checkbox' },
-      { key: 'ip_disable_forwarding', title: '禁用 IP 转发', type: 'checkbox' },
-      { key: 'ip_enable_arp_accept', title: '启用 ARP accept', type: 'checkbox' },
-      { key: 'ip_enable_arp_announce', title: '启用 ARP announce', type: 'checkbox' },
-      { key: 'ip_enable_arp_ignore', title: '启用 ARP ignore', type: 'checkbox' },
-      { key: 'ip_enable_directed_broadcast', title: '启用定向广播转发', type: 'checkbox' },
-      { key: 'ip_enable_proxy_arp', title: '启用 Proxy ARP', type: 'checkbox' },
-      { key: 'ip_proxy_arp_pvlan', title: '启用私有 VLAN Proxy ARP', type: 'checkbox' },
-      { key: 'ip_source_validation', title: '源验证 (uRPF)', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择验证模式' },
+      { key: 'ip_adjust_mss', title: t('interface.tunnel.ip_adjust_mss'), type: 'text', placeholder: t('interface.tunnel.ip_adjust_mss_placeholder'), help: t('interface.tunnel.ip_adjust_mss_help') },
+      { key: 'ip_arp_cache_timeout', title: t('interface.tunnel.ip_arp_cache_timeout'), type: 'number', min: 1, max: 86400, placeholder: t('interface.tunnel.ip_arp_cache_timeout_placeholder'), help: t('interface.tunnel.ip_arp_cache_timeout_help') },
+      { key: 'ip_disable_arp_filter', title: t('interface.tunnel.ip_disable_arp_filter'), type: 'checkbox' },
+      { key: 'ip_disable_forwarding', title: t('interface.tunnel.ip_disable_forwarding'), type: 'checkbox' },
+      { key: 'ip_enable_arp_accept', title: t('interface.tunnel.ip_enable_arp_accept'), type: 'checkbox' },
+      { key: 'ip_enable_arp_announce', title: t('interface.tunnel.ip_enable_arp_announce'), type: 'checkbox' },
+      { key: 'ip_enable_arp_ignore', title: t('interface.tunnel.ip_enable_arp_ignore'), type: 'checkbox' },
+      { key: 'ip_enable_directed_broadcast', title: t('interface.tunnel.ip_enable_directed_broadcast'), type: 'checkbox' },
+      { key: 'ip_enable_proxy_arp', title: t('interface.tunnel.ip_enable_proxy_arp'), type: 'checkbox' },
+      { key: 'ip_proxy_arp_pvlan', title: t('interface.tunnel.ip_proxy_arp_pvlan'), type: 'checkbox' },
+      { key: 'ip_source_validation', title: t('interface.tunnel.ip_source_validation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: t('interface.tunnel.ip_source_validation_placeholder') },
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: '接受 DAD', type: 'select', options: ACCEPT_DAD_OPTIONS, help: '重复地址检测 (默认: 1)' },
-      { key: 'ipv6_address_autoconf', title: '自动配置 (SLAAC)', type: 'checkbox', help: '使用无状态自动配置获取 IPv6 地址' },
-      { key: 'ipv6_address_eui64', title: 'EUI-64 前缀', type: 'text', placeholder: 'IPv6 /64 网络，如 2001:db8::/64' },
-      { key: 'ipv6_no_default_link_local', title: '移除默认链路本地地址', type: 'checkbox' },
-      { key: 'ipv6_adjust_mss', title: '调整 TCP MSS', type: 'text', placeholder: '536-65535 或 clamp-mss-to-pmtu' },
-      { key: 'ipv6_base_reachable_time', title: '基础可达时间', type: 'number', min: 1, max: 86400, placeholder: '默认: 30', help: '基础可达时间 (秒)' },
-      { key: 'ipv6_disable_forwarding', title: '禁用 IPv6 转发', type: 'checkbox' },
-      { key: 'ipv6_dup_addr_detect_transmits', title: 'DAD 探测次数', type: 'number', min: 0, placeholder: '默认: 1', help: '执行 DAD 时发送的 NS 消息数量 (0=禁用)' },
-      { key: 'ipv6_source_validation', title: '源验证 (uRPF)', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择验证模式' },
+      { key: 'ipv6_accept_dad', title: t('interface.tunnel.ipv6_accept_dad'), type: 'select', options: ACCEPT_DAD_OPTIONS, help: t('interface.tunnel.ipv6_accept_dad_help') },
+      { key: 'ipv6_address_autoconf', title: t('interface.tunnel.ipv6_address_autoconf'), type: 'checkbox', help: t('interface.tunnel.ipv6_address_autoconf_help') },
+      { key: 'ipv6_address_eui64', title: t('interface.tunnel.ipv6_address_eui64'), type: 'text', placeholder: t('interface.tunnel.ipv6_address_eui64_placeholder') },
+      { key: 'ipv6_no_default_link_local', title: t('interface.tunnel.ipv6_no_default_link_local'), type: 'checkbox' },
+      { key: 'ipv6_adjust_mss', title: t('interface.tunnel.ipv6_adjust_mss'), type: 'text', placeholder: t('interface.tunnel.ipv6_adjust_mss_placeholder') },
+      { key: 'ipv6_base_reachable_time', title: t('interface.tunnel.ipv6_base_reachable_time'), type: 'number', min: 1, max: 86400, placeholder: t('interface.tunnel.ipv6_base_reachable_time_placeholder'), help: t('interface.tunnel.ipv6_base_reachable_time_help') },
+      { key: 'ipv6_disable_forwarding', title: t('interface.tunnel.ipv6_disable_forwarding'), type: 'checkbox' },
+      { key: 'ipv6_dup_addr_detect_transmits', title: t('interface.tunnel.ipv6_dup_addr_detect_transmits'), type: 'number', min: 0, placeholder: t('interface.tunnel.ipv6_dup_addr_detect_transmits_placeholder'), help: t('interface.tunnel.ipv6_dup_addr_detect_transmits_help') },
+      { key: 'ipv6_source_validation', title: t('interface.tunnel.ipv6_source_validation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: t('interface.tunnel.ipv6_source_validation_placeholder') },
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_ingress', title: '镜像入方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '将入方向流量镜像到指定接口' },
-      { key: 'mirror_egress', title: '镜像出方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '将出方向流量镜像到指定接口' },
+      { key: 'mirror_ingress', title: t('interface.tunnel.mirror_ingress'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.tunnel.mirror_placeholder'), help: t('interface.tunnel.mirror_ingress_help') },
+      { key: 'mirror_egress', title: t('interface.tunnel.mirror_egress'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.tunnel.mirror_placeholder'), help: t('interface.tunnel.mirror_egress_help') },
     ]);
 
     const parametersSchema = computed(() => [
       {
-        key: 'parameters_erspan', title: 'ERSPAN 参数', type: 'group', children: [
-          { key: 'direction', title: '方向', type: 'select', options: ERSPAN_DIRECTION_OPTIONS, placeholder: '选择镜像方向' },
-          { key: 'hw_id', title: '硬件 ID', type: 'number', min: 0, max: 1048575, placeholder: '0-1048575', help: 'ERSPAN 引擎唯一标识符' },
-          { key: 'index', title: '索引', type: 'number', min: 0, max: 63, placeholder: '0-63', help: 'ERSPAN v1 索引字段' },
-          { key: 'version', title: '版本', type: 'select', options: ERSPAN_VERSION_OPTIONS, help: '协议版本 (默认: 1)' },
+        key: 'parameters_erspan', title: t('interface.tunnel.erspan_parameters'), type: 'group', children: [
+          { key: 'direction', title: t('interface.tunnel.erspan_direction'), type: 'select', options: ERSPAN_DIRECTION_OPTIONS, placeholder: t('interface.tunnel.erspan_direction_placeholder') },
+          { key: 'hw_id', title: t('interface.tunnel.erspan_hw_id'), type: 'number', min: 0, max: 1048575, placeholder: '0-1048575', help: t('interface.tunnel.erspan_hw_id_help') },
+          { key: 'index', title: t('interface.tunnel.erspan_index'), type: 'number', min: 0, max: 63, placeholder: '0-63', help: t('interface.tunnel.erspan_index_help') },
+          { key: 'version', title: t('interface.tunnel.erspan_version'), type: 'select', options: ERSPAN_VERSION_OPTIONS, help: t('interface.tunnel.erspan_version_help') },
         ],
       },
       {
-        key: 'parameters_ip', title: 'IPv4 隧道参数', type: 'group', children: [
-          { key: 'ignore_df', title: '忽略 DF 位', type: 'checkbox', help: '忽略 Don\'t Fragment 位' },
-          { key: 'key', title: '隧道密钥', type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: '仅 GRE 隧道' },
-          { key: 'no_pmtu_discovery', title: '禁用 PMTU 发现', type: 'checkbox', help: '禁用路径 MTU 发现' },
-          { key: 'tos', title: 'TOS 值', type: 'select', options: TOS_OPTIONS, placeholder: '选择 TOS 值', help: '出站数据包 TOS 值 (默认: inherit)' },
-          { key: 'ttl', title: 'TTL', type: 'text', placeholder: '0 (继承) 或 1-255', help: '出站数据包 TTL (默认: 64, 0=继承)' },
+        key: 'parameters_ip', title: t('interface.tunnel.ipv4_tunnel_parameters'), type: 'group', children: [
+          { key: 'ignore_df', title: t('interface.tunnel.ignore_df'), type: 'checkbox', help: t('interface.tunnel.ignore_df_help') },
+          { key: 'key', title: t('interface.tunnel.tunnel_key'), type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: t('interface.tunnel.tunnel_key_help') },
+          { key: 'no_pmtu_discovery', title: t('interface.tunnel.no_pmtu_discovery'), type: 'checkbox', help: t('interface.tunnel.no_pmtu_discovery_help') },
+          { key: 'tos', title: t('interface.tunnel.tos_value'), type: 'select', options: TOS_OPTIONS, placeholder: t('interface.tunnel.tos_value_placeholder'), help: t('interface.tunnel.tos_value_help') },
+          { key: 'ttl', title: 'TTL', type: 'text', placeholder: t('interface.tunnel.ttl_placeholder'), help: t('interface.tunnel.ttl_help') },
         ],
       },
       {
-        key: 'parameters_ipv6', title: 'IPv6 隧道参数', type: 'group', children: [
-          { key: 'encaplimit', title: '封装限制', type: 'select', options: ENCAPLIMIT_OPTIONS, placeholder: '选择封装限制', help: '固定封装限制 (默认: 4, none=禁用)' },
-          { key: 'flowlabel', title: '流标签', type: 'text', placeholder: 'inherit 或 0x0-0x0fffff', help: '出站数据包流标签' },
-          { key: 'hoplimit', title: '跳数限制', type: 'number', min: 0, max: 255, placeholder: '0-255', help: '跳数限制 (默认: 64)' },
-          { key: 'tclass', title: '流量类别', type: 'text', placeholder: 'inherit 或 0x0-0x0fffff', help: '流量类别 (默认: inherit)' },
+        key: 'parameters_ipv6', title: t('interface.tunnel.ipv6_tunnel_parameters'), type: 'group', children: [
+          { key: 'encaplimit', title: t('interface.tunnel.encaplimit'), type: 'select', options: ENCAPLIMIT_OPTIONS, placeholder: t('interface.tunnel.encaplimit_placeholder'), help: t('interface.tunnel.encaplimit_help') },
+          { key: 'flowlabel', title: t('interface.tunnel.flowlabel'), type: 'text', placeholder: t('interface.tunnel.flowlabel_placeholder'), help: t('interface.tunnel.flowlabel_help') },
+          { key: 'hoplimit', title: t('interface.tunnel.hoplimit'), type: 'number', min: 0, max: 255, placeholder: '0-255', help: t('interface.tunnel.hoplimit_help') },
+          { key: 'tclass', title: t('interface.tunnel.tclass'), type: 'text', placeholder: t('interface.tunnel.tclass_placeholder'), help: t('interface.tunnel.tclass_help') },
         ],
       },
     ]);
@@ -156,31 +163,30 @@ export default defineComponent({
     // Dynamic tabs based on encapsulation type
     const modalTabs = computed(() => {
       const encap = editingTunnel.value?.encapsulation || '';
-      const tabs = [{ key: 'basic', title: '基本配置' }];
+      const tabs = [{ key: 'basic', title: t('interface.tunnel.basic_config') }];
 
       // ERSPAN related encapsulations
       if (encap === 'erspan' || encap === 'ip6erspan') {
-        tabs.push({ key: 'erspan', title: 'ERSPAN 参数' });
+        tabs.push({ key: 'erspan', title: t('interface.tunnel.erspan_parameters') });
       }
 
       // IPv4 tunnel parameters (for IPv4-based encapsulations)
       const ipv4Encaps = ['gre', 'gretap', 'ipip', 'ipip6', 'sit'];
       if (ipv4Encaps.includes(encap)) {
-        tabs.push({ key: 'ipParams', title: 'IPv4 隧道参数' });
+        tabs.push({ key: 'ipParams', title: t('interface.tunnel.ipv4_tunnel_parameters') });
       }
 
       // IPv6 tunnel parameters (for IPv6-based encapsulations)
       const ipv6Encaps = ['ip6gre', 'ip6gretap', 'ip6ip6'];
       if (ipv6Encaps.includes(encap)) {
-        tabs.push({ key: 'ipv6Params', title: 'IPv6 隧道参数' });
+        tabs.push({ key: 'ipv6Params', title: t('interface.tunnel.ipv6_tunnel_parameters') });
       }
 
       // Always show these tabs
       tabs.push(
-        { key: 'ip', title: 'IPv4 参数' },
-        { key: 'ipv6', title: 'IPv6 参数' },
-        { key: 'mirror', title: '流量镜像' },
-        { key: 'preview', title: '命令预览' }
+        { key: 'ip', title: t('interface.tunnel.ipv4_params') },
+        { key: 'ipv6', title: t('interface.tunnel.ipv6_params') },
+        { key: 'mirror', title: t('interface.tunnel.mirror_traffic') }
       );
 
       return tabs;
@@ -188,40 +194,40 @@ export default defineComponent({
 
     const commandText = computed(() => {
       if (!editingTunnel.value) return '';
-      const t = editingTunnel.value;
+      const tunnel = editingTunnel.value;
       const cmds = [];
-      const base = `set interfaces tunnel ${t.name}`;
-      if (t.description) cmds.push(`${base} description ${t.description}`);
-      if (t.encapsulation) cmds.push(`${base} encapsulation ${t.encapsulation}`);
-      if (t.remote) cmds.push(`${base} remote ${t.remote}`);
-      if (t.source_address) cmds.push(`${base} source-address ${t.source_address}`);
-      if (t.source_interface) cmds.push(`${base} source-interface ${t.source_interface}`);
-      if (t.address) {
-        const addrs = t.address.split('\n').filter(Boolean);
+      const base = `set interfaces tunnel ${tunnel.name}`;
+      if (tunnel.description) cmds.push(`${base} description ${tunnel.description}`);
+      if (tunnel.encapsulation) cmds.push(`${base} encapsulation ${tunnel.encapsulation}`);
+      if (tunnel.remote) cmds.push(`${base} remote ${tunnel.remote}`);
+      if (tunnel.source_address) cmds.push(`${base} source-address ${tunnel.source_address}`);
+      if (tunnel.source_interface) cmds.push(`${base} source-interface ${tunnel.source_interface}`);
+      if (tunnel.address) {
+        const addrs = tunnel.address.split('\n').filter(Boolean);
         addrs.forEach(addr => cmds.push(`${base} address ${addr.trim()}`));
       }
-      if (t.mtu) cmds.push(`${base} mtu ${t.mtu}`);
-      if (t['6rd_prefix']) cmds.push(`${base} 6rd-prefix ${t['6rd_prefix']}`);
-      if (t['6rd_relay_prefix']) cmds.push(`${base} 6rd-relay-prefix ${t['6rd_relay_prefix']}`);
-      if (t.disable) cmds.push(`${base} disable`);
-      if (t.disable_link_detect) cmds.push(`${base} disable-link-detect`);
-      if (t.enable_multicast) cmds.push(`${base} enable-multicast`);
-      if (t.redirect) cmds.push(`${base} redirect ${t.redirect}`);
-      if (t.vrf) cmds.push(`${base} vrf ${t.vrf}`);
+      if (tunnel.mtu) cmds.push(`${base} mtu ${tunnel.mtu}`);
+      if (tunnel['6rd_prefix']) cmds.push(`${base} 6rd-prefix ${tunnel['6rd_prefix']}`);
+      if (tunnel['6rd_relay_prefix']) cmds.push(`${base} 6rd-relay-prefix ${tunnel['6rd_relay_prefix']}`);
+      if (tunnel.disable) cmds.push(`${base} disable`);
+      if (tunnel.disable_link_detect) cmds.push(`${base} disable-link-detect`);
+      if (tunnel.enable_multicast) cmds.push(`${base} enable-multicast`);
+      if (tunnel.redirect) cmds.push(`${base} redirect ${tunnel.redirect}`);
+      if (tunnel.vrf) cmds.push(`${base} vrf ${tunnel.vrf}`);
 
       // Mirror
-      if (t.mirror_ingress) cmds.push(`${base} mirror ingress ${t.mirror_ingress}`);
-      if (t.mirror_egress) cmds.push(`${base} mirror egress ${t.mirror_egress}`);
+      if (tunnel.mirror_ingress) cmds.push(`${base} mirror ingress ${tunnel.mirror_ingress}`);
+      if (tunnel.mirror_egress) cmds.push(`${base} mirror egress ${tunnel.mirror_egress}`);
 
       // Parameters - ERSPAN
-      const erspan = t.parameters_erspan || {};
+      const erspan = tunnel.parameters_erspan || {};
       if (erspan.direction) cmds.push(`${base} parameters erspan direction ${erspan.direction}`);
       if (erspan.hw_id !== '' && erspan.hw_id !== null && erspan.hw_id !== undefined) cmds.push(`${base} parameters erspan hw-id ${erspan.hw_id}`);
       if (erspan.index !== '' && erspan.index !== null && erspan.index !== undefined) cmds.push(`${base} parameters erspan index ${erspan.index}`);
       if (erspan.version && erspan.version !== '1') cmds.push(`${base} parameters erspan version ${erspan.version}`);
 
       // Parameters - IP
-      const ipParams = t.parameters_ip || {};
+      const ipParams = tunnel.parameters_ip || {};
       if (ipParams.ignore_df) cmds.push(`${base} parameters ip ignore-df`);
       if (ipParams.key !== '' && ipParams.key !== null && ipParams.key !== undefined) cmds.push(`${base} parameters ip key ${ipParams.key}`);
       if (ipParams.no_pmtu_discovery) cmds.push(`${base} parameters ip no-pmtu-discovery`);
@@ -229,7 +235,7 @@ export default defineComponent({
       if (ipParams.ttl && ipParams.ttl !== '') cmds.push(`${base} parameters ip ttl ${ipParams.ttl}`);
 
       // Parameters - IPv6
-      const ipv6Params = t.parameters_ipv6 || {};
+      const ipv6Params = tunnel.parameters_ipv6 || {};
       if (ipv6Params.encaplimit && ipv6Params.encaplimit !== '4') cmds.push(`${base} parameters ipv6 encaplimit ${ipv6Params.encaplimit}`);
       if (ipv6Params.flowlabel) cmds.push(`${base} parameters ipv6 flowlabel ${ipv6Params.flowlabel}`);
       if (ipv6Params.hoplimit !== '' && ipv6Params.hoplimit !== null && ipv6Params.hoplimit !== undefined) cmds.push(`${base} parameters ipv6 hoplimit ${ipv6Params.hoplimit}`);
@@ -419,7 +425,7 @@ export default defineComponent({
           label: iface.name || iface
         }));
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('common.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -482,41 +488,47 @@ export default defineComponent({
 
     async function save() {
       if (!editingTunnel.value.name) {
-        showError('请输入接口名称');
+        showError(t('interface.tunnel.nameRequired'));
         return;
       }
       if (!editingTunnel.value.encapsulation) {
-        showError('请选择封装类型');
+        showError(t('interface.tunnel.encapsulationRequired'));
         return;
       }
       const config = formToTunnel(editingTunnel.value);
       try {
         await configApi.set(`interfaces tunnel ${editingTunnel.value.name}`, config);
+        configStore.markPending();
         modalVisible.value = false;
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('common.saveFailed'));
       }
     }
 
     async function remove() {
       if (selected.value.length === 0) {
-        showError('请选择要删除的隧道');
+        showError(t('interface.tunnel.selectTunnelFirst'));
         return;
       }
       const names = selected.value.map(s => s.name);
       try {
         await Promise.all(names.map(name => configApi.delete(`interfaces tunnel ${name}`)));
+        configStore.markPending();
         selected.value = [];
         await load();
       } catch (e) {
-        showError(e.message || '删除失败');
+        showError(e.message || t('common.deleteFailed'));
       }
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
-    return {
+    return {t,
+      
       loading, tunnels, selected, modalVisible, editingTunnel, interfaceOptions, activeTab,
       COLUMNS,
       schema, ipSchema, ipv6Schema, mirrorSchema, parametersSchema, commandText, modalTabs,
@@ -541,19 +553,19 @@ export default defineComponent({
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'disable'">
             <span :class="record.disable ? 'badge badge-danger' : 'badge badge-success'">
-              {{ record.disable ? '是' : '否' }}
+              {{ record.disable ? t('common.yes') : t('common.no') }}
             </span>
           </template>
           <template v-if="column.key === 'actions'">
-            <a @click="openModal(tunnels.indexOf(record))">编辑</a>
-            <a @click="selected = [record]; remove()" style="color: #ff4d4f; margin-left: 8px;">删除</a>
+            <a @click="openModal(tunnels.indexOf(record))">{{ t('common.edit') }}</a>
+            <a @click="selected = [record]; remove()" style="color: #ff4d4f; margin-left: 8px;">{{ t('common.delete') }}</a>
           </template>
         </template>
       </DataTable>
 
       <DraggableModal
         v-model:visible="modalVisible"
-        :title="editingTunnel?.name ? '编辑隧道接口' : '创建隧道接口'"
+        :title="editingTunnel?.name ? t('interface.tunnel.editTunnelInterface') : t('interface.tunnel.createTunnelInterface')"
         width="800px"
         @confirm="save"
       >
@@ -563,13 +575,13 @@ export default defineComponent({
               <ConfigForm v-model="editingTunnel" :schema="schema" />
             </template>
             <template #erspan>
-              <ConfigForm v-model="editingTunnel" :schema="[{ key: 'parameters_erspan', title: 'ERSPAN 参数', type: 'group', children: parametersSchema[0].children }]" />
+              <ConfigForm v-model="editingTunnel" :schema="[{ key: 'parameters_erspan', title: t('interface.tunnel.erspan_parameters'), type: 'group', children: parametersSchema[0].children }]" />
             </template>
             <template #ipParams>
-              <ConfigForm v-model="editingTunnel" :schema="[{ key: 'parameters_ip', title: 'IPv4 隧道参数', type: 'group', children: parametersSchema[1].children }]" />
+              <ConfigForm v-model="editingTunnel" :schema="[{ key: 'parameters_ip', title: t('interface.tunnel.ipv4_tunnel_parameters'), type: 'group', children: parametersSchema[1].children }]" />
             </template>
             <template #ipv6Params>
-              <ConfigForm v-model="editingTunnel" :schema="[{ key: 'parameters_ipv6', title: 'IPv6 隧道参数', type: 'group', children: parametersSchema[2].children }]" />
+              <ConfigForm v-model="editingTunnel" :schema="[{ key: 'parameters_ipv6', title: t('interface.tunnel.ipv6_tunnel_parameters'), type: 'group', children: parametersSchema[2].children }]" />
             </template>
             <template #ip>
               <ConfigForm v-model="editingTunnel" :schema="ipSchema" />
@@ -579,9 +591,6 @@ export default defineComponent({
             </template>
             <template #mirror>
               <ConfigForm v-model="editingTunnel" :schema="mirrorSchema" />
-            </template>
-            <template #preview>
-              <pre style="background: #f5f5f5; padding: 12px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap;">{{ commandText }}</pre>
             </template>
           </TabGroup>
         </div>

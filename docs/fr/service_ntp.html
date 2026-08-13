@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="ntp">
+<h1>NTP</h1>
+<p><abbr>NTP (Network Time Protocol</abbr>) est un protocole réseau pour la synchronisation des horloges entre les systèmes informatiques sur des réseaux de données à commutation de paquets et à latence variable. En fonctionnement depuis avant 1985, le NTP est l'un des protocoles Internet les plus anciens en usage actuel.</p>
+<p>Le NTP vise à synchroniser tous les ordinateurs participants à quelques millisecondes près de <abbr title="Coordinated Universal Time">UTC</abbr>. Il utilise l'algorithme d'intersection, une version modifiée de l'algorithme de Marzullo, pour sélectionner des serveurs de temps précis et est conçu pour atténuer les effets de la latence réseau variable. Le NTP peut généralement maintenir le temps à quelques dizaines de millisecondes près sur Internet public, et peut atteindre une précision supérieure à une milliseconde dans les réseaux locaux sous conditions idéales. Les itinéraires asymétriques et la congestion du réseau peuvent causer des erreurs de 100 ms ou plus.</p>
+<p>Le protocole est généralement décrit en termes d'un modèle client-serveur, mais peut également être utilisé facilement dans des relations pair à pair où chaque pair considère l'autre comme une source potentielle de temps. Les implémentations envoient et reçoivent des horodatages en utilisant <abbr title="User Datagram Protocol">UDP</abbr> sur le numéro de port 123.</p>
+<p>Le NTP fournit un avertissement en cas de correction d'une seconde intercalaire imminente, mais ne transmet aucune information sur les fuseaux horaires locaux ou l'heure d'été.</p>
+<p>Le protocole actuel est la version 4 (NTPv4), qui est une norme proposée telle qu'elle est documentée dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5905.html"><strong>RFC 5905</strong></a>. Il est compatible avec la version 3, spécifiée dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1305.html"><strong>RFC 1305</strong></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Remarque</p>
+<p>VyOS 1.4 utilise chrony au lieu de ntpd (voir <a class="reference external" href="https://vyos.dev/T3008">T3008</a>) qui ne prendra plus en charge les demandes anonymes NTP comme dans VyOS 1.3. Toutes les configurations seront migrées pour conserver la fonctionnalité anonyme. Pour les nouveaux déploiements, si vous avez des clients utilisant votre installation VyOS comme serveur NTP, vous devez spécifier la directive <code class="docutils literal notranslate">allow-client</code>.</p>
+</div>
+<section id="configuration">
+<h2>Configuration</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ntp server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez un ou plusieurs serveurs pour la synchronisation. Le nom du serveur peut être soit une adresse IP, soit un <abbr title="Fully Qualified Domain Name">FQDN</abbr>.</p>
+<p>Il y a 3 serveurs NTP par défaut configurés. Vous pouvez les modifier.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">time1.vyos.net</code></p></li>
+<li><p><code class="docutils literal notranslate">time2.vyos.net</code></p></li>
+<li><p><code class="docutils literal notranslate">time3.vyos.net</code></p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ntp server &lt;address&gt; &lt;noselect | nts | pool | prefer | ptp | interleave&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-server-address-noselect-nts-pool-prefer-ptp-interleave" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez un ou plusieurs attributs pour le serveur NTP donné.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">noselect</code> marque le serveur comme non utilisé, sauf pour des raisons d'affichage. Le serveur est écarté par l'algorithme de sélection.</p></li>
+<li><p><code class="docutils literal notranslate">nts</code> active la sécurité du temps réseau (NTS) pour le serveur tel que spécifié dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc8915.html"><strong>RFC 8915</strong></a></p></li>
+<li><p><code class="docutils literal notranslate">pool</code> mobilise le mode client persistant avec un nombre de serveurs distants.</p></li>
+<li><p><code class="docutils literal notranslate">prefer</code> marque le serveur comme préféré. Toutes choses étant égales par ailleurs, cet hôte sera choisi pour la synchronisation parmi un ensemble d'hôtes correctement opérationnels.</p></li>
+<li><p><code class="docutils literal notranslate">ptp</code> active le transport PTP pour ce serveur (voir <a class="reference internal" href="#ptp-transport">Transport PTP des paquets NTP</a>).</p></li>
+<li><p><code class="docutils literal notranslate">interleave</code> active le mode NTP intercalé (voir <a class="reference external" href="https://datatracker.ietf.org/doc/draft-ietf-ntp-interleaved-modes/07/">draft-ntp-interleaved-modes</a>), ce qui peut améliorer la précision et la stabilité de la synchronisation lorsqu'elle est prise en charge par les deux parties.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ntp listen-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-listen-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Le processus NTP n'écoute que sur l'adresse IP spécifiée. Vous devez spécifier <code class="docutils literal notranslate">&lt;address&gt;</code> et éventuellement les clients autorisés. Plusieurs adresses d'écoute pour la même famille IP ne sont plus prises en charge. Une seule adresse IPv4 et une seule adresse IPv6 peuvent être configurées, en utilisant des commandes séparées pour chacune.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ntp allow-client address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-allow-client-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Liste des réseaux ou adresses de clients autorisés à contacter ce serveur NTP.</p>
+<p>Plusieurs réseaux/adresses IP de clients peuvent être configurés.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ntp vrf &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Spécifiez le nom de l'instance <abbr title="Virtual Routing and Forwarding">VRF</abbr>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ntp leap-second [ignore|smear|system|timezone]
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-leap-second-ignore-smear-system-timezone" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définissez comment gérer les secondes intercalaires.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">ignore</code>: Aucune correction n'est appliquée à l'horloge pour la seconde intercalaire. L'horloge sera corrigée ultérieurement pendant l'exploitation normale lorsque de nouvelles mesures seront effectuées et que l'écart estimé inclura l'erreur d'une seconde.</p></li>
+<li><p><code class="docutils literal notranslate">smear</code>: Lors de la mise en œuvre d'une seconde intercalaire, le statut de la seconde intercalaire est supprimé sur le serveur et le temps servi est corrigé lentement par glissement au lieu de saut. Les clients n'ont pas besoin de configuration particulière car ils ne savent pas qu'il y a une seconde intercalaire et suivent le temps du serveur qui finit par les ramener à UTC. Il faut faire attention à s'assurer qu'ils utilisent uniquement des serveurs NTP qui mettent en œuvre la seconde intercalaire exactement de la même manière pour la synchronisation.</p></li>
+<li><p><code class="docutils literal notranslate">system</code>: Lors de l'insertion d'une seconde intercalaire, le noyau fait reculer l'horloge système de une seconde lorsqu'elle atteint 00:00:00 UTC. Lors de la suppression d'une seconde intercalaire, il fait avancer l'horloge de une seconde lorsqu'elle atteint 23:59:59 UTC.</p></li>
+<li><p><code class="docutils literal notranslate">timezone</code>: Cette directive spécifie un fuseau horaire dans la base de données de fuseaux horaires du système que chronyd peut utiliser pour déterminer quand aura lieu la prochaine seconde intercalaire et quel est le décalage actuel entre TAI et UTC. Il vérifiera périodiquement si 23:59:59 et 23:59:60 sont des heures valides dans le fuseau horaire. Cela fonctionne normalement avec le fuseau horaire right/UTC qui est le par défaut</p></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="hardware-timestamping-of-ntp-packets">
+<h2>Horodatage matériel des paquets NTP</h2>
+<p>Le démon chrony sur VyOS peut exploiter les capacités matérielles des cartes réseau pour enregistrer le moment exact où les paquets sont reçus sur l'interface, ainsi que le moment où les paquets ont été réellement transmis. Cela offre une meilleure précision et stabilité lorsque le système est chargé, car la file d'attente et le changement de contexte du système d'exploitation peuvent introduire un délai variable entre le moment où le paquet est reçu sur le réseau et le moment où il est traité par le démon NTP.</p>
+<p>L'horodatage matériel dépend du support de la carte réseau. Certaines cartes réseau peuvent être configurées pour appliquer des horodatages à tout paquet entrant, tandis que d'autres ne prennent en charge que l'application d'horodatages à des protocoles spécifiques (par exemple, PTP).</p>
+<p>Lorsque l'horodatage est activé sur une interface, le comportement par défaut de chrony est d'essayer de configurer l'interface pour n'horodater que les paquets NTP. Si ce mode n'est pas pris en charge, chrony essaiera de le configurer pour horodater tous les paquets. Si aucun des deux modes n'est pris en charge (par exemple, si la carte réseau ne peut horodater que les paquets PTP reçus), chrony utilisera uniquement l'horodatage des paquets transmis, ce qui apporte encore certains bénéfices.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ntp timestamp interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-timestamp-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configure l'horodatage matériel sur l'interface &lt;interface&gt;. La valeur spéciale <code class="docutils literal notranslate">all</code> peut également être spécifiée pour activer l'horodatage sur toutes les interfaces qui le supportent.</p>
+<p>Configurez le comportement de l'horodatage avec l'option suivante :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">receive-filter [all|ntp|ptp|none]</code> sélectionne le mode de filtre d'entrée, qui contrôle quels paquets entrants la carte réseau applique des horodatages. Le mode sélectionné doit être pris en charge par la carte réseau, sinon l'horodatage sera désactivé pour l'interface.</p></li>
+</ul>
+</div>
+</div>
+<p>Les modes suivants de <code class="docutils literal notranslate">receive-filter</code> peuvent être sélectionnés :</p>
+<ul class="simple">
+<li><p><em>all</em>: Tous les paquets reçus seront horodatés.</p></li>
+<li><p><em>ntp</em>: Seuls les paquets du protocole NTP seront horodatés.</p></li>
+<li><p><em>ptp</em>: Seuls les paquets du protocole PTP seront horodatés. Combiné avec le transport PTP pour les paquets NTP, cela peut être utilisé pour tirer parti de l'horodatage matériel sur les cartes réseau qui ne prennent en charge que le mode de filtre PTP.</p></li>
+<li><p><em>none</em>: Aucun paquet reçu ne sera horodaté. L'horodatage des paquets transmis sera toujours utilisé, si la carte réseau le supporte.</p></li>
+</ul>
+</section>
+<section id="ptp-transport-of-ntp-packets">
+<h2>Transport PTP des paquets NTP</h2>
+<p>Le protocole de temps précis (IEEE 1588) est un protocole de synchronisation de l'heure sur un réseau local qui fournit une synchronisation haute précision de l'heure en exploitant les horloges matérielles des cartes réseau et d'autres éléments réseau. VyOS ne prend pas en charge actuellement le PTP basé sur les normes, qui peut être déployé indépendamment du NTP.</p>
+<p>Pour les réseaux composés de VyOS et d'autres systèmes Linux exécutant des versions récentes du démon chrony, les paquets NTP peuvent être « tunnélisés » via PTP. Le NTP sur PTP offre le meilleur des deux mondes, en exploitant le support matériel pour l'horodatage des paquets PTP tout en conservant la flexibilité de configuration et la tolérance aux pannes du NTP.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ntp ptp
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-ptp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Active le transport PTP du démon NTP. Le démon NTP écoutera sur le port PTP configuré. Notez qu'un ou plusieurs serveurs doivent être individuellement activés pour PTP avant que le démon ne puisse synchroniser via le transport.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ntp ptp port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-ptp-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configure le port PTP. Par défaut, le port standard 319 est utilisé.</p>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

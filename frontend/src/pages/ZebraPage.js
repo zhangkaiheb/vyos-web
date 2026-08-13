@@ -5,6 +5,7 @@ import DataTable from '/src/components/Table/DataTable.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import HelpButton from '/src/components/Layout/HelpButton.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function isSeparator(line) {
   return /^\s*-+(\s+-+)*\s*$/.test(line);
@@ -107,6 +108,7 @@ function parseDplane(output) {
 export default defineComponent({
   name: 'ZebraPage',
   setup() {
+    const { t } = useI18n();
     const loading = ref(false);
     const activeTab = ref('overview');
 
@@ -119,33 +121,33 @@ export default defineComponent({
     const routerRows = ref([]);
 
     const tabs = [
-      { key: 'overview', title: '概览' },
-      { key: 'clients', title: '客户端' },
-      { key: 'dplane', title: '数据平面' },
-      { key: 'router', title: '路由表摘要' },
+      { key: 'overview', title: t('zebra.tabs.overview') },
+      { key: 'clients', title: t('zebra.tabs.clients') },
+      { key: 'dplane', title: t('zebra.tabs.dplane') },
+      { key: 'router', title: t('zebra.tabs.router') },
     ];
 
     const infoColumns = [
-      { key: 'key', title: '项目' },
-      { key: 'value', title: '值' },
+      { key: 'key', title: t('zebra.columns.key') },
+      { key: 'value', title: t('zebra.columns.value') },
     ];
 
     const clientColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'connect_time', title: '连接时间' },
-      { key: 'last_read', title: '最后读取' },
-      { key: 'last_write', title: '最后写入' },
-      { key: 'ipv4_routes', title: 'IPv4 路由' },
-      { key: 'ipv6_routes', title: 'IPv6 路由' },
+      { key: 'name', title: t('zebra.columns.name') },
+      { key: 'connect_time', title: t('zebra.columns.connectTime') },
+      { key: 'last_read', title: t('zebra.columns.lastRead') },
+      { key: 'last_write', title: t('zebra.columns.lastWrite') },
+      { key: 'ipv4_routes', title: t('zebra.columns.ipv4Routes') },
+      { key: 'ipv6_routes', title: t('zebra.columns.ipv6Routes') },
     ];
 
     const vrfColumns = [
       { key: 'vrf', title: 'VRF' },
-      { key: 'route_installs', title: '路由安装' },
-      { key: 'route_removals', title: '路由删除' },
-      { key: 'neighbor_updates', title: '邻居更新' },
-      { key: 'lsp_installs', title: 'LSP 安装' },
-      { key: 'lsp_removals', title: 'LSP 删除' },
+      { key: 'route_installs', title: t('zebra.columns.routeInstalls') },
+      { key: 'route_removals', title: t('zebra.columns.routeRemovals') },
+      { key: 'neighbor_updates', title: t('zebra.columns.neighborUpdates') },
+      { key: 'lsp_installs', title: t('zebra.columns.lspInstalls') },
+      { key: 'lsp_removals', title: t('zebra.columns.lspRemovals') },
     ];
 
     const routerColumns = [
@@ -193,6 +195,7 @@ export default defineComponent({
     onMounted(load);
 
     return {
+      t,
       loading,
       activeTab,
       tabs,
@@ -213,16 +216,16 @@ export default defineComponent({
     <div class="page-container">
       <div class="toolbar toolbar-compact">
         <div class="toolbar-left">
-          <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+          <ToolbarButton icon="refresh" @click="load">{{ t('zebra.buttons.refresh') }}</ToolbarButton>
           <HelpButton routePath="/monitor/network/zebra" />
         </div>
       </div>
       <TabGroup v-model="activeTab" :tabs="tabs">
         <template #overview>
           <div class="zebra-overview">
-            <h4>基本信息</h4>
+            <h4>{{ t('zebra.sections.basicInfo') }}</h4>
             <DataTable :columns="infoColumns" :data="overviewInfo" :selectable="false" :actions="[]" rowKey="key" />
-            <h4>VRF 统计</h4>
+            <h4>{{ t('zebra.sections.vrfStats') }}</h4>
             <DataTable :columns="vrfColumns" :data="overviewVrf" :selectable="false" :actions="[]" rowKey="id" />
           </div>
         </template>

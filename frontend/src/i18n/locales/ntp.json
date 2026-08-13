@@ -1,0 +1,443 @@
+{
+  "zh-CN": {
+    "ntp": {
+      "columns": {
+        "address": "地址",
+        "noselect": "不选择",
+        "pool": "地址池",
+        "prefer": "优先"
+      },
+      "hints": {
+        "leapSecondDefault": "闰秒默认值"
+      },
+      "labels": {
+        "address": "地址",
+        "allowClient": "允许客户端",
+        "allowClientTitle": "允许客户端",
+        "available": "可用",
+        "interface": "接口",
+        "interfaceTitle": "接口",
+        "leapSecond": "闰秒",
+        "leapSecondTitle": "闰秒",
+        "listenAddress": "监听地址",
+        "listenAddressTitle": "监听地址",
+        "noselect": "不选择",
+        "noselectTitle": "不选择",
+        "notSelected": "未选择",
+        "ntsTitle": "NTS",
+        "pool": "地址池",
+        "poolTitle": "地址池",
+        "prefer": "优先",
+        "preferTitle": "优先",
+        "selected": "已选择",
+        "vrfTitle": "VRF"
+      },
+      "messages": {
+        "confirmDeleteServers": "确认删除选中的服务器？",
+        "saved": "已保存"
+      },
+      "modals": {
+        "addServer": "添加服务器",
+        "confirmDelete": "确认删除",
+        "editServer": "编辑服务器"
+      },
+      "placeholders": {
+        "serverAddress": "服务器地址",
+        "vrfName": "VRF 名称"
+      },
+      "tabs": {
+        "basic": "基本设置",
+        "server": "服务器"
+      },
+      "validation": {
+        "addressAlreadyExists": "地址已存在",
+        "enterServerAddress": "请输入服务器地址",
+        "ipFormat": "IP 格式不正确",
+        "ipOrPrefixFormat": "IP 或前缀格式不正确",
+        "ipv4Format": "IPv4 格式不正确",
+        "ipv4PrefixRange": "IPv4 前缀范围不正确",
+        "ipv6Format": "IPv6 格式不正确",
+        "ipv6PrefixRange": "IPv6 前缀范围不正确",
+        "prefixMustBeNumber": "前缀必须为数字"
+      }
+    }
+  },
+  "en": {
+    "ntp": {
+      "columns": {
+        "address": "Address",
+        "noselect": "Noselect",
+        "pool": "Pool",
+        "prefer": "Prefer"
+      },
+      "hints": {
+        "leapSecondDefault": "Leap Second Default"
+      },
+      "labels": {
+        "address": "Address",
+        "allowClient": "Allow Client",
+        "allowClientTitle": "Allow Client Title",
+        "available": "Available",
+        "interface": "Interface",
+        "interfaceTitle": "Interface Title",
+        "leapSecond": "Leap Second",
+        "leapSecondTitle": "Leap Second Title",
+        "listenAddress": "Listen Address",
+        "listenAddressTitle": "Listen Address Title",
+        "noselect": "Noselect",
+        "noselectTitle": "Noselect Title",
+        "notSelected": "Not Selected",
+        "ntsTitle": "Nts Title",
+        "pool": "Pool",
+        "poolTitle": "Pool Title",
+        "prefer": "Prefer",
+        "preferTitle": "Prefer Title",
+        "selected": "Selected",
+        "vrfTitle": "Vrf Title"
+      },
+      "messages": {
+        "confirmDeleteServers": "Confirm Delete Servers",
+        "saved": "Saved"
+      },
+      "modals": {
+        "addServer": "Add Server",
+        "confirmDelete": "Confirm Delete",
+        "editServer": "Edit Server"
+      },
+      "placeholders": {
+        "serverAddress": "Server Address",
+        "vrfName": "Vrf Name"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "server": "Server"
+      },
+      "validation": {
+        "addressAlreadyExists": "Address Already Exists",
+        "enterServerAddress": "Enter Server Address",
+        "ipFormat": "Ip Format",
+        "ipOrPrefixFormat": "Ip Or Prefix Format",
+        "ipv4Format": "Ipv4 Format",
+        "ipv4PrefixRange": "Ipv4 Prefix Range",
+        "ipv6Format": "Ipv6 Format",
+        "ipv6PrefixRange": "Ipv6 Prefix Range",
+        "prefixMustBeNumber": "Prefix Must Be Number"
+      }
+    }
+  },
+  "zh-TW": {
+    "ntp": {
+      "columns": {
+        "address": "Address",
+        "noselect": "Noselect",
+        "pool": "Pool",
+        "prefer": "Prefer"
+      },
+      "hints": {
+        "leapSecondDefault": "Leap Second Default"
+      },
+      "labels": {
+        "address": "Address",
+        "allowClient": "Allow Client",
+        "allowClientTitle": "Allow Client Title",
+        "available": "Available",
+        "interface": "Interface",
+        "interfaceTitle": "Interface Title",
+        "leapSecond": "Leap Second",
+        "leapSecondTitle": "Leap Second Title",
+        "listenAddress": "Listen Address",
+        "listenAddressTitle": "Listen Address Title",
+        "noselect": "Noselect",
+        "noselectTitle": "Noselect Title",
+        "notSelected": "Not Selected",
+        "ntsTitle": "Nts Title",
+        "pool": "Pool",
+        "poolTitle": "Pool Title",
+        "prefer": "Prefer",
+        "preferTitle": "Prefer Title",
+        "selected": "Selected",
+        "vrfTitle": "Vrf Title"
+      },
+      "messages": {
+        "confirmDeleteServers": "Confirm Delete Servers",
+        "saved": "Saved"
+      },
+      "modals": {
+        "addServer": "Add Server",
+        "confirmDelete": "Confirm Delete",
+        "editServer": "Edit Server"
+      },
+      "placeholders": {
+        "serverAddress": "Server Address",
+        "vrfName": "Vrf Name"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "server": "Server"
+      },
+      "validation": {
+        "addressAlreadyExists": "Address Already Exists",
+        "enterServerAddress": "Enter Server Address",
+        "ipFormat": "Ip Format",
+        "ipOrPrefixFormat": "Ip Or Prefix Format",
+        "ipv4Format": "Ipv4 Format",
+        "ipv4PrefixRange": "Ipv4 Prefix Range",
+        "ipv6Format": "Ipv6 Format",
+        "ipv6PrefixRange": "Ipv6 Prefix Range",
+        "prefixMustBeNumber": "Prefix Must Be Number"
+      }
+    }
+  },
+  "ru": {
+    "ntp": {
+      "columns": {
+        "address": "Address",
+        "noselect": "Noselect",
+        "pool": "Pool",
+        "prefer": "Prefer"
+      },
+      "hints": {
+        "leapSecondDefault": "Leap Second Default"
+      },
+      "labels": {
+        "address": "Address",
+        "allowClient": "Allow Client",
+        "allowClientTitle": "Allow Client Title",
+        "available": "Available",
+        "interface": "Interface",
+        "interfaceTitle": "Interface Title",
+        "leapSecond": "Leap Second",
+        "leapSecondTitle": "Leap Second Title",
+        "listenAddress": "Listen Address",
+        "listenAddressTitle": "Listen Address Title",
+        "noselect": "Noselect",
+        "noselectTitle": "Noselect Title",
+        "notSelected": "Not Selected",
+        "ntsTitle": "Nts Title",
+        "pool": "Pool",
+        "poolTitle": "Pool Title",
+        "prefer": "Prefer",
+        "preferTitle": "Prefer Title",
+        "selected": "Selected",
+        "vrfTitle": "Vrf Title"
+      },
+      "messages": {
+        "confirmDeleteServers": "Confirm Delete Servers",
+        "saved": "Saved"
+      },
+      "modals": {
+        "addServer": "Add Server",
+        "confirmDelete": "Confirm Delete",
+        "editServer": "Edit Server"
+      },
+      "placeholders": {
+        "serverAddress": "Server Address",
+        "vrfName": "Vrf Name"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "server": "Server"
+      },
+      "validation": {
+        "addressAlreadyExists": "Address Already Exists",
+        "enterServerAddress": "Enter Server Address",
+        "ipFormat": "Ip Format",
+        "ipOrPrefixFormat": "Ip Or Prefix Format",
+        "ipv4Format": "Ipv4 Format",
+        "ipv4PrefixRange": "Ipv4 Prefix Range",
+        "ipv6Format": "Ipv6 Format",
+        "ipv6PrefixRange": "Ipv6 Prefix Range",
+        "prefixMustBeNumber": "Prefix Must Be Number"
+      }
+    }
+  },
+  "de": {
+    "ntp": {
+      "columns": {
+        "address": "Address",
+        "noselect": "Noselect",
+        "pool": "Pool",
+        "prefer": "Prefer"
+      },
+      "hints": {
+        "leapSecondDefault": "Leap Second Default"
+      },
+      "labels": {
+        "address": "Address",
+        "allowClient": "Allow Client",
+        "allowClientTitle": "Allow Client Title",
+        "available": "Available",
+        "interface": "Interface",
+        "interfaceTitle": "Interface Title",
+        "leapSecond": "Leap Second",
+        "leapSecondTitle": "Leap Second Title",
+        "listenAddress": "Listen Address",
+        "listenAddressTitle": "Listen Address Title",
+        "noselect": "Noselect",
+        "noselectTitle": "Noselect Title",
+        "notSelected": "Not Selected",
+        "ntsTitle": "Nts Title",
+        "pool": "Pool",
+        "poolTitle": "Pool Title",
+        "prefer": "Prefer",
+        "preferTitle": "Prefer Title",
+        "selected": "Selected",
+        "vrfTitle": "Vrf Title"
+      },
+      "messages": {
+        "confirmDeleteServers": "Confirm Delete Servers",
+        "saved": "Saved"
+      },
+      "modals": {
+        "addServer": "Add Server",
+        "confirmDelete": "Confirm Delete",
+        "editServer": "Edit Server"
+      },
+      "placeholders": {
+        "serverAddress": "Server Address",
+        "vrfName": "Vrf Name"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "server": "Server"
+      },
+      "validation": {
+        "addressAlreadyExists": "Address Already Exists",
+        "enterServerAddress": "Enter Server Address",
+        "ipFormat": "Ip Format",
+        "ipOrPrefixFormat": "Ip Or Prefix Format",
+        "ipv4Format": "Ipv4 Format",
+        "ipv4PrefixRange": "Ipv4 Prefix Range",
+        "ipv6Format": "Ipv6 Format",
+        "ipv6PrefixRange": "Ipv6 Prefix Range",
+        "prefixMustBeNumber": "Prefix Must Be Number"
+      }
+    }
+  },
+  "fr": {
+    "ntp": {
+      "columns": {
+        "address": "Address",
+        "noselect": "Noselect",
+        "pool": "Pool",
+        "prefer": "Prefer"
+      },
+      "hints": {
+        "leapSecondDefault": "Leap Second Default"
+      },
+      "labels": {
+        "address": "Address",
+        "allowClient": "Allow Client",
+        "allowClientTitle": "Allow Client Title",
+        "available": "Available",
+        "interface": "Interface",
+        "interfaceTitle": "Interface Title",
+        "leapSecond": "Leap Second",
+        "leapSecondTitle": "Leap Second Title",
+        "listenAddress": "Listen Address",
+        "listenAddressTitle": "Listen Address Title",
+        "noselect": "Noselect",
+        "noselectTitle": "Noselect Title",
+        "notSelected": "Not Selected",
+        "ntsTitle": "Nts Title",
+        "pool": "Pool",
+        "poolTitle": "Pool Title",
+        "prefer": "Prefer",
+        "preferTitle": "Prefer Title",
+        "selected": "Selected",
+        "vrfTitle": "Vrf Title"
+      },
+      "messages": {
+        "confirmDeleteServers": "Confirm Delete Servers",
+        "saved": "Saved"
+      },
+      "modals": {
+        "addServer": "Add Server",
+        "confirmDelete": "Confirm Delete",
+        "editServer": "Edit Server"
+      },
+      "placeholders": {
+        "serverAddress": "Server Address",
+        "vrfName": "Vrf Name"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "server": "Server"
+      },
+      "validation": {
+        "addressAlreadyExists": "Address Already Exists",
+        "enterServerAddress": "Enter Server Address",
+        "ipFormat": "Ip Format",
+        "ipOrPrefixFormat": "Ip Or Prefix Format",
+        "ipv4Format": "Ipv4 Format",
+        "ipv4PrefixRange": "Ipv4 Prefix Range",
+        "ipv6Format": "Ipv6 Format",
+        "ipv6PrefixRange": "Ipv6 Prefix Range",
+        "prefixMustBeNumber": "Prefix Must Be Number"
+      }
+    }
+  },
+  "ko": {
+    "ntp": {
+      "columns": {
+        "address": "Address",
+        "noselect": "Noselect",
+        "pool": "Pool",
+        "prefer": "Prefer"
+      },
+      "hints": {
+        "leapSecondDefault": "Leap Second Default"
+      },
+      "labels": {
+        "address": "Address",
+        "allowClient": "Allow Client",
+        "allowClientTitle": "Allow Client Title",
+        "available": "Available",
+        "interface": "Interface",
+        "interfaceTitle": "Interface Title",
+        "leapSecond": "Leap Second",
+        "leapSecondTitle": "Leap Second Title",
+        "listenAddress": "Listen Address",
+        "listenAddressTitle": "Listen Address Title",
+        "noselect": "Noselect",
+        "noselectTitle": "Noselect Title",
+        "notSelected": "Not Selected",
+        "ntsTitle": "Nts Title",
+        "pool": "Pool",
+        "poolTitle": "Pool Title",
+        "prefer": "Prefer",
+        "preferTitle": "Prefer Title",
+        "selected": "Selected",
+        "vrfTitle": "Vrf Title"
+      },
+      "messages": {
+        "confirmDeleteServers": "Confirm Delete Servers",
+        "saved": "Saved"
+      },
+      "modals": {
+        "addServer": "Add Server",
+        "confirmDelete": "Confirm Delete",
+        "editServer": "Edit Server"
+      },
+      "placeholders": {
+        "serverAddress": "Server Address",
+        "vrfName": "Vrf Name"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "server": "Server"
+      },
+      "validation": {
+        "addressAlreadyExists": "Address Already Exists",
+        "enterServerAddress": "Enter Server Address",
+        "ipFormat": "Ip Format",
+        "ipOrPrefixFormat": "Ip Or Prefix Format",
+        "ipv4Format": "Ipv4 Format",
+        "ipv4PrefixRange": "Ipv4 Prefix Range",
+        "ipv6Format": "Ipv6 Format",
+        "ipv6PrefixRange": "Ipv6 Prefix Range",
+        "prefixMustBeNumber": "Prefix Must Be Number"
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "zh-CN": {
+    "igmpProxy": {
+      "basicSettings": "basicSettings",
+      "interfaces": "接口s"
+    }
+  },
+  "en": {
+    "igmpProxy": {
+      "basicSettings": "Basic Settings",
+      "interfaces": "Interfaces"
+    }
+  },
+  "zh-TW": {
+    "igmpProxy": {
+      "basicSettings": "Basic Settings",
+      "interfaces": "Interfaces"
+    }
+  },
+  "ru": {
+    "igmpProxy": {
+      "basicSettings": "Basic Settings",
+      "interfaces": "Interfaces"
+    }
+  },
+  "de": {
+    "igmpProxy": {
+      "basicSettings": "Basic Settings",
+      "interfaces": "Interfaces"
+    }
+  },
+  "fr": {
+    "igmpProxy": {
+      "basicSettings": "Basic Settings",
+      "interfaces": "Interfaces"
+    }
+  },
+  "ko": {
+    "igmpProxy": {
+      "basicSettings": "Basic Settings",
+      "interfaces": "Interfaces"
+    }
+  }
+}

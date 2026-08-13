@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="dhcp-relay">
+<h1>Ретрансляция DHCP</h1>
+<p>Агент ретрансляции DHCP позволяет одному серверу DHCP обслуживать клиентов на удаленных подсетях, что исключает необходимость в отдельном сервере на каждой подсети.</p>
+<p>Агент ретрансляции DHCP получает запросы клиентов на одном интерфейсе, передает их как одноадресные сообщения на указанный сервер на другом сетевом интерфейсе и доставляет ответы сервера обратно исходным клиентам.</p>
+<p>VyOS предоставляет две независимые службы ретрансляции DHCP:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">service dhcp-relay</code>: Ретранслирует сообщения между клиентами и серверами IPv4.</p></li>
+<li><p><code class="docutils literal notranslate">service dhcpv6-relay</code>: Ретранслирует сообщения между клиентами и серверами IPv6.</p></li>
+</ul>
+<p>Эти две службы настраиваются отдельно и не делят настройки. На двойной стековой сети, где клиенты обоих адресных семей нуждаются в DHCP, необходимо настроить обе.</p>
+<section id="ipv4-relay">
+<h2>Ретрансляция IPv4</h2>
+<section id="configuration">
+<h3>Настройка</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay listen-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-listen-interface-interface" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс прослушивания, на котором DHCPv4 ретранслятор получает запросы клиентов в виде широковещательных сообщений.</strong></p>
+<p>Повторите команду для настройки нескольких интерфейсов прослушивания.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Для успешного применения конфигурации необходимо настроить хотя бы один <code class="docutils literal notranslate">listen-interface</code> и один <code class="docutils literal notranslate">upstream-interface</code>.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay listen-interface eth1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay upstream-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-upstream-interface-interface" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте верхний интерфейс, через который DHCPv4 ретранслятор передает запросы клиентов к DHCP-серверу.</strong></p>
+<p>Повторите команду для настройки нескольких верхних интерфейсов.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Для успешного применения конфигурации необходимо настроить хотя бы один <code class="docutils literal notranslate">listen-interface</code> и один <code class="docutils literal notranslate">upstream-interface</code>.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay upstream-interface eth2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay server &lt;ipv4-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-server-ipv4-address" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IPv4-адрес DHCPv4-сервера, к которому ретранслятор перенаправляет запросы клиентов.</strong></p>
+<p>Повторите команду, чтобы перенаправить запросы клиентов на несколько DHCPv4-серверов.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Для успешного применения конфигурации необходимо настроить хотя бы один DHCPv4-сервер.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay server 203.0.113.4
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-interface-interface" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс, участвующий в ретрансляции DHCPv4.</strong></p>
+<p>Интерфейсы, настроенные с помощью этой устаревшей команды, работают в двух направлениях, получая широковещательные сообщения DHCPv4 от клиентов и перенаправляя запросы на сервер.</p>
+</div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Предупреждение</p>
+<p>Эта команда устарела и доступна только для поддержки существующих конфигураций. Новые развертывания должны использовать <code class="docutils literal notranslate">listen-interface</code> и <code class="docutils literal notranslate">upstream-interface</code>, которые не могут быть использованы вместе с этой командой. При применении появляется предупреждение о прекращении поддержки.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Циклический интерфейс (<code class="docutils literal notranslate">lo</code>) не принимается в качестве допустимого значения для этой команды.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay interface eth1
+set service dhcp-relay interface eth2
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay disable
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-disable" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Административно отключите службу ретрансляции DHCPv4 без удаления ее конфигурации.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay disable
+</pre></div>
+</div>
+</section>
+<section id="relay-options">
+<h3>Параметры ретрансляции</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay relay-options hop-count &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-relay-options-hop-count-1-255" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте количество промежутков (hop count), при котором ретранслируемые пакеты будут отбрасываться.</strong></p>
+<p>Ретранслятор DHCPv4, получающий сообщение клиента, устанавливает количество промежутков в 0. Каждый последующий ретранслятор DHCPv4 вдоль пути увеличивает его. Пакеты, чей счетчик промежутков достиг указанного значения, будут беззвучно отброшены.</p>
+<p>По умолчанию установлено значение 10.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay relay-options hop-count 4
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay relay-options max-size &lt;64-1400&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-relay-options-max-size-64-1400" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте максимальный размер, в байтах, который может достигнуть пакет DHCPv4 с добавленным опцией информации агента ретрансляции.</strong></p>
+<p>Если пакет с добавленной опцией превышает этот размер, опция будет опущена, и пакет будет передан без нее.</p>
+<p>По умолчанию установлено значение 576.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay relay-options max-size 1400
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-relay relay-options relay-agents-packets &lt;append | discard | forward | replace&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-relay-options-relay-agents-packets-append-discard-forward-replace" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте политику, применяемую к входящим пакетам DHCPv4, которые уже содержат опцию информации агента ретрансляции:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">append</code>: Добавляет локальную опцию информации агента ретрансляции, сохранив существующую опцию информации агента ретрансляции.</p></li>
+<li><p><code class="docutils literal notranslate">discard</code>: Отбрасывает пакеты, содержащие опцию информации агента ретрансляции.</p></li>
+<li><p><code class="docutils literal notranslate">forward</code>: Передает пакеты без изменений в существующей опции информации агента ретрансляции.</p></li>
+<li><p><code class="docutils literal notranslate">replace</code>: Удаляет существующую опцию информации агента ретрансляции и вставляет локальную опцию информации агента ретрансляции.</p></li>
+</ul>
+<p>По умолчанию установлено значение <code class="docutils literal notranslate">forward</code>.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay relay-options relay-agents-packets discard
+</pre></div>
+</div>
+</section>
+<section id="operation">
+<h3>Работа</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+restart dhcp relay-agent
+<a class="cmdlink" href="#opcmd-restart-dhcp-relay-agent" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Перезапустите службу ретрансляции DHCPv4.</p>
+</div>
+</div>
+</section>
+<section id="example">
+<h3>Пример</h3>
+<p>Следующая конфигурация перенаправляет запросы клиентов DHCP, полученные на <code class="docutils literal notranslate">eth1</code> (интерфейс, обращенный к клиенту), через <code class="docutils literal notranslate">eth2</code> (интерфейс, обращенный к серверу), к DHCP-серверу по адресу <code class="docutils literal notranslate">203.0.113.4</code>. Пакеты, содержащие информацию о ретрансляторе, будут отброшены, поэтому будут перенаправлены только запросы, исходящие непосредственно от клиентов.</p>
+<figure class="align-default" id="id6">
+<a class="reference internal image-reference" href="https://docs.vyos.io/en/rolling/_images/service_dhcp-relay01.webp"><img alt="Топология ретрансляции DHCPv4" src="https://docs.vyos.io/en/rolling/_images/service_dhcp-relay01.webp" style="width: 505.6px; height: 203.20000000000002px;" /></a>
+<figcaption>
+<p>Топология ретрансляции DHCPv4</p>
+</figcaption>
+</figure>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address &#39;192.0.2.1/24&#39;
+set interfaces ethernet eth2 address &#39;198.51.100.1/24&#39;
+set service dhcp-relay listen-interface &#39;eth1&#39;
+set service dhcp-relay upstream-interface &#39;eth2&#39;
+set service dhcp-relay server &#39;203.0.113.4&#39;
+set service dhcp-relay relay-options relay-agents-packets discard
+</pre></div>
+</div>
+<p>Эквивалентная конфигурация с использованием устаревшего синтаксиса <code class="docutils literal notranslate">interface</code>, сохраненного только для обеспечения обратной совместимости, выглядит так:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address &#39;192.0.2.1/24&#39;
+set interfaces ethernet eth2 address &#39;198.51.100.1/24&#39;
+set service dhcp-relay interface &#39;eth1&#39;
+set service dhcp-relay interface &#39;eth2&#39;
+set service dhcp-relay server &#39;203.0.113.4&#39;
+set service dhcp-relay relay-options relay-agents-packets discard
+</pre></div>
+</div>
+</section>
+</section>
+<section id="ipv6-relay">
+<h2>Ретрансляция IPv6</h2>
+<section id="dhcp-relay-ipv6-configuration">
+<h3>Настройка</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-relay listen-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-listen-interface-interface" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс прослушивания, на котором DHCPv6 ретранслятор получает запросы клиентов в виде многоадресных сообщений.</strong></p>
+<p>Интерфейс должен уже иметь назначенный глобальный одноранговый IPv6-адрес.</p>
+<p>Повторите команду для настройки нескольких интерфейсов прослушивания.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Для успешного применения конфигурации необходимо настроить хотя бы один <code class="docutils literal notranslate">listen-interface</code> и один <code class="docutils literal notranslate">upstream-interface</code>.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay listen-interface eth1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-relay listen-interface &lt;interface&gt; address &lt;ipv6-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-listen-interface-interface-address-ipv6-address" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IPv6-адрес, который использует DHCPv6 ретранслятор для идентификации клиентского сетевого интерфейса для DHCPv6-сервера.</strong></p>
+<p>Адрес должен быть нелокальным IPv6-адресом, уже назначенным указанному интерфейсу прослушивания.</p>
+<p>Если адрес не задан, DHCPv6 ретранслятор использует первый нелокальный IPv6-адрес, найденный на этом интерфейсе прослушивания.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay listen-interface eth1 address 2001:db8:1::1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-relay upstream-interface &lt;interface&gt; address &lt;ipv6-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-upstream-interface-interface-address-ipv6-address" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IPv6-адрес DHCPv6-сервера (или другого ретранслятора), к которому DHCPv6 ретранслятор перенаправляет сообщения клиентов через указанный верхний интерфейс.</strong></p>
+<p>Повторите команду, чтобы перенаправить сообщения клиентов на несколько серверов (или ретрансляторов).</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Для успешного применения конфигурации необходимо настроить адрес сервера (или ретранслятора) для каждого верхнего интерфейса.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay upstream-interface eth2 address 2001:db8:2::4
+</pre></div>
+</div>
+<div class="cmd cmd-cfg" id="dhcp-relay-ipv6-options">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-relay disable
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-disable" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Административно отключите службу ретрансляции DHCPv6 без удаления ее конфигурации.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay disable
+</pre></div>
+</div>
+</section>
+<section id="dhcp-relay-v6-options">
+<h3>Параметры ретрансляции</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-relay max-hop-count &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-max-hop-count-1-255" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте количество промежутков (hop count), при котором ретранслируемые пакеты будут отбрасываться.</strong></p>
+<p>Ретранслятор DHCPv6, получающий сообщение клиента, устанавливает количество промежутков в 0. Каждый последующий ретранслятор DHCPv6 вдоль пути увеличивает его. Пакеты, чей счетчик промежутков достиг указанного значения, будут беззвучно отброшены.</p>
+<p>По умолчанию установлено значение 10.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay max-hop-count 4
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-relay use-interface-id-option
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-use-interface-id-option" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включите вставку опции идентификатора интерфейса в каждое сообщение Relay-forward.</strong></p>
+<p>Опция идентификатора интерфейса вставляется автоматически каждый раз, когда на ретрансляторе настроено более одного интерфейса прослушивания, независимо от этого параметра.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay use-interface-id-option
+</pre></div>
+</div>
+</section>
+<section id="dhcp-relay-ipv6-op-cmd">
+<h3>Работа</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+restart dhcpv6 relay-agent
+<a class="cmdlink" href="#opcmd-restart-dhcpv6-relay-agent" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Перезапустите службу ретрансляции DHCPv6.</p>
+</div>
+</div>
+</section>
+<section id="dhcp-relay-ipv6-example">
+<h3>Пример</h3>
+<p>Следующая конфигурация перенаправляет запросы клиентов DHCPv6, полученные на <code class="docutils literal notranslate">eth1</code> (интерфейс, обращающийся к клиенту), через <code class="docutils literal notranslate">eth2</code> (интерфейс, обращающийся к серверу), к DHCPv6-серверу по адресу <code class="docutils literal notranslate">2001:db8:2::4</code>.</p>
+<figure class="align-default" id="id7">
+<a class="reference internal image-reference" href="https://docs.vyos.io/en/rolling/_images/service_dhcpv6-relay01.webp"><img alt="Топология ретрансляции DHCPv6" src="https://docs.vyos.io/en/rolling/_images/service_dhcpv6-relay01.webp" style="width: 491.20000000000005px; height: 185.60000000000002px;" /></a>
+<figcaption>
+<p>Топология ретрансляции DHCPv6</p>
+</figcaption>
+</figure>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address &#39;2001:db8:1::1/64&#39;
+set interfaces ethernet eth2 address &#39;2001:db8:2::1/64&#39;
+set service dhcpv6-relay listen-interface &#39;eth1&#39;
+set service dhcpv6-relay upstream-interface &#39;eth2&#39; address &#39;2001:db8:2::4&#39;
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

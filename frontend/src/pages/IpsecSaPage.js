@@ -3,6 +3,7 @@ import { opModeApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function parseSa(output) {
   const lines = String(output || '').split('\n').map(s => s.replace(/\r$/, ''));
@@ -60,27 +61,26 @@ function parseSa(output) {
 export default defineComponent({
   name: 'IpsecSaPage',
   setup() {
+    const { t } = useI18n();
     const loading = ref(false);
     const saList = ref([]);
-    const rawOutput = ref('');
 
     const columns = [
-      { key: 'connection', title: '连接' },
-      { key: 'state', title: '状态' },
-      { key: 'uptime', title: '运行时间' },
-      { key: 'bytes', title: '字节 In/Out' },
-      { key: 'packets', title: '包 In/Out' },
-      { key: 'remote_address', title: '远端地址' },
-      { key: 'remote_id', title: '远端 ID' },
-      { key: 'proposal', title: '提议' },
+      { key: 'connection', title: t('ipsecSa.columns.connection') },
+      { key: 'state', title: t('ipsecSa.columns.state') },
+      { key: 'uptime', title: t('ipsecSa.columns.uptime') },
+      { key: 'bytes', title: t('ipsecSa.columns.bytes') },
+      { key: 'packets', title: t('ipsecSa.columns.packets') },
+      { key: 'remote_address', title: t('ipsecSa.columns.remoteAddress') },
+      { key: 'remote_id', title: t('ipsecSa.columns.remoteId') },
+      { key: 'proposal', title: t('ipsecSa.columns.proposal') },
     ];
 
     async function load() {
       loading.value = true;
       try {
         const res = await opModeApi.show('vpn ipsec sa');
-        rawOutput.value = res.output || '';
-        saList.value = parseSa(rawOutput.value);
+        saList.value = parseSa(res.output || '');
       } catch (e) {
         showError(e);
         saList.value = [];
@@ -91,22 +91,12 @@ export default defineComponent({
 
     onMounted(load);
 
-    return { loading, saList, columns, load };
+    return { loading, saList, columns, load, t };
   },
   components: { DataTable, ToolbarButton },
   template: `
     <div class="page-container">
-      <div class="toolbar">
-        <div class="toolbar-left"><h3>IPsec 安全关联</h3></div>
-        <div class="toolbar-right">
-          <ToolbarButton icon="refresh" @click="load">{{ $t('app.refresh') }}</ToolbarButton>
-        </div>
-      </div>
       <DataTable :columns="columns" :data="saList" :loading="loading" :selectable="false" :actions="[]" />
-      <div v-if="rawOutput" style="margin-top:16px;">
-        <div style="font-weight:bold;margin-bottom:4px;">原始输出</div>
-        <pre style="background:#f5f5f5;padding:8px;border:1px solid #ddd;font-size:12px;overflow:auto;">{{ rawOutput }}</pre>
-      </div>
     </div>
   `,
 });

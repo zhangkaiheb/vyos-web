@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, watch, inject } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { interfaceApi } from '/src/api/index.js';
 import { useConfigStore } from '/src/stores/config.js';
@@ -8,10 +8,12 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 
 export default defineComponent({
   name: 'StaticNatPage',
   setup() {
+    const { t } = inject('i18n');
     const route = useRoute();
     const configStore = useConfigStore();
     const path = 'nat static';
@@ -24,38 +26,40 @@ export default defineComponent({
     const editingOriginalId = ref(null);
     const modalKey = ref(0);
     const interfaces = ref([]);
+    const deleteModalVisible = ref(false);
+    const pendingDeleteRuleId = ref('');
 
-    const tabs = [
-      { key: 'basic', title: '基本' },
-      { key: 'match', title: '匹配条件' },
-      { key: 'translation', title: '翻译' },
-    ];
+    const tabs = computed(() => [
+      { key: 'basic', title: t('staticNat.tab.basic') },
+      { key: 'match', title: t('staticNat.tab.match') },
+      { key: 'translation', title: t('staticNat.tab.translation') },
+    ]);
     const activeTab = ref('basic');
 
     const tabSchemas = computed(() => ({
       basic: [
-        { key: 'id', title: '规则编号', type: 'text', required: true, help: '规则标识符（文本）' },
-        { key: 'description', title: '描述', type: 'text', help: '规则描述信息' },
-        { key: 'log', title: '日志', type: 'checkbox', defaultValue: false, help: '记录匹配此规则的数据包' },
+        { key: 'id', title: t('staticNat.field.ruleNumber'), type: 'text', required: true, help: t('staticNat.help.ruleNumber') },
+        { key: 'description', title: t('staticNat.field.description'), type: 'text', help: t('staticNat.help.description') },
+        { key: 'log', title: t('staticNat.field.log'), type: 'checkbox', defaultValue: false, help: t('staticNat.help.log') },
       ],
       match: [
-        { key: 'destinationAddress', title: '目的地址', type: 'text', placeholder: 'IP地址或前缀', help: '目的IP地址或CIDR前缀，如: 192.168.1.0/24' },
-        { key: 'inboundInterface', title: '入站接口', type: 'select', placeholder: '选择入站接口', help: '入站接口',
+        { key: 'destinationAddress', title: t('staticNat.field.destinationAddress'), type: 'text', placeholder: t('staticNat.placeholder.destinationAddress'), help: t('staticNat.help.destinationAddress') },
+        { key: 'inboundInterface', title: t('staticNat.field.inboundInterface'), type: 'select', placeholder: t('staticNat.placeholder.inboundInterface'), help: t('staticNat.help.inboundInterface'),
           options: ['any', ...interfaces.value] },
       ],
       translation: [
-        { key: 'translationAddress', title: '翻译地址', type: 'text', placeholder: 'IP地址或前缀', help: '转换后的IP地址或前缀，如: 10.0.0.1/32' },
+        { key: 'translationAddress', title: t('staticNat.field.translationAddress'), type: 'text', placeholder: t('staticNat.placeholder.translationAddress'), help: t('staticNat.help.translationAddress') },
       ],
     }));
 
-    const columns = [
-      { key: 'id', title: '规则编号' },
-      { key: 'description', title: '描述' },
-      { key: 'destinationAddress', title: '目的地址' },
-      { key: 'inboundInterface', title: '入站接口' },
-      { key: 'translationAddress', title: '翻译地址' },
-      { key: 'log', title: '日志' },
-    ];
+    const columns = computed(() => [
+      { key: 'id', title: t('staticNat.column.ruleNumber') },
+      { key: 'description', title: t('staticNat.column.description') },
+      { key: 'destinationAddress', title: t('staticNat.column.destinationAddress') },
+      { key: 'inboundInterface', title: t('staticNat.column.inboundInterface') },
+      { key: 'translationAddress', title: t('staticNat.column.translationAddress') },
+      { key: 'log', title: t('staticNat.column.log') },
+    ]);
 
     async function load() {
       loading.value = true;
@@ -70,7 +74,7 @@ export default defineComponent({
           }));
         }
       } catch (e) {
-        showError('加载静态 NAT 配置失败', e);
+        showError(t('staticNat.loadFailed'), e);
       } finally {
         loading.value = false;
       }
@@ -130,28 +134,37 @@ export default defineComponent({
     async function saveRule() {
       try {
         const rule = editingRule.value;
-        if (!rule.id) return showError({ message: '请输入规则编号' });
+        if (!rule.id) return showError({ message: t('staticNat.ruleNumberRequired') });
         const value = buildRuleValue(rule);
         if (editingOriginalId.value && editingOriginalId.value !== rule.id) {
           await configStore.deleteConfig(`${path} rule ${editingOriginalId.value}`);
+          configStore.markPending();
         }
         await configStore.setConfig(`${path} rule ${rule.id}`, value);
+        configStore.markPending();
         modalVisible.value = false;
         await load();
       } catch (e) {
-        showError('保存静态 NAT 规则失败', e);
+        showError(t('staticNat.saveFailed'), e);
       }
     }
 
     async function deleteRule(index) {
       const row = rules.value[index];
       if (!row) return;
-      if (!confirm('确认删除此静态 NAT 规则？')) return;
+      pendingDeleteRuleId.value = row.id;
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmDeleteRule() {
+      deleteModalVisible.value = false;
       try {
-        await configStore.deleteConfig(`${path} rule ${row.id}`);
+        await configStore.deleteConfig(`${path} rule ${pendingDeleteRuleId.value}`);
+        configStore.markPending();
+        pendingDeleteRuleId.value = '';
         await load();
       } catch (e) {
-        showError('删除静态 NAT 规则失败', e);
+        showError(t('staticNat.deleteFailed'), e);
       }
     }
 
@@ -164,10 +177,10 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => { load(); loadInterfaces(); });
+    onMounted(() => { load(); loadInterfaces(); onMenuRefresh(load); });
     watch(() => route.path, () => { load(); loadInterfaces(); });
 
-    return { path, writeDisabled, rules, loading, modalVisible, editingRule, editingOriginalId, tabs, activeTab, tabSchemas, columns, openModal, saveRule, deleteRule };
+    return { path, writeDisabled, rules, loading, modalVisible, modalKey, editingRule, editingOriginalId, tabs, activeTab, tabSchemas, columns, openModal, saveRule, deleteRule, deleteModalVisible, pendingDeleteRuleId, confirmDeleteRule, load, t };
   },
   components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   template: `
@@ -175,16 +188,18 @@ export default defineComponent({
       <DataTable :columns="columns" :data="rules" :loading="loading" :disabled="writeDisabled"
                  rowKey="id" :actions="['create', 'edit', 'delete']"
                  @create="openModal(-1)" @edit="openModal(rules.findIndex(r => r.id === $event.id))" @delete="deleteRule" />
-      <div style="height:32px;"></div>
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
-      </div>
-      <DraggableModal v-model:visible="modalVisible" :title="editingOriginalId ? '编辑静态 NAT 规则' : '创建静态 NAT 规则'" width="820px" :key="modalKey" @confirm="saveRule">
+      <DraggableModal v-model:visible="modalVisible" :title="editingOriginalId ? t('staticNat.editRule') : t('staticNat.createRule')" width="820px" :key="modalKey" @confirm="saveRule">
         <TabGroup v-model="activeTab" :tabs="tabs">
           <template v-for="tab in tabs" :key="tab.key" #[tab.key]>
             <ConfigForm v-model="editingRule" :schema="tabSchemas[tab.key]" :showAdvanced="true" :formKey="'static_nat_rule_' + tab.key" />
           </template>
         </TabGroup>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('config.confirmDelete')" width="400px" @confirm="confirmDeleteRule">
+        <div>{{ t('staticNat.confirmDelete') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div style="padding:2px 0;">{{ pendingDeleteRuleId }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

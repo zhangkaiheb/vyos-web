@@ -1,0 +1,240 @@
+{
+  "zh-CN": {
+    "dhcpv6Leases": {
+      "title": "DHCPv6 租约",
+      "columns": {
+        "ipv6Address": "IPv6 地址",
+        "state": "状态",
+        "lastCommunication": "最后通信",
+        "leaseExpiration": "租约到期",
+        "remaining": "剩余时间",
+        "type": "类型",
+        "pool": "地址池",
+        "duid": "DUID"
+      },
+      "filter": {
+        "byPool": "按地址池过滤",
+        "allPools": "全部地址池",
+        "byState": "按状态过滤",
+        "defaultState": "默认状态",
+        "all": "全部"
+      },
+      "sort": {
+        "title": "排序",
+        "default": "默认排序",
+        "expiration": "到期时间",
+        "lastCommunication": "最后通信",
+        "pool": "地址池",
+        "remaining": "剩余时间",
+        "state": "状态",
+        "type": "类型"
+      },
+      "refresh": "刷新",
+      "rawOutput": "原始输出"
+    }
+  },
+  "zh-TW": {
+    "dhcpv6Leases": {
+      "title": "DHCPv6 租約",
+      "columns": {
+        "ipv6Address": "IPv6 位址",
+        "state": "狀態",
+        "lastCommunication": "最後通訊",
+        "leaseExpiration": "租約到期",
+        "remaining": "剩餘時間",
+        "type": "類型",
+        "pool": "位址池",
+        "duid": "DUID"
+      },
+      "filter": {
+        "byPool": "按位址池過濾",
+        "allPools": "全部位址池",
+        "byState": "按狀態過濾",
+        "defaultState": "預設狀態",
+        "all": "全部"
+      },
+      "sort": {
+        "title": "排序",
+        "default": "預設排序",
+        "expiration": "到期時間",
+        "lastCommunication": "最後通訊",
+        "pool": "位址池",
+        "remaining": "剩餘時間",
+        "state": "狀態",
+        "type": "類型"
+      },
+      "refresh": "重新整理",
+      "rawOutput": "原始輸出"
+    }
+  },
+  "en": {
+    "dhcpv6Leases": {
+      "title": "DHCPv6 Leases",
+      "columns": {
+        "ipv6Address": "IPv6 Address",
+        "state": "State",
+        "lastCommunication": "Last Communication",
+        "leaseExpiration": "Lease Expiration",
+        "remaining": "Remaining",
+        "type": "Type",
+        "pool": "Pool",
+        "duid": "DUID"
+      },
+      "filter": {
+        "byPool": "Filter by Pool",
+        "allPools": "All Pools",
+        "byState": "Filter by State",
+        "defaultState": "Default State",
+        "all": "All"
+      },
+      "sort": {
+        "title": "Sort",
+        "default": "Default Sort",
+        "expiration": "Expiration Time",
+        "lastCommunication": "Last Communication",
+        "pool": "Pool",
+        "remaining": "Remaining",
+        "state": "State",
+        "type": "Type"
+      },
+      "refresh": "Refresh",
+      "rawOutput": "Raw Output"
+    }
+  },
+  "ru": {
+    "dhcpv6Leases": {
+      "title": "Аренды DHCPv6",
+      "columns": {
+        "ipv6Address": "IPv6 адрес",
+        "state": "Состояние",
+        "lastCommunication": "Последняя связь",
+        "leaseExpiration": "Истечение аренды",
+        "remaining": "Осталось",
+        "type": "Тип",
+        "pool": "Пул",
+        "duid": "DUID"
+      },
+      "filter": {
+        "byPool": "Фильтр по пулу",
+        "allPools": "Все пулы",
+        "byState": "Фильтр по состоянию",
+        "defaultState": "Состояние по умолчанию",
+        "all": "Все"
+      },
+      "sort": {
+        "title": "Сортировка",
+        "default": "Сортировка по умолчанию",
+        "expiration": "Время истечения",
+        "lastCommunication": "Последняя связь",
+        "pool": "Пул",
+        "remaining": "Осталось",
+        "state": "Состояние",
+        "type": "Тип"
+      },
+      "refresh": "Обновить",
+      "rawOutput": "Необработанный вывод"
+    }
+  },
+  "de": {
+    "dhcpv6Leases": {
+      "title": "DHCPv6-Leases",
+      "columns": {
+        "ipv6Address": "IPv6-Adresse",
+        "state": "Status",
+        "lastCommunication": "Letzte Kommunikation",
+        "leaseExpiration": "Lease-Ablauf",
+        "remaining": "Verbleibend",
+        "type": "Typ",
+        "pool": "Pool",
+        "duid": "DUID"
+      },
+      "filter": {
+        "byPool": "Nach Pool filtern",
+        "allPools": "Alle Pools",
+        "byState": "Nach Status filtern",
+        "defaultState": "Standardstatus",
+        "all": "Alle"
+      },
+      "sort": {
+        "title": "Sortierung",
+        "default": "Standardsortierung",
+        "expiration": "Ablaufzeit",
+        "lastCommunication": "Letzte Kommunikation",
+        "pool": "Pool",
+        "remaining": "Verbleibend",
+        "state": "Status",
+        "type": "Typ"
+      },
+      "refresh": "Aktualisieren",
+      "rawOutput": "Rohausgabe"
+    }
+  },
+  "fr": {
+    "dhcpv6Leases": {
+      "title": "Baux DHCPv6",
+      "columns": {
+        "ipv6Address": "Adresse IPv6",
+        "state": "État",
+        "lastCommunication": "Dernière communication",
+        "leaseExpiration": "Expiration du bail",
+        "remaining": "Restant",
+        "type": "Type",
+        "pool": "Pool",
+        "duid": "DUID"
+      },
+      "filter": {
+        "byPool": "Filtrer par pool",
+        "allPools": "Tous les pools",
+        "byState": "Filtrer par état",
+        "defaultState": "État par défaut",
+        "all": "Tous"
+      },
+      "sort": {
+        "title": "Tri",
+        "default": "Tri par défaut",
+        "expiration": "Date d'expiration",
+        "lastCommunication": "Dernière communication",
+        "pool": "Pool",
+        "remaining": "Restant",
+        "state": "État",
+        "type": "Type"
+      },
+      "refresh": "Actualiser",
+      "rawOutput": "Sortie brute"
+    }
+  },
+  "ko": {
+    "dhcpv6Leases": {
+      "title": "DHCPv6 임대",
+      "columns": {
+        "ipv6Address": "IPv6 주소",
+        "state": "상태",
+        "lastCommunication": "마지막 통신",
+        "leaseExpiration": "임대 만료",
+        "remaining": "남은 시간",
+        "type": "유형",
+        "pool": "풀",
+        "duid": "DUID"
+      },
+      "filter": {
+        "byPool": "풀별 필터링",
+        "allPools": "모든 풀",
+        "byState": "상태별 필터링",
+        "defaultState": "기본 상태",
+        "all": "전체"
+      },
+      "sort": {
+        "title": "정렬",
+        "default": "기본 정렬",
+        "expiration": "만료 시간",
+        "lastCommunication": "마지막 통신",
+        "pool": "풀",
+        "remaining": "남은 시간",
+        "state": "상태",
+        "type": "유형"
+      },
+      "refresh": "새로고침",
+      "rawOutput": "원시 출력"
+    }
+  }
+}

@@ -1,11 +1,14 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import DualListSelector from '/src/components/Form/DualListSelector.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -30,42 +33,42 @@ function splitMembers(text) {
   return String(text || '').split('\n').map(s => s.trim()).filter(Boolean);
 }
 
-function validateName(name) {
-  if (!name || !String(name).trim()) return '请输入名称';
-  if (!/^[a-zA-Z0-9_-]+$/.test(String(name))) return '名称只能包含字母、数字、下划线和连字符';
+function validateName(name, t) {
+  if (!name || !String(name).trim()) return t('dhcpv6.validation.enterName');
+  if (!/^[a-zA-Z0-9_-]+$/.test(String(name))) return t('dhcpv6.validation.nameInvalid');
   return '';
 }
 
-function validateIPv6(value) {
+function validateIPv6(value, t) {
   if (!value) return '';
   const re = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}$|^(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}$|^(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}$|^:(?::[0-9a-fA-F]{1,4}){1,7}$|^::$/;
-  if (!re.test(value)) return 'IPv6 地址格式错误';
+  if (!re.test(value)) return t('dhcpv6.validation.ipv6Invalid');
   return '';
 }
 
-function validateIPv6Prefix(value) {
+function validateIPv6Prefix(value, t) {
   if (!value) return '';
   const parts = value.split('/');
-  if (parts.length !== 2) return 'IPv6 子网格式应为 前缀/长度';
-  const err = validateIPv6(parts[0]);
+  if (parts.length !== 2) return t('dhcpv6.validation.ipv6PrefixInvalid');
+  const err = validateIPv6(parts[0], t);
   if (err) return err;
   const p = parseInt(parts[1], 10);
-  if (isNaN(p) || p < 0 || p > 128) return 'IPv6 前缀长度范围为 0-128';
+  if (isNaN(p) || p < 0 || p > 128) return t('dhcpv6.validation.ipv6PrefixLengthInvalid');
   return '';
 }
 
-function validateFQDN(value) {
+function validateFQDN(value, t) {
   if (!value) return '';
   const re = /^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*\.?$/;
-  if (!re.test(value)) return '主机名格式错误';
+  if (!re.test(value)) return t('dhcpv6.validation.fqdnInvalid');
   return '';
 }
 
-function validateIPv6OrFQDN(value) {
+function validateIPv6OrFQDN(value, t) {
   if (!value) return '';
-  if (!validateIPv6(value)) return '';
-  if (!validateFQDN(value)) return '';
-  return '请输入 IPv6 地址或主机名';
+  if (!validateIPv6(value, t)) return '';
+  if (!validateFQDN(value, t)) return '';
+  return t('dhcpv6.validation.enterIPv6OrFQDN');
 }
 
 function expandIPv6Address(addr) {
@@ -118,10 +121,10 @@ function getLocalIPv6Prefixes(interfaces) {
   return prefixes;
 }
 
-function validateRange(value, min, max, name) {
+function validateRange(value, min, max, nameKey, t) {
   if (!isPresent(value)) return '';
   const n = parseInt(value, 10);
-  if (isNaN(n) || n < min || n > max) return `${name} 范围为 ${min}-${max}`;
+  if (isNaN(n) || n < min || n > max) return t(nameKey, { min, max });
   return '';
 }
 
@@ -362,6 +365,8 @@ function dhcpv6ServerToConfig(form) {
 export default defineComponent({
   name: 'Dhcpv6ServerPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -389,11 +394,11 @@ export default defineComponent({
     });
 
     const networkColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'interface', title: '接口' },
-      { key: 'description', title: '描述' },
-      { key: 'disable', title: '禁用', render: v => v ? '是' : '否' },
-      { key: 'subnets', title: '子网数量', render: (_, row) => (row.subnets || []).length },
+      { key: 'name', title: t('dhcpv6.columns.name') },
+      { key: 'interface', title: t('dhcpv6.columns.interface') },
+      { key: 'description', title: t('dhcpv6.columns.description') },
+      { key: 'disable', title: t('dhcpv6.columns.disable'), render: v => v ? t('dhcpv6.yes') : t('dhcpv6.no') },
+      { key: 'subnets', title: t('dhcpv6.columns.subnetCount'), render: (_, row) => (row.subnets || []).length },
     ];
 
     const selectedNetwork = ref([]);
@@ -401,10 +406,10 @@ export default defineComponent({
     const editingNetwork = ref({});
 
     const subnetColumns = [
-      { key: 'subnet', title: 'IPv6 子网' },
-      { key: 'interface', title: '接口' },
-      { key: 'lease_time_default', title: '默认租约' },
-      { key: 'ranges', title: '地址范围数量', render: (_, row) => (row.ranges || []).length },
+      { key: 'subnet', title: t('dhcpv6.columns.ipv6Subnet') },
+      { key: 'interface', title: t('dhcpv6.columns.interface') },
+      { key: 'lease_time_default', title: t('dhcpv6.columns.defaultLease') },
+      { key: 'ranges', title: t('dhcpv6.columns.rangeCount'), render: (_, row) => (row.ranges || []).length },
     ];
 
     const selectedSubnet = ref([]);
@@ -412,10 +417,10 @@ export default defineComponent({
     const editingSubnet = ref({});
 
     const rangeColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'prefix', title: '前缀' },
-      { key: 'start', title: '起始地址' },
-      { key: 'stop', title: '结束地址' },
+      { key: 'name', title: t('dhcpv6.columns.name') },
+      { key: 'prefix', title: t('dhcpv6.columns.prefix') },
+      { key: 'start', title: t('dhcpv6.columns.startAddress') },
+      { key: 'stop', title: t('dhcpv6.columns.endAddress') },
     ];
 
     const selectedRange = ref([]);
@@ -423,10 +428,10 @@ export default defineComponent({
     const editingRange = ref({});
 
     const mappingColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'ipv6_address', title: 'IPv6 地址' },
-      { key: 'mac', title: 'MAC' },
-      { key: 'disable', title: '禁用', render: v => v ? '是' : '否' },
+      { key: 'name', title: t('dhcpv6.columns.name') },
+      { key: 'ipv6_address', title: t('dhcpv6.columns.ipv6Address') },
+      { key: 'mac', title: t('dhcpv6.columns.mac') },
+      { key: 'disable', title: t('dhcpv6.columns.disable'), render: v => v ? t('dhcpv6.yes') : t('dhcpv6.no') },
     ];
 
     const selectedMapping = ref([]);
@@ -434,9 +439,9 @@ export default defineComponent({
     const editingMapping = ref({});
 
     const delegationColumns = [
-      { key: 'prefix', title: '前缀' },
-      { key: 'delegated_length', title: '委派长度' },
-      { key: 'prefix_length', title: '前缀长度' },
+      { key: 'prefix', title: t('dhcpv6.columns.prefix') },
+      { key: 'delegated_length', title: t('dhcpv6.columns.delegatedLength') },
+      { key: 'prefix_length', title: t('dhcpv6.columns.prefixLength') },
     ];
 
     const selectedDelegation = ref([]);
@@ -458,86 +463,86 @@ export default defineComponent({
     }
 
     async function save() {
-      const err = validateRange(config.value.preference, 0, 255, 'Preference');
-      if (err) return alert(err);
+      const err = validateRange(config.value.preference, 0, 255, 'dhcpv6.validation.preferenceRange', t);
+      if (err) return showError({ message: err });
       for (const ip of config.value.global_parameters.name_server || []) {
-        if (validateIPv6(ip)) return alert(`全局 DNS 服务器 ${ip}：IPv6 地址格式错误`);
+        if (validateIPv6(ip, t)) return showError({ message: t('dhcpv6.messages.globalDnsInvalid', { ip }) });
       }
       for (const n of config.value.shared_networks || []) {
-        const nameErr = validateName(n.name);
-        if (nameErr) return alert(nameErr);
+        const nameErr = validateName(n.name, t);
+        if (nameErr) return showError({ message: nameErr });
         for (const ip of n.common_options?.name_server || []) {
-          if (validateIPv6(ip)) return alert(`共享网络 ${n.name} 通用 DNS ${ip}：IPv6 地址格式错误`);
+          if (validateIPv6(ip, t)) return showError({ message: t('dhcpv6.messages.networkDnsInvalid', { network: n.name, ip }) });
         }
         for (const s of n.subnets || []) {
-          const subnetErr = validateIPv6Prefix(s.subnet);
-          if (subnetErr) return alert(`共享网络 ${n.name} 子网 ${s.subnet}：${subnetErr}`);
-          const leaseErr = validateRange(s.lease_time_default, 1, 4294967295, '默认租约时间') ||
-            validateRange(s.lease_time_min, 1, 4294967295, '最小租约时间') ||
-            validateRange(s.lease_time_max, 1, 4294967295, '最大租约时间') ||
-            validateRange(s.subnet_id, 0, 4294967295, '子网 ID');
-          if (leaseErr) return alert(`子网 ${s.subnet}：${leaseErr}`);
+          const subnetErr = validateIPv6Prefix(s.subnet, t);
+          if (subnetErr) return showError({ message: t('dhcpv6.messages.subnetError', { network: n.name, subnet: s.subnet, error: subnetErr }) });
+          const leaseErr = validateRange(s.lease_time_default, 1, 4294967295, 'dhcpv6.validation.defaultLeaseRange', t) ||
+            validateRange(s.lease_time_min, 1, 4294967295, 'dhcpv6.validation.minLeaseRange', t) ||
+            validateRange(s.lease_time_max, 1, 4294967295, 'dhcpv6.validation.maxLeaseRange', t) ||
+            validateRange(s.subnet_id, 0, 4294967295, 'dhcpv6.validation.subnetIdRange', t);
+          if (leaseErr) return showError({ message: t('dhcpv6.messages.subnetError', { subnet: s.subnet, error: leaseErr }) });
           for (const ip of s.options?.name_server || []) {
-            if (validateIPv6(ip)) return alert(`子网 ${s.subnet} DNS ${ip}：IPv6 地址格式错误`);
+            if (validateIPv6(ip, t)) return showError({ message: t('dhcpv6.messages.subnetDnsInvalid', { subnet: s.subnet, ip }) });
           }
           for (const ip of s.options?.sntp_server || []) {
-            if (validateIPv6(ip)) return alert(`子网 ${s.subnet} SNTP ${ip}：IPv6 地址格式错误`);
+            if (validateIPv6(ip, t)) return showError({ message: t('dhcpv6.messages.subnetSntpInvalid', { subnet: s.subnet, ip }) });
           }
           for (const ip of s.options?.sip_server || []) {
-            if (validateIPv6(ip)) return alert(`子网 ${s.subnet} SIP ${ip}：IPv6 地址格式错误`);
+            if (validateIPv6(ip, t)) return showError({ message: t('dhcpv6.messages.subnetSipInvalid', { subnet: s.subnet, ip }) });
           }
           for (const ip of s.options?.nis_server || []) {
-            if (validateIPv6(ip)) return alert(`子网 ${s.subnet} NIS ${ip}：IPv6 地址格式错误`);
+            if (validateIPv6(ip, t)) return showError({ message: t('dhcpv6.messages.subnetNisInvalid', { subnet: s.subnet, ip }) });
           }
           for (const ip of s.options?.nisplus_server || []) {
-            if (validateIPv6(ip)) return alert(`子网 ${s.subnet} NIS+ ${ip}：IPv6 地址格式错误`);
+            if (validateIPv6(ip, t)) return showError({ message: t('dhcpv6.messages.subnetNisplusInvalid', { subnet: s.subnet, ip }) });
           }
           const tftpServers = s.options?.cisco_tftp_server || [];
-          if (tftpServers.length > 2) return alert(`子网 ${s.subnet}：Cisco TFTP 服务器最多 2 个`);
+          if (tftpServers.length > 2) return showError({ message: t('dhcpv6.messages.subnetTftpMax', { subnet: s.subnet }) });
           for (const ip of tftpServers) {
-            if (validateIPv6(ip)) return alert(`子网 ${s.subnet} Cisco TFTP 服务器 ${ip}：IPv6 地址格式错误`);
+            if (validateIPv6(ip, t)) return showError({ message: t('dhcpv6.messages.subnetTftpInvalid', { subnet: s.subnet, ip }) });
           }
           for (const m of s.static_mappings || []) {
-            if (!m.name) return alert(`子网 ${s.subnet} 存在未命名的静态映射`);
-            if (isPresent(m.ipv6_address) && validateIPv6(m.ipv6_address)) return alert(`子网 ${s.subnet} 静态映射 ${m.name} IPv6 地址格式错误`);
-            if (isPresent(m.ipv6_prefix) && validateIPv6Prefix(m.ipv6_prefix)) return alert(`子网 ${s.subnet} 静态映射 ${m.name} IPv6 前缀格式错误`);
-            if (isPresent(m.mac) && !/^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/.test(m.mac)) return alert(`子网 ${s.subnet} 静态映射 ${m.name} MAC 格式错误`);
+            if (!m.name) return showError({ message: t('dhcpv6.messages.subnetUnnamedMapping', { subnet: s.subnet }) });
+            if (isPresent(m.ipv6_address) && validateIPv6(m.ipv6_address, t)) return showError({ message: t('dhcpv6.messages.subnetMappingIpv6Invalid', { subnet: s.subnet, name: m.name }) });
+            if (isPresent(m.ipv6_prefix) && validateIPv6Prefix(m.ipv6_prefix, t)) return showError({ message: t('dhcpv6.messages.subnetMappingPrefixInvalid', { subnet: s.subnet, name: m.name }) });
+            if (isPresent(m.mac) && !/^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/.test(m.mac)) return showError({ message: t('dhcpv6.messages.subnetMappingMacInvalid', { subnet: s.subnet, name: m.name }) });
           }
           for (const d of s.prefix_delegations || []) {
-            if (!d.prefix) return alert(`子网 ${s.subnet} 存在未设置前缀的前缀委派`);
-            const dErr = validateIPv6Prefix(d.prefix);
-            if (dErr) return alert(`子网 ${s.subnet} 前缀委派 ${d.prefix}：${dErr}`);
-            const dlErr = validateRange(d.delegated_length, 32, 64, '委派长度');
-            if (dlErr) return alert(`子网 ${s.subnet} 前缀委派 ${d.prefix}：${dlErr}`);
-            const plErr = validateRange(d.prefix_length, 32, 64, '前缀长度');
-            if (plErr) return alert(`子网 ${s.subnet} 前缀委派 ${d.prefix}：${plErr}`);
+            if (!d.prefix) return showError({ message: t('dhcpv6.messages.subnetDelegationNoPrefix', { subnet: s.subnet }) });
+            const dErr = validateIPv6Prefix(d.prefix, t);
+            if (dErr) return showError({ message: t('dhcpv6.messages.subnetDelegationError', { subnet: s.subnet, prefix: d.prefix, error: dErr }) });
+            const dlErr = validateRange(d.delegated_length, 32, 64, 'dhcpv6.validation.delegatedLengthRange', t);
+            if (dlErr) return showError({ message: t('dhcpv6.messages.subnetDelegationError', { subnet: s.subnet, prefix: d.prefix, error: dlErr }) });
+            const plErr = validateRange(d.prefix_length, 32, 64, 'dhcpv6.validation.prefixLengthRange', t);
+            if (plErr) return showError({ message: t('dhcpv6.messages.subnetDelegationError', { subnet: s.subnet, prefix: d.prefix, error: plErr }) });
             if (isPresent(d.excluded_prefix)) {
-              const epErr = validateIPv6Prefix(d.excluded_prefix);
-              if (epErr) return alert(`子网 ${s.subnet} 前缀委派 ${d.prefix} 排除前缀：${epErr}`);
+              const epErr = validateIPv6Prefix(d.excluded_prefix, t);
+              if (epErr) return showError({ message: t('dhcpv6.messages.subnetDelegationExcludedError', { subnet: s.subnet, prefix: d.prefix, error: epErr }) });
             }
             if (isPresent(d.excluded_prefix_length)) {
-              const eplErr = validateRange(d.excluded_prefix_length, 32, 64, '排除前缀长度');
-              if (eplErr) return alert(`子网 ${s.subnet} 前缀委派 ${d.prefix} 排除前缀长度：${eplErr}`);
+              const eplErr = validateRange(d.excluded_prefix_length, 32, 64, 'dhcpv6.validation.excludedPrefixLengthRange', t);
+              if (eplErr) return showError({ message: t('dhcpv6.messages.subnetDelegationExcludedLengthError', { subnet: s.subnet, prefix: d.prefix, error: eplErr }) });
             }
           }
           for (const r of s.ranges || []) {
-            if (!r.name) return alert(`子网 ${s.subnet} 存在未命名的地址范围`);
+            if (!r.name) return showError({ message: t('dhcpv6.messages.subnetUnnamedRange', { subnet: s.subnet }) });
             if (isPresent(r.prefix)) {
-              const pErr = validateIPv6Prefix(r.prefix);
-              if (pErr) return alert(`子网 ${s.subnet} 范围 ${r.name} 前缀：${pErr}`);
+              const pErr = validateIPv6Prefix(r.prefix, t);
+              if (pErr) return showError({ message: t('dhcpv6.messages.subnetRangePrefixError', { subnet: s.subnet, name: r.name, error: pErr }) });
             }
             if (isPresent(r.start)) {
-              const sErr = validateIPv6(r.start);
-              if (sErr) return alert(`子网 ${s.subnet} 范围 ${r.name} 起始地址：${sErr}`);
+              const sErr = validateIPv6(r.start, t);
+              if (sErr) return showError({ message: t('dhcpv6.messages.subnetRangeStartError', { subnet: s.subnet, name: r.name, error: sErr }) });
             }
             if (isPresent(r.stop)) {
-              const sErr = validateIPv6(r.stop);
-              if (sErr) return alert(`子网 ${s.subnet} 范围 ${r.name} 结束地址：${sErr}`);
+              const sErr = validateIPv6(r.stop, t);
+              if (sErr) return showError({ message: t('dhcpv6.messages.subnetRangeStopError', { subnet: s.subnet, name: r.name, error: sErr }) });
             }
             const rtftp = r.options?.cisco_tftp_server || [];
-            if (rtftp.length > 2) return alert(`子网 ${s.subnet} 范围 ${r.name}：Cisco TFTP 服务器最多 2 个`);
+            if (rtftp.length > 2) return showError({ message: t('dhcpv6.messages.subnetRangeTftpMax', { subnet: s.subnet, name: r.name }) });
             for (const ip of rtftp) {
-              if (validateIPv6(ip)) return alert(`子网 ${s.subnet} 范围 ${r.name} Cisco TFTP 服务器 ${ip}：IPv6 地址格式错误`);
+              if (validateIPv6(ip, t)) return showError({ message: t('dhcpv6.messages.subnetRangeTftpInvalid', { subnet: s.subnet, name: r.name, ip }) });
             }
           }
         }
@@ -553,13 +558,14 @@ export default defineComponent({
           })
         );
         if (!hasConnectedSubnet) {
-          return alert('None of the DHCPv6 subnets are connected to a subnet6 on this machine. At least one subnet6 must be connected such that DHCPv6 listens on an interface!');
+          return showError({ message: t('dhcpv6.messages.noConnectedSubnet') });
         }
       }
 
       saving.value = true;
       try {
         await configApi.set('service dhcpv6-server', dhcpv6ServerToConfig(config.value));
+        configStore.markPending();
         saved.value = true;
         await load();
       } catch (e) {
@@ -580,29 +586,29 @@ export default defineComponent({
     }
 
     function editNetwork() {
-      if (!selectedNetwork.value.length) return alert('请选择要编辑的共享网络');
+      if (!selectedNetwork.value.length) return showError({ message: t('dhcpv6.messages.selectNetworkToEdit') });
       const row = (config.value.shared_networks || []).find(n => n._name === selectedNetwork.value[0]);
-      if (!row) return alert('未找到选中的共享网络');
+      if (!row) return showError({ message: t('dhcpv6.messages.networkNotFound') });
       editingNetwork.value = JSON.parse(JSON.stringify(row));
       selectedSubnet.value = [];
       showNetworkModal.value = true;
     }
 
     function removeNetwork() {
-      if (!selectedNetwork.value.length) return alert('请选择要删除的共享网络');
+      if (!selectedNetwork.value.length) return showError({ message: t('dhcpv6.messages.selectNetworkToDelete') });
       config.value.shared_networks = (config.value.shared_networks || []).filter(n => n._name !== selectedNetwork.value[0]);
       selectedNetwork.value = [];
     }
 
     function saveNetwork() {
-      const err = validateName(editingNetwork.value.name);
-      if (err) return alert(err);
+      const err = validateName(editingNetwork.value.name, t);
+      if (err) return showError({ message: err });
       const list = config.value.shared_networks || [];
       const idx = list.findIndex(n => n._name === editingNetwork.value._name);
       if (idx >= 0) {
         list.splice(idx, 1, JSON.parse(JSON.stringify(editingNetwork.value)));
       } else {
-        if (list.some(n => n.name === editingNetwork.value.name)) return alert('该共享网络名称已存在');
+        if (list.some(n => n.name === editingNetwork.value.name)) return showError({ message: t('dhcpv6.messages.networkNameExists') });
         list.push(JSON.parse(JSON.stringify(editingNetwork.value)));
       }
       config.value.shared_networks = [...list];
@@ -623,34 +629,34 @@ export default defineComponent({
     }
 
     function editSubnet() {
-      if (!selectedSubnet.value.length) return alert('请选择要编辑的子网');
+      if (!selectedSubnet.value.length) return showError({ message: t('dhcpv6.messages.selectSubnetToEdit') });
       const row = (editingNetwork.value.subnets || []).find(s => s._subnet === selectedSubnet.value[0]);
-      if (!row) return alert('未找到选中的子网');
+      if (!row) return showError({ message: t('dhcpv6.messages.subnetNotFound') });
       editingSubnet.value = JSON.parse(JSON.stringify(row));
       selectedRange.value = [];
       showSubnetModal.value = true;
     }
 
     function removeSubnet() {
-      if (!selectedSubnet.value.length) return alert('请选择要删除的子网');
+      if (!selectedSubnet.value.length) return showError({ message: t('dhcpv6.messages.selectSubnetToDelete') });
       editingNetwork.value.subnets = (editingNetwork.value.subnets || []).filter(s => s._subnet !== selectedSubnet.value[0]);
       selectedSubnet.value = [];
     }
 
     function saveSubnet() {
-      const err = validateIPv6Prefix(editingSubnet.value.subnet);
-      if (err) return alert(err);
+      const err = validateIPv6Prefix(editingSubnet.value.subnet, t);
+      if (err) return showError({ message: err });
       const tftpServers = editingSubnet.value.options?.cisco_tftp_server || [];
-      if (tftpServers.length > 2) return alert('Cisco TFTP 服务器最多 2 个');
+      if (tftpServers.length > 2) return showError({ message: t('dhcpv6.messages.tftpServerMax') });
       for (const ip of tftpServers) {
-        if (validateIPv6(ip)) return alert(`Cisco TFTP 服务器 ${ip}：IPv6 地址格式错误`);
+        if (validateIPv6(ip, t)) return showError({ message: t('dhcpv6.messages.tftpServerInvalid', { ip }) });
       }
       const list = editingNetwork.value.subnets || [];
       const idx = list.findIndex(s => s._subnet === editingSubnet.value._subnet);
       if (idx >= 0) {
         list.splice(idx, 1, JSON.parse(JSON.stringify(editingSubnet.value)));
       } else {
-        if (list.some(s => s.subnet === editingSubnet.value.subnet)) return alert('该子网已存在');
+        if (list.some(s => s.subnet === editingSubnet.value.subnet)) return showError({ message: t('dhcpv6.messages.subnetExists') });
         list.push(JSON.parse(JSON.stringify(editingSubnet.value)));
       }
       editingNetwork.value.subnets = [...list];
@@ -667,46 +673,46 @@ export default defineComponent({
     }
 
     function editRange() {
-      if (!selectedRange.value.length) return alert('请选择要编辑的地址范围');
+      if (!selectedRange.value.length) return showError({ message: t('dhcpv6.messages.selectRangeToEdit') });
       const row = (editingSubnet.value.ranges || []).find(r => r._name === selectedRange.value[0]);
-      if (!row) return alert('未找到选中的地址范围');
+      if (!row) return showError({ message: t('dhcpv6.messages.rangeNotFound') });
       editingRange.value = JSON.parse(JSON.stringify(row));
       showRangeModal.value = true;
     }
 
     function removeRange() {
-      if (!selectedRange.value.length) return alert('请选择要删除的地址范围');
+      if (!selectedRange.value.length) return showError({ message: t('dhcpv6.messages.selectRangeToDelete') });
       editingSubnet.value.ranges = (editingSubnet.value.ranges || []).filter(r => r._name !== selectedRange.value[0]);
       selectedRange.value = [];
     }
 
     function saveRange() {
-      if (!editingRange.value.name) return alert('请输入地址范围名称');
-      const err = validateName(editingRange.value.name);
-      if (err) return alert(err);
+      if (!editingRange.value.name) return showError({ message: t('dhcpv6.messages.enterRangeName') });
+      const err = validateName(editingRange.value.name, t);
+      if (err) return showError({ message: err });
       if (isPresent(editingRange.value.prefix)) {
-        const pErr = validateIPv6Prefix(editingRange.value.prefix);
-        if (pErr) return alert(`前缀：${pErr}`);
+        const pErr = validateIPv6Prefix(editingRange.value.prefix, t);
+        if (pErr) return showError({ message: t('dhcpv6.messages.rangePrefixError', { error: pErr }) });
       }
       if (isPresent(editingRange.value.start)) {
-        const sErr = validateIPv6(editingRange.value.start);
-        if (sErr) return alert(`起始地址：${sErr}`);
+        const sErr = validateIPv6(editingRange.value.start, t);
+        if (sErr) return showError({ message: t('dhcpv6.messages.rangeStartError', { error: sErr }) });
       }
       if (isPresent(editingRange.value.stop)) {
-        const sErr = validateIPv6(editingRange.value.stop);
-        if (sErr) return alert(`结束地址：${sErr}`);
+        const sErr = validateIPv6(editingRange.value.stop, t);
+        if (sErr) return showError({ message: t('dhcpv6.messages.rangeStopError', { error: sErr }) });
       }
       const rangeTftp = editingRange.value.options?.cisco_tftp_server || [];
-      if (rangeTftp.length > 2) return alert('地址范围 Cisco TFTP 服务器最多 2 个');
+      if (rangeTftp.length > 2) return showError({ message: t('dhcpv6.messages.rangeTftpMax') });
       for (const ip of rangeTftp) {
-        if (validateIPv6(ip)) return alert(`地址范围 Cisco TFTP 服务器 ${ip}：IPv6 地址格式错误`);
+        if (validateIPv6(ip, t)) return showError({ message: t('dhcpv6.messages.rangeTftpInvalid', { ip }) });
       }
       const list = editingSubnet.value.ranges || [];
       const idx = list.findIndex(r => r._name === editingRange.value._name);
       if (idx >= 0) {
         list.splice(idx, 1, JSON.parse(JSON.stringify(editingRange.value)));
       } else {
-        if (list.some(r => r.name === editingRange.value.name)) return alert('该地址范围名称已存在');
+        if (list.some(r => r.name === editingRange.value.name)) return showError({ message: t('dhcpv6.messages.rangeNameExists') });
         list.push(JSON.parse(JSON.stringify(editingRange.value)));
       }
       editingSubnet.value.ranges = [...list];
@@ -723,45 +729,45 @@ export default defineComponent({
     }
 
     function editMapping() {
-      if (!selectedMapping.value.length) return alert('请选择要编辑的静态映射');
+      if (!selectedMapping.value.length) return showError({ message: t('dhcpv6.messages.selectMappingToEdit') });
       const row = (editingSubnet.value.static_mappings || []).find(m => m._name === selectedMapping.value[0]);
-      if (!row) return alert('未找到选中的静态映射');
+      if (!row) return showError({ message: t('dhcpv6.messages.mappingNotFound') });
       editingMapping.value = JSON.parse(JSON.stringify(row));
       showMappingModal.value = true;
     }
 
     function removeMapping() {
-      if (!selectedMapping.value.length) return alert('请选择要删除的静态映射');
+      if (!selectedMapping.value.length) return showError({ message: t('dhcpv6.messages.selectMappingToDelete') });
       editingSubnet.value.static_mappings = (editingSubnet.value.static_mappings || []).filter(m => m._name !== selectedMapping.value[0]);
       selectedMapping.value = [];
     }
 
     function saveMapping() {
-      if (!editingMapping.value.name) return alert('请输入静态映射名称');
-      const err = validateName(editingMapping.value.name);
-      if (err) return alert(err);
+      if (!editingMapping.value.name) return showError({ message: t('dhcpv6.messages.enterMappingName') });
+      const err = validateName(editingMapping.value.name, t);
+      if (err) return showError({ message: err });
       if (isPresent(editingMapping.value.ipv6_address)) {
-        const ipErr = validateIPv6(editingMapping.value.ipv6_address);
-        if (ipErr) return alert(`IPv6 地址：${ipErr}`);
+        const ipErr = validateIPv6(editingMapping.value.ipv6_address, t);
+        if (ipErr) return showError({ message: t('dhcpv6.messages.mappingIpv6Error', { error: ipErr }) });
       }
       if (isPresent(editingMapping.value.ipv6_prefix)) {
-        const pErr = validateIPv6Prefix(editingMapping.value.ipv6_prefix);
-        if (pErr) return alert(`IPv6 前缀：${pErr}`);
+        const pErr = validateIPv6Prefix(editingMapping.value.ipv6_prefix, t);
+        if (pErr) return showError({ message: t('dhcpv6.messages.mappingPrefixError', { error: pErr }) });
       }
       if (isPresent(editingMapping.value.mac)) {
-        if (!/^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/.test(editingMapping.value.mac)) return alert('MAC 格式错误');
+        if (!/^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/.test(editingMapping.value.mac)) return showError({ message: t('dhcpv6.messages.mappingMacInvalid') });
       }
       const mtftp = editingMapping.value.options?.cisco_tftp_server || [];
-      if (mtftp.length > 2) return alert('静态映射 Cisco TFTP 服务器最多 2 个');
+      if (mtftp.length > 2) return showError({ message: t('dhcpv6.messages.mappingTftpMax') });
       for (const ip of mtftp) {
-        if (validateIPv6(ip)) return alert(`静态映射 Cisco TFTP 服务器 ${ip}：IPv6 地址格式错误`);
+        if (validateIPv6(ip, t)) return showError({ message: t('dhcpv6.messages.mappingTftpInvalid', { ip }) });
       }
       const list = editingSubnet.value.static_mappings || [];
       const idx = list.findIndex(m => m._name === editingMapping.value._name);
       if (idx >= 0) {
         list.splice(idx, 1, JSON.parse(JSON.stringify(editingMapping.value)));
       } else {
-        if (list.some(m => m.name === editingMapping.value.name)) return alert('该静态映射名称已存在');
+        if (list.some(m => m.name === editingMapping.value.name)) return showError({ message: t('dhcpv6.messages.mappingNameExists') });
         list.push(JSON.parse(JSON.stringify(editingMapping.value)));
       }
       editingSubnet.value.static_mappings = [...list];
@@ -777,41 +783,41 @@ export default defineComponent({
     }
 
     function editDelegation() {
-      if (!selectedDelegation.value.length) return alert('请选择要编辑的前缀委派');
+      if (!selectedDelegation.value.length) return showError({ message: t('dhcpv6.messages.selectDelegationToEdit') });
       const row = (editingSubnet.value.prefix_delegations || []).find(d => d._prefix === selectedDelegation.value[0]);
-      if (!row) return alert('未找到选中的前缀委派');
+      if (!row) return showError({ message: t('dhcpv6.messages.delegationNotFound') });
       editingDelegation.value = JSON.parse(JSON.stringify(row));
       showDelegationModal.value = true;
     }
 
     function removeDelegation() {
-      if (!selectedDelegation.value.length) return alert('请选择要删除的前缀委派');
+      if (!selectedDelegation.value.length) return showError({ message: t('dhcpv6.messages.selectDelegationToDelete') });
       editingSubnet.value.prefix_delegations = (editingSubnet.value.prefix_delegations || []).filter(d => d._prefix !== selectedDelegation.value[0]);
       selectedDelegation.value = [];
     }
 
     function saveDelegation() {
-      if (!editingDelegation.value.prefix) return alert('请输入前缀');
-      const pErr = validateIPv6Prefix(editingDelegation.value.prefix);
-      if (pErr) return alert(`前缀：${pErr}`);
-      const dlErr = validateRange(editingDelegation.value.delegated_length, 32, 64, '委派长度');
-      if (dlErr) return alert(dlErr);
-      const plErr = validateRange(editingDelegation.value.prefix_length, 32, 64, '前缀长度');
-      if (plErr) return alert(plErr);
+      if (!editingDelegation.value.prefix) return showError({ message: t('dhcpv6.messages.enterPrefix') });
+      const pErr = validateIPv6Prefix(editingDelegation.value.prefix, t);
+      if (pErr) return showError({ message: t('dhcpv6.messages.delegationPrefixError', { error: pErr }) });
+      const dlErr = validateRange(editingDelegation.value.delegated_length, 32, 64, 'dhcpv6.validation.delegatedLengthRange', t);
+      if (dlErr) return showError({ message: dlErr });
+      const plErr = validateRange(editingDelegation.value.prefix_length, 32, 64, 'dhcpv6.validation.prefixLengthRange', t);
+      if (plErr) return showError({ message: plErr });
       if (isPresent(editingDelegation.value.excluded_prefix)) {
-        const epErr = validateIPv6Prefix(editingDelegation.value.excluded_prefix);
-        if (epErr) return alert(`排除前缀：${epErr}`);
+        const epErr = validateIPv6Prefix(editingDelegation.value.excluded_prefix, t);
+        if (epErr) return showError({ message: t('dhcpv6.messages.delegationExcludedPrefixError', { error: epErr }) });
       }
       if (isPresent(editingDelegation.value.excluded_prefix_length)) {
-        const eplErr = validateRange(editingDelegation.value.excluded_prefix_length, 32, 64, '排除前缀长度');
-        if (eplErr) return alert(eplErr);
+        const eplErr = validateRange(editingDelegation.value.excluded_prefix_length, 32, 64, 'dhcpv6.validation.excludedPrefixLengthRange', t);
+        if (eplErr) return showError({ message: eplErr });
       }
       const list = editingSubnet.value.prefix_delegations || [];
       const idx = list.findIndex(d => d._prefix === editingDelegation.value._prefix);
       if (idx >= 0) {
         list.splice(idx, 1, JSON.parse(JSON.stringify(editingDelegation.value)));
       } else {
-        if (list.some(d => d.prefix === editingDelegation.value.prefix)) return alert('该前缀已存在');
+        if (list.some(d => d.prefix === editingDelegation.value.prefix)) return showError({ message: t('dhcpv6.messages.prefixExists') });
         list.push(JSON.parse(JSON.stringify(editingDelegation.value)));
       }
       editingSubnet.value.prefix_delegations = [...list];
@@ -819,9 +825,13 @@ export default defineComponent({
       showDelegationModal.value = false;
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
     return {
+      t,
       loading, saving, saved, config, activeTab, writeDisabled, commandPath, interfaces,
       networkColumns, selectedNetwork, showNetworkModal, editingNetwork,
       subnetColumns, selectedSubnet, showSubnetModal, editingSubnet,
@@ -839,289 +849,285 @@ export default defineComponent({
   components: { DataTable, DraggableModal, DualListSelector, TabGroup, ToolbarButton },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('dhcpv6.messages.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本' },
-        { key: 'global', title: '全局参数' },
-        { key: 'shared-networks', title: '共享网络' }
+        { key: 'basic', title: t('dhcpv6.tabs.basic') },
+        { key: 'global', title: t('dhcpv6.tabs.global') },
+        { key: 'shared-networks', title: t('dhcpv6.tabs.sharedNetworks') }
       ]">
 
         <template #basic>
-          <div class="form-row"><label class="form-label" title="禁用 DHCPv6 服务器实例">禁用</label><input type="checkbox" v-model="config.disable" /></div>
-          <div class="form-row"><label class="form-label" title="禁止从 DHCPv6 学习到的路由自动安装到 FIB">禁用路由自动安装</label><input type="checkbox" v-model="config.disable_route_autoinstall" /></div>
+          <div class="form-row"><label class="form-label" :title="t('dhcpv6.labels.disableTitle')">{{ t('dhcpv6.labels.disable') }}</label><input type="checkbox" v-model="config.disable" /></div>
+          <div class="form-row"><label class="form-label" :title="t('dhcpv6.labels.disableRouteAutoinstallTitle')">{{ t('dhcpv6.labels.disableRouteAutoinstall') }}</label><input type="checkbox" v-model="config.disable_route_autoinstall" /></div>
           <div class="form-row">
-            <label class="form-label" title="服务器优先级，范围 0-255">优先级 (Preference)</label>
+            <label class="form-label" :title="t('dhcpv6.labels.preferenceTitle')">{{ t('dhcpv6.labels.preference') }}</label>
             <div style="flex:1;">
               <input type="number" min="0" max="255" class="form-control" v-model="config.preference" placeholder="0-255" />
-              <div class="form-hint">范围：0-255</div>
+              <div class="form-hint">{{ t('dhcpv6.hints.range0to255') }}</div>
             </div>
           </div>
           <div class="form-row">
-            <label class="form-label" title="DHCPv6 服务器监听请求的接口">监听接口</label>
+            <label class="form-label" :title="t('dhcpv6.labels.listenInterfaceTitle')">{{ t('dhcpv6.labels.listenInterface') }}</label>
             <div style="flex:1;max-width:600px;">
-              <DualListSelector v-model="config.listen_interface" :options="interfaces.map(i => i.name).sort()" title-left="可选" title-right="已选" />
+              <DualListSelector v-model="config.listen_interface" :options="interfaces.map(i => i.name).sort()" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" />
             </div>
           </div>
         </template>
 
         <template #global>
           <div class="form-row">
-            <label class="form-label" title="全局 DNS 服务器地址">DNS 服务器</label>
+            <label class="form-label" :title="t('dhcpv6.labels.dnsServerTitle')">{{ t('dhcpv6.labels.dnsServer') }}</label>
             <div style="flex:1;max-width:600px;">
-              <DualListSelector v-model="config.global_parameters.name_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 DNS 地址后按回车" :custom-validator="validateIPv6" />
-              <div class="form-hint">点击可选列表右侧的 + 号添加自定义 IPv6 DNS 地址</div>
+              <DualListSelector v-model="config.global_parameters.name_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6Dns')" :custom-validator="(v) => validateIPv6(v, t)" />
+              <div class="form-hint">{{ t('dhcpv6.hints.addCustomDns') }}</div>
             </div>
           </div>
         </template>
 
         <template #shared-networks>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createNetwork">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editNetwork" :disabled="!selectedNetwork.length || selectedNetwork.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeNetwork" :disabled="!selectedNetwork.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createNetwork">{{ t('dhcpv6.buttons.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editNetwork" :disabled="!selectedNetwork.length || selectedNetwork.length > 1">{{ t('dhcpv6.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeNetwork" :disabled="!selectedNetwork.length">{{ t('dhcpv6.buttons.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="networkColumns" :data="config.shared_networks" row-key="name" :externalToolbar="true" :selectable="true" @selection-change="selectedNetwork = $event" />
         </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="showNetworkModal" title="共享网络" width="700px" @confirm="saveNetwork" @close="showNetworkModal = false">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingNetwork.name" :disabled="!!editingNetwork._name" /></div>
-        <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingNetwork.description" /></div>
-        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingNetwork.disable" /></div>
-        <div class="form-row"><label class="form-label">接口</label>
+      <DraggableModal v-model:visible="showNetworkModal" :title="t('dhcpv6.modals.sharedNetwork')" width="700px" @confirm="saveNetwork" @close="showNetworkModal = false">
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.name') }}</label><input class="form-control" v-model="editingNetwork.name" :disabled="!!editingNetwork._name" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.description') }}</label><input class="form-control" v-model="editingNetwork.description" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.disable') }}</label><input type="checkbox" v-model="editingNetwork.disable" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.interface') }}</label>
           <select class="form-control" v-model="editingNetwork.interface">
-            <option value="">未选择</option>
+            <option value="">{{ t('dhcpv6.placeholders.notSelected') }}</option>
             <option v-for="iface in interfaces" :key="iface.name" :value="iface.name">{{ iface.name }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">通用 DNS 服务器</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.commonDnsServer') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingNetwork.common_options.name_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 DNS 地址后按回车" :custom-validator="validateIPv6" />
+            <DualListSelector v-model="editingNetwork.common_options.name_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6Dns')" :custom-validator="(v) => validateIPv6(v, t)" />
           </div>
         </div>
-        <div class="form-row"><label class="form-label">通用搜索域</label><textarea class="form-control" v-model="editingNetwork.common_options.domain_search" rows="2" placeholder="每行一个搜索域" /></div>
-        <div class="form-row"><label class="form-label">信息刷新时间 (秒)</label><input type="number" min="0" class="form-control" v-model="editingNetwork.common_options.info_refresh_time" placeholder="秒" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.commonDomainSearch') }}</label><textarea class="form-control" v-model="editingNetwork.common_options.domain_search" rows="2" :placeholder="t('dhcpv6.placeholders.onePerLine')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.infoRefreshTime') }}</label><input type="number" min="0" class="form-control" v-model="editingNetwork.common_options.info_refresh_time" :placeholder="t('dhcpv6.placeholders.seconds')" /></div>
 
         <div style="margin-top:16px;border-top:1px solid #444;padding-top:12px;">
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createSubnet">创建子网</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editSubnet" :disabled="!selectedSubnet.length || selectedSubnet.length > 1">编辑子网</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeSubnet" :disabled="!selectedSubnet.length">删除子网</ToolbarButton>
+            <ToolbarButton icon="create" @click="createSubnet">{{ t('dhcpv6.buttons.createSubnet') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editSubnet" :disabled="!selectedSubnet.length || selectedSubnet.length > 1">{{ t('dhcpv6.buttons.editSubnet') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeSubnet" :disabled="!selectedSubnet.length">{{ t('dhcpv6.buttons.deleteSubnet') }}</ToolbarButton>
           </div>
           <DataTable :columns="subnetColumns" :data="editingNetwork.subnets || []" row-key="subnet" :externalToolbar="true" :selectable="true" @selection-change="selectedSubnet = $event" />
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showSubnetModal" title="子网" width="620px" @confirm="saveSubnet" @close="showSubnetModal = false">
-        <div class="form-row"><label class="form-label">IPv6 子网</label>
+      <DraggableModal v-model:visible="showSubnetModal" :title="t('dhcpv6.modals.subnet')" width="620px" @confirm="saveSubnet" @close="showSubnetModal = false">
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.ipv6Subnet') }}</label>
           <div style="flex:1;">
             <input class="form-control" v-model="editingSubnet.subnet" :disabled="!!editingSubnet._subnet" placeholder="2001:db8::/64" />
-            <div class="form-hint">必须与本机某个接口的 IPv6 子网一致，否则 commit 会失败</div>
+            <div class="form-hint">{{ t('dhcpv6.hints.subnetMustMatch') }}</div>
           </div>
         </div>
-        <div class="form-row"><label class="form-label">接口</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.interface') }}</label>
           <select class="form-control" v-model="editingSubnet.interface">
-            <option value="">未选择</option>
+            <option value="">{{ t('dhcpv6.placeholders.notSelected') }}</option>
             <option v-for="iface in interfaces" :key="iface.name" :value="iface.name">{{ iface.name }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">默认租约时间 (秒)</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.defaultLeaseTime') }}</label>
           <div style="flex:1;">
             <input type="number" min="1" max="4294967295" class="form-control" v-model="editingSubnet.lease_time_default" placeholder="1-4294967295" />
-            <div class="form-hint">范围：1-4294967295 秒</div>
+            <div class="form-hint">{{ t('dhcpv6.hints.rangeSeconds', { min: 1, max: 4294967295 }) }}</div>
           </div>
         </div>
-        <div class="form-row"><label class="form-label">最小租约时间 (秒)</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.minLeaseTime') }}</label>
           <div style="flex:1;">
             <input type="number" min="1" max="4294967295" class="form-control" v-model="editingSubnet.lease_time_min" placeholder="1-4294967295" />
-            <div class="form-hint">范围：1-4294967295 秒</div>
+            <div class="form-hint">{{ t('dhcpv6.hints.rangeSeconds', { min: 1, max: 4294967295 }) }}</div>
           </div>
         </div>
-        <div class="form-row"><label class="form-label">最大租约时间 (秒)</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.maxLeaseTime') }}</label>
           <div style="flex:1;">
             <input type="number" min="1" max="4294967295" class="form-control" v-model="editingSubnet.lease_time_max" placeholder="1-4294967295" />
-            <div class="form-hint">范围：1-4294967295 秒</div>
+            <div class="form-hint">{{ t('dhcpv6.hints.rangeSeconds', { min: 1, max: 4294967295 }) }}</div>
           </div>
         </div>
-        <div class="form-row"><label class="form-label">子网 ID</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.subnetId') }}</label>
           <div style="flex:1;">
             <input type="number" min="0" max="4294967295" class="form-control" v-model="editingSubnet.subnet_id" placeholder="0-4294967295" />
-            <div class="form-hint">范围：0-4294967295</div>
+            <div class="form-hint">{{ t('dhcpv6.hints.range0to4294967295') }}</div>
           </div>
         </div>
-        <div class="form-row"><label class="form-label">子网 DNS 服务器</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.subnetDnsServer') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingSubnet.options.name_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 DNS 地址后按回车" :custom-validator="validateIPv6" />
+            <DualListSelector v-model="editingSubnet.options.name_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6Dns')" :custom-validator="(v) => validateIPv6(v, t)" />
           </div>
         </div>
-        <div class="form-row"><label class="form-label">子网搜索域</label><textarea class="form-control" v-model="editingSubnet.options.domain_search" rows="2" placeholder="每行一个搜索域" /></div>
-        <div class="form-row"><label class="form-label">SNTP 服务器</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.subnetDomainSearch') }}</label><textarea class="form-control" v-model="editingSubnet.options.domain_search" rows="2" :placeholder="t('dhcpv6.placeholders.onePerLine')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.sntpServer') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingSubnet.options.sntp_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址后按回车" :custom-validator="validateIPv6" />
+            <DualListSelector v-model="editingSubnet.options.sntp_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6')" :custom-validator="(v) => validateIPv6(v, t)" />
           </div>
         </div>
-        <div class="form-row"><label class="form-label">SIP 服务器</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.sipServer') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingSubnet.options.sip_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址或主机名后按回车" :custom-validator="validateIPv6OrFQDN" />
+            <DualListSelector v-model="editingSubnet.options.sip_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6OrHostname')" :custom-validator="(v) => validateIPv6OrFQDN(v, t)" />
           </div>
         </div>
-        <div class="form-row"><label class="form-label">NIS 服务器</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.nisServer') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingSubnet.options.nis_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址后按回车" :custom-validator="validateIPv6" />
+            <DualListSelector v-model="editingSubnet.options.nis_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6')" :custom-validator="(v) => validateIPv6(v, t)" />
           </div>
         </div>
-        <div class="form-row"><label class="form-label">NIS+ 服务器</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.nisplusServer') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingSubnet.options.nisplus_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址后按回车" :custom-validator="validateIPv6" />
+            <DualListSelector v-model="editingSubnet.options.nisplus_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6')" :custom-validator="(v) => validateIPv6(v, t)" />
           </div>
         </div>
-        <div class="form-row"><label class="form-label">NIS 域</label><input class="form-control" v-model="editingSubnet.options.nis_domain" placeholder="NIS domain name" /></div>
-        <div class="form-row"><label class="form-label">NIS+ 域</label><input class="form-control" v-model="editingSubnet.options.nisplus_domain" placeholder="NIS+ domain name" /></div>
-        <div class="form-row"><label class="form-label">强制门户 (Captive Portal)</label><input class="form-control" v-model="editingSubnet.options.captive_portal" placeholder="Captive portal API endpoint" /></div>
-        <div class="form-row"><label class="form-label" title="Cisco 专用 TFTP 服务器，每个子网最多 2 个">Cisco TFTP 服务器</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.nisDomain') }}</label><input class="form-control" v-model="editingSubnet.options.nis_domain" placeholder="NIS domain name" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.nisplusDomain') }}</label><input class="form-control" v-model="editingSubnet.options.nisplus_domain" placeholder="NIS+ domain name" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.captivePortal') }}</label><input class="form-control" v-model="editingSubnet.options.captive_portal" placeholder="Captive portal API endpoint" /></div>
+        <div class="form-row"><label class="form-label" :title="t('dhcpv6.labels.ciscoTftpTitle')">{{ t('dhcpv6.labels.ciscoTftpServer') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingSubnet.options.cisco_tftp_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址后按回车" :custom-validator="validateIPv6" />
-            <div class="form-hint">最多 2 个 IPv6 地址</div>
+            <DualListSelector v-model="editingSubnet.options.cisco_tftp_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6')" :custom-validator="(v) => validateIPv6(v, t)" />
+            <div class="form-hint">{{ t('dhcpv6.hints.max2IPv6') }}</div>
           </div>
         </div>
 
         <div style="margin-top:16px;border-top:1px solid #444;padding-top:12px;">
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createRange">创建地址范围</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editRange" :disabled="!selectedRange.length || selectedRange.length > 1">编辑地址范围</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeRange" :disabled="!selectedRange.length">删除地址范围</ToolbarButton>
+            <ToolbarButton icon="create" @click="createRange">{{ t('dhcpv6.buttons.createRange') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editRange" :disabled="!selectedRange.length || selectedRange.length > 1">{{ t('dhcpv6.buttons.editRange') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeRange" :disabled="!selectedRange.length">{{ t('dhcpv6.buttons.deleteRange') }}</ToolbarButton>
           </div>
           <DataTable :columns="rangeColumns" :data="editingSubnet.ranges || []" row-key="name" :externalToolbar="true" :selectable="true" @selection-change="selectedRange = $event" />
         </div>
 
         <div style="margin-top:16px;border-top:1px solid #444;padding-top:12px;">
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createMapping">创建静态映射</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editMapping" :disabled="!selectedMapping.length || selectedMapping.length > 1">编辑静态映射</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeMapping" :disabled="!selectedMapping.length">删除静态映射</ToolbarButton>
+            <ToolbarButton icon="create" @click="createMapping">{{ t('dhcpv6.buttons.createMapping') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editMapping" :disabled="!selectedMapping.length || selectedMapping.length > 1">{{ t('dhcpv6.buttons.editMapping') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeMapping" :disabled="!selectedMapping.length">{{ t('dhcpv6.buttons.deleteMapping') }}</ToolbarButton>
           </div>
           <DataTable :columns="mappingColumns" :data="editingSubnet.static_mappings || []" row-key="name" :externalToolbar="true" :selectable="true" @selection-change="selectedMapping = $event" />
         </div>
 
         <div style="margin-top:16px;border-top:1px solid #444;padding-top:12px;">
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createDelegation">创建前缀委派</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editDelegation" :disabled="!selectedDelegation.length || selectedDelegation.length > 1">编辑前缀委派</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeDelegation" :disabled="!selectedDelegation.length">删除前缀委派</ToolbarButton>
+            <ToolbarButton icon="create" @click="createDelegation">{{ t('dhcpv6.buttons.createDelegation') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editDelegation" :disabled="!selectedDelegation.length || selectedDelegation.length > 1">{{ t('dhcpv6.buttons.editDelegation') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeDelegation" :disabled="!selectedDelegation.length">{{ t('dhcpv6.buttons.deleteDelegation') }}</ToolbarButton>
           </div>
           <DataTable :columns="delegationColumns" :data="editingSubnet.prefix_delegations || []" row-key="prefix" :externalToolbar="true" :selectable="true" @selection-change="selectedDelegation = $event" />
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showRangeModal" title="地址范围" width="620px" @confirm="saveRange" @close="showRangeModal = false">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingRange.name" :disabled="!!editingRange._name" placeholder="range01" /></div>
-        <div class="form-row"><label class="form-label">前缀</label><input class="form-control" v-model="editingRange.prefix" placeholder="h:h:h:h:h:h:h:h/x" /></div>
-        <div class="form-row"><label class="form-label">起始地址</label><input class="form-control" v-model="editingRange.start" placeholder="IPv6 地址" /></div>
-        <div class="form-row"><label class="form-label">结束地址</label><input class="form-control" v-model="editingRange.stop" placeholder="IPv6 地址" /></div>
-        <div class="form-row"><label class="form-label">DNS 服务器</label>
+      <DraggableModal v-model:visible="showRangeModal" :title="t('dhcpv6.modals.range')" width="620px" @confirm="saveRange" @close="showRangeModal = false">
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.name') }}</label><input class="form-control" v-model="editingRange.name" :disabled="!!editingRange._name" placeholder="range01" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.prefix') }}</label><input class="form-control" v-model="editingRange.prefix" placeholder="h:h:h:h:h:h:h:h/x" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.startAddress') }}</label><input class="form-control" v-model="editingRange.start" :placeholder="t('dhcpv6.placeholders.ipv6Address')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.endAddress') }}</label><input class="form-control" v-model="editingRange.stop" :placeholder="t('dhcpv6.placeholders.ipv6Address')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.dnsServer') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingRange.options.name_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 DNS 地址后按回车" :custom-validator="validateIPv6" />
+            <DualListSelector v-model="editingRange.options.name_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6Dns')" :custom-validator="(v) => validateIPv6(v, t)" />
           </div>
         </div>
-        <div class="form-row"><label class="form-label">搜索域</label><textarea class="form-control" v-model="editingRange.options.domain_search" rows="2" placeholder="每行一个搜索域" /></div>
-        <div class="form-row"><label class="form-label">SNTP 服务器</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.domainSearch') }}</label><textarea class="form-control" v-model="editingRange.options.domain_search" rows="2" :placeholder="t('dhcpv6.placeholders.onePerLine')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.sntpServer') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingRange.options.sntp_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址后按回车" :custom-validator="validateIPv6" />
+            <DualListSelector v-model="editingRange.options.sntp_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6')" :custom-validator="(v) => validateIPv6(v, t)" />
           </div>
         </div>
-        <div class="form-row"><label class="form-label">SIP 服务器</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.sipServer') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingRange.options.sip_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址或主机名后按回车" :custom-validator="validateIPv6OrFQDN" />
+            <DualListSelector v-model="editingRange.options.sip_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6OrHostname')" :custom-validator="(v) => validateIPv6OrFQDN(v, t)" />
           </div>
         </div>
-        <div class="form-row"><label class="form-label">NIS 服务器</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.nisServer') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingRange.options.nis_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址后按回车" :custom-validator="validateIPv6" />
+            <DualListSelector v-model="editingRange.options.nis_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6')" :custom-validator="(v) => validateIPv6(v, t)" />
           </div>
         </div>
-        <div class="form-row"><label class="form-label">NIS+ 服务器</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.nisplusServer') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingRange.options.nisplus_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址后按回车" :custom-validator="validateIPv6" />
+            <DualListSelector v-model="editingRange.options.nisplus_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6')" :custom-validator="(v) => validateIPv6(v, t)" />
           </div>
         </div>
-        <div class="form-row"><label class="form-label">NIS 域</label><input class="form-control" v-model="editingRange.options.nis_domain" placeholder="NIS domain name" /></div>
-        <div class="form-row"><label class="form-label">NIS+ 域</label><input class="form-control" v-model="editingRange.options.nisplus_domain" placeholder="NIS+ domain name" /></div>
-        <div class="form-row"><label class="form-label">强制门户 (Captive Portal)</label><input class="form-control" v-model="editingRange.options.captive_portal" placeholder="Captive portal API endpoint" /></div>
-        <div class="form-row"><label class="form-label" title="Cisco 专用 TFTP 服务器，每个范围最多 2 个">Cisco TFTP 服务器</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.nisDomain') }}</label><input class="form-control" v-model="editingRange.options.nis_domain" placeholder="NIS domain name" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.nisplusDomain') }}</label><input class="form-control" v-model="editingRange.options.nisplus_domain" placeholder="NIS+ domain name" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.captivePortal') }}</label><input class="form-control" v-model="editingRange.options.captive_portal" placeholder="Captive portal API endpoint" /></div>
+        <div class="form-row"><label class="form-label" :title="t('dhcpv6.labels.ciscoTftpRangeTitle')">{{ t('dhcpv6.labels.ciscoTftpServer') }}</label>
           <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingRange.options.cisco_tftp_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址后按回车" :custom-validator="validateIPv6" />
-            <div class="form-hint">最多 2 个 IPv6 地址</div>
-          </div>
-        </div>
-      </DraggableModal>
-
-      <DraggableModal v-model:visible="showMappingModal" title="静态映射" width="620px" @confirm="saveMapping" @close="showMappingModal = false">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingMapping.name" :disabled="!!editingMapping._name" placeholder="mapping01" /></div>
-        <div class="form-row"><label class="form-label">DUID</label><input class="form-control" v-model="editingMapping.duid" placeholder="Client DUID" /></div>
-        <div class="form-row"><label class="form-label">IPv6 地址</label><input class="form-control" v-model="editingMapping.ipv6_address" placeholder="IPv6 地址" /></div>
-        <div class="form-row"><label class="form-label">IPv6 前缀</label><input class="form-control" v-model="editingMapping.ipv6_prefix" placeholder="IPv6 前缀" /></div>
-        <div class="form-row"><label class="form-label">MAC</label><input class="form-control" v-model="editingMapping.mac" placeholder="xx:xx:xx:xx:xx:xx" /></div>
-        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingMapping.disable" /></div>
-        <div class="form-row"><label class="form-label">DNS 服务器</label>
-          <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingMapping.options.name_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 DNS 地址后按回车" :custom-validator="validateIPv6" />
-          </div>
-        </div>
-        <div class="form-row"><label class="form-label">搜索域</label><textarea class="form-control" v-model="editingMapping.options.domain_search" rows="2" placeholder="每行一个搜索域" /></div>
-        <div class="form-row"><label class="form-label">SNTP 服务器</label>
-          <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingMapping.options.sntp_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址后按回车" :custom-validator="validateIPv6" />
-          </div>
-        </div>
-        <div class="form-row"><label class="form-label">SIP 服务器</label>
-          <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingMapping.options.sip_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址或主机名后按回车" :custom-validator="validateIPv6OrFQDN" />
-          </div>
-        </div>
-        <div class="form-row"><label class="form-label">NIS 服务器</label>
-          <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingMapping.options.nis_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址后按回车" :custom-validator="validateIPv6" />
-          </div>
-        </div>
-        <div class="form-row"><label class="form-label">NIS+ 服务器</label>
-          <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingMapping.options.nisplus_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址后按回车" :custom-validator="validateIPv6" />
-          </div>
-        </div>
-        <div class="form-row"><label class="form-label">NIS 域</label><input class="form-control" v-model="editingMapping.options.nis_domain" placeholder="NIS domain name" /></div>
-        <div class="form-row"><label class="form-label">NIS+ 域</label><input class="form-control" v-model="editingMapping.options.nisplus_domain" placeholder="NIS+ domain name" /></div>
-        <div class="form-row"><label class="form-label">强制门户 (Captive Portal)</label><input class="form-control" v-model="editingMapping.options.captive_portal" placeholder="Captive portal API endpoint" /></div>
-        <div class="form-row"><label class="form-label" title="Cisco 专用 TFTP 服务器，每个映射最多 2 个">Cisco TFTP 服务器</label>
-          <div style="flex:1;max-width:600px;">
-            <DualListSelector v-model="editingMapping.options.cisco_tftp_server" :options="[]" title-left="可选" title-right="已选" allow-custom custom-placeholder="输入 IPv6 地址后按回车" :custom-validator="validateIPv6" />
-            <div class="form-hint">最多 2 个 IPv6 地址</div>
+            <DualListSelector v-model="editingRange.options.cisco_tftp_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6')" :custom-validator="(v) => validateIPv6(v, t)" />
+            <div class="form-hint">{{ t('dhcpv6.hints.max2IPv6') }}</div>
           </div>
         </div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showDelegationModal" title="前缀委派" width="620px" @confirm="saveDelegation" @close="showDelegationModal = false">
-        <div class="form-row"><label class="form-label">前缀</label><input class="form-control" v-model="editingDelegation.prefix" :disabled="!!editingDelegation._prefix" placeholder="2001:db8::/48" /></div>
-        <div class="form-row"><label class="form-label">委派长度</label>
+      <DraggableModal v-model:visible="showMappingModal" :title="t('dhcpv6.modals.staticMapping')" width="620px" @confirm="saveMapping" @close="showMappingModal = false">
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.name') }}</label><input class="form-control" v-model="editingMapping.name" :disabled="!!editingMapping._name" placeholder="mapping01" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.duid') }}</label><input class="form-control" v-model="editingMapping.duid" placeholder="Client DUID" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.ipv6Address') }}</label><input class="form-control" v-model="editingMapping.ipv6_address" :placeholder="t('dhcpv6.placeholders.ipv6Address')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.ipv6Prefix') }}</label><input class="form-control" v-model="editingMapping.ipv6_prefix" :placeholder="t('dhcpv6.placeholders.ipv6Prefix')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.mac') }}</label><input class="form-control" v-model="editingMapping.mac" placeholder="xx:xx:xx:xx:xx:xx" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.disable') }}</label><input type="checkbox" v-model="editingMapping.disable" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.dnsServer') }}</label>
+          <div style="flex:1;max-width:600px;">
+            <DualListSelector v-model="editingMapping.options.name_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6Dns')" :custom-validator="(v) => validateIPv6(v, t)" />
+          </div>
+        </div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.domainSearch') }}</label><textarea class="form-control" v-model="editingMapping.options.domain_search" rows="2" :placeholder="t('dhcpv6.placeholders.onePerLine')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.sntpServer') }}</label>
+          <div style="flex:1;max-width:600px;">
+            <DualListSelector v-model="editingMapping.options.sntp_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6')" :custom-validator="(v) => validateIPv6(v, t)" />
+          </div>
+        </div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.sipServer') }}</label>
+          <div style="flex:1;max-width:600px;">
+            <DualListSelector v-model="editingMapping.options.sip_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6OrHostname')" :custom-validator="(v) => validateIPv6OrFQDN(v, t)" />
+          </div>
+        </div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.nisServer') }}</label>
+          <div style="flex:1;max-width:600px;">
+            <DualListSelector v-model="editingMapping.options.nis_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6')" :custom-validator="(v) => validateIPv6(v, t)" />
+          </div>
+        </div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.nisplusServer') }}</label>
+          <div style="flex:1;max-width:600px;">
+            <DualListSelector v-model="editingMapping.options.nisplus_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6')" :custom-validator="(v) => validateIPv6(v, t)" />
+          </div>
+        </div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.nisDomain') }}</label><input class="form-control" v-model="editingMapping.options.nis_domain" placeholder="NIS domain name" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.nisplusDomain') }}</label><input class="form-control" v-model="editingMapping.options.nisplus_domain" placeholder="NIS+ domain name" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.captivePortal') }}</label><input class="form-control" v-model="editingMapping.options.captive_portal" placeholder="Captive portal API endpoint" /></div>
+        <div class="form-row"><label class="form-label" :title="t('dhcpv6.labels.ciscoTftpMappingTitle')">{{ t('dhcpv6.labels.ciscoTftpServer') }}</label>
+          <div style="flex:1;max-width:600px;">
+            <DualListSelector v-model="editingMapping.options.cisco_tftp_server" :options="[]" :title-left="t('dhcpv6.dualList.available')" :title-right="t('dhcpv6.dualList.selected')" allow-custom :custom-placeholder="t('dhcpv6.placeholders.enterIPv6')" :custom-validator="(v) => validateIPv6(v, t)" />
+            <div class="form-hint">{{ t('dhcpv6.hints.max2IPv6') }}</div>
+          </div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="showDelegationModal" :title="t('dhcpv6.modals.prefixDelegation')" width="620px" @confirm="saveDelegation" @close="showDelegationModal = false">
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.prefix') }}</label><input class="form-control" v-model="editingDelegation.prefix" :disabled="!!editingDelegation._prefix" placeholder="2001:db8::/48" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.delegatedLength') }}</label>
           <div style="flex:1;">
             <input type="number" min="32" max="64" class="form-control" v-model="editingDelegation.delegated_length" placeholder="32-64" />
-            <div class="form-hint">范围：32-64</div>
+            <div class="form-hint">{{ t('dhcpv6.hints.range32to64') }}</div>
           </div>
         </div>
-        <div class="form-row"><label class="form-label">前缀长度</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.prefixLength') }}</label>
           <div style="flex:1;">
             <input type="number" min="32" max="64" class="form-control" v-model="editingDelegation.prefix_length" placeholder="32-64" />
-            <div class="form-hint">范围：32-64</div>
+            <div class="form-hint">{{ t('dhcpv6.hints.range32to64') }}</div>
           </div>
         </div>
-        <div class="form-row"><label class="form-label">排除前缀</label><input class="form-control" v-model="editingDelegation.excluded_prefix" placeholder="IPv6 前缀" /></div>
-        <div class="form-row"><label class="form-label">排除前缀长度</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.excludedPrefix') }}</label><input class="form-control" v-model="editingDelegation.excluded_prefix" :placeholder="t('dhcpv6.placeholders.ipv6Prefix')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcpv6.labels.excludedPrefixLength') }}</label>
           <div style="flex:1;">
             <input type="number" min="32" max="64" class="form-control" v-model="editingDelegation.excluded_prefix_length" placeholder="32-64" />
-            <div class="form-hint">范围：32-64</div>
+            <div class="form-hint">{{ t('dhcpv6.hints.range32to64') }}</div>
           </div>
         </div>
       </DraggableModal>

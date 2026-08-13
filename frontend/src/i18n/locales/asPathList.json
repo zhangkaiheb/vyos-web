@@ -1,0 +1,408 @@
+{
+  "zh-CN": {
+    "asPathList": {
+      "tab": {
+        "basic": "基本"
+      },
+      "column": {
+        "name": "名称",
+        "description": "描述",
+        "ruleCount": "规则数",
+        "rule": "规则编号",
+        "action": "动作",
+        "regex": "正则表达式"
+      },
+      "label": {
+        "name": "名称",
+        "description": "描述",
+        "rule": "规则编号",
+        "action": "动作",
+        "regex": "正则表达式"
+      },
+      "placeholder": {
+        "name": "例如: as01",
+        "regex": "例如: 64501 64502"
+      },
+      "help": {
+        "rule": "范围 1-65535"
+      },
+      "button": {
+        "create": "创建",
+        "edit": "编辑",
+        "delete": "删除",
+        "refresh": "刷新"
+      },
+      "title": {
+        "create": "创建",
+        "edit": "编辑",
+        "createRule": "创建规则",
+        "editRule": "编辑规则",
+        "confirmDelete": "确认删除",
+        "rules": "规则"
+      },
+      "message": {
+        "selectList": "请选择一个 AS 路径列表",
+        "enterName": "请输入名称",
+        "nameExists": "名称已存在",
+        "enterNameFirst": "请先输入名称",
+        "selectRule": "请选择一条规则",
+        "ruleExists": "规则编号已存在",
+        "confirmDeleteList": "确认删除以下 AS 路径列表？",
+        "confirmDeleteRule": "确认删除以下规则？"
+      },
+      "validation": {
+        "enterRule": "请输入规则编号",
+        "ruleRange": "规则编号范围 1-65535",
+        "selectAction": "请选择动作"
+      }
+    }
+  },
+  "en": {
+    "asPathList": {
+      "tab": {
+        "basic": "Basic"
+      },
+      "column": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Regular Expression"
+      },
+      "label": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Regular Expression"
+      },
+      "placeholder": {
+        "name": "e.g., as01",
+        "regex": "e.g., 64501 64502"
+      },
+      "help": {
+        "rule": "Range 1-65535"
+      },
+      "button": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "title": {
+        "create": "Create",
+        "edit": "Edit",
+        "createRule": "Create Rule",
+        "editRule": "Edit Rule",
+        "confirmDelete": "Confirm Delete",
+        "rules": "Rules"
+      },
+      "message": {
+        "selectList": "Please select an AS path list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "ruleExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following AS path lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      },
+      "validation": {
+        "enterRule": "Please enter a rule number",
+        "ruleRange": "Rule number range 1-65535",
+        "selectAction": "Please select an action"
+      }
+    }
+  },
+  "zh-TW": {
+    "asPathList": {
+      "tab": {
+        "basic": "Basic"
+      },
+      "column": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Regular Expression"
+      },
+      "label": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Regular Expression"
+      },
+      "placeholder": {
+        "name": "e.g., as01",
+        "regex": "e.g., 64501 64502"
+      },
+      "help": {
+        "rule": "Range 1-65535"
+      },
+      "button": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "title": {
+        "create": "Create",
+        "edit": "Edit",
+        "createRule": "Create Rule",
+        "editRule": "Edit Rule",
+        "confirmDelete": "Confirm Delete",
+        "rules": "Rules"
+      },
+      "message": {
+        "selectList": "Please select an AS path list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "ruleExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following AS path lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      },
+      "validation": {
+        "enterRule": "Please enter a rule number",
+        "ruleRange": "Rule number range 1-65535",
+        "selectAction": "Please select an action"
+      }
+    }
+  },
+  "ru": {
+    "asPathList": {
+      "tab": {
+        "basic": "Basic"
+      },
+      "column": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Regular Expression"
+      },
+      "label": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Regular Expression"
+      },
+      "placeholder": {
+        "name": "e.g., as01",
+        "regex": "e.g., 64501 64502"
+      },
+      "help": {
+        "rule": "Range 1-65535"
+      },
+      "button": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "title": {
+        "create": "Create",
+        "edit": "Edit",
+        "createRule": "Create Rule",
+        "editRule": "Edit Rule",
+        "confirmDelete": "Confirm Delete",
+        "rules": "Rules"
+      },
+      "message": {
+        "selectList": "Please select an AS path list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "ruleExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following AS path lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      },
+      "validation": {
+        "enterRule": "Please enter a rule number",
+        "ruleRange": "Rule number range 1-65535",
+        "selectAction": "Please select an action"
+      }
+    }
+  },
+  "de": {
+    "asPathList": {
+      "tab": {
+        "basic": "Basic"
+      },
+      "column": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Regular Expression"
+      },
+      "label": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Regular Expression"
+      },
+      "placeholder": {
+        "name": "e.g., as01",
+        "regex": "e.g., 64501 64502"
+      },
+      "help": {
+        "rule": "Range 1-65535"
+      },
+      "button": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "title": {
+        "create": "Create",
+        "edit": "Edit",
+        "createRule": "Create Rule",
+        "editRule": "Edit Rule",
+        "confirmDelete": "Confirm Delete",
+        "rules": "Rules"
+      },
+      "message": {
+        "selectList": "Please select an AS path list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "ruleExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following AS path lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      },
+      "validation": {
+        "enterRule": "Please enter a rule number",
+        "ruleRange": "Rule number range 1-65535",
+        "selectAction": "Please select an action"
+      }
+    }
+  },
+  "fr": {
+    "asPathList": {
+      "tab": {
+        "basic": "Basic"
+      },
+      "column": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Regular Expression"
+      },
+      "label": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Regular Expression"
+      },
+      "placeholder": {
+        "name": "e.g., as01",
+        "regex": "e.g., 64501 64502"
+      },
+      "help": {
+        "rule": "Range 1-65535"
+      },
+      "button": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "title": {
+        "create": "Create",
+        "edit": "Edit",
+        "createRule": "Create Rule",
+        "editRule": "Edit Rule",
+        "confirmDelete": "Confirm Delete",
+        "rules": "Rules"
+      },
+      "message": {
+        "selectList": "Please select an AS path list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "ruleExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following AS path lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      },
+      "validation": {
+        "enterRule": "Please enter a rule number",
+        "ruleRange": "Rule number range 1-65535",
+        "selectAction": "Please select an action"
+      }
+    }
+  },
+  "ko": {
+    "asPathList": {
+      "tab": {
+        "basic": "Basic"
+      },
+      "column": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Regular Expression"
+      },
+      "label": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "regex": "Regular Expression"
+      },
+      "placeholder": {
+        "name": "e.g., as01",
+        "regex": "e.g., 64501 64502"
+      },
+      "help": {
+        "rule": "Range 1-65535"
+      },
+      "button": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh"
+      },
+      "title": {
+        "create": "Create",
+        "edit": "Edit",
+        "createRule": "Create Rule",
+        "editRule": "Edit Rule",
+        "confirmDelete": "Confirm Delete",
+        "rules": "Rules"
+      },
+      "message": {
+        "selectList": "Please select an AS path list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "ruleExists": "Rule number already exists",
+        "confirmDeleteList": "Confirm delete the following AS path lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      },
+      "validation": {
+        "enterRule": "Please enter a rule number",
+        "ruleRange": "Rule number range 1-65535",
+        "selectAction": "Please select an action"
+      }
+    }
+  }
+}

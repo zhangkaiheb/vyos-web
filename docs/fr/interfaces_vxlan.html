@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="vxlan">
+<h1>VXLAN</h1>
+<p><abbr title="Virtual Extensible LAN">VXLAN</abbr> est une technologie de virtualisation réseau qui répond aux défis d'évolutivité dans les environnements informatiques cloud de grande taille. Il encapsule les trames Ethernet (couche 2) dans des datagrammes UDP (couche 4), qui sont ensuite transmis via le port UDP 4789, comme assigné par l'IANA. Les extrémités VXLAN, appelées <abbr title="VXLAN tunnel endpoints">VTEPs</abbr>, terminent les tunnels VXLAN et peuvent être soit des ports de commutateur virtuel ou physique.</p>
+<p>VXLAN prend en charge jusqu'à 16 millions de réseaux logiques et permet la connectivité au niveau 2 à travers des réseaux IP au niveau 3. Il utilise le multicast ou le unicast avec la réplication de tête (HER) pour diffuser le trafic de diffusion, de broadcast inconnu et multicast (BUM).</p>
+<p>La spécification VXLAN a été initialement développée par VMware, Arista Networks et Cisco. D'autres soutiens incluent Huawei, Broadcom, Citrix, Pica8, Big Switch Networks, Cumulus Networks, Dell EMC, Ericsson, Mellanox, FreeBSD, OpenBSD, Red Hat, Joyent et Juniper Networks.</p>
+<p>VXLAN est officiellement documenté par l'IETF dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc7348.html"><strong>RFC 7348</strong></a>.</p>
+<p>Lors de la configuration du VXLAN dans une machine virtuelle VyOS, assurez-vous que le spoofing MAC (Hyper-V) ou les transmissions falsifiées (ESX) sont autorisés. Sinon, l'hyperviseur peut bloquer les trames transmises.</p>
+<div class="admonition note">
+<p class="admonition-title">Remarque</p>
+<p>Même si le port VXLAN attribué par l'IANA est <strong>4789</strong>, VyOS utilise le port UDP par défaut de Linux <strong>8472</strong> pour les interfaces VXLAN. Pour garantir la compatibilité avec d'autres fournisseurs, définissez le port sur la norme IANA <strong>4789</strong>.</p>
+</div>
+<section id="configuration">
+<h2>Configuration</h2>
+<section id="common-interface-configuration">
+<h3>Configuration commune de l'interface</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez une ou plusieurs adresses IP d'interface.</strong></p>
+<p><code class="docutils literal notranslate">&lt;address&gt;</code> prend en charge IPv4 et IPv6 en notation CIDR. Par exemple, utilisez
+<code class="docutils literal notranslate">192.0.2.1/24</code> pour IPv4 ou <code class="docutils literal notranslate">2001:db8::1/64</code> pour IPv6.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 address 192.0.2.1/24
+set interfaces vxlan vxlan0 address 2001:db8::1/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un alias clair et descriptif pour l'interface.</strong></p>
+<p>Cet alias apparaît dans la commande <code class="docutils literal notranslate">show interfaces</code> et les outils de surveillance basés sur SNMP.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez l'interface.</strong></p>
+<p>L'interface sera configurée en état administrativement down (<code class="docutils literal notranslate">A/D</code>).</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt;  disable-flow-control
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-disable-flow-control" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez le contrôle de flux Ethernet (trames pause IEEE 802.3x) sur l'interface.</strong></p>
+<blockquote>
+<div><p>Le contrôle de flux Ethernet, défini par la norme IEEE 802.3x, temporairement arrête la transmission de données pour éviter la perte de paquets pendant la congestion réseau. Par exemple, lorsqu'un émetteur transmet des données plus rapidement que le récepteur ne peut les traiter.</p>
+<p>La désactivation du contrôle de flux Ethernet signifie que l'interface ne signalera pas à l'appareil connecté de suspendre la transmission et supprimera les paquets s'il est submergé.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 disable-flow-control
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; disable-link-detect
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-disable-link-detect" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez la détection des changements d'état physique de l'interface, tels que lorsqu'un câble est débranché.</strong></p>
+<p>Par défaut, l'interface détecte les changements d'état physique.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 disable-link-detect
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; mac &lt;xx:xx:xx:xx:xx:xx&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-mac-xx-xx-xx-xx-xx-xx" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez une adresse MAC personnalisée sur l'interface.</strong></p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 mac &#39;00:53:01:02:03:04&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le MTU sur l'interface.</strong></p>
+<p>Cette valeur définit la taille maximale du paquet, en octets, que l'interface transmet sans fragmentation.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la</strong> <abbr title="Taille maximale de segment">MSS</abbr> <strong>annoncée dans les paquets TCP SYN sortants sur l'interface spécifiée.</strong></p>
+<p>En limitant la valeur MSS dans les paquets TCP SYN, vous informez explicitement l'autre partie qu'elle ne doit pas envoyer de paquets plus grands que cette taille. Cela empêche les problèmes de connexion qui surviennent lorsque la découverte du MTU de chemin (PMTUD) échoue.</p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>mss :</strong> Définit la MSS à une valeur spécifique, en octets. Utilisez cette option si vous avez besoin d'imposer une MSS spécifique, par exemple pour résoudre des problèmes de connectivité ou pour satisfaire des exigences réseau spécifiques.</p></li>
+<li><p><strong>clamp-mss-to-pmtu :</strong> Le routeur calcule automatiquement la MSS à être la MTU de l'interface moins 40 octets pour le trafic IPv4 (20 octets pour l'en-tête IPv4 et 20 octets pour l'en-tête TCP). Cette option est recommandée pour configurer automatiquement la bonne valeur.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-arp-cache-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la durée pendant laquelle une entrée ARP reste valide après avoir appris une correspondance entre une adresse IP et une adresse MAC sur cette interface.</strong></p>
+<p>La durée par défaut est de 30 secondes.</p>
+<p>Une entrée ARP reste valide si elle reçoit un feedback positif des protocoles de niveau supérieur.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-disable-arp-filter" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le filtrage ARP sur cette interface.</strong></p>
+<p><strong>Comportement par défaut :</strong> Le noyau répond aux demandes ARP sur cette interface uniquement si le trafic serait routé de retour à l'expéditeur ARP via cette interface spécifique.</p>
+<p><strong>Si configuré :</strong> Le noyau répond aux demandes ARP sur cette interface pour toute adresse IP configurée sur l'hôte local, indépendamment de l'interface spécifique à laquelle cette adresse IP est assignée, et indépendamment de la table de routage. Cela reflète le concept Linux selon lequel les adresses IP appartiennent à l'hôte, et non aux interfaces individuelles.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip disable-arp-filter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour un comportement d'hôte ou de routeur.</strong></p>
+<p>Si configuré, l'interface passe en mode hôte, et le transfert IPv4 est désactivé dessus.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez si les paquets broadcast directs IP reçus sur cette interface doivent être transmis.</strong></p>
+<p><strong>Comportement par défaut :</strong> Les paquets broadcast directs IP sont supprimés.</p>
+<p><strong>Si configuré :</strong> Les paquets broadcast directs IP sont transmis à tous les hôtes sur le sous-réseau de destination, conformément à <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> et <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-enable-arp-accept" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez comment traiter les ARPs gratuit sur cette interface.</strong></p>
+<p>Si configuré, une correspondance IP-MAC est ajoutée au tableau ARP en fonction des demandes ou réponses ARP gratuit.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Si le tableau ARP contient déjà l'adresse IP provenant d'un ARP gratuit, son entrée est mise à jour, indépendamment de la configuration de ce paramètre.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-enable-arp-announce" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la sélection de l'adresse IP source pour les demandes ARP sur cette interface.</strong></p>
+<p><strong>Comportement par défaut :</strong> Le noyau peut utiliser n'importe quelle adresse IP possédée par l'hôte comme adresse IP source dans les demandes ARP sur cette interface.</p>
+<p><strong>Si configuré :</strong> Le noyau tente d'abord de sélectionner une adresse IP source configurée sur l'interface partageant un sous-réseau commun avec l'adresse IP cible. Si aucun tel sous-réseau n'existe, le noyau sélectionne l'adresse IP qu'il utiliserait normalement (en fonction de la table de routage pour atteindre la destination cible).</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-enable-arp-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez les demandes ARP qui seront ignorées sur cette interface.</strong></p>
+<p><strong>Comportement par défaut :</strong> Le noyau répond aux demandes ARP pour toutes les adresses IP locales, indépendamment de l'interface à laquelle elles sont assignées.</p>
+<p><strong>Si configuré :</strong> Le noyau répond aux demandes ARP uniquement si l'adresse IP cible est assignée à cette interface spécifique.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-enable-proxy-arp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le proxy ARP sur cette interface.</strong></p>
+<p>Si configuré, le routeur (noyau) intercepte les demandes ARP pour des adresses IP non locales et répond avec l'adresse <abbr title="Media Access Control">MAC</abbr> de l'interface qui a reçu la demande. Les paquets suivants destinés à ces adresses IP sont acheminés vers leurs destinations réelles sur des sous-réseaux distants.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip enable-proxy-arp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-proxy-arp-pvlan" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le proxy ARP local sur l'interface.</strong></p>
+<p>Si configuré, le routeur (noyau) répond aux demandes ARP sur cette interface VLAN même si l'adresse IP cible se trouve sur le même sous-réseau et interface.</p>
+<p>Cela est utilisé pour soutenir les exigences de séparation réseau (RFC 3069) pour les VLAN privés (PVLANs). Dans les configurations PVLAN, les hôtes sur les ports isolés ne sont PAS autorisés à communiquer directement entre eux au niveau 2, mais ils peuvent communiquer avec le routeur supérieur.</p>
+<p>Avec une réponse aux demandes ARP inter-hôtes avec sa propre adresse <abbr title="Media Access Control">MAC</abbr>, le routeur (noyau) dirige le trafic inter-hôtes à travers lui-même au lieu de directement entre les hôtes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette commande fonctionne indépendamment et ne nécessite pas l'activation du proxy ARP standard sur l'interface.</p>
+</div>
+<p>Le proxy ARP local est également connu sous les noms suivants :</p>
+<ul class="simple">
+<li><p>Aggrégation de VLAN (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>VLAN privé (Cisco, Allied Telesyn).</p></li>
+<li><p>Filtrage de port source ou isolation de port (Hewlett-Packard).</p></li>
+<li><p>Transfert forcé MAC (Ericsson).</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la validation de l'adresse IP source à l'aide de</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>sur cette interface, comme spécifié dans</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>strict :</strong> Chaque adresse IP source des paquets entrants est vérifiée contre la base d'informations de routage (FIB). Si l'interface n'est pas le meilleur chemin de retour à cette source, la validation échoue et le paquet est supprimé.</p></li>
+<li><p><strong>loose :</strong> Chaque adresse IP source des paquets entrants est vérifiée contre la FIB. Si l'adresse IP source est inatteignable via n'importe quelle interface, la validation échoue.</p></li>
+<li><p><strong>disable :</strong> Aucune validation d'adresse IP source n'est effectuée. Tous les paquets entrants sont acceptés.</p></li>
+</ul>
+<p>Le RFC 3704 recommande d'activer le mode strict pour empêcher le piratage d'IP, comme les attaques DDoS. Pour les scénarios de routage asymétrique ou autres scénarios complexes, utilisez le mode loose.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour obtenir automatiquement une adresse IPv6 à l'aide de</strong>
+<abbr title="Autoconfiguration d'adresse sans état">SLAAC</abbr>, <strong>comme spécifié dans</strong>
+<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<p>Les hôtes IPv6 peuvent se configurer automatiquement lorsqu'ils sont connectés à un réseau IPv6 en utilisant le protocole de découverte de voisins via les messages de découverte de routeur ICMPv6. Lorsqu'ils se connectent pour la première fois à un réseau, un hôte envoie une requête de diffusion de routeur link-local pour ses paramètres de configuration. Le routeur répond avec un paquet de publication de routeur contenant les paramètres de configuration du niveau Internet.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette méthode désactive automatiquement le transfert de trafic IPv6 sur l'interface.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ipv6 address autoconf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-address-eui64-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour lui attribuer une adresse IPv6 à l'aide de la méthode</strong>
+<abbr title="Identifiant unique étendu de 64 bits">EUI-64</abbr> <strong>, comme spécifié</strong> dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ipv6 address eui64 2001:db8:beef::/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ipv6 address no-default-link-local
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-address-no-default-link-local" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez l'attribution automatique d'une adresse IPv6 link-local à cette interface.</strong></p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ipv6 address no-default-link-local
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour un comportement d'hôte ou de routeur.</strong></p>
+<p>Si configuré, l'interface passe en mode hôte, et le transfert IPv6 est désactivé dessus.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ipv6 disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ipv6 adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la</strong> <abbr title="Taille maximale de segment">MSS</abbr> <strong>annoncée dans les paquets TCP SYN sortants sur l'interface spécifiée.</strong></p>
+<p>En limitant la valeur MSS dans les paquets TCP SYN, vous informez explicitement l'autre partie qu'elle ne doit pas envoyer de paquets plus grands que cette taille. Cela empêche les problèmes de connexion lorsqu'il y a un échec de la découverte du MTU de chemin (PMTUD).</p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>mss :</strong> Définissez la MSS à une valeur spécifique, en octets. Utilisez cette option pour imposer une MSS spécifique, par exemple pour résoudre des problèmes de connectivité ou pour satisfaire des exigences réseau spécifiques.</p></li>
+<li><p><strong>clamp-mss-to-pmtu :</strong> Le routeur calcule la MSS à être la MTU de l'interface moins 60 octets pour le trafic IPv6 (40 octets pour l'en-tête IPv6 et 20 octets pour l'en-tête TCP). Cette option est recommandée pour configurer automatiquement la bonne valeur.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ipv6 accept-dad &lt;0 | 1 | 2&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-accept-dad-0-1-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le</strong> <abbr title="Détection de duplication d'adresse">DAD</abbr> <strong>IPv6 sur l'interface.</strong></p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>0 :</strong> Désactive le DAD. Aucune détection de duplication d'adresse n'est effectuée.</p></li>
+<li><p><strong>1 :</strong> Active le DAD (par défaut). Les adresses dupliquées sont détectées. L'opération IPv6 de l'interface continue pour les adresses IPv6 valides.</p></li>
+<li><p><strong>2 :</strong> Active le DAD et, si une adresse link-local dupliquée basée sur la MAC est trouvée, désactive l'opération IPv6 sur cette interface.</p></li>
+</ul>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ipv6 accept-dad 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; ipv6 dup-addr-detect-transmits &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-dup-addr-detect-transmits-n" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le nombre de</strong> <abbr title="Détection de duplication d'adresse">DAD</abbr>
+<strong>messages que le routeur (noyau) envoie pendant l'attribution d'adresse IPv6 sur cette interface.</strong></p>
+<p>La valeur par défaut est 1.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ipv6 dup-addr-detect-transmits 5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; vrf &lt;vrf&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-vrf-vrf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Attribuez l'interface à une instance spécifique</strong> <abbr title="Routing et forwarding virtuels">VRF</abbr> <strong>.</strong></p>
+<div class="admonition seealso">
+<p class="admonition-title">Voir aussi</p>
+<p>Pour plus d'informations sur la configuration d'un VRF, consultez la section <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 vrf red
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="vxlan-specific-options">
+<h3>Options spécifiques à VXLAN</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; vni &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-vni-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un</strong> <abbr title="Identifiant de réseau VXLAN">VNI</abbr> <strong>pour l'interface VXLAN.</strong></p>
+<p>Chaque segment VXLAN est identifié par ce VNI de 24 bits, permettant jusqu'à 16 millions de segments de coexister dans le même domaine administratif.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez le port UDP de l'extrémité VXLAN distante.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Même si le port VXLAN attribué par l'IANA est <strong>4789</strong>, VyOS utilise le port UDP par défaut de Linux <strong>8472</strong> pour les interfaces VXLAN.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez l'adresse IP source pour le sous-réseau VXLAN.</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Cette configuration est obligatoire lors de la déploiement de VXLAN via L2VPN/EVPN.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; gpe
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-gpe" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activez le</strong> <abbr title="Extension de protocole générique">GPE</abbr> <strong>pour l'interface VXLAN.</strong></p>
+<p>Pour utiliser cette fonctionnalité, vous devez configurer l'interface avec le paramètre <code class="docutils literal notranslate">external</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; parameters external
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-parameters-external" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface VXLAN pour utiliser un plan de contrôle externe, comme BGP L2VPN/EVPN, pour la découverte des points d'extrémité distants.</strong></p>
+<p>Si non configuré, la base de données de transfert interne (FDB) est utilisée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; parameters neighbor-suppress
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-parameters-neighbor-suppress" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activez la suppression ARP et ND sur l'interface VXLAN.</strong></p>
+<p>Cela réduit la diffusion de messages ARP et ND sur le réseau VXLAN. Comme défini dans <a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc7432.html#section-10"><strong>RFC 7432#section-10</strong></a>, les VTEPs participants utilisent des liaisons MAC-IP connues pour répondre aux demandes locales au nom des hôtes distants.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; parameters nolearning
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-parameters-nolearning" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Désactivez l'apprentissage de l'adresse MAC et de l'adresse IP sur l'interface VXLAN.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; parameters vni-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-parameters-vni-filter" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activez le filtrage de</strong> <abbr title="Identifiant de réseau VXLAN">VNI</abbr> <strong>sur l'interface VXLAN.</strong></p>
+<p>Lorsqu'elle est activée, l'interface ne reçoit que les paquets avec des VNIs configurés dans sa table de filtrage VNI.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Le filtrage VNI fonctionne uniquement si l'interface est configurée avec le paramètre <code class="docutils literal notranslate">external</code>.</p>
+</div>
+</div>
+</div>
+<section id="unicast">
+<h4>Unicast</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; remote &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-remote-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'adresse IPv4 ou IPv6 de l'extrémité VTEP distante.</strong></p>
+<p>Contrairement aux configurations multicast, cette commande vous permet de configurer directement l'adresse IPv4 ou IPv6 distante.</p>
+</div>
+</div>
+</section>
+<section id="multicast">
+<h4>Multicast</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; source-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-source-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface source pour le sous-réseau VXLAN.</strong></p>
+<p>Tout le trafic VXLAN est envoyé et reçu via l'interface spécifiée. Cette configuration est obligatoire lors du déploiement de VXLAN sur un réseau multicast.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; group &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-group-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'adresse de groupe multicast IPv4 ou IPv6 pour l'interface VXLAN.</strong></p>
+<p>Les tunnels VXLAN peuvent être construits à l'aide d'une adresse de groupe multicast ou d'une adresse IP unicast.</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="multicast-vxlan">
+<h2>VXLAN multicast</h2>
+<p>Topologie : PC4 - Leaf2 - Spine1 - Leaf3 - PC5</p>
+<p>PC4 utilise l'adresse IP <code class="docutils literal notranslate">10.0.0.4/24</code>, et PC5 utilise l'adresse IP
+<code class="docutils literal notranslate">10.0.0.5/24</code>. Les deux appareils supposent qu'ils résident dans le même domaine de diffusion.</p>
+<p>Supposons que PC4 sur Leaf2 ping PC5 sur Leaf3. Au lieu de spécifier manuellement Leaf3 comme point d'extrémité distant, Leaf2 encapsule le paquet dans un datagramme UDP et l'envoie à l'adresse multicast désignée via Spine1. Spine1 transmet le paquet à tous les leafs du même groupe multicast, y compris Leaf3. Lorsque Leaf3 reçoit le datagramme, il le transmet à PC5 et apprend que PC4 est accessible via Leaf2 en examinant l'adresse IP source dans le datagramme encapsulé.</p>
+<p>PC5 reçoit le ping et répond avec une réponse d'écho. Leaf3, maintenant conscient de la localisation de PC4, transmet la réponse directement à l'adresse unicast de Leaf2. Lorsque Leaf2 reçoit la réponse d'écho, il apprend que PC5 est accessible via Leaf3.</p>
+<p>Après cette découverte, le trafic ultérieur entre PC4 et PC5 ne fera pas usage de l'adresse multicast entre les leafs, car les leafs ont appris la localisation des ordinateurs. Cela réduit le trafic multicast et la charge réseau, améliorant ainsi l'évolutivité lorsque davantage de leafs sont ajoutés.</p>
+</section>
+<section id="single-vxlan-device-svd">
+<h2>Appareil VXLAN unique (SVD)</h2>
+<p>Dans VyOS, vous pouvez configurer plusieurs <strong>mappages VLAN-VNI</strong> pour EVPN-VXLAN sur une seule interface conteneur, appelée un seul appareil VXLAN (SVD). Cela permet une grande évolutivité VNI car une interface VXLAN distincte n'est pas nécessaire pour chaque VNI.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vxlan &lt;interface&gt; vlan-to-vni &lt;vlan&gt; vni &lt;vni&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-vlan-to-vni-vlan-vni-vni" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Mappez un ID VLAN à un VNI sur l'interface VXLAN spécifiée.</strong></p>
+<p>L'interface VXLAN peut être ajoutée à un pont.</p>
+<p>L'exemple suivant montre une configuration SVD avec plusieurs mappages VLAN-VNI.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bridge br0 member interface vxlan0
+set interfaces vxlan vxlan0 parameters external
+set interfaces vxlan vxlan0 source-interface &#39;dum0&#39;
+set interfaces vxlan vxlan0 vlan-to-vni 10 vni &#39;10010&#39;
+set interfaces vxlan vxlan0 vlan-to-vni 11 vni &#39;10011&#39;
+set interfaces vxlan vxlan0 vlan-to-vni 30 vni &#39;10030&#39;
+set interfaces vxlan vxlan0 vlan-to-vni 31 vni &#39;10031&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<section id="example">
+<h3>Exemple</h3>
+<p>L'exemple suivant illustre un déploiement VXLAN multicast.</p>
+<p>La configuration comprend trois routeurs : Spine1, un routeur Cisco IOS, et Leaf2 et Leaf3, qui sont des routeurs VyOS.</p>
+<p><strong>Topologie :</strong> Leaf2 - Spine1 - Leaf3.</p>
+<p>La topologie est construite à l'aide de GNS3.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Spine1:
+fa0/2 vers Leaf2, adresse IP : 10.1.2.1/24
+fa0/3 vers Leaf3, adresse IP : 10.1.3.1/24
+
+Leaf2:
+Eth0 vers Spine1, adresse IP : 10.1.2.2/24
+Eth1 vers un commutateur compatible VLAN
+
+Leaf3:
+Eth0 vers Spine1, adresse IP 10.1.3.3/24
+Eth1 vers un commutateur compatible VLAN
+</pre></div>
+</div>
+<p><strong>Configuration de Spine1 :</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>conf t
+ip multicast-routing
+!
+interface fastethernet0/2
+ ip address 10.1.2.1 255.255.255.0
+ ip pim sparse-dense-mode
+!
+interface fastethernet0/3
+ ip address 10.1.3.1 255.255.255.0
+ ip pim sparse-dense-mode
+!
+router ospf 1
+ network 10.0.0.0 0.255.255.255 area 0
+</pre></div>
+</div>
+<p>Le routage multicast est requis pour le transfert de trafic évolutif entre les leafs.
+<abbr title="Multicast indépendant du protocole">PIM</abbr> doit être activé vers les leafs afin que le spine puisse apprendre de quel groupe multicast chaque leaf attend du trafic.</p>
+<p><strong>Configuration de Leaf2 :</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address &#39;10.1.2.2/24&#39;
+set protocols ospf area 0 network &#39;10.0.0.0/8&#39;
+
+! Première interface VXLAN
+set interfaces bridge br241 address &#39;172.16.241.1/24&#39;
+set interfaces bridge br241 member interface &#39;eth1.241&#39;
+set interfaces bridge br241 member interface &#39;vxlan241&#39;
+
+set interfaces vxlan vxlan241 group &#39;239.0.0.241&#39;
+set interfaces vxlan vxlan241 source-interface &#39;eth0&#39;
+set interfaces vxlan vxlan241 vni &#39;241&#39;
+
+! Deuxième interface VXLAN
+set interfaces bridge br242 address &#39;172.16.242.1/24&#39;
+set interfaces bridge br242 member interface &#39;eth1.242&#39;
+set interfaces bridge br242 member interface &#39;vxlan242&#39;
+
+set interfaces vxlan vxlan242 group &#39;239.0.0.242&#39;
+set interfaces vxlan vxlan242 source-interface &#39;eth0&#39;
+set interfaces vxlan vxlan242 vni &#39;242&#39;
+</pre></div>
+</div>
+<p><strong>Configuration de Leaf3 :</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address &#39;10.1.3.3/24&#39;
+set protocols ospf area 0 network &#39;10.0.0.0/8&#39;
+
+! Première interface VXLAN
+set interfaces bridge br241 address &#39;172.16.241.1/24&#39;
+set interfaces bridge br241 member interface &#39;eth1.241&#39;
+set interfaces bridge br241 member interface &#39;vxlan241&#39;
+
+set interfaces vxlan vxlan241 group &#39;239.0.0.241&#39;
+set interfaces vxlan vxlan241 source-interface &#39;eth0&#39;
+set interfaces vxlan vxlan241 vni &#39;241&#39;
+
+! Deuxième interface VXLAN
+set interfaces bridge br242 address &#39;172.16.242.1/24&#39;
+set interfaces bridge br242 member interface &#39;eth1.242&#39;
+set interfaces bridge br242 member interface &#39;vxlan242&#39;
+
+set interfaces vxlan vxlan242 group &#39;239.0.0.242&#39;
+set interfaces vxlan vxlan242 source-interface &#39;eth0&#39;
+set interfaces vxlan vxlan242 vni &#39;242&#39;
+</pre></div>
+</div>
+<p>Les configurations de Leaf2 et Leaf3 sont presque identiques. Des explications détaillées pour chaque commande sont fournies ci-dessous.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bridge br241 address &#39;172.16.241.1/24&#39;
+</pre></div>
+</div>
+<p>Cette commande crée un pont pour lier le trafic sur <code class="docutils literal notranslate">eth1</code> VLAN 241 avec l'interface <code class="docutils literal notranslate">vxlan241</code>. L'adresse IP est facultative. Si configurée, elle peut servir de passerelle par défaut pour chaque leaf, permettant aux appareils sur le VLAN d'accéder à d'autres sous-réseaux. Les sous-réseaux doivent être redistribués par <abbr title="Open Shortest Path First">OSPF</abbr> afin que le spine puisse apprendre comment les atteindre. Pour annoncer les réseaux <code class="docutils literal notranslate">172.16/12</code>, changez le réseau OSPF de <code class="docutils literal notranslate">10.0.0.0/8</code> en <code class="docutils literal notranslate">0.0.0.0/0</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bridge br241 member interface &#39;eth1.241&#39;
+set interfaces bridge br241 member interface &#39;vxlan241&#39;
+</pre></div>
+</div>
+<p>Ces commandes lient <code class="docutils literal notranslate">eth1.241</code> et <code class="docutils literal notranslate">vxlan241</code> en tant qu'interfaces membres du même pont.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan241 group &#39;239.0.0.241&#39;
+</pre></div>
+</div>
+<p>Cette commande configure le groupe multicast utilisé par tous les leafs pour cette extension VLAN. Elle doit être la même sur tous les leafs ayant cette interface.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan241 source-interface &#39;eth0&#39;
+</pre></div>
+</div>
+<p>Cette commande configure l'interface qui écoute les paquets multicast. Cela peut également être une interface boucle.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan241 vni &#39;241&#39;
+</pre></div>
+</div>
+<p>Cette commande configure l'ID unique pour l'interface VXLAN.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan241 port 12345
+</pre></div>
+</div>
+<p>VyOS utilise le port UDP par défaut de Linux <strong>8472</strong> pour les interfaces VXLAN. Cette commande vous permet de configurer un port UDP différent.</p>
+</section>
+</section>
+<section id="unicast-vxlan">
+<h2>VXLAN unicast</h2>
+<p>En alternative au multicast, vous pouvez configurer le tunnel VXLAN en spécifiant directement l'adresse IPv4 distante. La mise à jour suivante met à jour l'exemple multicast précédent :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># leaf2 et leaf3
+delete interfaces vxlan vxlan241 group &#39;239.0.0.241&#39;
+delete interfaces vxlan vxlan241 source-interface &#39;eth0&#39;
+
+# leaf2
+set interfaces vxlan vxlan241 remote 10.1.3.3
+
+# leaf3
+set interfaces vxlan vxlan241 remote 10.1.2.2
+</pre></div>
+</div>
+<p>Le port UDP par défaut est 8472. Pour configurer un port différent, utilisez <code class="docutils literal notranslate">set interfaces vxlan &lt;vxlanN&gt; port &lt;port&gt;</code>.</p>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

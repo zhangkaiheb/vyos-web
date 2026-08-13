@@ -2,6 +2,7 @@ import { defineComponent, ref, computed, onMounted, nextTick } from '/src/utils/
 import { opModeApi, systemApi } from '/src/api/index.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function isSeparator(line) {
   return /^\s*-+(\s+-+)*\s*$/.test(line);
@@ -254,10 +255,10 @@ function parseScsi(output) {
 const STORAGE_KEY = 'controlPanelLayout';
 
 const WIDGET_CATEGORIES = [
-  { key: 'system', title: '系统信息' },
-  { key: 'users', title: '用户' },
-  { key: 'hardware', title: '硬件' },
-  { key: 'tools', title: '工具' },
+  { key: 'system', titleKey: 'controlPanel.categories.system' },
+  { key: 'users', titleKey: 'controlPanel.categories.users' },
+  { key: 'hardware', titleKey: 'controlPanel.categories.hardware' },
+  { key: 'tools', titleKey: 'controlPanel.categories.tools' },
 ];
 
 const WIDGET_ORDER = [
@@ -267,20 +268,20 @@ const WIDGET_ORDER = [
 ];
 
 const WIDGET_META = {
-  cpu: { title: 'CPU', category: 'system', wide: false },
-  memory: { title: '内存', category: 'system', wide: false },
-  disk: { title: '磁盘', category: 'system', wide: false },
-  login: { title: '当前登录', category: 'system', wide: false },
-  version: { title: '系统版本', category: 'system', wide: false },
-  date: { title: '系统时间', category: 'system', wide: false },
-  users: { title: '当前用户', category: 'users', wide: false },
-  storageScsi: { title: 'SCSI 存储设备', category: 'hardware', wide: false },
-  storageNvme: { title: 'NVMe 存储设备', category: 'hardware', wide: false },
-  storageSmart: { title: 'SMART 信息', category: 'hardware', wide: false },
-  usb: { title: 'USB 设备', category: 'hardware', wide: false },
-  image: { title: '系统镜像', category: 'system', wide: false },
-  systemLoginUsers: { title: '系统登录用户', category: 'users', wide: true },
-  webshell: { title: 'Web Shell', category: 'tools', wide: false },
+  cpu: { titleKey: 'controlPanel.widgets.cpu', category: 'system', wide: false },
+  memory: { titleKey: 'controlPanel.widgets.memory', category: 'system', wide: false },
+  disk: { titleKey: 'controlPanel.widgets.disk', category: 'system', wide: false },
+  login: { titleKey: 'controlPanel.widgets.login', category: 'system', wide: false },
+  version: { titleKey: 'controlPanel.widgets.version', category: 'system', wide: false },
+  date: { titleKey: 'controlPanel.widgets.date', category: 'system', wide: false },
+  users: { titleKey: 'controlPanel.widgets.users', category: 'users', wide: false },
+  storageScsi: { titleKey: 'controlPanel.widgets.storageScsi', category: 'hardware', wide: false },
+  storageNvme: { titleKey: 'controlPanel.widgets.storageNvme', category: 'hardware', wide: false },
+  storageSmart: { titleKey: 'controlPanel.widgets.storageSmart', category: 'hardware', wide: false },
+  usb: { titleKey: 'controlPanel.widgets.usb', category: 'hardware', wide: false },
+  image: { titleKey: 'controlPanel.widgets.image', category: 'system', wide: false },
+  systemLoginUsers: { titleKey: 'controlPanel.widgets.systemLoginUsers', category: 'users', wide: true },
+  webshell: { titleKey: 'controlPanel.widgets.webshell', category: 'tools', wide: false },
 };
 
 const WidgetHeader = defineComponent({
@@ -291,14 +292,18 @@ const WidgetHeader = defineComponent({
     collapsed: { type: Boolean, default: false },
   },
   emits: ['refresh', 'toggle', 'close'],
+  setup(props) {
+    const { t } = useI18n();
+    return { t };
+  },
   template: `
     <div class="widget-header">
       <span class="widget-title">{{ title }}</span>
       <div class="widget-actions">
-        <span v-if="loading" class="widget-loading">加载中...</span>
-        <button class="widget-action-btn widget-action-refresh" title="刷新" @click.stop="$emit('refresh')">↻</button>
-        <button class="widget-action-btn widget-action-toggle" :title="collapsed ? '展开' : '折叠'" @click.stop="$emit('toggle')">{{ collapsed ? '▶' : '▼' }}</button>
-        <button class="widget-action-btn widget-action-close" title="关闭" @click.stop="$emit('close')">✕</button>
+        <span v-if="loading" class="widget-loading">{{ t('controlPanel.header.loading') }}</span>
+        <button class="widget-action-btn widget-action-refresh" :title="t('controlPanel.header.refresh')" @click.stop="$emit('refresh')">↻</button>
+        <button class="widget-action-btn widget-action-toggle" :title="collapsed ? t('controlPanel.header.expand') : t('controlPanel.header.collapse')" @click.stop="$emit('toggle')">{{ collapsed ? '▶' : '▼' }}</button>
+        <button class="widget-action-btn widget-action-close" :title="t('controlPanel.header.close')" @click.stop="$emit('close')">✕</button>
       </div>
     </div>
   `,
@@ -315,7 +320,7 @@ function createDefaultWidgets() {
   for (const key of WIDGET_ORDER) {
     const meta = WIDGET_META[key];
     result[key] = {
-      title: meta.title,
+      titleKey: meta.titleKey,
       loading: false,
       error: '',
       data: createDefaultData(key, meta.wide),
@@ -332,8 +337,13 @@ function createDefaultWidgets() {
 export default defineComponent({
   name: 'ControlPanelPage',
   setup() {
+    const { t } = useI18n();
     const widgets = ref(createDefaultWidgets());
     const widgetOrder = ref([...WIDGET_ORDER]);
+
+    const resolvedWidgetCategories = computed(() =>
+      WIDGET_CATEGORIES.map(c => ({ ...c, title: t(c.titleKey) }))
+    );
 
     const widgetItems = [
       { key: 'cpu', command: 'system cpu', parser: parseCpu },
@@ -446,7 +456,7 @@ export default defineComponent({
 
     const availableWidgets = computed(() => {
       return WIDGET_ORDER.filter(k => widgets.value[k] && !widgets.value[k].visible)
-        .map(k => ({ key: k, title: widgets.value[k].title, category: widgets.value[k].category }));
+        .map(k => ({ key: k, title: t(widgets.value[k].titleKey), category: widgets.value[k].category }));
     });
 
     const filteredWidgets = computed(() => {
@@ -457,7 +467,7 @@ export default defineComponent({
 
     const categorizedWidgets = computed(() => {
       const result = [];
-      for (const cat of WIDGET_CATEGORIES) {
+      for (const cat of resolvedWidgetCategories.value) {
         const items = filteredWidgets.value.filter(w => w.category === cat.key);
         if (items.length) result.push({ ...cat, items });
       }
@@ -473,7 +483,7 @@ export default defineComponent({
         w.raw = res.output || '';
         w.data = parser ? parser(w.raw) : w.raw;
       } catch (e) {
-        w.error = e.message || '加载失败';
+        w.error = e.message || t('controlPanel.errors.loadFailed');
         w.raw = '';
         w.data = parser ? createDefaultData(key, widgets.value[key].wide) : '';
       } finally {
@@ -536,6 +546,7 @@ export default defineComponent({
     });
 
     return {
+      t,
       widgets,
       widgetOrder,
       visibleOrder,
@@ -550,7 +561,7 @@ export default defineComponent({
       availableWidgets,
       filteredWidgets,
       categorizedWidgets,
-      WIDGET_CATEGORIES,
+      resolvedWidgetCategories,
       onDragStart,
       onDragOver,
       onDrop,
@@ -569,8 +580,8 @@ export default defineComponent({
     <div class="page-container">
       <div class="toolbar compact-toolbar">
         <div class="toolbar-left">
-          <ToolbarButton icon="addWidget" @click="modalVisible = true">添加模块</ToolbarButton>
-          <ToolbarButton icon="refresh" @click="loadAll">刷新全部</ToolbarButton>
+          <ToolbarButton icon="addWidget" @click="modalVisible = true">{{ t('controlPanel.buttons.addWidget') }}</ToolbarButton>
+          <ToolbarButton icon="refresh" @click="loadAll">{{ t('controlPanel.buttons.refreshAll') }}</ToolbarButton>
         </div>
       </div>
       <div class="widget-grid">
@@ -585,7 +596,7 @@ export default defineComponent({
           @drop="onDrop(index)"
         >
           <WidgetHeader
-            :title="widgets[key].title"
+            :title="t(widgets[key].titleKey)"
             :loading="widgets[key].loading"
             :collapsed="widgets[key].collapsed"
             @refresh="refreshWidget(key)"
@@ -598,10 +609,10 @@ export default defineComponent({
             <template v-if="key === 'cpu'">
               <table class="widget-kv">
                 <tbody>
-                <tr><td class="widget-kv-key">型号</td><td class="widget-kv-value">{{ widgets.cpu.data.model || '-' }}</td></tr>
-                <tr><td class="widget-kv-key">插槽数</td><td class="widget-kv-value">{{ widgets.cpu.data.sockets || '-' }}</td></tr>
-                <tr><td class="widget-kv-key">核心总数</td><td class="widget-kv-value">{{ widgets.cpu.data.cores || '-' }}</td></tr>
-                <tr><td class="widget-kv-key">当前主频</td><td class="widget-kv-value">{{ widgets.cpu.data.current_mhz ? widgets.cpu.data.current_mhz + ' MHz' : '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.cpu.model') }}</td><td class="widget-kv-value">{{ widgets.cpu.data.model || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.cpu.sockets') }}</td><td class="widget-kv-value">{{ widgets.cpu.data.sockets || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.cpu.cores') }}</td><td class="widget-kv-value">{{ widgets.cpu.data.cores || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.cpu.currentMhz') }}</td><td class="widget-kv-value">{{ widgets.cpu.data.current_mhz ? widgets.cpu.data.current_mhz + ' MHz' : '-' }}</td></tr>
                 </tbody>
               </table>
             </template>
@@ -609,9 +620,9 @@ export default defineComponent({
             <template v-else-if="key === 'memory'">
               <table class="widget-kv">
                 <tbody>
-                <tr><td class="widget-kv-key">总量</td><td class="widget-kv-value">{{ widgets.memory.data.total || '-' }}</td></tr>
-                <tr><td class="widget-kv-key">已用</td><td class="widget-kv-value">{{ widgets.memory.data.used || '-' }}</td></tr>
-                <tr><td class="widget-kv-key">空闲</td><td class="widget-kv-value">{{ widgets.memory.data.free || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.memory.total') }}</td><td class="widget-kv-value">{{ widgets.memory.data.total || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.memory.used') }}</td><td class="widget-kv-value">{{ widgets.memory.data.used || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.memory.free') }}</td><td class="widget-kv-value">{{ widgets.memory.data.free || '-' }}</td></tr>
                 </tbody>
               </table>
             </template>
@@ -619,9 +630,9 @@ export default defineComponent({
             <template v-else-if="key === 'disk'">
               <table class="widget-kv">
                 <tbody>
-                <tr><td class="widget-kv-key">总容量</td><td class="widget-kv-value">{{ widgets.disk.data.size || '-' }}</td></tr>
-                <tr><td class="widget-kv-key">型号</td><td class="widget-kv-value">{{ widgets.disk.data.model || '-' }}</td></tr>
-                <tr><td class="widget-kv-key">分区数</td><td class="widget-kv-value">{{ (widgets.disk.data.partitions || []).length }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.disk.size') }}</td><td class="widget-kv-value">{{ widgets.disk.data.size || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.disk.model') }}</td><td class="widget-kv-value">{{ widgets.disk.data.model || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.disk.partitions') }}</td><td class="widget-kv-value">{{ (widgets.disk.data.partitions || []).length }}</td></tr>
                 </tbody>
               </table>
             </template>
@@ -637,10 +648,10 @@ export default defineComponent({
             <template v-else-if="key === 'version'">
               <table class="widget-kv">
                 <tbody>
-                <tr><td class="widget-kv-key">Version</td><td class="widget-kv-value">{{ widgets.version.data.version || '-' }}</td></tr>
-                <tr><td class="widget-kv-key">Release train</td><td class="widget-kv-value">{{ widgets.version.data.release_train || '-' }}</td></tr>
-                <tr><td class="widget-kv-key">Architecture</td><td class="widget-kv-value">{{ widgets.version.data.architecture || '-' }}</td></tr>
-                <tr><td class="widget-kv-key">System type</td><td class="widget-kv-value">{{ widgets.version.data.system_type || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.version.version') }}</td><td class="widget-kv-value">{{ widgets.version.data.version || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.version.releaseTrain') }}</td><td class="widget-kv-value">{{ widgets.version.data.release_train || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.version.architecture') }}</td><td class="widget-kv-value">{{ widgets.version.data.architecture || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.version.systemType') }}</td><td class="widget-kv-value">{{ widgets.version.data.system_type || '-' }}</td></tr>
                 </tbody>
               </table>
             </template>
@@ -651,20 +662,20 @@ export default defineComponent({
 
             <template v-else-if="key === 'users'">
               <table class="widget-table">
-                <thead><tr><th>NAME</th><th>LINE</th><th>TIME</th><th>COMMENT</th></tr></thead>
+                <thead><tr><th>{{ t('controlPanel.users.name') }}</th><th>{{ t('controlPanel.users.line') }}</th><th>{{ t('controlPanel.users.time') }}</th><th>{{ t('controlPanel.users.comment') }}</th></tr></thead>
                 <tbody><tr v-for="(row, idx) in widgets.users.data" :key="idx"><td>{{ row.name }}</td><td>{{ row.line }}</td><td>{{ row.time }}</td><td>{{ row.comment }}</td></tr></tbody>
               </table>
             </template>
 
             <template v-else-if="key === 'storageScsi'">
               <table class="widget-table">
-                <thead><tr><th>地址</th><th>类型</th><th>厂商</th><th>产品</th><th>版本</th><th>设备</th></tr></thead>
+                <thead><tr><th>{{ t('controlPanel.storageScsi.address') }}</th><th>{{ t('controlPanel.storageScsi.type') }}</th><th>{{ t('controlPanel.storageScsi.vendor') }}</th><th>{{ t('controlPanel.storageScsi.product') }}</th><th>{{ t('controlPanel.storageScsi.revision') }}</th><th>{{ t('controlPanel.storageScsi.device') }}</th></tr></thead>
                 <tbody><tr v-for="(row, idx) in widgets.storageScsi.data" :key="idx"><td>{{ row.address }}</td><td>{{ row.type }}</td><td>{{ row.vendor }}</td><td>{{ row.product }}</td><td>{{ row.revision }}</td><td>{{ row.device }}</td></tr></tbody>
               </table>
             </template>
 
             <template v-else-if="key === 'storageNvme'">
-              <div v-if="!widgets.storageNvme.data.length" class="widget-empty">无 NVMe 设备</div>
+              <div v-if="!widgets.storageNvme.data.length" class="widget-empty">{{ t('controlPanel.storageNvme.noDevice') }}</div>
               <table v-else class="widget-table">
                 <thead><tr><th v-for="(col, cidx) in Object.keys(widgets.storageNvme.data[0])" :key="cidx">{{ col }}</th></tr></thead>
                 <tbody><tr v-for="(row, idx) in widgets.storageNvme.data" :key="idx"><td v-for="(col, cidx) in Object.keys(widgets.storageNvme.data[0])" :key="cidx">{{ row[col] }}</td></tr></tbody>
@@ -674,28 +685,28 @@ export default defineComponent({
             <template v-else-if="key === 'storageSmart'">
               <table class="widget-kv">
                 <tbody>
-                <tr><td class="widget-kv-key">Vendor</td><td class="widget-kv-value">{{ widgets.storageSmart.data.vendor || '-' }}</td></tr>
-                <tr><td class="widget-kv-key">Product</td><td class="widget-kv-value">{{ widgets.storageSmart.data.product || '-' }}</td></tr>
-                <tr><td class="widget-kv-key">User Capacity</td><td class="widget-kv-value">{{ widgets.storageSmart.data.user_capacity || '-' }}</td></tr>
-                <tr><td class="widget-kv-key">Current Temperature</td><td class="widget-kv-value">{{ widgets.storageSmart.data.current_drive_temperature || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.storageSmart.vendor') }}</td><td class="widget-kv-value">{{ widgets.storageSmart.data.vendor || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.storageSmart.product') }}</td><td class="widget-kv-value">{{ widgets.storageSmart.data.product || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.storageSmart.userCapacity') }}</td><td class="widget-kv-value">{{ widgets.storageSmart.data.user_capacity || '-' }}</td></tr>
+                <tr><td class="widget-kv-key">{{ t('controlPanel.storageSmart.currentTemperature') }}</td><td class="widget-kv-value">{{ widgets.storageSmart.data.current_drive_temperature || '-' }}</td></tr>
                 </tbody>
               </table>
             </template>
 
             <template v-else-if="key === 'usb'">
-              <pre class="widget-pre">{{ widgets.usb.data || '无数据' }}</pre>
+              <pre class="widget-pre">{{ widgets.usb.data || t('controlPanel.usb.noData') }}</pre>
             </template>
 
             <template v-else-if="key === 'image'">
               <table class="widget-table">
-                <thead><tr><th>名称</th><th>版本</th><th>只读存储</th><th>读写存储</th><th>总存储</th></tr></thead>
+                <thead><tr><th>{{ t('controlPanel.image.name') }}</th><th>{{ t('controlPanel.image.version') }}</th><th>{{ t('controlPanel.image.storageReadOnly') }}</th><th>{{ t('controlPanel.image.storageReadWrite') }}</th><th>{{ t('controlPanel.image.storageTotal') }}</th></tr></thead>
                 <tbody><tr v-for="(row, idx) in widgets.image.data" :key="idx"><td>{{ row.name }}</td><td>{{ row.version }}</td><td>{{ row.storage_read_only }}</td><td>{{ row.storage_read_write }}</td><td>{{ row.storage_total }}</td></tr></tbody>
               </table>
             </template>
 
             <template v-else-if="key === 'systemLoginUsers'">
               <table class="widget-table">
-                <thead><tr><th>用户名</th><th>类型</th><th>锁定</th><th>Tty</th><th>来源</th><th>最后登录</th></tr></thead>
+                <thead><tr><th>{{ t('controlPanel.systemLoginUsers.username') }}</th><th>{{ t('controlPanel.systemLoginUsers.type') }}</th><th>{{ t('controlPanel.systemLoginUsers.locked') }}</th><th>{{ t('controlPanel.systemLoginUsers.tty') }}</th><th>{{ t('controlPanel.systemLoginUsers.from') }}</th><th>{{ t('controlPanel.systemLoginUsers.lastLogin') }}</th></tr></thead>
                 <tbody><tr v-for="(row, idx) in widgets.systemLoginUsers.data" :key="idx"><td>{{ row.username }}</td><td>{{ row.type }}</td><td>{{ row.locked }}</td><td>{{ row.tty }}</td><td>{{ row.from }}</td><td>{{ row.last_login }}</td></tr></tbody>
               </table>
             </template>
@@ -716,9 +727,9 @@ export default defineComponent({
         </div>
       </div>
 
-      <DraggableModal v-model:visible="modalVisible" title="添加模块" width="560px" @confirm="modalVisible = false">
+      <DraggableModal v-model:visible="modalVisible" :title="t('controlPanel.modal.title')" width="560px" @confirm="modalVisible = false">
         <div class="widget-add-search">
-          <input v-model="searchKeyword" type="text" placeholder="搜索模块..." />
+          <input v-model="searchKeyword" type="text" :placeholder="t('controlPanel.modal.searchPlaceholder')" />
         </div>
         <div class="widget-add-groups">
           <div v-for="cat in categorizedWidgets" :key="cat.key" class="widget-add-group">
@@ -735,7 +746,7 @@ export default defineComponent({
               </div>
             </div>
           </div>
-          <div v-if="!filteredWidgets.length" class="widget-add-empty">未找到匹配的模块</div>
+          <div v-if="!filteredWidgets.length" class="widget-add-empty">{{ t('controlPanel.modal.noMatch') }}</div>
         </div>
       </DraggableModal>
     </div>

@@ -1,0 +1,429 @@
+{
+  "zh-CN": {
+    "prefixList": {
+      "tabs": {
+        "basic": "基本"
+      },
+      "columns": {
+        "name": "名称",
+        "description": "描述",
+        "ruleCount": "规则数",
+        "rule": "规则编号",
+        "action": "动作",
+        "prefix": "前缀",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "form": {
+        "name": "名称",
+        "description": "描述",
+        "rule": "规则编号",
+        "action": "动作",
+        "prefix": "前缀",
+        "ge": "GE",
+        "le": "LE",
+        "namePlaceholder": "例如: p01",
+        "ruleHelp": "范围 1-65535",
+        "prefixPlaceholder": "例如: 192.168.0.0/16",
+        "gePlaceholder": "0-32",
+        "geHelp": "前缀长度大于等于",
+        "lePlaceholder": "0-32",
+        "leHelp": "前缀长度小于等于"
+      },
+      "buttons": {
+        "create": "创建",
+        "edit": "编辑",
+        "delete": "删除",
+        "refresh": "刷新",
+        "rules": "规则"
+      },
+      "modal": {
+        "edit": "编辑",
+        "create": "创建",
+        "editRule": "编辑规则",
+        "createRule": "创建规则",
+        "confirmDelete": "确认删除",
+        "confirmDeleteList": "确认删除以下前缀列表？",
+        "confirmDeleteRule": "确认删除以下规则？"
+      },
+      "messages": {
+        "selectList": "请选择一个前缀列表",
+        "enterName": "请输入名称",
+        "nameExists": "名称已存在",
+        "enterNameFirst": "请先输入名称",
+        "selectRule": "请选择一条规则",
+        "enterRuleNumber": "请输入规则编号",
+        "ruleNumberRange": "规则编号范围 1-65535",
+        "selectAction": "请选择动作",
+        "enterPrefix": "请输入前缀",
+        "ruleNumberExists": "规则编号已存在"
+      }
+    }
+  },
+  "en": {
+    "prefixList": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "form": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "Prefix",
+        "ge": "GE",
+        "le": "LE",
+        "namePlaceholder": "e.g., p01",
+        "ruleHelp": "Range 1-65535",
+        "prefixPlaceholder": "e.g., 192.168.0.0/16",
+        "gePlaceholder": "0-32",
+        "geHelp": "Prefix length greater than or equal to",
+        "lePlaceholder": "0-32",
+        "leHelp": "Prefix length less than or equal to"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "rules": "Rules"
+      },
+      "modal": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteList": "Confirm delete the following prefix lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      },
+      "messages": {
+        "selectList": "Please select a prefix list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "enterRuleNumber": "Please enter rule number",
+        "ruleNumberRange": "Rule number range 1-65535",
+        "selectAction": "Please select an action",
+        "enterPrefix": "Please enter a prefix",
+        "ruleNumberExists": "Rule number already exists"
+      }
+    }
+  },
+  "zh-TW": {
+    "prefixList": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "form": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "Prefix",
+        "ge": "GE",
+        "le": "LE",
+        "namePlaceholder": "e.g., p01",
+        "ruleHelp": "Range 1-65535",
+        "prefixPlaceholder": "e.g., 192.168.0.0/16",
+        "gePlaceholder": "0-32",
+        "geHelp": "Prefix length greater than or equal to",
+        "lePlaceholder": "0-32",
+        "leHelp": "Prefix length less than or equal to"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "rules": "Rules"
+      },
+      "modal": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteList": "Confirm delete the following prefix lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      },
+      "messages": {
+        "selectList": "Please select a prefix list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "enterRuleNumber": "Please enter rule number",
+        "ruleNumberRange": "Rule number range 1-65535",
+        "selectAction": "Please select an action",
+        "enterPrefix": "Please enter a prefix",
+        "ruleNumberExists": "Rule number already exists"
+      }
+    }
+  },
+  "ru": {
+    "prefixList": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "form": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "Prefix",
+        "ge": "GE",
+        "le": "LE",
+        "namePlaceholder": "e.g., p01",
+        "ruleHelp": "Range 1-65535",
+        "prefixPlaceholder": "e.g., 192.168.0.0/16",
+        "gePlaceholder": "0-32",
+        "geHelp": "Prefix length greater than or equal to",
+        "lePlaceholder": "0-32",
+        "leHelp": "Prefix length less than or equal to"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "rules": "Rules"
+      },
+      "modal": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteList": "Confirm delete the following prefix lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      },
+      "messages": {
+        "selectList": "Please select a prefix list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "enterRuleNumber": "Please enter rule number",
+        "ruleNumberRange": "Rule number range 1-65535",
+        "selectAction": "Please select an action",
+        "enterPrefix": "Please enter a prefix",
+        "ruleNumberExists": "Rule number already exists"
+      }
+    }
+  },
+  "de": {
+    "prefixList": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "form": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "Prefix",
+        "ge": "GE",
+        "le": "LE",
+        "namePlaceholder": "e.g., p01",
+        "ruleHelp": "Range 1-65535",
+        "prefixPlaceholder": "e.g., 192.168.0.0/16",
+        "gePlaceholder": "0-32",
+        "geHelp": "Prefix length greater than or equal to",
+        "lePlaceholder": "0-32",
+        "leHelp": "Prefix length less than or equal to"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "rules": "Rules"
+      },
+      "modal": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteList": "Confirm delete the following prefix lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      },
+      "messages": {
+        "selectList": "Please select a prefix list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "enterRuleNumber": "Please enter rule number",
+        "ruleNumberRange": "Rule number range 1-65535",
+        "selectAction": "Please select an action",
+        "enterPrefix": "Please enter a prefix",
+        "ruleNumberExists": "Rule number already exists"
+      }
+    }
+  },
+  "fr": {
+    "prefixList": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "form": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "Prefix",
+        "ge": "GE",
+        "le": "LE",
+        "namePlaceholder": "e.g., p01",
+        "ruleHelp": "Range 1-65535",
+        "prefixPlaceholder": "e.g., 192.168.0.0/16",
+        "gePlaceholder": "0-32",
+        "geHelp": "Prefix length greater than or equal to",
+        "lePlaceholder": "0-32",
+        "leHelp": "Prefix length less than or equal to"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "rules": "Rules"
+      },
+      "modal": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteList": "Confirm delete the following prefix lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      },
+      "messages": {
+        "selectList": "Please select a prefix list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "enterRuleNumber": "Please enter rule number",
+        "ruleNumberRange": "Rule number range 1-65535",
+        "selectAction": "Please select an action",
+        "enterPrefix": "Please enter a prefix",
+        "ruleNumberExists": "Rule number already exists"
+      }
+    }
+  },
+  "ko": {
+    "prefixList": {
+      "tabs": {
+        "basic": "Basic"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "ruleCount": "Rule Count",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "Prefix",
+        "ge": "GE",
+        "le": "LE"
+      },
+      "form": {
+        "name": "Name",
+        "description": "Description",
+        "rule": "Rule Number",
+        "action": "Action",
+        "prefix": "Prefix",
+        "ge": "GE",
+        "le": "LE",
+        "namePlaceholder": "e.g., p01",
+        "ruleHelp": "Range 1-65535",
+        "prefixPlaceholder": "e.g., 192.168.0.0/16",
+        "gePlaceholder": "0-32",
+        "geHelp": "Prefix length greater than or equal to",
+        "lePlaceholder": "0-32",
+        "leHelp": "Prefix length less than or equal to"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "rules": "Rules"
+      },
+      "modal": {
+        "edit": "Edit",
+        "create": "Create",
+        "editRule": "Edit Rule",
+        "createRule": "Create Rule",
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteList": "Confirm delete the following prefix lists?",
+        "confirmDeleteRule": "Confirm delete the following rules?"
+      },
+      "messages": {
+        "selectList": "Please select a prefix list",
+        "enterName": "Please enter a name",
+        "nameExists": "Name already exists",
+        "enterNameFirst": "Please enter a name first",
+        "selectRule": "Please select a rule",
+        "enterRuleNumber": "Please enter rule number",
+        "ruleNumberRange": "Rule number range 1-65535",
+        "selectAction": "Please select an action",
+        "enterPrefix": "Please enter a prefix",
+        "ruleNumberExists": "Rule number already exists"
+      }
+    }
+  }
+}

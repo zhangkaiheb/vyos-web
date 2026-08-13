@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="static">
+<h1>Статические</h1>
+<p>Статические маршруты — это ручные записи в базе данных маршрутизации (RIB) маршрутизатора, которые определяют, как трафик должен доставляться к определенным пунктам назначения. В отличие от динамических протоколов маршрутизации, статические маршруты не обновляются автоматически при изменении топологии сети.</p>
+<p>Статические маршруты лучше всего подходят для простых сетевых топологий или для переопределения поведения динамического протокола маршрутизации для ограниченного числа маршрутов.</p>
+<p>BIB хранит всю информацию о маршрутизации, включая ручные статические маршруты и любые динамически полученные маршруты. Из BIB маршрутизатор выводит одиночные маршруты для построения таблицы пересылки (FIB).</p>
+<section id="ipv4-unicast-routes">
+<h2>IPv4 одиночные маршруты</h2>
+<p>IPv4 одиночные маршруты направляют трафик, предназначенный для одного IPv4 хоста или подсети, к определенному следующему узлу. Используйте следующие команды, чтобы настроить IPv4 одиночные маршруты для определенной удаленной подсети.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IP-адрес следующего узла для указанной подсети.</strong></p>
+<p>Вы можете настроить несколько IP-адресов следующего узла для одной и той же подсети назначения.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-disable" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите маршрут через указанный IP-адрес следующего узла.</strong></p>
+<p>Эта команда временно деактивирует маршрут, сохраняя при этом настроенную подсеть, адрес следующего узла и параметры расстояния.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-distance-distance" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте административное расстояние для маршрута через указанный IP-адрес следующего узла.</strong></p>
+<p>Маршруты с меньшим административным расстоянием имеют приоритет перед маршрутами с большим расстоянием.</p>
+<p>Допустимый диапазон: 1–255. По умолчанию расстояние равно 1.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Маршруты с расстоянием 255 отключены и не используются для передачи пакетов.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 distance 10
+</pre></div>
+</div>
+<section id="ipv4-interface-routes">
+<h3>IPv4 маршруты интерфейса</h3>
+<p>IPv4 маршруты интерфейса направляют трафик, предназначенный для одного IPv4 хоста или подсети, через определенный локальный интерфейс. Используйте следующие команды, чтобы настроить IPv4 маршруты интерфейса для определенной удаленной подсети.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-interface-interface" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс следующего узла для указанной подсети.</strong></p>
+<p>Вы можете настроить несколько интерфейсов следующего узла для одной и той же подсети назначения.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 interface eth0
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; interface &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-interface-interface-disable" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите маршрут через указанный интерфейс следующего узла.</strong></p>
+<p>Эта команда временно деактивирует маршрут, сохраняя при этом настроенную подсеть, интерфейс и параметры расстояния.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 interface eth0 disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; interface &lt;interface&gt; distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-interface-interface-distance-distance" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте административное расстояние для маршрута через указанный интерфейс следующего узла.</strong></p>
+<p>Маршруты с меньшим административным расстоянием имеют приоритет перед маршрутами с большим расстоянием.</p>
+<p>Допустимый диапазон: 1–255. По умолчанию расстояние равно 1.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 interface eth0 distance 10
+</pre></div>
+</div>
+</section>
+<section id="ipv4-bfd">
+<h3>IPv4 BFD</h3>
+<p><abbr title="Обнаружение двунаправленной передачи">BFD</abbr> контролирует доступность IP-адреса следующего узла статического маршрута. Используйте следующие команды, чтобы настроить параметры <abbr title="Обнаружение двунаправленной передачи">BFD</abbr> для ваших статических IPv4 маршрутов.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включите мониторинг BFD для маршрута через указанный IP-адрес следующего узла.</strong></p>
+<p>Система использует IP-адрес следующего узла как целевой узел BFD.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 bfd
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; bfd profile &lt;profile&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd-profile-profile" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Примените настройки из заданного профиля BFD к сессии BFD, которая мониторит указанный IP-адрес следующего узла.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 bfd profile custom-profile
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; bfd multi-hop source-address &lt;source-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd-multi-hop-source-address-source-address" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включите многоходовую сессию BFD для мониторинга доступности указанного IP-адреса следующего узла.</strong></p>
+<p>Система запускает сессию BFD с указанного локального исходного IPv4 адреса.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 bfd multi-hop source-address 172.16.1.1
+</pre></div>
+</div>
+</section>
+<section id="dhcp-interface-routes">
+<h3>Маршруты интерфейса DHCP</h3>
+<p>Маршруты интерфейса DHCP направляют трафик, предназначенный для одного IPv4 хоста или подсети, к шлюзу, полученному из интерфейса, включающего DHCP. Используйте следующую команду, чтобы настроить маршруты интерфейса DHCP.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; dhcp-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-dhcp-interface-interface" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте статический маршрут, который получает свой IP-адрес следующего узла из указанного интерфейса, включающего DHCP.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 dhcp-interface eth0
+</pre></div>
+</div>
+</section>
+<section id="ipv4-reject-routes">
+<h3>IPv4 маршруты отбраковки</h3>
+<p>IPv4 маршруты отбраковки явно отбрасывают трафик, предназначенный для одного IPv4 хоста или подсети, и возвращают сообщение ICMP недостижимого назначения отправителю. Используйте следующие команды, чтобы настроить IPv4 маршруты отбраковки.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; reject
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-reject" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте маршрут отбраковки для указанной подсети.</strong></p>
+<p>Система отбрасывает трафик, предназначенный для этой подсети, и возвращает сообщение ICMP недостижимого назначения отправителю.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 reject
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; reject distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-reject-distance-distance" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте административное расстояние для маршрута отбраковки.</strong></p>
+<p>Маршруты с меньшим административным расстоянием имеют приоритет перед маршрутами с большим расстоянием.</p>
+<p>Допустимый диапазон: 1–255.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 reject distance 200
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; reject tag &lt;tag&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-reject-tag-tag" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте числовой тег для маршрута отбраковки.</strong></p>
+<p>Допустимый диапазон: 1–4294967295.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 reject tag 100
+</pre></div>
+</div>
+</section>
+<section id="ipv4-blackhole-routes">
+<h3>IPv4 маршруты черной дыры</h3>
+<p>Маршруты черной дыры беззвучно отбрасывают трафик, предназначенный для определенной подсети. В отличие от маршрута отбраковки, который информирует отправителя сообщением ICMP недостижимого назначения, маршрут черной дыры отбрасывает пакеты без генерации любого ответа.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; blackhole
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-blackhole" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте маршрут черной дыры для указанной подсети.</strong></p>
+<p>Система беззвучно отбрасывает совпадающие пакеты без отправки ICMP-ответа источнику.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/8 blackhole
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; blackhole distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-blackhole-distance-distance" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте административное расстояние для маршрута черной дыры.</strong></p>
+<p>Маршруты с меньшим административным расстоянием имеют приоритет перед маршрутами с большим расстоянием.</p>
+<p>Допустимый диапазон: 1–255.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/8 blackhole distance 200
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; blackhole tag &lt;tag&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-blackhole-tag-tag" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте числовой тег для маршрута черной дыры.</strong></p>
+<p>Допустимый диапазон: 1–4294967295.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/8 blackhole tag 100
+</pre></div>
+</div>
+</section>
+</section>
+<section id="ipv6-unicast-routes">
+<h2>IPv6 одиночные маршруты</h2>
+<p>IPv6 одиночные маршруты направляют трафик, предназначенный для одного IPv6 хоста или подсети, к определенному следующему узлу. Используйте следующие команды, чтобы настроить IPv6 одиночные маршруты для определенной удаленной подсети.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IPv6-адрес следующего узла для указанной подсети.</strong></p>
+<p>Вы можете настроить несколько IPv6-адресов следующего узла для одной и той же подсети назначения.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-disable" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите маршрут через указанный IPv6-адрес следующего узла.</strong></p>
+<p>Эта команда временно деактивирует маршрут, сохраняя при этом настроенную подсеть, адрес следующего узла и параметры расстояния.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-distance-distance" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте административное расстояние для маршрута через указанный IPv6-адрес следующего узла.</strong></p>
+<p>Маршруты с меньшим административным расстоянием имеют приоритет перед маршрутами с большим расстоянием.</p>
+<p>Допустимый диапазон: 1–255. По умолчанию расстояние равно 1.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Маршруты с расстоянием 255 отключены и не используются для передачи пакетов.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 distance 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; segments &lt;segments&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-segments-segments" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IPv6 одиночный маршрут, использующий Segment Routing over IPv6 (SRv6), чтобы достичь подсети назначения.</strong></p>
+<p>Используйте слэш (<code class="docutils literal notranslate">/</code>) для разделения нескольких идентификаторов сегментов IPv6 (SIDs) в вашей последовательности.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1000::/36 next-hop 2001:db8:201::ffff segments &#39;2001:db8:aaaa::7/2002::4/2002::3/2002::2&#39;
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show ipv6 route
+Codes: K - kernel route, C - connected, S - static, R - RIPng,
+       O - OSPFv3, I - IS-IS, B - BGP, N - NHRP, T - Table,
+       v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+ C&gt;* 2001:db8:201::/64 is directly connected, eth0.201, 00:00:46
+ S&gt;* 2001:db8:1000::/36 [1/0] via 2001:db8:201::ffff, eth0.201, seg6 2001:db8:aaaa::7,2002::4,2002::3,2002::2, weight 1, 00:00:08
+</pre></div>
+</div>
+<section id="ipv6-interface-routes">
+<h3>IPv6 маршруты интерфейса</h3>
+<p>IPv6 маршруты интерфейса направляют трафик, предназначенный для одного IPv6 хоста или подсети, через определенный локальный интерфейс. Используйте следующие команды, чтобы настроить IPv6 маршруты интерфейса для определенной удаленной подсети.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс следующего узла для указанной подсети.</strong></p>
+<p>Вы можете настроить несколько интерфейсов следующего узла для одной и той же подсети назначения.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 interface eth0
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; interface &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface-disable" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите маршрут через указанный интерфейс следующего узла.</strong></p>
+<p>Эта команда временно деактивирует маршрут, сохраняя при этом настроенную подсеть, интерфейс и параметры расстояния.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 interface eth0 disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; interface &lt;interface&gt; distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface-distance-distance" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте административное расстояние для маршрута через указанный интерфейс следующего узла.</strong></p>
+<p>Маршруты с меньшим административным расстоянием имеют приоритет перед маршрутами с большим расстоянием.</p>
+<p>Допустимый диапазон: 1–255. По умолчанию расстояние равно 1.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 interface eth0 distance 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; interface &lt;interface&gt; segments &lt;segments&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface-segments-segments" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IPv6 маршрут интерфейса, использующий Segment Routing over IPv6 (SRv6), чтобы достичь подсети назначения.</strong></p>
+<p>Используйте слэш (<code class="docutils literal notranslate">/</code>) для разделения нескольких идентификаторов сегментов IPv6 (SIDs) в вашей последовательности.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1000::/36 interface eth0 segments &#39;2001:db8:aaaa::7/2002::4/2002::3/2002::2&#39;
+</pre></div>
+</div>
+</section>
+<section id="ipv6-bfd">
+<h3>IPv6 BFD</h3>
+<p><abbr title="Обнаружение двунаправленной передачи">BFD</abbr> контролирует доступность IPv6-адреса следующего узла статического маршрута. Используйте следующие команды, чтобы настроить параметры <abbr title="Обнаружение двунаправленной передачи">BFD</abbr> для ваших статических IPv6 маршрутов.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включите мониторинг BFD для маршрута через указанный IPv6-адрес следующего узла.</strong></p>
+<p>Система использует IPv6-адрес следующего узла как целевой узел BFD.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 bfd
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; bfd profile &lt;profile&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd-profile-profile" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Примените настройки из заданного профиля BFD к сессии BFD, которая мониторит указанный IPv6-адрес следующего узла.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 bfd profile custom-profile
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; bfd multi-hop source-address &lt;source-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd-multi-hop-source-address-source-address" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включите многоходовую сессию BFD для мониторинга доступности указанного IPv6-адреса следующего узла.</strong></p>
+<p>Система запускает сессию BFD с указанного локального исходного IPv6 адреса.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 bfd multi-hop source-address 2001:db8:200::1
+</pre></div>
+</div>
+</section>
+<section id="ipv6-reject-routes">
+<h3>IPv6 маршруты отбраковки</h3>
+<p>IPv6 маршруты отбраковки явно отбрасывают трафик, предназначенный для одного IPv6 хоста или подсети, и возвращают сообщение ICMPv6 недостижимого назначения отправителю. Используйте следующие команды, чтобы настроить IPv6 маршруты отбраковки.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; reject
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-reject" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте маршрут отбраковки для указанной подсети.</strong></p>
+<p>Система отбрасывает трафик, предназначенный для этой подсети, и возвращает сообщение ICMPv6 недостижимого назначения отправителю.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 reject
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; reject distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-reject-distance-distance" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте административное расстояние для маршрута отбраковки.</strong></p>
+<p>Маршруты с меньшим административным расстоянием имеют приоритет перед маршрутами с большим расстоянием.</p>
+<p>Допустимый диапазон: 1–255.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 reject distance 200
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; reject tag &lt;tag&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-reject-tag-tag" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте числовой тег для маршрута отбраковки.</strong></p>
+<p>Допустимый диапазон: 1–4294967295.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 reject tag 100
+</pre></div>
+</div>
+</section>
+<section id="ipv6-blackhole-routes">
+<h3>IPv6 маршруты черной дыры</h3>
+<p>Маршруты черной дыры беззвучно отбрасывают трафик, предназначенный для определенной подсети. В отличие от маршрута отбраковки, который информирует отправителя сообщением ICMPv6 недостижимого назначения, маршрут черной дыры отбрасывает пакеты без генерации любого ответа.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; blackhole
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-blackhole" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте маршрут черной дыры для указанной подсети.</strong></p>
+<p>Система беззвучно отбрасывает совпадающие пакеты без отправки ICMPv6-ответа источнику.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 blackhole
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; blackhole distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-blackhole-distance-distance" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте административное расстояние для маршрута черной дыры.</strong></p>
+<p>Маршруты с меньшим административным расстоянием имеют приоритет перед маршрутами с большим расстоянием.</p>
+<p>Допустимый диапазон: 1–255.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 blackhole distance 200
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; blackhole tag &lt;tag&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-blackhole-tag-tag" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте числовой тег для маршрута черной дыры.</strong></p>
+<p>Допустимый диапазон: 1–4294967295.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 blackhole tag 100
+</pre></div>
+</div>
+</section>
+</section>
+<section id="alternate-routing-tables">
+<h2>Альтернативные таблицы маршрутизации</h2>
+<p>Альтернативные таблицы маршрутизации используются для реализации как Политико-ориентированной маршрутизации (PBR), так и Виртуальной маршрутизации и пересылки (VRF).</p>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

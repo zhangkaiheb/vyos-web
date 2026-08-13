@@ -1,0 +1,541 @@
+{
+  "zh-CN": {
+    "dhcpv6relay": {
+      "tabs": {
+        "basic": "基本配置",
+        "relayOptions": "中继选项"
+      },
+      "columns": {
+        "interface": "接口",
+        "listenAddress": "监听地址",
+        "upstreamServerAddress": "上游服务器地址"
+      },
+      "labels": {
+        "disable": "禁用",
+        "interface": "接口",
+        "listenAddress": "监听地址",
+        "upstreamServerAddress": "上游服务器地址",
+        "maxHopCount": "最大跳数",
+        "useInterfaceIdOption": "使用接口 ID 选项"
+      },
+      "buttons": {
+        "createListen": "创建监听",
+        "editListen": "编辑监听",
+        "deleteListen": "删除监听",
+        "createUpstream": "创建上游",
+        "editUpstream": "编辑上游",
+        "deleteUpstream": "删除上游"
+      },
+      "modals": {
+        "listenInterface": "监听接口",
+        "upstreamInterface": "上游接口"
+      },
+      "tooltips": {
+        "disableInstance": "禁用 DHCPv6 中继实例",
+        "maxHopCount": "最大跳数",
+        "useInterfaceIdOption": "使用接口 ID 选项"
+      },
+      "placeholders": {
+        "selectInterface": "请选择接口",
+        "listenAddressOptional": "监听地址（可选）",
+        "maxHopCount": "1-255"
+      },
+      "hints": {
+        "maxHopCountRange": "范围 1-255",
+        "addIPv6Address": "添加 IPv6 地址"
+      },
+      "dualList": {
+        "available": "可用",
+        "selected": "已选",
+        "enterIPv6": "输入 IPv6 地址"
+      },
+      "errors": {
+        "invalidIPv6": "IPv6 地址格式错误",
+        "hopCountRange": "跳数范围 1-255",
+        "listenNameRequired": "请输入监听接口名称",
+        "listenDuplicate": "监听接口 {name} 已存在",
+        "listenInvalidAddress": "监听接口 {name} 地址格式错误: {error}",
+        "upstreamNameRequired": "请输入上游接口名称",
+        "upstreamDuplicate": "上游接口 {name} 已存在",
+        "upstreamAddressRequired": "上游接口 {name} 至少需要一个地址",
+        "upstreamInvalidAddress": "上游接口 {name} 地址 {address} 格式错误: {error}",
+        "selectListenToEdit": "请选择要编辑的监听接口",
+        "selectedListenNotFound": "未找到选中的监听接口",
+        "selectListenToDelete": "请选择要删除的监听接口",
+        "selectInterface": "请选择接口",
+        "listenAlreadyExists": "监听接口已存在",
+        "selectUpstreamToEdit": "请选择要编辑的上游接口",
+        "selectedUpstreamNotFound": "未找到选中的上游接口",
+        "selectUpstreamToDelete": "请选择要删除的上游接口",
+        "upstreamAddressRequiredGeneral": "至少需要一个上游服务器地址",
+        "invalidAddress": "地址 {address} 格式错误: {error}",
+        "upstreamAlreadyExists": "上游接口已存在"
+      },
+      "messages": {
+        "saved": "已保存"
+      }
+    }
+  },
+  "en": {
+    "dhcpv6relay": {
+      "tabs": {
+        "basic": "Basic",
+        "relayOptions": "Relay Options"
+      },
+      "columns": {
+        "interface": "Interface",
+        "listenAddress": "Listen Address",
+        "upstreamServerAddress": "Upstream Server Address"
+      },
+      "labels": {
+        "disable": "Disable",
+        "interface": "Interface",
+        "listenAddress": "Listen Address",
+        "upstreamServerAddress": "Upstream Server Address",
+        "maxHopCount": "Max Hop Count",
+        "useInterfaceIdOption": "Use Interface ID Option"
+      },
+      "buttons": {
+        "createListen": "Create Listen",
+        "editListen": "Edit Listen",
+        "deleteListen": "Delete Listen",
+        "createUpstream": "Create Upstream",
+        "editUpstream": "Edit Upstream",
+        "deleteUpstream": "Delete Upstream"
+      },
+      "modals": {
+        "listenInterface": "Listen Interface",
+        "upstreamInterface": "Upstream Interface"
+      },
+      "tooltips": {
+        "disableInstance": "Disable DHCPv6 relay instance",
+        "maxHopCount": "Maximum hop count",
+        "useInterfaceIdOption": "Use interface ID option"
+      },
+      "placeholders": {
+        "selectInterface": "Please select an interface",
+        "listenAddressOptional": "Listen address (optional)",
+        "maxHopCount": "1-255"
+      },
+      "hints": {
+        "maxHopCountRange": "Range 1-255",
+        "addIPv6Address": "Add IPv6 address"
+      },
+      "dualList": {
+        "available": "Available",
+        "selected": "Selected",
+        "enterIPv6": "Enter IPv6 address"
+      },
+      "errors": {
+        "invalidIPv6": "IPv6 address format error",
+        "hopCountRange": "Hop count range 1-255",
+        "listenNameRequired": "Please enter listen interface name",
+        "listenDuplicate": "Listen interface {name} already exists",
+        "listenInvalidAddress": "Listen interface {name} address format error: {error}",
+        "upstreamNameRequired": "Please enter upstream interface name",
+        "upstreamDuplicate": "Upstream interface {name} already exists",
+        "upstreamAddressRequired": "Upstream interface {name} requires at least one address",
+        "upstreamInvalidAddress": "Upstream interface {name} address {address} format error: {error}",
+        "selectListenToEdit": "Please select a listen interface to edit",
+        "selectedListenNotFound": "Selected listen interface not found",
+        "selectListenToDelete": "Please select a listen interface to delete",
+        "selectInterface": "Please select an interface",
+        "listenAlreadyExists": "Listen interface already exists",
+        "selectUpstreamToEdit": "Please select an upstream interface to edit",
+        "selectedUpstreamNotFound": "Selected upstream interface not found",
+        "selectUpstreamToDelete": "Please select an upstream interface to delete",
+        "upstreamAddressRequiredGeneral": "At least one upstream server address is required",
+        "invalidAddress": "Address {address} format error: {error}",
+        "upstreamAlreadyExists": "Upstream interface already exists"
+      },
+      "messages": {
+        "saved": "Saved"
+      }
+    }
+  },
+  "zh-TW": {
+    "dhcpv6relay": {
+      "tabs": {
+        "basic": "Basic",
+        "relayOptions": "Relay Options"
+      },
+      "columns": {
+        "interface": "Interface",
+        "listenAddress": "Listen Address",
+        "upstreamServerAddress": "Upstream Server Address"
+      },
+      "labels": {
+        "disable": "Disable",
+        "interface": "Interface",
+        "listenAddress": "Listen Address",
+        "upstreamServerAddress": "Upstream Server Address",
+        "maxHopCount": "Max Hop Count",
+        "useInterfaceIdOption": "Use Interface ID Option"
+      },
+      "buttons": {
+        "createListen": "Create Listen",
+        "editListen": "Edit Listen",
+        "deleteListen": "Delete Listen",
+        "createUpstream": "Create Upstream",
+        "editUpstream": "Edit Upstream",
+        "deleteUpstream": "Delete Upstream"
+      },
+      "modals": {
+        "listenInterface": "Listen Interface",
+        "upstreamInterface": "Upstream Interface"
+      },
+      "tooltips": {
+        "disableInstance": "Disable DHCPv6 relay instance",
+        "maxHopCount": "Maximum hop count",
+        "useInterfaceIdOption": "Use interface ID option"
+      },
+      "placeholders": {
+        "selectInterface": "Please select an interface",
+        "listenAddressOptional": "Listen address (optional)",
+        "maxHopCount": "1-255"
+      },
+      "hints": {
+        "maxHopCountRange": "Range 1-255",
+        "addIPv6Address": "Add IPv6 address"
+      },
+      "dualList": {
+        "available": "Available",
+        "selected": "Selected",
+        "enterIPv6": "Enter IPv6 address"
+      },
+      "errors": {
+        "invalidIPv6": "IPv6 address format error",
+        "hopCountRange": "Hop count range 1-255",
+        "listenNameRequired": "Please enter listen interface name",
+        "listenDuplicate": "Listen interface {name} already exists",
+        "listenInvalidAddress": "Listen interface {name} address format error: {error}",
+        "upstreamNameRequired": "Please enter upstream interface name",
+        "upstreamDuplicate": "Upstream interface {name} already exists",
+        "upstreamAddressRequired": "Upstream interface {name} requires at least one address",
+        "upstreamInvalidAddress": "Upstream interface {name} address {address} format error: {error}",
+        "selectListenToEdit": "Please select a listen interface to edit",
+        "selectedListenNotFound": "Selected listen interface not found",
+        "selectListenToDelete": "Please select a listen interface to delete",
+        "selectInterface": "Please select an interface",
+        "listenAlreadyExists": "Listen interface already exists",
+        "selectUpstreamToEdit": "Please select an upstream interface to edit",
+        "selectedUpstreamNotFound": "Selected upstream interface not found",
+        "selectUpstreamToDelete": "Please select an upstream interface to delete",
+        "upstreamAddressRequiredGeneral": "At least one upstream server address is required",
+        "invalidAddress": "Address {address} format error: {error}",
+        "upstreamAlreadyExists": "Upstream interface already exists"
+      },
+      "messages": {
+        "saved": "Saved"
+      }
+    }
+  },
+  "ru": {
+    "dhcpv6relay": {
+      "tabs": {
+        "basic": "Basic",
+        "relayOptions": "Relay Options"
+      },
+      "columns": {
+        "interface": "Interface",
+        "listenAddress": "Listen Address",
+        "upstreamServerAddress": "Upstream Server Address"
+      },
+      "labels": {
+        "disable": "Disable",
+        "interface": "Interface",
+        "listenAddress": "Listen Address",
+        "upstreamServerAddress": "Upstream Server Address",
+        "maxHopCount": "Max Hop Count",
+        "useInterfaceIdOption": "Use Interface ID Option"
+      },
+      "buttons": {
+        "createListen": "Create Listen",
+        "editListen": "Edit Listen",
+        "deleteListen": "Delete Listen",
+        "createUpstream": "Create Upstream",
+        "editUpstream": "Edit Upstream",
+        "deleteUpstream": "Delete Upstream"
+      },
+      "modals": {
+        "listenInterface": "Listen Interface",
+        "upstreamInterface": "Upstream Interface"
+      },
+      "tooltips": {
+        "disableInstance": "Disable DHCPv6 relay instance",
+        "maxHopCount": "Maximum hop count",
+        "useInterfaceIdOption": "Use interface ID option"
+      },
+      "placeholders": {
+        "selectInterface": "Please select an interface",
+        "listenAddressOptional": "Listen address (optional)",
+        "maxHopCount": "1-255"
+      },
+      "hints": {
+        "maxHopCountRange": "Range 1-255",
+        "addIPv6Address": "Add IPv6 address"
+      },
+      "dualList": {
+        "available": "Available",
+        "selected": "Selected",
+        "enterIPv6": "Enter IPv6 address"
+      },
+      "errors": {
+        "invalidIPv6": "IPv6 address format error",
+        "hopCountRange": "Hop count range 1-255",
+        "listenNameRequired": "Please enter listen interface name",
+        "listenDuplicate": "Listen interface {name} already exists",
+        "listenInvalidAddress": "Listen interface {name} address format error: {error}",
+        "upstreamNameRequired": "Please enter upstream interface name",
+        "upstreamDuplicate": "Upstream interface {name} already exists",
+        "upstreamAddressRequired": "Upstream interface {name} requires at least one address",
+        "upstreamInvalidAddress": "Upstream interface {name} address {address} format error: {error}",
+        "selectListenToEdit": "Please select a listen interface to edit",
+        "selectedListenNotFound": "Selected listen interface not found",
+        "selectListenToDelete": "Please select a listen interface to delete",
+        "selectInterface": "Please select an interface",
+        "listenAlreadyExists": "Listen interface already exists",
+        "selectUpstreamToEdit": "Please select an upstream interface to edit",
+        "selectedUpstreamNotFound": "Selected upstream interface not found",
+        "selectUpstreamToDelete": "Please select an upstream interface to delete",
+        "upstreamAddressRequiredGeneral": "At least one upstream server address is required",
+        "invalidAddress": "Address {address} format error: {error}",
+        "upstreamAlreadyExists": "Upstream interface already exists"
+      },
+      "messages": {
+        "saved": "Saved"
+      }
+    }
+  },
+  "de": {
+    "dhcpv6relay": {
+      "tabs": {
+        "basic": "Basic",
+        "relayOptions": "Relay Options"
+      },
+      "columns": {
+        "interface": "Interface",
+        "listenAddress": "Listen Address",
+        "upstreamServerAddress": "Upstream Server Address"
+      },
+      "labels": {
+        "disable": "Disable",
+        "interface": "Interface",
+        "listenAddress": "Listen Address",
+        "upstreamServerAddress": "Upstream Server Address",
+        "maxHopCount": "Max Hop Count",
+        "useInterfaceIdOption": "Use Interface ID Option"
+      },
+      "buttons": {
+        "createListen": "Create Listen",
+        "editListen": "Edit Listen",
+        "deleteListen": "Delete Listen",
+        "createUpstream": "Create Upstream",
+        "editUpstream": "Edit Upstream",
+        "deleteUpstream": "Delete Upstream"
+      },
+      "modals": {
+        "listenInterface": "Listen Interface",
+        "upstreamInterface": "Upstream Interface"
+      },
+      "tooltips": {
+        "disableInstance": "Disable DHCPv6 relay instance",
+        "maxHopCount": "Maximum hop count",
+        "useInterfaceIdOption": "Use interface ID option"
+      },
+      "placeholders": {
+        "selectInterface": "Please select an interface",
+        "listenAddressOptional": "Listen address (optional)",
+        "maxHopCount": "1-255"
+      },
+      "hints": {
+        "maxHopCountRange": "Range 1-255",
+        "addIPv6Address": "Add IPv6 address"
+      },
+      "dualList": {
+        "available": "Available",
+        "selected": "Selected",
+        "enterIPv6": "Enter IPv6 address"
+      },
+      "errors": {
+        "invalidIPv6": "IPv6 address format error",
+        "hopCountRange": "Hop count range 1-255",
+        "listenNameRequired": "Please enter listen interface name",
+        "listenDuplicate": "Listen interface {name} already exists",
+        "listenInvalidAddress": "Listen interface {name} address format error: {error}",
+        "upstreamNameRequired": "Please enter upstream interface name",
+        "upstreamDuplicate": "Upstream interface {name} already exists",
+        "upstreamAddressRequired": "Upstream interface {name} requires at least one address",
+        "upstreamInvalidAddress": "Upstream interface {name} address {address} format error: {error}",
+        "selectListenToEdit": "Please select a listen interface to edit",
+        "selectedListenNotFound": "Selected listen interface not found",
+        "selectListenToDelete": "Please select a listen interface to delete",
+        "selectInterface": "Please select an interface",
+        "listenAlreadyExists": "Listen interface already exists",
+        "selectUpstreamToEdit": "Please select an upstream interface to edit",
+        "selectedUpstreamNotFound": "Selected upstream interface not found",
+        "selectUpstreamToDelete": "Please select an upstream interface to delete",
+        "upstreamAddressRequiredGeneral": "At least one upstream server address is required",
+        "invalidAddress": "Address {address} format error: {error}",
+        "upstreamAlreadyExists": "Upstream interface already exists"
+      },
+      "messages": {
+        "saved": "Saved"
+      }
+    }
+  },
+  "fr": {
+    "dhcpv6relay": {
+      "tabs": {
+        "basic": "Basic",
+        "relayOptions": "Relay Options"
+      },
+      "columns": {
+        "interface": "Interface",
+        "listenAddress": "Listen Address",
+        "upstreamServerAddress": "Upstream Server Address"
+      },
+      "labels": {
+        "disable": "Disable",
+        "interface": "Interface",
+        "listenAddress": "Listen Address",
+        "upstreamServerAddress": "Upstream Server Address",
+        "maxHopCount": "Max Hop Count",
+        "useInterfaceIdOption": "Use Interface ID Option"
+      },
+      "buttons": {
+        "createListen": "Create Listen",
+        "editListen": "Edit Listen",
+        "deleteListen": "Delete Listen",
+        "createUpstream": "Create Upstream",
+        "editUpstream": "Edit Upstream",
+        "deleteUpstream": "Delete Upstream"
+      },
+      "modals": {
+        "listenInterface": "Listen Interface",
+        "upstreamInterface": "Upstream Interface"
+      },
+      "tooltips": {
+        "disableInstance": "Disable DHCPv6 relay instance",
+        "maxHopCount": "Maximum hop count",
+        "useInterfaceIdOption": "Use interface ID option"
+      },
+      "placeholders": {
+        "selectInterface": "Please select an interface",
+        "listenAddressOptional": "Listen address (optional)",
+        "maxHopCount": "1-255"
+      },
+      "hints": {
+        "maxHopCountRange": "Range 1-255",
+        "addIPv6Address": "Add IPv6 address"
+      },
+      "dualList": {
+        "available": "Available",
+        "selected": "Selected",
+        "enterIPv6": "Enter IPv6 address"
+      },
+      "errors": {
+        "invalidIPv6": "IPv6 address format error",
+        "hopCountRange": "Hop count range 1-255",
+        "listenNameRequired": "Please enter listen interface name",
+        "listenDuplicate": "Listen interface {name} already exists",
+        "listenInvalidAddress": "Listen interface {name} address format error: {error}",
+        "upstreamNameRequired": "Please enter upstream interface name",
+        "upstreamDuplicate": "Upstream interface {name} already exists",
+        "upstreamAddressRequired": "Upstream interface {name} requires at least one address",
+        "upstreamInvalidAddress": "Upstream interface {name} address {address} format error: {error}",
+        "selectListenToEdit": "Please select a listen interface to edit",
+        "selectedListenNotFound": "Selected listen interface not found",
+        "selectListenToDelete": "Please select a listen interface to delete",
+        "selectInterface": "Please select an interface",
+        "listenAlreadyExists": "Listen interface already exists",
+        "selectUpstreamToEdit": "Please select an upstream interface to edit",
+        "selectedUpstreamNotFound": "Selected upstream interface not found",
+        "selectUpstreamToDelete": "Please select an upstream interface to delete",
+        "upstreamAddressRequiredGeneral": "At least one upstream server address is required",
+        "invalidAddress": "Address {address} format error: {error}",
+        "upstreamAlreadyExists": "Upstream interface already exists"
+      },
+      "messages": {
+        "saved": "Saved"
+      }
+    }
+  },
+  "ko": {
+    "dhcpv6relay": {
+      "tabs": {
+        "basic": "Basic",
+        "relayOptions": "Relay Options"
+      },
+      "columns": {
+        "interface": "Interface",
+        "listenAddress": "Listen Address",
+        "upstreamServerAddress": "Upstream Server Address"
+      },
+      "labels": {
+        "disable": "Disable",
+        "interface": "Interface",
+        "listenAddress": "Listen Address",
+        "upstreamServerAddress": "Upstream Server Address",
+        "maxHopCount": "Max Hop Count",
+        "useInterfaceIdOption": "Use Interface ID Option"
+      },
+      "buttons": {
+        "createListen": "Create Listen",
+        "editListen": "Edit Listen",
+        "deleteListen": "Delete Listen",
+        "createUpstream": "Create Upstream",
+        "editUpstream": "Edit Upstream",
+        "deleteUpstream": "Delete Upstream"
+      },
+      "modals": {
+        "listenInterface": "Listen Interface",
+        "upstreamInterface": "Upstream Interface"
+      },
+      "tooltips": {
+        "disableInstance": "Disable DHCPv6 relay instance",
+        "maxHopCount": "Maximum hop count",
+        "useInterfaceIdOption": "Use interface ID option"
+      },
+      "placeholders": {
+        "selectInterface": "Please select an interface",
+        "listenAddressOptional": "Listen address (optional)",
+        "maxHopCount": "1-255"
+      },
+      "hints": {
+        "maxHopCountRange": "Range 1-255",
+        "addIPv6Address": "Add IPv6 address"
+      },
+      "dualList": {
+        "available": "Available",
+        "selected": "Selected",
+        "enterIPv6": "Enter IPv6 address"
+      },
+      "errors": {
+        "invalidIPv6": "IPv6 address format error",
+        "hopCountRange": "Hop count range 1-255",
+        "listenNameRequired": "Please enter listen interface name",
+        "listenDuplicate": "Listen interface {name} already exists",
+        "listenInvalidAddress": "Listen interface {name} address format error: {error}",
+        "upstreamNameRequired": "Please enter upstream interface name",
+        "upstreamDuplicate": "Upstream interface {name} already exists",
+        "upstreamAddressRequired": "Upstream interface {name} requires at least one address",
+        "upstreamInvalidAddress": "Upstream interface {name} address {address} format error: {error}",
+        "selectListenToEdit": "Please select a listen interface to edit",
+        "selectedListenNotFound": "Selected listen interface not found",
+        "selectListenToDelete": "Please select a listen interface to delete",
+        "selectInterface": "Please select an interface",
+        "listenAlreadyExists": "Listen interface already exists",
+        "selectUpstreamToEdit": "Please select an upstream interface to edit",
+        "selectedUpstreamNotFound": "Selected upstream interface not found",
+        "selectUpstreamToDelete": "Please select an upstream interface to delete",
+        "upstreamAddressRequiredGeneral": "At least one upstream server address is required",
+        "invalidAddress": "Address {address} format error: {error}",
+        "upstreamAlreadyExists": "Upstream interface already exists"
+      },
+      "messages": {
+        "saved": "Saved"
+      }
+    }
+  }
+}

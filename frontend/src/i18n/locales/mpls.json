@@ -1,0 +1,401 @@
+{
+  "zh-CN": {
+    "mpls": {
+      "alerts": {
+        "saved": "保存d"
+      },
+      "buttons": {
+        "addInterface": "添加 接口"
+      },
+      "columns": {
+        "helloHoldtime": "helloHoldtime",
+        "helloInterval": "helloInterval",
+        "interfaceName": "接口 名称"
+      },
+      "descriptions": {
+        "mplsConfig": "mplsConfig"
+      },
+      "labels": {
+        "helloHoldtime": "helloHoldtime",
+        "helloInterval": "helloInterval",
+        "interfaceNameRequired": "接口 名称 为必填项",
+        "maximumLabels": "maximum 标签",
+        "rangeSize": "范围 size",
+        "routerId": "routerId",
+        "targetedHello": "targetedHello"
+      },
+      "messages": {
+        "confirmDeleteInterface": "确定 删除 接口",
+        "confirmDeleteLdpInterface": "确定 删除 ldp 接口",
+        "selectInterface": "请选择 接口"
+      },
+      "modals": {
+        "addLdpInterface": "添加 ldp 接口",
+        "addMplsInterface": "添加 mpls 接口",
+        "confirmDelete": "确定 删除",
+        "editLdpInterface": "编辑 ldp 接口",
+        "editMplsInterface": "编辑 mpls 接口"
+      },
+      "placeholders": {
+        "helloHoldtime": "helloHoldtime",
+        "helloInterval": "helloInterval",
+        "labelRange": "label 范围",
+        "routerId": "routerId",
+        "selectInterface": "请选择 接口"
+      },
+      "sections": {
+        "ldpBasic": "ldpBasic",
+        "ldpInterfaces": "ldp 接口s",
+        "mplsConfig": "mplsConfig"
+      },
+      "tabs": {
+        "basic": "basic",
+        "interfaces": "接口s",
+        "ldp": "ldp",
+        "parameters": "parameters"
+      }
+    }
+  },
+  "en": {
+    "mpls": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "buttons": {
+        "addInterface": "Add Interface"
+      },
+      "columns": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "interfaceName": "Interface Name"
+      },
+      "descriptions": {
+        "mplsConfig": "Mpls Config"
+      },
+      "labels": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "interfaceNameRequired": "Interface Name Required",
+        "maximumLabels": "Maximum Labels",
+        "rangeSize": "Range Size",
+        "routerId": "Router Id",
+        "targetedHello": "Targeted Hello"
+      },
+      "messages": {
+        "confirmDeleteInterface": "Confirm Delete Interface",
+        "confirmDeleteLdpInterface": "Confirm Delete Ldp Interface",
+        "selectInterface": "Select Interface"
+      },
+      "modals": {
+        "addLdpInterface": "Add Ldp Interface",
+        "addMplsInterface": "Add Mpls Interface",
+        "confirmDelete": "Confirm Delete",
+        "editLdpInterface": "Edit Ldp Interface",
+        "editMplsInterface": "Edit Mpls Interface"
+      },
+      "placeholders": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "labelRange": "Label Range",
+        "routerId": "Router Id",
+        "selectInterface": "Select Interface"
+      },
+      "sections": {
+        "ldpBasic": "Ldp Basic",
+        "ldpInterfaces": "Ldp Interfaces",
+        "mplsConfig": "Mpls Config"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "ldp": "Ldp",
+        "parameters": "Parameters"
+      }
+    }
+  },
+  "zh-TW": {
+    "mpls": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "buttons": {
+        "addInterface": "Add Interface"
+      },
+      "columns": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "interfaceName": "Interface Name"
+      },
+      "descriptions": {
+        "mplsConfig": "Mpls Config"
+      },
+      "labels": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "interfaceNameRequired": "Interface Name Required",
+        "maximumLabels": "Maximum Labels",
+        "rangeSize": "Range Size",
+        "routerId": "Router Id",
+        "targetedHello": "Targeted Hello"
+      },
+      "messages": {
+        "confirmDeleteInterface": "Confirm Delete Interface",
+        "confirmDeleteLdpInterface": "Confirm Delete Ldp Interface",
+        "selectInterface": "Select Interface"
+      },
+      "modals": {
+        "addLdpInterface": "Add Ldp Interface",
+        "addMplsInterface": "Add Mpls Interface",
+        "confirmDelete": "Confirm Delete",
+        "editLdpInterface": "Edit Ldp Interface",
+        "editMplsInterface": "Edit Mpls Interface"
+      },
+      "placeholders": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "labelRange": "Label Range",
+        "routerId": "Router Id",
+        "selectInterface": "Select Interface"
+      },
+      "sections": {
+        "ldpBasic": "Ldp Basic",
+        "ldpInterfaces": "Ldp Interfaces",
+        "mplsConfig": "Mpls Config"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "ldp": "Ldp",
+        "parameters": "Parameters"
+      }
+    }
+  },
+  "ru": {
+    "mpls": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "buttons": {
+        "addInterface": "Add Interface"
+      },
+      "columns": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "interfaceName": "Interface Name"
+      },
+      "descriptions": {
+        "mplsConfig": "Mpls Config"
+      },
+      "labels": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "interfaceNameRequired": "Interface Name Required",
+        "maximumLabels": "Maximum Labels",
+        "rangeSize": "Range Size",
+        "routerId": "Router Id",
+        "targetedHello": "Targeted Hello"
+      },
+      "messages": {
+        "confirmDeleteInterface": "Confirm Delete Interface",
+        "confirmDeleteLdpInterface": "Confirm Delete Ldp Interface",
+        "selectInterface": "Select Interface"
+      },
+      "modals": {
+        "addLdpInterface": "Add Ldp Interface",
+        "addMplsInterface": "Add Mpls Interface",
+        "confirmDelete": "Confirm Delete",
+        "editLdpInterface": "Edit Ldp Interface",
+        "editMplsInterface": "Edit Mpls Interface"
+      },
+      "placeholders": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "labelRange": "Label Range",
+        "routerId": "Router Id",
+        "selectInterface": "Select Interface"
+      },
+      "sections": {
+        "ldpBasic": "Ldp Basic",
+        "ldpInterfaces": "Ldp Interfaces",
+        "mplsConfig": "Mpls Config"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "ldp": "Ldp",
+        "parameters": "Parameters"
+      }
+    }
+  },
+  "de": {
+    "mpls": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "buttons": {
+        "addInterface": "Add Interface"
+      },
+      "columns": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "interfaceName": "Interface Name"
+      },
+      "descriptions": {
+        "mplsConfig": "Mpls Config"
+      },
+      "labels": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "interfaceNameRequired": "Interface Name Required",
+        "maximumLabels": "Maximum Labels",
+        "rangeSize": "Range Size",
+        "routerId": "Router Id",
+        "targetedHello": "Targeted Hello"
+      },
+      "messages": {
+        "confirmDeleteInterface": "Confirm Delete Interface",
+        "confirmDeleteLdpInterface": "Confirm Delete Ldp Interface",
+        "selectInterface": "Select Interface"
+      },
+      "modals": {
+        "addLdpInterface": "Add Ldp Interface",
+        "addMplsInterface": "Add Mpls Interface",
+        "confirmDelete": "Confirm Delete",
+        "editLdpInterface": "Edit Ldp Interface",
+        "editMplsInterface": "Edit Mpls Interface"
+      },
+      "placeholders": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "labelRange": "Label Range",
+        "routerId": "Router Id",
+        "selectInterface": "Select Interface"
+      },
+      "sections": {
+        "ldpBasic": "Ldp Basic",
+        "ldpInterfaces": "Ldp Interfaces",
+        "mplsConfig": "Mpls Config"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "ldp": "Ldp",
+        "parameters": "Parameters"
+      }
+    }
+  },
+  "fr": {
+    "mpls": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "buttons": {
+        "addInterface": "Add Interface"
+      },
+      "columns": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "interfaceName": "Interface Name"
+      },
+      "descriptions": {
+        "mplsConfig": "Mpls Config"
+      },
+      "labels": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "interfaceNameRequired": "Interface Name Required",
+        "maximumLabels": "Maximum Labels",
+        "rangeSize": "Range Size",
+        "routerId": "Router Id",
+        "targetedHello": "Targeted Hello"
+      },
+      "messages": {
+        "confirmDeleteInterface": "Confirm Delete Interface",
+        "confirmDeleteLdpInterface": "Confirm Delete Ldp Interface",
+        "selectInterface": "Select Interface"
+      },
+      "modals": {
+        "addLdpInterface": "Add Ldp Interface",
+        "addMplsInterface": "Add Mpls Interface",
+        "confirmDelete": "Confirm Delete",
+        "editLdpInterface": "Edit Ldp Interface",
+        "editMplsInterface": "Edit Mpls Interface"
+      },
+      "placeholders": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "labelRange": "Label Range",
+        "routerId": "Router Id",
+        "selectInterface": "Select Interface"
+      },
+      "sections": {
+        "ldpBasic": "Ldp Basic",
+        "ldpInterfaces": "Ldp Interfaces",
+        "mplsConfig": "Mpls Config"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "ldp": "Ldp",
+        "parameters": "Parameters"
+      }
+    }
+  },
+  "ko": {
+    "mpls": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "buttons": {
+        "addInterface": "Add Interface"
+      },
+      "columns": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "interfaceName": "Interface Name"
+      },
+      "descriptions": {
+        "mplsConfig": "Mpls Config"
+      },
+      "labels": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "interfaceNameRequired": "Interface Name Required",
+        "maximumLabels": "Maximum Labels",
+        "rangeSize": "Range Size",
+        "routerId": "Router Id",
+        "targetedHello": "Targeted Hello"
+      },
+      "messages": {
+        "confirmDeleteInterface": "Confirm Delete Interface",
+        "confirmDeleteLdpInterface": "Confirm Delete Ldp Interface",
+        "selectInterface": "Select Interface"
+      },
+      "modals": {
+        "addLdpInterface": "Add Ldp Interface",
+        "addMplsInterface": "Add Mpls Interface",
+        "confirmDelete": "Confirm Delete",
+        "editLdpInterface": "Edit Ldp Interface",
+        "editMplsInterface": "Edit Mpls Interface"
+      },
+      "placeholders": {
+        "helloHoldtime": "Hello Holdtime",
+        "helloInterval": "Hello Interval",
+        "labelRange": "Label Range",
+        "routerId": "Router Id",
+        "selectInterface": "Select Interface"
+      },
+      "sections": {
+        "ldpBasic": "Ldp Basic",
+        "ldpInterfaces": "Ldp Interfaces",
+        "mplsConfig": "Mpls Config"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "ldp": "Ldp",
+        "parameters": "Parameters"
+      }
+    }
+  }
+}

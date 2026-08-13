@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, watch, onMounted, onUnmounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, watch, onMounted, onUnmounted, inject } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { firewallApi } from '/src/api/index.js';
@@ -11,7 +11,7 @@ import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { FIREWALL_RULE_SCHEMA_IPV6 } from '/src/data/firewallRuleSchemaIpv6.js';
 import { onMenuRefresh, offMenuRefresh } from '/src/utils/eventBus.js';
 
-const RULE_NUMBER_FIELD = { key: 'rule', title: '规则编号', type: 'number', min: 1, max: 999999 };
+const RULE_NUMBER_FIELD_KEY = { key: 'rule', titleKey: 'firewall.ruleNumber', type: 'number', min: 1, max: 999999 };
 
 function resolveRulePaths(routePath) {
   const parts = routePath.replace(/^\//, '').split('/').filter(Boolean);
@@ -87,6 +87,7 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const configStore = useConfigStore();
+    const { t } = inject('i18n');
     const data = ref([]);
     const stats = ref([]);
     const loading = ref(false);
@@ -110,19 +111,22 @@ export default defineComponent({
     const editingOriginalId = ref(null);
     const dataTableRef = ref(null);
     const searchText = ref('');
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
 
+    const RULE_NUMBER_FIELD = { ...RULE_NUMBER_FIELD_KEY, title: t(RULE_NUMBER_FIELD_KEY.titleKey) };
     const ruleSchema = [RULE_NUMBER_FIELD, ...FIREWALL_RULE_SCHEMA_IPV6];
 
-    const tabs = [
-      { key: 'basic', title: '基本' },
-      { key: 'source', title: '源/入接口' },
-      { key: 'destination', title: '目的/出接口' },
-      { key: 'time', title: '时间' },
-      { key: 'tcp', title: 'TCP 选项' },
-      { key: 'log', title: '日志' },
-      { key: 'dynamic', title: '动态地址组' },
-      { key: 'advanced', title: '高级' },
-    ];
+    const tabs = computed(() => [
+      { key: 'basic', title: t('firewall.tabBasic') },
+      { key: 'source', title: t('firewall.tabSource') },
+      { key: 'destination', title: t('firewall.tabDestination') },
+      { key: 'time', title: t('firewall.tabTime') },
+      { key: 'tcp', title: t('firewall.tabTcp') },
+      { key: 'log', title: t('firewall.tabLog') },
+      { key: 'dynamic', title: t('firewall.tabDynamic') },
+      { key: 'advanced', title: t('firewall.tabAdvanced') },
+    ]);
     const activeTab = ref('basic');
 
     const tabSchemas = computed(() => {
@@ -168,19 +172,19 @@ export default defineComponent({
       };
     });
 
-    const columns = ref([
-      { key: 'rule', title: '规则编号' },
-      { key: 'description', title: '描述' },
-      { key: 'action', title: '动作' },
-      { key: 'protocol', title: '协议' },
-      { key: 'source', title: '源' },
-      { key: 'destination', title: '目的' },
-      { key: 'inbound-interface', title: '入接口' },
-      { key: 'outbound-interface', title: '出接口' },
-      { key: 'packets', title: 'Packets' },
-      { key: 'bytes', title: 'Bytes' },
-      { key: 'log', title: '日志' },
-      { key: 'disable', title: '禁用' },
+    const columns = computed(() => [
+      { key: 'rule', title: t('firewall.ruleNumber') },
+      { key: 'description', title: t('rule.description') },
+      { key: 'action', title: t('rule.action') },
+      { key: 'protocol', title: t('rule.protocol') },
+      { key: 'source', title: t('rule.source') },
+      { key: 'destination', title: t('rule.destination') },
+      { key: 'inbound-interface', title: t('rule.inboundInterface') },
+      { key: 'outbound-interface', title: t('rule.outboundInterface') },
+      { key: 'packets', title: t('firewall.packets') },
+      { key: 'bytes', title: t('firewall.bytes') },
+      { key: 'log', title: t('rule.log') },
+      { key: 'disable', title: t('rule.disable') },
     ]);
 
     const tableData = computed(() => {
@@ -238,7 +242,7 @@ export default defineComponent({
     }
 
     function edit() {
-      if (!selected.value.length) return alert('请选择一行');
+      if (!selected.value.length) return showError({ message: t('firewall.selectRow') });
       const row = data.value.find(r => r.id === selected.value[0]) || {};
       editingItem.value = JSON.parse(JSON.stringify(row));
       editingOriginalId.value = row.id || null;
@@ -246,25 +250,37 @@ export default defineComponent({
     }
 
     async function remove() {
-      if (!selected.value.length) return alert('请选择一行');
-      if (!confirm('确认删除选中的规则？')) return;
-      for (const id of selected.value) {
-        await configStore.deleteConfig(`${rulePath.value} ${id}`);
+      if (!selected.value.length) return showError({ message: t('firewall.selectRow') });
+      pendingDeleteNames.value = selected.value.map(id => {
+        const row = data.value.find(r => r.id === id);
+        return row ? (row.rule || row.id) : id;
+      });
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemove() {
+      deleteModalVisible.value = false;
+      for (const name of pendingDeleteNames.value) {
+        await configStore.deleteConfig(`${rulePath.value} ${name}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
+      pendingDeleteNames.value = [];
       await load();
     }
 
     async function save() {
       const targetRule = editingItem.value.rule;
-      if (!targetRule) return alert('请输入规则编号');
+      if (!targetRule) return showError({ message: t('firewall.enterRuleNumber') });
       const originalId = editingOriginalId.value;
       const value = buildSaveValue(ruleSchema, editingItem.value);
       try {
         if (originalId && String(originalId) !== String(targetRule)) {
           await configStore.deleteConfig(`${rulePath.value} ${originalId}`);
+          configStore.markPending();
         }
         await configStore.setConfig(`${rulePath.value} ${targetRule}`, value);
+        configStore.markPending();
         modalVisible.value = false;
         await configStore.checkSessionChanged();
         await load();
@@ -335,7 +351,7 @@ export default defineComponent({
     }
 
     async function confirmImport() {
-      if (!importFile.value) return alert('请选择文件');
+      if (!importFile.value) return showError({ message: t('firewall.selectFile') });
       try {
         const text = await importFile.value.text();
         const lines = text.trim().split(/\r?\n/).filter(Boolean);
@@ -356,7 +372,7 @@ export default defineComponent({
     }
 
     function openMove() {
-      if (!selected.value.length) return alert('请选择一行');
+      if (!selected.value.length) return showError({ message: t('firewall.selectRow') });
       moveOption.value = 'top';
       moveTargetId.value = '';
       moveModalVisible.value = true;
@@ -381,8 +397,8 @@ export default defineComponent({
       const currentId = parseInt(selected.value[0]);
       const ids = data.value.map(r => parseInt(r.rule)).filter(Boolean);
       const targetId = resolveMoveTarget();
-      if (targetId === null || isNaN(targetId)) return alert('无法移动到该位置，请检查目标编号');
-      if (ids.includes(targetId)) return alert(`规则 ${targetId} 已存在，请选择其他位置`);
+      if (targetId === null || isNaN(targetId)) return showError({ message: t('firewall.invalidMoveTarget') });
+      if (ids.includes(targetId)) return showError({ message: t('firewall.ruleAlreadyExists', { id: targetId }) });
       try {
         await firewallApi.moveRule(configBase.value, currentId, targetId);
         moveModalVisible.value = false;
@@ -393,8 +409,8 @@ export default defineComponent({
     }
 
     async function copyRule() {
-      if (!selected.value.length) return alert('请选择一行');
-      const target = prompt('输入新规则编号');
+      if (!selected.value.length) return showError({ message: t('firewall.selectRow') });
+      const target = prompt(t('firewall.enterNewRuleNumber'));
       if (!target) return;
       try {
         await firewallApi.copyRule(configBase.value, selected.value[0], target);
@@ -404,11 +420,13 @@ export default defineComponent({
       }
     }
 
-    return {
+    return {t,
+      
       data: tableData, loading, columns, modalVisible, moveModalVisible, editingItem, selected, path, writeDisabled, moveOption, moveTargetId, importFile,
       importModalVisible, importPreview, importHeaders, importFileName,
       dataTableRef, searchText, tabs, activeTab, tabSchemas,
-      load, create, edit, remove, save, clearStats, exportExcel, openImport, onImportFileChange, confirmImport, openMove, moveRule, copyRule, ruleSchema,
+      deleteModalVisible, pendingDeleteNames,
+      load, create, edit, remove, confirmRemove, save, clearStats, exportExcel, openImport, onImportFileChange, confirmImport, openMove, moveRule, copyRule, ruleSchema, rulePath,
       formatEndpoint, formatInterface,
     };
   },
@@ -424,7 +442,7 @@ export default defineComponent({
           <ToolbarButton icon="clearCounters" @click="clearStats">{{ $t('firewall.clearCounters') }}</ToolbarButton>
         </div>
         <div class="toolbar-right">
-          <input class="toolbar-search" v-model="searchText" @input="dataTableRef?.setQuickFilter($event.target.value)" placeholder="搜索..." />
+          <input class="toolbar-search" v-model="searchText" @input="dataTableRef?.setQuickFilter($event.target.value)" :placeholder="$t('firewall.search')" />
           <ToolbarButton icon="filter" @click="dataTableRef?.openFilter()">{{ $t('app.filter') }}</ToolbarButton>
           <ToolbarButton icon="columnSetting" @click="dataTableRef?.openColumnSetting()">{{ $t('app.columnSetting') }}</ToolbarButton>
           <ToolbarButton icon="export" @click="exportExcel">{{ $t('firewall.exportExcel') }}</ToolbarButton>
@@ -446,44 +464,50 @@ export default defineComponent({
           {{ formatInterface(row['outbound-interface']) }}
         </template>
         <template #log="{ row }">
-          {{ row.log !== undefined ? '是' : '' }}
+          {{ row.log !== undefined ? $t('firewall.yes') : '' }}
         </template>
         <template #disable="{ row }">
-          {{ row.disable !== undefined ? '是' : '' }}
+          {{ row.disable !== undefined ? $t('firewall.yes') : '' }}
         </template>
       </DataTable>
-      <DraggableModal v-model:visible="modalVisible" :title="editingItem?.id ? '编辑 IPv6 规则' : '创建 IPv6 规则'" width="820px" @confirm="save">
+      <DraggableModal v-model:visible="modalVisible" :title="editingItem?.id ? $t('firewall.editIpv6Rule') : $t('firewall.createIpv6Rule')" width="820px" @confirm="save">
         <TabGroup v-model="activeTab" :tabs="tabs">
           <template v-for="tab in tabs" :key="tab.key" #[tab.key]>
             <ConfigForm v-model="editingItem" :schema="tabSchemas[tab.key]" :disabled="writeDisabled" :showAdvanced="true" :formKey="'firewall_ipv6_rule_' + path + '_' + tab.key" :suggestionPath="rulePath" />
           </template>
         </TabGroup>
       </DraggableModal>
-      <DraggableModal v-model:visible="moveModalVisible" title="移动规则" @confirm="moveRule">
+      <DraggableModal v-model:visible="moveModalVisible" :title="$t('firewall.moveRule')" @confirm="moveRule">
         <div class="form-row">
-          <label class="form-label">当前规则</label>
+          <label class="form-label">{{ $t('firewall.currentRule') }}</label>
           <div class="form-control">{{ selected[0] }}</div>
         </div>
         <div class="form-row">
-          <label class="form-label">移动到</label>
+          <label class="form-label">{{ $t('firewall.moveTo') }}</label>
           <div class="form-control radio-group">
-            <label class="radio-item"><input type="radio" v-model="moveOption" value="top" /> 置顶</label>
-            <label class="radio-item"><input type="radio" v-model="moveOption" value="bottom" /> 置底</label>
-            <label class="radio-item"><input type="radio" v-model="moveOption" value="before" /> 之前</label>
-            <label class="radio-item"><input type="radio" v-model="moveOption" value="after" /> 之后</label>
+            <label class="radio-item"><input type="radio" v-model="moveOption" value="top" /> {{ $t('firewall.moveToTop') }}</label>
+            <label class="radio-item"><input type="radio" v-model="moveOption" value="bottom" /> {{ $t('firewall.moveToBottom') }}</label>
+            <label class="radio-item"><input type="radio" v-model="moveOption" value="before" /> {{ $t('firewall.moveBefore') }}</label>
+            <label class="radio-item"><input type="radio" v-model="moveOption" value="after" /> {{ $t('firewall.moveAfter') }}</label>
           </div>
         </div>
         <div class="form-row" v-if="moveOption === 'before' || moveOption === 'after'">
-          <label class="form-label">目标规则编号</label>
+          <label class="form-label">{{ $t('firewall.targetRuleNumber') }}</label>
           <input class="form-control" v-model="moveTargetId" />
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="importModalVisible" title="导入 Excel" width="800px" @confirm="confirmImport">
+      <DraggableModal v-model:visible="deleteModalVisible" :title="$t('firewall.confirmDelete')" width="400px" @confirm="confirmRemove">
+        <div>{{ $t('firewall.confirmDeleteRule') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+      <DraggableModal v-model:visible="importModalVisible" :title="$t('firewall.importExcel')" width="800px" @confirm="confirmImport">
         <div class="form-row">
-          <label class="form-label">选择文件</label>
+          <label class="form-label">{{ $t('firewall.selectFile') }}</label>
           <input type="file" @change="onImportFileChange" />
         </div>
-        <div v-if="importFileName" style="margin-bottom:8px;color:#666;">已选择：{{ importFileName }}</div>
+        <div v-if="importFileName" style="margin-bottom:8px;color:#666;">{{ $t('firewall.selected') }}: {{ importFileName }}</div>
         <div v-if="importPreview.length" style="max-height:300px;overflow:auto;border:1px solid #ddd;">
           <table class="data-table">
             <thead>
@@ -495,9 +519,9 @@ export default defineComponent({
               </tr>
             </tbody>
           </table>
-          <div v-if="importPreview.length >= 10" style="padding:8px;color:#999;text-align:center;">仅显示前 10 行预览</div>
+          <div v-if="importPreview.length >= 10" style="padding:8px;color:#999;text-align:center;">{{ $t('firewall.previewFirst10Rows') }}</div>
         </div>
-        <div v-else style="padding:20px;color:#999;text-align:center;">请选择文件以预览内容</div>
+        <div v-else style="padding:20px;color:#999;text-align:center;">{{ $t('firewall.selectFileToPreview') }}</div>
       </DraggableModal>
     </div>
   `,

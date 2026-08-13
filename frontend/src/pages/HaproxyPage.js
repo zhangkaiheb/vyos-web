@@ -1,6 +1,8 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
 import { configApi } from '/src/api/index.js';
+import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import { useConfigStore } from '/src/stores/config.js';
+import { useI18n } from '/src/i18n/index.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
@@ -12,51 +14,48 @@ export default defineComponent({
   template: `
     <div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'global', title: '全局参数' },
-        { key: 'timeout', title: '超时设置' },
-        { key: 'backends', title: '后端服务器' },
-        { key: 'services', title: '前端服务' },
+        { key: 'global', title: t('haproxy.tabs.global') },
+        { key: 'timeout', title: t('haproxy.tabs.timeout') },
+        { key: 'backends', title: t('haproxy.tabs.backends') },
+        { key: 'services', title: t('haproxy.tabs.services') },
       ]">
         <template #global>
           <div style="padding: 16px;">
             <div style="max-width: 600px;">
               <div class="form-row">
-                <label class="form-label" title="最大允许连接数">最大连接数</label>
+                <label class="form-label" :title="t('haproxy.global.maxConnections.title')">{{ t('haproxy.global.maxConnections.label') }}</label>
                 <input type="number" v-model.number="globalConfig['max-connections']" min="1" max="2000000" style="width: 200px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">最大允许连接数 (1-2000000)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.global.maxConnections.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="指定最低 required TLS 版本">最低 TLS 版本</label>
+                <label class="form-label" :title="t('haproxy.global.tlsVersionMin.title')">{{ t('haproxy.global.tlsVersionMin.label') }}</label>
                 <select v-model="globalConfig['tls-version-min']" style="width: 200px;">
                   <option value="1.2">TLS 1.2</option>
                   <option value="1.3">TLS 1.3</option>
                 </select>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">指定最低 required TLS 版本 (默认: 1.3)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.global.tlsVersionMin.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="SSL/TLS 握手期间使用的密码算法">SSL 密码套件</label>
-                <textarea v-model="globalConfig['ssl-bind-ciphers']" rows="4" style="width: 300px; font-size: 12px;" placeholder="每行一个密码套件"></textarea>
+                <label class="form-label" :title="t('haproxy.global.sslCiphers.title')">{{ t('haproxy.global.sslCiphers.label') }}</label>
+                <textarea v-model="globalConfig['ssl-bind-ciphers']" rows="4" style="width: 300px; font-size: 12px;" :placeholder="t('haproxy.global.sslCiphers.placeholder')"></textarea>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">SSL/TLS 握手期间使用的密码算法 (每行一个)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.global.sslCiphers.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="日志设施">日志设施</label>
+                <label class="form-label" :title="t('haproxy.global.loggingFacility.title')">{{ t('haproxy.global.loggingFacility.label') }}</label>
                 <select v-model="globalConfig['logging-facility']" style="width: 200px;">
-                  <option value="">不设置</option>
+                  <option value="">{{ t('haproxy.common.notSet') }}</option>
                   <option v-for="f in LOG_FACILITIES" :key="f" :value="f">{{ f }}</option>
                 </select>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">日志设施</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.global.loggingFacility.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="日志级别">日志级别</label>
+                <label class="form-label" :title="t('haproxy.global.loggingLevel.title')">{{ t('haproxy.global.loggingLevel.label') }}</label>
                 <select v-model="globalConfig['logging-level']" style="width: 200px;">
                   <option v-for="l in LOG_LEVELS" :key="l" :value="l">{{ l }}</option>
                 </select>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">日志级别 (默认: err)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.global.loggingLevel.help') }}</div>
             </div>
-          </div>
-          <div class="page-actions-bottom">
-            <ToolbarButton icon="save" primary @click="saveConfig" :disabled="loading">{{ loading ? '保存中...' : '保存配置' }}</ToolbarButton>
           </div>
         </template>
 
@@ -64,40 +63,37 @@ export default defineComponent({
           <div style="padding: 16px;">
             <div style="max-width: 600px;">
               <div class="form-row">
-                <label class="form-label" title="客户端侧最大不活动时间(秒)">客户端超时</label>
+                <label class="form-label" :title="t('haproxy.timeout.client.title')">{{ t('haproxy.timeout.client.label') }}</label>
                 <input type="number" v-model.number="timeoutConfig.client" min="1" max="3600" style="width: 200px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">客户端侧最大不活动时间(秒) (1-3600, 默认: 50)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.timeout.client.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="等待连接成功的最大时间(秒)">连接超时</label>
+                <label class="form-label" :title="t('haproxy.timeout.connect.title')">{{ t('haproxy.timeout.connect.label') }}</label>
                 <input type="number" v-model.number="timeoutConfig.connect" min="1" max="3600" style="width: 200px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">等待连接成功的最大时间(秒) (1-3600, 默认: 10)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.timeout.connect.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="服务器端最大不活动时间(秒)">服务器超时</label>
+                <label class="form-label" :title="t('haproxy.timeout.server.title')">{{ t('haproxy.timeout.server.label') }}</label>
                 <input type="number" v-model.number="timeoutConfig.server" min="1" max="3600" style="width: 200px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">服务器端最大不活动时间(秒) (1-3600, 默认: 50)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.timeout.server.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="已建立连接的超时时间(秒)">检查超时</label>
+                <label class="form-label" :title="t('haproxy.timeout.check.title')">{{ t('haproxy.timeout.check.label') }}</label>
                 <input type="number" v-model.number="timeoutConfig.check" min="1" max="3600" style="width: 200px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">已建立连接的超时时间(秒) (1-3600)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.timeout.check.help') }}</div>
             </div>
-          </div>
-          <div class="page-actions-bottom">
-            <ToolbarButton icon="save" primary @click="saveConfig" :disabled="loading">{{ loading ? '保存中...' : '保存配置' }}</ToolbarButton>
           </div>
         </template>
 
         <template #backends>
           <DataTable :columns="[
-              { key: 'name', title: '名称', width: 120 },
-              { key: 'description', title: '描述', width: 150 },
-              { key: 'mode', title: '模式', width: 80 },
-              { key: 'balance', title: '负载均衡', width: 120 },
-              { key: 'serverCount', title: '服务器数', width: 80 },
-              { key: 'actions', title: '操作', width: 120 },
+              { key: 'name', title: t('haproxy.columns.name'), width: 120 },
+              { key: 'description', title: t('haproxy.columns.description'), width: 150 },
+              { key: 'mode', title: t('haproxy.columns.mode'), width: 80 },
+              { key: 'balance', title: t('haproxy.columns.balance'), width: 120 },
+              { key: 'serverCount', title: t('haproxy.columns.serverCount'), width: 80 },
+              { key: 'actions', title: t('haproxy.columns.actions'), width: 120 },
             ]" :data="backendList.map(b => ({
               name: b.name,
               description: b.description || '-',
@@ -112,24 +108,22 @@ export default defineComponent({
             @delete="deleteBackend($event)"
             @refresh="loadConfig">
               <template #actions="{ record }">
-                <button class="btn btn-link" @click="openBackendModal(record.actions)">编辑</button>
-                <button class="btn btn-link btn-danger" @click="deleteBackend(record.actions)">删除</button>
+                <button class="btn btn-link" @click="openBackendModal(record.actions)">{{ t('haproxy.buttons.edit') }}</button>
+                <button class="btn btn-link btn-danger" @click="deleteBackend(record.actions)">{{ t('haproxy.buttons.delete') }}</button>
               </template>
             </DataTable>
-          <div class="page-actions-bottom">
-            <ToolbarButton icon="save" primary @click="saveConfig" :disabled="loading">{{ loading ? '保存中...' : '保存配置' }}</ToolbarButton>
-          </div>
+
         </template>
 
         <template #services>
           <DataTable :columns="[
-              { key: 'name', title: '名称', width: 120 },
-              { key: 'description', title: '描述', width: 150 },
-              { key: 'mode', title: '模式', width: 80 },
-              { key: 'port', title: '端口', width: 80 },
-              { key: 'listenAddress', title: '监听地址', width: 150 },
-              { key: 'backend', title: '后端', width: 150 },
-              { key: 'actions', title: '操作', width: 120 },
+              { key: 'name', title: t('haproxy.columns.name'), width: 120 },
+              { key: 'description', title: t('haproxy.columns.description'), width: 150 },
+              { key: 'mode', title: t('haproxy.columns.mode'), width: 80 },
+              { key: 'port', title: t('haproxy.columns.port'), width: 80 },
+              { key: 'listenAddress', title: t('haproxy.columns.listenAddress'), width: 150 },
+              { key: 'backend', title: t('haproxy.columns.backend'), width: 150 },
+              { key: 'actions', title: t('haproxy.columns.actions'), width: 120 },
             ]" :data="serviceList.map(s => ({
               name: s.name,
               description: s.description || '-',
@@ -145,59 +139,57 @@ export default defineComponent({
             @delete="deleteService($event)"
             @refresh="loadConfig">
               <template #actions="{ record }">
-                <button class="btn btn-link" @click="openServiceModal(record.actions)">编辑</button>
-                <button class="btn btn-link btn-danger" @click="deleteService(record.actions)">删除</button>
+                <button class="btn btn-link" @click="openServiceModal(record.actions)">{{ t('haproxy.buttons.edit') }}</button>
+                <button class="btn btn-link btn-danger" @click="deleteService(record.actions)">{{ t('haproxy.buttons.delete') }}</button>
               </template>
             </DataTable>
-          <div class="page-actions-bottom">
-            <ToolbarButton icon="save" primary @click="saveConfig" :disabled="loading">{{ loading ? '保存中...' : '保存配置' }}</ToolbarButton>
-          </div>
+
         </template>
 
       </TabGroup>
 
 
-      <!-- 后端服务器弹窗 -->
-      <DraggableModal v-model:visible="showBackendModal" title="后端服务器" width="700px" @ok="saveBackend">
+      <!-- Backend server modal -->
+      <DraggableModal v-model:visible="showBackendModal" :title="t('haproxy.modal.backend.title')" width="700px" @ok="saveBackend">
         <TabGroup v-model="activeBackendTab" :tabs="[
-          { key: 'basic', title: '基本配置' },
-          { key: 'servers', title: '服务器' },
-          { key: 'health', title: '健康检查' },
-          { key: 'rules', title: '规则' },
+          { key: 'basic', title: t('haproxy.modal.backend.tabs.basic') },
+          { key: 'servers', title: t('haproxy.modal.backend.tabs.servers') },
+          { key: 'health', title: t('haproxy.modal.backend.tabs.health') },
+          { key: 'rules', title: t('haproxy.modal.backend.tabs.rules') },
         ]">
           <template #basic>
             <div style="padding: 8px 0;">
               <div class="form-row">
-                <label class="form-label" title="后端服务器名称">名称</label>
+                <label class="form-label" :title="t('haproxy.modal.backend.basic.name.title')">{{ t('haproxy.modal.backend.basic.name.label') }}</label>
                 <input type="text" v-model="editingBackend.name" style="width: 200px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">后端服务器名称</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.basic.name.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="描述">描述</label>
+                <label class="form-label" :title="t('haproxy.modal.backend.basic.description.title')">{{ t('haproxy.modal.backend.basic.description.label') }}</label>
                 <input type="text" v-model="editingBackend.description" style="width: 300px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">描述 (最多255字符)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.basic.description.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="代理模式">模式</label>
+                <label class="form-label" :title="t('haproxy.modal.backend.basic.mode.title')">{{ t('haproxy.modal.backend.basic.mode.label') }}</label>
                 <select v-model="editingBackend.mode" style="width: 200px;">
                   <option value="http">HTTP</option>
                   <option value="tcp">TCP</option>
                 </select>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">代理模式 (默认: http)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.basic.mode.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="负载均衡算法">负载均衡算法</label>
+                <label class="form-label" :title="t('haproxy.modal.backend.basic.balance.title')">{{ t('haproxy.modal.backend.basic.balance.label') }}</label>
                 <select v-model="editingBackend.balance" style="width: 200px;">
-                  <option value="round-robin">轮询 (round-robin)</option>
-                  <option value="least-connection">最少连接 (least-connection)</option>
-                  <option value="source-address">源地址 (source-address)</option>
+                  <option value="round-robin">{{ t('haproxy.modal.backend.basic.balance.roundRobin') }}</option>
+                  <option value="least-connection">{{ t('haproxy.modal.backend.basic.balance.leastConnection') }}</option>
+                  <option value="source-address">{{ t('haproxy.modal.backend.basic.balance.sourceAddress') }}</option>
                 </select>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">负载均衡算法 (默认: round-robin)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.basic.balance.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="非HTTP健康检查选项">健康检查类型</label>
+                <label class="form-label" :title="t('haproxy.modal.backend.basic.healthCheck.title')">{{ t('haproxy.modal.backend.basic.healthCheck.label') }}</label>
                 <select v-model="editingBackend['health-check']" style="width: 200px;">
-                  <option value="">不设置</option>
+                  <option value="">{{ t('haproxy.common.notSet') }}</option>
                   <option value="ldap">LDAP</option>
                   <option value="mysql">MySQL</option>
                   <option value="pgsql">PostgreSQL</option>
@@ -205,67 +197,67 @@ export default defineComponent({
                   <option value="smtp">SMTP</option>
                 </select>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">非HTTP健康检查选项</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.basic.healthCheck.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="日志设施">日志设施</label>
+                <label class="form-label" :title="t('haproxy.modal.backend.basic.loggingFacility.title')">{{ t('haproxy.modal.backend.basic.loggingFacility.label') }}</label>
                 <select v-model="editingBackend['logging-facility']" style="width: 200px;">
-                  <option value="">不设置</option>
+                  <option value="">{{ t('haproxy.common.notSet') }}</option>
                   <option v-for="f in LOG_FACILITIES" :key="f" :value="f">{{ f }}</option>
                 </select>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">日志设施</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.basic.loggingFacility.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="日志级别">日志级别</label>
+                <label class="form-label" :title="t('haproxy.modal.backend.basic.loggingLevel.title')">{{ t('haproxy.modal.backend.basic.loggingLevel.label') }}</label>
                 <select v-model="editingBackend['logging-level']" style="width: 200px;">
-                  <option value="">不设置</option>
+                  <option value="">{{ t('haproxy.common.notSet') }}</option>
                   <option v-for="l in LOG_LEVELS" :key="l" :value="l">{{ l }}</option>
                 </select>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">日志级别 (默认: err)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.basic.loggingLevel.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="SSL CA 证书">CA 证书</label>
-                <input type="text" v-model="editingBackend['ssl-ca-certificate']" style="width: 200px;" placeholder="PKI CA 名称" />
+                <label class="form-label" :title="t('haproxy.modal.backend.basic.caCert.title')">{{ t('haproxy.modal.backend.basic.caCert.label') }}</label>
+                <input type="text" v-model="editingBackend['ssl-ca-certificate']" style="width: 200px;" :placeholder="t('haproxy.modal.backend.basic.caCert.placeholder')" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">PKI 配置中的证书颁发机构</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.basic.caCert.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="不验证后端服务器SSL证书">不验证 SSL</label>
+                <label class="form-label" :title="t('haproxy.modal.backend.basic.sslNoVerify.title')">{{ t('haproxy.modal.backend.basic.sslNoVerify.label') }}</label>
                 <input type="checkbox" v-model="editingBackend['ssl-no-verify']" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">不尝试验证后端服务器的SSL证书</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.basic.sslNoVerify.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="连接超时(秒)">连接超时</label>
+                <label class="form-label" :title="t('haproxy.modal.backend.basic.timeoutConnect.title')">{{ t('haproxy.modal.backend.basic.timeoutConnect.label') }}</label>
                 <input type="number" v-model.number="editingBackend['timeout-connect']" min="1" max="3600" style="width: 200px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">等待连接成功的最大时间(秒) (1-3600)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.basic.timeoutConnect.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="服务器超时(秒)">服务器超时</label>
+                <label class="form-label" :title="t('haproxy.modal.backend.basic.timeoutServer.title')">{{ t('haproxy.modal.backend.basic.timeoutServer.label') }}</label>
                 <input type="number" v-model.number="editingBackend['timeout-server']" min="1" max="3600" style="width: 200px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">服务器端最大不活动时间(秒) (1-3600)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.basic.timeoutServer.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="检查超时(秒)">检查超时</label>
+                <label class="form-label" :title="t('haproxy.modal.backend.basic.timeoutCheck.title')">{{ t('haproxy.modal.backend.basic.timeoutCheck.label') }}</label>
                 <input type="number" v-model.number="editingBackend['timeout-check']" min="1" max="3600" style="width: 200px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">已建立连接的超时时间(秒) (1-3600)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.basic.timeoutCheck.help') }}</div>
             </div>
           </template>
 
           <template #servers>
             <div style="padding: 8px 0;">
               <DataTable :columns="[
-                { key: 'name', title: '名称', width: 100 },
-                { key: 'address', title: '地址', width: 150 },
-                { key: 'port', title: '端口', width: 80 },
-                { key: 'backup', title: '备用', width: 60 },
-                { key: 'check', title: '检查', width: 60 },
-                { key: 'checkPort', title: '检查端口', width: 80 },
-                { key: 'sendProxy', title: 'Proxy', width: 80 },
+                { key: 'name', title: t('haproxy.columns.name'), width: 100 },
+                { key: 'address', title: t('haproxy.columns.address'), width: 150 },
+                { key: 'port', title: t('haproxy.columns.port'), width: 80 },
+                { key: 'backup', title: t('haproxy.columns.backup'), width: 60 },
+                { key: 'check', title: t('haproxy.columns.check'), width: 60 },
+                { key: 'checkPort', title: t('haproxy.columns.checkPort'), width: 80 },
+                { key: 'sendProxy', title: t('haproxy.columns.proxy'), width: 80 },
               ]" rowKey="name" :data="editingBackend.servers.map((s, i) => ({
                 name: s.name,
                 address: s.address || '-',
                 port: s.port || '-',
-                backup: s.backup ? '是' : '-',
-                check: s.check ? '是' : '-',
+                backup: s.backup ? t('haproxy.common.yes') : '-',
+                check: s.check ? t('haproxy.common.yes') : '-',
                 checkPort: s['check-port'] || '-',
                 sendProxy: s['send-proxy-v2'] ? 'v2' : (s['send-proxy'] ? 'v1' : '-'),
                 _index: i,
@@ -281,9 +273,9 @@ export default defineComponent({
           <template #health>
             <div style="padding: 8px 0;">
               <div class="form-row">
-                <label class="form-label" title="HTTP健康检查方法">检查方法</label>
+                <label class="form-label" :title="t('haproxy.modal.backend.health.checkMethod.title')">{{ t('haproxy.modal.backend.health.checkMethod.label') }}</label>
                 <select v-model="editingBackend['http-check-method']" style="width: 200px;">
-                  <option value="">不设置</option>
+                  <option value="">{{ t('haproxy.common.notSet') }}</option>
                   <option value="options">OPTIONS</option>
                   <option value="head">HEAD</option>
                   <option value="get">GET</option>
@@ -291,37 +283,37 @@ export default defineComponent({
                   <option value="put">PUT</option>
                 </select>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">HTTP健康检查方法</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.health.checkMethod.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="HTTP健康检查URI">检查URI</label>
-                <input type="text" v-model="editingBackend['http-check-uri']" style="width: 300px;" placeholder="/health" />
+                <label class="form-label" :title="t('haproxy.modal.backend.health.checkUri.title')">{{ t('haproxy.modal.backend.health.checkUri.label') }}</label>
+                <input type="text" v-model="editingBackend['http-check-uri']" style="width: 300px;" :placeholder="t('haproxy.modal.backend.health.checkUri.placeholder')" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">HTTP健康检查URI (如 /path 或 /path?query)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.health.checkUri.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="期望的响应状态码">期望状态码</label>
-                <input type="text" v-model="editingBackend['http-check-expect-status']" style="width: 200px;" placeholder="200-399" />
+                <label class="form-label" :title="t('haproxy.modal.backend.health.expectStatus.title')">{{ t('haproxy.modal.backend.health.expectStatus.label') }}</label>
+                <input type="text" v-model="editingBackend['http-check-expect-status']" style="width: 200px;" :placeholder="t('haproxy.modal.backend.health.expectStatus.placeholder')" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">期望的响应状态码 (200-399)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.health.expectStatus.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="期望在响应体中的字符串">期望字符串</label>
+                <label class="form-label" :title="t('haproxy.modal.backend.health.expectString.title')">{{ t('haproxy.modal.backend.health.expectString.label') }}</label>
                 <input type="text" v-model="editingBackend['http-check-expect-string']" style="width: 300px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">期望在响应体中出现的字符串</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backend.health.expectString.help') }}</div>
             </div>
           </template>
 
           <template #rules>
             <div style="padding: 8px 0;">
               <DataTable :columns="[
-                { key: 'rule', title: '编号', width: 60 },
-                { key: 'domainName', title: '域名', width: 150 },
-                { key: 'urlPath', title: 'URL路径', width: 150 },
-                { key: 'setServer', title: '设置服务器', width: 120 },
-                { key: 'setRedirect', title: '重定向', width: 120 },
+                { key: 'rule', title: t('haproxy.columns.rule'), width: 60 },
+                { key: 'domainName', title: t('haproxy.columns.domainName'), width: 150 },
+                { key: 'urlPath', title: t('haproxy.columns.urlPath'), width: 150 },
+                { key: 'setServer', title: t('haproxy.columns.setServer'), width: 120 },
+                { key: 'setRedirect', title: t('haproxy.columns.setRedirect'), width: 120 },
               ]" rowKey="rule" :data="editingBackend.rules.map((r, i) => ({
                 rule: r.rule,
                 domainName: (r['domain-name'] || []).join(', ') || '-',
-                urlPath: r['url-path-exact'] ? ('精确: ' + r['url-path-exact'].join(', ')) : (r['url-path-begin'] ? ('开头: ' + r['url-path-begin'].join(', ')) : (r['url-path-end'] ? ('结尾: ' + r['url-path-end'].join(', ')) : '-')),
+                urlPath: r['url-path-exact'] ? (t('haproxy.common.exact') + ': ' + r['url-path-exact'].join(', ')) : (r['url-path-begin'] ? (t('haproxy.common.begin') + ': ' + r['url-path-begin'].join(', ')) : (r['url-path-end'] ? (t('haproxy.common.end') + ': ' + r['url-path-end'].join(', ')) : '-')),
                 setServer: r['set-server'] || '-',
                 setRedirect: r['set-redirect-location'] || '-',
               }))"
@@ -335,197 +327,197 @@ export default defineComponent({
         </TabGroup>
       </DraggableModal>
 
-      <!-- 服务器编辑弹窗 -->
-      <DraggableModal v-model:visible="showServerModal" title="服务器" width="500px" @ok="saveServer">
+      <!-- Server edit modal -->
+      <DraggableModal v-model:visible="showServerModal" :title="t('haproxy.modal.server.title')" width="500px" @ok="saveServer">
         <div style="padding: 8px 0;">
           <div class="form-row">
-            <label class="form-label">名称</label>
+            <label class="form-label">{{ t('haproxy.modal.server.name.label') }}</label>
             <input type="text" v-model="editingServer.name" style="width: 200px;" />
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">服务器名称</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.server.name.help') }}</div>
           <div class="form-row">
-            <label class="form-label">地址</label>
-            <input type="text" v-model="editingServer.address" style="width: 200px;" placeholder="IP地址或主机名" />
+            <label class="form-label">{{ t('haproxy.modal.server.address.label') }}</label>
+            <input type="text" v-model="editingServer.address" style="width: 200px;" :placeholder="t('haproxy.modal.server.address.placeholder')" />
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">服务器地址</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.server.address.help') }}</div>
           <div class="form-row">
-            <label class="form-label">端口</label>
+            <label class="form-label">{{ t('haproxy.modal.server.port.label') }}</label>
             <input type="number" v-model.number="editingServer.port" min="1" max="65535" style="width: 200px;" />
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">端口号 (1-65535)</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.server.port.help') }}</div>
           <div class="form-row">
-            <label class="form-label">备用</label>
+            <label class="form-label">{{ t('haproxy.modal.server.backup.label') }}</label>
             <input type="checkbox" v-model="editingServer.backup" />
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">标记为备用服务器</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.server.backup.help') }}</div>
           <div class="form-row">
-            <label class="form-label">健康检查</label>
+            <label class="form-label">{{ t('haproxy.modal.server.check.label') }}</label>
             <input type="checkbox" v-model="editingServer.check" />
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">启用健康检查</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.server.check.help') }}</div>
           <div class="form-row">
-            <label class="form-label">检查端口</label>
+            <label class="form-label">{{ t('haproxy.modal.server.checkPort.label') }}</label>
             <input type="number" v-model.number="editingServer['check-port']" min="1" max="65535" style="width: 200px;" />
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">健康检查端口</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.server.checkPort.help') }}</div>
           <div class="form-row">
-            <label class="form-label">Send Proxy</label>
+            <label class="form-label">{{ t('haproxy.modal.server.sendProxy.label') }}</label>
             <input type="checkbox" v-model="editingServer['send-proxy']" />
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">发送 PROXY 协议 v1</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.server.sendProxy.help') }}</div>
           <div class="form-row">
-            <label class="form-label">Send Proxy v2</label>
+            <label class="form-label">{{ t('haproxy.modal.server.sendProxyV2.label') }}</label>
             <input type="checkbox" v-model="editingServer['send-proxy-v2']" />
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">发送 PROXY 协议 v2</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.server.sendProxyV2.help') }}</div>
         </div>
       </DraggableModal>
 
-      <!-- 后端规则编辑弹窗 -->
-      <DraggableModal v-model:visible="showBackendRuleModal" title="后端规则" width="600px" @ok="saveBackendRule">
+      <!-- Backend rule edit modal -->
+      <DraggableModal v-model:visible="showBackendRuleModal" :title="t('haproxy.modal.backendRule.title')" width="600px" @ok="saveBackendRule">
         <div style="padding: 8px 0;">
           <div class="form-row">
-            <label class="form-label">规则编号</label>
+            <label class="form-label">{{ t('haproxy.modal.backendRule.ruleNumber.label') }}</label>
             <input type="number" v-model.number="editingBackendRule.rule" min="1" style="width: 100px;" />
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">规则编号</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backendRule.ruleNumber.help') }}</div>
           <div class="form-row">
-            <label class="form-label">域名</label>
-            <textarea v-model="editingBackendRule.domainNameText" rows="2" style="width: 300px; font-size: 12px;" placeholder="每行一个域名"></textarea>
+            <label class="form-label">{{ t('haproxy.modal.backendRule.domainName.label') }}</label>
+            <textarea v-model="editingBackendRule.domainNameText" rows="2" style="width: 300px; font-size: 12px;" :placeholder="t('haproxy.modal.backendRule.domainName.placeholder')"></textarea>
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">匹配的域名 (每行一个)</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backendRule.domainName.help') }}</div>
           <div class="form-row">
-            <label class="form-label">URL路径 (精确)</label>
-            <textarea v-model="editingBackendRule.urlPathExactText" rows="2" style="width: 300px; font-size: 12px;" placeholder="每行一个路径"></textarea>
+            <label class="form-label">{{ t('haproxy.modal.backendRule.urlPathExact.label') }}</label>
+            <textarea v-model="editingBackendRule.urlPathExactText" rows="2" style="width: 300px; font-size: 12px;" :placeholder="t('haproxy.modal.backendRule.urlPathExact.placeholder')"></textarea>
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">精确匹配的URL路径 (每行一个)</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backendRule.urlPathExact.help') }}</div>
           <div class="form-row">
-            <label class="form-label">URL路径 (开头)</label>
-            <textarea v-model="editingBackendRule.urlPathBeginText" rows="2" style="width: 300px; font-size: 12px;" placeholder="每行一个路径"></textarea>
+            <label class="form-label">{{ t('haproxy.modal.backendRule.urlPathBegin.label') }}</label>
+            <textarea v-model="editingBackendRule.urlPathBeginText" rows="2" style="width: 300px; font-size: 12px;" :placeholder="t('haproxy.modal.backendRule.urlPathBegin.placeholder')"></textarea>
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">以...开头的URL路径 (每行一个)</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backendRule.urlPathBegin.help') }}</div>
           <div class="form-row">
-            <label class="form-label">URL路径 (结尾)</label>
-            <textarea v-model="editingBackendRule.urlPathEndText" rows="2" style="width: 300px; font-size: 12px;" placeholder="每行一个路径"></textarea>
+            <label class="form-label">{{ t('haproxy.modal.backendRule.urlPathEnd.label') }}</label>
+            <textarea v-model="editingBackendRule.urlPathEndText" rows="2" style="width: 300px; font-size: 12px;" :placeholder="t('haproxy.modal.backendRule.urlPathEnd.placeholder')"></textarea>
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">以...结尾的URL路径 (每行一个)</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backendRule.urlPathEnd.help') }}</div>
           <div class="form-row">
-            <label class="form-label">设置服务器</label>
+            <label class="form-label">{{ t('haproxy.modal.backendRule.setServer.label') }}</label>
             <input type="text" v-model="editingBackendRule['set-server']" style="width: 200px;" />
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">重定向到的服务器名称</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backendRule.setServer.help') }}</div>
           <div class="form-row">
-            <label class="form-label">重定向地址</label>
+            <label class="form-label">{{ t('haproxy.modal.backendRule.redirectUrl.label') }}</label>
             <input type="text" v-model="editingBackendRule['set-redirect-location']" style="width: 300px;" />
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">HTTP重定向目标地址</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.backendRule.redirectUrl.help') }}</div>
         </div>
       </DraggableModal>
 
-      <!-- 前端服务弹窗 -->
-      <DraggableModal v-model:visible="showServiceModal" title="前端服务" width="700px" @ok="saveService">
+      <!-- Frontend service modal -->
+      <DraggableModal v-model:visible="showServiceModal" :title="t('haproxy.modal.service.title')" width="700px" @ok="saveService">
         <TabGroup v-model="activeServiceTab" :tabs="[
-          { key: 'basic', title: '基本配置' },
-          { key: 'ssl', title: 'SSL' },
-          { key: 'rules', title: '规则' },
-          { key: 'compression', title: 'HTTP压缩' },
+          { key: 'basic', title: t('haproxy.modal.service.tabs.basic') },
+          { key: 'ssl', title: t('haproxy.modal.service.tabs.ssl') },
+          { key: 'rules', title: t('haproxy.modal.service.tabs.rules') },
+          { key: 'compression', title: t('haproxy.modal.service.tabs.compression') },
         ]">
           <template #basic>
             <div style="padding: 8px 0;">
               <div class="form-row">
-                <label class="form-label" title="前端服务名称">名称</label>
+                <label class="form-label" :title="t('haproxy.modal.service.basic.name.title')">{{ t('haproxy.modal.service.basic.name.label') }}</label>
                 <input type="text" v-model="editingService.name" style="width: 200px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">前端服务名称</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.service.basic.name.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="描述">描述</label>
+                <label class="form-label" :title="t('haproxy.modal.service.basic.description.title')">{{ t('haproxy.modal.service.basic.description.label') }}</label>
                 <input type="text" v-model="editingService.description" style="width: 300px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">描述 (最多255字符)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.service.basic.description.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="代理模式">模式</label>
+                <label class="form-label" :title="t('haproxy.modal.service.basic.mode.title')">{{ t('haproxy.modal.service.basic.mode.label') }}</label>
                 <select v-model="editingService.mode" style="width: 200px;">
                   <option value="http">HTTP</option>
                   <option value="tcp">TCP</option>
                 </select>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">代理模式 (默认: http)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.service.basic.mode.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="监听端口">端口</label>
+                <label class="form-label" :title="t('haproxy.modal.service.basic.port.title')">{{ t('haproxy.modal.service.basic.port.label') }}</label>
                 <input type="number" v-model.number="editingService.port" min="1" max="65535" style="width: 200px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">连接端口号 (1-65535)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.service.basic.port.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="监听地址">监听地址</label>
-                <textarea v-model="editingService.listenAddressText" rows="3" style="width: 300px; font-size: 12px;" placeholder="每行一个IP地址"></textarea>
+                <label class="form-label" :title="t('haproxy.modal.service.basic.listenAddress.title')">{{ t('haproxy.modal.service.basic.listenAddress.label') }}</label>
+                <textarea v-model="editingService.listenAddressText" rows="3" style="width: 300px; font-size: 12px;" :placeholder="t('haproxy.modal.service.basic.listenAddress.placeholder')"></textarea>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">监听的本地IP地址 (每行一个)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.service.basic.listenAddress.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="接受 PROXY 协议">接受 PROXY</label>
+                <label class="form-label" :title="t('haproxy.modal.service.basic.acceptProxy.title')">{{ t('haproxy.modal.service.basic.acceptProxy.label') }}</label>
                 <input type="checkbox" v-model="editingService['accept-proxy']" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">接受 PROXY 协议</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.service.basic.acceptProxy.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="后端成员">后端</label>
-                <textarea v-model="editingService.backendText" rows="3" style="width: 300px; font-size: 12px;" placeholder="每行一个后端名称"></textarea>
+                <label class="form-label" :title="t('haproxy.modal.service.basic.backend.title')">{{ t('haproxy.modal.service.basic.backend.label') }}</label>
+                <textarea v-model="editingService.backendText" rows="3" style="width: 300px; font-size: 12px;" :placeholder="t('haproxy.modal.service.basic.backend.placeholder')"></textarea>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">后端成员 (每行一个)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.service.basic.backend.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="重定向HTTP到HTTPS">HTTP→HTTPS</label>
+                <label class="form-label" :title="t('haproxy.modal.service.basic.redirectHttp.title')">{{ t('haproxy.modal.service.basic.redirectHttp.label') }}</label>
                 <input type="checkbox" v-model="editingService['redirect-http-to-https']" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">重定向HTTP到HTTPS</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.service.basic.redirectHttp.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="内容检查等待时间(毫秒)">检查延迟</label>
+                <label class="form-label" :title="t('haproxy.modal.service.basic.inspectDelay.title')">{{ t('haproxy.modal.service.basic.inspectDelay.label') }}</label>
                 <input type="number" v-model.number="editingService['tcp-inspect-delay']" min="1" max="65535" style="width: 200px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">内容检查期间等待数据的最大时间(毫秒) (1-65535)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.service.basic.inspectDelay.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="客户端超时(秒)">客户端超时</label>
+                <label class="form-label" :title="t('haproxy.modal.service.basic.timeoutClient.title')">{{ t('haproxy.modal.service.basic.timeoutClient.label') }}</label>
                 <input type="number" v-model.number="editingService['timeout-client']" min="1" max="3600" style="width: 200px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">客户端侧最大不活动时间(秒) (1-3600, 默认: 50)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.service.basic.timeoutClient.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="日志设施">日志设施</label>
+                <label class="form-label" :title="t('haproxy.modal.service.basic.loggingFacility.title')">{{ t('haproxy.modal.service.basic.loggingFacility.label') }}</label>
                 <select v-model="editingService['logging-facility']" style="width: 200px;">
-                  <option value="">不设置</option>
+                  <option value="">{{ t('haproxy.common.notSet') }}</option>
                   <option v-for="f in LOG_FACILITIES" :key="f" :value="f">{{ f }}</option>
                 </select>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">日志设施</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.service.basic.loggingFacility.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="日志级别">日志级别</label>
+                <label class="form-label" :title="t('haproxy.modal.service.basic.loggingLevel.title')">{{ t('haproxy.modal.service.basic.loggingLevel.label') }}</label>
                 <select v-model="editingService['logging-level']" style="width: 200px;">
-                  <option value="">不设置</option>
+                  <option value="">{{ t('haproxy.common.notSet') }}</option>
                   <option v-for="l in LOG_LEVELS" :key="l" :value="l">{{ l }}</option>
                 </select>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">日志级别 (默认: err)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.service.basic.loggingLevel.help') }}</div>
             </div>
           </template>
 
           <template #ssl>
             <div style="padding: 8px 0;">
               <div class="form-row">
-                <label class="form-label" title="SSL证书">证书</label>
-                <textarea v-model="editingService.sslCertificateText" rows="3" style="width: 300px; font-size: 12px;" placeholder="每行一个PKI证书名称"></textarea>
+                <label class="form-label" :title="t('haproxy.modal.service.ssl.certificate.title')">{{ t('haproxy.modal.service.ssl.certificate.label') }}</label>
+                <textarea v-model="editingService.sslCertificateText" rows="3" style="width: 300px; font-size: 12px;" :placeholder="t('haproxy.modal.service.ssl.certificate.placeholder')"></textarea>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">PKI 配置中的证书 (每行一个)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.service.ssl.certificate.help') }}</div>
             </div>
           </template>
 
           <template #rules>
             <div style="padding: 8px 0;">
               <DataTable :columns="[
-                { key: 'rule', title: '编号', width: 60 },
-                { key: 'domainName', title: '域名', width: 150 },
-                { key: 'urlPath', title: 'URL路径', width: 150 },
-                { key: 'setBackend', title: '设置后端', width: 120 },
-                { key: 'setRedirect', title: '重定向', width: 120 },
+                { key: 'rule', title: t('haproxy.columns.rule'), width: 60 },
+                { key: 'domainName', title: t('haproxy.columns.domainName'), width: 150 },
+                { key: 'urlPath', title: t('haproxy.columns.urlPath'), width: 150 },
+                { key: 'setBackend', title: t('haproxy.columns.setBackend'), width: 120 },
+                { key: 'setRedirect', title: t('haproxy.columns.setRedirect'), width: 120 },
               ]" rowKey="rule" :data="editingService.rules.map((r, i) => ({
                 rule: r.rule,
                 domainName: (r['domain-name'] || []).join(', ') || '-',
-                urlPath: r['url-path-exact'] ? ('精确: ' + r['url-path-exact'].join(', ')) : (r['url-path-begin'] ? ('开头: ' + r['url-path-begin'].join(', ')) : (r['url-path-end'] ? ('结尾: ' + r['url-path-end'].join(', ')) : '-')),
+                urlPath: r['url-path-exact'] ? (t('haproxy.common.exact') + ': ' + r['url-path-exact'].join(', ')) : (r['url-path-begin'] ? (t('haproxy.common.begin') + ': ' + r['url-path-begin'].join(', ')) : (r['url-path-end'] ? (t('haproxy.common.end') + ': ' + r['url-path-end'].join(', ')) : '-')),
                 setBackend: r['set-backend'] || '-',
                 setRedirect: r['set-redirect-location'] || '-',
               }))"
@@ -540,69 +532,84 @@ export default defineComponent({
           <template #compression>
             <div style="padding: 8px 0;">
               <div class="form-row">
-                <label class="form-label" title="压缩算法">压缩算法</label>
+                <label class="form-label" :title="t('haproxy.modal.service.compression.algorithm.title')">{{ t('haproxy.modal.service.compression.algorithm.label') }}</label>
                 <select v-model="editingService['compression-algorithm']" style="width: 200px;">
-                  <option value="">不设置</option>
+                  <option value="">{{ t('haproxy.common.notSet') }}</option>
                   <option value="gzip">gzip</option>
                   <option value="deflate">deflate</option>
                   <option value="identity">identity</option>
                   <option value="raw-deflate">raw-deflate</option>
                 </select>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">压缩算法</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.service.compression.algorithm.help') }}</div>
               <div class="form-row">
-                <label class="form-label" title="要压缩的MIME类型">MIME类型</label>
-                <textarea v-model="editingService.compressionMimeText" rows="3" style="width: 300px; font-size: 12px;" placeholder="每行一个MIME类型, 如 text/html"></textarea>
+                <label class="form-label" :title="t('haproxy.modal.service.compression.mimeTypes.title')">{{ t('haproxy.modal.service.compression.mimeTypes.label') }}</label>
+                <textarea v-model="editingService.compressionMimeText" rows="3" style="width: 300px; font-size: 12px;" :placeholder="t('haproxy.modal.service.compression.mimeTypes.placeholder')"></textarea>
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">要压缩的MIME类型 (每行一个, 格式: type/subtype)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.service.compression.mimeTypes.help') }}</div>
             </div>
           </template>
         </TabGroup>
       </DraggableModal>
 
-      <!-- 服务规则编辑弹窗 -->
-      <DraggableModal v-model:visible="showServiceRuleModal" title="服务规则" width="600px" @ok="saveServiceRule">
+      <!-- Service rule edit modal -->
+      <DraggableModal v-model:visible="showServiceRuleModal" :title="t('haproxy.modal.serviceRule.title')" width="600px" @ok="saveServiceRule">
         <div style="padding: 8px 0;">
           <div class="form-row">
-            <label class="form-label">规则编号</label>
+            <label class="form-label">{{ t('haproxy.modal.serviceRule.ruleNumber.label') }}</label>
             <input type="number" v-model.number="editingServiceRule.rule" min="1" style="width: 100px;" />
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">规则编号</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.serviceRule.ruleNumber.help') }}</div>
           <div class="form-row">
-            <label class="form-label">域名</label>
-            <textarea v-model="editingServiceRule.domainNameText" rows="2" style="width: 300px; font-size: 12px;" placeholder="每行一个域名"></textarea>
+            <label class="form-label">{{ t('haproxy.modal.serviceRule.domainName.label') }}</label>
+            <textarea v-model="editingServiceRule.domainNameText" rows="2" style="width: 300px; font-size: 12px;" :placeholder="t('haproxy.modal.serviceRule.domainName.placeholder')"></textarea>
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">匹配的域名 (每行一个)</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.serviceRule.domainName.help') }}</div>
           <div class="form-row">
-            <label class="form-label">URL路径 (精确)</label>
-            <textarea v-model="editingServiceRule.urlPathExactText" rows="2" style="width: 300px; font-size: 12px;" placeholder="每行一个路径"></textarea>
+            <label class="form-label">{{ t('haproxy.modal.serviceRule.urlPathExact.label') }}</label>
+            <textarea v-model="editingServiceRule.urlPathExactText" rows="2" style="width: 300px; font-size: 12px;" :placeholder="t('haproxy.modal.serviceRule.urlPathExact.placeholder')"></textarea>
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">精确匹配的URL路径 (每行一个)</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.serviceRule.urlPathExact.help') }}</div>
           <div class="form-row">
-            <label class="form-label">URL路径 (开头)</label>
-            <textarea v-model="editingServiceRule.urlPathBeginText" rows="2" style="width: 300px; font-size: 12px;" placeholder="每行一个路径"></textarea>
+            <label class="form-label">{{ t('haproxy.modal.serviceRule.urlPathBegin.label') }}</label>
+            <textarea v-model="editingServiceRule.urlPathBeginText" rows="2" style="width: 300px; font-size: 12px;" :placeholder="t('haproxy.modal.serviceRule.urlPathBegin.placeholder')"></textarea>
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">以...开头的URL路径 (每行一个)</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.serviceRule.urlPathBegin.help') }}</div>
           <div class="form-row">
-            <label class="form-label">URL路径 (结尾)</label>
-            <textarea v-model="editingServiceRule.urlPathEndText" rows="2" style="width: 300px; font-size: 12px;" placeholder="每行一个路径"></textarea>
+            <label class="form-label">{{ t('haproxy.modal.serviceRule.urlPathEnd.label') }}</label>
+            <textarea v-model="editingServiceRule.urlPathEndText" rows="2" style="width: 300px; font-size: 12px;" :placeholder="t('haproxy.modal.serviceRule.urlPathEnd.placeholder')"></textarea>
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">以...结尾的URL路径 (每行一个)</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.serviceRule.urlPathEnd.help') }}</div>
           <div class="form-row">
-            <label class="form-label">设置后端</label>
+            <label class="form-label">{{ t('haproxy.modal.serviceRule.setBackend.label') }}</label>
             <input type="text" v-model="editingServiceRule['set-backend']" style="width: 200px;" />
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">重定向到的后端名称</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.serviceRule.setBackend.help') }}</div>
           <div class="form-row">
-            <label class="form-label">重定向地址</label>
+            <label class="form-label">{{ t('haproxy.modal.serviceRule.redirectUrl.label') }}</label>
             <input type="text" v-model="editingServiceRule['set-redirect-location']" style="width: 300px;" />
           </div>
-          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">HTTP重定向目标地址</div>
+          <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('haproxy.modal.serviceRule.redirectUrl.help') }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="deleteBackendModalVisible" :title="t('haproxy.modal.confirmDelete.title')" width="400px" @confirm="confirmDeleteBackend">
+        <div>{{ t('haproxy.modal.confirmDelete.backendMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div style="padding:2px 0;">{{ pendingDeleteBackendName }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="deleteServiceModalVisible" :title="t('haproxy.modal.confirmDelete.title')" width="400px" @confirm="confirmDeleteService">
+        <div>{{ t('haproxy.modal.confirmDelete.serviceMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div style="padding:2px 0;">{{ pendingDeleteServiceName }}</div>
         </div>
       </DraggableModal>
     </div>
   `,
   setup() {
+    const { t } = useI18n();
     const configStore = useConfigStore();
     const loading = ref(false);
     const activeTab = ref('global');
@@ -682,6 +689,11 @@ export default defineComponent({
     const editingBackendRuleIndex = ref(-1);
     const editingServiceRule = ref({});
     const editingServiceRuleIndex = ref(-1);
+
+    const deleteBackendModalVisible = ref(false);
+    const pendingDeleteBackendName = ref('');
+    const deleteServiceModalVisible = ref(false);
+    const pendingDeleteServiceName = ref('');
 
     const commandPath = computed(() => {
       switch (activeTab.value) {
@@ -800,7 +812,7 @@ export default defineComponent({
         });
       });
 
-      return lines.join('\n') || '# 暂无配置';
+      return lines.join('\n') || '# ' + t('haproxy.preview.noConfig');
     });
 
     const parseConfig = (data) => {
@@ -1091,11 +1103,10 @@ export default defineComponent({
           }
         }
 
-        await configStore.commit();
+        configStore.markPending();
         await loadConfig();
-        alert('保存成功');
       } catch (e) {
-        alert('保存失败: ' + (e.message || e));
+        showError({ message: t('haproxy.messages.saveFailed') + (e.message || e) });
       } finally {
         loading.value = false;
       }
@@ -1151,7 +1162,7 @@ export default defineComponent({
 
     const saveBackend = () => {
       if (!editingBackend.value.name) {
-        alert('请输入后端名称');
+        showError({ message: t('haproxy.messages.backendNameRequired') });
         return;
       }
       const idx = backendList.value.findIndex(b => b.name === editingBackend.value.name);
@@ -1165,8 +1176,14 @@ export default defineComponent({
     };
 
     const deleteBackend = (backend) => {
-      if (!confirm(`确定要删除后端 "${backend.name}" 吗？`)) return;
-      backendList.value = backendList.value.filter(b => b.name !== backend.name);
+      pendingDeleteBackendName.value = backend.name;
+      deleteBackendModalVisible.value = true;
+    };
+
+    const confirmDeleteBackend = () => {
+      deleteBackendModalVisible.value = false;
+      backendList.value = backendList.value.filter(b => b.name !== pendingDeleteBackendName.value);
+      pendingDeleteBackendName.value = '';
     };
 
     const addServer = () => {
@@ -1200,7 +1217,7 @@ export default defineComponent({
 
     const saveServer = () => {
       if (!editingServer.value.name) {
-        alert('请输入服务器名称');
+        showError({ message: t('haproxy.messages.serverNameRequired') });
         return;
       }
       if (editingServerIndex.value >= 0) {
@@ -1315,7 +1332,7 @@ export default defineComponent({
 
     const saveService = () => {
       if (!editingService.value.name) {
-        alert('请输入服务名称');
+        showError({ message: t('haproxy.messages.serviceNameRequired') });
         return;
       }
       const idx = serviceList.value.findIndex(s => s.name === editingService.value.name);
@@ -1329,8 +1346,14 @@ export default defineComponent({
     };
 
     const deleteService = (service) => {
-      if (!confirm(`确定要删除服务 "${service.name}" 吗？`)) return;
-      serviceList.value = serviceList.value.filter(s => s.name !== service.name);
+      pendingDeleteServiceName.value = service.name;
+      deleteServiceModalVisible.value = true;
+    };
+
+    const confirmDeleteService = () => {
+      deleteServiceModalVisible.value = false;
+      serviceList.value = serviceList.value.filter(s => s.name !== pendingDeleteServiceName.value);
+      pendingDeleteServiceName.value = '';
     };
 
     const addServiceRule = () => {
@@ -1396,17 +1419,19 @@ export default defineComponent({
     });
 
     return {
+      t,
       loading, activeTab, activeBackendTab, activeServiceTab,
       LOG_FACILITIES, LOG_LEVELS,
       globalConfig, timeoutConfig, backendList, serviceList,
       showBackendModal, showServiceModal, showServerModal, showBackendRuleModal, showServiceRuleModal,
       editingBackend, editingService, editingServer, editingBackendRule, editingServiceRule,
+      deleteBackendModalVisible, pendingDeleteBackendName, deleteServiceModalVisible, pendingDeleteServiceName,
       commandPath, previewText,
       loadConfig, saveConfig,
-      openBackendModal, saveBackend, deleteBackend,
+      openBackendModal, saveBackend, deleteBackend, confirmDeleteBackend,
       addServer, editServer, deleteServer, saveServer,
       addBackendRule, editBackendRule, deleteBackendRule, saveBackendRule,
-      openServiceModal, saveService, deleteService,
+      openServiceModal, saveService, deleteService, confirmDeleteService,
       addServiceRule, editServiceRule, deleteServiceRule, saveServiceRule,
     };
   },

@@ -1,0 +1,226 @@
+{
+  "zh-CN": {
+    "zebra": {
+      "tabs": {
+        "overview": "概览",
+        "clients": "客户端",
+        "dplane": "数据平面",
+        "router": "路由表摘要"
+      },
+      "columns": {
+        "key": "项目",
+        "value": "值",
+        "name": "名称",
+        "connectTime": "连接时间",
+        "lastRead": "最后读取",
+        "lastWrite": "最后写入",
+        "ipv4Routes": "IPv4 路由",
+        "ipv6Routes": "IPv6 路由",
+        "routeInstalls": "路由安装",
+        "routeRemovals": "路由删除",
+        "neighborUpdates": "邻居更新",
+        "lspInstalls": "LSP 安装",
+        "lspRemovals": "LSP 删除"
+      },
+      "sections": {
+        "basicInfo": "基本信息",
+        "vrfStats": "VRF 统计"
+      },
+      "buttons": {
+        "refresh": "刷新"
+      }
+    }
+  },
+  "en": {
+    "zebra": {
+      "tabs": {
+        "overview": "Overview",
+        "clients": "Clients",
+        "dplane": "Data Plane",
+        "router": "Router Table Summary"
+      },
+      "columns": {
+        "key": "Key",
+        "value": "Value",
+        "name": "Name",
+        "connectTime": "Connect Time",
+        "lastRead": "Last Read",
+        "lastWrite": "Last Write",
+        "ipv4Routes": "IPv4 Routes",
+        "ipv6Routes": "IPv6 Routes",
+        "routeInstalls": "Route Installs",
+        "routeRemovals": "Route Removals",
+        "neighborUpdates": "Neighbor Updates",
+        "lspInstalls": "LSP Installs",
+        "lspRemovals": "LSP Removals"
+      },
+      "sections": {
+        "basicInfo": "Basic Information",
+        "vrfStats": "VRF Statistics"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "zh-TW": {
+    "zebra": {
+      "tabs": {
+        "overview": "Overview",
+        "clients": "Clients",
+        "dplane": "Data Plane",
+        "router": "Router Table Summary"
+      },
+      "columns": {
+        "key": "Key",
+        "value": "Value",
+        "name": "Name",
+        "connectTime": "Connect Time",
+        "lastRead": "Last Read",
+        "lastWrite": "Last Write",
+        "ipv4Routes": "IPv4 Routes",
+        "ipv6Routes": "IPv6 Routes",
+        "routeInstalls": "Route Installs",
+        "routeRemovals": "Route Removals",
+        "neighborUpdates": "Neighbor Updates",
+        "lspInstalls": "LSP Installs",
+        "lspRemovals": "LSP Removals"
+      },
+      "sections": {
+        "basicInfo": "Basic Information",
+        "vrfStats": "VRF Statistics"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "ru": {
+    "zebra": {
+      "tabs": {
+        "overview": "Overview",
+        "clients": "Clients",
+        "dplane": "Data Plane",
+        "router": "Router Table Summary"
+      },
+      "columns": {
+        "key": "Key",
+        "value": "Value",
+        "name": "Name",
+        "connectTime": "Connect Time",
+        "lastRead": "Last Read",
+        "lastWrite": "Last Write",
+        "ipv4Routes": "IPv4 Routes",
+        "ipv6Routes": "IPv6 Routes",
+        "routeInstalls": "Route Installs",
+        "routeRemovals": "Route Removals",
+        "neighborUpdates": "Neighbor Updates",
+        "lspInstalls": "LSP Installs",
+        "lspRemovals": "LSP Removals"
+      },
+      "sections": {
+        "basicInfo": "Basic Information",
+        "vrfStats": "VRF Statistics"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "de": {
+    "zebra": {
+      "tabs": {
+        "overview": "Overview",
+        "clients": "Clients",
+        "dplane": "Data Plane",
+        "router": "Router Table Summary"
+      },
+      "columns": {
+        "key": "Key",
+        "value": "Value",
+        "name": "Name",
+        "connectTime": "Connect Time",
+        "lastRead": "Last Read",
+        "lastWrite": "Last Write",
+        "ipv4Routes": "IPv4 Routes",
+        "ipv6Routes": "IPv6 Routes",
+        "routeInstalls": "Route Installs",
+        "routeRemovals": "Route Removals",
+        "neighborUpdates": "Neighbor Updates",
+        "lspInstalls": "LSP Installs",
+        "lspRemovals": "LSP Removals"
+      },
+      "sections": {
+        "basicInfo": "Basic Information",
+        "vrfStats": "VRF Statistics"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "fr": {
+    "zebra": {
+      "tabs": {
+        "overview": "Overview",
+        "clients": "Clients",
+        "dplane": "Data Plane",
+        "router": "Router Table Summary"
+      },
+      "columns": {
+        "key": "Key",
+        "value": "Value",
+        "name": "Name",
+        "connectTime": "Connect Time",
+        "lastRead": "Last Read",
+        "lastWrite": "Last Write",
+        "ipv4Routes": "IPv4 Routes",
+        "ipv6Routes": "IPv6 Routes",
+        "routeInstalls": "Route Installs",
+        "routeRemovals": "Route Removals",
+        "neighborUpdates": "Neighbor Updates",
+        "lspInstalls": "LSP Installs",
+        "lspRemovals": "LSP Removals"
+      },
+      "sections": {
+        "basicInfo": "Basic Information",
+        "vrfStats": "VRF Statistics"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "ko": {
+    "zebra": {
+      "tabs": {
+        "overview": "Overview",
+        "clients": "Clients",
+        "dplane": "Data Plane",
+        "router": "Router Table Summary"
+      },
+      "columns": {
+        "key": "Key",
+        "value": "Value",
+        "name": "Name",
+        "connectTime": "Connect Time",
+        "lastRead": "Last Read",
+        "lastWrite": "Last Write",
+        "ipv4Routes": "IPv4 Routes",
+        "ipv6Routes": "IPv6 Routes",
+        "routeInstalls": "Route Installs",
+        "routeRemovals": "Route Removals",
+        "neighborUpdates": "Neighbor Updates",
+        "lspInstalls": "LSP Installs",
+        "lspRemovals": "LSP Removals"
+      },
+      "sections": {
+        "basicInfo": "Basic Information",
+        "vrfStats": "VRF Statistics"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  }
+}

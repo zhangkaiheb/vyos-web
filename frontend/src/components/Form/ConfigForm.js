@@ -1,8 +1,10 @@
-import { defineComponent, ref, watch, h, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, watch, h, onMounted, inject } from '/src/utils/vue-import.js';
 import { validateField } from '/src/utils/validators.js';
 import { configApi } from '/src/api/index.js';
 import DualListSelector from '/src/components/Form/DualListSelector.js';
 import MatchTypeCards from '/src/components/Form/MatchTypeCards.js';
+import DatePicker from '/src/components/Form/DatePicker.js';
+import TimePicker from '/src/components/Form/TimePicker.js';
 
 function defaultValue(field) {
   if (field.default !== undefined) return JSON.parse(JSON.stringify(field.default));
@@ -26,6 +28,7 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   setup(props, { emit, expose, slots }) {
+    const { t } = inject('i18n');
     const form = ref({});
     const advancedOpen = ref({ '': false });
     const fieldErrors = ref({});
@@ -33,7 +36,8 @@ export default defineComponent({
     const activeTab = ref('');
 
     function suggestionKey(path, key) {
-      return path.length ? `${path.join('.')}.${key}` : key;
+      const prefix = props.suggestionPath ? `${props.suggestionPath}.` : '';
+      return path.length ? `${prefix}${path.join('.')}.${key}` : `${prefix}${key}`;
     }
 
     async function loadSuggestions(path, field) {
@@ -143,15 +147,24 @@ export default defineComponent({
       return path.length ? `${path.join('.')}.${key}` : key;
     }
 
+    function translateError(err) {
+      if (!err) return '';
+      if (typeof err === 'string') return err;
+      if (err.key === 'errors._array') {
+        return err.items.map(translateError).join(t('errors.separator'));
+      }
+      return t(err.key, err.params || {});
+    }
+
     function validateOne(field, formObj, path) {
       const key = errorKey(path, field.key);
-      const msg = validateField(formObj[field.key], field);
-      if (msg) {
-        fieldErrors.value[key] = msg;
+      const err = validateField(formObj[field.key], field);
+      if (err) {
+        fieldErrors.value[key] = translateError(err);
       } else {
         delete fieldErrors.value[key];
       }
-      return !msg;
+      return !err;
     }
 
     function validateFields(schema, formObj, path, errors) {
@@ -162,9 +175,10 @@ export default defineComponent({
         } else if (field.type === 'group') {
           validateFields(field.children || [], formObj[field.key] || {}, [...path, field.key], errors);
         } else {
-          const msg = validateField(formObj[field.key], field);
+          const err = validateField(formObj[field.key], field);
           const key = errorKey(path, field.key);
-          if (msg) {
+          if (err) {
+            const msg = translateError(err);
             fieldErrors.value[key] = msg;
             errors.push(`${field.title}: ${msg}`);
           } else {
@@ -185,8 +199,20 @@ export default defineComponent({
 
     function hintText(field) {
       const parts = [];
-      if (field.help) parts.push(field.help);
-      if (field.default !== undefined) parts.push(`默认值：${field.default}`);
+      if (field.help) {
+        // translateField 已经将 field.help 翻译好了（不包含点号的是已翻译文本）
+        // 如果仍包含点号，说明是翻译键未找到翻译，不显示
+        if (typeof field.help === 'string' && !field.help.includes('.')) {
+          parts.push(field.help);
+        }
+      }
+      // date/time 类型附加格式提示
+      if (field.type === 'date') {
+        parts.push('YYYY-MM-dd');
+      } else if (field.type === 'time') {
+        parts.push('HH:mm:ss');
+      }
+      if (field.default !== undefined) parts.push(`${t('form.defaultValue')}${field.default}`);
       return parts.join('；');
     }
 
@@ -234,6 +260,49 @@ export default defineComponent({
       return h('div', { class: 'form-control' }, children);
     }
 
+    function translateTitle(title) {
+      if (!title) return '';
+      if (title.includes('.')) {
+        return t(title);
+      }
+      return title;
+    }
+
+    function translateField(field) {
+      if (!field || typeof field !== 'object') return field;
+      const result = { ...field };
+      if (result.placeholder && typeof result.placeholder === 'string' && result.placeholder.includes('.')) {
+        const translated = t(result.placeholder);
+        if (translated !== result.placeholder) result.placeholder = translated;
+      }
+      if (result.help && typeof result.help === 'string' && result.help.includes('.')) {
+        const translated = t(result.help);
+        // 只有翻译成功时才覆盖，否则保留原始翻译键让hintText判断隐藏
+        if (translated !== result.help) result.help = translated;
+      }
+      if (result.title && typeof result.title === 'string' && result.title.includes('.')) {
+        const translated = t(result.title);
+        if (translated !== result.title) result.title = translated;
+      }
+      if (Array.isArray(result.options)) {
+        result.options = result.options.map(opt => {
+          if (typeof opt === 'object' && opt.label && typeof opt.label === 'string' && opt.label.includes('.')) {
+            const translated = t(opt.label);
+            return { ...opt, label: translated !== opt.label ? translated : opt.label };
+          }
+          return opt;
+        });
+      }
+      if (Array.isArray(result.children)) {
+        result.children = result.children.map(child => translateField(child));
+      }
+      // Also translate fields inside tabs array
+      if (Array.isArray(result.tabs)) {
+        result.tabs = result.tabs.map(tab => translateField(tab));
+      }
+      return result;
+    }
+
     function renderInput(field, formObj, path) {
       const key = errorKey(path, field.key);
       const error = fieldErrors.value[key];
@@ -242,15 +311,15 @@ export default defineComponent({
 
       if (field.type === 'select') {
         // For dynamic select fields, get options from suggestionsCache
-        const key = errorKey(path, field.key);
-        const dynamicOpts = field.dynamic ? (suggestionsCache.value[key] || []) : [];
+        const sKey = suggestionKey(path, field.key);
+        const dynamicOpts = field.dynamic ? (suggestionsCache.value[sKey] || []) : [];
         const options = dynamicOpts.length > 0 
           ? dynamicOpts.map(o => ({ value: o, label: o }))
           : (field.options || []);
         children.push(h('select', {
           value: formObj[field.key] || '',
           disabled,
-          style: { maxWidth: '200px' },
+          class: 'form-control',
           onChange: (e) => { formObj[field.key] = e.target.value; },
         }, options.map(opt => {
           const optValue = typeof opt === 'object' ? opt.value : opt;
@@ -283,8 +352,8 @@ export default defineComponent({
           'onUpdate:modelValue': (val) => { formObj[field.key] = val; },
           options: field.options || [],
           disabled,
-          titleLeft: field.titleLeft || '可选',
-          titleRight: field.titleRight || '已选',
+          titleLeft: field.titleLeft || t('form.optional'),
+          titleRight: field.titleRight || t('form.selected'),
         }));
       } else if (field.type === 'radio') {
         children.push(h('div', { class: 'radio-cards' }, (field.options || []).map(opt => {
@@ -314,6 +383,45 @@ export default defineComponent({
           disabled,
           onChange: (e) => { formObj[field.key] = e.target.checked; },
         }));
+      } else if (field.type === 'date') {
+        children.push(h(DatePicker, {
+          modelValue: formObj[field.key] ?? '',
+          placeholder: field.placeholder || 'YYYY-MM-dd',
+          disabled: disabled,
+          'onUpdate:modelValue': (val) => { formObj[field.key] = val; },
+        }));
+        // 不再单独添加YYYY-MM-DD提示，使用hintText统一处理
+      } else if (field.type === 'time') {
+        children.push(h(TimePicker, {
+          modelValue: formObj[field.key] ?? '',
+          placeholder: field.placeholder || 'HH:mm:ss',
+          disabled: disabled,
+          'onUpdate:modelValue': (val) => { formObj[field.key] = val; },
+        }));
+        // 不再单独添加HH:mm:ss提示，使用hintText统一处理
+      } else if (field.type === 'multiselect') {
+        const selected = formObj[field.key] || [];
+        children.push(h('div', { class: 'checkbox-group' }, (field.options || []).map(opt => {
+          const optValue = typeof opt === 'object' ? opt.value : opt;
+          const optLabel = typeof opt === 'object' ? (opt.label || opt.value) : opt;
+          const checked = selected.includes(optValue);
+          return h('label', { key: optValue, class: 'checkbox-item' }, [
+            h('input', {
+              type: 'checkbox',
+              value: optValue,
+              checked,
+              disabled,
+              onChange: (e) => {
+                if (e.target.checked) {
+                  formObj[field.key] = [...selected, optValue];
+                } else {
+                  formObj[field.key] = selected.filter(v => v !== optValue);
+                }
+              },
+            }),
+            h('span', {}, optLabel),
+          ]);
+        })));
       } else if (field.type === 'textarea') {
         return renderTextarea(field, formObj, path);
       } else {
@@ -355,14 +463,14 @@ export default defineComponent({
       if (field.type === 'group') {
         const groupClass = level > 0 ? 'form-group nested-group' : 'form-group';
         const groupModel = formObj[field.key] || {};
-        return h('div', { class: groupClass }, [
-          h('div', { class: 'form-group-title' }, field.title),
-          h('div', { class: 'form-group-content' }, renderFields(field.children || [], groupModel, [...path, field.key], level + 1)),
-        ]);
+        const groupChildren = [];
+        groupChildren.push(h('div', { class: 'form-group-title' }, translateTitle(field.title)));
+        groupChildren.push(h('div', { class: 'form-group-content' }, renderFields(field.children || [], groupModel, [...path, field.key], level + 1)));
+        return h('div', { class: groupClass }, groupChildren);
       }
       if (field.type === 'checkbox') {
         return h('div', { class: 'form-row' }, [
-          h('label', { class: 'form-label' }, field.title),
+          h('label', { class: 'form-label' }, translateTitle(field.title)),
           renderInput(field, formObj, path),
         ]);
       }
@@ -374,44 +482,47 @@ export default defineComponent({
         const groupOptsMap = field.groupOptionsMap || {};
         const selectOptions = isAddress ? [] : (groupOptsMap[currentType] || []).map(v => ({ value: v, label: v }));
 
-        const inputEl = isAddress
+        const inputChildren = [];
+        inputChildren.push(isAddress
           ? h('input', {
               type: 'text',
               class: 'form-input',
               placeholder: field.placeholder || '',
               value: formObj[field.key] || '',
               disabled: props.disabled,
-              onInput: (e) => { formObj[field.key] = e.target.value; emitUpdate(); },
+              onInput: (e) => { formObj[field.key] = e.target.value; },
             })
           : h('select', {
-              class: 'form-input',
+              class: 'form-control',
               value: formObj[field.key] || '',
               disabled: props.disabled,
-              onChange: (e) => { formObj[field.key] = e.target.value; emitUpdate(); },
+              onChange: (e) => { formObj[field.key] = e.target.value; },
             }, [
-              h('option', { value: '' }, '请选择'),
+              h('option', { value: '' }, t('form.pleaseSelect')),
               ...selectOptions.map(opt => h('option', { value: opt.value }, opt.label)),
-            ]);
+            ]));
+        if (hintText(field)) {
+          inputChildren.push(h('div', { class: 'form-hint' }, hintText(field)));
+        }
 
         return h('div', { class: 'form-row' }, [
-          h('label', { class: 'form-label' }, field.title),
-          h('div', { class: 'form-control' }, [
-            inputEl,
-            field.help ? h('div', { class: 'form-hint' }, field.help) : null,
-          ]),
+          h('label', { class: 'form-label' }, translateTitle(field.title)),
+          h('div', { class: 'form-control' }, inputChildren),
         ]);
       }
       return h('div', { class: 'form-row' }, [
-        h('label', { class: 'form-label' }, field.title),
+        h('label', { class: 'form-label' }, translateTitle(field.title)),
         renderInput(field, formObj, path),
       ]);
     }
 
     function renderFields(schema, formObj, path, level) {
-      const basic = schema.filter(f => !f.advanced);
-      const advanced = schema.filter(f => f.advanced);
+      // 先翻译所有字段
+      const translatedSchema = schema.map(f => translateField(f));
+      const basic = translatedSchema.filter(f => !f.advanced);
+      const advanced = translatedSchema.filter(f => f.advanced);
       if (props.showAdvanced) {
-        return schema.map(f => renderField(f, formObj, path, level)).filter(Boolean);
+        return translatedSchema.map(f => renderField(f, formObj, path, level)).filter(Boolean);
       }
       const nodes = basic.map(f => renderField(f, formObj, path, level)).filter(Boolean);
       if (advanced.length) {
@@ -419,7 +530,7 @@ export default defineComponent({
         nodes.push(h('div', { class: 'advanced-section' }, [
           h('div', { class: 'advanced-title', onClick: () => toggleAdvanced(path) }, [
             h('span', {}, open ? '▼' : '▶'),
-            h('span', {}, '高级选项'),
+            h('span', {}, t('form.advanced')),
           ]),
           h('div', { class: 'advanced-content', style: { display: open ? 'block' : 'none' } }, advanced.map(f => renderField(f, formObj, path, level))),
         ]));
@@ -435,7 +546,10 @@ export default defineComponent({
         return renderFields(schema, formObj, path, level);
       }
 
-      if (!activeTab.value && tabs.length) {
+      // Reset activeTab if current tab doesn't exist in new schema
+      if (!tabs.find(t => t.key === activeTab.value)) {
+        activeTab.value = tabs[0].key;
+      } else if (!activeTab.value && tabs.length) {
         activeTab.value = tabs[0].key;
       }
 
@@ -452,7 +566,7 @@ export default defineComponent({
           key: tab.key,
           class: ['form-tab', activeTab.value === tab.key ? 'form-tab-active' : ''].filter(Boolean).join(' '),
           onClick: () => { activeTab.value = tab.key; },
-        }, tab.title)
+        }, translateTitle(tab.title))
       )));
 
       // Tab content - check for named slot first

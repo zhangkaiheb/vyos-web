@@ -1,20 +1,12 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { configApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-
-const TLS_VERSION_OPTIONS = ['1.0', '1.1', '1.2', '1.3'];
-const API_KEY_COLUMNS = [
-  { key: 'id', title: 'ID' },
-  { key: 'key', title: 'Key' },
-];
-const GRAPHQL_AUTH_TYPE_OPTIONS = [
-  { key: 'key', label: 'API Keys（默认）' },
-  { key: 'token', label: 'JWT Token' },
-];
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -37,27 +29,6 @@ function joinMembers(val) {
 
 function splitMembers(text) {
   return String(text || '').split('\n').map(s => s.trim()).filter(Boolean);
-}
-
-function validateIPv4(value) {
-  if (!value) return '';
-  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return 'IPv4 地址格式错误';
-  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return 'IPv4 地址格式错误';
-  return '';
-}
-
-function validateIPv6(value) {
-  if (!value) return '';
-  const re = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}$|^(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}$|^(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}$|^:(?::[0-9a-fA-F]{1,4}){1,7}$|^::$/;
-  if (!re.test(value)) return 'IPv6 地址格式错误';
-  return '';
-}
-
-function validateIP(value) {
-  if (!value) return '';
-  if (!validateIPv4(value)) return '';
-  if (!validateIPv6(value)) return '';
-  return 'IP 地址格式错误';
 }
 
 function apiKeysToForm(keysData = {}) {
@@ -166,21 +137,54 @@ function httpsToConfig(form) {
   return result;
 }
 
-function validateApiKey(key) {
-  if (!key || !String(key).trim()) return '请输入 API Key ID';
-  if (!/^[a-zA-Z0-9_-]+$/.test(String(key))) return 'API Key ID 只能包含字母、数字、下划线和连字符';
-  return '';
-}
-
 export default defineComponent({
   name: 'HttpsPage',
   setup() {
+    const { t } = inject('i18n');
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
     const config = ref(httpsToForm());
     const activeTab = ref('basic');
     const writeDisabled = ref(false);
+
+    const TLS_VERSION_OPTIONS = ['1.0', '1.1', '1.2', '1.3'];
+    const API_KEY_COLUMNS = [
+      { key: 'id', title: 'ID' },
+      { key: 'key', title: 'Key' },
+    ];
+    const GRAPHQL_AUTH_TYPE_OPTIONS = [
+      { key: 'key', label: t('https.auth_type_keys') },
+      { key: 'token', label: t('https.auth_type_token') },
+    ];
+
+    function validateIPv4(value) {
+      if (!value) return '';
+      if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return t('https.error_ipv4');
+      if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return t('https.error_ipv4');
+      return '';
+    }
+
+    function validateIPv6(value) {
+      if (!value) return '';
+      const re = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}$|^(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}$|^(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}$|^:(?::[0-9a-fA-F]{1,4}){1,7}$|^::$/;
+      if (!re.test(value)) return t('https.error_ipv6');
+      return '';
+    }
+
+    function validateIP(value) {
+      if (!value) return '';
+      if (!validateIPv4(value)) return '';
+      if (!validateIPv6(value)) return '';
+      return t('https.error_ip');
+    }
+
+    function validateApiKey(key) {
+      if (!key || !String(key).trim()) return t('https.error_api_key_id_required');
+      if (!/^[a-zA-Z0-9_-]+$/.test(String(key))) return t('https.error_api_key_id_chars');
+      return '';
+    }
 
     const commandPath = computed(() => {
       switch (activeTab.value) {
@@ -210,41 +214,42 @@ export default defineComponent({
 
     async function save() {
       const port = parseInt(config.value.port, 10);
-      if (isNaN(port) || port < 1 || port > 65535) return alert('端口范围为 1-65535，默认 443');
+      if (isNaN(port) || port < 1 || port > 65535) return showError({ message: t('https.error_port_range') });
 
       const listenAddresses = splitMembers(config.value.listen_address);
       for (const ip of listenAddresses) {
         const err = validateIP(ip);
-        if (err) return alert(`监听地址 ${ip} 格式错误`);
+        if (err) return showError({ message: t('https.error_listen_address_format', { ip }) });
       }
 
       const size = parseInt(config.value.request_body_size_limit, 10);
-      if (isNaN(size) || size < 1) return alert('请求体大小限制必须为正整数，默认 1 MB');
+      if (isNaN(size) || size < 1) return showError({ message: t('https.error_request_body_size') });
 
       const allowClients = splitMembers(config.value.allow_client);
       for (const ip of allowClients) {
         const err = validateIP(ip);
-        if (err) return alert(`允许客户端地址 ${ip} 格式错误`);
+        if (err) return showError({ message: t('https.error_allow_client_format', { ip }) });
       }
 
       if (config.value.api.graphql_authentication.enabled) {
         const exp = parseInt(config.value.api.graphql_authentication.expiration, 10);
-        if (isNaN(exp) || exp < 60 || exp > 31536000) return alert('GraphQL Token 过期时间范围为 60-31536000 秒，默认 3600');
+        if (isNaN(exp) || exp < 60 || exp > 31536000) return showError({ message: t('https.error_graphql_expiration') });
         const secret = parseInt(config.value.api.graphql_authentication.secret_length, 10);
-        if (isNaN(secret) || secret < 16 || secret > 65535) return alert('GraphQL Secret 长度范围为 16-65535 字节，默认 32');
+        if (isNaN(secret) || secret < 16 || secret > 65535) return showError({ message: t('https.error_graphql_secret_length') });
       }
 
       const keyIds = new Set();
       for (const k of config.value.api.keys || []) {
         const err = validateApiKey(k.id);
-        if (err) return alert(err);
-        if (keyIds.has(k.id)) return alert(`API Key ID ${k.id} 重复`);
+        if (err) return showError({ message: err });
+        if (keyIds.has(k.id)) return showError({ message: t('https.error_api_key_id_duplicate', { id: k.id }) });
         keyIds.add(k.id);
       }
 
       saving.value = true;
       try {
-        await configApi.set('service https', httpsToConfig(config.value));
+        await configStore.setConfig('service https', httpsToConfig(config.value));
+        configStore.markPending();
         saved.value = true;
         await load();
       } catch (e) {
@@ -272,10 +277,10 @@ export default defineComponent({
 
     function saveKey() {
       const err = validateApiKey(editingKey.value.id);
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       const list = config.value.api.keys || [];
       const duplicate = list.some((k, idx) => k.id === editingKey.value.id && idx !== editingKey.value._index);
-      if (duplicate) return alert(`API Key ID ${editingKey.value.id} 已存在`);
+      if (duplicate) return showError({ message: t('https.error_api_key_id_exists', { id: editingKey.value.id }) });
       if (editingKey.value._index !== undefined) {
         list[editingKey.value._index] = { ...editingKey.value };
       } else {
@@ -286,9 +291,13 @@ export default defineComponent({
       showKeyModal.value = false;
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
     return {
+      t,
       loading, saving, saved, config, activeTab, writeDisabled, commandPath,
       showKeyModal, editingKey, API_KEY_COLUMNS,
       load, save, TLS_VERSION_OPTIONS, GRAPHQL_AUTH_TYPE_OPTIONS,
@@ -298,106 +307,115 @@ export default defineComponent({
   components: { DataTable, DraggableModal, TabGroup, ToolbarButton },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('https.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本' },
-        { key: 'certificates', title: '证书' },
-        { key: 'api', title: 'API' },
-        { key: 'allow-client', title: '允许客户端' }
+        { key: 'basic', title: t('https.tab_basic') },
+        { key: 'certificates', title: t('https.tab_certificates') },
+        { key: 'api', title: t('https.tab_api') },
+        { key: 'allow-client', title: t('https.tab_allow_client') }
       ]">
 
         <template #basic>
           <div class="form-row">
-            <label class="form-label" title="HTTPS 监听端口，默认 443，范围 1-65535">端口</label>
+            <label class="form-label" :title="t('https.port_title')">{{ t('https.port_label') }}</label>
             <div style="flex:1;">
-              <input type="number" min="1" max="65535" class="form-control" v-model="config.port" placeholder="1-65535，默认 443" title="HTTPS 监听端口，默认 443，范围 1-65535" />
-              <div class="form-hint">默认：443，范围：1-65535</div>
+              <input type="number" min="1" max="65535" class="form-control" v-model="config.port" :placeholder="t('https.port_placeholder')" :title="t('https.port_title')" />
+              <div class="form-hint">{{ t('https.port_hint') }}</div>
             </div>
           </div>
           <div class="form-row">
-            <label class="form-label" title="HTTPS 监听地址列表，每行一个 IPv4/IPv6 地址">监听地址</label>
-            <textarea class="form-control" v-model="config.listen_address" rows="3" placeholder="每行一个 IPv4/IPv6 地址" title="HTTPS 监听地址列表" />
+            <label class="form-label" :title="t('https.listen_address_title')">{{ t('https.listen_address_label') }}</label>
+            <textarea class="form-control" v-model="config.listen_address" rows="3" :placeholder="t('https.listen_address_placeholder')" :title="t('https.listen_address_title')" />
           </div>
           <div class="form-row">
-            <label class="form-label" title="指定可用的 TLS 版本，默认 1.2 和 1.3">TLS 版本</label>
+            <label class="form-label" :title="t('https.tls_version_title')">{{ t('https.tls_version_label') }}</label>
             <div style="display:flex;gap:12px;flex-wrap:wrap;">
               <label v-for="v in TLS_VERSION_OPTIONS" :key="v"><input type="checkbox" v-model="config.tls_version" :value="v" /> {{ v }}</label>
             </div>
-            <div class="form-hint">默认：1.2, 1.3</div>
+            <div class="form-hint">{{ t('https.tls_version_hint') }}</div>
           </div>
-          <div class="form-row"><label class="form-label" title="将 HTTP 请求重定向到 HTTPS">启用 HTTP 重定向</label><input type="checkbox" v-model="config.enable_http_redirect" title="将 HTTP 请求重定向到 HTTPS" /></div>
+          <div class="form-row"><label class="form-label" :title="t('https.enable_http_redirect_title')">{{ t('https.enable_http_redirect_label') }}</label><input type="checkbox" v-model="config.enable_http_redirect" :title="t('https.enable_http_redirect_title')" /></div>
           <div class="form-row">
-            <label class="form-label" title="最大请求体大小，单位 MB，默认 1">请求体大小限制 (MB)</label>
+            <label class="form-label" :title="t('https.request_body_size_limit_title')">{{ t('https.request_body_size_limit_label') }}</label>
             <div style="flex:1;">
-              <input type="number" min="1" class="form-control" v-model="config.request_body_size_limit" placeholder="默认 1" title="最大请求体大小，单位 MB，默认 1" />
-              <div class="form-hint">默认：1 MB</div>
+              <input type="number" min="1" class="form-control" v-model="config.request_body_size_limit" :placeholder="t('https.request_body_size_limit_placeholder')" :title="t('https.request_body_size_limit_title')" />
+              <div class="form-hint">{{ t('https.request_body_size_limit_hint') }}</div>
             </div>
           </div>
-          <div class="form-row"><label class="form-label" title="绑定的 VRF 实例名称">VRF</label><input class="form-control" v-model="config.vrf" placeholder="VRF 名称" title="绑定的 VRF 实例名称" /></div>
+          <div class="form-row"><label class="form-label" :title="t('https.vrf_title')">VRF</label><input class="form-control" v-model="config.vrf" :placeholder="t('https.vrf_placeholder')" :title="t('https.vrf_title')" /></div>
         </template>
 
         <template #certificates>
-          <div class="form-row"><label class="form-label" title="PKI 中的服务器证书名称">证书</label><input class="form-control" v-model="config.certificates.certificate" placeholder="PKI 证书名称" title="PKI 中的服务器证书名称" /></div>
-          <div class="form-row"><label class="form-label" title="PKI 中的 CA 证书名称">CA 证书</label><input class="form-control" v-model="config.certificates.ca_certificate" placeholder="PKI CA 证书名称" title="PKI 中的 CA 证书名称" /></div>
-          <div class="form-row"><label class="form-label" title="PKI 中的 Diffie-Hellman 参数名称">DH 参数</label><input class="form-control" v-model="config.certificates.dh_params" placeholder="PKI DH 参数名称" title="PKI 中的 Diffie-Hellman 参数名称" /></div>
+          <div class="form-row"><label class="form-label" :title="t('https.certificate_title')">{{ t('https.certificate_label') }}</label><input class="form-control" v-model="config.certificates.certificate" :placeholder="t('https.certificate_placeholder')" :title="t('https.certificate_title')" /></div>
+          <div class="form-row"><label class="form-label" :title="t('https.ca_certificate_title')">{{ t('https.ca_certificate_label') }}</label><input class="form-control" v-model="config.certificates.ca_certificate" :placeholder="t('https.ca_certificate_placeholder')" :title="t('https.ca_certificate_title')" /></div>
+          <div class="form-row"><label class="form-label" :title="t('https.dh_params_title')">{{ t('https.dh_params_label') }}</label><input class="form-control" v-model="config.certificates.dh_params" :placeholder="t('https.dh_params_placeholder')" :title="t('https.dh_params_title')" /></div>
         </template>
 
         <template #api>
-          <div class="form-row"><label class="form-label" title="启用 API 严格路径检查">严格模式</label><input type="checkbox" v-model="config.api.strict" title="启用 API 严格路径检查" /></div>
-          <div class="form-row"><label class="form-label" title="启用 API 调试输出">调试模式</label><input type="checkbox" v-model="config.api.debug" title="启用 API 调试输出" /></div>
+          <div class="form-row"><label class="form-label" :title="t('https.strict_title')">{{ t('https.strict_label') }}</label><input type="checkbox" v-model="config.api.strict" :title="t('https.strict_title')" /></div>
+          <div class="form-row"><label class="form-label" :title="t('https.debug_title')">{{ t('https.debug_label') }}</label><input type="checkbox" v-model="config.api.debug" :title="t('https.debug_title')" /></div>
           <div class="form-row">
-            <label class="form-label" title="CORS 允许的 Origin 列表，每行一个">CORS 允许 Origin</label>
+            <label class="form-label" :title="t('https.cors_allow_origin_title')">{{ t('https.cors_allow_origin_label') }}</label>
             <div style="flex:1;">
-              <textarea class="form-control" v-model="config.api.cors_allow_origin" rows="3" placeholder="每行一个 Origin，例如 https://example.com" title="CORS 允许的 Origin 列表" />
-              <div class="form-hint">对应命令：set service https api cors allow-origin &lt;origin&gt;</div>
+              <textarea class="form-control" v-model="config.api.cors_allow_origin" rows="3" :placeholder="t('https.cors_allow_origin_placeholder')" :title="t('https.cors_allow_origin_title')" />
+              <div class="form-hint">{{ t('https.cors_allow_origin_hint') }}</div>
             </div>
           </div>
 
-          <div class="section-title" style="margin-top:16px;">GraphQL</div>
-          <div class="form-row"><label class="form-label" title="启用 GraphQL 内省查询">GraphQL 内省</label><input type="checkbox" v-model="config.api.graphql_introspection" title="启用 GraphQL 内省查询" /></div>
-          <div class="form-row"><label class="form-label" title="启用 GraphQL 认证">GraphQL 认证</label><input type="checkbox" v-model="config.api.graphql_authentication.enabled" title="启用 GraphQL 认证" /></div>
-          <template v-if="config.api.graphql_authentication.enabled">
-            <div class="form-row">
-              <label class="form-label" title="认证类型，默认 key">认证类型</label>
-              <select class="form-control" v-model="config.api.graphql_authentication.type" title="GraphQL 认证类型">
-                <option v-for="opt in GRAPHQL_AUTH_TYPE_OPTIONS" :key="opt.key" :value="opt.key">{{ opt.label }}</option>
-              </select>
+          <div class="form-group" style="margin-top:16px;">
+            <div class="form-group-title">GraphQL</div>
+            <div class="form-group-content">
+              <div class="form-row"><label class="form-label" :title="t('https.graphql_introspection_title')">{{ t('https.graphql_introspection_label') }}</label><input type="checkbox" v-model="config.api.graphql_introspection" :title="t('https.graphql_introspection_title')" /></div>
+              <div class="form-row"><label class="form-label" :title="t('https.graphql_authentication_title')">{{ t('https.graphql_authentication_label') }}</label><input type="checkbox" v-model="config.api.graphql_authentication.enabled" :title="t('https.graphql_authentication_title')" /></div>
+              <template v-if="config.api.graphql_authentication.enabled">
+                <div class="form-row">
+                  <label class="form-label" :title="t('https.auth_type_title')">{{ t('https.auth_type_label') }}</label>
+                  <select class="form-control" v-model="config.api.graphql_authentication.type" :title="t('https.auth_type_title')">
+                    <option v-for="opt in GRAPHQL_AUTH_TYPE_OPTIONS" :key="opt.key" :value="opt.key">{{ opt.label }}</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label class="form-label" :title="t('https.expiration_title')">{{ t('https.expiration_label') }}</label>
+                  <div style="flex:1;">
+                    <input type="number" min="60" max="31536000" class="form-control" v-model="config.api.graphql_authentication.expiration" :placeholder="t('https.expiration_placeholder')" :title="t('https.expiration_title')" />
+                    <div class="form-hint">{{ t('https.expiration_hint') }}</div>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <label class="form-label" :title="t('https.secret_length_title')">{{ t('https.secret_length_label') }}</label>
+                  <div style="flex:1;">
+                    <input type="number" min="16" max="65535" class="form-control" v-model="config.api.graphql_authentication.secret_length" :placeholder="t('https.secret_length_placeholder')" :title="t('https.secret_length_title')" />
+                    <div class="form-hint">{{ t('https.secret_length_hint') }}</div>
+                  </div>
+                </div>
+              </template>
             </div>
-            <div class="form-row">
-              <label class="form-label" title="Token 过期时间，默认 3600 秒，范围 60-31536000">Token 过期时间 (秒)</label>
-              <div style="flex:1;">
-                <input type="number" min="60" max="31536000" class="form-control" v-model="config.api.graphql_authentication.expiration" placeholder="60-31536000，默认 3600" title="Token 过期时间，默认 3600 秒" />
-                <div class="form-hint">默认：3600，范围：60-31536000</div>
-              </div>
-            </div>
-            <div class="form-row">
-              <label class="form-label" title="共享密钥长度，默认 32 字节，范围 16-65535">Secret 长度 (字节)</label>
-              <div style="flex:1;">
-                <input type="number" min="16" max="65535" class="form-control" v-model="config.api.graphql_authentication.secret_length" placeholder="16-65535，默认 32" title="共享密钥长度，默认 32 字节" />
-                <div class="form-hint">默认：32，范围：16-65535</div>
-              </div>
-            </div>
-          </template>
+          </div>
 
-          <div class="section-title" style="margin-top:16px;">API Keys</div>
-          <DataTable :columns="API_KEY_COLUMNS" :data="config.api.keys" row-key="id" :actions="['create', 'edit', 'delete']" @create="createKey" @edit="editKey" @delete="removeKey" />
+          <div class="form-group" style="margin-top:16px;">
+            <div class="form-group-title">API Keys</div>
+            <div class="form-group-content">
+              <DataTable :columns="API_KEY_COLUMNS" :data="config.api.keys" row-key="id" :actions="['create', 'edit', 'delete']" @create="createKey" @edit="editKey" @delete="removeKey" />
+            </div>
+          </div>
         </template>
 
         <template #allow-client>
           <div class="form-row">
-            <label class="form-label" title="允许访问 HTTPS 服务的客户端 IPv4/IPv6 地址，每行一个">允许客户端地址</label>
-            <textarea class="form-control" v-model="config.allow_client" rows="5" placeholder="每行一个 IPv4/IPv6 地址" title="允许访问 HTTPS 服务的客户端地址列表" />
+            <label class="form-label" :title="t('https.allow_client_title')">{{ t('https.allow_client_label') }}</label>
+            <textarea class="form-control" v-model="config.allow_client" rows="5" :placeholder="t('https.allow_client_placeholder')" :title="t('https.allow_client_title')" />
           </div>
         </template>
       </TabGroup>
-
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
+      <div class="toolbar" style="margin-top:16px;">
+        <div class="toolbar-left">
+          <ToolbarButton icon="save" primary @click="save" :disabled="saving || loading || writeDisabled">{{ saving ? t('https.saving') : t('https.confirm') }}</ToolbarButton>
+        </div>
       </div>
 
-      <DraggableModal v-model:visible="showKeyModal" title="API Key" @confirm="saveKey" @close="showKeyModal = false">
-        <div class="form-row"><label class="form-label">ID</label><input class="form-control" v-model="editingKey.id" :disabled="editingKey._id" placeholder="API Key ID" title="API Key ID" /></div>
-        <div class="form-row"><label class="form-label">Key</label><input class="form-control" v-model="editingKey.key" placeholder="API Key 明文" title="API Key 明文" /></div>
+      <DraggableModal v-model:visible="showKeyModal" :title="t('https.modal_api_key_title')" @confirm="saveKey" @close="showKeyModal = false">
+        <div class="form-row"><label class="form-label">ID</label><input class="form-control" v-model="editingKey.id" :placeholder="t('https.api_key_id_placeholder')" title="API Key ID" /></div>
+        <div class="form-row"><label class="form-label">Key</label><input class="form-control" v-model="editingKey.key" :placeholder="t('https.api_key_value_placeholder')" :title="t('https.api_key_value_title')" /></div>
       </DraggableModal>
     </div>
   `,

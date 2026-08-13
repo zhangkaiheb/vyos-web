@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="ssh">
+<h1>SSH</h1>
+<p><abbr title="Secure Shell">SSH</abbr> — это криптографический сетевой протокол для безопасного выполнения
+сетевых служб над не защищенной сетью. Стандартный TCP-порт для
+SSH — 22. Наиболее известным примером применения является удаленный вход в компьютерные системы
+пользователями.</p>
+<p>SSH обеспечивает безопасный канал над не защищенной сетью в клиент-серверной
+архитектуре, соединяя приложение клиента SSH с сервером SSH. Обычные
+приложения включают удаленный вход в командную строку и удаленное выполнение команд,
+но любую сетевую службу можно защитить с помощью SSH. Спецификация протокола
+различает две основные версии, обозначаемые как SSH-1 и SSH-2.</p>
+<p>Наиболее заметное применение протокола — это доступ к shell-аккаунтам
+на операционных системах, похожих на Unix, но он также используется ограниченным образом на Windows.
+В 2015 году Microsoft объявила, что они будут включать нативную поддержку
+SSH в будущем выпуске.</p>
+<p>SSH был разработан как замена Telnet и не защищенным удаленным протоколам shell,
+таким как Berkeley rlogin, rsh и rexec протоколы.
+Эти протоколы передают информацию, особенно пароли, в текстовом виде,
+что делает их уязвимыми для перехвата и раскрытия с использованием анализа пакетов.
+Шифрование, используемое SSH, предназначено для обеспечения конфиденциальности
+и целостности данных над не защищенной сетью, такой как интернет.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>VyOS 1.1 поддерживал вход в систему как пользователь <code class="docutils literal notranslate">root</code>. Это было удалено из-за более строгой безопасности в VyOS 1.2.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">См. также</p>
+<p>SSH <a class="reference internal" href="../system/login.html#ssh-key-based-authentication">Аутентификация на основе ключей</a></p>
+</div>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-port-port" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Включение SSH требует только указания порта <code class="docutils literal notranslate">&lt;port&gt;</code>, на котором SSH должен
+прослушивать. По умолчанию SSH работает на порту 22.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh listen-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-listen-address-address" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Укажите IPv4/IPv6 адрес прослушивания сервера SSH. Можно определить несколько адресов.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh cipher &lt;cipher&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-cipher-cipher" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Определите допустимые шифры, используемые для соединения SSH. Можно указать несколько допустимых
+шифров, используя несколько повторений для разрешения нескольких шифров.</p>
+<p>Список поддерживаемых шифров: <code class="docutils literal notranslate">3des-cbc</code>, <code class="docutils literal notranslate">aes128-cbc</code>, <code class="docutils literal notranslate">aes192-cbc</code>,
+<code class="docutils literal notranslate">aes256-cbc</code>, <code class="docutils literal notranslate">aes128-ctr</code>, <code class="docutils literal notranslate">aes192-ctr</code>, <code class="docutils literal notranslate">aes256-ctr</code>,
+<code class="docutils literal notranslate">aes128-gcm&#64;openssh.com</code>, <code class="docutils literal notranslate">aes256-gcm&#64;openssh.com</code>,
+<code class="docutils literal notranslate">chacha20-poly1305&#64;openssh.com</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh disable-password-authentication
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-disable-password-authentication" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Отключить аутентификацию по паролю. Вход только через SSH-ключи. Это повышает безопасность!</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh fido pin-required
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-fido-pin-required" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Требовать FIDO2-ключи для подтверждения того, что пользователь был проверен (например, через PIN).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh fido touch-required
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-fido-touch-required" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Требовать FIDO2-ключи для подтверждения физического присутствия пользователя.</p>
+<p>VyOS поддерживает аутентификацию SSH с использованием FIDO2-ключей, созданных OpenSSH.
+Два типа FIDO2-ключей поддерживаются OpenSSH: <code class="docutils literal notranslate">ed25519-sk</code>, <code class="docutils literal notranslate">ecdsa-sk</code></p>
+<p>Пример генерации общего FIDO2-ключа SSH:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>ssh-keygen -t ecdsa-sk -O verify-required -C &quot;fido2-ssh-key&quot;
+</pre></div>
+</div>
+<dl class="simple">
+<dt>Во время генерации ключа OpenSSH будет:</dt><dd><ul class="simple">
+<li><p>Запрашивать наличие пользователя (например, физическое касание или подтверждение)</p></li>
+<li><p>По желанию запрашивать проверку пользователя (PIN), если это поддерживается аутентификатором</p></li>
+<li><p>Создавать локальный файл ключа и соответствующий открытый ключ (<code class="docutils literal notranslate">.pub</code>)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Частный ключ никогда не покидает устройство аутентификатора.</p>
+<p>Пример конфигурации VyOS:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># Создайте FIDO2 SSH-ключ на клиентской системе
+# Копируйте открытый ключ на экземпляр VyOS
+set system login user vyos authentication public-keys fido key &#39;&lt;public-key&gt;&#39;
+set system login user vyos authentication public-keys fido type &#39;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e39088ce8680879082ce908b82d1ce8d8a909793d1d6d5a38c93868d90908bcd808c8e">[email&#160;protected]</a>&#39;
+set service ssh fido touch-required
+</pre></div>
+</div>
+<p>Теперь вы можете войти в систему, используя: <code class="docutils literal notranslate">ssh -i ~/.ssh/id_fido_key vyos&#64;192.0.2.1</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh disable-host-validation
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-disable-host-validation" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Отключить проверку хоста через обратные DNS-запросы — может ускорить время входа
+когда обратный запрос невозможен.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh mac &lt;mac&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-mac-mac" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Указывает доступные алгоритмы <abbr title="Message Authentication Code">MAC</abbr>.
+Алгоритм MAC используется в версии протокола 2 для защиты целостности данных.
+Можно предоставить несколько алгоритмов, используя несколько команд, определяя
+один алгоритм на команду.</p>
+<p>Список поддерживаемых MAC: <code class="docutils literal notranslate">hmac-md5</code>, <code class="docutils literal notranslate">hmac-md5-96</code>, <code class="docutils literal notranslate">hmac-ripemd160</code>,
+<code class="docutils literal notranslate">hmac-sha1</code>, <code class="docutils literal notranslate">hmac-sha1-96</code>, <code class="docutils literal notranslate">hmac-sha2-256</code>, <code class="docutils literal notranslate">hmac-sha2-512</code>,
+<code class="docutils literal notranslate">umac-64&#64;openssh.com</code>, <code class="docutils literal notranslate">umac-128&#64;openssh.com</code>,
+<code class="docutils literal notranslate">hmac-md5-etm&#64;openssh.com</code>, <code class="docutils literal notranslate">hmac-md5-96-etm&#64;openssh.com</code>,
+<code class="docutils literal notranslate">hmac-ripemd160-etm&#64;openssh.com</code>, <code class="docutils literal notranslate">hmac-sha1-etm&#64;openssh.com</code>,
+<code class="docutils literal notranslate">hmac-sha1-96-etm&#64;openssh.com</code>, <code class="docutils literal notranslate">hmac-sha2-256-etm&#64;openssh.com</code>,
+<code class="docutils literal notranslate">hmac-sha2-512-etm&#64;openssh.com</code>, <code class="docutils literal notranslate">umac-64-etm&#64;openssh.com</code>,
+<code class="docutils literal notranslate">umac-128-etm&#64;openssh.com</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh access-control &lt;allow | deny&gt; &lt;group | user&gt; &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-access-control-allow-deny-group-user-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Добавьте директиву контроля доступа, чтобы разрешить или запретить пользователей и группы. Директивы
+обрабатываются в следующем порядке приоритета: <code class="docutils literal notranslate">deny-users</code>,
+<code class="docutils literal notranslate">allow-users</code>, <code class="docutils literal notranslate">deny-groups</code> и <code class="docutils literal notranslate">allow-groups</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh client-keepalive-interval &lt;interval&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-client-keepalive-interval-interval" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Укажите интервал времени в секундах для сообщения о сохранении связи.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh key-exchange &lt;kex&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-key-exchange-kex" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Укажите допустимые алгоритмы <abbr title="Key Exchange">KEX</abbr>.</p>
+<p>Список поддерживаемых алгоритмов: <code class="docutils literal notranslate">diffie-hellman-group1-sha1</code>,
+<code class="docutils literal notranslate">diffie-hellman-group14-sha1</code>, <code class="docutils literal notranslate">diffie-hellman-group14-sha256</code>,
+<code class="docutils literal notranslate">diffie-hellman-group16-sha512</code>, <code class="docutils literal notranslate">diffie-hellman-group18-sha512</code>,
+<code class="docutils literal notranslate">diffie-hellman-group-exchange-sha1</code>,
+<code class="docutils literal notranslate">diffie-hellman-group-exchange-sha256</code>,
+<code class="docutils literal notranslate">ecdh-sha2-nistp256</code>, <code class="docutils literal notranslate">ecdh-sha2-nistp384</code>, <code class="docutils literal notranslate">ecdh-sha2-nistp521</code>,
+<code class="docutils literal notranslate">curve25519-sha256</code> и <code class="docutils literal notranslate">curve25519-sha256&#64;libssh.org</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh loglevel &lt;quiet | fatal | error | info | verbose&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-loglevel-quiet-fatal-error-info-verbose" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите уровень журналирования <code class="docutils literal notranslate">sshd</code>. По умолчанию установлено значение <code class="docutils literal notranslate">info</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh vrf &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-vrf-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Укажите имя экземпляра <abbr title="Virtual Routing and Forwarding">VRF</abbr>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh pubkey-accepted-algorithm &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-pubkey-accepted-algorithm-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Указывает алгоритмы подписи, которые будут приняты для аутентификации по открытым ключам</p>
+<p>Список поддерживаемых алгоритмов: <code class="docutils literal notranslate">ssh-ed25519</code>,
+<code class="docutils literal notranslate">ssh-ed25519-cert-v01&#64;openssh.com</code>, <code class="docutils literal notranslate">sk-ssh-ed25519&#64;openssh.com</code>,
+<code class="docutils literal notranslate">sk-ssh-ed25519-cert-v01&#64;openssh.com</code>, <code class="docutils literal notranslate">ecdsa-sha2-nistp256</code>,
+<code class="docutils literal notranslate">ecdsa-sha2-nistp256-cert-v01&#64;openssh.com</code>, <code class="docutils literal notranslate">ecdsa-sha2-nistp384</code>,
+<code class="docutils literal notranslate">ecdsa-sha2-nistp384-cert-v01&#64;openssh.com</code>, <code class="docutils literal notranslate">ecdsa-sha2-nistp521</code>,
+<code class="docutils literal notranslate">ecdsa-sha2-nistp521-cert-v01&#64;openssh.com</code>,
+<code class="docutils literal notranslate">sk-ecdsa-sha2-nistp256&#64;openssh.com</code>,
+<code class="docutils literal notranslate">sk-ecdsa-sha2-nistp256-cert-v01&#64;openssh.com</code>,
+<code class="docutils literal notranslate">webauthn-sk-ecdsa-sha2-nistp256&#64;openssh.com</code>,
+<code class="docutils literal notranslate">ssh-dss</code>, <code class="docutils literal notranslate">ssh-dss-cert-v01&#64;openssh.com</code>, <code class="docutils literal notranslate">ssh-rsa</code>,
+<code class="docutils literal notranslate">ssh-rsa-cert-v01&#64;openssh.com</code>, <code class="docutils literal notranslate">rsa-sha2-256</code>,
+<code class="docutils literal notranslate">rsa-sha2-256-cert-v01&#64;openssh.com</code>, <code class="docutils literal notranslate">rsa-sha2-512</code>,
+<code class="docutils literal notranslate">rsa-sha2-512-cert-v01&#64;openssh.com</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh trusted-user-ca &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-trusted-user-ca-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Укажите имя ключевой пары OpenSSH, которая действует как центр сертификации и будет использоваться для проверки пользовательских сертификатов.</p>
+<p>Вы можете использовать его, добавив ключевую пару OpenSSH в подсистему PKI.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># Генерация ключевой пары, действующей как CA
+$ ssh-keygen -f vyos-ssh-ca.key
+
+# Генерация ключа для пользователя: vyos_testca
+$ ssh-keygen -f vyos_testca  -C &quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="12646b7d614d667761717352646b7d613c7c7766">[email&#160;protected]</a>&quot;
+
+# Подписать открытый ключ пользователя vyos_testca и вставить имена пользователей: vyos, vyos_testca
+# с сроком действия ключа два недели — после чего ключ станет непригодным
+$ ssh-keygen -s vyos-ssh-ca.key -I <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="eb9d928498b49f8e989f888aab9d928498c5858e9f">[email&#160;protected]</a> -n vyos,vyos_testca -V +2w vyos_testca.pub
+
+$ set system login user vyos_testca
+$ set pki openssh test_ca public key AAAAB3N.....
+$ set pki openssh test_ca public type ssh-rsa
+$ set service ssh trusted-user-ca test_ca
+</pre></div>
+</div>
+<p>Теперь вы можете войти в систему, используя: <code class="docutils literal notranslate">ssh -i vyos_testca vyos_testca&#64;vyos.test.com</code></p>
+</div>
+</div>
+</section>
+<section id="dynamic-protection">
+<h2>Динамическая защита</h2>
+<p>Защищает хост от атак методом подбора паролей против
+SSH. Сообщения журнала анализируются построчно для распознаваемых шаблонов. Если обнаружена атака, например, несколько неудачных попыток входа в течение нескольких секунд, то
+IP-адрес злоумышленника блокируется. Злоумышленники разблокируются через заданный интервал.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh dynamic-protection
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-dynamic-protection" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Разрешить <code class="docutils literal notranslate">ssh</code> динамическую защиту.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh dynamic-protection allow-from &lt;address | prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-dynamic-protection-allow-from-address-prefix" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Список доверенных адресов и сетей. Всегда разрешать входящие соединения с этих систем.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh dynamic-protection block-time &lt;sec&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-dynamic-protection-block-time-sec" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Блокировать исходный IP-адрес в секундах. Последующие блокировки увеличиваются в 1.5 раза
+По умолчанию 120.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh dynamic-protection detect-time &lt;sec&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-dynamic-protection-detect-time-sec" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Помнить исходный IP-адрес в секундах до сброса их балла. По умолчанию 1800.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service ssh dynamic-protection threshold &lt;sec&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-dynamic-protection-threshold-sec" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Блокировать исходный IP-адрес, когда их суммарный балл атаки превышает пороговое значение. По умолчанию 30.</p>
+</div>
+</div>
+</section>
+<section id="operation">
+<h2>Операция</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+restart ssh
+<a class="cmdlink" href="#opcmd-restart-ssh" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Перезапустить процесс демона SSH, текущая сессия не затрагивается, только фоновый демон перезапускается.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+generate ssh server-key
+<a class="cmdlink" href="#opcmd-generate-ssh-server-key" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Перегенерировать часть публичного/приватного ключа, которую SSH использует для безопасного
+соединения.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Already learned known_hosts files of clients need an update as the
+public key will change.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+generate ssh client-key /path/to/private_key
+<a class="cmdlink" href="#opcmd-generate-ssh-client-key-path-to-private-key" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Перегенерировать известный файл публичного/приватного ключа, который можно использовать для подключения к
+другим службам (например, кэшу RPKI).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ generate ssh client-key /config/auth/id_rsa_rpki
+Generating public/private rsa key pair.
+Your identification has been saved in /config/auth/id_rsa_rpki.
+Your public key has been saved in /config/auth/id_rsa_rpki.pub.
+The key fingerprint is:
+SHA256:XGv2PpdOzVCzpmEzJZga8hTRq7B/ZYL3fXaioLFLS5Q vyos@vyos
+The key&#39;s randomart image is:
++---[RSA 2048]----+
+|         oo      |
+|          ..o    |
+|       . o.o.. o.|
+|       o+ooo  o.o|
+|        Eo*  =.o |
+|       o = +.o*+ |
+|        = o *.o.o|
+|       o * +.o+.+|
+|        =.. o=.oo|
++----[SHA256]-----+
+</pre></div>
+</div>
+<p>Будут созданы два новых файла <code class="docutils literal notranslate">/config/auth/id_rsa_rpki</code> и
+<code class="docutils literal notranslate">/config/auth/id_rsa_rpki.pub</code>
+.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+generate public-key-command user &lt;username&gt; path &lt;location&gt;
+<a class="cmdlink" href="#opcmd-generate-public-key-command-user-username-path-location" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<blockquote>
+<div><p>Сгенерируйте команды режима конфигурации для добавления открытого ключа для
+<a class="reference internal" href="../system/login.html#ssh-key-based-authentication">Аутентификации на основе ключей</a>.
+<code class="docutils literal notranslate">&lt;location&gt;</code> может быть локальным путем или URL, указывающим на удаленный файл.</p>
+<p>Поддерживаемые удаленные протоколы: FTP, FTPS, HTTP, HTTPS, SCP/SFTP и TFTP.</p>
+</div></blockquote>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>alyssa@vyos:~$ generate public-key-command user alyssa path sftp://example.net/home/alyssa/.ssh/id_rsa.pub
+# Чтобы добавить этот ключ как встроенный ключ, выполните следующие команды:
+configure
+set system login user alyssa authentication public-keys <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c8a9a4b1bbbba988adb0a9a5b8a4ade6a6adbc">[email&#160;protected]</a> key AAA...
+set system login user alyssa authentication public-keys <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ccada0b5bfbfad8ca9b4ada1bca0a9e2a2a9b8">[email&#160;protected]</a> type ssh-rsa
+commit
+save
+exit
+
+ben@vyos:~$ generate public-key-command user ben path ~/.ssh/id_rsa.pub
+# Чтобы добавить этот ключ как встроенный ключ, выполните следующие команды:
+configure
+set system login user ben authentication public-keys ben@vyos key AAA...
+set system login user ben authentication public-keys ben@vyos type ssh-dss
+commit
+save
+exit
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log ssh
+<a class="cmdlink" href="#opcmd-show-log-ssh" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать журнал сервера SSH.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+monitor log ssh
+<a class="cmdlink" href="#opcmd-monitor-log-ssh" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Следить за журналом сервера SSH.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log ssh dynamic-protection
+<a class="cmdlink" href="#opcmd-show-log-ssh-dynamic-protection" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать журнал динамической защиты SSH.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+monitor log ssh dynamic-protection
+<a class="cmdlink" href="#opcmd-monitor-log-ssh-dynamic-protection" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Следить за журналом динамической защиты SSH.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show ssh dynamic-protection
+<a class="cmdlink" href="#opcmd-show-ssh-dynamic-protection" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать список IP-адресов, временно заблокированных динамической защитой SSH.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show ssh fingerprints
+<a class="cmdlink" href="#opcmd-show-ssh-fingerprints" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать отпечатки пальцев публичных ключей сервера SSH.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show ssh fingerprints ascii
+<a class="cmdlink" href="#opcmd-show-ssh-fingerprints-ascii" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p>Показать отпечатки пальцев публичных ключей сервера SSH, включая визуальное представление ASCII.</p>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

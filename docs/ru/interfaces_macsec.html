@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="macsec">
+<h1>MACsec</h1>
+<p>MACsec — это стандарт IEEE (IEEE 802.1AE) для обеспечения безопасности на уровне MAC, представленный в 2006 году. Он обеспечивает протокольно-независимое соединение между двумя хостами, предоставляя конфиденциальность данных, аутентичность и целостность с использованием шифров GCM-AES. MACsec работает на уровне Ethernet как протокол уровня 2 и защищает трафик внутри сетей уровня 2, включая запросы DHCP и ARP. Он не конкурирует с другими решениями безопасности, такими как IPsec (уровень 3) или TLS (уровень 4), поскольку каждое из них решает отдельные задачи.</p>
+<section id="configuration">
+<h2>Конфигурация</h2>
+<section id="common-interface-configuration">
+<h3>Общая конфигурация интерфейса</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; address &lt;address | dhcp |  dhcpv6&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-address-address-dhcp-dhcpv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс с одним или несколькими IP-адресами.</strong></p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>address:</strong> Назначьте один или несколько IPv4 или IPv6 адресов интерфейсу.
+Например, используйте 192.0.2.1/24 для IPv4 или 2001:db8::1/64 для IPv6.</p></li>
+<li><p><strong>dhcp:</strong> Интерфейс получает IPv4-адрес от сервера DHCP на той же сетевой подсети.</p></li>
+<li><p><strong>dhcpv6:</strong> Интерфейс получает IPv6-адрес от сервера DHCPv6 на той же сетевой подсети.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если интерфейс получает IPv4-адрес через DHCP, и необходимы определенные настройки до/после получения IP-адреса, используйте предоставленные скрипты-хуки:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/pre-hooks.d/</code></p></li>
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/post-hooks.d/</code></p></li>
+</ul>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 address 192.0.2.1/24
+set interfaces macsec macsec0 address 2001:db8::1/64
+set interfaces macsec macsec0 address dhcp
+set interfaces macsec macsec0 address dhcpv6
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте понятное описание интерфейса.</strong></p>
+<p>Это описание появляется в команде <code class="docutils literal notranslate">show interfaces</code> и инструментах мониторинга на основе SNMP.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите интерфейс.</strong></p>
+<p>Интерфейс будет установлен в состояние административно выключен (<code class="docutils literal notranslate">A/D</code>).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt;  disable-flow-control
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-disable-flow-control" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите управление потоком Ethernet (стандарт IEEE 802.3x pause frames) на интерфейсе.</strong></p>
+<blockquote>
+<div><p>Управление потоком Ethernet, определенное стандартом IEEE 802.3x, временно останавливает передачу данных для предотвращения потери пакетов при перегрузке сети. Например, когда отправитель передает данные быстрее, чем получатель может их обработать.</p>
+<p>Отключение управления потоком Ethernet означает, что интерфейс не будет сигнализировать подключенному устройству о паузе передачи и будет удалять пакеты, если перегружен.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 disable-flow-control
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; disable-link-detect
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-disable-link-detect" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите обнаружение изменений состояния физической линии на интерфейсе, например, когда кабель отсоединен.</strong></p>
+<p>По умолчанию интерфейс обнаруживает изменения состояния физической линии.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 disable-link-detect
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; mac &lt;xx:xx:xx:xx:xx:xx&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-mac-xx-xx-xx-xx-xx-xx" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте пользовательский MAC-адрес на интерфейсе.</strong></p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 mac &#39;00:53:01:02:03:04&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте MTU на интерфейсе.</strong></p>
+<p>Это значение определяет максимальный размер пакета, который интерфейс передает без фрагментации.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>, объявляемый в исходящих пакетах TCP SYN на указанном интерфейсе.</strong></p>
+<p>Путем ограничения значения MSS в пакетах TCP SYN вы явно информируете удаленный сторону о том, что она не должна отправлять пакеты большего размера. Это предотвращает проблемы с соединением, которые возникают, когда Path MTU Discovery (PMTUD) не работает.</p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Устанавливает MSS в конкретное значение, в байтах. Используйте этот вариант, если необходимо принудительно установить конкретное значение MSS, например, для устранения проблем с доступностью или учета специфических требований сети.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> Роутер автоматически рассчитывает MSS как MTU интерфейса минус 40 байт для IPv4 (20 байт для заголовка IPv4 и 20 байт для заголовка TCP). Этот вариант рекомендуется для автоматического установления правильного значения.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-arp-cache-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, как долго ARP-запись остается действительной после того, как интерфейс узнал сопоставление IP-адреса и MAC-адреса.</strong></p>
+<p>По умолчанию длительность составляет 30 секунд.</p>
+<p>ARP-запись остается действительной, если она получает положительный ответ от более высоких уровней протоколов.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-disable-arp-filter" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте фильтрацию ARP на этом интерфейсе.</strong></p>
+<p><strong>Поведение по умолчанию:</strong> Ядро отвечает на запросы ARP на этом интерфейсе только в том случае, если трафик будет маршрутизироваться обратно к отправителю ARP через этот конкретный интерфейс.</p>
+<p><strong>Если настроено:</strong> Ядро отвечает на запросы ARP на этом интерфейсе для любого IP-адреса, настроенного на локальном хосте, независимо от того, какой конкретный интерфейс этому IP-адресу назначен, и независимо от таблицы маршрутизации. Это отражает концепцию Linux, согласно которой IP-адреса принадлежат хосту, а не отдельным интерфейсам.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip disable-arp-filter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс для работы в режиме хоста или роутера.</strong></p>
+<p>Если настроено, интерфейс переключается в режим хоста, и IPv4-пересылка отключена на нем.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, чтобы передавать пакеты IP-направленного широковещания, полученные на этом интерфейсе.</strong></p>
+<p><strong>Поведение по умолчанию:</strong> Пакеты IP-направленного широковещания отбрасываются.</p>
+<p><strong>Если настроено:</strong> Пакеты IP-направленного широковещания передаются всем хостам на подсети назначения, как определено в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> и <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-enable-arp-accept" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, как обрабатывать gratuitous ARPs на этом интерфейсе.</strong></p>
+<p>Если настроено, сопоставление IP-адреса и MAC-адреса добавляется в таблицу ARP на основе gratuitous ARP-запросов или ответов.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если в таблице ARP уже есть IP-адрес из gratuitous ARP, его запись обновляется независимо от того, настроено ли это настройство.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-enable-arp-announce" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте выбор источника IP-адреса для запросов ARP на этом интерфейсе.</strong></p>
+<p><strong>Поведение по умолчанию:</strong> Ядро может использовать любой IP-адрес, которым владеет хост, в качестве исходного IP-адреса в запросах ARP на этом интерфейсе.</p>
+<p><strong>Если настроено:</strong> Ядро сначала пытается выбрать исходный IP-адрес, настроенный на интерфейсе, который совпадает с подсетью цели. Если такой подсети нет, ядро выбирает IP-адрес, который оно обычно использует (на основе таблицы маршрутизации для достижения цели).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-enable-arp-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, какие запросы ARP будут игнорироваться на этом интерфейсе.</strong></p>
+<p><strong>Поведение по умолчанию:</strong> Ядро отвечает на запросы ARP для любых локальных IP-адресов, независимо от того, к какому интерфейсу они привязаны.</p>
+<p><strong>Если настроено:</strong> Ядро отвечает на запросы ARP только в том случае, если целевой IP-адрес привязан к этому конкретному интерфейсу.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-enable-proxy-arp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте proxy ARP на этом интерфейсе.</strong></p>
+<p>Если настроено, роутер (ядро) перехватывает запросы ARP для не-локальных IP-адресов и отвечает с MAC-адресом интерфейса, который получил запрос. Последующие пакеты, предназначенные этим IP-адресам, перенаправляются на их фактические цели на удаленных подсетях.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip enable-proxy-arp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-proxy-arp-pvlan" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте локальный proxy ARP на интерфейсе.</strong></p>
+<p>Если настроено, роутер (ядро) отвечает на запросы ARP на этом VLAN-интерфейсе даже в том случае, если целевой IP-адрес находится на той же подсети и интерфейсе.</p>
+<p>Это используется для поддержки требований изоляции сети (RFC 3069) для частных VLAN (PVLAN). В конфигурациях PVLAN хосты на изолированных портах НЕ разрешены к прямой коммуникации друг с другом на уровне 2, но могут общаться с верхним роутером.</p>
+<p>Путем ответа на запросы ARP между хостами своим собственным MAC-адресом, роутер (ядро) направляет трафик между хостами через себя вместо прямой передачи между хостами.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Эта команда работает независимо и не требует включения обычного proxy ARP на интерфейсе.</p>
+</div>
+<p>Локальный proxy ARP также известен как:</p>
+<ul class="simple">
+<li><p>VLAN агрегация (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>Частная VLAN (Cisco, Allied Telesyn).</p></li>
+<li><p>Фильтрация по источнику или изоляция портов (Hewlett-Packard).</p></li>
+<li><p>Перенаправление MAC (Ericsson).</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте проверку исходного IP-адреса с помощью</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>на этом интерфейсе, как указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>strict:</strong> Каждый входящий пакет проверяет исходный IP-адрес против FIB. Если интерфейс не является лучшим маршрутом обратно к этому источнику, проверка не проходит, и пакет удаляется.</p></li>
+<li><p><strong>loose:</strong> Каждый входящий пакет проверяет исходный IP-адрес против FIB. Если исходный IP-адрес недостижим через любой интерфейс, проверка не проходит.</p></li>
+<li><p><strong>disable:</strong> Не выполняется проверка исходного IP-адреса. Все входящие пакеты принимаются.</p></li>
+</ul>
+<p>RFC 3704 рекомендует включить строгий режим для предотвращения спуфинга IP, например, DDoS-атак. Для асимметричных или других сложных сценариев маршрутизации используйте режим loose.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс для автоматического получения IPv6-адреса с помощью</strong> <abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>как указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<p>Хосты IPv6 могут автоматически настраивать себя, когда подключены к IPv6-сети, используя протокол обнаружения соседей через ICMPv6 сообщения о маршрутизаторе. При первом подключении к сети хост отправляет многоадресное сообщение запроса маршрутизатора на локальной подсети для получения параметров своей конфигурации. Маршрутизатор отвечает пакетом рекламы маршрутизатора, содержащим параметры конфигурации уровня интернета.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Этот метод автоматически отключает передачу IPv6 на интерфейсе.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ipv6 address autoconf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-address-eui64-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс для присвоения себе IPv6-адреса с помощью метода</strong> <abbr title="64-Bit Extended Unique Identifier">EUI-64</abbr> <strong>, как указано</strong> в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ipv6 address eui64 2001:db8:beef::/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ipv6 address no-default-link-local
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-address-no-default-link-local" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Отключите автоматическое присвоение link-local IPv6-адреса этому интерфейсу.</strong></p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ipv6 address no-default-link-local
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интерфейс для работы в режиме хоста или роутера.</strong></p>
+<p>Если настроено, интерфейс переключается в режим хоста, и IPv6-пересылка отключена на нем.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ipv6 disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ipv6 adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>, объявляемый в исходящих пакетах TCP SYN на указанном интерфейсе.</strong></p>
+<p>Путем ограничения значения MSS в пакетах TCP SYN вы явно информируете удаленный сторону о том, что она не должна отправлять пакеты большего размера. Это предотвращает проблемы с соединением, когда Path MTU Discovery (PMTUD) не работает.</p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Устанавливает MSS в конкретное значение, в байтах. Используйте этот вариант, если необходимо принудительно установить конкретное значение MSS, например, для устранения проблем с доступностью или учета специфических требований сети.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> Роутер рассчитывает MSS как MTU интерфейса минус 60 байт для IPv6 (40 байт для заголовка IPv6 и 20 байт для заголовка TCP). Этот вариант рекомендуется для автоматического установления правильного значения.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ipv6 accept-dad &lt;0 | 1 | 2&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-accept-dad-0-1-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IPv6</strong> <abbr title="Duplicate Address Detection">DAD</abbr> <strong>на интерфейсе.</strong></p>
+<p>Доступны следующие варианты:</p>
+<ul class="simple">
+<li><p><strong>0:</strong> Отключает DAD. Не производится обнаружение дублирующих адресов.</p></li>
+<li><p><strong>1:</strong> Включает DAD (по умолчанию). Обнаруживаются дублирующиеся адреса. Работа интерфейса IPv6 продолжается для допустимых IPv6-адресов.</p></li>
+<li><p><strong>2:</strong> Включает DAD и, если найден дублирующийся локальный адрес, отключает работу IPv6 на этом интерфейсе.</p></li>
+</ul>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ipv6 accept-dad 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; ipv6 dup-addr-detect-transmits &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-dup-addr-detect-transmits-n" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте количество сообщений</strong> <abbr title="Duplicate Address Detection">DAD</abbr> <strong>, которые отправляет роутер (ядро) во время назначения IPv6-адреса на этом интерфейсе.</strong></p>
+<p>Значение по умолчанию — 1.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ipv6 dup-addr-detect-transmits 5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; vrf &lt;vrf&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-vrf-vrf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Назначьте интерфейс определенному экземпляру</strong> <abbr title="Virtual Routing and Forwarding">VRF</abbr> <strong>.</strong></p>
+<div class="admonition seealso">
+<p class="admonition-title">См. также</p>
+<p>Для информации о настройке VRF см. раздел <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>.</p>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 vrf red
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>DHCP(v6)</strong></p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcp-options client-id &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcp-options-client-id-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте идентификатор клиента DHCP для интерфейса, как указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2131.html"><strong>RFC 2131</strong></a>.</p>
+<p><code class="docutils literal notranslate">client-id</code> — это идентификатор, который клиент DHCP отправляет серверу DHCP для уникальной идентификации себя для назначения IP-адреса. По умолчанию клиент использует свой MAC-адрес. <code class="docutils literal notranslate">&lt;description&gt;</code> — это строка, заданная пользователем, которая будет отправлена серверу DHCP как идентификатор клиента DHCP.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcp-options client-id &#39;foo-bar&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcp-options host-name &lt;hostname&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcp-options-host-name-hostname" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте конкретное имя хоста для интерфейса.</strong></p>
+<p>Вместо реального имени хоста клиент DHCP будет отправлять конкретное имя хоста серверу DHCP при запросе IP-адреса.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcp-options host-name &#39;VyOS&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcp-options vendor-class-id &lt;vendor-id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcp-options-vendor-class-id-vendor-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте клиент DHCP на включение идентификатора класса поставщика в свои запросы на этом интерфейсе.</strong></p>
+<p>Идентификатор класса поставщика — это строка байтов, специфичная для поставщика, которая позволяет серверу DHCP идентифицировать устройство и, в некоторых случаях, предоставить опции конфигурации.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcp-options vendor-class-id &#39;VyOS&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcp-options no-default-route
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcp-options-no-default-route" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте клиента DHCP на получение IP-адреса, но игнорирование любого шлюза по умолчанию, предоставляемого сервером DHCP на этом интерфейсе.</strong></p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcp-options no-default-route
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcp-options default-route-distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcp-options-default-route-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте расстояние для маршрута по умолчанию, полученного от сервера DHCP на этом интерфейсе.</strong></p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcp-options default-route-distance 220
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcp-options reject &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcp-options-reject-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте клиента DHCP на отказ от конкретного IP-адреса или диапазона IP-адресов от сервера DHCP на этом интерфейсе.</strong></p>
+<p>Это полезно, когда модем назначает локальный IP-адрес при запуске. Чтобы отклонить несколько адресов, выполните эту команду несколько раз с разными значениями. Вы можете отклонять отдельные адреса (192.168.100.1) или целые подсети (192.168.100.0/24).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcp-options reject 192.168.100.0/24
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcp-options user-class &lt;string&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcp-options-user-class-string" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте клиента DHCP на отправку определенного идентификатора класса пользователя в свои запросы на этом интерфейсе.</strong></p>
+<p>Сервер DHCP может интерпретировать этот идентификатор и предоставить соответствующие опции конфигурации (например, маршруты по умолчанию). Значение класса пользователя обычно группирует клиентов DHCP с похожими потребностями в конфигурации (например, сотрудники, гости или принтеры).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcp-options user-class VyOS
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options duid &lt;duid&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-duid-duid" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте определенный</strong> <abbr title="DHCP Unique Identifier">DUID</abbr> <strong>для клиента DHCPv6 на этом интерфейсе.</strong></p>
+<p>DUID — это идентификатор, используемый клиентом DHCPv6 для получения IPv6-адреса от сервера DHCPv6. Он состоит из 2-байтового поля типа, за которым следует переменная часть идентификатора длиной до 128 байт. Формат части идентификатора зависит от типа DUID:</p>
+<ul class="simple">
+<li><p><strong>DUID-LLT:</strong> Самый распространенный тип, который включает тип оборудования, временную метку и MAC-адрес.</p></li>
+<li><p><strong>DUID-EN:</strong> Основан на номере предприятия поставщика и уникальном идентификаторе, назначенном поставщиком.</p></li>
+<li><p><strong>DUID-LL:</strong> Включает только MAC-адрес.</p></li>
+</ul>
+<p>Сервер DHCP сопоставляет DUID с базой данных и предоставляет информацию о конфигурации (например, адрес, срок аренды, DNS-серверы и т.д.) клиенту DHCP.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 duid &#39;0e:00:00:01:00:01:27:71:db:f0:00:50:56:bf:c5:6d&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options no-release
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-no-release" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте клиент DHCP не отправлять сообщение о выпуске, когда он прекращает работу на этом интерфейсе.</strong></p>
+<p>Это помогает сохранить назначенный адрес или префикс.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcpv6-options no-release
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options parameters-only
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-parameters-only" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Включите режим состоятельного клиента DHCPv6 на этом интерфейсе.</strong></p>
+<p>В состоянии без состояния клиент DHCPv6 запрашивает только параметры конфигурации без состояния у сервера DHCP (например, адреса серверов DNS). Он не запрашивает состоятельную конфигурацию, например, IPv6-адреса или префиксы.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcpv6-options parameters-only
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options rapid-commit
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-rapid-commit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Включите быстрое подтверждение DHCPv6 на этом интерфейсе.</strong></p>
+<p>При включении клиент и сервер пропускают шаги согласования (Advertise и Request), завершая процесс конфигурации DHCPv6 всего за два сообщения (Solicit и окончательный Reply).</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcpv6-options rapid-commit
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options temporary
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-temporary" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте клиента DHCPv6 на запрос временного IPv6-адреса на этом интерфейсе.</strong></p>
+<p>При настройке клиент DHCP не формирует партнерство Identity Association for Non-temporary Addresses (IA_NA). Следовательно, он получает только временный IPv6-адрес и не получает постоянный.</p>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcpv6-options temporary
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>DHCPv6 Prefix Delegation (PD)</strong></p>
+<p>VyOS поддерживает DHCPv6 Prefix Delegation (DHCPv6-PD), как описано в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3633.html"><strong>RFC 3633</strong></a>.
+DHCPv6-PD поддерживается большинством провайдеров, предоставляющих native IPv6 для потребителей на фиксированных сетях.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options pd &lt;id&gt; length &lt;length&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-pd-id-length-length" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте определенную длину префикса для запросов DHCPv6-PD на этом интерфейсе.</strong></p>
+<p>Некоторые провайдеры по умолчанию предоставляют только /64 префикс. Используйте эту команду, чтобы запросить другой размер префикса для конкретного запроса DHCPv6-PD, варьируясь от /32 (если разрешено вашим провайдером) до /64. &lt;id&gt; — это уникальный идентификатор для запроса DHCPv6-PD.</p>
+<p>Значение по умолчанию — 64.</p>
+<p>Чтобы запросить префикс /56 от вашего провайдера, используйте:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcpv6-options pd 0 length 56
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options pd &lt;id&gt; interface &lt;delegatee&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-pd-id-interface-delegatee-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте идентификатор интерфейса IPv6 (часть хоста) для делегированного интерфейса.</strong></p>
+<p>Значение должно быть десятичным целым числом. Оно добавляется к делегированному префиксу и конфигурируемому <abbr title="Site-Level Aggregation ID">SLA ID</abbr>, чтобы образовать окончательный IPv6-адрес.</p>
+<p>По умолчанию часть хоста генерируется на основе MAC-адреса родительского интерфейса (в формате EUI-64).</p>
+<blockquote>
+<div></div></blockquote>
+<p><strong>Пример:</strong></p>
+<p>Если /64 префикс делегирован интерфейсу eth8, и вы настраиваете часть хоста как 65535, то результатом будет IPv6-адрес, оканчивающийся на ::ffff, так как 65535 соответствует ffff в шестнадцатеричном виде.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcpv6-options pd 0 interface eth8 address 65534
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; dhcpv6-options pd &lt;id&gt; interface &lt;delegatee&gt; sla-id &lt;id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcpv6-options-pd-id-interface-delegatee-sla-id-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте</strong> <abbr title="Site-Level Aggregation ID">SLA ID</abbr> <strong>для делегированного интерфейса.</strong></p>
+<p>Значение должно быть десятичным целым числом больше 0 и помещаться в длину SLA ID. Оно преобразуется в шестнадцатеричное и добавляется к делегированному префиксу, чтобы образовать конкретный подсетевой префикс для делегированного интерфейса.</p>
+<p><strong>Пример:</strong></p>
+<p>Если SLA ID равен 1, а делегированный префикс — <code class="docutils literal notranslate">2001:db8:ffff::/48</code>, то подсетевой префикс для делегированного интерфейса будет <code class="docutils literal notranslate">2001:db8:ffff:1::/64</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcpv6-options pd 0 interface eth8 sla-id 1
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="macsec-options">
+<h3>Параметры MACsec</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; security cipher &lt;gcm-aes-128|gcm-aes-256&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-security-cipher-gcm-aes-128-gcm-aes-256" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте набор шифров для интерфейса MACsec.</strong></p>
+<p>Этот параметр конфигурации обязателен.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces macsec &lt;interface&gt; security encrypt
+<a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-security-encrypt" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Включите шифрование на интерфейсе MACsec.</strong></p>
+<p>По умолчанию интерфейсы MACsec0
+</code> </span> </code>;</code:</code="http://="section="="code</section2.
+code>
+=":code</code>.</code:</code>code>29</code>code>code>
+code</code>
+   code</code><code>code</code></code</code:code</code</code</code</code</code:code</code</code</code</code</code</code>code></code>code</</</code</code</code>
+</code</code>0</code>
+code</code:</code</code</code>="="</code</code</code</code</code</code</code</code</code</section>
+code</code</code</code</code</code>
+code</code:</code</code</code</code</code</code</code</code</code:</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</</code</code</code</code</code</code</code</code</
+</
+0
+0code</code</code</code</code</code</code</code</code</code</code:code</code</code</code:</code:</code</code</code</code</codeode</code</code</code</codecode</code</code</code</0</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</0</code</code</code</code</code</code>code</code</code</code>code</code</code>code<code></code</code</code</code>
+</code</code></code</code</code</code>code</code</</code</code</</code></code>code>0</code</code>
+</code</code>
+code>code</code</code</code</code>code</code</code</code</code</code</code</code</</code>
+code</code</code</code</code><code>
+code>
+</code</code</code</code</code>
+code</code</code>
+code</code</code>
+code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code>code</code</code</code</code</code</code</code</code>code>code</code</code>code</code></code</code</code</code</code</code</code</code</code</code></code</code</code</code</code</code</code</code</code</code</code></code</code</code</code</code</code><code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</codecode</code</code</code</code</code</code</code</code</code</</code</code</code</code</code</code</code</code</</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code>code</code</code</code</code</code</code</code</code</code</code</code</code</code</code:</code</code</code</code</code</code</code</code</code><code>
+</code</code</code><code</code</code><code</code</code></code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code>code</code</code</code</code</code</code</code</code</code</code</0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code:</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</codecodeodecode</code</code</code</code</code</code</code</code</code</code</code></code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code>
+</code</code</code</code</code</code</code</code</code</code</codecode>
+code>
+</ode</code</code</code><code</code</code</code</code</code</code</code</code</code><code</code</code</code</code</code</code</code</code</code</0</code></code</code</code><code</code</code</code</code</code>code</code</</code</code
+code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code:title="code</code</code</code</code</code</code><code</code</code</code>
+code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code><code</code</code</code</code</code</code</0</code</code</code</code</code</code</code</code</code</code</0
+code</code</code</code</code</code</code</code
+code</code</code</code</code</code</code</code</code</code>
+code</code</</code</code</code</code</code</code</code</code</code</code</codecode</code</code</code</code</_code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</</0</code>
+code</code</code</code</code</code</code</code</code><br0</code</code><code</code</code><code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code</code<br>
+code</code</code</code</code><code</code</code><code</code</code</code</code</code</code</code</code</code>oltage>
+code><code</code</code><code</code>
+code</code</code</code</code</code

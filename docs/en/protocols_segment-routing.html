@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="segment-routing">
+<h1>Segment Routing</h1>
+<p><abbr title="Segment Routing">SR</abbr> is a network architecture similar to source
+routing. The ingress router attaches a list of segments, known as
+<abbr title="Segment Identifiers">SIDs</abbr>, to each packet as it enters the network.</p>
+<p>The SID list explicitly defines the path the packet will follow. At each
+node, the router reads the first SID, executes its forwarding instruction,
+and typically removes it so the next node can process the subsequent SID.</p>
+<p>SR relies on <abbr title="Interior Gateway Protocols">IGPs</abbr> such as IS-IS or OSPF
+to advertise SIDs across the network.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SR defines a control plane architecture and can be applied to existing
+MPLS-based data planes. In MPLS networks, segments are encoded as MPLS
+labels and applied at the ingress router. These labels are then
+distributed across the routing domain by IGPs such as IS-IS (as described
+in <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc8667">RFC 8667</a>) or OSPF.</p>
+<p>SR for the MPLS data plane supports IPv4, IPv6, and
+<abbr title="Equal-Cost Multi-Path">ECMP</abbr>, and has been tested with Cisco and
+Juniper routers. However, this deployment is still experimental for FRR.</p>
+</div>
+<section id="is-is-sr-configuration">
+<h2>IS-IS SR configuration</h2>
+<p>Use the following commands to enable SR on IS-IS.</p>
+<p>Known limitations:</p>
+<ul class="simple">
+<li><p>No support for level redistribution (L1 to L2 or L2 to L1).</p></li>
+<li><p>No support for <abbr title="Binding SID">BSID</abbr>.</p></li>
+<li><p>Only a single <abbr title="Segment Routing Global Block">SRGB</abbr> and the default
+<abbr title="Shortest Path First">SPF</abbr> algorithm are supported.</p></li>
+</ul>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis segment-routing global-block high-label-value &lt;16-1048575&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-global-block-high-label-value-16-1048575" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the upper bound of the Segment Routing Global Block (SRGB).</strong></p>
+<p>The SRGB defines the range of MPLS labels reserved for mapping global
+segments, such as Prefix-SIDs, to FIB entries.</p>
+<p>The range cannot exceed 65535 labels.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing global-block high-label-value 23999
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis segment-routing global-block low-label-value &lt;16-1048575&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-global-block-low-label-value-16-1048575" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the lower bound of the Segment Routing Global Block (SRGB).</strong></p>
+<p>The SRGB defines the range of MPLS labels reserved for mapping global
+segments, such as Prefix-SIDs, to FIB entries.</p>
+<p>The range cannot exceed 65535 labels.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing global-block low-label-value 16000
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis segment-routing local-block high-label-value &lt;16-1048575&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-local-block-high-label-value-16-1048575" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the upper bound of the Segment Routing Local Block (SRLB).</strong></p>
+<p>The SRLB defines the range of MPLS labels that a router reserves for its
+local segments, such as Adjacency-SIDs.</p>
+<p>The range cannot exceed 65535 labels.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing local-block high-label-value 15999
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis segment-routing local-block low-label-value &lt;16-1048575&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-local-block-low-label-value-16-1048575" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the lower bound of the Segment Routing Local Block (SRLB).</strong></p>
+<p>The SRLB defines the range of MPLS labels that a router reserves for its
+local segments, such as Adjacency-SIDs.</p>
+<p>The range cannot exceed 65535 labels.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing local-block low-label-value 15000
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SR label blocks have the following configuration constraints:</p>
+<ul class="simple">
+<li><p>Both bounds (<code class="docutils literal notranslate">high-label-value</code> and <code class="docutils literal notranslate">low-label-value</code>) must be set.
+Removing either bound also removes the other.</p></li>
+<li><p><code class="docutils literal notranslate">local-block</code> requires <code class="docutils literal notranslate">global-block</code> to be configured.</p></li>
+<li><p>The SRGB and SRLB ranges must not overlap.</p></li>
+</ul>
+<p>Violating any of these causes the commit to fail.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis segment-routing maximum-label-depth &lt;1-16&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-maximum-label-depth-1-16" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the <abbr title="Maximum SID Depth">MSD</abbr> supported by the router.</strong></p>
+<p>The value depends on the MPLS data plane.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing maximum-label-depth 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis segment-routing prefix &lt;address&gt; index value &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-prefix-address-index-value-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a Prefix-SID with an index value for the specified IP prefix.</strong></p>
+<p>A Prefix-SID is a Segment Identifier associated with an IP prefix and
+distributed by the IGP (IS-IS).</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing prefix 192.0.2.1/32 index value 1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis segment-routing prefix &lt;address&gt; index &lt;no-php-flag | explicit-null&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-prefix-address-index-no-php-flag-explicit-null" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a label processing flag for the indexed Prefix-SID associated
+with the specified IP prefix:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">no-php-flag</code>: Requests the upstream neighbor not to pop the Prefix-SID
+label before forwarding the packet.</p></li>
+<li><p><code class="docutils literal notranslate">explicit-null</code>: Requests that the upstream neighbor forwards the packet
+with the Explicit-Null label.</p></li>
+</ul>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing prefix 192.0.2.1/32 index no-php-flag
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis segment-routing prefix &lt;address&gt; absolute value &lt;16-1048575&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-prefix-address-absolute-value-16-1048575" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a Prefix-SID with an absolute value for the specified IP
+prefix</strong></p>
+<p>A Prefix-SID is a Segment Identifier associated with an IP prefix and
+distributed by the IGP (IS-IS).</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing prefix 192.0.2.1/32 absolute value 16001
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols isis segment-routing prefix &lt;address&gt; absolute &lt;no-php-flag | explicit-null&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-prefix-address-absolute-no-php-flag-explicit-null" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a label processing flag for the absolute Prefix-SID associated
+with the specified IP prefix:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">no-php-flag</code>: Requests the upstream neighbor not to pop the Prefix-SID
+label before forwarding the packet.</p></li>
+<li><p><code class="docutils literal notranslate">explicit-null</code>: Requests that the upstream neighbor forwards the packet
+with the Explicit-Null label.</p></li>
+</ul>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing prefix 192.0.2.1/32 absolute no-php-flag
+</pre></div>
+</div>
+<section id="operational-commands">
+<h3>Operational commands</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show isis segment-routing node
+<a class="cmdlink" href="#opcmd-show-isis-segment-routing-node" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p><strong>Show all learned SR nodes.</strong></p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show isis route prefix-sid
+<a class="cmdlink" href="#opcmd-show-isis-route-prefix-sid" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p><strong>Show all learned Prefix-SIDs and their MPLS labels.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For more information, see <a class="reference internal" href="isis.html#isis">IS-IS</a>.</p>
+</div>
+</section>
+</section>
+<section id="ospf-sr-configuration">
+<h2>OSPF SR configuration</h2>
+<p>Use the following commands to enable SR on OSPF.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf parameters opaque-lsa
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-parameters-opaque-lsa" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable Opaque <abbr title="Link State Advertisement">LSA</abbr>
+(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc2370">RFC 2370</a>) in OSPF.</strong></p>
+<p>Opaque LSAs are required to transport MPLS labels via OSPF.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospf parameters opaque-lsa
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf segment-routing global-block high-label-value &lt;16-1048575&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-segment-routing-global-block-high-label-value-16-1048575" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the upper bound of the Segment Routing Global Block (SRGB).</strong></p>
+<p>The SRGB defines the range of MPLS labels reserved for mapping Prefix-SIDs
+to FIB entries.</p>
+<p>The range cannot exceed 65535 labels.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospf segment-routing global-block high-label-value 23999
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf segment-routing global-block low-label-value &lt;16-1048575&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-segment-routing-global-block-low-label-value-16-1048575" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the lower bound of the Segment Routing Global Block (SRGB).</strong></p>
+<p>The SRGB defines the range of MPLS labels reserved for mapping Prefix-SIDs
+to FIB entries.</p>
+<p>The range cannot exceed 65535 labels.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospf segment-routing global-block low-label-value 16000
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf segment-routing local-block high-label-value &lt;16-1048575&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-segment-routing-local-block-high-label-value-16-1048575" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the upper bound of the Segment Routing Local Block (SRLB).</strong></p>
+<p>The SRLB defines the range of MPLS labels that a router reserves for its
+local segments, such as Adjacency-SIDs.</p>
+<p>The range cannot exceed 65535 labels.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospf segment-routing local-block high-label-value 15999
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf segment-routing local-block low-label-value &lt;16-1048575&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-segment-routing-local-block-low-label-value-16-1048575" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the lower bound of the Segment Routing Local Block (SRLB).</strong></p>
+<p>The SRLB defines the range of MPLS labels that a router reserves for its
+local segments, such as Adjacency-SIDs.</p>
+<p>The range cannot exceed 65535 labels.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospf segment-routing local-block low-label-value 15000
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SR label blocks have the following configuration constraints:</p>
+<ul class="simple">
+<li><p>Both bounds (<code class="docutils literal notranslate">high-label-value</code> and <code class="docutils literal notranslate">low-label-value</code>) must be set.
+Removing either bound also removes the other.</p></li>
+<li><p><code class="docutils literal notranslate">local-block</code> requires <code class="docutils literal notranslate">global-block</code> to be configured.</p></li>
+<li><p>The SRGB and SRLB ranges must not overlap.</p></li>
+</ul>
+<p>Violating any of these causes the commit to fail.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf segment-routing maximum-label-depth &lt;1-16&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-segment-routing-maximum-label-depth-1-16" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the <abbr title="Maximum SID Depth">MSD</abbr> supported by the router.</strong></p>
+<p>The value depends on the MPLS data plane.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospf segment-routing maximum-label-depth 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf segment-routing prefix &lt;address&gt; index value &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-segment-routing-prefix-address-index-value-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a Prefix-SID for the specified IP prefix.</strong></p>
+<p>A Prefix-SID is a Segment Identifier associated with an IP prefix and
+distributed by the IGP (OSPF).</p>
+<p>Prefix-SIDs are unique within an SR domain.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospf segment-routing prefix 192.0.2.1/32 index value 1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf segment-routing prefix &lt;address&gt; index &lt;no-php-flag | explicit-null&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-segment-routing-prefix-address-index-no-php-flag-explicit-null" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a label processing flag for the Prefix-SID associated with the
+specified IP prefix:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">no-php-flag</code>: Requests the upstream neighbor not to pop the Prefix-SID
+label before forwarding the packet.</p></li>
+<li><p><code class="docutils literal notranslate">explicit-null</code>: Requests that the upstream neighbor forwards the packet
+with the Explicit-Null label.</p></li>
+</ul>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospf segment-routing prefix 192.0.2.1/32 index no-php-flag
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For more information, see ospf.</p>
+</div>
+</section>
+<section id="examples">
+<h2>Examples</h2>
+<section id="enable-sr-on-is-is-experimental">
+<h3>Enable SR on IS-IS (experimental)</h3>
+<p>The following example demonstrates a basic two-node SR topology using IS-IS.</p>
+<p><strong>Node 1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address &#39;198.51.100.1/32&#39;
+set interfaces ethernet eth1 address &#39;192.0.2.1/24&#39;
+
+set protocols isis interface eth1
+set protocols isis interface lo
+set protocols isis net &#39;49.0001.1980.5110.0001.00&#39;
+set protocols isis segment-routing global-block high-label-value &#39;599&#39;
+set protocols isis segment-routing global-block low-label-value &#39;550&#39;
+set protocols isis segment-routing prefix 198.51.100.1/32 index value &#39;1&#39;
+set protocols isis segment-routing prefix 198.51.100.1/32 index explicit-null
+set protocols mpls interface &#39;eth1&#39;
+</pre></div>
+</div>
+<p><strong>Node 2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address &#39;198.51.100.2/32&#39;
+set interfaces ethernet eth1 address &#39;192.0.2.2/24&#39;
+
+set protocols isis interface eth1
+set protocols isis interface lo
+set protocols isis net &#39;49.0001.1980.5110.0002.00&#39;
+set protocols isis segment-routing global-block high-label-value &#39;599&#39;
+set protocols isis segment-routing global-block low-label-value &#39;550&#39;
+set protocols isis segment-routing prefix 198.51.100.2/32 index value &#39;2&#39;
+set protocols isis segment-routing prefix 198.51.100.2/32 index explicit-null
+set protocols mpls interface &#39;eth1&#39;
+</pre></div>
+</div>
+<p>The following outputs show that MPLS Segment Routing is enabled and that
+each router has learned MPLS labels for the other router’s loopback:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show mpls table
+ Inbound Label  Type        Nexthop                Outbound Label
+ ----------------------------------------------------------------------
+ 552            SR (IS-IS)  192.0.2.2              IPv4 Explicit Null     &lt;-- Node-2 loopback learned on Node-1
+ 15000          SR (IS-IS)  192.0.2.2              implicit-null
+ 15001          SR (IS-IS)  fe80::e87:6cff:fe09:1  implicit-null
+ 15002          SR (IS-IS)  192.0.2.2              implicit-null
+ 15003          SR (IS-IS)  fe80::e87:6cff:fe09:1  implicit-null
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Node-2@vyos:~$ show mpls table
+ Inbound Label  Type        Nexthop               Outbound Label
+ ---------------------------------------------------------------------
+ 551            SR (IS-IS)  192.0.2.1             IPv4 Explicit Null     &lt;-- Node-1 loopback learned on Node-2
+ 15000          SR (IS-IS)  192.0.2.1             implicit-null
+ 15001          SR (IS-IS)  fe80::e33:2ff:fe80:1  implicit-null
+ 15002          SR (IS-IS)  192.0.2.1             implicit-null
+ 15003          SR (IS-IS)  fe80::e33:2ff:fe80:1  implicit-null
+</pre></div>
+</div>
+<p>The following outputs show MPLS Segment Routing label assignments for IP
+routes:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show ip route isis
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+I   192.0.2.0/24 [115/20] via 192.0.2.2, eth1 inactive, weight 1, 00:07:48
+I&gt;* 198.51.100.2/32 [115/20] via 192.0.2.2, eth1, label IPv4 Explicit Null, weight 1, 00:03:39
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Node-2@vyos:~$ show ip route isis
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+I   192.0.2.0/24 [115/20] via 192.0.2.1, eth1 inactive, weight 1, 00:07:46
+I&gt;* 198.51.100.1/32 [115/20] via 192.0.2.1, eth1, label IPv4 Explicit Null, weight 1, 00:03:43
+</pre></div>
+</div>
+</section>
+<section id="enable-sr-on-ospf-experimental">
+<h3>Enable SR on OSPF (experimental)</h3>
+<p>The following example demonstrates a basic two-node SR topology using OSPF.</p>
+<p><strong>Node 1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address 198.51.100.1/32
+set interfaces ethernet eth0 address 192.0.2.1/24
+set protocols ospf area 0 network &#39;192.0.2.0/24&#39;
+set protocols ospf area 0 network &#39;198.51.100.1/32&#39;
+set protocols ospf parameters opaque-lsa
+set protocols ospf parameters router-id &#39;198.51.100.1&#39;
+set protocols ospf segment-routing global-block high-label-value &#39;1100&#39;
+set protocols ospf segment-routing global-block low-label-value &#39;1000&#39;
+set protocols ospf segment-routing prefix 198.51.100.1/32 index explicit-null
+set protocols ospf segment-routing prefix 198.51.100.1/32 index value &#39;1&#39;
+</pre></div>
+</div>
+<p><strong>Node 2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address 198.51.100.2/32
+set interfaces ethernet eth0 address 192.0.2.2/24
+set protocols ospf area 0 network &#39;192.0.2.0/24&#39;
+set protocols ospf area 0 network &#39;198.51.100.2/32&#39;
+set protocols ospf parameters opaque-lsa
+set protocols ospf parameters router-id &#39;198.51.100.2&#39;
+set protocols ospf segment-routing global-block high-label-value &#39;1100&#39;
+set protocols ospf segment-routing global-block low-label-value &#39;1000&#39;
+set protocols ospf segment-routing prefix 198.51.100.2/32 index explicit-null
+set protocols ospf segment-routing prefix 198.51.100.2/32 index value &#39;2&#39;
+</pre></div>
+</div>
+<p>The following outputs show MPLS Segment Routing label assignments:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show mpls table
+ Inbound Label  Type       Nexthop      Outbound Label
+ -----------------------------------------------------------
+ 1002           SR (OSPF)  192.0.2.2    IPv4 Explicit Null  &lt;-- Node-2 loopback learned on Node-1
+ 15000          SR (OSPF)  192.0.2.2    implicit-null
+ 15001          SR (OSPF)  192.0.2.2    implicit-null
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Node-2@vyos:~$ show mpls table
+ Inbound Label  Type       Nexthop      Outbound Label
+ -----------------------------------------------------------
+ 1001           SR (OSPF)  192.0.2.1    IPv4 Explicit Null  &lt;-- Node-1 loopback learned on Node-2
+ 15000          SR (OSPF)  192.0.2.1    implicit-null
+ 15001          SR (OSPF)  192.0.2.1    implicit-null
+</pre></div>
+</div>
+<p>The following outputs show MPLS Segment Routing label assignments for IP
+routes:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show ip route ospf
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+O   198.51.100.1/32 [110/0] is directly connected, lo, weight 1, 00:03:43
+O&gt;* 198.51.100.2/32 [110/1] via 192.0.2.2, eth0, label IPv4 Explicit Null, weight 1, 00:03:32
+O   192.0.2.0/24 [110/1] is directly connected, eth0, weight 1, 00:03:43
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>Node-2@vyos:~$ show ip route ospf
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
+       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+O&gt;* 198.51.100.1/32 [110/1] via 192.0.2.1, eth0, label IPv4 Explicit Null, weight 1, 00:03:36
+O   198.51.100.2/32 [110/0] is directly connected, lo, weight 1, 00:03:51
+O   192.0.2.0/24 [110/1] is directly connected, eth0, weight 1, 00:03:51
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

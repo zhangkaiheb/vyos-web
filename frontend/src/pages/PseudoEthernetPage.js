@@ -1,44 +1,20 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { useConfigStore } from '/src/stores/config.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import { api, interfaceApi } from '/src/api/index.js';
-
-const COLUMNS = [
-  { key: 'name', title: '接口名称', width: 120 },
-  { key: 'description', title: '描述', width: 160 },
-  { key: 'source_interface', title: '源接口', width: 120 },
-  { key: 'mode', title: '模式', width: 120 },
-  { key: 'mac', title: 'MAC 地址', width: 140 },
-  { key: 'mtu', title: 'MTU', width: 80 },
-  { key: 'disable', title: '禁用', width: 80 },
-  { key: 'actions', title: '操作', width: 100 },
-];
-
-const MODE_OPTIONS = [
-  { value: 'private', label: 'private (私有 - 默认)' },
-  { value: 'vepa', label: 'vepa (VEPA 反射中继)' },
-  { value: 'bridge', label: 'bridge (桥接)' },
-  { value: 'passthru', label: 'passthru (直通)' },
-];
-
-const SOURCE_VALIDATION_OPTIONS = [
-  { value: 'strict', label: 'strict (严格)' },
-  { value: 'loose', label: 'loose (宽松)' },
-  { value: 'disable', label: 'disable (禁用)' },
-];
-
-const ACCEPT_DAD_OPTIONS = [
-  { value: '0', label: '0 (禁用 DAD)' },
-  { value: '1', label: '1 (启用 DAD - 默认)' },
-  { value: '2', label: '2 (启用 DAD - MAC 重复时禁用 IPv6)' },
-];
+import { showError } from '/src/components/Layout/ErrorDisplay.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 export default defineComponent({
   name: 'PseudoEthernetPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const pseudoEthernets = ref([]);
     const modalVisible = ref(false);
@@ -46,82 +22,114 @@ export default defineComponent({
     const interfaceOptions = ref([]);
     const activeTab = ref('basic');
     const selectedItems = ref([]);
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
+
+    const COLUMNS = computed(() => [
+      { key: 'name', title: t('pseudoEthernet.columns.name'), width: 120 },
+      { key: 'description', title: t('pseudoEthernet.columns.description'), width: 160 },
+      { key: 'source_interface', title: t('pseudoEthernet.columns.sourceInterface'), width: 120 },
+      { key: 'mode', title: t('pseudoEthernet.columns.mode'), width: 120 },
+      { key: 'mac', title: t('pseudoEthernet.columns.mac'), width: 140 },
+      { key: 'mtu', title: t('pseudoEthernet.columns.mtu'), width: 80 },
+      { key: 'disable', title: t('pseudoEthernet.columns.disable'), width: 80 },
+      { key: 'actions', title: t('pseudoEthernet.columns.actions'), width: 100 },
+    ]);
+
+    const MODE_OPTIONS = computed(() => [
+      { value: 'private', label: t('pseudoEthernet.modeOptions.private') },
+      { value: 'vepa', label: t('pseudoEthernet.modeOptions.vepa') },
+      { value: 'bridge', label: t('pseudoEthernet.modeOptions.bridge') },
+      { value: 'passthru', label: t('pseudoEthernet.modeOptions.passthru') },
+    ]);
+
+    const SOURCE_VALIDATION_OPTIONS = computed(() => [
+      { value: 'strict', label: t('pseudoEthernet.sourceValidationOptions.strict') },
+      { value: 'loose', label: t('pseudoEthernet.sourceValidationOptions.loose') },
+      { value: 'disable', label: t('pseudoEthernet.sourceValidationOptions.disable') },
+    ]);
+
+    const ACCEPT_DAD_OPTIONS = computed(() => [
+      { value: '0', label: t('pseudoEthernet.acceptDadOptions.0') },
+      { value: '1', label: t('pseudoEthernet.acceptDadOptions.1') },
+      { value: '2', label: t('pseudoEthernet.acceptDadOptions.2') },
+    ]);
 
     const basicSchema = computed(() => [
-      { key: 'name', title: '接口名称', type: 'text', required: true, placeholder: '如 peth0, peth1', help: '格式: pethN' },
-      { key: 'description', title: '描述', type: 'text', placeholder: '接口描述' },
-      { key: 'address', title: 'IP 地址', type: 'textarea', placeholder: '每行一个 IPv4/IPv6 地址或 CIDR', help: '接口 IP 地址 (支持多行)' },
-      { key: 'source_interface', title: '源接口', type: 'select', options: interfaceOptions.value, placeholder: '选择物理接口', help: '流量通过的物理接口' },
-      { key: 'mode', title: '模式', type: 'select', options: MODE_OPTIONS, help: '接收模式 (默认: private)' },
-      { key: 'mac', title: 'MAC 地址', type: 'text', placeholder: '如 00:11:22:33:44:55', help: 'Media Access Control 地址' },
-      { key: 'mtu', title: 'MTU', type: 'number', min: 68, max: 16000, placeholder: '68-16000', help: '最大传输单元 (默认: 1500)' },
-      { key: 'disable_link_detect', title: '忽略链路状态', type: 'checkbox', help: '忽略链路状态变化' },
-      { key: 'disable', title: '禁用接口', type: 'checkbox', help: '管理性禁用接口' },
+      { key: 'name', title: t('pseudoEthernet.basic.name'), type: 'text', required: true, placeholder: t('pseudoEthernet.basic.namePlaceholder'), help: t('pseudoEthernet.basic.nameHelp') },
+      { key: 'description', title: t('pseudoEthernet.basic.description'), type: 'text', placeholder: t('pseudoEthernet.basic.descriptionPlaceholder') },
+      { key: 'address', title: t('pseudoEthernet.basic.address'), type: 'textarea', placeholder: t('pseudoEthernet.basic.addressPlaceholder'), help: t('pseudoEthernet.basic.addressHelp') },
+      { key: 'source_interface', title: t('pseudoEthernet.basic.sourceInterface'), type: 'select', options: interfaceOptions.value, placeholder: t('pseudoEthernet.basic.sourceInterfacePlaceholder'), help: t('pseudoEthernet.basic.sourceInterfaceHelp') },
+      { key: 'mode', title: t('pseudoEthernet.basic.mode'), type: 'select', options: MODE_OPTIONS.value, help: t('pseudoEthernet.basic.modeHelp') },
+      { key: 'mac', title: t('pseudoEthernet.basic.mac'), type: 'text', placeholder: t('pseudoEthernet.basic.macPlaceholder'), help: t('pseudoEthernet.basic.macHelp') },
+      { key: 'mtu', title: t('pseudoEthernet.basic.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('pseudoEthernet.basic.mtuPlaceholder'), help: t('pseudoEthernet.basic.mtuHelp') },
+      { key: 'disable_link_detect', title: t('pseudoEthernet.basic.disableLinkDetect'), type: 'checkbox', help: t('pseudoEthernet.basic.disableLinkDetectHelp') },
+      { key: 'disable', title: t('pseudoEthernet.basic.disable'), type: 'checkbox', help: t('pseudoEthernet.basic.disableHelp') },
     ]);
 
     const ipSchema = computed(() => [
-      { key: 'ip_adjust_mss', title: '调整 MSS', type: 'text', placeholder: 'clamp-mss-to-pmtu 或 536-65535', help: 'TCP MSS 值' },
-      { key: 'ip_arp_cache_timeout', title: 'ARP 缓存超时', type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: 'ARP 缓存条目超时 (秒, 默认: 30)' },
-      { key: 'ip_disable_arp_filter', title: '禁用 ARP 过滤', type: 'checkbox', help: '禁用 ARP 过滤' },
-      { key: 'ip_disable_forwarding', title: '禁用转发', type: 'checkbox', help: '禁用 IP 转发' },
-      { key: 'ip_enable_arp_accept', title: '启用 ARP 接受', type: 'checkbox', help: '启用 ARP 接受' },
-      { key: 'ip_enable_arp_announce', title: '启用 ARP 通告', type: 'checkbox', help: '启用 ARP 通告' },
-      { key: 'ip_enable_arp_ignore', title: '启用 ARP 忽略', type: 'checkbox', help: '启用 ARP 忽略' },
-      { key: 'ip_enable_directed_broadcast', title: '启用定向广播', type: 'checkbox', help: '启用定向广播转发' },
-      { key: 'ip_enable_proxy_arp', title: '启用代理 ARP', type: 'checkbox', help: '启用代理 ARP' },
-      { key: 'ip_proxy_arp_pvlan', title: '私有 VLAN 代理 ARP', type: 'checkbox', help: '启用私有 VLAN 代理 ARP' },
-      { key: 'ip_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
+      { key: 'ip_adjust_mss', title: t('pseudoEthernet.ip.adjustMss'), type: 'text', placeholder: t('pseudoEthernet.ip.adjustMssPlaceholder'), help: t('pseudoEthernet.ip.adjustMssHelp') },
+      { key: 'ip_arp_cache_timeout', title: t('pseudoEthernet.ip.arpCacheTimeout'), type: 'number', min: 1, max: 86400, placeholder: t('pseudoEthernet.ip.arpCacheTimeoutPlaceholder'), help: t('pseudoEthernet.ip.arpCacheTimeoutHelp') },
+      { key: 'ip_disable_arp_filter', title: t('pseudoEthernet.ip.disableArpFilter'), type: 'checkbox', help: t('pseudoEthernet.ip.disableArpFilterHelp') },
+      { key: 'ip_disable_forwarding', title: t('pseudoEthernet.ip.disableForwarding'), type: 'checkbox', help: t('pseudoEthernet.ip.disableForwardingHelp') },
+      { key: 'ip_enable_arp_accept', title: t('pseudoEthernet.ip.enableArpAccept'), type: 'checkbox', help: t('pseudoEthernet.ip.enableArpAcceptHelp') },
+      { key: 'ip_enable_arp_announce', title: t('pseudoEthernet.ip.enableArpAnnounce'), type: 'checkbox', help: t('pseudoEthernet.ip.enableArpAnnounceHelp') },
+      { key: 'ip_enable_arp_ignore', title: t('pseudoEthernet.ip.enableArpIgnore'), type: 'checkbox', help: t('pseudoEthernet.ip.enableArpIgnoreHelp') },
+      { key: 'ip_enable_directed_broadcast', title: t('pseudoEthernet.ip.enableDirectedBroadcast'), type: 'checkbox', help: t('pseudoEthernet.ip.enableDirectedBroadcastHelp') },
+      { key: 'ip_enable_proxy_arp', title: t('pseudoEthernet.ip.enableProxyArp'), type: 'checkbox', help: t('pseudoEthernet.ip.enableProxyArpHelp') },
+      { key: 'ip_proxy_arp_pvlan', title: t('pseudoEthernet.ip.proxyArpPvlan'), type: 'checkbox', help: t('pseudoEthernet.ip.proxyArpPvlanHelp') },
+      { key: 'ip_source_validation', title: t('pseudoEthernet.ip.sourceValidation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS.value, placeholder: t('pseudoEthernet.ip.sourceValidationPlaceholder'), help: t('pseudoEthernet.ip.sourceValidationHelp') },
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: '接受 DAD', type: 'select', options: ACCEPT_DAD_OPTIONS, help: '重复地址检测 (默认: 1)' },
-      { key: 'ipv6_autoconf', title: '自动配置', type: 'checkbox', help: '使用 SLAAC 获取 IPv6 地址' },
-      { key: 'ipv6_eui64', title: 'EUI-64 前缀', type: 'text', placeholder: 'IPv6 前缀', help: '基于 MAC 的 EUI-64 地址前缀' },
-      { key: 'ipv6_interface_identifier', title: '接口标识符', type: 'text', placeholder: '::h:h:h:h', help: 'SLAAC 接口标识符' },
-      { key: 'ipv6_no_default_link_local', title: '无默认链路本地地址', type: 'checkbox', help: '移除默认链路本地地址' },
-      { key: 'ipv6_adjust_mss', title: '调整 MSS', type: 'text', placeholder: 'clamp-mss-to-pmtu 或 536-65535', help: 'TCP MSS 值' },
-      { key: 'ipv6_base_reachable_time', title: '基础可达时间', type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: '基础可达时间 (秒, 默认: 30)' },
-      { key: 'ipv6_disable_forwarding', title: '禁用转发', type: 'checkbox', help: '禁用 IPv6 转发' },
-      { key: 'ipv6_dup_addr_detect_transmits', title: 'DAD 传输次数', type: 'number', min: 0, max: 100, placeholder: '0-100', help: 'DAD 期间发送的 NS 消息数 (默认: 1, 0=禁用)' },
-      { key: 'ipv6_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
+      { key: 'ipv6_accept_dad', title: t('pseudoEthernet.ipv6.acceptDad'), type: 'select', options: ACCEPT_DAD_OPTIONS.value, help: t('pseudoEthernet.ipv6.acceptDadHelp') },
+      { key: 'ipv6_autoconf', title: t('pseudoEthernet.ipv6.autoconf'), type: 'checkbox', help: t('pseudoEthernet.ipv6.autoconfHelp') },
+      { key: 'ipv6_eui64', title: t('pseudoEthernet.ipv6.eui64'), type: 'text', placeholder: t('pseudoEthernet.ipv6.eui64Placeholder'), help: t('pseudoEthernet.ipv6.eui64Help') },
+      { key: 'ipv6_interface_identifier', title: t('pseudoEthernet.ipv6.interfaceIdentifier'), type: 'text', placeholder: t('pseudoEthernet.ipv6.interfaceIdentifierPlaceholder'), help: t('pseudoEthernet.ipv6.interfaceIdentifierHelp') },
+      { key: 'ipv6_no_default_link_local', title: t('pseudoEthernet.ipv6.noDefaultLinkLocal'), type: 'checkbox', help: t('pseudoEthernet.ipv6.noDefaultLinkLocalHelp') },
+      { key: 'ipv6_adjust_mss', title: t('pseudoEthernet.ipv6.adjustMss'), type: 'text', placeholder: t('pseudoEthernet.ipv6.adjustMssPlaceholder'), help: t('pseudoEthernet.ipv6.adjustMssHelp') },
+      { key: 'ipv6_base_reachable_time', title: t('pseudoEthernet.ipv6.baseReachableTime'), type: 'number', min: 1, max: 86400, placeholder: t('pseudoEthernet.ipv6.baseReachableTimePlaceholder'), help: t('pseudoEthernet.ipv6.baseReachableTimeHelp') },
+      { key: 'ipv6_disable_forwarding', title: t('pseudoEthernet.ipv6.disableForwarding'), type: 'checkbox', help: t('pseudoEthernet.ipv6.disableForwardingHelp') },
+      { key: 'ipv6_dup_addr_detect_transmits', title: t('pseudoEthernet.ipv6.dupAddrDetectTransmits'), type: 'number', min: 0, max: 100, placeholder: t('pseudoEthernet.ipv6.dupAddrDetectTransmitsPlaceholder'), help: t('pseudoEthernet.ipv6.dupAddrDetectTransmitsHelp') },
+      { key: 'ipv6_source_validation', title: t('pseudoEthernet.ipv6.sourceValidation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS.value, placeholder: t('pseudoEthernet.ipv6.sourceValidationPlaceholder'), help: t('pseudoEthernet.ipv6.sourceValidationHelp') },
     ]);
 
     const dhcpSchema = computed(() => [
-      { key: 'dhcp_client_id', title: '客户端 ID', type: 'text', placeholder: 'DHCP 选项字符串', help: '用于向 DHCP 服务器标识客户端' },
-      { key: 'dhcp_default_route_distance', title: '默认路由距离', type: 'number', min: 1, max: 255, placeholder: '1-255', help: '默认路由的距离 (默认: 210)' },
-      { key: 'dhcp_host_name', title: '主机名', type: 'text', placeholder: '主机名', help: '覆盖系统主机名' },
-      { key: 'dhcp_mtu', title: '使用 DHCP MTU', type: 'checkbox', help: '使用 DHCP 服务器提供的 MTU' },
-      { key: 'dhcp_no_default_route', title: '不安装默认路由', type: 'checkbox', help: '不安装默认路由' },
-      { key: 'dhcp_reject', title: '拒绝地址', type: 'textarea', placeholder: '每行一个 IP 或子网', help: '拒绝 DHCP 租约的地址' },
-      { key: 'dhcp_user_class', title: '用户类别', type: 'text', placeholder: 'DHCP 选项字符串', help: '用户可配置选项' },
-      { key: 'dhcp_vendor_class_id', title: '厂商类别 ID', type: 'text', placeholder: 'DHCP 选项字符串', help: '标识厂商客户端类型' },
+      { key: 'dhcp_client_id', title: t('pseudoEthernet.dhcp.clientId'), type: 'text', placeholder: t('pseudoEthernet.dhcp.clientIdPlaceholder'), help: t('pseudoEthernet.dhcp.clientIdHelp') },
+      { key: 'dhcp_default_route_distance', title: t('pseudoEthernet.dhcp.defaultRouteDistance'), type: 'number', min: 1, max: 255, placeholder: t('pseudoEthernet.dhcp.defaultRouteDistancePlaceholder'), help: t('pseudoEthernet.dhcp.defaultRouteDistanceHelp') },
+      { key: 'dhcp_host_name', title: t('pseudoEthernet.dhcp.hostName'), type: 'text', placeholder: t('pseudoEthernet.dhcp.hostNamePlaceholder'), help: t('pseudoEthernet.dhcp.hostNameHelp') },
+      { key: 'dhcp_mtu', title: t('pseudoEthernet.dhcp.mtu'), type: 'checkbox', help: t('pseudoEthernet.dhcp.mtuHelp') },
+      { key: 'dhcp_no_default_route', title: t('pseudoEthernet.dhcp.noDefaultRoute'), type: 'checkbox', help: t('pseudoEthernet.dhcp.noDefaultRouteHelp') },
+      { key: 'dhcp_reject', title: t('pseudoEthernet.dhcp.reject'), type: 'textarea', placeholder: t('pseudoEthernet.dhcp.rejectPlaceholder'), help: t('pseudoEthernet.dhcp.rejectHelp') },
+      { key: 'dhcp_user_class', title: t('pseudoEthernet.dhcp.userClass'), type: 'text', placeholder: t('pseudoEthernet.dhcp.userClassPlaceholder'), help: t('pseudoEthernet.dhcp.userClassHelp') },
+      { key: 'dhcp_vendor_class_id', title: t('pseudoEthernet.dhcp.vendorClassId'), type: 'text', placeholder: t('pseudoEthernet.dhcp.vendorClassIdPlaceholder'), help: t('pseudoEthernet.dhcp.vendorClassIdHelp') },
     ]);
 
     const dhcpv6Schema = computed(() => [
-      { key: 'dhcpv6_duid', title: 'DUID', type: 'text', placeholder: 'DHCP 唯一标识符', help: '客户端发送的 DUID' },
-      { key: 'dhcpv6_no_release', title: '不发送 Release', type: 'checkbox', help: '客户端退出时不发送 release 消息' },
-      { key: 'dhcpv6_no_request_dns', title: '不请求 DNS', type: 'checkbox', help: '不请求 DNS 服务器' },
-      { key: 'dhcpv6_no_request_domain_name', title: '不请求域名', type: 'checkbox', help: '不请求域名' },
-      { key: 'dhcpv6_parameters_only', title: '仅获取参数', type: 'checkbox', help: '仅获取配置参数，不获取地址' },
-      { key: 'dhcpv6_pd_instances', title: '前缀委派实例', type: 'textarea', placeholder: '每行一个: instance,interface,address,sla-id', help: '格式: 实例号,接口名,地址,SLA-ID (每行一个, 地址和 SLA-ID 可选)' },
-      { key: 'dhcpv6_pd_length', title: '前缀长度', type: 'number', min: 32, max: 64, placeholder: '32-64', help: '请求的 IPv6 前缀长度 (默认: 64)' },
-      { key: 'dhcpv6_rapid_commit', title: '快速提交', type: 'checkbox', help: '等待立即回复而非通告' },
-      { key: 'dhcpv6_temporary', title: '临时地址', type: 'checkbox', help: 'IPv6 临时地址' },
+      { key: 'dhcpv6_duid', title: t('pseudoEthernet.dhcpv6.duid'), type: 'text', placeholder: t('pseudoEthernet.dhcpv6.duidPlaceholder'), help: t('pseudoEthernet.dhcpv6.duidHelp') },
+      { key: 'dhcpv6_no_release', title: t('pseudoEthernet.dhcpv6.noRelease'), type: 'checkbox', help: t('pseudoEthernet.dhcpv6.noReleaseHelp') },
+      { key: 'dhcpv6_no_request_dns', title: t('pseudoEthernet.dhcpv6.noRequestDns'), type: 'checkbox', help: t('pseudoEthernet.dhcpv6.noRequestDnsHelp') },
+      { key: 'dhcpv6_no_request_domain_name', title: t('pseudoEthernet.dhcpv6.noRequestDomainName'), type: 'checkbox', help: t('pseudoEthernet.dhcpv6.noRequestDomainNameHelp') },
+      { key: 'dhcpv6_parameters_only', title: t('pseudoEthernet.dhcpv6.parametersOnly'), type: 'checkbox', help: t('pseudoEthernet.dhcpv6.parametersOnlyHelp') },
+      { key: 'dhcpv6_pd_instances', title: t('pseudoEthernet.dhcpv6.pdInstances'), type: 'textarea', placeholder: t('pseudoEthernet.dhcpv6.pdInstancesPlaceholder'), help: t('pseudoEthernet.dhcpv6.pdInstancesHelp') },
+      { key: 'dhcpv6_pd_length', title: t('pseudoEthernet.dhcpv6.pdLength'), type: 'number', min: 32, max: 64, placeholder: t('pseudoEthernet.dhcpv6.pdLengthPlaceholder'), help: t('pseudoEthernet.dhcpv6.pdLengthHelp') },
+      { key: 'dhcpv6_rapid_commit', title: t('pseudoEthernet.dhcpv6.rapidCommit'), type: 'checkbox', help: t('pseudoEthernet.dhcpv6.rapidCommitHelp') },
+      { key: 'dhcpv6_temporary', title: t('pseudoEthernet.dhcpv6.temporary'), type: 'checkbox', help: t('pseudoEthernet.dhcpv6.temporaryHelp') },
     ]);
 
     const vifSchema = computed(() => [
-      { key: 'vif', title: 'VLAN 子接口', type: 'textarea', placeholder: 'JSON 格式: {"10":{"description":"VLAN10","mtu":1500}}', help: '键为 VLAN ID (0-4094)，值为子接口配置' },
-      { key: 'vif_s', title: 'QinQ 子接口', type: 'textarea', placeholder: 'JSON 格式: {"10":{"vif":{"20":{"description":"S10.C20"}}}}', help: 'QinQ TAG-S 子接口 (S-VLAN ID 0-4094)' },
+      { key: 'vif', title: t('pseudoEthernet.vif.vif'), type: 'textarea', placeholder: t('pseudoEthernet.vif.vifPlaceholder'), help: t('pseudoEthernet.vif.vifHelp') },
+      { key: 'vif_s', title: t('pseudoEthernet.vif.vifS'), type: 'textarea', placeholder: t('pseudoEthernet.vif.vifSPlaceholder'), help: t('pseudoEthernet.vif.vifSHelp') },
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: '镜像出方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像出方向流量到目标接口' },
-      { key: 'mirror_ingress', title: '镜像入方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像入方向流量到目标接口' },
+      { key: 'mirror_egress', title: t('pseudoEthernet.mirror.egress'), type: 'select', options: interfaceOptions.value, placeholder: t('pseudoEthernet.mirror.egressPlaceholder'), help: t('pseudoEthernet.mirror.egressHelp') },
+      { key: 'mirror_ingress', title: t('pseudoEthernet.mirror.ingress'), type: 'select', options: interfaceOptions.value, placeholder: t('pseudoEthernet.mirror.ingressPlaceholder'), help: t('pseudoEthernet.mirror.ingressHelp') },
     ]);
 
     const otherSchema = computed(() => [
-      { key: 'redirect', title: '重定向目标', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '重定向入站数据包到目标接口' },
-      { key: 'vrf', title: 'VRF 实例', type: 'text', placeholder: 'VRF 实例名称', help: 'VRF 实例名称' },
+      { key: 'redirect', title: t('pseudoEthernet.other.redirect'), type: 'select', options: interfaceOptions.value, placeholder: t('pseudoEthernet.other.redirectPlaceholder'), help: t('pseudoEthernet.other.redirectHelp') },
+      { key: 'vrf', title: t('pseudoEthernet.other.vrf'), type: 'text', placeholder: t('pseudoEthernet.other.vrfPlaceholder'), help: t('pseudoEthernet.other.vrfHelp') },
     ]);
 
     const commandText = computed(() => {
@@ -243,19 +251,18 @@ export default defineComponent({
       if (m.redirect) lines.push(`set interfaces pseudo-ethernet ${name} redirect ${m.redirect}`);
       if (m.vrf) lines.push(`set interfaces pseudo-ethernet ${name} vrf ${m.vrf}`);
 
-      return lines.length ? lines.join('\n') : '# 未配置任何参数';
+      return lines.length ? lines.join('\n') : t('pseudoEthernet.messages.noConfig');
     });
 
     const modalTabs = computed(() => [
-      { key: 'basic', title: '基本配置' },
-      { key: 'ip', title: 'IPv4 参数' },
-      { key: 'ipv6', title: 'IPv6 参数' },
-      { key: 'dhcp', title: 'DHCP' },
-      { key: 'dhcpv6', title: 'DHCPv6' },
-      { key: 'vif', title: 'VLAN 子接口' },
-      { key: 'mirror', title: '流量镜像' },
-      { key: 'other', title: '其他' },
-      { key: 'command', title: '命令预览' },
+      { key: 'basic', title: t('pseudoEthernet.tabs.basic') },
+      { key: 'ip', title: t('pseudoEthernet.tabs.ip') },
+      { key: 'ipv6', title: t('pseudoEthernet.tabs.ipv6') },
+      { key: 'dhcp', title: t('pseudoEthernet.tabs.dhcp') },
+      { key: 'dhcpv6', title: t('pseudoEthernet.tabs.dhcpv6') },
+      { key: 'vif', title: t('pseudoEthernet.tabs.vif') },
+      { key: 'mirror', title: t('pseudoEthernet.tabs.mirror') },
+      { key: 'other', title: t('pseudoEthernet.tabs.other') },
     ]);
 
     function getDefaultForm() {
@@ -479,14 +486,14 @@ export default defineComponent({
           label: iface.name || iface,
         }));
       } catch (err) {
-        showError(err);
+        handleError(err);
       } finally {
         loading.value = false;
       }
     }
 
-    function showError(err) {
-      alert(`错误码: ${err.code || 'ERROR'}\n错误信息: ${err.message || err}`);
+    function handleError(err) {
+      showError({ message: `${t('pseudoEthernet.messages.errorCode', { code: err.code || 'ERROR' })}\n${t('pseudoEthernet.messages.errorMessage', { message: err.message || err })}` });
     }
 
     function openModal(index = -1) {
@@ -502,39 +509,49 @@ export default defineComponent({
     async function save() {
       try {
         const form = editingItem.value;
-        if (!form.name) { alert('请输入接口名称'); return; }
+        if (!form.name) { showError({ message: t('pseudoEthernet.messages.enterName') }); return; }
         const config = formToItem(form);
-        console.log('[PseudoEthernet] 保存配置:', JSON.stringify(config, null, 2));
-        await api.put('/config', { path: `interfaces pseudo-ethernet ${form.name}`, value: config });
+        console.log('[PseudoEthernet] save config:', JSON.stringify(config, null, 2));
+        await configStore.setConfig(`interfaces pseudo-ethernet ${form.name}`, config);
+        configStore.markPending();
         modalVisible.value = false;
         await load();
       } catch (err) {
-        showError(err);
+        handleError(err);
       }
     }
 
     async function remove() {
-      if (!selectedItems.value.length) { alert('请先选择要删除的 pseudo-ethernet 接口'); return; }
-      if (!confirm(`确定删除选中的 ${selectedItems.value.length} 个 pseudo-ethernet 接口?`)) return;
+      if (!selectedItems.value.length) { showError({ message: t('pseudoEthernet.messages.selectToDelete') }); return; }
+      pendingDeleteNames.value = selectedItems.value.map(m => m.name);
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemove() {
+      deleteModalVisible.value = false;
       try {
-        for (const m of selectedItems.value) {
-          await api.delete('/config', { path: `interfaces pseudo-ethernet ${m.name}` });
+        for (const name of pendingDeleteNames.value) {
+          await configStore.deleteConfig(`interfaces pseudo-ethernet ${name}`);
+          configStore.markPending();
         }
         selectedItems.value = [];
+        pendingDeleteNames.value = [];
         await load();
       } catch (err) {
-        showError(err);
+        handleError(err);
       }
     }
 
-    onMounted(() => { load(); });
+    onMounted(() => { load(); onMenuRefresh(load); });
 
     return {
       loading, pseudoEthernets, selected: selectedItems, modalVisible, editingItem, interfaceOptions, activeTab,
+      deleteModalVisible, pendingDeleteNames,
       COLUMNS,
       basicSchema, ipSchema, ipv6Schema, dhcpSchema, dhcpv6Schema, vifSchema, mirrorSchema, otherSchema,
       commandText, modalTabs,
-      openModal, save, remove, load,
+      openModal, save, remove, confirmRemove, load,
+      t,
     };
   },
   template: `
@@ -551,7 +568,7 @@ export default defineComponent({
         @refresh="load"
         @selection-change="selected = $event"
       />
-      <DraggableModal v-model:visible="modalVisible" :title="editingItem?.name ? '编辑 pseudo-ethernet 接口' : '创建 pseudo-ethernet 接口'" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingItem?.name ? t('pseudoEthernet.modal.edit') : t('pseudoEthernet.modal.create')" width="900px">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic><ConfigForm :schema="basicSchema" :model="editingItem" /></template>
@@ -562,13 +579,18 @@ export default defineComponent({
             <template #vif><ConfigForm :schema="vifSchema" :model="editingItem" /></template>
             <template #mirror><ConfigForm :schema="mirrorSchema" :model="editingItem" /></template>
             <template #other><ConfigForm :schema="otherSchema" :model="editingItem" /></template>
-            <template #command><pre style="background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;font-size:13px;">{{ commandText }}</pre></template>
           </TabGroup>
         </template>
         <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">取消</button>
-          <button type="button" class="btn btn-primary" @click="save">确定</button>
+          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('pseudoEthernet.buttons.cancel') }}</button>
+          <button type="button" class="btn btn-primary" @click="save">{{ t('pseudoEthernet.buttons.confirm') }}</button>
         </template>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('pseudoEthernet.modal.confirmDelete')" width="400px" @confirm="confirmRemove">
+        <div>{{ t('pseudoEthernet.modal.confirmDeleteMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

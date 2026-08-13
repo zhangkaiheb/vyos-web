@@ -1,0 +1,226 @@
+{
+  "zh-CN": {
+    "systemIpv6": {
+      "tabs": {
+        "basic": "基本设置",
+        "neighbor": "邻居缓存",
+        "multipath": "多路径",
+        "nht": "NHT",
+        "protocol": "协议"
+      },
+      "labels": {
+        "disableIpv6Forwarding": "禁用 IPv6 转发",
+        "strictDad": "Strict DAD",
+        "neighborTableSize": "邻居表大小",
+        "layer4Hash": "Layer4 哈希",
+        "resolveViaDefault": "不通过默认路由解析"
+      },
+      "hints": {
+        "disableIpv6Forwarding": "禁用所有接口的 IPv6 转发",
+        "strictDad": "当 DAD 失败时禁用接口 IPv6 操作",
+        "neighborTableSize": "邻居发现缓存最大条目数（默认: 8192）",
+        "layer4Hash": "使用 Layer 4 信息进行 ECMP 哈希",
+        "resolveViaDefault": "不通过默认路由解析下一跳"
+      },
+      "placeholders": {
+        "routeMapName": "Route-map 名称"
+      },
+      "errors": {
+        "loadFailed": "加载失败",
+        "saveFailed": "保存失败"
+      }
+    }
+  },
+  "en": {
+    "systemIpv6": {
+      "tabs": {
+        "basic": "Basic",
+        "neighbor": "Neighbor Cache",
+        "multipath": "Multipath",
+        "nht": "NHT",
+        "protocol": "Protocol"
+      },
+      "labels": {
+        "disableIpv6Forwarding": "Disable IPv6 Forwarding",
+        "strictDad": "Strict DAD",
+        "neighborTableSize": "Neighbor Table Size",
+        "layer4Hash": "Layer4 Hashing",
+        "resolveViaDefault": "No Resolve via Default Route"
+      },
+      "hints": {
+        "disableIpv6Forwarding": "Disable IPv6 forwarding on all interfaces",
+        "strictDad": "Disable interface IPv6 operation when DAD fails",
+        "neighborTableSize": "Maximum entries in neighbor discovery cache (default: 8192)",
+        "layer4Hash": "Use Layer 4 information for ECMP hashing",
+        "resolveViaDefault": "Do not resolve next-hop via default route"
+      },
+      "placeholders": {
+        "routeMapName": "Route-map name"
+      },
+      "errors": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed"
+      }
+    }
+  },
+  "zh-TW": {
+    "systemIpv6": {
+      "tabs": {
+        "basic": "Basic",
+        "neighbor": "Neighbor Cache",
+        "multipath": "Multipath",
+        "nht": "NHT",
+        "protocol": "Protocol"
+      },
+      "labels": {
+        "disableIpv6Forwarding": "Disable IPv6 Forwarding",
+        "strictDad": "Strict DAD",
+        "neighborTableSize": "Neighbor Table Size",
+        "layer4Hash": "Layer4 Hashing",
+        "resolveViaDefault": "No Resolve via Default Route"
+      },
+      "hints": {
+        "disableIpv6Forwarding": "Disable IPv6 forwarding on all interfaces",
+        "strictDad": "Disable interface IPv6 operation when DAD fails",
+        "neighborTableSize": "Maximum entries in neighbor discovery cache (default: 8192)",
+        "layer4Hash": "Use Layer 4 information for ECMP hashing",
+        "resolveViaDefault": "Do not resolve next-hop via default route"
+      },
+      "placeholders": {
+        "routeMapName": "Route-map name"
+      },
+      "errors": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed"
+      }
+    }
+  },
+  "ru": {
+    "systemIpv6": {
+      "tabs": {
+        "basic": "Basic",
+        "neighbor": "Neighbor Cache",
+        "multipath": "Multipath",
+        "nht": "NHT",
+        "protocol": "Protocol"
+      },
+      "labels": {
+        "disableIpv6Forwarding": "Disable IPv6 Forwarding",
+        "strictDad": "Strict DAD",
+        "neighborTableSize": "Neighbor Table Size",
+        "layer4Hash": "Layer4 Hashing",
+        "resolveViaDefault": "No Resolve via Default Route"
+      },
+      "hints": {
+        "disableIpv6Forwarding": "Disable IPv6 forwarding on all interfaces",
+        "strictDad": "Disable interface IPv6 operation when DAD fails",
+        "neighborTableSize": "Maximum entries in neighbor discovery cache (default: 8192)",
+        "layer4Hash": "Use Layer 4 information for ECMP hashing",
+        "resolveViaDefault": "Do not resolve next-hop via default route"
+      },
+      "placeholders": {
+        "routeMapName": "Route-map name"
+      },
+      "errors": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed"
+      }
+    }
+  },
+  "de": {
+    "systemIpv6": {
+      "tabs": {
+        "basic": "Basic",
+        "neighbor": "Neighbor Cache",
+        "multipath": "Multipath",
+        "nht": "NHT",
+        "protocol": "Protocol"
+      },
+      "labels": {
+        "disableIpv6Forwarding": "Disable IPv6 Forwarding",
+        "strictDad": "Strict DAD",
+        "neighborTableSize": "Neighbor Table Size",
+        "layer4Hash": "Layer4 Hashing",
+        "resolveViaDefault": "No Resolve via Default Route"
+      },
+      "hints": {
+        "disableIpv6Forwarding": "Disable IPv6 forwarding on all interfaces",
+        "strictDad": "Disable interface IPv6 operation when DAD fails",
+        "neighborTableSize": "Maximum entries in neighbor discovery cache (default: 8192)",
+        "layer4Hash": "Use Layer 4 information for ECMP hashing",
+        "resolveViaDefault": "Do not resolve next-hop via default route"
+      },
+      "placeholders": {
+        "routeMapName": "Route-map name"
+      },
+      "errors": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed"
+      }
+    }
+  },
+  "fr": {
+    "systemIpv6": {
+      "tabs": {
+        "basic": "Basic",
+        "neighbor": "Neighbor Cache",
+        "multipath": "Multipath",
+        "nht": "NHT",
+        "protocol": "Protocol"
+      },
+      "labels": {
+        "disableIpv6Forwarding": "Disable IPv6 Forwarding",
+        "strictDad": "Strict DAD",
+        "neighborTableSize": "Neighbor Table Size",
+        "layer4Hash": "Layer4 Hashing",
+        "resolveViaDefault": "No Resolve via Default Route"
+      },
+      "hints": {
+        "disableIpv6Forwarding": "Disable IPv6 forwarding on all interfaces",
+        "strictDad": "Disable interface IPv6 operation when DAD fails",
+        "neighborTableSize": "Maximum entries in neighbor discovery cache (default: 8192)",
+        "layer4Hash": "Use Layer 4 information for ECMP hashing",
+        "resolveViaDefault": "Do not resolve next-hop via default route"
+      },
+      "placeholders": {
+        "routeMapName": "Route-map name"
+      },
+      "errors": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed"
+      }
+    }
+  },
+  "ko": {
+    "systemIpv6": {
+      "tabs": {
+        "basic": "Basic",
+        "neighbor": "Neighbor Cache",
+        "multipath": "Multipath",
+        "nht": "NHT",
+        "protocol": "Protocol"
+      },
+      "labels": {
+        "disableIpv6Forwarding": "Disable IPv6 Forwarding",
+        "strictDad": "Strict DAD",
+        "neighborTableSize": "Neighbor Table Size",
+        "layer4Hash": "Layer4 Hashing",
+        "resolveViaDefault": "No Resolve via Default Route"
+      },
+      "hints": {
+        "disableIpv6Forwarding": "Disable IPv6 forwarding on all interfaces",
+        "strictDad": "Disable interface IPv6 operation when DAD fails",
+        "neighborTableSize": "Maximum entries in neighbor discovery cache (default: 8192)",
+        "layer4Hash": "Use Layer 4 information for ECMP hashing",
+        "resolveViaDefault": "Do not resolve next-hop via default route"
+      },
+      "placeholders": {
+        "routeMapName": "Route-map name"
+      },
+      "errors": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed"
+      }
+    }
+  }
+}

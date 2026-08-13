@@ -4,29 +4,16 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import { api, interfaceApi } from '/src/api/index.js';
-
-const COLUMNS = [
-  { key: 'name', title: '接口名称', width: 120 },
-  { key: 'description', title: '描述', width: 160 },
-  { key: 'username', title: '用户名', width: 120 },
-  { key: 'source_interface', title: '源接口', width: 120 },
-  { key: 'remote_address', title: '远端地址', width: 140 },
-  { key: 'mtu', title: 'MTU', width: 80 },
-  { key: 'mru', title: 'MRU', width: 80 },
-  { key: 'disable', title: '禁用', width: 80 },
-  { key: 'actions', title: '操作', width: 100 },
-];
-
-const SOURCE_VALIDATION_OPTIONS = [
-  { value: 'strict', label: 'strict (严格)' },
-  { value: 'loose', label: 'loose (宽松)' },
-  { value: 'disable', label: 'disable (禁用)' },
-];
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { showError } from '/src/components/Layout/ErrorDisplay.js';
+import { useI18n } from '/src/i18n/index.js';
 
 export default defineComponent({
   name: 'PPPoEPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
+    const { t } = useI18n();
     const loading = ref(false);
     const pppoes = ref([]);
     const selected = ref([]);
@@ -35,70 +22,90 @@ export default defineComponent({
     const interfaceOptions = ref([]);
     const activeTab = ref('basic');
     const selectedPPPoEs = ref([]);
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
+
+    const COLUMNS = computed(() => [
+      { key: 'name', title: t('pppoe.columns.name'), width: 120 },
+      { key: 'description', title: t('pppoe.columns.description'), width: 160 },
+      { key: 'username', title: t('pppoe.columns.username'), width: 120 },
+      { key: 'source_interface', title: t('pppoe.columns.source_interface'), width: 120 },
+      { key: 'remote_address', title: t('pppoe.columns.remote_address'), width: 140 },
+      { key: 'mtu', title: 'MTU', width: 80 },
+      { key: 'mru', title: 'MRU', width: 80 },
+      { key: 'disable', title: t('pppoe.columns.disable'), width: 80 },
+      { key: 'actions', title: t('pppoe.columns.actions'), width: 100 },
+    ]);
+
+    const SOURCE_VALIDATION_OPTIONS = computed(() => [
+      { value: 'strict', label: t('pppoe.source_validation.strict') },
+      { value: 'loose', label: t('pppoe.source_validation.loose') },
+      { value: 'disable', label: t('pppoe.source_validation.disable') },
+    ]);
 
     // Schema definitions
     const basicSchema = computed(() => [
-      { key: 'name', title: '接口名称', type: 'text', required: true, placeholder: '如 pppoe0, pppoe1', help: '格式: pppoeN' },
-      { key: 'description', title: '描述', type: 'text', placeholder: '接口描述' },
-      { key: 'source_interface', title: '源接口', type: 'select', options: interfaceOptions.value, placeholder: '选择源接口', help: '用于建立连接的接口' },
-      { key: 'access_concentrator', title: '接入集中器', type: 'text', placeholder: '接入集中器名称', help: 'Access concentrator name' },
-      { key: 'service_name', title: '服务名称', type: 'text', placeholder: '服务名称', help: '仅连接到通告此服务的接入集中器' },
-      { key: 'authentication_username', title: '用户名', type: 'text', placeholder: 'PPPoE 认证用户名' },
-      { key: 'authentication_password', title: '密码', type: 'password', placeholder: 'PPPoE 认证密码' },
-      { key: 'remote_address', title: '远端地址', type: 'text', placeholder: '如 192.168.1.1', help: 'PPPoE 链路远端 IPv4 地址' },
-      { key: 'local_address', title: '本地地址', type: 'text', placeholder: '如 192.168.1.2', help: 'PPPoE 链路本地端地址' },
-      { key: 'host_uniq', title: 'Host-uniq', type: 'text', placeholder: 'HEX 字节字符串', help: 'Host-uniq 标签' },
-      { key: 'connect_on_demand', title: '按需连接', type: 'checkbox', help: '仅在需要时建立连接' },
-      { key: 'no_default_route', title: '不安装默认路由', type: 'checkbox', help: '不安装默认路由到系统' },
-      { key: 'no_peer_dns', title: '不使用对端 DNS', type: 'checkbox', help: '不使用对端提供的 DNS 服务器' },
-      { key: 'mru', title: 'MRU', type: 'number', min: 128, max: 16384, placeholder: '128-16384', help: '最大接收单元 (默认: MTU 值)' },
-      { key: 'mtu', title: 'MTU', type: 'number', min: 68, max: 1500, placeholder: '68-1500', help: '最大传输单元 (默认: 1492)' },
-      { key: 'holdoff', title: 'Holdoff 时间', type: 'number', min: 0, max: 86400, placeholder: '0-86400', help: '重连等待时间 (秒)' },
-      { key: 'idle_timeout', title: '空闲超时', type: 'number', min: 0, max: 86400, placeholder: '0-86400', help: '空闲超时时间 (秒)' },
-      { key: 'default_route_distance', title: '默认路由距离', type: 'number', min: 1, max: 255, placeholder: '1-255', help: '从服务器接收的默认路由距离' },
-      { key: 'disable', title: '禁用接口', type: 'checkbox', help: '管理性禁用接口' },
+      { key: 'name', title: t('pppoe.columns.name'), type: 'text', required: true, placeholder: t('pppoe.form.name_placeholder'), help: t('pppoe.form.name_help') },
+      { key: 'description', title: t('pppoe.columns.description'), type: 'text', placeholder: t('pppoe.form.description_placeholder') },
+      { key: 'source_interface', title: t('pppoe.columns.source_interface'), type: 'select', options: interfaceOptions.value, placeholder: t('pppoe.form.source_interface_placeholder'), help: t('pppoe.form.source_interface_help') },
+      { key: 'access_concentrator', title: t('pppoe.form.access_concentrator'), type: 'text', placeholder: t('pppoe.form.access_concentrator_placeholder'), help: t('pppoe.form.access_concentrator_help') },
+      { key: 'service_name', title: t('pppoe.form.service_name'), type: 'text', placeholder: t('pppoe.form.service_name_placeholder'), help: t('pppoe.form.service_name_help') },
+      { key: 'authentication_username', title: t('pppoe.columns.username'), type: 'text', placeholder: t('pppoe.form.auth_username_placeholder') },
+      { key: 'authentication_password', title: t('pppoe.form.password'), type: 'password', placeholder: t('pppoe.form.auth_password_placeholder') },
+      { key: 'remote_address', title: t('pppoe.columns.remote_address'), type: 'text', placeholder: t('pppoe.form.remote_address_placeholder'), help: t('pppoe.form.remote_address_help') },
+      { key: 'local_address', title: t('pppoe.form.local_address'), type: 'text', placeholder: t('pppoe.form.local_address_placeholder'), help: t('pppoe.form.local_address_help') },
+      { key: 'host_uniq', title: 'Host-uniq', type: 'text', placeholder: t('pppoe.form.host_uniq_placeholder'), help: t('pppoe.form.host_uniq_help') },
+      { key: 'connect_on_demand', title: t('pppoe.form.connect_on_demand'), type: 'checkbox', help: t('pppoe.form.connect_on_demand_help') },
+      { key: 'no_default_route', title: t('pppoe.form.no_default_route'), type: 'checkbox', help: t('pppoe.form.no_default_route_help') },
+      { key: 'no_peer_dns', title: t('pppoe.form.no_peer_dns'), type: 'checkbox', help: t('pppoe.form.no_peer_dns_help') },
+      { key: 'mru', title: 'MRU', type: 'number', min: 128, max: 16384, placeholder: '128-16384', help: t('pppoe.form.mru_help') },
+      { key: 'mtu', title: 'MTU', type: 'number', min: 68, max: 1500, placeholder: '68-1500', help: t('pppoe.form.mtu_help') },
+      { key: 'holdoff', title: t('pppoe.form.holdoff'), type: 'number', min: 0, max: 86400, placeholder: '0-86400', help: t('pppoe.form.holdoff_help') },
+      { key: 'idle_timeout', title: t('pppoe.form.idle_timeout'), type: 'number', min: 0, max: 86400, placeholder: '0-86400', help: t('pppoe.form.idle_timeout_help') },
+      { key: 'default_route_distance', title: t('pppoe.form.default_route_distance'), type: 'number', min: 1, max: 255, placeholder: '1-255', help: t('pppoe.form.default_route_distance_help') },
+      { key: 'disable', title: t('pppoe.form.disable_interface'), type: 'checkbox', help: t('pppoe.form.disable_interface_help') },
     ]);
 
     const dhcpSchema = computed(() => [
-      { key: 'dhcp_client_id', title: '客户端 ID', type: 'text', placeholder: 'DHCP 选项字符串', help: '客户端标识符' },
-      { key: 'dhcp_default_route_distance', title: '默认路由距离', type: 'number', min: 1, max: 255, placeholder: '1-255', help: '默认路由距离 (默认: 210)' },
-      { key: 'dhcp_host_name', title: '主机名', type: 'text', placeholder: '覆盖系统主机名', help: '发送到 DHCP 服务器的主机名' },
-      { key: 'dhcp_mtu', title: '使用 DHCP MTU', type: 'checkbox', help: '使用 DHCP 服务器的 MTU 值' },
-      { key: 'dhcp_no_default_route', title: '不安装默认路由', type: 'checkbox', help: '不安装默认路由到系统' },
-      { key: 'dhcp_reject', title: '拒绝地址', type: 'textarea', placeholder: '每行一个 IP 或子网', help: '拒绝 DHCP 租约的 IP 地址或子网' },
-      { key: 'dhcp_user_class', title: '用户类别', type: 'text', placeholder: 'DHCP 选项字符串', help: '用户可配置选项' },
-      { key: 'dhcp_vendor_class_id', title: '厂商类别 ID', type: 'text', placeholder: 'DHCP 选项字符串', help: '厂商类别标识符' },
+      { key: 'dhcp_client_id', title: t('pppoe.form.dhcp_client_id'), type: 'text', placeholder: t('pppoe.form.dhcp_option_string'), help: t('pppoe.form.dhcp_client_id_help') },
+      { key: 'dhcp_default_route_distance', title: t('pppoe.form.default_route_distance'), type: 'number', min: 1, max: 255, placeholder: '1-255', help: t('pppoe.form.dhcp_default_route_distance_help') },
+      { key: 'dhcp_host_name', title: t('pppoe.form.dhcp_host_name'), type: 'text', placeholder: t('pppoe.form.dhcp_host_name_placeholder'), help: t('pppoe.form.dhcp_host_name_help') },
+      { key: 'dhcp_mtu', title: t('pppoe.form.dhcp_mtu'), type: 'checkbox', help: t('pppoe.form.dhcp_mtu_help') },
+      { key: 'dhcp_no_default_route', title: t('pppoe.form.no_default_route'), type: 'checkbox', help: t('pppoe.form.no_default_route_help') },
+      { key: 'dhcp_reject', title: t('pppoe.form.dhcp_reject'), type: 'textarea', placeholder: t('pppoe.form.dhcp_reject_placeholder'), help: t('pppoe.form.dhcp_reject_help') },
+      { key: 'dhcp_user_class', title: t('pppoe.form.dhcp_user_class'), type: 'text', placeholder: t('pppoe.form.dhcp_option_string'), help: t('pppoe.form.dhcp_user_class_help') },
+      { key: 'dhcp_vendor_class_id', title: t('pppoe.form.dhcp_vendor_class_id'), type: 'text', placeholder: t('pppoe.form.dhcp_option_string'), help: t('pppoe.form.dhcp_vendor_class_id_help') },
     ]);
 
     const dhcpv6Schema = computed(() => [
-      { key: 'dhcpv6_instance_name', title: '实例名称', type: 'text', placeholder: 'DHCPv6 实例名称' },
-      { key: 'dhcpv6_no_release', title: '不发送 Release', type: 'checkbox', help: '不发送 DHCPv6 Release 消息' },
-      { key: 'dhcpv6_rapid_commit', title: '快速提交', type: 'checkbox', help: '使用 DHCPv6 快速提交选项' },
-      { key: 'dhcpv6_temporary', title: '临时地址', type: 'checkbox', help: '请求临时地址 (IA_TA)' },
-      { key: 'dhcpv6_pd_length', title: '前缀长度', type: 'number', min: 32, max: 64, placeholder: '32-64', help: '请求的前缀长度 (默认: 64)' },
+      { key: 'dhcpv6_instance_name', title: t('pppoe.form.dhcpv6_instance_name'), type: 'text', placeholder: t('pppoe.form.dhcpv6_instance_name_placeholder') },
+      { key: 'dhcpv6_no_release', title: t('pppoe.form.dhcpv6_no_release'), type: 'checkbox', help: t('pppoe.form.dhcpv6_no_release_help') },
+      { key: 'dhcpv6_rapid_commit', title: t('pppoe.form.dhcpv6_rapid_commit'), type: 'checkbox', help: t('pppoe.form.dhcpv6_rapid_commit_help') },
+      { key: 'dhcpv6_temporary', title: t('pppoe.form.dhcpv6_temporary'), type: 'checkbox', help: t('pppoe.form.dhcpv6_temporary_help') },
+      { key: 'dhcpv6_pd_length', title: t('pppoe.form.dhcpv6_pd_length'), type: 'number', min: 32, max: 64, placeholder: '32-64', help: t('pppoe.form.dhcpv6_pd_length_help') },
     ]);
 
     const ipSchema = computed(() => [
-      { key: 'ip_adjust_mss', title: '调整 MSS', type: 'text', placeholder: 'clamp-mss-to-pmtu 或 536-65535', help: 'TCP MSS 值' },
-      { key: 'ip_disable_forwarding', title: '禁用转发', type: 'checkbox', help: '禁用 IP 转发' },
-      { key: 'ip_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
+      { key: 'ip_adjust_mss', title: t('pppoe.form.adjust_mss'), type: 'text', placeholder: t('pppoe.form.adjust_mss_placeholder'), help: t('pppoe.form.adjust_mss_help') },
+      { key: 'ip_disable_forwarding', title: t('pppoe.form.disable_forwarding'), type: 'checkbox', help: t('pppoe.form.disable_forwarding_help') },
+      { key: 'ip_source_validation', title: t('pppoe.form.source_validation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS.value, placeholder: t('pppoe.form.source_validation_placeholder'), help: t('pppoe.form.source_validation_help') },
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_autoconf', title: '自动配置', type: 'checkbox', help: '使用 SLAAC 获取 IPv6 地址' },
-      { key: 'ipv6_interface_identifier', title: '接口标识符', type: 'text', placeholder: '如 ::1:2:3:4', help: 'SLAAC 接口标识符' },
-      { key: 'ipv6_adjust_mss', title: '调整 MSS', type: 'text', placeholder: 'clamp-mss-to-pmtu 或 536-65535', help: 'TCP MSS 值' },
-      { key: 'ipv6_disable_forwarding', title: '禁用转发', type: 'checkbox', help: '禁用 IPv6 转发' },
+      { key: 'ipv6_autoconf', title: t('pppoe.form.ipv6_autoconf'), type: 'checkbox', help: t('pppoe.form.ipv6_autoconf_help') },
+      { key: 'ipv6_interface_identifier', title: t('pppoe.form.ipv6_interface_identifier'), type: 'text', placeholder: t('pppoe.form.ipv6_interface_identifier_placeholder'), help: t('pppoe.form.ipv6_interface_identifier_help') },
+      { key: 'ipv6_adjust_mss', title: t('pppoe.form.adjust_mss'), type: 'text', placeholder: t('pppoe.form.adjust_mss_placeholder'), help: t('pppoe.form.adjust_mss_help') },
+      { key: 'ipv6_disable_forwarding', title: t('pppoe.form.disable_forwarding'), type: 'checkbox', help: t('pppoe.form.disable_forwarding_ipv6_help') },
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: '镜像出方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像出方向流量到目标接口' },
-      { key: 'mirror_ingress', title: '镜像入方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像入方向流量到目标接口' },
+      { key: 'mirror_egress', title: t('pppoe.form.mirror_egress'), type: 'select', options: interfaceOptions.value, placeholder: t('pppoe.form.mirror_target_placeholder'), help: t('pppoe.form.mirror_egress_help') },
+      { key: 'mirror_ingress', title: t('pppoe.form.mirror_ingress'), type: 'select', options: interfaceOptions.value, placeholder: t('pppoe.form.mirror_target_placeholder'), help: t('pppoe.form.mirror_ingress_help') },
     ]);
 
     const otherSchema = computed(() => [
-      { key: 'redirect', title: '重定向目标', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '重定向入站数据包到目标接口' },
-      { key: 'vrf', title: 'VRF 实例', type: 'text', placeholder: 'VRF 实例名称', help: 'VRF 实例名称' },
+      { key: 'redirect', title: t('pppoe.form.redirect'), type: 'select', options: interfaceOptions.value, placeholder: t('pppoe.form.redirect_placeholder'), help: t('pppoe.form.redirect_help') },
+      { key: 'vrf', title: t('pppoe.form.vrf_instance'), type: 'text', placeholder: t('pppoe.form.vrf_instance_placeholder'), help: t('pppoe.form.vrf_instance_help') },
     ]);
 
     // Command text
@@ -167,19 +174,18 @@ export default defineComponent({
       if (p.redirect) lines.push(`set interfaces pppoe ${name} redirect ${p.redirect}`);
       if (p.vrf) lines.push(`set interfaces pppoe ${name} vrf ${p.vrf}`);
 
-      return lines.length ? lines.join('\n') : '# 未配置任何参数';
+      return lines.length ? lines.join('\n') : t('pppoe.command.no_config');
     });
 
     // Dynamic tabs
     const modalTabs = computed(() => [
-      { key: 'basic', title: '基本配置' },
+      { key: 'basic', title: t('pppoe.tabs.basic') },
       { key: 'dhcp', title: 'DHCP' },
       { key: 'dhcpv6', title: 'DHCPv6' },
-      { key: 'ip', title: 'IPv4 参数' },
-      { key: 'ipv6', title: 'IPv6 参数' },
-      { key: 'mirror', title: '流量镜像' },
-      { key: 'other', title: '其他' },
-      { key: 'command', title: '命令预览' },
+      { key: 'ip', title: t('pppoe.tabs.ipv4_params') },
+      { key: 'ipv6', title: t('pppoe.tabs.ipv6_params') },
+      { key: 'mirror', title: t('pppoe.tabs.mirror') },
+      { key: 'other', title: t('pppoe.tabs.other') },
     ]);
 
     function getDefaultForm() {
@@ -356,14 +362,14 @@ export default defineComponent({
           label: iface.name || iface,
         }));
       } catch (err) {
-        showError(err);
+        handleError(err);
       } finally {
         loading.value = false;
       }
     }
 
-    function showError(err) {
-      alert(`错误码: ${err.code || 'ERROR'}\n错误信息: ${err.message || err}`);
+    function handleError(err) {
+      showError({ message: `${t('pppoe.error.code')}: ${err.code || 'ERROR'}\n${t('pppoe.error.message')}: ${err.message || err}` });
     }
 
     function openModal(index = -1) {
@@ -380,42 +386,51 @@ export default defineComponent({
       try {
         const form = editingPPPoE.value;
         const name = form.name;
-        if (!name) { alert('请输入接口名称'); return; }
+        if (!name) { showError({ message: t('pppoe.error.name_required') }); return; }
 
         const config = formToPPPoE(form);
-        console.log('[PPPoE] 保存配置:', JSON.stringify(config, null, 2));
+        console.log('[PPPoE] Save config:', JSON.stringify(config, null, 2));
 
         const path = `interfaces pppoe ${name}`;
-        await api.put('/config', { path, value: config });
+        await configStore.setConfig(path, config);
+        configStore.markPending();
         modalVisible.value = false;
         await load();
       } catch (err) {
-        showError(err);
+        handleError(err);
       }
     }
 
-    async function remove() {
-      if (!selectedPPPoEs.value.length) { alert('请先选择要删除的 PPPoE 接口'); return; }
-      if (!confirm(`确定删除选中的 ${selectedPPPoEs.value.length} 个 PPPoE 接口?`)) return;
+    function remove() {
+      if (!selectedPPPoEs.value.length) { showError({ message: t('pppoe.error.select_delete') }); return; }
+      pendingDeleteNames.value = selectedPPPoEs.value.map(p => p.name);
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemove() {
+      deleteModalVisible.value = false;
       try {
-        for (const p of selectedPPPoEs.value) {
-          await api.delete('/config', { path: `interfaces pppoe ${p.name}` });
+        for (const name of pendingDeleteNames.value) {
+          await configStore.deleteConfig(`interfaces pppoe ${name}`);
+          configStore.markPending();
         }
         selectedPPPoEs.value = [];
+        pendingDeleteNames.value = [];
         await load();
       } catch (err) {
-        showError(err);
+        handleError(err);
       }
     }
 
-    onMounted(() => { load(); });
+    onMounted(() => { load(); onMenuRefresh(load); });
 
     return {
       loading, pppoes, selected: selectedPPPoEs, modalVisible, editingPPPoE, interfaceOptions, activeTab,
+      deleteModalVisible, pendingDeleteNames,
       COLUMNS,
       basicSchema, dhcpSchema, dhcpv6Schema, ipSchema, ipv6Schema, mirrorSchema, otherSchema,
       commandText, modalTabs,
-      openModal, save, remove, load,
+      openModal, save, remove, confirmRemove, load, t,
     };
   },
   template: `
@@ -433,7 +448,7 @@ export default defineComponent({
         @selection-change="selected = $event"
       />
 
-      <DraggableModal v-model:visible="modalVisible" :title="editingPPPoE?.name ? '编辑 PPPoE 接口' : '创建 PPPoE 接口'" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingPPPoE?.name ? t('pppoe.modal.edit_title') : t('pppoe.modal.create_title')" width="900px">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs" />
           <div v-show="activeTab === 'basic'" style="padding: 16px 0;">
@@ -457,14 +472,17 @@ export default defineComponent({
           <div v-show="activeTab === 'other'" style="padding: 16px 0;">
             <ConfigForm :schema="otherSchema" :model="editingPPPoE" />
           </div>
-          <div v-show="activeTab === 'command'" style="padding: 16px 0;">
-            <pre style="background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;font-size:13px;">{{ commandText }}</pre>
-          </div>
         </template>
         <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">取消</button>
-          <button type="button" class="btn btn-primary" @click="save">确定</button>
+          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('pppoe.buttons.cancel') }}</button>
+          <button type="button" class="btn btn-primary" @click="save">{{ t('pppoe.buttons.confirm') }}</button>
         </template>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('pppoe.modal.confirm_delete')" width="400px" @confirm="confirmRemove">
+        <div>{{ t('pppoe.modal.confirm_delete_message') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

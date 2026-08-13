@@ -2,6 +2,7 @@ import { defineComponent, ref, computed, onMounted, onUnmounted, watch, nextTick
 import { monitorApi } from '/src/api/index.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function drawLineChart(canvas, data, label, color = '#5B9BD5') {
   if (!canvas) return;
@@ -65,10 +66,10 @@ function drawTrafficChartBase(canvas, hoverIndex) {
   const options = canvas._trafficOptions || {};
   const rxData = canvas._trafficRx || [];
   const txData = canvas._trafficTx || [];
-  const { title = '接口流量', iface = '' } = options;
+  const { title = '', iface = '', t: tFn = (k) => k } = options;
   const datasets = [
-    { data: rxData, label: `${iface}上行流量`, color: '#5B9BD5', key: 'rx' },
-    { data: txData, label: `${iface}下行流量`, color: '#888888', key: 'tx' },
+    { data: rxData, label: tFn('monitorDashboard.chart.uploadTraffic', { iface }), color: '#5B9BD5', key: 'rx' },
+    { data: txData, label: tFn('monitorDashboard.chart.downloadTraffic', { iface }), color: '#888888', key: 'tx' },
   ];
 
   const hasData = datasets.some(d => d.data.length > 0);
@@ -88,7 +89,7 @@ function drawTrafficChartBase(canvas, hoverIndex) {
   ctx.font = '12px sans-serif';
   ctx.textAlign = 'right';
   ctx.textBaseline = 'top';
-  ctx.fillText(`接口: ${iface}`, cssWidth - 12, 10);
+  ctx.fillText(tFn('monitorDashboard.chart.interfaceLabel', { iface }), cssWidth - 12, 10);
 
   // Collect values
   const allValues = datasets.flatMap(d => d.data.map(p => parseFloat(p.value) || 0));
@@ -130,7 +131,7 @@ function drawTrafficChartBase(canvas, hoverIndex) {
   ctx.textAlign = 'center';
   ctx.fillStyle = '#666';
   ctx.font = '12px sans-serif';
-  const yLabel = '比特每秒';
+  const yLabel = tFn('monitorDashboard.chart.bitsPerSecond');
   const charHeight = 14;
   yLabel.split('').forEach((char, i) => {
     const y = (i - (yLabel.length - 1) / 2) * charHeight;
@@ -236,11 +237,12 @@ function drawTrafficTooltip(canvas, idx) {
   if (tsPoint && tsPoint.timestamp) {
     lines.push(formatTimeLabel(tsPoint.timestamp));
   }
+  const tFn = options.t || ((k) => k);
   if (rxData[idx]) {
-    lines.push(`${iface}上行流量 ${formatBitrate(parseFloat(rxData[idx].value) || 0)}`);
+    lines.push(tFn('monitorDashboard.chart.uploadTrafficValue', { iface, value: formatBitrate(parseFloat(rxData[idx].value) || 0) }));
   }
   if (txData[idx]) {
-    lines.push(`${iface}下行流量 ${formatBitrate(parseFloat(txData[idx].value) || 0)}`);
+    lines.push(tFn('monitorDashboard.chart.downloadTrafficValue', { iface, value: formatBitrate(parseFloat(txData[idx].value) || 0) }));
   }
   if (!lines.length) return;
 
@@ -318,7 +320,7 @@ function drawMetricChartBase(canvas, hoverIndex) {
 
   const options = canvas._metricOptions || {};
   const data = canvas._metricData || [];
-  const { title = '', valueLabel = '', color = '#5B9BD5', durationLabel = '' } = options;
+  const { title = '', valueLabel = '', color = '#5B9BD5', durationLabel = '', t: tFn = (k) => k } = options;
 
   if (!data || !data.length) {
     ctx.fillStyle = '#999';
@@ -389,7 +391,7 @@ function drawMetricChartBase(canvas, hoverIndex) {
   ctx.textAlign = 'center';
   ctx.fillStyle = '#666';
   ctx.font = '12px sans-serif';
-  const yLabel = '数量';
+  const yLabel = tFn('monitorDashboard.chart.quantity');
   const charHeight = 14;
   yLabel.split('').forEach((char, i) => {
     const y = (i - (yLabel.length - 1) / 2) * charHeight;
@@ -454,8 +456,8 @@ function drawMetricChartBase(canvas, hoverIndex) {
   ctx.font = '12px sans-serif';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  const legendLabel = title || '数量';
-  const legendText = `${legendLabel}数量`;
+  const legendLabel = title || tFn('monitorDashboard.chart.quantity');
+  const legendText = tFn('monitorDashboard.chart.quantityWithLabel', { label: legendLabel });
   const legendLineLen = 16;
   const legendGap = 6;
   const textWidth = ctx.measureText(legendText).width;
@@ -636,23 +638,24 @@ function drawGauge(canvas, value, label) {
 const STORAGE_KEY = 'monitorDashboardLayout';
 
 const DEFAULT_WIDGETS = [
-  { id: 'cpu', title: 'CPU 使用率', type: 'cpu', metric: 'usage', duration: '24h', interface: '', data: [], value: 0 },
-  { id: 'memory', title: '内存 使用率', type: 'memory', metric: 'usage', duration: '24h', interface: '', data: [], value: 0 },
-  { id: 'conntrack', title: 'Conntrack 数量', type: 'conntrack', metric: 'count', duration: '24h', interface: '', data: [], value: 0 },
-  { id: 'conntrack-ipv6', title: 'IPv6 Conntrack 数量', type: 'conntrack-ipv6', metric: 'count', duration: '24h', interface: '', data: [], value: 0 },
+  { id: 'cpu', title: 'monitorDashboard.widgets.cpu', type: 'cpu', metric: 'usage', duration: '24h', interface: '', data: [], value: 0 },
+  { id: 'memory', title: 'monitorDashboard.widgets.memory', type: 'memory', metric: 'usage', duration: '24h', interface: '', data: [], value: 0 },
+  { id: 'conntrack', title: 'monitorDashboard.widgets.conntrack', type: 'conntrack', metric: 'count', duration: '24h', interface: '', data: [], value: 0 },
+  { id: 'conntrack-ipv6', title: 'monitorDashboard.widgets.conntrackIpv6', type: 'conntrack-ipv6', metric: 'count', duration: '24h', interface: '', data: [], value: 0 },
 ];
 
 const AVAILABLE_WIDGETS = [
-  { type: 'cpu', title: 'CPU 使用率', metric: 'usage', duration: '24h', multi: false },
-  { type: 'memory', title: '内存 使用率', metric: 'usage', duration: '24h', multi: false },
-  { type: 'conntrack', title: 'Conntrack 数量', metric: 'count', duration: '24h', multi: false },
-  { type: 'conntrack-ipv6', title: 'IPv6 Conntrack 数量', metric: 'count', duration: '24h', multi: false },
-  { type: 'interface-traffic', title: '接口流量', metric: 'bps', duration: '1h', multi: true },
+  { type: 'cpu', title: 'monitorDashboard.widgets.cpu', metric: 'usage', duration: '24h', multi: false },
+  { type: 'memory', title: 'monitorDashboard.widgets.memory', metric: 'usage', duration: '24h', multi: false },
+  { type: 'conntrack', title: 'monitorDashboard.widgets.conntrack', metric: 'count', duration: '24h', multi: false },
+  { type: 'conntrack-ipv6', title: 'monitorDashboard.widgets.conntrackIpv6', metric: 'count', duration: '24h', multi: false },
+  { type: 'interface-traffic', title: 'monitorDashboard.widgets.interfaceTraffic', metric: 'bps', duration: '1h', multi: true },
 ];
 
 export default defineComponent({
   name: 'MonitorDashboard',
   setup() {
+    const { t } = useI18n();
     const widgets = ref([]);
     const interfaces = ref([]);
     const canvases = ref({});
@@ -774,22 +777,29 @@ export default defineComponent({
       const c = canvases.value[w.id];
       if (!c) return;
       if (w.type === 'cpu' || w.type === 'memory') {
-        drawGauge(c, w.value, w.title);
+        drawGauge(c, w.value, t(w.title));
       } else if (w.type === 'interface-traffic') {
-        const durationMap = { '1h': '过去60分钟', '24h': '24小时', '30d': '30天' };
+        const durationMap = {
+          '1h': t('monitorDashboard.durations.past60Minutes'),
+          '24h': t('monitorDashboard.durations.24hours'),
+          '30d': t('monitorDashboard.durations.30days')
+        };
         drawTrafficChart(c, w.data?.rx, w.data?.tx, {
-          title: '接口流量',
+          title: t('monitorDashboard.widgets.interfaceTraffic'),
           iface: w.interface || '',
           durationLabel: durationMap[w.duration] || w.duration,
+          t: t
         });
       } else if (w.type === 'conntrack' || w.type === 'conntrack-ipv6') {
+        const translatedTitle = t(w.title);
         drawMetricChart(c, w.data, {
-          title: w.title,
+          title: translatedTitle,
           color: '#5B9BD5',
-          valueLabel: `${w.title}: ${formatNumber(w.value)}`,
+          valueLabel: `${translatedTitle}: ${formatNumber(w.value)}`,
+          t: t
         });
       } else {
-        let label = `${w.title}: ${w.value}`;
+        let label = `${t(w.title)}: ${w.value}`;
         drawLineChart(c, w.data, label);
       }
     }
@@ -812,7 +822,7 @@ export default defineComponent({
     function drawHistory() {
       const w = historyWidget.value;
       if (!w || !historyCanvas.value) return;
-      let label = `${w.title} 历史`;
+      let label = t('monitorDashboard.labels.historyTitle', { title: w.title });
       if (w.type === 'cpu' || w.type === 'memory') label += ` (${w.value}%)`;
       else if (w.type === 'interface-traffic') label += ` (${w.value} bps)`;
       drawLineChart(historyCanvas.value, w.data, label);
@@ -840,7 +850,7 @@ export default defineComponent({
         const id = `if-${iface}-${Date.now()}`;
         widgets.value.push({
           id,
-          title: `接口流量 ${iface}`,
+          title: t('monitorDashboard.labels.interfaceTrafficWithIface', { iface }),
           type: 'interface-traffic',
           metric: item.metric || 'bps',
           duration: item.duration || '1h',
@@ -883,7 +893,7 @@ export default defineComponent({
       const iface = editSelectedInterface.value;
       if (iface) {
         w.interface = iface;
-        w.title = `接口流量 ${iface}`;
+        w.title = t('monitorDashboard.labels.interfaceTrafficWithIface', { iface });
         saveLayout();
         fetchWidget(w).then(() => nextTick().then(() => drawWidget(w)));
       }
@@ -893,7 +903,7 @@ export default defineComponent({
 
     function configureWidget(w) {
       if (w.type === 'interface-traffic' && w.interface) {
-        w.title = `接口流量 ${w.interface}`;
+        w.title = t('monitorDashboard.labels.interfaceTrafficWithIface', { iface: w.interface });
       }
       saveLayout();
       fetchWidget(w).then(() => nextTick().then(() => drawWidget(w)));
@@ -935,6 +945,7 @@ export default defineComponent({
     });
 
     return {
+      t,
       widgets,
       interfaces,
       canvases,
@@ -966,7 +977,7 @@ export default defineComponent({
     <div>
       <div class="toolbar compact-toolbar">
         <div class="toolbar-left" style="gap:8px;">
-          <ToolbarButton icon="addWidget" @click="modalVisible = true">控件</ToolbarButton>
+          <ToolbarButton icon="addWidget" @click="modalVisible = true">{{ t('monitorDashboard.labels.addWidget') }}</ToolbarButton>
         </div>
       </div>
       <div class="widget-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:16px;">
@@ -981,7 +992,7 @@ export default defineComponent({
           style="border:1px solid #ddd;border-radius:4px;background:#fff;cursor:move;"
         >
           <div class="widget-header" :class="{ 'traffic-header': w.type === 'interface-traffic' }" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(#f0f0f0,#e0e0e0);padding:8px;">
-            <span>{{ w.type === 'interface-traffic' ? '接口流量' : w.title }}</span>
+            <span>{{ w.type === 'interface-traffic' ? w.title : t(w.title) }}</span>
             <div class="widget-actions">
               <template v-if="w.type !== 'interface-traffic'">
                 <select v-if="w.type !== 'cpu' && w.type !== 'memory'" v-model="w.duration" @change="configureWidget(w)" style="font-size:12px;">
@@ -991,30 +1002,30 @@ export default defineComponent({
                   <option value="1w">1w</option>
                   <option value="24h">24h</option>
                 </select>
-                <button v-if="w.type === 'cpu' || w.type === 'memory'" class="widget-action-text" @click="showHistory(w)">历史</button>
+                <button v-if="w.type === 'cpu' || w.type === 'memory'" class="widget-action-text" @click="showHistory(w)">{{ t('monitorDashboard.labels.history') }}</button>
               </template>
-              <button class="widget-action-btn widget-action-refresh" title="刷新" @click="refreshWidget(w)">↻</button>
-              <button v-if="w.type === 'interface-traffic'" class="widget-action-btn widget-action-edit" title="编辑" @click="openEditModal(w)">✎</button>
-              <button class="widget-action-btn widget-action-close" title="关闭" @click="removeWidget(w)">✕</button>
+              <button class="widget-action-btn widget-action-refresh" :title="t('monitorDashboard.labels.refresh')" @click="refreshWidget(w)">↻</button>
+              <button v-if="w.type === 'interface-traffic'" class="widget-action-btn widget-action-edit" :title="t('monitorDashboard.labels.edit')" @click="openEditModal(w)">✎</button>
+              <button class="widget-action-btn widget-action-close" :title="t('monitorDashboard.labels.close')" @click="removeWidget(w)">✕</button>
             </div>
           </div>
           <div class="widget-body" :class="{ 'traffic-body': w.type === 'interface-traffic' }" style="padding:8px;">
             <canvas :ref="el => { if(el) canvases[w.id] = el }" :style="{ width: '100%', height: (w.type === 'cpu' || w.type === 'memory') ? '260px' : '280px', background: '#fff' }"></canvas>
             <div v-if="w.type === 'interface-traffic'" class="traffic-duration-bar" style="display:flex;justify-content:center;gap:16px;margin-top:8px;padding-top:4px;border-top:1px solid #eee;">
               <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;">
-                <input type="radio" v-model="w.duration" value="1h" @change="configureWidget(w)"> 过去60分钟
+                <input type="radio" v-model="w.duration" value="1h" @change="configureWidget(w)"> {{ t('monitorDashboard.durations.past60Minutes') }}
               </label>
               <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;">
-                <input type="radio" v-model="w.duration" value="24h" @change="configureWidget(w)"> 24小时
+                <input type="radio" v-model="w.duration" value="24h" @change="configureWidget(w)"> {{ t('monitorDashboard.durations.24hours') }}
               </label>
               <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;">
-                <input type="radio" v-model="w.duration" value="30d" @change="configureWidget(w)"> 30天
+                <input type="radio" v-model="w.duration" value="30d" @change="configureWidget(w)"> {{ t('monitorDashboard.durations.30days') }}
               </label>
             </div>
           </div>
         </div>
       </div>
-      <DraggableModal v-model:visible="modalVisible" title="添加控件" width="520px" @confirm="modalVisible = false">
+      <DraggableModal v-model:visible="modalVisible" :title="t('monitorDashboard.labels.addWidget')" width="520px" @confirm="modalVisible = false">
         <div style="padding:8px 0;">
           <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:12px;">
             <div
@@ -1030,15 +1041,15 @@ export default defineComponent({
                 opacity: isWidgetAdded(item) ? 0.6 : 1,
               }"
             >
-              <div style="font-weight:bold;margin-bottom:4px;">{{ item.title }}</div>
+              <div style="font-weight:bold;margin-bottom:4px;">{{ t(item.title) }}</div>
               <div style="font-size:12px;color:#666;">
-                {{ item.multi ? '可添加多个' : '仅可添加一个' }}
+                {{ item.multi ? t('monitorDashboard.messages.canAddMultiple') : t('monitorDashboard.messages.canOnlyAddOne') }}
               </div>
             </div>
           </div>
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="historyModalVisible" :title="historyWidget ? historyWidget.title + ' 历史' : '历史'" width="720px" @confirm="historyModalVisible = false">
+      <DraggableModal v-model:visible="historyModalVisible" :title="historyWidget ? t('monitorDashboard.labels.historyTitle', { title: historyWidget.title }) : t('monitorDashboard.labels.history')" width="720px" @confirm="historyModalVisible = false">
         <div style="padding:8px 0;">
           <div v-if="historyWidget" style="display:flex;justify-content:flex-end;margin-bottom:8px;">
             <select v-model="historyWidget.duration" @change="changeHistoryDuration" style="font-size:12px;">
@@ -1051,14 +1062,14 @@ export default defineComponent({
           </div>
           <canvas ref="historyCanvas" style="width:100%;height:300px;background:#fff;"></canvas>
           <div v-if="historyWidget && historyWidget.data && historyWidget.data.length" style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:#666;">
-            <span>开始: {{ historyTimeRange.start }}</span>
-            <span>结束: {{ historyTimeRange.end }}</span>
+            <span>{{ t('monitorDashboard.labels.start') }}: {{ historyTimeRange.start }}</span>
+            <span>{{ t('monitorDashboard.labels.end') }}: {{ historyTimeRange.end }}</span>
           </div>
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="editModalVisible" title="编辑接口" width="360px" @confirm="saveEdit">
+      <DraggableModal v-model:visible="editModalVisible" :title="t('monitorDashboard.labels.editInterface')" width="360px" @confirm="saveEdit">
         <div style="padding:16px 0;">
-          <label style="display:block;font-size:12px;color:#666;margin-bottom:4px;">选择接口</label>
+          <label style="display:block;font-size:12px;color:#666;margin-bottom:4px;">{{ t('monitorDashboard.labels.selectInterface') }}</label>
           <select v-model="editSelectedInterface" style="width:100%;padding:6px;font-size:14px;border:1px solid #ccc;border-radius:4px;">
             <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
           </select>

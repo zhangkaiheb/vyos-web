@@ -1,4 +1,4 @@
-import { defineComponent, ref, watch, computed } from '/src/utils/vue-import.js';
+import { defineComponent, ref, watch, computed, h } from '/src/utils/vue-import.js';
 
 export default defineComponent({
   name: 'TabGroup',
@@ -7,7 +7,7 @@ export default defineComponent({
     modelValue: { type: String, default: '' },
   },
   emits: ['update:modelValue'],
-  setup(props, { emit }) {
+  setup(props, { emit, slots }) {
     const active = ref(props.modelValue || (props.tabs[0]?.key || ''));
 
     function select(key) {
@@ -21,25 +21,19 @@ export default defineComponent({
 
     const activeTab = computed(() => props.tabs.find(t => t.key === active.value) || props.tabs[0]);
 
-    return { active, select, activeTab };
+    return () => h('div', { class: 'tab-group' }, [
+      h('div', { class: 'tab-headers' }, props.tabs.map(tab =>
+        h('div', {
+          class: ['tab-header', { active: active.value === tab.key }],
+          onClick: () => select(tab.key)
+        }, tab.title)
+      )),
+      h('div', { class: 'tab-panels' }, props.tabs.map(tab =>
+        h('div', {
+          class: 'tab-panel',
+          style: { display: active.value === tab.key ? 'block' : 'none' }
+        }, slots[tab.key] ? slots[tab.key]() : [])
+      ))
+    ]);
   },
-  template: `
-    <div class="tab-group">
-      <div class="tab-headers">
-        <div v-for="tab in tabs" :key="tab.key"
-             class="tab-header"
-             :class="{ active: active === tab.key }"
-             @click="select(tab.key)">
-          {{ tab.title }}
-        </div>
-      </div>
-      <div class="tab-panels">
-        <template v-for="tab in tabs" :key="tab.key">
-          <div v-if="active === tab.key" class="tab-panel">
-            <slot :name="tab.key" :tab="tab"></slot>
-          </div>
-        </template>
-      </div>
-    </div>
-  `,
 });

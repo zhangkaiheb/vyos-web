@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="dns-forwarding">
+<h1>Forwarding DNS</h1>
+<p>VyOS fournit une infrastructure DNS pour les réseaux de petite taille, conçue pour être légère et adaptée aux routeurs et pare-feux à ressources limitées.</p>
+<p>Les clients connectés sont servis par le service de forwarding DNS, configuré sous <code class="docutils literal notranslate">service dns forwarding</code>. Il peut soit transférer les requêtes vers des serveurs DNS upstream configurables, soit fonctionner en tant que serveur DNS récursif complet sans nécessiter de serveurs DNS upstream. Fonctionner sans serveurs upstream évite d'exposer les requêtes des clients à un opérateur de DNS upstream.</p>
+<section id="configuration">
+<h2>Configuration</h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Une configuration de forwarding DNS ne peut être validée que lorsqu'<code class="docutils literal notranslate">listen-address</code> et <code class="docutils literal notranslate">allow-from</code> sont définis. Sinon, la validation échoue.</p>
+</div>
+<section id="listener">
+<h3>Écouteur</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding listen-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-listen-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez une adresse IPv4 ou IPv6 locale sur laquelle le forwarding DNS écoute les requêtes entrantes.</strong></p>
+<p>L'adresse doit déjà être assignée à une interface locale. Répétez la commande pour configurer plusieurs adresses d'écoute. Au moins une adresse d'écoute est nécessaire pour une validation réussie.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding listen-address 192.0.2.1
+set service dns forwarding listen-address 2001:db8::1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding port &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-port-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le port sur lequel le forwarding DNS écoute les requêtes entrantes.</strong></p>
+<p>La valeur par défaut est 53.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding port 5353
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding allow-from &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-allow-from-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Restreindre les requêtes entrantes aux clients dont l'IP source se trouve dans le préfixe IPv4 ou IPv6 spécifié.</strong></p>
+<p>Répétez la commande pour autoriser plusieurs préfixes. Au moins un préfixe est requis pour une validation réussie.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Limitez <code class="docutils literal notranslate">allow-from</code> aux réseaux fiables. N'utilisez pas <code class="docutils literal notranslate">0.0.0.0/0</code> ou <code class="docutils literal notranslate">::/0</code> si le service est accessible depuis Internet public.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding allow-from 192.0.2.0/24
+set service dns forwarding allow-from 2001:db8::/32
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding exclude-throttle-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-exclude-throttle-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Empêchez le throttling des serveurs autoritatifs correspondant à l'adresse IPv4 ou IPv6 ou au préfixe spécifié.</strong></p>
+<p>Le forwarding DNS throttle les serveurs autoritatifs qui ne répondent pas à une requête ou retournent des réponses que le forwarding DNS rejette. Cette commande exempte les adresses spécifiées du throttling. Répétez la commande pour ajouter plusieurs adresses.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding exclude-throttle-address 192.0.2.53
+set service dns forwarding exclude-throttle-address 2001:db8::53
+</pre></div>
+</div>
+</section>
+<section id="upstream-forwarding">
+<h3>Forwarding en amont</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-name-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Transférer les requêtes vers le serveur DNS upstream IPv4 ou IPv6 spécifié.</strong></p>
+<p>Les serveurs upstream sont configurés directement sous le forwarding DNS. Répétez la commande pour configurer plusieurs serveurs upstream.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding name-server 192.0.2.53
+set service dns forwarding name-server 2001:db8::53
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding name-server &lt;address&gt; port &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-name-server-address-port-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le port de destination utilisé lors du transfert des requêtes vers le serveur DNS upstream spécifié.</strong></p>
+<p>La valeur par défaut est 53.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding name-server 192.0.2.53 port 853
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding system
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-system" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Transférer les requêtes vers les serveurs DNS upstream configurés sous <code class="docutils literal notranslate">system name-server</code>.</strong></p>
+<p>Les serveurs upstream sont hérités de <code class="docutils literal notranslate">system name-server</code>.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding system
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding dhcp &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-dhcp-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Transférer les requêtes vers les serveurs DNS appris via le client DHCPv4 ou DHCPv6 sur l'interface spécifiée.</strong></p>
+<p>Répétez la commande pour transférer les requêtes vers des serveurs appris via DHCP sur plusieurs interfaces.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding dhcp eth0
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'adresse IPv4 ou IPv6 locale utilisée comme source lorsqu'le forwarding DNS initie des requêtes sortantes.</strong></p>
+<p>La valeur par défaut est <code class="docutils literal notranslate">0.0.0.0</code> et <code class="docutils literal notranslate">::</code>, ce qui signifie que l'adresse source est sélectionnée pour chaque requête sortante. Répétez la commande pour configurer plusieurs adresses sources.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding source-address 192.0.2.1
+set service dns forwarding source-address 2001:db8::1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding no-serve-rfc1918
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-no-serve-rfc1918" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactiver la réponse autoritaire aux requêtes pour les zones <code class="docutils literal notranslate">10.in-addr.arpa</code>, <code class="docutils literal notranslate">168.192.in-addr.arpa</code> et <code class="docutils literal notranslate">16-31.172.in-addr.arpa</code>.</strong></p>
+<p>Ces sont les zones de recherche inverse pour les plages d'adresses privées RFC 1918. Les requêtes pour ces zones sont ensuite transférées vers les serveurs upstream configurés.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding no-serve-rfc1918
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding ignore-hosts-file
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-ignore-hosts-file" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Ne pas utiliser le fichier local <code class="docutils literal notranslate">/etc/hosts</code> dans la résolution de noms.</strong></p>
+<p>Par défaut, le forwarding DNS répond aux requêtes en utilisant <code class="docutils literal notranslate">/etc/hosts</code> avant d'effectuer une récursion ou un transfert.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding ignore-hosts-file
+</pre></div>
+</div>
+</section>
+<section id="cache-et-timers">
+<h3>Cache et temporisations</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding cache-size &lt;0-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-cache-size-0-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le nombre maximum d'entrées de cache DNS.</strong></p>
+<p>La valeur par défaut est 10000. Une valeur de 0 désactive le cache.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding cache-size 1000000
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding negative-ttl &lt;0-7200&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-negative-ttl-0-7200" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le temps maximum, en secondes, pendant lequel les réponses négatives (NXDOMAIN et NODATA) sont mises en cache.</strong></p>
+<p>La valeur par défaut est 3600.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding negative-ttl 60
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding minimum-ttl-override &lt;0-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-minimum-ttl-override-0-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la durée minimale <abbr title="Time-to-Live">TTL</abbr>, en secondes, appliquée aux enregistrements mis en cache, indépendamment du TTL reçu du serveur autoritatif.</strong></p>
+<p>Les enregistrements avec un TTL inférieur à cette valeur sont mis en cache avec ce TTL minimal. La valeur par défaut est <code class="docutils literal notranslate">1</code>.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Modifiez uniquement si vous avez une raison spécifique d'augmenter les TTL courts, car cela prolonge le cache au-delà du TTL autoritatif. Si l'enregistrement change en amont, les clients reçoivent la valeur mise en cache obsolète jusqu'à ce que l'override expire.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding minimum-ttl-override 30
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding timeout &lt;10-60000&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-timeout-10-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le temps, en millisecondes, pendant lequel le forwarding DNS attend une réponse du serveur autoritatif distant à une requête sortante.</strong></p>
+<p>La valeur par défaut est 1500.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding timeout 2000
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding ttl-percent &lt;0-100&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-ttl-percent-0-100" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Actualisez les enregistrements en cache en arrière-plan lorsque le TTL restant tombe en dessous de ce pourcentage du TTL original.</strong></p>
+<p>Les clients continuent de recevoir la réponse existante pendant la mise à jour. La valeur par défaut est 0, ce qui désactive la mise à jour en arrière-plan.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding ttl-percent 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding serve-stale-extension &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-serve-stale-extension-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez combien de fois le TTL d'un enregistrement expiré peut être étendu de 30 secondes lorsque l'enregistrement ne peut pas être actualisé.</strong></p>
+<p>La valeur par défaut est 0, ce qui désactive le service des enregistrements périmés.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding serve-stale-extension 30
+</pre></div>
+</div>
+</section>
+<section id="dnssec-et-comportement-nxdomain">
+<h3>DNSSEC et comportement NXDOMAIN</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding dnssec &lt;off | process-no-validate | process | log-fail | validate&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-dnssec-off-process-no-validate-process-log-fail-validate" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le mode de traitement DNSSEC pour les requêtes et réponses sortantes :</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">off</code> : Aucun traitement DNSSEC. Les bits DO des requêtes clients sont ignorés, et aucun enregistrement DNSSEC n'est demandé aux serveurs autoritatifs.</p></li>
+<li><p><code class="docutils literal notranslate">process-no-validate</code> : Retourne les enregistrements DNSSEC (RRSIG, NSEC) aux clients qui les demandent, mais ne valide pas.</p></li>
+<li><p><code class="docutils literal notranslate">process</code> : Valide les réponses uniquement lorsqu'un client les demande (bit DO ou AD). Retourne <code class="docutils literal notranslate">SERVFAIL</code> en cas de données frauduleuses.</p></li>
+<li><p><code class="docutils literal notranslate">log-fail</code> : Valide toutes les réponses, indépendamment de la demande du client, enregistre les réponses frauduleuses, mais retourne les mêmes réponses qu'en mode <code class="docutils literal notranslate">process</code>.</p></li>
+<li><p><code class="docutils literal notranslate">validate</code> : Valide toutes les réponses et retourne <code class="docutils literal notranslate">SERVFAIL</code> en cas de données frauduleuses, indépendamment de la demande du client.</p></li>
+</ul>
+<p>La valeur par défaut est <code class="docutils literal notranslate">process-no-validate</code>.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding dnssec validate
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding nothing-below-nxdomain &lt;no | dnssec | yes&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-nothing-below-nxdomain-no-dnssec-yes" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez comment le forwarding DNS gère la coupure NXDOMAIN.</strong></p>
+<p>Lorsque le forwarding DNS a un NXDOMAIN en cache, il peut également retourner NXDOMAIN pour tout nom sous le nom refusé, sans interroger en amont. Ce paramètre contrôle quand ce comportement s'applique :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">no</code> : Ne jamais appliquer la coupure NXDOMAIN.</p></li>
+<li><p><code class="docutils literal notranslate">dnssec</code> : Appliquer la coupure NXDOMAIN uniquement pour les entrées NXDOMAIN validées par DNSSEC.</p></li>
+<li><p><code class="docutils literal notranslate">yes</code> : Appliquer la coupure NXDOMAIN pour tout NXDOMAIN en cache qui n'est pas frauduleux.</p></li>
+</ul>
+<p>La valeur par défaut est <code class="docutils literal notranslate">dnssec</code>.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding nothing-below-nxdomain yes
+</pre></div>
+</div>
+</section>
+<section id="dns64">
+<h3>DNS64</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding dns64-prefix &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-dns64-prefix-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Synthétisez les enregistrements AAAA à partir des enregistrements A pour les noms qui n'ont pas d'enregistrements AAAA, en utilisant le préfixe IPv6 NAT64 spécifié.</strong></p>
+<p>La longueur du préfixe doit être exactement <code class="docutils literal notranslate">/96</code>.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding dns64-prefix 2001:db8:64::/96
+</pre></div>
+</div>
+</section>
+<section id="edns-client-subnet">
+<h3>Sous-réseau client EDNS</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding options ecs-add-for &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-options-ecs-add-for-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez quelle adresse source de client est envoyée en tant que valeur <abbr title="EDNS Client Subnet">ECS</abbr> dans les requêtes sortantes.</strong></p>
+<p>Pour les clients dont l'adresse source correspond au préfixe spécifié, l'adresse réelle du client est envoyée. Pour les clients non correspondants, une adresse de substitution est envoyée afin qu'aucun sous-réseau spécifique au client ne soit exposé.</p>
+<p>ECS n'est envoyé que pour les requêtes correspondant à <code class="docutils literal notranslate">edns-subnet-allow-list</code>. Cette option contrôle uniquement la valeur, pas si ECS est envoyé.</p>
+<p>Précédé de <code class="docutils literal notranslate">!</code> pour exclure un préfixe. Répétez la commande pour plusieurs entrées.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding options ecs-add-for 192.0.2.0/24
+set service dns forwarding options ecs-add-for !192.0.2.128/25
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding options ecs-ipv4-bits &lt;0-32&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-options-ecs-ipv4-bits-0-32" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le nombre de bits de l'adresse IPv4 du client inclus dans l'option ECS envoyée aux serveurs autoritatifs.</strong></p>
+<p>S'applique uniquement aux requêtes où ECS est envoyé (celles correspondant à <code class="docutils literal notranslate">edns-subnet-allow-list</code>).</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding options ecs-ipv4-bits 24
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding options edns-subnet-allow-list &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-options-edns-subnet-allow-list-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activer ECS dans les requêtes sortantes lorsque l'adresse du serveur de destination est dans le masque réseau spécifié, ou lorsque le nom de la requête est sous le domaine spécifié.</strong></p>
+<p>Répétez la commande pour ajouter plusieurs entrées.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding options edns-subnet-allow-list example.com
+set service dns forwarding options edns-subnet-allow-list 192.0.2.0/24
+</pre></div>
+</div>
+</section>
+<section id="forwarding-par-domaine">
+<h3>Forwarding par domaine</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding domain &lt;domain-name&gt; name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-domain-domain-name-name-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Transférer les requêtes pour le domaine spécifié vers le serveur DNS upstream IPv4 ou IPv6 spécifié.</strong></p>
+<p>Répétez la commande pour configurer plusieurs noms de serveurs pour le même domaine. Utilisez cette option pour implémenter un DNS split-horizon. Le domaine peut également être une zone de recherche inverse telle que <code class="docutils literal notranslate">2.0.192.in-addr.arpa</code>.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding domain example.com name-server 192.0.2.53
+set service dns forwarding domain example.com name-server 2001:db8::53
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding domain &lt;domain-name&gt; name-server &lt;address&gt; port &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-domain-domain-name-name-server-address-port-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le port du serveur DNS upstream vers lequel les requêtes pour le domaine spécifié sont transférées.</strong></p>
+<p>La valeur par défaut est 53.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding domain example.com name-server 192.0.2.53 port 853
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding domain &lt;domain-name&gt; addnta
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-domain-domain-name-addnta" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le domaine spécifié comme un <abbr title="Negative Trust Anchor">NTA</abbr>, désactivant la validation DNSSEC pour celui-ci.</strong></p>
+<p>Configurez cela lorsque les requêtes pour un domaine cassé DNSSEC retournent <code class="docutils literal notranslate">SERVFAIL</code>, afin que le domaine devienne à nouveau accessible.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding domain example.com addnta
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding domain &lt;domain-name&gt; recursion-desired
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-domain-domain-name-recursion-desired" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Définissez le bit <abbr title="Recursion Desired">RD</abbr> dans les requêtes envoyées au serveur DNS upstream pour ce domaine.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding domain example.com recursion-desired
+</pre></div>
+</div>
+</section>
+<section id="zones-authoritatives">
+<h3>Zones autoritatives</h3>
+<p>Le forwarding DNS peut héberger des enregistrements autoritatifs pour un domaine, répondant directement plutôt que de transférer ou de rechercher.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Empêche le forwarding DNS de servir la zone autoritaire spécifiée, sans la supprimer de la configuration.</strong></p>
+<p>Les requêtes pour les noms dans la zone sont transférées ou recherchées au lieu d'être servies.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records &lt;type&gt; &lt;name&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-type-name-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Empêche le forwarding DNS de servir un enregistrement spécifique dans la zone autoritaire, sans le supprimer de la configuration.</strong></p>
+<p>Les requêtes correspondant à l'enregistrement sont transférées ou recherchées au lieu d'être servies.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records a www disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records &lt;type&gt; &lt;name&gt; ttl &lt;0-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-type-name-ttl-0-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le TTL, en secondes, pour l'enregistrement spécifié.</strong></p>
+<p>La valeur par défaut est 300.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records a www ttl 600
+</pre></div>
+</div>
+<section id="types-de-registres">
+<h4>Types de registres</h4>
+<p>Les commandes de type de registre de cette section acceptent les mots-clés suivants pour le nom de registre :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">&#64;</code> : Représente une zone apex, par exemple <code class="docutils literal notranslate">example.com</code>. Accepté par tous les types de registre.</p></li>
+<li><p><code class="docutils literal notranslate">any</code> : Représente un enregistrement wildcard, par exemple <code class="docutils literal notranslate">*.example.com</code>, qui correspond à tous les sous-domaines sous l'apex. Accepté par les enregistrements <code class="docutils literal notranslate">a</code> et <code class="docutils literal notranslate">aaaa</code> uniquement.</p></li>
+</ul>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records a &lt;name&gt; address &lt;ipv4-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-a-name-address-ipv4-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un enregistrement <abbr title="IPv4 address">A</abbr> dans la zone autoritaire spécifiée.</strong></p>
+<p>Accepte <code class="docutils literal notranslate">&#64;</code> et <code class="docutils literal notranslate">any</code> comme <code class="docutils literal notranslate">&lt;name&gt;</code>. Répétez la commande pour ajouter plusieurs adresses IPv4 au même enregistrement.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records a www address 192.0.2.10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records aaaa &lt;name&gt; address &lt;ipv6-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-aaaa-name-address-ipv6-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un enregistrement <abbr title="IPv6 address">AAAA</abbr> dans la zone autoritaire spécifiée.</strong></p>
+<p>Accepte <code class="docutils literal notranslate">&#64;</code> et <code class="docutils literal notranslate">any</code> comme <code class="docutils literal notranslate">&lt;name&gt;</code>. Répétez la commande pour ajouter plusieurs adresses IPv6 au même enregistrement.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records aaaa www address 2001:db8::10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records cname &lt;name&gt; target &lt;target-domain-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-cname-name-target-target-domain-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un enregistrement <abbr title="Canonical Name">CNAME</abbr> dans la zone autoritaire spécifiée.</strong></p>
+<p>Accepte <code class="docutils literal notranslate">&#64;</code> comme <code class="docutils literal notranslate">&lt;name&gt;</code>.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records cname www target host.example.com
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records mx &lt;name&gt; server &lt;server&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-mx-name-server-server" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un enregistrement <abbr title="Mail Exchanger">MX</abbr> dans la zone autoritaire spécifiée.</strong></p>
+<p>Accepte <code class="docutils literal notranslate">&#64;</code> comme <code class="docutils literal notranslate">&lt;name&gt;</code>. Répétez la commande pour ajouter plusieurs serveurs de messagerie au même enregistrement.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records mx @ server mail.example.com
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records mx &lt;name&gt; server &lt;server&gt; priority &lt;1-999&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-mx-name-server-server-priority-1-999" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la priorité de l'enregistrement MX spécifié.</strong></p>
+<p>Les valeurs plus basses sont prioritaires. La valeur par défaut est 10.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records mx @ server mail.example.com priority 20
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records ns &lt;name&gt; target &lt;target-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-ns-name-target-target-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un enregistrement <abbr title="Name Server">NS</abbr> dans la zone autoritaire spécifiée.</strong></p>
+<p>Accepte <code class="docutils literal notranslate">&#64;</code> comme <code class="docutils literal notranslate">&lt;name&gt;</code>. Répétez la commande pour ajouter plusieurs serveurs de noms au même enregistrement.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records ns @ target ns1.example.com
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records ptr &lt;name&gt; target &lt;target-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-ptr-name-target-target-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un enregistrement <abbr title="Pointer">PTR</abbr> dans la zone autoritaire spécifiée.</strong></p>
+<p>Accepte <code class="docutils literal notranslate">&#64;</code> comme <code class="docutils literal notranslate">&lt;name&gt;</code>.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain 2.0.192.in-addr.arpa records ptr 10 target host.example.com
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records txt &lt;name&gt; value &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-txt-name-value-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un enregistrement <abbr title="Text">TXT</abbr> dans la zone autoritaire spécifiée.</strong></p>
+<p>Accepte <code class="docutils literal notranslate">&#64;</code> comme <code class="docutils literal notranslate">&lt;name&gt;</code>. Répétez la commande pour ajouter plusieurs chaînes TXT au même enregistrement.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records txt @ value &#39;v=spf1 -all&#39;
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records spf &lt;name&gt; value &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-spf-name-value-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un enregistrement <abbr title="Sender Policy Framework">SPF</abbr> dans la zone autoritaire spécifiée.</strong></p>
+<p>Accepte <code class="docutils literal notranslate">&#64;</code> comme <code class="docutils literal notranslate">&lt;name&gt;</code>.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Les enregistrements SPF sont dépréciés au profit des enregistrements TXT. Privilégiez les enregistrements TXT pour les nouvelles implantations.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records spf @ value &#39;v=spf1 -all&#39;
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records srv &lt;name&gt; entry &lt;0-65535&gt; hostname &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-srv-name-entry-0-65535-hostname-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'hôte cible d'une entrée d'enregistrement <abbr title="Service Locator">SRV</abbr> dans la zone autoritaire spécifiée.</strong></p>
+<p>Accepte <code class="docutils literal notranslate">&#64;</code> comme <code class="docutils literal notranslate">&lt;name&gt;</code>.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records srv _sip._tcp entry 0 hostname sip.example.com
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records srv &lt;name&gt; entry &lt;0-65535&gt; port &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-srv-name-entry-0-65535-port-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le port d'une entrée d'enregistrement SRV dans la zone autoritaire spécifiée.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records srv _sip._tcp entry 0 port 5060
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records srv &lt;name&gt; entry &lt;0-65535&gt; priority &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-srv-name-entry-0-65535-priority-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la priorité d'une entrée d'enregistrement SRV dans la zone autoritaire spécifiée.</strong></p>
+<p>Les valeurs plus basses sont prioritaires. La valeur par défaut est 10.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records srv _sip._tcp entry 0 priority 20
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records srv &lt;name&gt; entry &lt;0-65535&gt; weight &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-srv-name-entry-0-65535-weight-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le poids d'une entrée d'enregistrement SRV dans la zone autoritaire spécifiée.</strong></p>
+<p>Le poids est utilisé pour distribuer la charge entre les entrées ayant la même priorité. La valeur par défaut est 0.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records srv _sip._tcp entry 0 weight 50
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; order &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-order-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le champ d'ordre d'une règle NAPTR dans la zone autoritaire spécifiée.</strong></p>
+<p>Accepte <code class="docutils literal notranslate">&#64;</code> comme <code class="docutils literal notranslate">&lt;name&gt;</code>. Les règles avec un ordre plus bas sont évaluées en premier.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 order 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; preference &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-preference-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le champ de préférence d'une règle NAPTR dans la zone autoritaire spécifiée.</strong></p>
+<p>Accepte <code class="docutils literal notranslate">&#64;</code> comme <code class="docutils literal notranslate">&lt;name&gt;</code>. La valeur par défaut est 0.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 preference 50
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; lookup-a
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-lookup-a" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Définissez le bit A sur une règle NAPTR dans la zone autoritaire spécifiée.</strong></p>
+<p>Lorsqu'il est activé, le forwarding DNS traite la sortie de la règle comme un nom de domaine et cherche son enregistrement A ou AAAA. Aucune autre recherche NAPTR ne suit.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Définissez au plus un des champs <code class="docutils literal notranslate">lookup-a</code>, <code class="docutils literal notranslate">lookup-srv</code>, <code class="docutils literal notranslate">resolve-uri</code> et <code class="docutils literal notranslate">protocol-specific</code> sur la même règle NAPTR. Ces indicateurs définissent des actions suivantes mutuellement exclusives dans la résolution DNS.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 lookup-a
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; lookup-srv
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-lookup-srv" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Définissez le bit S sur une règle NAPTR dans la zone autoritaire spécifiée.</strong></p>
+<p>Lorsqu'il est activé, le forwarding DNS traite la sortie de la règle comme un nom de domaine et cherche son enregistrement SRV. Aucune autre recherche NAPTR ne suit.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 lookup-srv
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; resolve-uri
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-resolve-uri" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Définissez le bit U sur une règle NAPTR dans la zone autoritaire spécifiée.</strong></p>
+<p>Lorsqu'il est activé, le forwarding DNS traite la sortie de la règle comme un URI et l'utilise directement. Aucune autre recherche DNS ne suit.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 resolve-uri
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; protocol-specific
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-protocol-specific" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Définissez le bit P sur une règle NAPTR dans la zone autoritaire spécifiée.</strong></p>
+<p>Lorsqu'il est activé, le forwarding DNS traite la sortie de la règle selon le protocole d'application associé. Aucune autre recherche DNS ne suit.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 protocol-specific
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; service &lt;service&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-service-service" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le champ Service d'une règle NAPTR dans la zone autoritaire spécifiée.</strong></p>
+<p>Définit le protocole et le service de résolution que cette règle propose dans le format <code class="docutils literal notranslate">Protocol+ResolutionService</code> (par exemple, SIP sur TCP → <code class="docutils literal notranslate">SIP+D2T</code>).</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 service SIP+D2T
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; regexp &lt;expression&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-regexp-expression" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le champ Regexp d'une règle NAPTR dans la zone autoritaire spécifiée.</strong></p>
+<p>Une expression de substitution au format <code class="docutils literal notranslate">!ere!replacement!</code>, appliquée au nom de la requête pour produire la cible de la prochaine recherche ou URI.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Une règle utilise soit <code class="docutils literal notranslate">regexp</code> soit <code class="docutils literal notranslate">replacement</code>, pas les deux. Définir les deux produit un enregistrement NAPTR mal formé.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 regexp !^.*$!sip:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fb939e978b9f9e8890bb9e839a968b979ed5989496">[email&#160;protected]</a>!
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding authoritative-domain &lt;domain-name&gt; records naptr &lt;name&gt; rule &lt;0-65535&gt; replacement &lt;target-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-authoritative-domain-domain-name-records-naptr-name-rule-0-65535-replacement-target-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le champ Replacement d'une règle NAPTR dans la zone autoritaire spécifiée.</strong></p>
+<p>Un nom DNS absolu utilisé comme cible de la prochaine recherche, dont le type dépend du drapeau de la règle.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding authoritative-domain example.com records naptr @ rule 100 replacement sip.example.com
+</pre></div>
+</div>
+</section>
+</section>
+<section id="mise-en-cache-de-zone">
+<h3>Mise en cache de zone</h3>
+<p>Le forwarding DNS peut charger une zone directement dans son cache via AXFR ou à partir d'un fichier de zone à une URL.
+La mise en cache de zone est configurée sous <code class="docutils literal notranslate">service dns forwarding zone-cache &lt;domain-name&gt;</code>.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding zone-cache &lt;domain-name&gt; source axfr &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-zone-cache-domain-name-source-axfr-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le forwarding DNS pour charger la zone spécifiée via AXFR depuis le serveur DNS IPv4 ou IPv6 spécifié.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding zone-cache example.com source axfr 192.0.2.53
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding zone-cache &lt;domain-name&gt; source url &lt;url&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-zone-cache-domain-name-source-url-url" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le forwarding DNS pour charger la zone spécifiée à partir de l'URL HTTP(S) pointant vers un fichier de zone.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding zone-cache example.com source url https://zones.example.com/example.com.zone
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dns forwarding zone-cache &lt;domain-name&gt; options timeout &lt;1-3600&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dns-forwarding-zone-cache-domain-name-options-timeout-1-3600" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez pendant combien de secondes le forwarding DNS attend la récupération de la zone avant d'abandonner l'essai.</strong></p>
+<p>La valeur par défaut est 20.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dns forwarding zone-cache example.com

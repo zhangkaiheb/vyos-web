@@ -5,6 +5,9 @@ import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -21,17 +24,17 @@ function isPresent(value) {
   return true;
 }
 
-function validateIPv4(value) {
+function validateIPv4(value, t) {
   if (!value) return '';
-  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return 'IPv4 地址格式错误';
-  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return 'IPv4 地址格式错误';
+  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return t('bfd.validation.ipv4');
+  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return t('bfd.validation.ipv4');
   return '';
 }
 
-function validateInterval(value, min, max, name) {
+function validateInterval(value, min, max, name, t) {
   if (!value) return '';
   const n = parseInt(value, 10);
-  if (isNaN(n) || n < min || n > max) return `${name}必须在 ${min}-${max} 之间`;
+  if (isNaN(n) || n < min || n > max) return t('bfd.validation.interval', { name, min, max });
   return '';
 }
 
@@ -101,6 +104,8 @@ function configToConfig(form) {
 export default defineComponent({
   name: 'BfdPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -122,19 +127,19 @@ export default defineComponent({
     });
 
     const peerColumns = [
-      { key: 'address', title: '对端地址' },
-      { key: 'source-address', title: '源地址' },
-      { key: 'multiplier', title: '乘数' },
-      { key: 'receive-interval', title: '接收间隔' },
-      { key: 'transmit-interval', title: '发送间隔' },
-      { key: 'profile', title: '配置文件' },
+      { key: 'address', title: t('bfd.columns.address') },
+      { key: 'source-address', title: t('bfd.columns.sourceAddress') },
+      { key: 'multiplier', title: t('bfd.columns.multiplier') },
+      { key: 'receive-interval', title: t('bfd.columns.receiveInterval') },
+      { key: 'transmit-interval', title: t('bfd.columns.transmitInterval') },
+      { key: 'profile', title: t('bfd.columns.profile') },
     ];
 
     const profileColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'receive-interval', title: '接收间隔' },
-      { key: 'transmit-interval', title: '发送间隔' },
-      { key: 'multiplier', title: '乘数' },
+      { key: 'name', title: t('bfd.columns.name') },
+      { key: 'receive-interval', title: t('bfd.columns.receiveInterval') },
+      { key: 'transmit-interval', title: t('bfd.columns.transmitInterval') },
+      { key: 'multiplier', title: t('bfd.columns.multiplier') },
     ];
 
     const commandPath = computed(() => {
@@ -159,7 +164,8 @@ export default defineComponent({
       saved.value = false;
       try {
         const payload = configToConfig(config.value);
-        await configApi.set('protocols bfd', payload);
+        await configStore.setConfig('protocols bfd', payload);
+        configStore.markPending();
         saved.value = true;
         setTimeout(() => (saved.value = false), 2000);
         peerModalVisible.value = false;
@@ -183,12 +189,12 @@ export default defineComponent({
     }
 
     function savePeer() {
-      if (!peerForm.value.address) return alert('请输入对端地址');
-      const err = validateIPv4(peerForm.value.address);
-      if (err) return alert(err);
+      if (!peerForm.value.address) return showError({ message: t('bfd.errors.peerAddressRequired') });
+      const err = validateIPv4(peerForm.value.address, t);
+      if (err) return showError({ message: err });
       if (peerForm.value.multiplier) {
-        const err = validateInterval(peerForm.value.multiplier, 2, 50, '乘数');
-        if (err) return alert(err);
+        const err = validateInterval(peerForm.value.multiplier, 2, 50, t('bfd.columns.multiplier'), t);
+        if (err) return showError({ message: err });
       }
       if (editingPeerIndex.value >= 0) {
         config.value.peers.splice(editingPeerIndex.value, 1, JSON.parse(JSON.stringify(peerForm.value)));
@@ -209,7 +215,7 @@ export default defineComponent({
     }
 
     function saveProfile() {
-      if (!profileForm.value.name) return alert('请输入配置文件名称');
+      if (!profileForm.value.name) return showError({ message: t('bfd.errors.profileNameRequired') });
       if (editingProfileIndex.value >= 0) {
         config.value.profiles.splice(editingProfileIndex.value, 1, JSON.parse(JSON.stringify(profileForm.value)));
       } else {
@@ -218,23 +224,57 @@ export default defineComponent({
       profileModalVisible.value = false;
     }
 
+    // Delete confirmation modals
+    const deletePeerModalVisible = ref(false);
+    const pendingDeletePeerNames = ref([]);
+
+    const deleteProfileModalVisible = ref(false);
+    const pendingDeleteProfileNames = ref([]);
+
     function deletePeer(index) {
-      if (confirm('确定删除此对端？')) config.value.peers.splice(index, 1);
+      pendingDeletePeerNames.value = [config.value.peers[index].address];
+      deletePeerModalVisible.value = true;
+    }
+
+    function confirmDeletePeer() {
+      const index = config.value.peers.findIndex(a => a.address === pendingDeletePeerNames.value[0]);
+      if (index >= 0) {
+        config.value.peers.splice(index, 1);
+      }
+      deletePeerModalVisible.value = false;
+      pendingDeletePeerNames.value = [];
     }
 
     function deleteProfile(index) {
-      if (confirm('确定删除此配置文件？')) config.value.profiles.splice(index, 1);
+      pendingDeleteProfileNames.value = [config.value.profiles[index].name];
+      deleteProfileModalVisible.value = true;
     }
 
-    onMounted(load);
+    function confirmDeleteProfile() {
+      const index = config.value.profiles.findIndex(a => a.name === pendingDeleteProfileNames.value[0]);
+      if (index >= 0) {
+        config.value.profiles.splice(index, 1);
+      }
+      deleteProfileModalVisible.value = false;
+      pendingDeleteProfileNames.value = [];
+    }
+
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
     return {
+      t,
       loading, saving, saved, config, activeTab, writeDisabled,
       peerModalVisible, editingPeerIndex, peerForm,
       profileModalVisible, editingProfileIndex, profileForm,
       peerColumns, profileColumns, commandPath,
       openPeerModal, openProfileModal,
       deletePeer, deleteProfile,
+      confirmDeletePeer, confirmDeleteProfile,
+      deletePeerModalVisible, pendingDeletePeerNames,
+      deleteProfileModalVisible, pendingDeleteProfileNames,
       savePeer, saveProfile,
       save, configToConfig,
     };
@@ -242,10 +282,10 @@ export default defineComponent({
   components: { TabGroup, ToolbarButton, DataTable, DraggableModal },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('bfd.alerts.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'peer', title: '对端' },
-        { key: 'profile', title: '配置文件' }
+        { key: 'peer', title: t('bfd.tabs.peer') },
+        { key: 'profile', title: t('bfd.tabs.profile') }
       ]">
 
         <template #peer>
@@ -261,55 +301,66 @@ export default defineComponent({
         </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
-
       <!-- Peer Modal -->
-      <DraggableModal v-model:visible="peerModalVisible" :title="editingPeerIndex >= 0 ? '编辑 BFD 对端' : '添加 BFD 对端'" width="600px" @confirm="savePeer">
+      <DraggableModal v-model:visible="peerModalVisible" :title="editingPeerIndex >= 0 ? t('bfd.modals.editPeer') : t('bfd.modals.addPeer')" width="600px" @confirm="savePeer">
         <div class="form-row">
-          <label class="form-label">对端地址 *</label>
-          <input type="text" class="form-control" v-model="peerForm.address" placeholder="IPv4 地址" style="width:100%;" :disabled="editingPeerIndex >= 0" />
+          <label class="form-label">{{ t('bfd.labels.peerAddressRequired') }}</label>
+          <input type="text" class="form-control" v-model="peerForm.address" :placeholder="t('bfd.placeholders.ipv4')" style="width:100%;" :disabled="editingPeerIndex >= 0" />
         </div>
         <div class="form-row">
-          <label class="form-label">源地址</label>
-          <input type="text" class="form-control" v-model="peerForm['source-address']" placeholder="IPv4 地址" style="width:100%;" />
+          <label class="form-label">{{ t('bfd.labels.sourceAddress') }}</label>
+          <input type="text" class="form-control" v-model="peerForm['source-address']" :placeholder="t('bfd.placeholders.ipv4')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">乘数</label>
-          <input type="number" class="form-control" v-model="peerForm.multiplier" min="2" max="50" placeholder="2-50" style="width:100%;" />
+          <label class="form-label">{{ t('bfd.labels.multiplier') }}</label>
+          <input type="number" class="form-control" v-model="peerForm.multiplier" min="2" max="50" :placeholder="t('bfd.placeholders.multiplier')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">接收间隔</label>
-          <input type="number" class="form-control" v-model="peerForm['receive-interval']" min="50" max="1000" placeholder="50-1000 毫秒" style="width:100%;" />
+          <label class="form-label">{{ t('bfd.labels.receiveInterval') }}</label>
+          <input type="number" class="form-control" v-model="peerForm['receive-interval']" min="50" max="1000" :placeholder="t('bfd.placeholders.intervalMs')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">发送间隔</label>
-          <input type="number" class="form-control" v-model="peerForm['transmit-interval']" min="50" max="1000" placeholder="50-1000 毫秒" style="width:100%;" />
+          <label class="form-label">{{ t('bfd.labels.transmitInterval') }}</label>
+          <input type="number" class="form-control" v-model="peerForm['transmit-interval']" min="50" max="1000" :placeholder="t('bfd.placeholders.intervalMs')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">配置文件</label>
-          <input type="text" class="form-control" v-model="peerForm.profile" placeholder="配置文件名称" style="width:100%;" />
+          <label class="form-label">{{ t('bfd.labels.profile') }}</label>
+          <input type="text" class="form-control" v-model="peerForm.profile" :placeholder="t('bfd.placeholders.profileName')" style="width:100%;" />
         </div>
       </DraggableModal>
 
       <!-- Profile Modal -->
-      <DraggableModal v-model:visible="profileModalVisible" :title="editingProfileIndex >= 0 ? '编辑 BFD 配置文件' : '添加 BFD 配置文件'" width="500px" @confirm="saveProfile">
+      <DraggableModal v-model:visible="profileModalVisible" :title="editingProfileIndex >= 0 ? t('bfd.modals.editProfile') : t('bfd.modals.addProfile')" width="500px" @confirm="saveProfile">
         <div class="form-row">
-          <label class="form-label">名称 *</label>
-          <input type="text" class="form-control" v-model="profileForm.name" placeholder="配置文件名称" style="width:100%;" :disabled="editingProfileIndex >= 0" />
+          <label class="form-label">{{ t('bfd.labels.nameRequired') }}</label>
+          <input type="text" class="form-control" v-model="profileForm.name" :placeholder="t('bfd.placeholders.profileName')" style="width:100%;" :disabled="editingProfileIndex >= 0" />
         </div>
         <div class="form-row">
-          <label class="form-label">接收间隔</label>
-          <input type="number" class="form-control" v-model="profileForm['receive-interval']" min="50" max="1000" placeholder="50-1000 毫秒" style="width:100%;" />
+          <label class="form-label">{{ t('bfd.labels.receiveInterval') }}</label>
+          <input type="number" class="form-control" v-model="profileForm['receive-interval']" min="50" max="1000" :placeholder="t('bfd.placeholders.intervalMs')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">发送间隔</label>
-          <input type="number" class="form-control" v-model="profileForm['transmit-interval']" min="50" max="1000" placeholder="50-1000 毫秒" style="width:100%;" />
+          <label class="form-label">{{ t('bfd.labels.transmitInterval') }}</label>
+          <input type="number" class="form-control" v-model="profileForm['transmit-interval']" min="50" max="1000" :placeholder="t('bfd.placeholders.intervalMs')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">乘数</label>
-          <input type="number" class="form-control" v-model="profileForm.multiplier" min="2" max="50" placeholder="2-50" style="width:100%;" />
+          <label class="form-label">{{ t('bfd.labels.multiplier') }}</label>
+          <input type="number" class="form-control" v-model="profileForm.multiplier" min="2" max="50" :placeholder="t('bfd.placeholders.multiplier')" style="width:100%;" />
+        </div>
+      </DraggableModal>
+
+      <!-- Delete Confirmation Modals -->
+      <DraggableModal v-model:visible="deletePeerModalVisible" :title="t('bfd.modals.confirmDelete')" width="400px" @confirm="confirmDeletePeer">
+        <div>{{ t('bfd.messages.confirmDeletePeer') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeletePeerNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="deleteProfileModalVisible" :title="t('bfd.modals.confirmDelete')" width="400px" @confirm="confirmDeleteProfile">
+        <div>{{ t('bfd.messages.confirmDeleteProfile') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteProfileNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
     </div>

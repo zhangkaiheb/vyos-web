@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="pim">
+<h1>PIM</h1>
+<p><abbr title="Protocol Independent Multicast">PIM</abbr> routes multicast traffic between
+routers using the existing unicast routing table for path decisions. VyOS
+supports PIM Sparse Mode (PIM-SM) and IGMP versions 2 and 3.</p>
+<p>In PIM-SM, traffic from multicast sources is forwarded toward the
+<abbr title="Rendezvous Point">RP</abbr>. Multicast receivers use IGMP to signal their
+local router which groups they want to receive, and the router uses PIM to
+pull that traffic from the RP via a shared tree.</p>
+<p>A working PIM-SM deployment requires:</p>
+<ul class="simple">
+<li><p>PIM enabled on every interface along the multicast path.</p></li>
+<li><p>The location of the RP declared identically on every router in the PIM
+domain.</p></li>
+<li><p>IGMP enabled on interfaces facing multicast receivers.</p></li>
+</ul>
+<section id="configuration">
+<h2>Configuration</h2>
+<section id="pim-sm">
+<h3>PIM-SM</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim ecmp
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-ecmp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable <abbr title="Equal-Cost Multipath">ECMP</abbr> routing for multicast traffic.</strong></p>
+<p>When a specific <abbr title="Reverse Path Forwarding">RPF</abbr> lookup returns
+multiple equal-cost next-hops, enabling this feature distributes (S,G)
+multicast flows across all of them.</p>
+<p>If ECMP is not enabled, PIM defaults to using only the first next-hop
+returned by the RPF lookup.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim ecmp
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim ecmp rebalance
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-ecmp-rebalance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable automatic rebalancing of all PIM (S,G) multicast flows when an
+ECMP next-hop interface fails.</strong></p>
+<p>When ECMP is enabled, and one of the interfaces used by PIM goes down,
+this feature forces PIM to redistribute all existing (S,G) flows across
+the remaining equal-cost interfaces.</p>
+<p>If rebalancing is not configured, PIM only reroutes the specific flows
+that were actively using the failed interface.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim ecmp rebalance
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim join-prune-interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-join-prune-interval-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interval, in seconds, at which PIM sends Join/Prune
+messages to upstream neighbors.</strong></p>
+<p>The default interval is 60 seconds. Setting a value below 60 seconds can
+negatively impact convergence at scale.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim join-prune-interval 120
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim keep-alive-timer &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-keep-alive-timer-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the keep-alive timeout interval, in seconds, for (S,G)
+multicast flow state.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Some hardware cannot detect traffic flowing in intervals shorter than 30
+seconds. For such hardware, ensure the value is set to 31 seconds or
+higher.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim keep-alive-timer 60
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim packets &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-packets-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the number of incoming PIM packets processed consecutively
+from a neighbor before the system moves to the next task.</strong></p>
+<p>The default value is 3 packets. This command is only useful in
+deployments with a high number of PIM control packets.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim packets 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim register-accept-list prefix-list &lt;prefix-list&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-register-accept-list-prefix-list-prefix-list" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a prefix-list to filter incoming PIM Register messages.</strong></p>
+<p>When PIM receives a Register packet, the multicast source IP address is
+evaluated against the specified prefix-list. If the source IP address is
+permitted, normal PIM processing continues. If the source IP address is
+denied, a Register-Stop message is sent to the sender.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim register-accept-list prefix-list MULTICAST-SOURCES
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim register-suppress-time &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-register-suppress-time-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the duration, in seconds, during which a
+<abbr title="First-Hop Router">FHR</abbr> suppresses sending PIM Register messages.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim register-suppress-time 60
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim rp address &lt;ip-address&gt; group &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-rp-address-ip-address-group-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a Rendezvous Point (RP) for the specified multicast group
+range.</strong></p>
+<p>To use PIM, you must configure an RP to receive Join messages. VyOS
+currently supports only static RP configuration.</p>
+<p>The <code class="docutils literal notranslate">&lt;address&gt;</code> parameter defines the RP’s IP address, and the <code class="docutils literal notranslate">&lt;group&gt;</code>
+parameter defines the prefix of the multicast group range served by this
+RP.</p>
+<p>A single RP can serve multiple group ranges. Repeat the command with
+different <code class="docutils literal notranslate">&lt;group&gt;</code> prefixes to map several ranges to the same RP.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim rp address 192.0.2.1 group 239.0.0.0/8
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim rp keep-alive-timer &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-rp-keep-alive-timer-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the keep-alive timeout interval, in seconds, for (S,G)
+multicast flow state at the Rendezvous Point (RP).</strong></p>
+<p>This value must be at least equal to the register-suppression-time;
+otherwise, the RP may time out the (S,G) state before the next
+Null-Register message arrives from the FHR.</p>
+<p>When a Register-Stop is sent, the KAT(S,G) at the RP is set to the maximum
+of the global Keepalive_Period and the RP_Keepalive_Period.</p>
+<p>The default value is 210 seconds.</p>
+<p>See <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7761#section-4.1">RFC 7761, Section 4.1</a>
+for details.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As some hardware platforms cannot detect data flowing in intervals shorter
+than 30 seconds, ensure the value is set to 31 seconds or higher.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim rp keep-alive-timer 300
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim no-v6-secondary
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-no-v6-secondary" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable sending IPv6 secondary addresses in PIM Hello messages.</strong></p>
+<p>By default, PIM Hello messages include all IPv6 secondary addresses
+configured on the interface, allowing PIM neighbors to use them as IPv6
+next-hops for RPF lookups.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim no-v6-secondary
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim spt-switchover infinity-and-beyond prefix-list &lt;list&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-spt-switchover-infinity-and-beyond-prefix-list-list" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>On the <abbr title="Last-Hop Router">LHR</abbr>, suppress the switchover from the
+shared (*,G) tree to the source-specific (S,G)
+<abbr title="Shortest-Path Tree">SPT</abbr>.</strong></p>
+<p>The optional <code class="docutils literal notranslate">prefix-list</code> controls which groups are affected: groups
+matched by a <em>permit</em> entry stay on the shared tree, groups matched by a
+<em>deny</em> entry switch over normally. Without a prefix-list, the suppression
+applies to all groups.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim spt-switchover infinity-and-beyond
+set protocols pim spt-switchover infinity-and-beyond prefix-list SHARED-TREE-GROUPS
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim ssm prefix-list &lt;list&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-ssm-prefix-list-list" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a prefix-list with the range of multicast group IP addresses
+that operate in <abbr title="Source-Specific Multicast">SSM</abbr> mode.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim ssm prefix-list SSM-RANGE
+</pre></div>
+</div>
+<section id="interface-specific-commands">
+<h4>Interface-specific commands</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable <abbr title="Bidirectional Forwarding Detection">BFD</abbr> for each PIM
+neighbor discovered on the specified interface.</strong></p>
+<p>When BFD detects a link failure, the PIM neighbor relationship is torn
+down, and all associated multicast (S,G) entries are removed.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 bfd
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; bfd profile &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-bfd-profile-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Apply the specified BFD profile to BFD sessions on this PIM interface.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 bfd profile fast-failover
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; dr-priority &lt;1-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-dr-priority-1-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the <abbr title="Designated Router">DR</abbr> priority for the specified
+interface.</strong></p>
+<p>The router with the highest interface priority is elected as the DR for a
+LAN segment.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 dr-priority 100
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; hello &lt;1-180&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-hello-1-180" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the PIM Hello interval, in seconds, for the specified
+interface.</strong></p>
+<p>PIM Hello messages are sent periodically on the interface to discover and
+maintain PIM neighbor relationships. The hold time (the duration after
+which a neighbor is considered dead if no Hello is received) is calculated
+based on the Hello interval.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 hello 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; no-bsm
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-no-bsm" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable processing of PIM <abbr title="Bootstrap Messages">BSMs</abbr> on the
+specified interface.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 no-bsm
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; no-unicast-bsm
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-no-unicast-bsm" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable processing of unicast PIM BSMs on this interface.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 no-unicast-bsm
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; passive
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-passive" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable sending and receiving PIM control packets on this interface.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 passive
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; source-address &lt;ip-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-source-address-ip-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the source IP address PIM uses for control messages sent on
+the specified interface.</strong></p>
+<p>This command is useful when multiple IP addresses are configured on a
+single interface.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 source-address 192.0.2.10
+</pre></div>
+</div>
+</section>
+</section>
+<section id="igmp">
+<h3>IGMP</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim igmp watermark-warning &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-igmp-watermark-warning-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure watermark warning generation based on the number of joined
+IGMP groups.</strong></p>
+<p>When the total number of joined IGMP groups reaches this specified limit,
+the router generates a warning.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim igmp watermark-warning 500
+</pre></div>
+</div>
+<section id="id2">
+<h4>Interface-specific commands</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; igmp
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable IGMP on the specified interface.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 igmp
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; igmp disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Administratively disable IGMP on the specified interface without removing
+the existing IGMP configuration.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 igmp disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; igmp join &lt;multicast-address&gt; source-address &lt;IP-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-join-multicast-address-source-address-ip-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interface to join a specific (S,G) channel.</strong></p>
+<p>Specify both the multicast IP address (G) and the source IP address (S).
+Each command joins one (S,G) channel. To join multiple channels sharing
+the same group, repeat the command with different <code class="docutils literal notranslate">source-address</code> values.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 igmp join 232.1.1.100 source-address 192.0.2.50
+set protocols pim interface eth0 igmp join 232.1.1.100 source-address 192.0.2.51
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; igmp query-interval &lt;1-1800&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-query-interval-1-1800" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IGMP Host Query Interval, in seconds, on the specified
+interface.</strong></p>
+<p>This setting determines the interval between IGMP queries sent by the
+router to discover which multicast groups have active listeners on the
+attached network.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth1 igmp query-interval 125
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; igmp query-max-response-time &lt;10-250&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-query-max-response-time-10-250" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IGMP maximum query response time, in deciseconds, on the
+specified interface.</strong></p>
+<p>This value is inserted in IGMP queries and specifies the maximum time
+hosts have to respond with a membership report. If no report is received
+within the specified window, PIM assumes there are no longer any active
+local receivers and may time out the associated (*,G) or (S,G) state
+(see <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7761#section-4.1">RFC 7761, Section 4.1</a>).</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 igmp query-max-response-time 50
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim interface &lt;interface&gt; igmp version &lt;2-3&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-version-2-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IGMP version on the specified interface.</strong></p>
+<p>The default version is 3.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 igmp version 2
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="example">
+<h2>Example</h2>
+<p>The following example demonstrates a basic PIM Sparse Mode (PIM-SM) multicast
+deployment across three routers, showing how to configure each router’s role
+within a multicast domain. Together, the three routers form a complete
+multicast distribution path from sources to receivers, with one router acting
+as the Rendezvous Point (RP).</p>
+<section id="topology-and-roles">
+<h3>Topology and roles</h3>
+<ul class="simple">
+<li><p>Router 1 is the <abbr title="Last-Hop Router">LHR</abbr>.</p></li>
+<li><p>Router 3 is the <abbr title="Rendezvous Point">RP</abbr>.</p></li>
+<li><p>Router 2 is the <abbr title="First-Hop Router">FHR</abbr>.</p></li>
+</ul>
+<p><strong>Router 1:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth2 address &#39;198.51.100.1/30&#39;
+set interfaces ethernet eth1 address &#39;192.0.2.1/24&#39;
+set protocols ospf area 0 network &#39;198.51.100.0/30&#39;
+set protocols ospf area 0 network &#39;192.0.2.0/24&#39;
+set protocols pim interface eth1
+set protocols pim interface eth1 igmp
+set protocols pim interface eth2
+set protocols pim rp address 203.0.113.1 group &#39;224.0.0.0/4&#39;
+</pre></div>
+</div>
+<p><strong>Router 3:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum0 address &#39;203.0.113.1/32&#39;
+set interfaces ethernet eth0 address &#39;198.51.100.2/30&#39;
+set interfaces ethernet eth1 address &#39;198.51.100.5/30&#39;
+set protocols ospf area 0 network &#39;198.51.100.0/30&#39;
+set protocols ospf area 0 network &#39;203.0.113.1/32&#39;
+set protocols ospf area 0 network &#39;198.51.100.4/30&#39;
+set protocols pim interface dum0
+set protocols pim interface eth0
+set protocols pim interface eth1
+set protocols pim rp address 203.0.113.1 group &#39;224.0.0.0/4&#39;
+</pre></div>
+</div>
+<p><strong>Router 2:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address &#39;203.0.113.129/25&#39;
+set interfaces ethernet eth2 address &#39;198.51.100.6/30&#39;
+set protocols ospf area 0 network &#39;203.0.113.128/25&#39;
+set protocols ospf area 0 network &#39;198.51.100.4/30&#39;
+set protocols pim interface eth1
+set protocols pim interface eth2
+set protocols pim rp address 203.0.113.1 group &#39;224.0.0.0/4&#39;
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, watch, inject } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
@@ -6,6 +6,7 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 
 const PROTOCOL_OPTIONS = [
   { value: 'icmp', label: 'ICMP' },
@@ -16,6 +17,7 @@ const PROTOCOL_OPTIONS = [
 export default defineComponent({
   name: 'Nat64SourcePage',
   setup() {
+    const { t } = inject('i18n');
     const route = useRoute();
     const configStore = useConfigStore();
     const path = 'nat64 source';
@@ -26,22 +28,24 @@ export default defineComponent({
     const modalVisible = ref(false);
     const editingRule = ref(null);
     const editingOriginalId = ref(null);
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
 
-    const ruleSchema = [
-      { key: 'id', title: '规则编号', type: 'number', min: 1, max: 999999, required: true, help: '范围: 1-999999' },
-      { key: 'description', title: '描述', type: 'text' },
-      { key: 'matchMark', title: '匹配 fwmark 值', type: 'number', min: 1, max: 2147483647, placeholder: '1-2147483647' },
-      { key: 'sourcePrefix', title: 'IPv6 源前缀', type: 'text', placeholder: 'h:h:h:h:h:h:h:h/x' },
-      { key: 'disable', title: '禁用', type: 'checkbox' },
-    ];
+    const ruleSchema = computed(() => [
+      { key: 'id', title: t('nat64.source.field.ruleNumber'), type: 'number', min: 1, max: 999999, required: true, help: t('nat64.source.help.ruleNumber') },
+      { key: 'description', title: t('nat64.source.field.description'), type: 'text' },
+      { key: 'matchMark', title: t('nat64.source.field.matchMark'), type: 'number', min: 1, max: 2147483647, placeholder: t('nat64.source.placeholder.matchMark') },
+      { key: 'sourcePrefix', title: t('nat64.source.field.sourcePrefix'), type: 'text', placeholder: t('nat64.source.placeholder.sourcePrefix') },
+      { key: 'disable', title: t('nat64.source.field.disable'), type: 'checkbox' },
+    ]);
 
-    const ruleColumns = [
-      { key: 'id', title: '规则编号' },
-      { key: 'description', title: '描述' },
-      { key: 'sourcePrefix', title: 'IPv6 源前缀' },
-      { key: 'matchMark', title: 'fwmark' },
-      { key: 'disable', title: '禁用' },
-    ];
+    const ruleColumns = computed(() => [
+      { key: 'id', title: t('nat64.source.column.ruleNumber') },
+      { key: 'description', title: t('nat64.source.column.description') },
+      { key: 'sourcePrefix', title: t('nat64.source.column.sourcePrefix') },
+      { key: 'matchMark', title: t('nat64.source.column.fwmark') },
+      { key: 'disable', title: t('nat64.source.column.disable') },
+    ]);
 
     // Translation pools per rule
     const poolModalVisible = ref(false);
@@ -49,23 +53,23 @@ export default defineComponent({
     const editingPoolRuleId = ref(null);
     const editingPoolOriginalId = ref(null);
 
-    const poolSchema = [
-      { key: 'id', title: '池编号', type: 'number', min: 1, max: 999999, required: true, help: '范围: 1-999999' },
-      { key: 'description', title: '描述', type: 'text' },
-      { key: 'address', title: 'IPv4 地址/前缀', type: 'text', placeholder: 'x.x.x.x 或 x.x.x.x/x' },
-      { key: 'port', title: '端口', type: 'text', placeholder: '1-65535 或 start-end' },
-      { key: 'protocol', title: '协议', type: 'select', options: PROTOCOL_OPTIONS },
-      { key: 'disable', title: '禁用', type: 'checkbox' },
-    ];
+    const poolSchema = computed(() => [
+      { key: 'id', title: t('nat64.source.pool.field.poolId'), type: 'number', min: 1, max: 999999, required: true, help: t('nat64.source.pool.help.poolId') },
+      { key: 'description', title: t('nat64.source.pool.field.description'), type: 'text' },
+      { key: 'address', title: t('nat64.source.pool.field.address'), type: 'text', placeholder: t('nat64.source.pool.placeholder.address') },
+      { key: 'port', title: t('nat64.source.pool.field.port'), type: 'text', placeholder: t('nat64.source.pool.placeholder.port') },
+      { key: 'protocol', title: t('nat64.source.pool.field.protocol'), type: 'select', options: PROTOCOL_OPTIONS },
+      { key: 'disable', title: t('nat64.source.pool.field.disable'), type: 'checkbox' },
+    ]);
 
-    const poolColumns = [
-      { key: 'id', title: '池编号' },
-      { key: 'description', title: '描述' },
-      { key: 'address', title: 'IPv4 地址' },
-      { key: 'port', title: '端口' },
-      { key: 'protocol', title: '协议' },
-      { key: 'disable', title: '禁用' },
-    ];
+    const poolColumns = computed(() => [
+      { key: 'id', title: t('nat64.source.pool.column.poolId') },
+      { key: 'description', title: t('nat64.source.pool.column.description') },
+      { key: 'address', title: t('nat64.source.pool.column.address') },
+      { key: 'port', title: t('nat64.source.pool.column.port') },
+      { key: 'protocol', title: t('nat64.source.pool.column.protocol') },
+      { key: 'disable', title: t('nat64.source.pool.column.disable') },
+    ]);
 
     const currentRulePools = computed(() => {
       if (!editingRule.value) return [];
@@ -110,7 +114,7 @@ export default defineComponent({
           });
         }
       } catch (e) {
-        showError('加载 NAT64 源配置失败', e);
+        showError(t('nat64.source.loadFailed'), e);
       } finally {
         loading.value = false;
       }
@@ -159,29 +163,40 @@ export default defineComponent({
     async function saveRule() {
       try {
         const rule = editingRule.value;
-        if (!rule.id) return showError({ message: '请输入规则编号' });
+        if (!rule.id) return showError({ message: t('nat64.source.ruleNumberRequired') });
         const value = buildRuleValue(rule);
         if (editingOriginalId.value && editingOriginalId.value !== rule.id) {
           await configStore.deleteConfig(`${path} rule ${editingOriginalId.value}`);
+          configStore.markPending();
         }
         await configStore.setConfig(`${path} rule ${rule.id}`, value);
+        configStore.markPending();
         modalVisible.value = false;
         await load();
       } catch (e) {
-        showError('保存 NAT64 源规则失败', e);
+        showError(t('nat64.source.saveFailed'), e);
       }
     }
 
-    async function deleteRule(index) {
+    function deleteRule(index) {
       const row = rules.value[index];
       if (!row) return;
-      if (!confirm('确认删除此 NAT64 源规则？')) return;
-      try {
-        await configStore.deleteConfig(`${path} rule ${row.id}`);
-        await load();
-      } catch (e) {
-        showError('删除 NAT64 源规则失败', e);
+      pendingDeleteNames.value = [row.id];
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemove() {
+      deleteModalVisible.value = false;
+      for (const id of pendingDeleteNames.value) {
+        try {
+          await configStore.deleteConfig(`${path} rule ${id}`);
+          configStore.markPending();
+        } catch (e) {
+          showError(t('nat64.source.deleteFailed'), e);
+        }
       }
+      pendingDeleteNames.value = [];
+      await load();
     }
 
     // Pool handlers (within rule modal)
@@ -199,7 +214,7 @@ export default defineComponent({
 
     function savePool() {
       const pool = editingPool.value;
-      if (!pool.id) return showError({ message: '请输入池编号' });
+      if (!pool.id) return showError({ message: t('nat64.source.pool.poolIdRequired') });
       if (editingPoolOriginalId.value) {
         const idx = editingRule.value._pools.findIndex(p => p.id === editingPoolOriginalId.value);
         if (idx !== -1) editingRule.value._pools.splice(idx, 1, { ...pool });
@@ -211,24 +226,29 @@ export default defineComponent({
     }
 
     function deletePool() {
-      if (!selectedPools.value.length) return showError({ message: '请选择池' });
+      if (!selectedPools.value.length) return showError({ message: t('nat64.source.pool.selectPool') });
       editingRule.value._pools = editingRule.value._pools.filter(p => !selectedPools.value.includes(p.id));
       selectedPools.value = [];
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
     watch(() => route.path, load);
 
     return {
       path, writeDisabled,
       rules, loading,
       modalVisible, editingRule, editingOriginalId,
+      deleteModalVisible, pendingDeleteNames,
       ruleSchema, ruleColumns,
-      openModal, saveRule, deleteRule,
+      openModal, saveRule, deleteRule, confirmRemove,
       poolModalVisible, editingPool, editingPoolOriginalId,
       poolSchema, poolColumns,
       currentRulePools, selectedPools,
       openPoolModal, savePool, deletePool,
+      t,
     };
   },
   components: { DataTable, DraggableModal, ConfigForm, ToolbarButton },
@@ -237,41 +257,46 @@ export default defineComponent({
       <DataTable :columns="ruleColumns" :data="rules" :loading="loading" :disabled="writeDisabled"
                  rowKey="id" :actions="['create', 'edit', 'delete']"
                  @create="openModal(-1)" @edit="openModal" @delete="deleteRule" />
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
-      </div>
 
       <!-- Rule Modal with embedded pool management -->
-      <DraggableModal v-model:visible="modalVisible" :title="editingOriginalId ? '编辑 NAT64 源规则' : '创建 NAT64 源规则'" width="800px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingOriginalId ? t('nat64.source.editRule') : t('nat64.source.createRule')" width="800px">
         <div style="margin-bottom:16px;">
           <ConfigForm v-model="editingRule" :schema="ruleSchema" :showAdvanced="true" />
         </div>
         <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-          <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">翻译池</div>
+          <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('nat64.source.translationPool') }}</div>
           <div style="padding:16px;">
             <div class="toolbar toolbar-compact" style="margin-bottom:8px;">
               <div class="toolbar-left">
-                <ToolbarButton icon="create" @click="openPoolModal(null)">创建</ToolbarButton>
-                <ToolbarButton icon="edit" :disabled="selectedPools.length !== 1" @click="openPoolModal(currentRulePools.find(p => p.id === selectedPools[0]))">编辑</ToolbarButton>
-                <ToolbarButton icon="delete" :disabled="!selectedPools.length" @click="deletePool">删除</ToolbarButton>
+                <ToolbarButton icon="create" @click="openPoolModal(null)">{{ t('app.create') }}</ToolbarButton>
+                <ToolbarButton icon="edit" :disabled="selectedPools.length !== 1" @click="openPoolModal(currentRulePools.find(p => p.id === selectedPools[0]))">{{ t('app.edit') }}</ToolbarButton>
+                <ToolbarButton icon="delete" :disabled="!selectedPools.length" @click="deletePool">{{ t('app.delete') }}</ToolbarButton>
               </div>
             </div>
             <DataTable :columns="poolColumns" :data="currentRulePools" v-model:selectedRowKeys="selectedPools" row-key="id" :selectable="true" :externalToolbar="true" />
           </div>
         </div>
         <template #footer>
-          <button @click="modalVisible = false">取消</button>
-          <button class="btn-primary" @click="saveRule">确定</button>
+          <button @click="modalVisible = false">{{ t('app.cancel') }}</button>
+          <button class="btn-primary" @click="saveRule">{{ t('app.confirm') }}</button>
         </template>
       </DraggableModal>
 
       <!-- Pool Modal -->
-      <DraggableModal v-model:visible="poolModalVisible" :title="editingPoolOriginalId ? '编辑翻译池' : '创建翻译池'" width="500px">
+      <DraggableModal v-model:visible="poolModalVisible" :title="editingPoolOriginalId ? t('nat64.source.pool.editPool') : t('nat64.source.pool.createPool')" width="500px">
         <ConfigForm v-model="editingPool" :schema="poolSchema" :showAdvanced="true" />
         <template #footer>
-          <button @click="poolModalVisible = false">取消</button>
-          <button class="btn-primary" @click="savePool">确定</button>
+          <button @click="poolModalVisible = false">{{ t('app.cancel') }}</button>
+          <button class="btn-primary" @click="savePool">{{ t('app.confirm') }}</button>
         </template>
+      </DraggableModal>
+
+      <!-- Delete Confirmation Modal -->
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('config.confirmDelete')" width="400px" @confirm="confirmRemove">
+        <div>{{ t('nat64.source.confirmDelete') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="id in pendingDeleteNames" :key="id" style="padding:2px 0;">{{ id }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

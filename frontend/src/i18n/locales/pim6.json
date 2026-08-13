@@ -1,0 +1,723 @@
+{
+  "zh-CN": {
+    "pim6": {
+      "tabs": {
+        "basic": "基本设置",
+        "interfaces": "接口",
+        "rpAddress": "RP 地址"
+      },
+      "sections": {
+        "basicConfig": "基本配置",
+        "mldJoinGroups": "MLD Join 组播组",
+        "groupAddressRange": "组地址范围"
+      },
+      "labels": {
+        "joinPruneInterval": "Join/Prune 间隔",
+        "keepAliveTimer": "Keep-Alive 定时器",
+        "rpKeepAliveTimer": "RP Keep-Alive 定时器",
+        "interfaceNameRequired": "接口名称 *",
+        "interfaceName": "接口名称",
+        "drPriority": "DR 优先级",
+        "helloInterval": "Hello 间隔",
+        "noBsm": "不处理 Bootstrap 消息 (no-bsm)",
+        "noUnicastBsm": "不处理单播 Bootstrap 消息 (no-unicast-bsm)",
+        "passiveMode": "被动模式 (passive)",
+        "disableMld": "禁用 MLD",
+        "mldVersion": "MLD 版本",
+        "queryInterval": "查询间隔",
+        "maxResponseTime": "最大响应时间",
+        "lastMemberQueryCount": "Last Member Query Count",
+        "lastMemberQueryInterval": "Last Member Query Interval",
+        "groupAddressRequired": "组播组地址 *",
+        "sourceAddress": "源地址",
+        "rpAddressRequired": "RP 地址 *",
+        "prefixListIpv6": "IPv6 前缀列表",
+        "addGroupAddress": "添加组地址"
+      },
+      "placeholders": {
+        "joinPruneInterval": "默认: 60 秒",
+        "keepAliveTimer": "Keep-Alive 定时器",
+        "rpKeepAliveTimer": "RP Keep-Alive 定时器",
+        "selectInterface": "请选择接口",
+        "helloInterval": "Hello 间隔 (秒)",
+        "queryInterval": "MLD 查询间隔 (秒)",
+        "maxResponseTime": "MLD 最大响应时间 (秒)",
+        "lastMemberQueryCount": "Last Member Query Count",
+        "lastMemberQueryInterval": "Last Member Query Interval (秒)",
+        "groupAddressExample": "例如: ff02::1",
+        "ipv6SourceAddress": "IPv6 源地址",
+        "rpAddressExample": "例如: 2001:db8::1",
+        "prefixListName": "前缀列表名称",
+        "groupAddressRangeExample": "例如: ff00::/8"
+      },
+      "columns": {
+        "interfaceName": "接口名称",
+        "drPriority": "DR 优先级",
+        "helloInterval": "Hello 间隔",
+        "passive": "被动",
+        "rpAddress": "RP 地址",
+        "prefixList": "前缀列表",
+        "groupAddress": "组地址",
+        "sourceAddress": "源地址"
+      },
+      "options": {
+        "defaultVersion": "默认 (2)",
+        "version1": "版本 1",
+        "version2": "版本 2"
+      },
+      "buttons": {
+        "addJoin": "添加 Join"
+      },
+      "modals": {
+        "editInterface": "编辑 PIM6 接口",
+        "addInterface": "添加 PIM6 接口",
+        "editMldJoin": "编辑 MLD Join",
+        "addMldJoin": "添加 MLD Join",
+        "editRpAddress": "编辑 RP 地址",
+        "addRpAddress": "添加 RP 地址",
+        "confirmDelete": "确认删除"
+      },
+      "messages": {
+        "confirmDeleteInterface": "确认删除以下接口？",
+        "confirmDeleteMldJoin": "确认删除以下 MLD Join？",
+        "confirmDeleteRpAddress": "确认删除以下 RP 地址？"
+      },
+      "alerts": {
+        "saved": "已保存"
+      },
+      "errors": {
+        "interfaceNameRequired": "请输入接口名称",
+        "groupAddressRequired": "请输入组播组地址",
+        "rpAddressRequired": "请输入 RP 地址",
+        "interfaceError": "接口 {name}：{error}",
+        "interfaceMldJoin": "接口 {name} MLD Join：{error}",
+        "rpAddressError": "RP 地址：{error}",
+        "rpGroupError": "RP {address} 组地址：{error}"
+      },
+      "validation": {
+        "ipv6": "IPv6 地址格式错误",
+        "ipv6Prefix": "IPv6 前缀格式错误",
+        "timer": "{name} 必须在 {min}-{max} 之间",
+        "priority": "优先级必须在 1-4294967295 之间"
+      }
+    }
+  },
+  "en": {
+    "pim6": {
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "rpAddress": "RP Addresses"
+      },
+      "sections": {
+        "basicConfig": "Basic Configuration",
+        "mldJoinGroups": "MLD Join Groups",
+        "groupAddressRange": "Group Address Range"
+      },
+      "labels": {
+        "joinPruneInterval": "Join/Prune Interval",
+        "keepAliveTimer": "Keep-Alive Timer",
+        "rpKeepAliveTimer": "RP Keep-Alive Timer",
+        "interfaceNameRequired": "Interface Name *",
+        "interfaceName": "Interface Name",
+        "drPriority": "DR Priority",
+        "helloInterval": "Hello Interval",
+        "noBsm": "Do not process Bootstrap messages (no-bsm)",
+        "noUnicastBsm": "Do not process unicast Bootstrap messages (no-unicast-bsm)",
+        "passiveMode": "Passive mode (passive)",
+        "disableMld": "Disable MLD",
+        "mldVersion": "MLD Version",
+        "queryInterval": "Query Interval",
+        "maxResponseTime": "Max Response Time",
+        "lastMemberQueryCount": "Last Member Query Count",
+        "lastMemberQueryInterval": "Last Member Query Interval",
+        "groupAddressRequired": "Multicast Group Address *",
+        "sourceAddress": "Source Address",
+        "rpAddressRequired": "RP Address *",
+        "prefixListIpv6": "IPv6 Prefix List",
+        "addGroupAddress": "Add Group Address"
+      },
+      "placeholders": {
+        "joinPruneInterval": "Default: 60 seconds",
+        "keepAliveTimer": "Keep-Alive Timer",
+        "rpKeepAliveTimer": "RP Keep-Alive Timer",
+        "selectInterface": "Select an interface",
+        "helloInterval": "Hello interval (seconds)",
+        "queryInterval": "MLD query interval (seconds)",
+        "maxResponseTime": "MLD max response time (seconds)",
+        "lastMemberQueryCount": "Last Member Query Count",
+        "lastMemberQueryInterval": "Last Member Query Interval (seconds)",
+        "groupAddressExample": "e.g., ff02::1",
+        "ipv6SourceAddress": "IPv6 source address",
+        "rpAddressExample": "e.g., 2001:db8::1",
+        "prefixListName": "Prefix list name",
+        "groupAddressRangeExample": "e.g., ff00::/8"
+      },
+      "columns": {
+        "interfaceName": "Interface Name",
+        "drPriority": "DR Priority",
+        "helloInterval": "Hello Interval",
+        "passive": "Passive",
+        "rpAddress": "RP Address",
+        "prefixList": "Prefix List",
+        "groupAddress": "Group Address",
+        "sourceAddress": "Source Address"
+      },
+      "options": {
+        "defaultVersion": "Default (2)",
+        "version1": "Version 1",
+        "version2": "Version 2"
+      },
+      "buttons": {
+        "addJoin": "Add Join"
+      },
+      "modals": {
+        "editInterface": "Edit PIM6 Interface",
+        "addInterface": "Add PIM6 Interface",
+        "editMldJoin": "Edit MLD Join",
+        "addMldJoin": "Add MLD Join",
+        "editRpAddress": "Edit RP Address",
+        "addRpAddress": "Add RP Address",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "confirmDeleteInterface": "Confirm delete the following interface?",
+        "confirmDeleteMldJoin": "Confirm delete the following MLD Join?",
+        "confirmDeleteRpAddress": "Confirm delete the following RP address?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "errors": {
+        "interfaceNameRequired": "Please enter interface name",
+        "groupAddressRequired": "Please enter multicast group address",
+        "rpAddressRequired": "Please enter RP address",
+        "interfaceError": "Interface {name}: {error}",
+        "interfaceMldJoin": "Interface {name} MLD Join: {error}",
+        "rpAddressError": "RP address: {error}",
+        "rpGroupError": "RP {address} group address: {error}"
+      },
+      "validation": {
+        "ipv6": "Invalid IPv6 address format",
+        "ipv6Prefix": "Invalid IPv6 prefix format",
+        "timer": "{name} must be between {min}-{max}",
+        "priority": "Priority must be between 1-4294967295"
+      }
+    }
+  },
+  "zh-TW": {
+    "pim6": {
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "rpAddress": "RP Addresses"
+      },
+      "sections": {
+        "basicConfig": "Basic Configuration",
+        "mldJoinGroups": "MLD Join Groups",
+        "groupAddressRange": "Group Address Range"
+      },
+      "labels": {
+        "joinPruneInterval": "Join/Prune Interval",
+        "keepAliveTimer": "Keep-Alive Timer",
+        "rpKeepAliveTimer": "RP Keep-Alive Timer",
+        "interfaceNameRequired": "Interface Name *",
+        "interfaceName": "Interface Name",
+        "drPriority": "DR Priority",
+        "helloInterval": "Hello Interval",
+        "noBsm": "Do not process Bootstrap messages (no-bsm)",
+        "noUnicastBsm": "Do not process unicast Bootstrap messages (no-unicast-bsm)",
+        "passiveMode": "Passive mode (passive)",
+        "disableMld": "Disable MLD",
+        "mldVersion": "MLD Version",
+        "queryInterval": "Query Interval",
+        "maxResponseTime": "Max Response Time",
+        "lastMemberQueryCount": "Last Member Query Count",
+        "lastMemberQueryInterval": "Last Member Query Interval",
+        "groupAddressRequired": "Multicast Group Address *",
+        "sourceAddress": "Source Address",
+        "rpAddressRequired": "RP Address *",
+        "prefixListIpv6": "IPv6 Prefix List",
+        "addGroupAddress": "Add Group Address"
+      },
+      "placeholders": {
+        "joinPruneInterval": "Default: 60 seconds",
+        "keepAliveTimer": "Keep-Alive Timer",
+        "rpKeepAliveTimer": "RP Keep-Alive Timer",
+        "selectInterface": "Select an interface",
+        "helloInterval": "Hello interval (seconds)",
+        "queryInterval": "MLD query interval (seconds)",
+        "maxResponseTime": "MLD max response time (seconds)",
+        "lastMemberQueryCount": "Last Member Query Count",
+        "lastMemberQueryInterval": "Last Member Query Interval (seconds)",
+        "groupAddressExample": "e.g., ff02::1",
+        "ipv6SourceAddress": "IPv6 source address",
+        "rpAddressExample": "e.g., 2001:db8::1",
+        "prefixListName": "Prefix list name",
+        "groupAddressRangeExample": "e.g., ff00::/8"
+      },
+      "columns": {
+        "interfaceName": "Interface Name",
+        "drPriority": "DR Priority",
+        "helloInterval": "Hello Interval",
+        "passive": "Passive",
+        "rpAddress": "RP Address",
+        "prefixList": "Prefix List",
+        "groupAddress": "Group Address",
+        "sourceAddress": "Source Address"
+      },
+      "options": {
+        "defaultVersion": "Default (2)",
+        "version1": "Version 1",
+        "version2": "Version 2"
+      },
+      "buttons": {
+        "addJoin": "Add Join"
+      },
+      "modals": {
+        "editInterface": "Edit PIM6 Interface",
+        "addInterface": "Add PIM6 Interface",
+        "editMldJoin": "Edit MLD Join",
+        "addMldJoin": "Add MLD Join",
+        "editRpAddress": "Edit RP Address",
+        "addRpAddress": "Add RP Address",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "confirmDeleteInterface": "Confirm delete the following interface?",
+        "confirmDeleteMldJoin": "Confirm delete the following MLD Join?",
+        "confirmDeleteRpAddress": "Confirm delete the following RP address?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "errors": {
+        "interfaceNameRequired": "Please enter interface name",
+        "groupAddressRequired": "Please enter multicast group address",
+        "rpAddressRequired": "Please enter RP address",
+        "interfaceError": "Interface {name}: {error}",
+        "interfaceMldJoin": "Interface {name} MLD Join: {error}",
+        "rpAddressError": "RP address: {error}",
+        "rpGroupError": "RP {address} group address: {error}"
+      },
+      "validation": {
+        "ipv6": "Invalid IPv6 address format",
+        "ipv6Prefix": "Invalid IPv6 prefix format",
+        "timer": "{name} must be between {min}-{max}",
+        "priority": "Priority must be between 1-4294967295"
+      }
+    }
+  },
+  "ru": {
+    "pim6": {
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "rpAddress": "RP Addresses"
+      },
+      "sections": {
+        "basicConfig": "Basic Configuration",
+        "mldJoinGroups": "MLD Join Groups",
+        "groupAddressRange": "Group Address Range"
+      },
+      "labels": {
+        "joinPruneInterval": "Join/Prune Interval",
+        "keepAliveTimer": "Keep-Alive Timer",
+        "rpKeepAliveTimer": "RP Keep-Alive Timer",
+        "interfaceNameRequired": "Interface Name *",
+        "interfaceName": "Interface Name",
+        "drPriority": "DR Priority",
+        "helloInterval": "Hello Interval",
+        "noBsm": "Do not process Bootstrap messages (no-bsm)",
+        "noUnicastBsm": "Do not process unicast Bootstrap messages (no-unicast-bsm)",
+        "passiveMode": "Passive mode (passive)",
+        "disableMld": "Disable MLD",
+        "mldVersion": "MLD Version",
+        "queryInterval": "Query Interval",
+        "maxResponseTime": "Max Response Time",
+        "lastMemberQueryCount": "Last Member Query Count",
+        "lastMemberQueryInterval": "Last Member Query Interval",
+        "groupAddressRequired": "Multicast Group Address *",
+        "sourceAddress": "Source Address",
+        "rpAddressRequired": "RP Address *",
+        "prefixListIpv6": "IPv6 Prefix List",
+        "addGroupAddress": "Add Group Address"
+      },
+      "placeholders": {
+        "joinPruneInterval": "Default: 60 seconds",
+        "keepAliveTimer": "Keep-Alive Timer",
+        "rpKeepAliveTimer": "RP Keep-Alive Timer",
+        "selectInterface": "Select an interface",
+        "helloInterval": "Hello interval (seconds)",
+        "queryInterval": "MLD query interval (seconds)",
+        "maxResponseTime": "MLD max response time (seconds)",
+        "lastMemberQueryCount": "Last Member Query Count",
+        "lastMemberQueryInterval": "Last Member Query Interval (seconds)",
+        "groupAddressExample": "e.g., ff02::1",
+        "ipv6SourceAddress": "IPv6 source address",
+        "rpAddressExample": "e.g., 2001:db8::1",
+        "prefixListName": "Prefix list name",
+        "groupAddressRangeExample": "e.g., ff00::/8"
+      },
+      "columns": {
+        "interfaceName": "Interface Name",
+        "drPriority": "DR Priority",
+        "helloInterval": "Hello Interval",
+        "passive": "Passive",
+        "rpAddress": "RP Address",
+        "prefixList": "Prefix List",
+        "groupAddress": "Group Address",
+        "sourceAddress": "Source Address"
+      },
+      "options": {
+        "defaultVersion": "Default (2)",
+        "version1": "Version 1",
+        "version2": "Version 2"
+      },
+      "buttons": {
+        "addJoin": "Add Join"
+      },
+      "modals": {
+        "editInterface": "Edit PIM6 Interface",
+        "addInterface": "Add PIM6 Interface",
+        "editMldJoin": "Edit MLD Join",
+        "addMldJoin": "Add MLD Join",
+        "editRpAddress": "Edit RP Address",
+        "addRpAddress": "Add RP Address",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "confirmDeleteInterface": "Confirm delete the following interface?",
+        "confirmDeleteMldJoin": "Confirm delete the following MLD Join?",
+        "confirmDeleteRpAddress": "Confirm delete the following RP address?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "errors": {
+        "interfaceNameRequired": "Please enter interface name",
+        "groupAddressRequired": "Please enter multicast group address",
+        "rpAddressRequired": "Please enter RP address",
+        "interfaceError": "Interface {name}: {error}",
+        "interfaceMldJoin": "Interface {name} MLD Join: {error}",
+        "rpAddressError": "RP address: {error}",
+        "rpGroupError": "RP {address} group address: {error}"
+      },
+      "validation": {
+        "ipv6": "Invalid IPv6 address format",
+        "ipv6Prefix": "Invalid IPv6 prefix format",
+        "timer": "{name} must be between {min}-{max}",
+        "priority": "Priority must be between 1-4294967295"
+      }
+    }
+  },
+  "de": {
+    "pim6": {
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "rpAddress": "RP Addresses"
+      },
+      "sections": {
+        "basicConfig": "Basic Configuration",
+        "mldJoinGroups": "MLD Join Groups",
+        "groupAddressRange": "Group Address Range"
+      },
+      "labels": {
+        "joinPruneInterval": "Join/Prune Interval",
+        "keepAliveTimer": "Keep-Alive Timer",
+        "rpKeepAliveTimer": "RP Keep-Alive Timer",
+        "interfaceNameRequired": "Interface Name *",
+        "interfaceName": "Interface Name",
+        "drPriority": "DR Priority",
+        "helloInterval": "Hello Interval",
+        "noBsm": "Do not process Bootstrap messages (no-bsm)",
+        "noUnicastBsm": "Do not process unicast Bootstrap messages (no-unicast-bsm)",
+        "passiveMode": "Passive mode (passive)",
+        "disableMld": "Disable MLD",
+        "mldVersion": "MLD Version",
+        "queryInterval": "Query Interval",
+        "maxResponseTime": "Max Response Time",
+        "lastMemberQueryCount": "Last Member Query Count",
+        "lastMemberQueryInterval": "Last Member Query Interval",
+        "groupAddressRequired": "Multicast Group Address *",
+        "sourceAddress": "Source Address",
+        "rpAddressRequired": "RP Address *",
+        "prefixListIpv6": "IPv6 Prefix List",
+        "addGroupAddress": "Add Group Address"
+      },
+      "placeholders": {
+        "joinPruneInterval": "Default: 60 seconds",
+        "keepAliveTimer": "Keep-Alive Timer",
+        "rpKeepAliveTimer": "RP Keep-Alive Timer",
+        "selectInterface": "Select an interface",
+        "helloInterval": "Hello interval (seconds)",
+        "queryInterval": "MLD query interval (seconds)",
+        "maxResponseTime": "MLD max response time (seconds)",
+        "lastMemberQueryCount": "Last Member Query Count",
+        "lastMemberQueryInterval": "Last Member Query Interval (seconds)",
+        "groupAddressExample": "e.g., ff02::1",
+        "ipv6SourceAddress": "IPv6 source address",
+        "rpAddressExample": "e.g., 2001:db8::1",
+        "prefixListName": "Prefix list name",
+        "groupAddressRangeExample": "e.g., ff00::/8"
+      },
+      "columns": {
+        "interfaceName": "Interface Name",
+        "drPriority": "DR Priority",
+        "helloInterval": "Hello Interval",
+        "passive": "Passive",
+        "rpAddress": "RP Address",
+        "prefixList": "Prefix List",
+        "groupAddress": "Group Address",
+        "sourceAddress": "Source Address"
+      },
+      "options": {
+        "defaultVersion": "Default (2)",
+        "version1": "Version 1",
+        "version2": "Version 2"
+      },
+      "buttons": {
+        "addJoin": "Add Join"
+      },
+      "modals": {
+        "editInterface": "Edit PIM6 Interface",
+        "addInterface": "Add PIM6 Interface",
+        "editMldJoin": "Edit MLD Join",
+        "addMldJoin": "Add MLD Join",
+        "editRpAddress": "Edit RP Address",
+        "addRpAddress": "Add RP Address",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "confirmDeleteInterface": "Confirm delete the following interface?",
+        "confirmDeleteMldJoin": "Confirm delete the following MLD Join?",
+        "confirmDeleteRpAddress": "Confirm delete the following RP address?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "errors": {
+        "interfaceNameRequired": "Please enter interface name",
+        "groupAddressRequired": "Please enter multicast group address",
+        "rpAddressRequired": "Please enter RP address",
+        "interfaceError": "Interface {name}: {error}",
+        "interfaceMldJoin": "Interface {name} MLD Join: {error}",
+        "rpAddressError": "RP address: {error}",
+        "rpGroupError": "RP {address} group address: {error}"
+      },
+      "validation": {
+        "ipv6": "Invalid IPv6 address format",
+        "ipv6Prefix": "Invalid IPv6 prefix format",
+        "timer": "{name} must be between {min}-{max}",
+        "priority": "Priority must be between 1-4294967295"
+      }
+    }
+  },
+  "fr": {
+    "pim6": {
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "rpAddress": "RP Addresses"
+      },
+      "sections": {
+        "basicConfig": "Basic Configuration",
+        "mldJoinGroups": "MLD Join Groups",
+        "groupAddressRange": "Group Address Range"
+      },
+      "labels": {
+        "joinPruneInterval": "Join/Prune Interval",
+        "keepAliveTimer": "Keep-Alive Timer",
+        "rpKeepAliveTimer": "RP Keep-Alive Timer",
+        "interfaceNameRequired": "Interface Name *",
+        "interfaceName": "Interface Name",
+        "drPriority": "DR Priority",
+        "helloInterval": "Hello Interval",
+        "noBsm": "Do not process Bootstrap messages (no-bsm)",
+        "noUnicastBsm": "Do not process unicast Bootstrap messages (no-unicast-bsm)",
+        "passiveMode": "Passive mode (passive)",
+        "disableMld": "Disable MLD",
+        "mldVersion": "MLD Version",
+        "queryInterval": "Query Interval",
+        "maxResponseTime": "Max Response Time",
+        "lastMemberQueryCount": "Last Member Query Count",
+        "lastMemberQueryInterval": "Last Member Query Interval",
+        "groupAddressRequired": "Multicast Group Address *",
+        "sourceAddress": "Source Address",
+        "rpAddressRequired": "RP Address *",
+        "prefixListIpv6": "IPv6 Prefix List",
+        "addGroupAddress": "Add Group Address"
+      },
+      "placeholders": {
+        "joinPruneInterval": "Default: 60 seconds",
+        "keepAliveTimer": "Keep-Alive Timer",
+        "rpKeepAliveTimer": "RP Keep-Alive Timer",
+        "selectInterface": "Select an interface",
+        "helloInterval": "Hello interval (seconds)",
+        "queryInterval": "MLD query interval (seconds)",
+        "maxResponseTime": "MLD max response time (seconds)",
+        "lastMemberQueryCount": "Last Member Query Count",
+        "lastMemberQueryInterval": "Last Member Query Interval (seconds)",
+        "groupAddressExample": "e.g., ff02::1",
+        "ipv6SourceAddress": "IPv6 source address",
+        "rpAddressExample": "e.g., 2001:db8::1",
+        "prefixListName": "Prefix list name",
+        "groupAddressRangeExample": "e.g., ff00::/8"
+      },
+      "columns": {
+        "interfaceName": "Interface Name",
+        "drPriority": "DR Priority",
+        "helloInterval": "Hello Interval",
+        "passive": "Passive",
+        "rpAddress": "RP Address",
+        "prefixList": "Prefix List",
+        "groupAddress": "Group Address",
+        "sourceAddress": "Source Address"
+      },
+      "options": {
+        "defaultVersion": "Default (2)",
+        "version1": "Version 1",
+        "version2": "Version 2"
+      },
+      "buttons": {
+        "addJoin": "Add Join"
+      },
+      "modals": {
+        "editInterface": "Edit PIM6 Interface",
+        "addInterface": "Add PIM6 Interface",
+        "editMldJoin": "Edit MLD Join",
+        "addMldJoin": "Add MLD Join",
+        "editRpAddress": "Edit RP Address",
+        "addRpAddress": "Add RP Address",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "confirmDeleteInterface": "Confirm delete the following interface?",
+        "confirmDeleteMldJoin": "Confirm delete the following MLD Join?",
+        "confirmDeleteRpAddress": "Confirm delete the following RP address?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "errors": {
+        "interfaceNameRequired": "Please enter interface name",
+        "groupAddressRequired": "Please enter multicast group address",
+        "rpAddressRequired": "Please enter RP address",
+        "interfaceError": "Interface {name}: {error}",
+        "interfaceMldJoin": "Interface {name} MLD Join: {error}",
+        "rpAddressError": "RP address: {error}",
+        "rpGroupError": "RP {address} group address: {error}"
+      },
+      "validation": {
+        "ipv6": "Invalid IPv6 address format",
+        "ipv6Prefix": "Invalid IPv6 prefix format",
+        "timer": "{name} must be between {min}-{max}",
+        "priority": "Priority must be between 1-4294967295"
+      }
+    }
+  },
+  "ko": {
+    "pim6": {
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "rpAddress": "RP Addresses"
+      },
+      "sections": {
+        "basicConfig": "Basic Configuration",
+        "mldJoinGroups": "MLD Join Groups",
+        "groupAddressRange": "Group Address Range"
+      },
+      "labels": {
+        "joinPruneInterval": "Join/Prune Interval",
+        "keepAliveTimer": "Keep-Alive Timer",
+        "rpKeepAliveTimer": "RP Keep-Alive Timer",
+        "interfaceNameRequired": "Interface Name *",
+        "interfaceName": "Interface Name",
+        "drPriority": "DR Priority",
+        "helloInterval": "Hello Interval",
+        "noBsm": "Do not process Bootstrap messages (no-bsm)",
+        "noUnicastBsm": "Do not process unicast Bootstrap messages (no-unicast-bsm)",
+        "passiveMode": "Passive mode (passive)",
+        "disableMld": "Disable MLD",
+        "mldVersion": "MLD Version",
+        "queryInterval": "Query Interval",
+        "maxResponseTime": "Max Response Time",
+        "lastMemberQueryCount": "Last Member Query Count",
+        "lastMemberQueryInterval": "Last Member Query Interval",
+        "groupAddressRequired": "Multicast Group Address *",
+        "sourceAddress": "Source Address",
+        "rpAddressRequired": "RP Address *",
+        "prefixListIpv6": "IPv6 Prefix List",
+        "addGroupAddress": "Add Group Address"
+      },
+      "placeholders": {
+        "joinPruneInterval": "Default: 60 seconds",
+        "keepAliveTimer": "Keep-Alive Timer",
+        "rpKeepAliveTimer": "RP Keep-Alive Timer",
+        "selectInterface": "Select an interface",
+        "helloInterval": "Hello interval (seconds)",
+        "queryInterval": "MLD query interval (seconds)",
+        "maxResponseTime": "MLD max response time (seconds)",
+        "lastMemberQueryCount": "Last Member Query Count",
+        "lastMemberQueryInterval": "Last Member Query Interval (seconds)",
+        "groupAddressExample": "e.g., ff02::1",
+        "ipv6SourceAddress": "IPv6 source address",
+        "rpAddressExample": "e.g., 2001:db8::1",
+        "prefixListName": "Prefix list name",
+        "groupAddressRangeExample": "e.g., ff00::/8"
+      },
+      "columns": {
+        "interfaceName": "Interface Name",
+        "drPriority": "DR Priority",
+        "helloInterval": "Hello Interval",
+        "passive": "Passive",
+        "rpAddress": "RP Address",
+        "prefixList": "Prefix List",
+        "groupAddress": "Group Address",
+        "sourceAddress": "Source Address"
+      },
+      "options": {
+        "defaultVersion": "Default (2)",
+        "version1": "Version 1",
+        "version2": "Version 2"
+      },
+      "buttons": {
+        "addJoin": "Add Join"
+      },
+      "modals": {
+        "editInterface": "Edit PIM6 Interface",
+        "addInterface": "Add PIM6 Interface",
+        "editMldJoin": "Edit MLD Join",
+        "addMldJoin": "Add MLD Join",
+        "editRpAddress": "Edit RP Address",
+        "addRpAddress": "Add RP Address",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "confirmDeleteInterface": "Confirm delete the following interface?",
+        "confirmDeleteMldJoin": "Confirm delete the following MLD Join?",
+        "confirmDeleteRpAddress": "Confirm delete the following RP address?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "errors": {
+        "interfaceNameRequired": "Please enter interface name",
+        "groupAddressRequired": "Please enter multicast group address",
+        "rpAddressRequired": "Please enter RP address",
+        "interfaceError": "Interface {name}: {error}",
+        "interfaceMldJoin": "Interface {name} MLD Join: {error}",
+        "rpAddressError": "RP address: {error}",
+        "rpGroupError": "RP {address} group address: {error}"
+      },
+      "validation": {
+        "ipv6": "Invalid IPv6 address format",
+        "ipv6Prefix": "Invalid IPv6 prefix format",
+        "timer": "{name} must be between {min}-{max}",
+        "priority": "Priority must be between 1-4294967295"
+      }
+    }
+  }
+}

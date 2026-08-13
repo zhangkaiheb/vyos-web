@@ -1,0 +1,737 @@
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="static">
+<h1>Static</h1>
+<p>Static routes are manually configured entries in the router’s <abbr title="Routing Information Base">RIB</abbr>
+that define how traffic should reach specific destinations. Unlike dynamic
+routing protocols, static routes are not automatically updated when the network
+topology changes.</p>
+<p>Static routes are best suited for simple network topologies or to override
+dynamic routing protocol behavior for a limited number of routes.</p>
+<p>The <abbr title="Routing Information Base">RIB</abbr> stores all routing information,
+including manually configured static routes and any dynamically learned routes.
+From the <abbr title="Routing Information Base">RIB</abbr>, the router derives unicast
+routes to build the <abbr title="Forwarding Information Base">FIB</abbr>.</p>
+<section id="ipv4-unicast-routes">
+<h2>IPv4 unicast routes</h2>
+<p>IPv4 unicast routes direct traffic destined for a single IPv4 host or subnet
+toward a specific next hop. Use the following commands to configure IPv4
+unicast routes for a specific remote subnet.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> next-hop <address>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the next-hop IP address for the specified subnet.</strong></p>
+<p>You can configure multiple next-hop IP addresses for the same destination
+subnet.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> next-hop <address> disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable the route via the specified next-hop IP address.</strong></p>
+<p>This command temporarily deactivates the route while preserving the
+configured subnet, next-hop, and distance parameters.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> next-hop <address> distance <distance>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the administrative distance for the route via the specified
+next-hop IP address.</strong></p>
+<p>路由s with a lower administrative distance are prioritized over routes with
+a higher distance.</p>
+<p>The allowed range is 1 to 255. The default distance is 1.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>路由s with a distance of 255 are disabled and not used for packet
+forwarding.</p>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 distance 10
+</pre></div>
+</div>
+<section id="ipv4-interface-routes">
+<h3>IPv4 interface routes</h3>
+<p>IPv4 interface routes direct traffic destined for a single IPv4 host or subnet
+out of a specific local interface. Use the following commands to configure IPv4
+interface routes for a specific remote subnet.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> interface <interface>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the next-hop interface for the specified subnet.</strong></p>
+<p>You can configure multiple next-hop interfaces for the same destination
+subnet.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 interface eth0
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> interface <interface> disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-interface-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable the route via the specified next-hop interface.</strong></p>
+<p>This command temporarily deactivates the route while preserving the
+configured subnet, interface, and distance parameters.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 interface eth0 disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> interface <interface> distance <distance>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-interface-interface-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the administrative distance for the route via the specified
+next-hop interface.</strong></p>
+<p>路由s with a lower administrative distance are prioritized over routes with
+a higher distance.</p>
+<p>The allowed range is 1 to 255. The default distance is 1.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 interface eth0 distance 10
+</pre></div>
+</div>
+</section>
+<section id="ipv4-bfd">
+<h3>IPv4 BFD</h3>
+<p><abbr title="Bidirectional Forwarding Detection">BFD</abbr> monitors the reachability
+of a static route’s next-hop IP address. Use the following commands to
+configure <abbr title="Bidirectional Forwarding Detection">BFD</abbr> parameters for your
+IPv4 static routes.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> next-hop <address> bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable BFD monitoring for the route via the specified next-hop IP address.</strong></p>
+<p>The system uses the next-hop IP address as the BFD peer destination.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 bfd
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> next-hop <address> bfd profile <profile>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd-profile-profile" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>应用 the settings from a designated BFD profile to the BFD session that monitors
+the specified next-hop IP address.</strong></p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 bfd profile custom-profile
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> next-hop <address> bfd multi-hop source-address <source-address>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd-multi-hop-source-address-source-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable a multi-hop BFD session to monitor the reachability of the
+specified next-hop IP address.</strong></p>
+<p>The system initiates the BFD session from the specified local source IPv4
+address.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 bfd multi-hop source-address 172.16.1.1
+</pre></div>
+</div>
+</section>
+<section id="dhcp-interface-routes">
+<h3>DHCP interface routes</h3>
+<p>DHCP interface routes direct traffic destined for a single IPv4 host or subnet
+toward a next-hop gateway obtained from a DHCP-enabled interface. Use the
+following command to configure DHCP interface routes.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> dhcp-interface <interface>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-dhcp-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a static route that derives its next-hop IP address from
+the specified DHCP-enabled interface.</strong></p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 dhcp-interface eth0
+</pre></div>
+</div>
+</section>
+<section id="ipv4-reject-routes">
+<h3>IPv4 reject routes</h3>
+<p>IPv4 reject routes explicitly drop traffic destined for a single IPv4 host or
+subnet and return an ICMP unreachable message to the sending device. Use the
+following commands to configure IPv4 reject routes.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> reject
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-reject" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a reject route for the specified subnet.</strong></p>
+<p>The system discards traffic destined for this subnet and returns an ICMP
+destination unreachable message to the sending device.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 reject
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> reject distance <distance>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-reject-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the administrative distance for the reject route.</strong></p>
+<p>路由s with a lower administrative distance are prioritized over routes with
+a higher distance.</p>
+<p>The allowed range is 1 to 255.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 reject distance 200
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> reject tag <tag>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-reject-tag-tag" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a numeric tag for the reject route.</strong></p>
+<p>The allowed range is 1 to 4294967295.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 reject tag 100
+</pre></div>
+</div>
+</section>
+<section id="ipv4-blackhole-routes">
+<h3>IPv4 blackhole routes</h3>
+<p>Blackhole routes silently discard traffic destined for a specific subnet.
+Unlike a reject route, which notifies the sender with an ICMP destination
+unreachable message, a blackhole route drops the packets without generating
+any response.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> blackhole
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-blackhole" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a blackhole route for the specified subnet.</strong></p>
+<p>The system silently discards matching packets without sending an ICMP
+response to the source.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/8 blackhole
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> blackhole distance <distance>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-blackhole-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the administrative distance for the blackhole route.</strong></p>
+<p>路由s with a lower administrative distance are prioritized over routes with
+a higher distance.</p>
+<p>The allowed range is 1 to 255.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/8 blackhole distance 200
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route <subnet> blackhole tag <tag>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-blackhole-tag-tag" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a numeric tag for the blackhole route.</strong></p>
+<p>The allowed range is 1 to 4294967295.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/8 blackhole tag 100
+</pre></div>
+</div>
+</section>
+</section>
+<section id="ipv6-unicast-routes">
+<h2>IPv6 unicast routes</h2>
+<p>IPv6 unicast routes direct traffic destined for a single IPv6 host or subnet
+toward a specific next hop. Use the following commands to configure IPv6
+unicast routes for a specific remote subnet.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> next-hop <address>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the next-hop IPv6 address for the specified subnet.</strong></p>
+<p>You can configure multiple next-hop IPv6 addresses for the same destination
+subnet.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> next-hop <address> disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable the route via the specified next-hop IPv6 address.</strong></p>
+<p>This command temporarily deactivates the route while preserving the
+configured subnet, next-hop, and distance parameters.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> next-hop <address> distance <distance>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the administrative distance for the route via the
+specified next-hop IPv6 address.</strong></p>
+<p>路由s with a lower administrative distance are prioritized over routes with
+a higher distance.</p>
+<p>The allowed range is 1 to 255. The default distance is 1.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>路由s with a distance of 255 are disabled and not used for packet
+forwarding.</p>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 distance 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> next-hop <address> segments <segments>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-segments-segments" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure an IPv6 unicast route that utilizes Segment 路由 over IPv6 (SRv6)
+to reach the destination subnet.</strong></p>
+<p>Use a forward slash (<code class="docutils literal notranslate">/</code>) to separate multiple IPv6 segment identifiers
+(SIDs) in your sequence.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1000::/36 next-hop 2001:db8:201::ffff segments '2001:db8:aaaa::7/2002::4/2002::3/2002::2'
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show ipv6 route
+Codes: K - kernel route, C - connected, S - static, R - RIPng,
+       O - OSPFv3, I - IS-IS, B - BGP, N - NHRP, T - Table,
+       v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric,
+       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+ C>* 2001:db8:201::/64 is directly connected, eth0.201, 00:00:46
+ S>* 2001:db8:1000::/36 [1/0] via 2001:db8:201::ffff, eth0.201, seg6 2001:db8:aaaa::7,2002::4,2002::3,2002::2, weight 1, 00:00:08
+</pre></div>
+</div>
+<section id="ipv6-interface-routes">
+<h3>IPv6 interface routes</h3>
+<p>IPv6 interface routes direct traffic destined for a single IPv6 host or subnet
+out of a specific local interface. Use the following commands to configure IPv6
+interface routes for a specific remote subnet.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> interface <interface>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the next-hop interface for the specified subnet.</strong></p>
+<p>You can configure multiple next-hop interfaces for the same destination
+subnet.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 interface eth0
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> interface <interface> disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable the route via the specified next-hop interface.</strong></p>
+<p>This command temporarily deactivates the route while preserving the
+configured subnet, interface, and distance parameters.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 interface eth0 disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> interface <interface> distance <distance>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the administrative distance for the route via the
+specified next-hop interface.</strong></p>
+<p>路由s with a lower administrative distance are prioritized over routes with
+a higher distance.</p>
+<p>The allowed range is 1 to 255. The default distance is 1.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 interface eth0 distance 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> interface <interface> segments <segments>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface-segments-segments" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure an IPv6 interface route that utilizes Segment 路由 over IPv6
+(SRv6) to reach a destination subnet.</strong></p>
+<p>Use a forward slash (<code class="docutils literal notranslate">/</code>) to separate multiple IPv6 segment identifiers
+(SIDs) in your sequence.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1000::/36 interface eth0 segments '2001:db8:aaaa::7/2002::4/2002::3/2002::2'
+</pre></div>
+</div>
+</section>
+<section id="ipv6-bfd">
+<h3>IPv6 BFD</h3>
+<p><abbr title="Bidirectional Forwarding Detection">BFD</abbr> monitors the reachability
+of a static route’s next-hop IPv6 address. Use the following commands to
+configure <abbr title="Bidirectional Forwarding Detection">BFD</abbr> parameters for your
+IPv6 static routes.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> next-hop <address> bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable BFD monitoring for the route via the specified next-hop IPv6
+address.</strong></p>
+<p>The system uses the next-hop IPv6 address as the BFD peer destination.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 bfd
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> next-hop <address> bfd profile <profile>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd-profile-profile" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>应用 the settings from a designated BFD profile to the BFD session
+that monitors the specified next-hop IPv6 address.</strong></p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 bfd profile custom-profile
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> next-hop <address> bfd multi-hop source-address <source-address>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd-multi-hop-source-address-source-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable a multi-hop BFD session to monitor the reachability of the
+specified next-hop IPv6 address.</strong></p>
+<p>The system initiates the BFD session from the specified local source IPv6
+address.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 bfd multi-hop source-address 2001:db8:200::1
+</pre></div>
+</div>
+</section>
+<section id="ipv6-reject-routes">
+<h3>IPv6 reject routes</h3>
+<p>IPv6 reject routes explicitly drop traffic destined for a single IPv6 host or
+subnet and return an ICMPv6 unreachable message to the sending device. Use the
+following commands to configure IPv6 reject routes.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> reject
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-reject" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a reject route for the specified subnet.</strong></p>
+<p>The system discards traffic destined for this subnet and returns an ICMPv6
+destination unreachable message to the sending device.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 reject
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> reject distance <distance>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-reject-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the administrative distance for the reject route.</strong></p>
+<p>路由s with a lower administrative distance are prioritized over routes with
+a higher distance.</p>
+<p>The allowed range is 1 to 255.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 reject distance 200
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> reject tag <tag>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-reject-tag-tag" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a numeric tag for the reject route.</strong></p>
+<p>The allowed range is 1 to 4294967295.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 reject tag 100
+</pre></div>
+</div>
+</section>
+<section id="ipv6-blackhole-routes">
+<h3>IPv6 blackhole routes</h3>
+<p>Blackhole routes silently discard traffic destined for a specific subnet.
+Unlike a reject route, which notifies the sender with an ICMPv6 destination
+unreachable message, a blackhole route drops the packets without generating
+any response.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> blackhole
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-blackhole" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a blackhole route for the specified subnet.</strong></p>
+<p>The system silently discards matching packets without sending an ICMPv6
+response to the source.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 blackhole
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> blackhole distance <distance>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-blackhole-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the administrative distance for the blackhole route.</strong></p>
+<p>路由s with a lower administrative distance are prioritized over routes with
+a higher distance.</p>
+<p>The allowed range is 1 to 255.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 blackhole distance 200
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 <subnet> blackhole tag <tag>
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-blackhole-tag-tag" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a numeric tag for the blackhole route.</strong></p>
+<p>The allowed range is 1 to 4294967295.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 blackhole tag 100
+</pre></div>
+</div>
+</section>
+</section>
+<section id="alternate-routing-tables">
+<h2>Alternate routing tables</h2>
+<p>Alternate routing tables are utilized to implement both 策略-Based 路由
+(PBR) and Virtual 路由 and Forwarding (<a class="reference internal" href="../vrf/index.html#vrf">VRF</a>).</p>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

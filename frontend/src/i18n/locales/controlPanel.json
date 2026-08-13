@@ -1,0 +1,758 @@
+{
+  "zh-CN": {
+    "controlPanel": {
+      "categories": {
+        "system": "系统信息",
+        "users": "用户",
+        "hardware": "硬件",
+        "tools": "工具"
+      },
+      "widgets": {
+        "cpu": "CPU",
+        "memory": "内存",
+        "disk": "磁盘",
+        "login": "当前登录",
+        "version": "系统版本",
+        "date": "系统时间",
+        "users": "当前用户",
+        "storageScsi": "SCSI 存储设备",
+        "storageNvme": "NVMe 存储设备",
+        "storageSmart": "SMART 信息",
+        "usb": "USB 设备",
+        "image": "系统镜像",
+        "systemLoginUsers": "系统登录用户",
+        "webshell": "Web Shell"
+      },
+      "header": {
+        "loading": "加载中...",
+        "refresh": "刷新",
+        "expand": "展开",
+        "collapse": "折叠",
+        "close": "关闭"
+      },
+      "buttons": {
+        "addWidget": "添加模块",
+        "refreshAll": "刷新全部"
+      },
+      "cpu": {
+        "model": "型号",
+        "sockets": "插槽数",
+        "cores": "核心总数",
+        "currentMhz": "当前主频"
+      },
+      "memory": {
+        "total": "总量",
+        "used": "已用",
+        "free": "空闲"
+      },
+      "disk": {
+        "size": "总容量",
+        "model": "型号",
+        "partitions": "分区数"
+      },
+      "storageScsi": {
+        "address": "地址",
+        "type": "类型",
+        "vendor": "厂商",
+        "product": "产品",
+        "revision": "版本",
+        "device": "设备"
+      },
+      "storageNvme": {
+        "noDevice": "无 NVMe 设备"
+      },
+      "storageSmart": {
+        "vendor": "厂商",
+        "product": "产品",
+        "userCapacity": "用户容量",
+        "currentTemperature": "当前温度"
+      },
+      "usb": {
+        "noData": "无数据"
+      },
+      "users": {
+        "name": "名称",
+        "line": "线路",
+        "time": "时间",
+        "comment": "注释"
+      },
+      "version": {
+        "version": "版本",
+        "releaseTrain": "发布序列",
+        "architecture": "架构",
+        "systemType": "系统类型"
+      },
+      "image": {
+        "name": "名称",
+        "version": "版本",
+        "storageReadOnly": "只读存储",
+        "storageReadWrite": "读写存储",
+        "storageTotal": "总存储"
+      },
+      "systemLoginUsers": {
+        "username": "用户名",
+        "type": "类型",
+        "locked": "锁定",
+        "tty": "Tty",
+        "from": "来源",
+        "lastLogin": "最后登录"
+      },
+      "modal": {
+        "title": "添加模块",
+        "searchPlaceholder": "搜索模块...",
+        "noMatch": "未找到匹配的模块"
+      },
+      "errors": {
+        "loadFailed": "加载失败"
+      }
+    }
+  },
+  "en": {
+    "controlPanel": {
+      "categories": {
+        "system": "System Information",
+        "users": "Users",
+        "hardware": "Hardware",
+        "tools": "Tools"
+      },
+      "widgets": {
+        "cpu": "CPU",
+        "memory": "Memory",
+        "disk": "Disk",
+        "login": "Current Login",
+        "version": "System Version",
+        "date": "System Time",
+        "users": "Current Users",
+        "storageScsi": "SCSI Storage Devices",
+        "storageNvme": "NVMe Storage Devices",
+        "storageSmart": "SMART Information",
+        "usb": "USB Devices",
+        "image": "System Image",
+        "systemLoginUsers": "System Login Users",
+        "webshell": "Web Shell"
+      },
+      "header": {
+        "loading": "Loading...",
+        "refresh": "Refresh",
+        "expand": "Expand",
+        "collapse": "Collapse",
+        "close": "Close"
+      },
+      "buttons": {
+        "addWidget": "Add Widget",
+        "refreshAll": "Refresh All"
+      },
+      "cpu": {
+        "model": "Model",
+        "sockets": "Sockets",
+        "cores": "Total Cores",
+        "currentMhz": "Current Frequency"
+      },
+      "memory": {
+        "total": "Total",
+        "used": "Used",
+        "free": "Free"
+      },
+      "disk": {
+        "size": "Total Capacity",
+        "model": "Model",
+        "partitions": "Partitions"
+      },
+      "storageScsi": {
+        "address": "Address",
+        "type": "Type",
+        "vendor": "Vendor",
+        "product": "Product",
+        "revision": "Revision",
+        "device": "Device"
+      },
+      "storageNvme": {
+        "noDevice": "No NVMe Device"
+      },
+      "storageSmart": {
+        "vendor": "Vendor",
+        "product": "Product",
+        "userCapacity": "User Capacity",
+        "currentTemperature": "Current Temperature"
+      },
+      "usb": {
+        "noData": "No Data"
+      },
+      "users": {
+        "name": "Name",
+        "line": "Line",
+        "time": "Time",
+        "comment": "Comment"
+      },
+      "version": {
+        "version": "Version",
+        "releaseTrain": "Release Train",
+        "architecture": "Architecture",
+        "systemType": "System Type"
+      },
+      "image": {
+        "name": "Name",
+        "version": "Version",
+        "storageReadOnly": "Read-Only Storage",
+        "storageReadWrite": "Read-Write Storage",
+        "storageTotal": "Total Storage"
+      },
+      "systemLoginUsers": {
+        "username": "Username",
+        "type": "Type",
+        "locked": "Locked",
+        "tty": "Tty",
+        "from": "From",
+        "lastLogin": "Last Login"
+      },
+      "modal": {
+        "title": "Add Widget",
+        "searchPlaceholder": "Search widgets...",
+        "noMatch": "No matching widgets found"
+      },
+      "errors": {
+        "loadFailed": "Load failed"
+      }
+    }
+  },
+  "zh-TW": {
+    "controlPanel": {
+      "categories": {
+        "system": "System Information",
+        "users": "Users",
+        "hardware": "Hardware",
+        "tools": "Tools"
+      },
+      "widgets": {
+        "cpu": "CPU",
+        "memory": "Memory",
+        "disk": "Disk",
+        "login": "Current Login",
+        "version": "System Version",
+        "date": "System Time",
+        "users": "Current Users",
+        "storageScsi": "SCSI Storage Devices",
+        "storageNvme": "NVMe Storage Devices",
+        "storageSmart": "SMART Information",
+        "usb": "USB Devices",
+        "image": "System Image",
+        "systemLoginUsers": "System Login Users",
+        "webshell": "Web Shell"
+      },
+      "header": {
+        "loading": "Loading...",
+        "refresh": "Refresh",
+        "expand": "Expand",
+        "collapse": "Collapse",
+        "close": "Close"
+      },
+      "buttons": {
+        "addWidget": "Add Widget",
+        "refreshAll": "Refresh All"
+      },
+      "cpu": {
+        "model": "Model",
+        "sockets": "Sockets",
+        "cores": "Total Cores",
+        "currentMhz": "Current Frequency"
+      },
+      "memory": {
+        "total": "Total",
+        "used": "Used",
+        "free": "Free"
+      },
+      "disk": {
+        "size": "Total Capacity",
+        "model": "Model",
+        "partitions": "Partitions"
+      },
+      "storageScsi": {
+        "address": "Address",
+        "type": "Type",
+        "vendor": "Vendor",
+        "product": "Product",
+        "revision": "Revision",
+        "device": "Device"
+      },
+      "storageNvme": {
+        "noDevice": "No NVMe Device"
+      },
+      "storageSmart": {
+        "vendor": "Vendor",
+        "product": "Product",
+        "userCapacity": "User Capacity",
+        "currentTemperature": "Current Temperature"
+      },
+      "usb": {
+        "noData": "No Data"
+      },
+      "users": {
+        "name": "Name",
+        "line": "Line",
+        "time": "Time",
+        "comment": "Comment"
+      },
+      "version": {
+        "version": "Version",
+        "releaseTrain": "Release Train",
+        "architecture": "Architecture",
+        "systemType": "System Type"
+      },
+      "image": {
+        "name": "Name",
+        "version": "Version",
+        "storageReadOnly": "Read-Only Storage",
+        "storageReadWrite": "Read-Write Storage",
+        "storageTotal": "Total Storage"
+      },
+      "systemLoginUsers": {
+        "username": "Username",
+        "type": "Type",
+        "locked": "Locked",
+        "tty": "Tty",
+        "from": "From",
+        "lastLogin": "Last Login"
+      },
+      "modal": {
+        "title": "Add Widget",
+        "searchPlaceholder": "Search widgets...",
+        "noMatch": "No matching widgets found"
+      },
+      "errors": {
+        "loadFailed": "Load failed"
+      }
+    }
+  },
+  "ru": {
+    "controlPanel": {
+      "categories": {
+        "system": "System Information",
+        "users": "Users",
+        "hardware": "Hardware",
+        "tools": "Tools"
+      },
+      "widgets": {
+        "cpu": "CPU",
+        "memory": "Memory",
+        "disk": "Disk",
+        "login": "Current Login",
+        "version": "System Version",
+        "date": "System Time",
+        "users": "Current Users",
+        "storageScsi": "SCSI Storage Devices",
+        "storageNvme": "NVMe Storage Devices",
+        "storageSmart": "SMART Information",
+        "usb": "USB Devices",
+        "image": "System Image",
+        "systemLoginUsers": "System Login Users",
+        "webshell": "Web Shell"
+      },
+      "header": {
+        "loading": "Loading...",
+        "refresh": "Refresh",
+        "expand": "Expand",
+        "collapse": "Collapse",
+        "close": "Close"
+      },
+      "buttons": {
+        "addWidget": "Add Widget",
+        "refreshAll": "Refresh All"
+      },
+      "cpu": {
+        "model": "Model",
+        "sockets": "Sockets",
+        "cores": "Total Cores",
+        "currentMhz": "Current Frequency"
+      },
+      "memory": {
+        "total": "Total",
+        "used": "Used",
+        "free": "Free"
+      },
+      "disk": {
+        "size": "Total Capacity",
+        "model": "Model",
+        "partitions": "Partitions"
+      },
+      "storageScsi": {
+        "address": "Address",
+        "type": "Type",
+        "vendor": "Vendor",
+        "product": "Product",
+        "revision": "Revision",
+        "device": "Device"
+      },
+      "storageNvme": {
+        "noDevice": "No NVMe Device"
+      },
+      "storageSmart": {
+        "vendor": "Vendor",
+        "product": "Product",
+        "userCapacity": "User Capacity",
+        "currentTemperature": "Current Temperature"
+      },
+      "usb": {
+        "noData": "No Data"
+      },
+      "users": {
+        "name": "Name",
+        "line": "Line",
+        "time": "Time",
+        "comment": "Comment"
+      },
+      "version": {
+        "version": "Version",
+        "releaseTrain": "Release Train",
+        "architecture": "Architecture",
+        "systemType": "System Type"
+      },
+      "image": {
+        "name": "Name",
+        "version": "Version",
+        "storageReadOnly": "Read-Only Storage",
+        "storageReadWrite": "Read-Write Storage",
+        "storageTotal": "Total Storage"
+      },
+      "systemLoginUsers": {
+        "username": "Username",
+        "type": "Type",
+        "locked": "Locked",
+        "tty": "Tty",
+        "from": "From",
+        "lastLogin": "Last Login"
+      },
+      "modal": {
+        "title": "Add Widget",
+        "searchPlaceholder": "Search widgets...",
+        "noMatch": "No matching widgets found"
+      },
+      "errors": {
+        "loadFailed": "Load failed"
+      }
+    }
+  },
+  "de": {
+    "controlPanel": {
+      "categories": {
+        "system": "System Information",
+        "users": "Users",
+        "hardware": "Hardware",
+        "tools": "Tools"
+      },
+      "widgets": {
+        "cpu": "CPU",
+        "memory": "Memory",
+        "disk": "Disk",
+        "login": "Current Login",
+        "version": "System Version",
+        "date": "System Time",
+        "users": "Current Users",
+        "storageScsi": "SCSI Storage Devices",
+        "storageNvme": "NVMe Storage Devices",
+        "storageSmart": "SMART Information",
+        "usb": "USB Devices",
+        "image": "System Image",
+        "systemLoginUsers": "System Login Users",
+        "webshell": "Web Shell"
+      },
+      "header": {
+        "loading": "Loading...",
+        "refresh": "Refresh",
+        "expand": "Expand",
+        "collapse": "Collapse",
+        "close": "Close"
+      },
+      "buttons": {
+        "addWidget": "Add Widget",
+        "refreshAll": "Refresh All"
+      },
+      "cpu": {
+        "model": "Model",
+        "sockets": "Sockets",
+        "cores": "Total Cores",
+        "currentMhz": "Current Frequency"
+      },
+      "memory": {
+        "total": "Total",
+        "used": "Used",
+        "free": "Free"
+      },
+      "disk": {
+        "size": "Total Capacity",
+        "model": "Model",
+        "partitions": "Partitions"
+      },
+      "storageScsi": {
+        "address": "Address",
+        "type": "Type",
+        "vendor": "Vendor",
+        "product": "Product",
+        "revision": "Revision",
+        "device": "Device"
+      },
+      "storageNvme": {
+        "noDevice": "No NVMe Device"
+      },
+      "storageSmart": {
+        "vendor": "Vendor",
+        "product": "Product",
+        "userCapacity": "User Capacity",
+        "currentTemperature": "Current Temperature"
+      },
+      "usb": {
+        "noData": "No Data"
+      },
+      "users": {
+        "name": "Name",
+        "line": "Line",
+        "time": "Time",
+        "comment": "Comment"
+      },
+      "version": {
+        "version": "Version",
+        "releaseTrain": "Release Train",
+        "architecture": "Architecture",
+        "systemType": "System Type"
+      },
+      "image": {
+        "name": "Name",
+        "version": "Version",
+        "storageReadOnly": "Read-Only Storage",
+        "storageReadWrite": "Read-Write Storage",
+        "storageTotal": "Total Storage"
+      },
+      "systemLoginUsers": {
+        "username": "Username",
+        "type": "Type",
+        "locked": "Locked",
+        "tty": "Tty",
+        "from": "From",
+        "lastLogin": "Last Login"
+      },
+      "modal": {
+        "title": "Add Widget",
+        "searchPlaceholder": "Search widgets...",
+        "noMatch": "No matching widgets found"
+      },
+      "errors": {
+        "loadFailed": "Load failed"
+      }
+    }
+  },
+  "fr": {
+    "controlPanel": {
+      "categories": {
+        "system": "System Information",
+        "users": "Users",
+        "hardware": "Hardware",
+        "tools": "Tools"
+      },
+      "widgets": {
+        "cpu": "CPU",
+        "memory": "Memory",
+        "disk": "Disk",
+        "login": "Current Login",
+        "version": "System Version",
+        "date": "System Time",
+        "users": "Current Users",
+        "storageScsi": "SCSI Storage Devices",
+        "storageNvme": "NVMe Storage Devices",
+        "storageSmart": "SMART Information",
+        "usb": "USB Devices",
+        "image": "System Image",
+        "systemLoginUsers": "System Login Users",
+        "webshell": "Web Shell"
+      },
+      "header": {
+        "loading": "Loading...",
+        "refresh": "Refresh",
+        "expand": "Expand",
+        "collapse": "Collapse",
+        "close": "Close"
+      },
+      "buttons": {
+        "addWidget": "Add Widget",
+        "refreshAll": "Refresh All"
+      },
+      "cpu": {
+        "model": "Model",
+        "sockets": "Sockets",
+        "cores": "Total Cores",
+        "currentMhz": "Current Frequency"
+      },
+      "memory": {
+        "total": "Total",
+        "used": "Used",
+        "free": "Free"
+      },
+      "disk": {
+        "size": "Total Capacity",
+        "model": "Model",
+        "partitions": "Partitions"
+      },
+      "storageScsi": {
+        "address": "Address",
+        "type": "Type",
+        "vendor": "Vendor",
+        "product": "Product",
+        "revision": "Revision",
+        "device": "Device"
+      },
+      "storageNvme": {
+        "noDevice": "No NVMe Device"
+      },
+      "storageSmart": {
+        "vendor": "Vendor",
+        "product": "Product",
+        "userCapacity": "User Capacity",
+        "currentTemperature": "Current Temperature"
+      },
+      "usb": {
+        "noData": "No Data"
+      },
+      "users": {
+        "name": "Name",
+        "line": "Line",
+        "time": "Time",
+        "comment": "Comment"
+      },
+      "version": {
+        "version": "Version",
+        "releaseTrain": "Release Train",
+        "architecture": "Architecture",
+        "systemType": "System Type"
+      },
+      "image": {
+        "name": "Name",
+        "version": "Version",
+        "storageReadOnly": "Read-Only Storage",
+        "storageReadWrite": "Read-Write Storage",
+        "storageTotal": "Total Storage"
+      },
+      "systemLoginUsers": {
+        "username": "Username",
+        "type": "Type",
+        "locked": "Locked",
+        "tty": "Tty",
+        "from": "From",
+        "lastLogin": "Last Login"
+      },
+      "modal": {
+        "title": "Add Widget",
+        "searchPlaceholder": "Search widgets...",
+        "noMatch": "No matching widgets found"
+      },
+      "errors": {
+        "loadFailed": "Load failed"
+      }
+    }
+  },
+  "ko": {
+    "controlPanel": {
+      "categories": {
+        "system": "System Information",
+        "users": "Users",
+        "hardware": "Hardware",
+        "tools": "Tools"
+      },
+      "widgets": {
+        "cpu": "CPU",
+        "memory": "Memory",
+        "disk": "Disk",
+        "login": "Current Login",
+        "version": "System Version",
+        "date": "System Time",
+        "users": "Current Users",
+        "storageScsi": "SCSI Storage Devices",
+        "storageNvme": "NVMe Storage Devices",
+        "storageSmart": "SMART Information",
+        "usb": "USB Devices",
+        "image": "System Image",
+        "systemLoginUsers": "System Login Users",
+        "webshell": "Web Shell"
+      },
+      "header": {
+        "loading": "Loading...",
+        "refresh": "Refresh",
+        "expand": "Expand",
+        "collapse": "Collapse",
+        "close": "Close"
+      },
+      "buttons": {
+        "addWidget": "Add Widget",
+        "refreshAll": "Refresh All"
+      },
+      "cpu": {
+        "model": "Model",
+        "sockets": "Sockets",
+        "cores": "Total Cores",
+        "currentMhz": "Current Frequency"
+      },
+      "memory": {
+        "total": "Total",
+        "used": "Used",
+        "free": "Free"
+      },
+      "disk": {
+        "size": "Total Capacity",
+        "model": "Model",
+        "partitions": "Partitions"
+      },
+      "storageScsi": {
+        "address": "Address",
+        "type": "Type",
+        "vendor": "Vendor",
+        "product": "Product",
+        "revision": "Revision",
+        "device": "Device"
+      },
+      "storageNvme": {
+        "noDevice": "No NVMe Device"
+      },
+      "storageSmart": {
+        "vendor": "Vendor",
+        "product": "Product",
+        "userCapacity": "User Capacity",
+        "currentTemperature": "Current Temperature"
+      },
+      "usb": {
+        "noData": "No Data"
+      },
+      "users": {
+        "name": "Name",
+        "line": "Line",
+        "time": "Time",
+        "comment": "Comment"
+      },
+      "version": {
+        "version": "Version",
+        "releaseTrain": "Release Train",
+        "architecture": "Architecture",
+        "systemType": "System Type"
+      },
+      "image": {
+        "name": "Name",
+        "version": "Version",
+        "storageReadOnly": "Read-Only Storage",
+        "storageReadWrite": "Read-Write Storage",
+        "storageTotal": "Total Storage"
+      },
+      "systemLoginUsers": {
+        "username": "Username",
+        "type": "Type",
+        "locked": "Locked",
+        "tty": "Tty",
+        "from": "From",
+        "lastLogin": "Last Login"
+      },
+      "modal": {
+        "title": "Add Widget",
+        "searchPlaceholder": "Search widgets...",
+        "noMatch": "No matching widgets found"
+      },
+      "errors": {
+        "loadFailed": "Load failed"
+      }
+    }
+  }
+}

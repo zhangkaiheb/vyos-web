@@ -3,10 +3,13 @@ import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 export default defineComponent({
   name: 'GenericConfigPage',
   setup() {
+    const { t } = useI18n();
     const route = useRoute();
     const configStore = useConfigStore();
     const data = ref({});
@@ -17,13 +20,24 @@ export default defineComponent({
 
     const isLeaf = ref(false);
 
+    const backendKeyMap = {
+      'Rule action': 'firewall.ruleAction',
+      'Protocol to match (protocol name, number, or "all")': 'firewall.protocolToMatch',
+      'Disable instance': 'firewall.disableInstance',
+      'Session state': 'firewall.sessionState',
+      'Description': 'firewall.description',
+    };
+
     const schema = computed(() => {
       const meta = route.meta?.menuItem;
       if (isLeaf.value) {
-        return [{ key: 'value', title: meta?.label || '值', type: 'text' }];
+        return [{ key: 'value', title: meta?.label || t('genericConfig.defaultValue'), type: 'text' }];
       }
       if (meta?.schema) return meta.schema;
-      return Object.keys(data.value).map(k => ({ key: k, title: k }));
+      return Object.keys(data.value).map(k => {
+        const transKey = backendKeyMap[k];
+        return { key: k, title: transKey ? t(transKey) : k };
+      });
     });
 
     async function load() {
@@ -50,6 +64,7 @@ export default defineComponent({
       try {
         const payload = isLeaf.value ? data.value.value : data.value;
         await configStore.setConfig(path.value, payload);
+        configStore.markPending();
         saved.value = true;
         await configStore.checkSessionChanged();
       } catch (e) {
@@ -57,10 +72,10 @@ export default defineComponent({
       }
     }
 
-    onMounted(load);
+    onMounted(() => { load(); onMenuRefresh(load); });
     watch(() => route.path, load);
 
-    return { data, schema, loading, saved, load, save, route, path, writeDisabled };
+    return { data, schema, loading, saved, load, save, route, path, writeDisabled, t };
   },
   template: `
     <div>

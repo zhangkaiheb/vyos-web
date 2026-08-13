@@ -1,0 +1,408 @@
+{
+  "zh-CN": {
+    "idsddos": {
+      "errors": {
+        "sflowPortRange": "sFlow 端口范围为 1-65535",
+        "thresholdNegative": "{proto} 阈值不能为负数"
+      },
+      "labels": {
+        "alertScript": "告警脚本",
+        "banTime": "封禁时间",
+        "collector": "采集器",
+        "direction": "方向",
+        "excludedNetwork": "排除网络",
+        "generalRate": "通用速率",
+        "icmpRate": "ICMP 速率",
+        "listenInterface": "监听接口",
+        "mode": "模式",
+        "network": "网络",
+        "port": "端口",
+        "tcpRate": "TCP 速率",
+        "udpRate": "UDP 速率"
+      },
+      "messages": {
+        "saved": "已保存"
+      },
+      "options": {
+        "notSet": "未设置",
+        "selectInterface": "请选择接口"
+      },
+      "placeholders": {
+        "alertScript": "告警脚本路径",
+        "collector": "采集器地址",
+        "listenInterface": "监听接口",
+        "network": "网络地址",
+        "sflowPort": "sFlow 端口"
+      },
+      "tabs": {
+        "basic": "基本设置",
+        "network": "网络",
+        "sflow": "sFlow",
+        "threshold": "阈值"
+      },
+      "titles": {
+        "alertScript": "告警脚本路径",
+        "banTime": "封禁时间（秒）",
+        "collector": "sFlow 采集器地址",
+        "excludedNetwork": "排除的网络地址",
+        "generalRate": "通用数据包速率（包/秒）",
+        "icmpRate": "ICMP 数据包速率（包/秒）",
+        "listenInterface": "选择监听接口",
+        "listenInterfaceList": "监听接口列表",
+        "mode": "检测模式",
+        "network": "监控的网络地址",
+        "sflowPort": "sFlow 端口号",
+        "tcpRate": "TCP 数据包速率（包/秒）",
+        "udpRate": "UDP 数据包速率（包/秒）"
+      }
+    }
+  },
+  "en": {
+    "idsddos": {
+      "errors": {
+        "sflowPortRange": "sFlow port must be between 1 and 65535",
+        "thresholdNegative": "{proto} threshold cannot be negative"
+      },
+      "labels": {
+        "alertScript": "Alert Script",
+        "banTime": "Ban Time",
+        "collector": "Collector",
+        "direction": "Direction",
+        "excludedNetwork": "Excluded Network",
+        "generalRate": "General Rate",
+        "icmpRate": "ICMP Rate",
+        "listenInterface": "Listen Interface",
+        "mode": "Mode",
+        "network": "Network",
+        "port": "Port",
+        "tcpRate": "TCP Rate",
+        "udpRate": "UDP Rate"
+      },
+      "messages": {
+        "saved": "Saved"
+      },
+      "options": {
+        "notSet": "Not Set",
+        "selectInterface": "Select Interface"
+      },
+      "placeholders": {
+        "alertScript": "Alert script path",
+        "collector": "Collector address",
+        "listenInterface": "Listen interface",
+        "network": "Network address",
+        "sflowPort": "sFlow port"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "network": "Network",
+        "sflow": "sFlow",
+        "threshold": "Threshold"
+      },
+      "titles": {
+        "alertScript": "Alert script path",
+        "banTime": "Ban time (seconds)",
+        "collector": "sFlow collector address",
+        "excludedNetwork": "Excluded network addresses",
+        "generalRate": "General packet rate (packets/sec)",
+        "icmpRate": "ICMP packet rate (packets/sec)",
+        "listenInterface": "Select listen interface",
+        "listenInterfaceList": "Listen interface list",
+        "mode": "Detection mode",
+        "network": "Monitored network addresses",
+        "sflowPort": "sFlow port number",
+        "tcpRate": "TCP packet rate (packets/sec)",
+        "udpRate": "UDP packet rate (packets/sec)"
+      }
+    }
+  },
+  "zh-TW": {
+    "idsddos": {
+      "errors": {
+        "sflowPortRange": "sFlow 端口範圍為 1-65535",
+        "thresholdNegative": "{proto} 閾值不能為負數"
+      },
+      "labels": {
+        "alertScript": "告警腳本",
+        "banTime": "封禁時間",
+        "collector": "採集器",
+        "direction": "方向",
+        "excludedNetwork": "排除網絡",
+        "generalRate": "通用速率",
+        "icmpRate": "ICMP 速率",
+        "listenInterface": "監聽接口",
+        "mode": "模式",
+        "network": "網絡",
+        "port": "端口",
+        "tcpRate": "TCP 速率",
+        "udpRate": "UDP 速率"
+      },
+      "messages": {
+        "saved": "已保存"
+      },
+      "options": {
+        "notSet": "未設置",
+        "selectInterface": "請選擇接口"
+      },
+      "placeholders": {
+        "alertScript": "告警腳本路徑",
+        "collector": "採集器地址",
+        "listenInterface": "監聽接口",
+        "network": "網絡地址",
+        "sflowPort": "sFlow 端口"
+      },
+      "tabs": {
+        "basic": "基本設置",
+        "network": "網絡",
+        "sflow": "sFlow",
+        "threshold": "閾值"
+      },
+      "titles": {
+        "alertScript": "告警腳本路徑",
+        "banTime": "封禁時間（秒）",
+        "collector": "sFlow 採集器地址",
+        "excludedNetwork": "排除的網絡地址",
+        "generalRate": "通用數據包速率（包/秒）",
+        "icmpRate": "ICMP 數據包速率（包/秒）",
+        "listenInterface": "選擇監聽接口",
+        "listenInterfaceList": "監聽接口列表",
+        "mode": "檢測模式",
+        "network": "監控的網絡地址",
+        "sflowPort": "sFlow 端口號",
+        "tcpRate": "TCP 數據包速率（包/秒）",
+        "udpRate": "UDP 數據包速率（包/秒）"
+      }
+    }
+  },
+  "ru": {
+    "idsddos": {
+      "errors": {
+        "sflowPortRange": "Порт sFlow должен быть от 1 до 65535",
+        "thresholdNegative": "Порог {proto} не может быть отрицательным"
+      },
+      "labels": {
+        "alertScript": "Скрипт оповещения",
+        "banTime": "Время блокировки",
+        "collector": "Коллектор",
+        "direction": "Направление",
+        "excludedNetwork": "Исключённая сеть",
+        "generalRate": "Общая скорость",
+        "icmpRate": "Скорость ICMP",
+        "listenInterface": "Интерфейс прослушивания",
+        "mode": "Режим",
+        "network": "Сеть",
+        "port": "Порт",
+        "tcpRate": "Скорость TCP",
+        "udpRate": "Скорость UDP"
+      },
+      "messages": {
+        "saved": "Сохранено"
+      },
+      "options": {
+        "notSet": "Не задано",
+        "selectInterface": "Выберите интерфейс"
+      },
+      "placeholders": {
+        "alertScript": "Путь к скрипту оповещения",
+        "collector": "Адрес коллектора",
+        "listenInterface": "Интерфейс прослушивания",
+        "network": "Сетевой адрес",
+        "sflowPort": "Порт sFlow"
+      },
+      "tabs": {
+        "basic": "Основные",
+        "network": "Сеть",
+        "sflow": "sFlow",
+        "threshold": "Порог"
+      },
+      "titles": {
+        "alertScript": "Путь к скрипту оповещения",
+        "banTime": "Время блокировки (секунды)",
+        "collector": "Адрес коллектора sFlow",
+        "excludedNetwork": "Исключённые сетевые адреса",
+        "generalRate": "Общая скорость пакетов (пакетов/сек)",
+        "icmpRate": "Скорость пакетов ICMP (пакетов/сек)",
+        "listenInterface": "Выберите интерфейс прослушивания",
+        "listenInterfaceList": "Список интерфейсов прослушивания",
+        "mode": "Режим обнаружения",
+        "network": "Мониторинг сетевых адресов",
+        "sflowPort": "Номер порта sFlow",
+        "tcpRate": "Скорость пакетов TCP (пакетов/сек)",
+        "udpRate": "Скорость пакетов UDP (пакетов/сек)"
+      }
+    }
+  },
+  "de": {
+    "idsddos": {
+      "errors": {
+        "sflowPortRange": "sFlow-Port muss zwischen 1 und 65535 liegen",
+        "thresholdNegative": "{proto}-Schwellenwert darf nicht negativ sein"
+      },
+      "labels": {
+        "alertScript": "Warnskript",
+        "banTime": "Sperrzeit",
+        "collector": "Kollektor",
+        "direction": "Richtung",
+        "excludedNetwork": "Ausgeschlossenes Netzwerk",
+        "generalRate": "Allgemeine Rate",
+        "icmpRate": "ICMP-Rate",
+        "listenInterface": "Überwachungsschnittstelle",
+        "mode": "Modus",
+        "network": "Netzwerk",
+        "port": "Port",
+        "tcpRate": "TCP-Rate",
+        "udpRate": "UDP-Rate"
+      },
+      "messages": {
+        "saved": "Gespeichert"
+      },
+      "options": {
+        "notSet": "Nicht festgelegt",
+        "selectInterface": "Schnittstelle auswählen"
+      },
+      "placeholders": {
+        "alertScript": "Pfad zum Warnskript",
+        "collector": "Kollektoradresse",
+        "listenInterface": "Überwachungsschnittstelle",
+        "network": "Netzwerkadresse",
+        "sflowPort": "sFlow-Port"
+      },
+      "tabs": {
+        "basic": "Allgemein",
+        "network": "Netzwerk",
+        "sflow": "sFlow",
+        "threshold": "Schwellenwert"
+      },
+      "titles": {
+        "alertScript": "Pfad zum Warnskript",
+        "banTime": "Sperrzeit (Sekunden)",
+        "collector": "sFlow-Kollektoradresse",
+        "excludedNetwork": "Ausgeschlossene Netzwerkadressen",
+        "generalRate": "Allgemeine Paketrate (Pakete/Sek)",
+        "icmpRate": "ICMP-Paketrate (Pakete/Sek)",
+        "listenInterface": "Überwachungsschnittstelle auswählen",
+        "listenInterfaceList": "Liste der Überwachungsschnittstellen",
+        "mode": "Erkennungsmodus",
+        "network": "Überwachte Netzwerkadressen",
+        "sflowPort": "sFlow-Portnummer",
+        "tcpRate": "TCP-Paketrate (Pakete/Sek)",
+        "udpRate": "UDP-Paketrate (Pakete/Sek)"
+      }
+    }
+  },
+  "fr": {
+    "idsddos": {
+      "errors": {
+        "sflowPortRange": "Le port sFlow doit être entre 1 et 65535",
+        "thresholdNegative": "Le seuil {proto} ne peut pas être négatif"
+      },
+      "labels": {
+        "alertScript": "Script d'alerte",
+        "banTime": "Durée de bannissement",
+        "collector": "Collecteur",
+        "direction": "Direction",
+        "excludedNetwork": "Réseau exclu",
+        "generalRate": "Débit général",
+        "icmpRate": "Débit ICMP",
+        "listenInterface": "Interface d'écoute",
+        "mode": "Mode",
+        "network": "Réseau",
+        "port": "Port",
+        "tcpRate": "Débit TCP",
+        "udpRate": "Débit UDP"
+      },
+      "messages": {
+        "saved": "Enregistré"
+      },
+      "options": {
+        "notSet": "Non défini",
+        "selectInterface": "Sélectionner une interface"
+      },
+      "placeholders": {
+        "alertScript": "Chemin du script d'alerte",
+        "collector": "Adresse du collecteur",
+        "listenInterface": "Interface d'écoute",
+        "network": "Adresse réseau",
+        "sflowPort": "Port sFlow"
+      },
+      "tabs": {
+        "basic": "Paramètres de base",
+        "network": "Réseau",
+        "sflow": "sFlow",
+        "threshold": "Seuil"
+      },
+      "titles": {
+        "alertScript": "Chemin du script d'alerte",
+        "banTime": "Durée de bannissement (secondes)",
+        "collector": "Adresse du collecteur sFlow",
+        "excludedNetwork": "Adresses réseau exclues",
+        "generalRate": "Débit de paquets général (paquets/sec)",
+        "icmpRate": "Débit de paquets ICMP (paquets/sec)",
+        "listenInterface": "Sélectionner l'interface d'écoute",
+        "listenInterfaceList": "Liste des interfaces d'écoute",
+        "mode": "Mode de détection",
+        "network": "Adresses réseau surveillées",
+        "sflowPort": "Numéro de port sFlow",
+        "tcpRate": "Débit de paquets TCP (paquets/sec)",
+        "udpRate": "Débit de paquets UDP (paquets/sec)"
+      }
+    }
+  },
+  "ko": {
+    "idsddos": {
+      "errors": {
+        "sflowPortRange": "sFlow 포트는 1~65535 사이여야 합니다",
+        "thresholdNegative": "{proto} 임계값은 음수일 수 없습니다"
+      },
+      "labels": {
+        "alertScript": "경고 스크립트",
+        "banTime": "차단 시간",
+        "collector": "컬렉터",
+        "direction": "방향",
+        "excludedNetwork": "제외 네트워크",
+        "generalRate": "일반 속도",
+        "icmpRate": "ICMP 속도",
+        "listenInterface": "리스닝 인터페이스",
+        "mode": "모드",
+        "network": "네트워크",
+        "port": "포트",
+        "tcpRate": "TCP 속도",
+        "udpRate": "UDP 속도"
+      },
+      "messages": {
+        "saved": "저장됨"
+      },
+      "options": {
+        "notSet": "설정되지 않음",
+        "selectInterface": "인터페이스를 선택하세요"
+      },
+      "placeholders": {
+        "alertScript": "경고 스크립트 경로",
+        "collector": "컬렉터 주소",
+        "listenInterface": "리스닝 인터페이스",
+        "network": "네트워크 주소",
+        "sflowPort": "sFlow 포트"
+      },
+      "tabs": {
+        "basic": "기본 설정",
+        "network": "네트워크",
+        "sflow": "sFlow",
+        "threshold": "임계값"
+      },
+      "titles": {
+        "alertScript": "경고 스크립트 경로",
+        "banTime": "차단 시간 (초)",
+        "collector": "sFlow 컬렉터 주소",
+        "excludedNetwork": "제외된 네트워크 주소",
+        "generalRate": "일반 패킷 속도 (패킷/초)",
+        "icmpRate": "ICMP 패킷 속도 (패킷/초)",
+        "listenInterface": "리스닝 인터페이스 선택",
+        "listenInterfaceList": "리스닝 인터페이스 목록",
+        "mode": "감지 모드",
+        "network": "모니터링 네트워크 주소",
+        "sflowPort": "sFlow 포트 번호",
+        "tcpRate": "TCP 패킷 속도 (패킷/초)",
+        "udpRate": "UDP 패킷 속도 (패킷/초)"
+      }
+    }
+  }
+}

@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="pppoe">
+<h1>PPPoE</h1>
+<p><abbr title="Point-to-Point Protocol over Ethernet">PPPoE</abbr> ist ein Netzwerkprotokoll,
+das PPP-Frames innerhalb von Ethernet-Frames kapselt.
+Es wird häufig verwendet, um ISP-Clients mit einem Breitband-Zugangs-Server zu verbinden.</p>
+<section id="configuration">
+<h2>Konfiguration</h2>
+<section id="common-interface-configuration">
+<h3>Gemeinsame Schnittstellenkonfiguration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie einen klaren, beschreibenden Alias für die Schnittstelle.</strong></p>
+<p>Dieser Alias erscheint im Befehl <code class="docutils literal notranslate">show interfaces</code> und in SNMP-basierten
+Überwachungstools.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pppoe pppoe0 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Schalten Sie die Schnittstelle aus.</strong></p>
+<p>Die Schnittstelle wird auf den administrativ heruntergefahrenen
+(<code class="docutils literal notranslate">A/D</code>) Zustand gesetzt.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pppoe pppoe0 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie das MTU auf der Schnittstelle.</strong></p>
+<p>Der Wert definiert die größte Paketgröße in Bytes, die die Schnittstelle
+ohne Fragmentierung überträgt.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pppoe pppoe0 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; vrf &lt;vrf&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-vrf-vrf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Weisen Sie die Schnittstelle einer bestimmten</strong> <abbr title="Virtual Routing and Forwarding">VRF</abbr> <strong>Instanz zu.</strong></p>
+<div class="admonition seealso">
+<p class="admonition-title">Siehe auch</p>
+<p>Für Informationen zur Konfiguration einer VRF siehe den Abschnitt <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>.</p>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pppoe pppoe0 vrf red
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="pppoe-options">
+<h3>PPPoE-Optionen</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; access-concentrator &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-access-concentrator-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie den Namen des Ziel-Zugangs-Konzentrators für die PPPoE-Sitzung.</strong></p>
+<p>Während des PPPoE-Entdeckungsprozesses sendet der Client ein PPPoE-Initiierungs-Paket.
+Mehrere Zugangs-Konzentratoren können mit Angebotspaketen antworten, und der Client
+wählt eines davon aus.</p>
+<p>Diese Einstellung beschränkt den Client darauf, nur mit dem angegebenen Zugangs-Konzentratoren Sitzungen zu erstellen.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; authentication username &lt;username&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-authentication-username-username" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie den Benutzernamen für die PPPoE-Sitzungsauthentifizierung.</strong></p>
+<p>Obwohl die Authentifizierung optional in der Schnittstellenkonfiguration ist, benötigen die meisten ISPs sie, um eine Verbindung herzustellen.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; authentication password &lt;password&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-authentication-password-password" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie das Passwort für die PPPoE-Sitzungsauthentifizierung.</strong></p>
+<p>Obwohl die Authentifizierung optional in der Schnittstellenkonfiguration ist, benötigen die meisten ISPs sie, um eine Verbindung herzustellen.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; connect-on-demand
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-connect-on-demand" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable dial-on-demand auf der PPPoE-Schnittstelle.</strong></p>
+<p>Wenn aktiviert, stellt das System eine PPPoE-Verbindung nur dann her, wenn Daten durch die Schnittstelle fließen. Wenn die Verbindung fehlschlägt, wird sie wiederhergestellt, sobald der Datenverkehr wieder beginnt.</p>
+<p>Für bedarfsgesteuerte Verbindungen müssen Sie außerdem eine <code class="docutils literal notranslate">idle-timeout</code>-Periode konfigurieren, um die Sitzung nach Inaktivität zu trennen.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Das Festlegen des idle timeout auf Null oder das Nichtkonfigurieren behält die Verbindung aktiv, sobald sie hergestellt wurde.</p>
+</div>
+<p>Standardmäßig wird die PPPoE-Verbindung beim Start hergestellt und bleibt kontinuierlich aktiv; falls die Verbindung fehlschlägt, wird sie sofort wiederhergestellt.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; no-default-route
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-no-default-route" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Anfordern Sie eine IP-Adresse vom PPPoE-Server ohne Installation einer Standardroute.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pppoe pppoe0 no-default-route
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Eingeführt in VyOS 1.4, invertiert dieser Befehl die Logik des ehemaligen
+<code class="docutils literal notranslate">default-route</code> CLI-Option.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; default-route-distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-default-route-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Konfigurieren Sie die Distanz für den Standardgateway, der vom PPPoE-Server bereitgestellt wird.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pppoe pppoe0 default-route-distance 220
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; mru &lt;mru&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-mru-mru" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie das</strong> <abbr title="Maximum Receive Unit">MRU</abbr> <strong>für die PPPoE-Schnittstelle.</strong></p>
+<p>Diese Einstellung weist den pppd-Dienst an, den entfernten Peer daran zu hindern, Pakete größer als das konfigurierte MRU zu senden. Erlaubte MRU-Werte liegen zwischen 128 und
+16384 Bytes.</p>
+<p>Ein MRU von 296 ist für sehr langsamen Links (40 Bytes für das TCP/IP-Header und 256 Bytes für Daten) geeignet.</p>
+<p>Das Standard-MRU beträgt 1492 Bytes.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Bei Verwendung des IPv6-Protokolls muss das MRU mindestens 1280 Bytes betragen.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; idle-timeout &lt;time&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-idle-timeout-time" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie den Inaktivitätszeitraum für bedarfsgesteuerte PPPoE-Sitzungen.</strong></p>
+<p>Diese Einstellung definiert, wie lange die Verbindung aktiv bleibt, ohne dass Datenfluss stattfindet, bevor sie getrennt wird.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Das Festlegen des Inaktivitätszeitraums auf Null oder das Nichtkonfigurieren behält die Verbindung aktiv, sobald sie hergestellt wurde.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; holdoff &lt;time&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-holdoff-time" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Wartezeit für dauerhafte PPPoE-Sitzungen.</strong></p>
+<p>Wenn eine dauerhafte Sitzung (mit <code class="docutils literal notranslate">connect-on-demand</code> deaktiviert) vom Remote-Partner beendet wird oder unerwartet abbricht, wartet der Router die angegebene Intervallzeit, bevor er versucht, sich erneut zu verbinden.</p>
+<p>Die Standardwartezeit beträgt 30 Sekunden.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; local-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-local-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die lokale Endpunktkennung für PPPoE-Sitzungen.</strong></p>
+<p>Standardmäßig wird diese IP-Adresse vereinbart.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; no-peer-dns
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-no-peer-dns" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Deaktivieren Sie die Installation der von der lokalen Systemwerbung angegebenen DNS-Nameserver.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; remote-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-remote-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die entfernte Endpunktkennung für PPPoE-Sitzungen.</strong></p>
+<p>Standardmäßig wird diese IP-Adresse vereinbart.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; service-name &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-service-name-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie den Dienstnamen des Ziel-Zugangs-Konzentrators für die PPPoE-Sitzung.</strong></p>
+<p>Standardmäßig verbindet die PPPoE-Schnittstelle mit jedem verfügbaren Zugangs-Konzentratoren.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; source-interface &lt;source-interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-source-interface-source-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die zugrunde liegende Schnittstelle für die PPPoE-Verbindung.</strong></p>
+<p>Jede PPPoE-Verbindung wird über eine zugrunde liegende Schnittstelle hergestellt, die eine Ethernet-Schnittstelle, ein VIF oder eine Bonding-Schnittstelle sein kann.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie das</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>im ausgehenden TCP SYN-Paket auf der angegebenen Schnittstelle.</strong></p>
+<p>Durch das Begrenzen des MSS-Werts in TCP SYN-Paketen instruieren Sie den Remote-Partner, keine Pakete größer als die angegebene Größe zu senden. Dies hilft, Verbindungsprobleme zu vermeiden, falls <abbr title="Path MTU Discovery">PMTUD</abbr> fehlschlägt.</p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">mss</code>: Setzt das MSS auf einen spezifischen Wert in Bytes.</p></li>
+<li><p><code class="docutils literal notranslate">clamp-mss-to-pmtu</code>: Setzt das MSS auf das MTU der Schnittstelle minus 40 Bytes für
+IPv4-Datenverkehr (20 Bytes für das IPv4-Header und 20 Bytes für das TCP-Header).
+Diese Option wird empfohlen, um den richtigen Wert automatisch zu setzen.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Ab VyOS 1.4 wurde dieser Befehl eingeführt und ersetzt die ältere Syntax <code class="docutils literal notranslate">set firewall options interface &lt;name&gt; adjust-mss &lt;value&gt;</code>.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Schnittstelle für Host- oder Router-Verhalten.</strong></p>
+<p>Wenn konfiguriert, wechselt die Schnittstelle in Hostmodus und wird IPv4-Weiterleitung deaktiviert.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Quell-IP-Adressen-Validierung mit</strong>
+<abbr title="Reverse Path Forwarding">RPF</abbr> <strong>auf dieser Schnittstelle, wie in</strong>
+<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> <strong>beschrieben.</strong></p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">strict</code>: Jedes eingehende Paket wird anhand des <abbr title="Forwarding Information Base">FIB</abbr> überprüft. Wenn die Schnittstelle nicht der beste Weg zurück zu diesem Quell-IP-Adress ist, schlägt die Validierung fehl und das Paket wird gelöscht.</p></li>
+<li><p><code class="docutils literal notranslate">loose</code>: Jedes eingehende Paket wird anhand des <abbr title="Forwarding Information Base">FIB</abbr> überprüft. Wenn die Quell-IP-Adresse über keine Schnittstelle erreichbar ist, schlägt die Validierung fehl.</p></li>
+<li><p><code class="docutils literal notranslate">disable</code>: Keine Quell-IP-Adressen-Validierung wird durchgeführt. Alle eingehenden Pakete werden akzeptiert.</p></li>
+</ul>
+<p><a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> empfiehlt, den <code class="docutils literal notranslate">strict</code>-Modus zu aktivieren, um IP-Spoofing, wie z. B. DDoS-Angriffe, zu verhindern. Für asynchrone oder komplexe Routing-Szenarien verwenden Sie den <code class="docutils literal notranslate">loose</code>-Modus.</p>
+</div>
+</div>
+<section id="ipv6">
+<h4>IPv6</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IPv6-Adresszuweisung über <abbr title="Stateless Address Auto-Configuration">SLAAC</abbr> auf dieser Schnittstelle aktivieren.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; ipv6 adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie das</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>im ausgehenden TCP SYN-Paket auf der angegebenen Schnittstelle.</strong></p>
+<p>Durch das Begrenzen des MSS-Werts in TCP SYN-Paketen instruieren Sie den Remote-Partner, keine Pakete größer als die angegebene Größe zu senden. Dies hilft, Verbindungsprobleme zu vermeiden, falls <abbr title="Path MTU Discovery">PMTUD</abbr> fehlschlägt.</p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">mss</code>: Setzt das MSS auf einen spezifischen Wert in Bytes.</p></li>
+<li><p><code class="docutils literal notranslate">clamp-mss-to-pmtu</code>: Setzt das MSS auf das MTU der Schnittstelle minus 60 Bytes für
+IPv6-Datenverkehr (40 Bytes für das IPv6-Header und 20 Bytes für das TCP-Header).
+Diese Option wird empfohlen, um den richtigen Wert automatisch zu setzen.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Ab VyOS 1.4 wurde dieser Befehl eingeführt und ersetzt die ältere Syntax <code class="docutils literal notranslate">set firewall options interface &lt;name&gt; adjust-mss &lt;value&gt;</code>.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-ipv6-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Schnittstelle für Host- oder Router-Verhalten.</strong></p>
+<p>Wenn konfiguriert, wechselt die Schnittstelle in Hostmodus und wird IPv6-Weiterleitung deaktiviert.</p>
+</div>
+</div>
+<p><strong>DHCPv6 Prefix Delegation (PD)</strong></p>
+<p>VyOS unterstützt DHCPv6 Prefix Delegation (DHCPv6-PD), wie in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3633.html"><strong>RFC 3633</strong></a> beschrieben.
+DHCPv6-PD wird von den meisten ISPs unterstützt, die native IPv6 für Verbraucher auf festen Netzwerken anbieten.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; dhcpv6-options pd &lt;id&gt; length &lt;length&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-dhcpv6-options-pd-id-length-length" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine spezifische Präfixlänge für DHCPv6-PD-Anfragen auf dieser
+Schnittstelle.</strong></p>
+<p>Einige ISPs bieten standardmäßig nur ein /64-Präfix an. Verwenden Sie diesen Befehl, um eine andere Präfixlänge für eine spezifische DHCPv6-PD-Anfrage anzufordern,
+die von /32 (wenn von Ihrem ISP erlaubt) bis /64 reicht. &lt;id&gt; ist ein
+einzigartiger Bezeichner für die DHCPv6-PD-Anfrage.</p>
+<p>Der Standardwert ist 64.</p>
+<p>Um ein /56-Präfix von Ihrem ISP anzufordern, verwenden Sie:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pppoe pppoe0 dhcpv6-options pd 0 length 56
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; dhcpv6-options pd &lt;id&gt; interface &lt;delegatee&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-dhcpv6-options-pd-id-interface-delegatee-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie den IPv6-Schnittstellen-Identifier (Host-Anteil) für die delegatee-Schnittstelle.</strong></p>
+<p>Der Wert muss eine Dezimalzahl sein. Er wird dem delegierten Präfix und dem konfigurierten <abbr title="Site-Level Aggregation ID">SLA ID</abbr> angehängt, um die
+endgültige IPv6-Adresse zu bilden.</p>
+<p>Standardmäßig wird der Host-Anteil basierend auf der MAC-Adresse der Elternschnittstelle generiert (EUI-64-Format).</p>
+<blockquote>
+<div></div></blockquote>
+<p><strong>Beispiel:</strong></p>
+<p>Wenn ein /64-Präfix an die Schnittstelle eth8 delegiert wird und Sie den Host-Anteil als 65535 konfigurieren, endet die resultierende IPv6-Adresse mit ::ffff, da 65535 hexadezimal ffff entspricht.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pppoe pppoe0 dhcpv6-options pd 0 interface eth8 address 65534
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces pppoe &lt;interface&gt; dhcpv6-options pd &lt;id&gt; interface &lt;delegatee&gt; sla-id &lt;id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-dhcpv6-options-pd-id-interface-delegatee-sla-id-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie den</strong> <abbr title="Site-Level Aggregation ID">SLA ID</abbr> <strong>für die delegatee-Schnittstelle.</strong></p>
+<p>Der Wert muss eine Dezimalzahl sein, größer als 0 und in die Länge der SLA IDs passt. Er wird in Hexadezimal umgewandelt und an das delegierte Präfix angehängt, um das spezifische Subnetzpräfix für die delegatee-Schnittstelle zu bilden.</p>
+<p><strong>Beispiel:</strong></p>
+<p>Wenn SLA ID 1 ist und das delegierte Präfix <code class="docutils literal notranslate">2001:db8:ffff::/48</code> ist, wird das
+resultierende Subnetzpräfix für die delegatee-Schnittstelle <code class="docutils literal notranslate">2001:db8:ffff:1::/64</code> sein.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pppoe pppoe0 dhcpv6-options pd 0 interface eth8 sla-id 1
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="operation">
+<h2>Betrieb</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show interfaces pppoe &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-show-interfaces-pppoe-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Zeigen Sie detaillierte Informationen zu einer spezifischen PPPoE-Schnittstelle an.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show interfaces pppoe pppoe0
+pppoe0: &lt;POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP&gt; mtu 1492 qdisc pfifo_fast state UNKNOWN group default qlen 3
+    link/ppp
+    inet 192.0.2.1 peer 192.0.2.255/32 scope global pppoe0
+       valid_lft forever preferred_lft forever
+
+    RX:  bytes    packets     errors    dropped    overrun      mcast
+    7002658233    5064967          0          0          0          0
+    TX:  bytes    packets     errors    dropped    carrier collisions
+     533822843    1620173          0          0          0          0
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show interfaces pppoe &lt;interface&gt; queue
+<a class="cmdlink" href="#opcmd-show-interfaces-pppoe-interface-queue" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Zeigen Sie Queue-Informationen für eine spezifische PPPoE-Schnittstelle an.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show interfaces pppoe pppoe0 queue
+qdisc pfifo_fast 0: root refcnt 2 bands 3 priomap  1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
+ Sent 534625359 bytes 1626761 pkt (dropped 62, overlimits 0 requeues 0)
+ backlog 0b 0p requeues 0
+</pre></div>
+</div>
+</div>
+</div>
+<section id="connect-disconnect">
+<h3>Verbinden/Trennen</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+disconnect interface &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-disconnect-interface-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Trennen Sie die angegebene Schnittstelle.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+connect interface &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-connect-interface-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Starten Sie eine Sitzung auf der angegebenen Schnittstelle.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="example">
+<h2>Beispiel</h2>
+<section id="pppoe-over-dsl">
+<h3>PPPoE über DSL</h3>
+<p><strong>Konfigurations-Szenario:</strong></p>
+<ul class="simple">
+<li><p>Ihr ISP's DSL-Modem ist an die <code class="docutils literal notranslate">eth0</code> Schnittstelle Ihres VyOS-Routers angeschlossen.</p></li>
+<li><p>Ihr ISP benötigt keine VLAN-Beschilderung.</p></li>
+<li><p>PPPoE-Anmeldeinformationen werden von Ihrem ISP bereitgestellt. Das typische Benutzernamensformat ist
+<code class="docutils literal notranslate">name&#64;host.net</code>, obwohl dies variieren kann.</p></li>
+</ul>
+<p><strong>Konfigurationsnotizen:</strong></p>
+<ul class="simple">
+<li><p>Das maximale MTU-Größe für DSL beträgt 1492, wegen PPPoE-Overhead. Wenn Sie von einem DHCP-basierten ISP wechseln (z. B. ein Standard-Kabelanschluss), stellen Sie sicher, dass VPN-Verbindungen entsprechend angepasst werden.</p></li>
+<li><p>Um ISP-bereitgestellte Nameserver zu ignorieren und nur Ihre statisch konfigurierten zu verwenden, setzen Sie die <code class="docutils literal notranslate">name-server</code> Option auf <code class="docutils literal notranslate">none</code>.</p></li>
+<li><p>Ein Standardroute wird automatisch installiert, sobald die Schnittstelle aktiviert ist. Um dieses Verhalten zu ändern, verwenden Sie die <code class="docutils literal notranslate">no-default-route</code> CLI-Option.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Die PPPoE-Konfigurationsyntax hat sich nach VyOS 1.2 (Crux) geändert und wird während eines Upgrades automatisch migriert.</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pppoe pppoe0 authentication username &#39;userid&#39;
+set interfaces pppoe pppoe0 authentication password &#39;secret&#39;
+set interfaces pppoe pppoe0 source-interface &#39;eth0&#39;
+</pre></div>
+</div>
+<p>Schützen Sie Ihre Einrichtung, indem Sie Regeln erstellen, die die <code class="docutils literal notranslate">pppoe0</code> Schnittstelle in den Firewall-Chains abgleichen:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv4 input filter rule 10 inbound-interface name &#39;pppoe0&#39;
+set firewall ipv4 forward filter rule 10 inbound-interface name &#39;pppoe0&#39;
+</pre></div>
+</div>
+</section>
+<section id="pppoe-over-vlan">
+<h3>PPPoE über VLAN</h3>
+<p>Einige ISPs erfordern, dass PPPoE-Verbindungen über eine VLAN-Schnittstelle hergestellt werden. Dieses spezifische Topologie wird vollständig von VyOS unterstützt.</p>
+<p>Die folgende Konfiguration stellt die PPPoE-Verbindung über VLAN 7 her, was das Standard-VLAN für Deutsche Telekom ist:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pppoe pppoe0 authentication username &#39;userid&#39;
+set interfaces pppoe pppoe0 authentication password &#39;secret&#39;
+set interfaces pppoe pppoe0 source-interface &#39;eth0.7&#39;
+</pre></div>
+</div>
+<section id="ipv6-dhcpv6-prefix-delegation">
+<h4>IPv6 DHCPv6 Präfixdelegation</h4>
+<p><strong>Konfigurations-Szenario:</strong></p>
+<p>Die folgende Konfiguration stellt eine PPPoE-Sitzung auf der <code class="docutils literal notranslate">eth1</code>
+Schnittstelle her, fordert ein <code class="docutils literal notranslate">/56</code> IPv6-Präfixdelegations von der ISP an und weist
+ein <code class="docutils literal notranslate">/64</code> Subnetz aus dieser Delegation der <code class="docutils literal notranslate">eth0</code> Schnittstelle zu.</p>
+<p><strong>Konfigurationsnotizen:</strong></p>
+<ul class="simple">
+<li><p>Die IPv6-Adresse, die der <code class="docutils literal notranslate">eth0</code> Schnittstelle zugewiesen wird, ist <code class="docutils literal notranslate">&lt;prefix&gt;::1/64</code>.</p></li>
+<li><p>Wenn Sie Ihren delegierten Präfix-Größe nicht kennen, beginnen Sie mit <code class="docutils literal notranslate">sla-len 0</code>.</p></li>
+<li><p>Um das Präfix auf der <code class="docutils literal notranslate">eth0</code> Verbindung zu bewerben, konfigurieren Sie IPv6 Router Advertisement.</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pppoe pppoe0 authentication username vyos
+set interfaces pppoe pppoe0 authentication password vyos
+set interfaces pppoe pppoe0 dhcpv6-options pd 0 interface eth0 address &#39;1&#39;
+set interfaces pppoe pppoe0 dhcpv6-options pd 0 interface eth0 sla-id &#39;0&#39;
+set interfaces pppoe pppoe0 dhcpv6-options pd 0 length &#39;56&#39;
+set interfaces pppoe pppoe0 ipv6 address autoconf
+set interfaces pppoe pppoe0 source-interface eth1
+
+set service router-advert interface eth0 prefix ::/64
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

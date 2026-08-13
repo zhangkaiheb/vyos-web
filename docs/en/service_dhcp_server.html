@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="dhcp-server">
+<h1>DHCP Server</h1>
+<p>VyOS uses Kea DHCP server for both IPv4 and IPv6 address assignment.</p>
+<section id="ipv4-server">
+<h2>IPv4 server</h2>
+<p>The network topology is declared by shared-network-name and the subnet
+declarations. The DHCP service can serve multiple shared networks, with each
+shared network having 1 or more subnets. Each subnet must be present on an
+interface. A range can be declared inside a subnet to define a pool of dynamic
+addresses. Multiple ranges can be defined and can contain holes. Static
+mappings can be set to assign “static” addresses to clients based on their MAC
+address.</p>
+<section id="configuration">
+<h3>Configuration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server hostfile-update
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-hostfile-update" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Create DNS record per client lease, by adding clients to /etc/hosts file.
+Entry will have format: <code class="docutils literal notranslate">&lt;shared-network-name&gt;_&lt;hostname&gt;.&lt;domain-name&gt;</code></p>
+</div>
+</div>
+<section id="shared-network-options">
+<h4>Shared network options</h4>
+<p>The following DHCP options apply to an entire shared network. All subnets
+inherit these values unless the same option is set locally.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option bootfile-name &lt;filename&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-bootfile-name-filename" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Bootstrap file name (DHCP Option 67).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option bootfile-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-bootfile-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Server from which the initial boot file is to be loaded (DHCP siaddr
+field).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option bootfile-size &lt;size&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-bootfile-size-size" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Bootstrap file size in 512-octet blocks (DHCP Option 13).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option captive-portal &lt;url&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-captive-portal-url" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Captive portal API endpoint (DHCP Option 114).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option capwap-controller &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-capwap-controller-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IP address of CAPWAP access controller (DHCP Option 138).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option client-prefix-length &lt;prefix-length&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-client-prefix-length-prefix-length" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specifies the client subnet mask as per RFC 950. If unset, the subnet
+declaration is used (DHCP Option 1).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option default-router &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-default-router-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IP address of default router (DHCP Option 3).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option domain-name &lt;domain-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-domain-name-domain-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>The domain-name parameter should be the domain name that will be appended to
+the client’s hostname to form a fully-qualified domain-name (FQDN) (DHCP
+Option 15).</p>
+<p>This is the configuration parameter for the entire shared network definition.
+All subnets will inherit this configuration item if not specified locally.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option domain-search &lt;domain-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-domain-search-domain-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>The domain-name parameter should be the domain name used when completing DNS
+request where no full FQDN is passed. This option can be given multiple times
+if you need multiple search domains (DHCP Option 119).</p>
+<p>This is the configuration parameter for the entire shared network definition.
+All subnets will inherit this configuration item if not specified locally.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option interface-mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Client interface MTU (DHCP Option 26).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option ip-forwarding
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-ip-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Enable IP forwarding on the client (DHCP Option 19).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option ipv6-only-preferred &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-ipv6-only-preferred-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Disable IPv4 on IPv6-only hosts for the specified number of seconds
+(RFC 8925, DHCP Option 108).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-name-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Inform client that the DNS server can be found at <code class="docutils literal notranslate">&lt;address&gt;</code> (DHCP Option 6).</p>
+<p>This is the configuration parameter for the entire shared network definition.
+All subnets will inherit this configuration item if not specified locally.
+Multiple DNS servers can be defined.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option ntp-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-ntp-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IP address of NTP server (DHCP Option 42). This option can be specified
+multiple times.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option pop-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-pop-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IP address of POP3 server (DHCP Option 70). This option can be specified
+multiple times.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option server-identifier &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-server-identifier-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Address for DHCP server identifier (DHCP Option 54).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option smtp-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-smtp-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IP address of SMTP server (DHCP Option 69). This option can be specified
+multiple times.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option static-route &lt;subnet&gt; next-hop &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-static-route-subnet-next-hop-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Classless static route destination subnet (DHCP Options 121 and 249). This
+option can be specified multiple times.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option tftp-server-name &lt;server-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-tftp-server-name-server-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>TFTP server name (DHCP Option 66).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option time-offset &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-time-offset-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Client subnet offset in seconds from Coordinated Universal Time (UTC)
+(DHCP Option 2).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option time-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-time-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IP address of time server (DHCP Option 4). This option can be specified
+multiple times.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option time-zone &lt;timezone&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-time-zone-timezone" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Time zone to send to clients (DHCP Options 100 and 101, <code class="docutils literal notranslate">pcode</code> and
+<code class="docutils literal notranslate">tcode</code>, RFC 4833).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option vendor-option &lt;vendor&gt; &lt;option-name&gt; &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-vendor-option-vendor-option-name-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This configuration parameter lets you specify a vendor-option for the
+entire shared network definition. All subnets will inherit this
+configuration item if not specified locally (DHCP Option 43). An example
+for Ubiquiti is shown below:</p>
+</div>
+</div>
+<p><strong>Example:</strong></p>
+<p>Pass address of Unifi controller at <code class="docutils literal notranslate">172.16.100.1</code> to all clients of <code class="docutils literal notranslate">NET1</code></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server shared-network-name &#39;NET1&#39; option vendor-option
+ubiquiti unifi-controller &#39;172.16.100.1&#39;
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option wins-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-wins-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IP address for Windows Internet Name Service (WINS) server (DHCP Option 44).
+This option can be specified multiple times.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; option wpad-url &lt;url&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-option-wpad-url-url" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Web Proxy Autodiscovery (WPAD) URL (DHCP Option 252).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server listen-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-listen-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This configuration parameter lets the DHCP server to listen for DHCP
+requests sent to the specified address, it is only realistically useful for
+a server whose only clients are reached via unicasts, such as via DHCP relay
+agents.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server log-level &lt;fatal | error | warn | info | debug&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-log-level-fatal-error-warn-info-debug" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Set the logging verbosity of the Kea DHCP server. The default level is
+<code class="docutils literal notranslate">info</code>.</p>
+</div>
+</div>
+</section>
+<section id="individual-client-subnet">
+<h4>Individual Client Subnet</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; authoritative
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-authoritative" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This says that this device is the only DHCP server for this network. If other
+devices are trying to offer DHCP leases, this machine will send ‘DHCPNAK’ to
+any device trying to request an IP address that is not valid for this
+network.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; subnet-id &lt;id&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-subnet-id-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This configuration parameter is required and must be unique to each subnet.
+It is required to map subnets to lease file entries.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; option default-router &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-option-default-router-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This is a configuration parameter for the <code class="docutils literal notranslate">&lt;subnet&gt;</code>, saying that as part of
+the response, tell the client that the default gateway can be reached at
+<code class="docutils literal notranslate">&lt;address&gt;</code> (DHCP Option 3).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; option name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-option-name-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This is a configuration parameter for the subnet, saying that as part of the
+response, tell the client that the DNS server can be found at <code class="docutils literal notranslate">&lt;address&gt;</code>
+(DHCP Option 6).</p>
+<p>Multiple DNS servers can be defined.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; lease &lt;time&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-lease-time" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Assign the IP address to this machine for <code class="docutils literal notranslate">&lt;time&gt;</code> seconds.</p>
+<p>The default value is 86400 seconds which corresponds to one day.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; range &lt;n&gt; start &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-range-n-start-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Create DHCP address range with a range id of <code class="docutils literal notranslate">&lt;n&gt;</code>. DHCP leases are taken
+from this pool. The pool starts at address <code class="docutils literal notranslate">&lt;address&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; range &lt;n&gt; stop &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-range-n-stop-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Create DHCP address range with a range id of <code class="docutils literal notranslate">&lt;n&gt;</code>. DHCP leases are taken
+from this pool. The pool stops with address <code class="docutils literal notranslate">&lt;address&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; exclude &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-exclude-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Always exclude this address from any defined range. This address will never
+be assigned by the DHCP server.</p>
+<p>This option can be specified multiple times.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; option domain-name &lt;domain-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-option-domain-name-domain-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>The domain-name parameter should be the domain name that will be appended to
+the client’s hostname to form a fully-qualified domain-name (FQDN) (DHCP
+Option 15).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; option domain-search &lt;domain-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-option-domain-search-domain-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>The domain-name parameter should be the domain name used when completing DNS
+request where no full FQDN is passed. This option can be given multiple times
+if you need multiple search domains (DHCP Option 119).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; option vendor-option &lt;vendor&gt; &lt;option-name&gt; &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-option-vendor-option-vendor-option-name-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This configuration parameter lets you specify a vendor-option for the
+subnet specified within the shared network definition (DHCP Option 43).
+An example for Ubiquiti is shown below:</p>
+</div>
+</div>
+<p><strong>Example:</strong></p>
+<p>Create <code class="docutils literal notranslate">172.18.201.0/24</code> as a subnet within <code class="docutils literal notranslate">NET1</code> and pass address of
+Unifi controller at <code class="docutils literal notranslate">172.16.100.1</code> to clients of that subnet.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server shared-network-name &#39;NET1&#39; subnet
+&#39;172.18.201.0/24&#39; option vendor-option ubiquiti unifi-controller &#39;172.16.100.1&#39;
+</pre></div>
+</div>
+</section>
+<section id="dynamic-dns-update-rfc-2136">
+<h4>Dynamic DNS Update (RFC 2136)</h4>
+<p>VyOS DHCP service supports RFC-2136 DDNS protocol. Based on DHCP lease change
+events, DHCP server generates DDNS update requests (defines as NameChangeRequests
+or NCRs) and posts them to a compliant DNS server, that will update its name
+database accordingly.</p>
+<p>VyOS built-in DNS Forwarder does not support DDNS, you will need an external DNS
+server with RFC-2136 DDNS support.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Enables DDNS globally.</p>
+</div>
+</div>
+<p><strong>Behavioral settings</strong></p>
+<p>These settings can be configured on the global level and overridden on the scope
+level, i.e. for individual shared networks or subnets. See examples below.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update send-updates &lt;enable | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-send-updates-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>If set to <code class="docutils literal notranslate">enable</code> on global level, updates for all scopes will be enabled,
+except if explicitly set to <code class="docutils literal notranslate">disable</code> on the scope level. If set to <code class="docutils literal notranslate">disable</code>,
+updates will only be sent for scopes, where <code class="docutils literal notranslate">send-updates</code> is explicitly
+set to <code class="docutils literal notranslate">enable</code>.</p>
+<p>This model is followed for a few behavioral settings below: if the option is
+not set, the setting is inherited from the parent scope. You can override the
+parent scope setting by setting the option explicitly.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update override-no-update &lt;enable | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-override-no-update-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>VyOS will ignore client request not to update DNS records and send DDNS
+update requests regardless.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update override-client-update &lt;enable | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-override-client-update-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>VyOS will override client DDNS request settings and always update both
+forward and reverse DNS records.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update update-on-renew &lt;enable | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-update-on-renew-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Issue DDNS update requests on DHCP lease renew. In busy networks this may
+generate a lot of traffic.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update conflict-resolution &lt;enable | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-conflict-resolution-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Use RFC-4703 conflict resolution. This algorithm helps in situation when
+multiple clients reserve same IP addresses or advertise identical hostnames.
+Should be used in most situations.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update replace-client-name [ never | always | when-present | when-not-present ]
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-replace-client-name-never-always-when-present-when-not-present" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<ul class="simple">
+<li><p><strong>never</strong>: use the name sent by the client. If the client didn’t provide any,
+do not generate one. This is the default behavior</p></li>
+<li><p><strong>always</strong>: always generate a name for the client</p></li>
+<li><p><strong>when-present</strong>: replace the name the client sent with a generated one, if
+the client didn’t send any, do not generate one</p></li>
+<li><p><strong>when-not-present</strong>: use the name sent by the client. If the client didn’t
+send any, generate one for the client</p></li>
+</ul>
+<p>The names are generated using <code class="docutils literal notranslate">generated-prefix</code>, <code class="docutils literal notranslate">qualifying-suffix</code> and the
+client’s IP address string.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update generated-prefix &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-generated-prefix-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Prefix used in client name generation.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update qualifying-suffix &lt;suffix&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-qualifying-suffix-suffix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>DNS suffix used in client name generation.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update ttl-percent &lt;0-100&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-ttl-percent-0-100" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>TTL of the DNS record as a percentage of the DHCP lease time.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update hostname-char-set &lt;character string&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-hostname-char-set-character-string" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Characters, that are considered invalid in the client name. They will be replaced
+with <code class="docutils literal notranslate">hostname-char-replacement</code> string.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update hostname-char-replacement &lt;character string&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-hostname-char-replacement-character-string" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Replacement string for the invalid characters defined by <code class="docutils literal notranslate">hostname-char-set</code>.</p>
+</div>
+</div>
+<p><strong>TSIG keys definition</strong></p>
+<p>This is the global list of TSIG keys for DDNS updates. They need to be specified by
+the name in the DNS domain definitions.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update tsig-key &lt;key-name&gt; algorithm &lt;algorithm&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-tsig-key-key-name-algorithm-algorithm" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Sets the algorithm for the TSIG key. Supported algorithms are <code class="docutils literal notranslate">hmac-md5</code>,
+<code class="docutils literal notranslate">hmac-sha1</code>, <code class="docutils literal notranslate">hmac-sha224</code>, <code class="docutils literal notranslate">hmac-sha256</code>, <code class="docutils literal notranslate">hmac-sha384</code>, <code class="docutils literal notranslate">hmac-sha512</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update tsig-key &lt;key-name&gt; secret &lt;key-secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-tsig-key-key-name-secret-key-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>base64-encoded TSIG key secret value</p>
+</div>
+</div>
+<p><strong>DNS domains definition</strong></p>
+<p>This is global configuration of DNS servers for the updatable forward and reverse
+DNS domains. For every domain multiple DNS servers can be specified.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update [forward|reverse]-domain &lt;domain-name&gt; key-name &lt;tsig-key-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-forward-reverse-domain-domain-name-key-name-tsig-key-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>TSIG key used for the domain.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update [forward|reverse]-domain &lt;domain-name&gt; dns-server &lt;number&gt; address &lt;ip-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-forward-reverse-domain-domain-name-dns-server-number-address-ip-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IP address of the DNS server.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server dynamic-dns-update [forward|reverse]-domain &lt;domain-name&gt; dns-server &lt;number&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-dynamic-dns-update-forward-reverse-domain-domain-name-dns-server-number-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>UDP port of the DNS server. <code class="docutils literal notranslate">53</code> is the default.</p>
+</div>
+</div>
+<p><strong>Example:</strong></p>
+<p>Global configuration you will most likely want:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server dynamic-dns-update send-updates enable
+set service dhcp-server dynamic-dns-update conflict-resolution enable
+</pre></div>
+</div>
+<p>Override the above configuration for a shared network NET1:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server shared-network-name &#39;NET1&#39; dynamic-dns-update replace-client-name when-not-present
+set service dhcp-server shared-network-name &#39;NET1&#39; dynamic-dns-update generated-prefix ip
+set service dhcp-server shared-network-name &#39;NET1&#39; dynamic-dns-update qualifying-suffix mybigdomain.net
+</pre></div>
+</div>
+<p>And in a subnet within the same shared network:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server shared-network-name &#39;NET1&#39; subnet &#39;172.18.201.0/24&#39; dynamic-dns-update qualifying-suffix mydomain.net
+</pre></div>
+</div>
+<p>Configure TSIG keys:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server dynamic-dns-update tsig-key mydomain-net algorithm hmac-sha256
+set service dhcp-server dynamic-dns-update tsig-key mydomain-net secret eWF5YW15bGl0dGxla2V5IQ==
+set service dhcp-server dynamic-dns-update tsig-key reverse-172-18-201 algorithm hmac-sha256
+set service dhcp-server dynamic-dns-update tsig-key reverse-172-18-201 secret eWF5YW15YW5vdGhlcmxpdHRsZWtleSE=
+</pre></div>
+</div>
+<p>Configure DDNS domains:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server dynamic-dns-update forward-domain mydomain.net key-name mydomain-net
+set service dhcp-server dynamic-dns-update forward-domain mydomain.net dns-server 1 address &#39;172.18.0.254&#39;
+set service dhcp-server dynamic-dns-update forward-domain mydomain.net dns-server 1 port 1053
+set service dhcp-server dynamic-dns-update forward-domain mydomain.net dns-server 2 address &#39;192.168.124.254&#39;
+set service dhcp-server dynamic-dns-update forward-domain mydomain.net dns-server 2 port 53
+set service dhcp-server dynamic-dns-update forward-domain 201.18.172.in-addr.arpa key-name reverse-172-18-201
+set service dhcp-server dynamic-dns-update reverse-domain 201.18.172.in-addr.arpa dns-server 1 address &#39;172.18.0.254&#39;
+set service dhcp-server dynamic-dns-update reverse-domain 201.18.172.in-addr.arpa dns-server 1 port 1053
+set service dhcp-server dynamic-dns-update reverse-domain 201.18.172.in-addr.arpa dns-server 2 address &#39;192.168.124.254&#39;
+set service dhcp-server dynamic-dns-update reverse-domain 201.18.172.in-addr.arpa dns-server 2 port 53
+</pre></div>
+</div>
+</section>
+<section id="high-availability">
+<h4>High Availability</h4>
+<p>VyOS provides High Availability support for DHCP server. DHCP High
+Availability can act in two different modes:</p>
+<ul class="simple">
+<li><p><strong>Active-active</strong>: both DHCP servers will respond to DHCP requests. If
+<code class="docutils literal notranslate">mode</code> is not defined, this is the default behavior.</p></li>
+<li><p><strong>Active-passive</strong>: only <code class="docutils literal notranslate">primary</code> server will respond to DHCP requests.
+If this server goes offline, then <code class="docutils literal notranslate">secondary</code> server will take place.</p></li>
+</ul>
+<p>DHCP High Availability must be configured explicitly by the following
+statements on both servers:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server high-availability mode [active-active | active-passive]
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-high-availability-mode-active-active-active-passive" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Define operation mode of High Availability feature. Default value if command
+is not specified is <code class="docutils literal notranslate">active-active</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server high-availability source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-high-availability-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Local IP <code class="docutils literal notranslate">&lt;address&gt;</code> used when communicating to the HA peer.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server high-availability remote &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-high-availability-remote-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Remote peer IP <code class="docutils literal notranslate">&lt;address&gt;</code> of the second DHCP server in this HA
+cluster.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server high-availability name &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-high-availability-name-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Define the name of the peer server to establish and identify the HA (High Availability) connection.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure the specified value does not conflict with the system host-name.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server high-availability status &lt;primary | secondary&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-high-availability-status-primary-secondary" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>The primary and secondary statements determines whether the server is primary
+or secondary.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In order for the primary and the secondary DHCP server to keep
+their lease tables in sync, they must be able to reach each other on TCP
+port 647. If you have firewall rules in effect, adjust them accordingly.</p>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>The dialogue between HA partners is neither encrypted nor
+authenticated. Since most DHCP servers exist within an organisation’s own
+secure Intranet, this would be an unnecessary overhead. However, if you
+have DHCP HA peers whose communications traverse insecure networks,
+then we recommend that you consider the use of VPN tunneling between them
+to ensure that the HA partnership is immune to disruption
+(accidental or otherwise) via third parties.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="static-mappings">
+<h4>Static mappings</h4>
+<p>You can specify a static DHCP assignment on a per-host basis (DHCP Reservations).
+You will need the MAC address of the station and your desired IP address. The
+address must be inside the subnet definition but can be outside the range statement.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; static-mapping &lt;hostname&gt; mac &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-static-mapping-hostname-mac-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Create a new DHCP static mapping named <code class="docutils literal notranslate">&lt;hostname&gt;</code> which is valid for
+the host identified by its MAC <code class="docutils literal notranslate">&lt;address&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; static-mapping &lt;hostname&gt; duid &lt;identifier&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-static-mapping-hostname-duid-identifier" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Create a new DHCP static mapping named <code class="docutils literal notranslate">&lt;hostname&gt;</code> which is valid for
+the host identified by its DHCP unique identifier (DUID) <code class="docutils literal notranslate">&lt;identifier&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; static-mapping &lt;hostname&gt; ip-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-name-subnet-subnet-static-mapping-hostname-ip-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Static DHCP IP address assigned to the host identified by <code class="docutils literal notranslate">&lt;hostname&gt;</code>.
+IP address must be inside the <code class="docutils literal notranslate">&lt;subnet&gt;</code> which is defined but can be outside
+the dynamic range created with <code class="docutils literal notranslate">{cfgcmd} set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; range &lt;n&gt;</code>. If no ip-address is
+specified, an IP address from the dynamic pool is used.</p>
+<p>This is useful, for example, in combination with hostfile update.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>This is the equivalent of the host block in dhcpd.conf of
+isc-dhcpd.</p>
+</div>
+</div>
+</div>
+<p><strong>Example:</strong></p>
+<ul class="simple">
+<li><p>IP address <code class="docutils literal notranslate">192.168.1.100</code> shall be statically mapped to client named <code class="docutils literal notranslate">client1</code></p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server shared-network-name &#39;NET1&#39; subnet 192.168.1.0/24 subnet-id 1
+set service dhcp-server shared-network-name &#39;NET1&#39; subnet 192.168.1.0/24 static-mapping client1 ip-address 192.168.1.100
+set service dhcp-server shared-network-name &#39;NET1&#39; subnet 192.168.1.0/24 static-mapping client1 mac aa:bb:11:22:33:00
+</pre></div>
+</div>
+<p>The configuration will look as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>show service dhcp-server shared-network-name NET1
+ subnet 192.168.1.0/24 {
+     static-mapping client1 {
+         ip-address 192.168.1.100
+         mac aa:bb:11:22:33:00
+     }
+     subnet-id 1
+ }
+</pre></div>
+</div>
+</section>
+<section id="relay-agent-information-option-82">
+<h4>Relay agent information (Option 82)</h4>
+<p>Some DHCP relays support the injection of information into a DHCP request, depending on
+where the request originated from. This is commonly used to determine the
+behaviour of the DHCP server, based on the port/switch combination where the
+request was first detected. I.e. the device plugged into a particular port (or
+set of ports) always gets the same IP address (or range of IP addresses). This
+information is usually included in the request using Option 82, hence this
+is what we call this part of the configuration.</p>
+<p>This behaviour is controlled in two parts. First, “client classes” are defined
+which determine which inputs match. Once a positive match has been found the
+request is “tagged” with this client class. Second, when the DHCP server
+processes the request it checks to see if the configuration has a client class
+defined. If it does then that part of the configuration will override the others</p>
+<p>Client classes can be applied at either the subnet or range level, depending on
+how you want the server to behave.</p>
+<p><strong>Client Class definition</strong></p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server client-class &lt;name&gt; relay-agent-information circuit-id &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-client-class-name-relay-agent-information-circuit-id-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Create a new client class (if not already defined) and set it to match on
+the “Circuit ID” part of the Option 82 field in the DHCP request. This is
+sub option “1” as specified by RFC 3046. The value specified here is either
+interpreted as a raw hex value, if it starts with the prefix 0x, or ASCII text
+otherwise. e.g. <code class="docutils literal notranslate">e1-5</code> and <code class="docutils literal notranslate">0x65312d35</code> are the same</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server client-class &lt;name&gt; relay-agent-information remote-id &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-client-class-name-relay-agent-information-remote-id-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Create a new client class (if not already defined) and set it to match on
+the “Remote ID” part of the Option 82 field in the DHCP request. This is
+sub option “2” as specified by RFC 3046. The value specified here is either
+interpreted as a raw hex value, if it starts with the prefix 0x, or ASCII text
+otherwise. e.g. <code class="docutils literal notranslate">10.100.0.41</code> and <code class="docutils literal notranslate">0x31302e3130302e302e3431</code> are the
+same</p>
+</div>
+</div>
+<p><strong>Client Class application</strong></p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;subnet-name&gt; subnet &lt;CIDR&gt; client-class &lt;class-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-subnet-name-subnet-cidr-client-class-class-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Applies the Client Class with the name <code class="docutils literal notranslate">&lt;class-name&gt;</code> to the subnet <code class="docutils literal notranslate">&lt;subnet-name&gt;</code>.
+This means that whenever the client class matches a request it is always
+routed to this subnet definition first.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcp-server shared-network-name &lt;subnet-name&gt; subnet &lt;CIDR&gt; range &lt;range-name&gt; client-class &lt;class-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcp-server-shared-network-name-subnet-name-subnet-cidr-range-range-name-client-class-class-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Applies the Client Class with the name <code class="docutils literal notranslate">&lt;class-name&gt;</code> to the range
+<code class="docutils literal notranslate">&lt;range-name&gt;</code> which belongs to subnet <code class="docutils literal notranslate">&lt;subnet-name&gt;</code>. This means that whenever the
+client class matches a request it is always routed to this range definition
+first.</p>
+</div>
+</div>
+<p>NB: Kea (the DHCP server used by VyOS) is programmed to offer as many
+alternatives as it can to repeated DHCP Discover requests. Some operating
+systems (Notably Microsoft Windows) make multiple DHCP Discover requests before
+settling on an address. This particularly seems to happen when the DHCP server
+isn’t set to authoritative. This may explain why the address you expect isn’t
+being chosen. Wireshark is helpful in these situations.</p>
+<p><strong>Example:</strong></p>
+<p>The following configuration example will classify requests coming in on port
+<code class="docutils literal notranslate">e1-5</code> from DHCP Relay <code class="docutils literal notranslate">192.0.2.1</code> and make sure that they are allocated the
+address <code class="docutils literal notranslate">192.0.2.4</code>. Any requests which do not match the circuit and remote ID
+will, instead, be allocated from the range otherRange in the usual manner.</p>
+<p>NB: Both the Circuit ID and Remote ID fields are arbitrary free text. <em>Most</em>
+switches set the Remote ID to the IP address of the management interface but
+that should not be relied upon. Check the documentation of your DHCP Relay for
+more detail or, as a measure of last resort, inspect the DHCP requests in
+Wireshark.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>service {
+    dhcp-server {
+        client-class className {
+            relay-agent-information {
+                circuit-id e1-5
+                remote-id 192.0.2.1
+            }
+        }
+        shared-network-name test {
+            subnet 192.0.2.0/24 {
+                range classNameRange {
+                    client-class className
+                    start 192.0.2.4
+                    stop 192.0.2.4
+                }
+                range otherRange {
+                    start 192.0.2.5
+                    stop 192.0.2.100
+                }
+                subnet-id 1
+            }
+        }
+    }
+}
+</pre></div>
+</div>
+</section>
+</section>
+<section id="options">
+<h3>Options</h3>
+<p>The following DHCP options can be set under
+<code class="docutils literal notranslate">set service dhcp-server shared-network-name &lt;name&gt; option ...</code> or
+<code class="docutils literal notranslate">set service dhcp-server shared-network-name &lt;name&gt; subnet &lt;subnet&gt; option ...</code>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 11.8%" />
+<col style="width: 6.9%" />
+<col style="width: 22.5%" />
+<col style="width: 39.2%" />
+<col style="width: 19.6%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Setting name</p></th>
+<th class="head"><p>Option number</p></th>
+<th class="head"><p>DHCP option name</p></th>
+<th class="head"><p>Option description</p></th>
+<th class="head"><p>Multi</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>bootfile-name</p></td>
+<td><p>67</p></td>
+<td><p>boot-file-name</p></td>
+<td><p>Bootstrap file name</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-odd"><td><p>bootfile-server</p></td>
+<td><p>siaddr</p></td>
+<td><p>next-server</p></td>
+<td><p>Server from which the initial boot file is to be loaded</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-even"><td><p>bootfile-size</p></td>
+<td><p>13</p></td>
+<td><p>boot-size</p></td>
+<td><p>Bootstrap file size</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-odd"><td><p>captive-portal</p></td>
+<td><p>114</p></td>
+<td><p>v4-captive-portal</p></td>
+<td><p>Captive portal API endpoint</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-even"><td><p>capwap-controller</p></td>
+<td><p>138</p></td>
+<td><p>capwap-ac-v4</p></td>
+<td><p>IPv4 address of CAPWAP access controller</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-odd"><td><p>client-prefix-length</p></td>
+<td><p>1</p></td>
+<td><p>subnet-mask</p></td>
+<td><p>Specifies the clients subnet mask as per RFC 950. If unset,
+subnet declaration is used.</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-even"><td><p>default-router</p></td>
+<td><p>3</p></td>
+<td><p>routers</p></td>
+<td><p>IPv4 address of router on the client’s subnet</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-odd"><td><p>domain-name</p></td>
+<td><p>15</p></td>
+<td><p>domain-name</p></td>
+<td><p>Client domain name</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-even"><td><p>domain-search</p></td>
+<td><p>119</p></td>
+<td><p>domain-search</p></td>
+<td><p>Client domain name search list</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p>interface-mtu</p></td>
+<td><p>26</p></td>
+<td><p>interface-mtu</p></td>
+<td><p>Client interface MTU</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-even"><td><p>ip-forwarding</p></td>
+<td><p>19</p></td>
+<td><p>ip-forwarding</p></td>
+<td><p>Enable IP forwarding on client</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-odd"><td><p>ipv6-only-preferred</p></td>
+<td><p>108</p></td>
+<td><p>v6-only-preferred</p></td>
+<td><p>Disable IPv4 on IPv6-only hosts (RFC 8925)</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-even"><td><p>name-server</p></td>
+<td><p>6</p></td>
+<td><p>domain-name-servers</p></td>
+<td><p>Domain Name Servers (DNS) addresses</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p>ntp-server</p></td>
+<td><p>42</p></td>
+<td><p>ntp-servers</p></td>
+<td><p>IPv4 address of NTP server</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-even"><td><p>pop-server</p></td>
+<td><p>70</p></td>
+<td><p>pop-server</p></td>
+<td><p>IPv4 address of POP3 server</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p>server-identifier</p></td>
+<td><p>54</p></td>
+<td><p>dhcp-server-identifier</p></td>
+<td><p>IPv4 address for DHCP server identifier</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-even"><td><p>smtp-server</p></td>
+<td><p>69</p></td>
+<td><p>smtp-server</p></td>
+<td><p>IPv4 address of SMTP server</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p>static-route</p></td>
+<td><p>121, 249</p></td>
+<td><p>classless-static-route, ms-classless-static-route</p></td>
+<td><p>Classless static route destination subnet</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-even"><td><p>tftp-server-name</p></td>
+<td><p>66</p></td>
+<td><p>tftp-server-name</p></td>
+<td><p>TFTP server name</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-odd"><td><p>time-offset</p></td>
+<td><p>2</p></td>
+<td><p>time-offset</p></td>
+<td><p>Client subnet offset in seconds from Coordinated Universal Time
+(UTC)</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-even"><td><p>time-server</p></td>
+<td><p>4</p></td>
+<td><p>time-servers</p></td>
+<td><p>IPv4 address of time server</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p>time-zone</p></td>
+<td><p>100, 101</p></td>
+<td><p>pcode, tcode</p></td>
+<td><p>Time zone to send to clients (RFC 4833)</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-even"><td><p>vendor-option</p></td>
+<td><p>43</p></td>
+<td><p>vendor-encapsulated-options</p></td>
+<td><p>Vendor-specific options</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p>wins-server</p></td>
+<td><p>44</p></td>
+<td><p>netbios-name-servers</p></td>
+<td><p>IPv4 address for Windows Internet Name Service (WINS) server</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-even"><td><p>wpad-url</p></td>
+<td><p>252</p></td>
+<td><p>wpad-url</p></td>
+<td><p>Web Proxy Autodiscovery (WPAD) URL</p></td>
+<td><p>N</p></td>
+</tr>
+</tbody>
+</table>
+<p>Multi: can be specified multiple times.</p>
+</section>
+<section id="example">
+<h3>Example</h3>
+<p>Please see the <a class="reference internal" href="../../quick-start.html#dhcp-dns-quick-start">DHCP/DNS quick-start</a> configuration.</p>
+<section id="dhcp-server-v4-example-failover">
+<h4>High Availability</h4>
+<p>Configuration of a DHCP HA pair:</p>
+<ul class="simple">
+<li><p>Setup DHCP HA for network 192.0.2.0/24</p></li>
+<li><p>Use active-active HA mode.</p></li>
+<li><p>Default gateway and DNS server is at <code class="docutils literal notranslate">192.0.2.254</code></p></li>
+<li><p>The primary DHCP server named dhcp-primary uses address <code class="docutils literal notranslate">192.168.189.252</code></p></li>
+<li><p>The secondary DHCP server with named dhcp-secondary uses address <code class="docutils literal notranslate">192.168.189.253</code></p></li>
+<li><p>DHCP range spans from <code class="docutils literal notranslate">192.168.189.10</code> - <code class="docutils literal notranslate">192.168.189.250</code></p></li>
+</ul>
+<p>Common configuration, valid for both primary and secondary node.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server shared-network-name NET-VYOS subnet 192.0.2.0/24 option default-router &#39;192.0.2.254&#39;
+set service dhcp-server shared-network-name NET-VYOS subnet 192.0.2.0/24 option name-server &#39;192.0.2.254&#39;
+set service dhcp-server shared-network-name NET-VYOS subnet 192.0.2.0/24 option domain-name &#39;vyos.net&#39;
+set service dhcp-server shared-network-name NET-VYOS subnet 192.0.2.0/24 range 0 start &#39;192.0.2.10&#39;
+set service dhcp-server shared-network-name NET-VYOS subnet 192.0.2.0/24 range 0 stop &#39;192.0.2.250&#39;
+set service dhcp-server shared-network-name NET-VYOS subnet 192.0.2.0/24 subnet-id &#39;1&#39;
+</pre></div>
+</div>
+<p><strong>Primary</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server high-availability mode &#39;active-active&#39;
+set service dhcp-server high-availability source-address &#39;192.168.189.252&#39;
+set service dhcp-server high-availability name &#39;dhcp-secondary&#39;
+set service dhcp-server high-availability remote &#39;192.168.189.253&#39;
+set service dhcp-server high-availability status &#39;primary&#39;
+</pre></div>
+</div>
+<p><strong>Secondary</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-server high-availability mode &#39;active-active&#39;
+set service dhcp-server high-availability source-address &#39;192.168.189.253&#39;
+set service dhcp-server high-availability name &#39;dhcp-primary&#39;
+set service dhcp-server high-availability remote &#39;192.168.189.252&#39;
+set service dhcp-server high-availability status &#39;secondary&#39;
+</pre></div>
+</div>
+</section>
+</section>
+<section id="operation-mode">
+<h3>Operation Mode</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log dhcp server
+<a class="cmdlink" href="#opcmd-show-log-dhcp-server" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show DHCP server daemon log file</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log dhcp client
+<a class="cmdlink" href="#opcmd-show-log-dhcp-client" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show logs from all DHCP client processes.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log dhcp client interface &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-show-log-dhcp-client-interface-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show logs from specific <code class="docutils literal notranslate">interface</code> DHCP client process.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+restart dhcp server
+<a class="cmdlink" href="#opcmd-restart-dhcp-server" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Restart the DHCP server</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show dhcp server statistics
+<a class="cmdlink" href="#opcmd-show-dhcp-server-statistics" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show the DHCP server statistics:</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show dhcp server statistics
+Pool           Size    Leases    Available  Usage
+-----------  ------  --------  -----------  -------
+dhcpexample      99         2           97  2%
+</pre></div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show dhcp server statistics pool &lt;pool&gt;
+<a class="cmdlink" href="#opcmd-show-dhcp-server-statistics-pool-pool" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show the DHCP server statistics for the specified pool.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show dhcp server leases
+<a class="cmdlink" href="#opcmd-show-dhcp-server-leases" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show statuses of all active leases:</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show dhcp server leases
+IP Address      MAC address        State    Lease start          Lease expiration     Remaining    Pool      Hostname    Origin
+--------------  -----------------  -------  -------------------  -------------------  -----------  --------  ----------  --------
+192.168.11.134  00:50:79:66:68:09  active   2023/11/29 09:51:05  2023/11/29 10:21:05  0:24:10      LAN       VPCS1       local
+192.168.11.133  50:00:00:06:00:00  active   2023/11/29 09:51:38  2023/11/29 10:21:38  0:24:43      LAN       VYOS-6      local
+10.11.11.108    50:00:00:05:00:00  active   2023/11/29 09:51:43  2023/11/29 10:21:43  0:24:48      VIF-1001  VYOS5       local
+192.168.11.135  00:50:79:66:68:07  active   2023/11/29 09:55:16  2023/11/29 09:59:16  0:02:21                            remote
+vyos@vyos:~$
+</pre></div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Static mappings aren’t shown. To show all states, use
+<code class="docutils literal notranslate">show dhcp server leases state all</code>.</p>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show dhcp server leases origin [local | remote]
+<a class="cmdlink" href="#opcmd-show-dhcp-server-leases-origin-local-remote" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show statuses of all active leases granted by local (this server) or
+remote (failover server):</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show dhcp server leases origin remote
+IP Address      MAC address        State    Lease start          Lease expiration     Remaining    Pool      Hostname    Origin
+--------------  -----------------  -------  -------------------  -------------------  -----------  --------  ----------  --------
+192.168.11.135  00:50:79:66:68:07  active   2023/11/29 09:55:16  2023/11/29 09:59:16  0:02:21                            remote
+vyos@vyos:~$
+</pre></div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show dhcp server leases pool &lt;pool&gt;
+<a class="cmdlink" href="#opcmd-show-dhcp-server-leases-pool-pool" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show only leases in the specified pool.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show dhcp server leases pool LAN
+IP Address      MAC address        State    Lease start          Lease expiration     Remaining    Pool    Hostname    Origin
+--------------  -----------------  -------  -------------------  -------------------  -----------  ------  ----------  --------
+192.168.11.134  00:50:79:66:68:09  active   2023/11/29 09:51:05  2023/11/29 10:21:05  0:23:55      LAN     VPCS1       local
+192.168.11.133  50:00:00:06:00:00  active   2023/11/29 09:51:38  2023/11/29 10:21:38  0:24:28      LAN     VYOS-6      local
+vyos@vyos:~$
+</pre></div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show dhcp server leases sort &lt;key&gt;
+<a class="cmdlink" href="#opcmd-show-dhcp-server-leases-sort-key" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Sort the output by the specified key. Possible keys: ip, hardware_address,
+state, start, end, remaining, pool, hostname (default = ip)</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show dhcp server leases state &lt;state&gt;
+<a class="cmdlink" href="#opcmd-show-dhcp-server-leases-state-state" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show only leases with the specified state. Possible states: all, active,
+free, expired, released, abandoned, reset, backup (default = active)</p>
+</div>
+</div>
+</section>
+</section>
+<section id="ipv6-server">
+<h2>IPv6 server</h2>
+<p>The network topology is declared by shared-network-name and subnet
+declarations. The DHCPv6 service can serve multiple shared networks, with each
+shared network having one or more subnets. Each subnet must be present on an
+interface. A range can be declared inside a subnet to define a pool of dynamic
+addresses. Prefix delegation and static mappings can assign prefixes or fixed
+addresses to clients based on their DUID.</p>
+<section id="dhcp-server-v6-config">
+<h3>Configuration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server preference &lt;preference value&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-preference-preference-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Clients receiving advertise messages from multiple servers choose the server
+with the highest preference value. The range for this value is <code class="docutils literal notranslate">0...255</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server log-level &lt;fatal | error | warn | info | debug&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-log-level-fatal-error-warn-info-debug" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Set the logging verbosity of the Kea DHCPv6 server. The default level is
+<code class="docutils literal notranslate">info</code>.</p>
+</div>
+</div>
+<section id="id4">
+<h4>Shared network options</h4>
+<p>The following DHCPv6 options apply to an entire shared network. All subnets
+inherit these values unless the same option is set locally.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; option captive-portal &lt;url&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-option-captive-portal-url" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Captive portal API endpoint (DHCPv6 Option 103).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; option capwap-controller &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-option-capwap-controller-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IP address of CAPWAP access controller (DHCPv6 Option 52).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; option domain-search &lt;domain-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-option-domain-search-domain-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Domain name used when completing DNS requests where no full FQDN is passed.
+This option can be given multiple times if you need multiple search domains
+(DHCPv6 Option 24).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; option info-refresh-time &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-option-info-refresh-time-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Time in seconds that stateless clients should wait between refreshing the
+information they were given (DHCPv6 Option 32).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; option name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-option-name-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Inform the client that the DNS server can be found at <code class="docutils literal notranslate">&lt;address&gt;</code> (DHCPv6
+Option 23). Multiple DNS servers can be defined.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; option nis-domain &lt;domain-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-option-nis-domain-domain-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>A <abbr title="Network Information Service">NIS</abbr> domain name for clients to use
+(DHCPv6 Option 29).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; option nis-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-option-nis-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IPv6 address of a NIS server (DHCPv6 Option 27). This option can be specified
+multiple times.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; option nisplus-domain &lt;domain-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-option-nisplus-domain-domain-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>A <abbr title="Network Information Service Plus">NIS+</abbr> domain name for clients to
+use (DHCPv6 Option 30).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; option nisplus-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-option-nisplus-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IPv6 address of a NIS+ server (DHCPv6 Option 28). This option can be specified
+multiple times.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; option sip-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-option-sip-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IPv6 address of <abbr title="Session Initiation Protocol">SIP</abbr> server (DHCPv6
+Option 21 and 22, <code class="docutils literal notranslate">sip-server-dns</code> and <code class="docutils literal notranslate">sip-server-addr</code>). This option can be
+specified multiple times.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; option sntp-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-option-sntp-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>IPv6 address of an SNTP server for clients to use (DHCPv6 Option 31). This
+option can be specified multiple times.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; option time-zone &lt;timezone&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-option-time-zone-timezone" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Time zone to send to clients (DHCPv6 Options 41 and 42,
+<code class="docutils literal notranslate">new-posix-timezone</code> and <code class="docutils literal notranslate">new-tzdb-timezone</code>, RFC 4833).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; option vendor-option &lt;vendor&gt; &lt;option-name&gt; &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-option-vendor-option-vendor-option-name-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Specify a vendor-specific DHCPv6 option for the shared network (DHCPv6
+Option 17). This option can be specified multiple times.</p>
+</div>
+</div>
+</section>
+<section id="id5">
+<h4>Individual Client Subnet</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Bind shared network <code class="docutils literal notranslate">&lt;name&gt;</code> to <code class="docutils literal notranslate">&lt;interface&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; subnet &lt;prefix&gt; subnet-id &lt;id&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-subnet-prefix-subnet-id-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>This configuration parameter is required and must be unique to each subnet.
+It is required to map subnets to lease file entries.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; subnet &lt;prefix&gt; lease-time {default | maximum | minimum} &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-subnet-prefix-lease-time-default-maximum-minimum-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>The default lease time for DHCPv6 leases is 24 hours. This can be changed by
+supplying a <code class="docutils literal notranslate">default</code>, <code class="docutils literal notranslate">maximum</code> and <code class="docutils literal notranslate">minimum</code>. All
+values need to be supplied in seconds.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; subnet &lt;prefix&gt; range &lt;n&gt; start &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-subnet-prefix-range-n-start-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Create DHCPv6 address range with a range id of <code class="docutils literal notranslate">&lt;n&gt;</code>. DHCPv6 leases are taken
+from this pool. The pool starts at address <code class="docutils literal notranslate">&lt;address&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; subnet &lt;prefix&gt; range &lt;n&gt; stop &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-subnet-prefix-range-n-stop-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Create DHCPv6 address range with a range id of <code class="docutils literal notranslate">&lt;n&gt;</code>. DHCPv6 leases are taken
+from this pool. The pool stops at address <code class="docutils literal notranslate">&lt;address&gt;</code>.</p>
+</div>
+</div>
+</section>
+<section id="prefix-delegation">
+<h4>Prefix Delegation</h4>
+<p>To hand out individual prefixes to your clients the following configuration is
+used:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; subnet &lt;prefix&gt; prefix-delegation prefix &lt;pd-prefix&gt; prefix-length &lt;length&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-subnet-prefix-prefix-delegation-prefix-pd-prefix-prefix-length-length" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Delegate prefixes from <code class="docutils literal notranslate">&lt;pd-prefix&gt;</code> to clients in subnet <code class="docutils literal notranslate">&lt;prefix&gt;</code>. Range
+is defined by <code class="docutils literal notranslate">&lt;length&gt;</code> in bits, 32 to 64.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; subnet &lt;prefix&gt; prefix-delegation prefix &lt;pd-prefix&gt; delegated-length &lt;length&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-subnet-prefix-prefix-delegation-prefix-pd-prefix-delegated-length-length" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Hand out prefixes of size <code class="docutils literal notranslate">&lt;length&gt;</code> in bits from <code class="docutils literal notranslate">&lt;pd-prefix&gt;</code> to clients
+in subnet <code class="docutils literal notranslate">&lt;prefix&gt;</code> when the request for prefix delegation.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; subnet &lt;prefix&gt; prefix-delegation prefix &lt;pd-prefix&gt; excluded-prefix &lt;exclude-prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-subnet-prefix-prefix-delegation-prefix-pd-prefix-excluded-prefix-exclude-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Exclude <code class="docutils literal notranslate">&lt;exclude-prefix&gt;</code> from <code class="docutils literal notranslate">&lt;pd-prefix&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; subnet &lt;prefix&gt; prefix-delegation prefix &lt;pd-prefix&gt; excluded-prefix-length &lt;length&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-subnet-prefix-prefix-delegation-prefix-pd-prefix-excluded-prefix-length-length" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Define length of exclude prefix in <code class="docutils literal notranslate">&lt;pd-prefix&gt;</code>.</p>
+</div>
+</div>
+<p><strong>Example:</strong></p>
+<ul class="simple">
+<li><p>A shared network named <code class="docutils literal notranslate">PD-NET</code> serves subnet <code class="docutils literal notranslate">2001:db8::/64</code>.</p></li>
+<li><p>It is connected to <code class="docutils literal notranslate">eth1</code>.</p></li>
+<li><p>Address pool shall be <code class="docutils literal notranslate">2001:db8::100</code> through <code class="docutils literal notranslate">2001:db8::199</code>.</p></li>
+<li><p>It hands out prefixes <code class="docutils literal notranslate">2001:db8:0:10::/64</code> through <code class="docutils literal notranslate">2001:db8:0:1f::/64</code>.</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-server shared-network-name &#39;PD-NET&#39; interface &#39;eth1&#39;
+set service dhcpv6-server shared-network-name &#39;PD-NET&#39; subnet 2001:db8::/64 range 1 start 2001:db8::100
+set service dhcpv6-server shared-network-name &#39;PD-NET&#39; subnet 2001:db8::/64 range 1 stop 2001:db8::199
+set service dhcpv6-server shared-network-name &#39;PD-NET&#39; subnet 2001:db8::/64 prefix-delegation prefix 2001:db8:0:10:: delegated-length &#39;64&#39;
+set service dhcpv6-server shared-network-name &#39;PD-NET&#39; subnet 2001:db8::/64 prefix-delegation prefix 2001:db8:0:10:: prefix-length &#39;60&#39;
+set service dhcpv6-server shared-network-name &#39;PD-NET&#39; subnet 2001:db8::/64 subnet-id 1
+</pre></div>
+</div>
+</section>
+<section id="address-pools">
+<h4>Address pools</h4>
+<p>DHCPv6 address pools must be configured for the system to act as a DHCPv6
+server. The following example describes a common scenario.</p>
+<p><strong>Example:</strong></p>
+<ul class="simple">
+<li><p>A shared network named <code class="docutils literal notranslate">NET1</code> serves subnet <code class="docutils literal notranslate">2001:db8::/64</code></p></li>
+<li><p>It is connected to <code class="docutils literal notranslate">eth1</code></p></li>
+<li><p>DNS server is located at <code class="docutils literal notranslate">2001:db8::ffff</code></p></li>
+<li><p>Address pool shall be <code class="docutils literal notranslate">2001:db8::100</code> through <code class="docutils literal notranslate">2001:db8::199</code>.</p></li>
+<li><p>Lease time will be left at the default value which is 24 hours</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-server shared-network-name &#39;NET&#39; interface &#39;eth1&#39;
+set service dhcpv6-server shared-network-name &#39;NET1&#39; subnet 2001:db8::/64 range 1 start 2001:db8::100
+set service dhcpv6-server shared-network-name &#39;NET1&#39; subnet 2001:db8::/64 range 1 stop 2001:db8::199
+set service dhcpv6-server shared-network-name &#39;NET1&#39; subnet 2001:db8::/64 option name-server 2001:db8::ffff
+set service dhcpv6-server shared-network-name &#39;NET1&#39; subnet 2001:db8::/64 subnet-id 1
+</pre></div>
+</div>
+<p>The configuration will look as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>show service dhcpv6-server
+    shared-network-name NET1 {
+        subnet 2001:db8::/64 {
+           range 1 {
+              start 2001:db8::100
+              stop 2001:db8::199
+           }
+           option {
+              name-server 2001:db8::ffff
+           }
+           subnet-id 1
+        }
+    }
+</pre></div>
+</div>
+</section>
+<section id="dhcp-server-v6-static-mapping">
+<h4>Static mappings</h4>
+<p>In order to map specific IPv6 addresses to specific hosts static mappings can
+be created (DHCPv6 Reservations). The following example explains the process.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; subnet &lt;prefix&gt; static-mapping &lt;hostname&gt; duid &lt;identifier&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-subnet-prefix-static-mapping-hostname-duid-identifier" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Create a new DHCPv6 static mapping named <code class="docutils literal notranslate">&lt;hostname&gt;</code> which is valid for
+the host identified by its DHCP unique identifier (DUID) <code class="docutils literal notranslate">&lt;identifier&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; subnet &lt;prefix&gt; static-mapping &lt;hostname&gt; ipv6-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-subnet-prefix-static-mapping-hostname-ipv6-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Static IPv6 address assigned to the host identified by <code class="docutils literal notranslate">&lt;hostname&gt;</code>. This option can be specified
+multiple times.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service dhcpv6-server shared-network-name &lt;name&gt; subnet &lt;prefix&gt; static-mapping &lt;hostname&gt; ipv6-prefix &lt;delegated-prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-server-shared-network-name-name-subnet-prefix-static-mapping-hostname-ipv6-prefix-delegated-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Static IPv6 prefix assigned to the host identified by <code class="docutils literal notranslate">&lt;hostname&gt;</code>.</p>
+</div>
+</div>
+<p><strong>Example:</strong></p>
+<ul class="simple">
+<li><p>IPv6 address <code class="docutils literal notranslate">2001:db8::101</code> shall be statically mapped</p></li>
+<li><p>IPv6 prefix <code class="docutils literal notranslate">2001:db8:0:101::/64</code> shall be statically mapped</p></li>
+<li><p>Host specific mapping shall be named <code class="docutils literal notranslate">client1</code></p></li>
+</ul>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>The identifier is the device’s DUID: colon-separated hex list (as
+used by isc-dhcp option dhcpv6.client-id). If the device already has a
+dynamic lease from the DHCPv6 server, its DUID can be found with <code class="docutils literal notranslate">show service dhcpv6 server leases</code>. The DUID begins at the 5th octet (after the
+4th colon) of IAID_DUID.</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-server shared-network-name &#39;NET1&#39; subnet 2001:db8::/64 static-mapping client1 ipv6-address 2001:db8::101
+set service dhcpv6-server shared-network-name &#39;NET1&#39; subnet 2001:db8::/64 static-mapping client1 ipv6-prefix 2001:db8:0:101::/64
+set service dhcpv6-server shared-network-name &#39;NET1&#39; subnet 2001:db8::/64 static-mapping client1 duid 00:01:00:01:12:34:56:78:aa:bb:cc:dd:ee:ff
+</pre></div>
+</div>
+<p>The configuration will look as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>show service dhcpv6-server shared-network-name NET1
+ subnet 2001:db8::/64 {
+     static-mapping client1 {
+         duid 00:01:00:01:12:34:56:78:aa:bb:cc:dd:ee:ff
+         ipv6-address 2001:db8::101
+         ipv6-prefix 2001:db8:0:101::/64
+     }
+ }
+</pre></div>
+</div>
+</section>
+</section>
+<section id="dhcp-server-v6-options">
+<h3>Options</h3>
+<p>The following DHCPv6 options can be set under
+<code class="docutils literal notranslate">set service dhcpv6-server shared-network-name &lt;name&gt; option ...</code> or under
+<code class="docutils literal notranslate">subnet &lt;prefix&gt; option ...</code> within the same shared network.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 11.8%" />
+<col style="width: 6.9%" />
+<col style="width: 22.5%" />
+<col style="width: 39.2%" />
+<col style="width: 19.6%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Setting name</p></th>
+<th class="head"><p>Option number</p></th>
+<th class="head"><p>DHCP option name</p></th>
+<th class="head"><p>Option description</p></th>
+<th class="head"><p>Multi</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>captive-portal</p></td>
+<td><p>103</p></td>
+<td><p>v6-captive-portal</p></td>
+<td><p>Captive portal API endpoint</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-odd"><td><p>capwap-controller</p></td>
+<td><p>52</p></td>
+<td><p>capwap-ac-v6</p></td>
+<td><p>IPv6 address of CAPWAP access controller</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-even"><td><p>domain-search</p></td>
+<td><p>24</p></td>
+<td><p>domain-search</p></td>
+<td><p>Client domain name search list</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p>info-refresh-time</p></td>
+<td><p>32</p></td>
+<td><p>information-refresh-time</p></td>
+<td><p>Time in seconds that stateless clients should wait between
+refreshing information</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-even"><td><p>name-server</p></td>
+<td><p>23</p></td>
+<td><p>dns-servers</p></td>
+<td><p>Domain Name Servers (DNS) addresses</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p>nis-domain</p></td>
+<td><p>29</p></td>
+<td><p>nis-domain-name</p></td>
+<td><p>NIS domain name for client to use</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-even"><td><p>nis-server</p></td>
+<td><p>27</p></td>
+<td><p>nis-servers</p></td>
+<td><p>IPv6 address of a NIS server</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p>nisplus-domain</p></td>
+<td><p>30</p></td>
+<td><p>nisp-domain-name</p></td>
+<td><p>NIS+ domain name for client to use</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-even"><td><p>nisplus-server</p></td>
+<td><p>28</p></td>
+<td><p>nisp-servers</p></td>
+<td><p>IPv6 address of a NIS+ server</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p>sip-server</p></td>
+<td><p>21, 22</p></td>
+<td><p>sip-server-dns, sip-server-addr</p></td>
+<td><p>IPv6 address of SIP server</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-even"><td><p>sntp-server</p></td>
+<td><p>31</p></td>
+<td><p>sntp-servers</p></td>
+<td><p>IPv6 address of an SNTP server for client to use</p></td>
+<td><p>Y</p></td>
+</tr>
+<tr class="row-odd"><td><p>time-zone</p></td>
+<td><p>41, 42</p></td>
+<td><p>new-posix-timezone, new-tzdb-timezone</p></td>
+<td><p>Time zone to send to clients (RFC 4833)</p></td>
+<td><p>N</p></td>
+</tr>
+<tr class="row-even"><td><p>vendor-option</p></td>
+<td><p>17</p></td>
+<td><p>vendor-opts</p></td>
+<td><p>Vendor-specific options</p></td>
+<td><p>Y</p></td>
+</tr>
+</tbody>
+</table>
+<p>Multi: can be specified multiple times.</p>
+</section>
+<section id="id8">
+<h3>Example</h3>
+<p>DHCPv6 address pools must be configured for the system to act as a DHCPv6
+server. The following example describes a common scenario.</p>
+<ul class="simple">
+<li><p>A shared network named <code class="docutils literal notranslate">NET1</code> serves subnet <code class="docutils literal notranslate">2001:db8::/64</code></p></li>
+<li><p>It is connected to <code class="docutils literal notranslate">eth1</code></p></li>
+<li><p>DNS server is located at <code class="docutils literal notranslate">2001:db8::ffff</code></p></li>
+<li><p>Address pool shall be <code class="docutils literal notranslate">2001:db8::100</code> through <code class="docutils literal notranslate">2001:db8::199</code>.</p></li>
+<li><p>Lease time will be left at the default value which is 24 hours</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-server shared-network-name &#39;NET1&#39; interface &#39;eth1&#39;
+set service dhcpv6-server shared-network-name &#39;NET1&#39; subnet 2001:db8::/64 range 1 start 2001:db8::100
+set service dhcpv6-server shared-network-name &#39;NET1&#39; subnet 2001:db8::/64 range 1 stop 2001:db8::199
+set service dhcpv6-server shared-network-name &#39;NET1&#39; subnet 2001:db8::/64 option name-server 2001:db8::ffff
+set service dhcpv6-server shared-network-name &#39;NET1&#39; subnet 2001:db8::/64 subnet-id 1
+</pre></div>
+</div>
+<p>The configuration will look as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>show service dhcpv6-server
+    shared-network-name NET1 {
+        subnet 2001:db8::/64 {
+           range 1 {
+              start 2001:db8::100
+              stop 2001:db8::199
+           }
+           option {
+              name-server 2001:db8::ffff
+           }
+           subnet-id 1
+        }
+    }
+</pre></div>
+</div>
+</section>
+<section id="dhcp-server-v6-op-cmd">
+<h3>Operation Mode</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log dhcpv6 server
+<a class="cmdlink" href="#opcmd-show-log-dhcpv6-server" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show DHCPv6 server daemon log file</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log dhcpv6 client
+<a class="cmdlink" href="#opcmd-show-log-dhcpv6-client" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show logs from all DHCPv6 client processes.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log dhcpv6 client interface &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-show-log-dhcpv6-client-interface-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show logs from specific <code class="docutils literal notranslate">interface</code> DHCPv6 client process.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+restart dhcpv6 server
+<a class="cmdlink" href="#opcmd-restart-dhcpv6-server" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>To restart the DHCPv6 server</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show dhcpv6 server leases
+<a class="cmdlink" href="#opcmd-show-dhcpv6-server-leases" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Shows status of all assigned leases:</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show dhcpv6 server leases
+IPv6 address      State    Last communication    Lease expiration     Remaining    Type   Pool      DUID
+----------------  -------  --------------------  -------------------  -----------  -----  --------  --------------------------------------------
+2001:db8::101     active   2019/12/05 19:40:10   2019/12/06 07:40:10  11:45:21     IA_NA  NET1      98:76:54:32:00:01:00:01:12:34:56:78:aa:bb:cc:dd:ee:ff
+2001:db8::102     active   2019/12/05 14:01:23   2019/12/06 02:01:23  6:06:34      IA_NA  NET1      87:65:43:21:00:01:00:01:11:22:33:44:fa:fb:fc:fd:fe:ff
+2001:db8:10::/64  active   2019/12/05 23:20:10   2019/12/06 11:40:10  11:45:21     IA_PD  PD-NET1   98:76:54:32:00:01:00:01:12:34:56:78:aa:bb:cc:dd:ee:ff
+</pre></div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Static mappings aren’t shown. To show all states, use <code class="docutils literal notranslate">show dhcp server leases state all</code>.</p>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show dhcpv6 server leases pool &lt;pool&gt;
+<a class="cmdlink" href="#opcmd-show-dhcpv6-server-leases-pool-pool" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show only leases in the specified pool.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show dhcpv6 server leases sort &lt;key&gt;
+<a class="cmdlink" href="#opcmd-show-dhcpv6-server-leases-sort-key" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Sort the output by the specified key. Possible keys: expires, iaid_duid, ip,
+last_comm, pool, remaining, state, type (default = ip)</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show dhcpv6 server leases state &lt;state&gt;
+<a class="cmdlink" href="#opcmd-show-dhcpv6-server-leases-state-state" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show only leases with the specified state. Possible states: abandoned,
+active, all, backup, expired, free, released, reset (default = active)</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

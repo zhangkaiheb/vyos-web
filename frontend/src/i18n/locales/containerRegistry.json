@@ -1,0 +1,499 @@
+{
+  "zh-CN": {
+    "containerRegistry": {
+      "pageTitle": "容器注册表",
+      "columns": {
+        "registryName": "注册表名称",
+        "username": "认证用户名",
+        "insecure": "不安全",
+        "disable": "禁用",
+        "mirrorCount": "镜像数",
+        "actions": "操作",
+        "hostName": "主机名",
+        "address": "地址",
+        "port": "端口",
+        "path": "路径"
+      },
+      "buttons": {
+        "create": "创建",
+        "edit": "编辑",
+        "delete": "删除",
+        "add": "添加"
+      },
+      "labels": {
+        "yes": "是",
+        "no": "否",
+        "authentication": "认证",
+        "mirrors": "镜像",
+        "username": "用户名",
+        "password": "密码"
+      },
+      "placeholders": {
+        "registryName": "如 docker.io",
+        "hostName": "如 mirror.example.com",
+        "address": "x.x.x.x",
+        "path": "/v2"
+      },
+      "titles": {
+        "registryName": "注册表名称，如 docker.io、quay.io",
+        "insecure": "允许通过未加密 HTTP 或不受信任证书的 TLS 连接访问注册表",
+        "disable": "禁用该实例",
+        "username": "认证用户名",
+        "password": "认证密码",
+        "hostName": "容器注册表镜像的主机名",
+        "address": "镜像的 IP 地址",
+        "port": "连接使用的端口号",
+        "path": "镜像路径，必须以 / 开头（可选）"
+      },
+      "modals": {
+        "editRegistry": "编辑注册表",
+        "createRegistry": "新建注册表",
+        "editMirror": "编辑镜像",
+        "addMirror": "添加镜像"
+      },
+      "errors": {
+        "loadFailed": "加载失败",
+        "saveFailed": "保存失败",
+        "selectRegistryToEdit": "请选择要编辑的注册表",
+        "registryNotFound": "未找到选中的注册表",
+        "selectRegistryToDelete": "请选择要删除的注册表",
+        "registryNameRequired": "请输入注册表名称",
+        "selectMirrorToEdit": "请选择要编辑的镜像",
+        "mirrorNotFound": "未找到选中的镜像",
+        "selectMirrorToDelete": "请选择要删除的镜像",
+        "hostNameRequired": "请输入镜像主机名",
+        "pathMustStartWithSlash": "路径必须以 / 开头"
+      },
+      "actions": {
+        "edit": "编辑",
+        "delete": "删除"
+      }
+    }
+  },
+  "en": {
+    "containerRegistry": {
+      "pageTitle": "Container Registry",
+      "columns": {
+        "registryName": "Registry Name",
+        "username": "Auth Username",
+        "insecure": "Insecure",
+        "disable": "Disable",
+        "mirrorCount": "Mirror Count",
+        "actions": "Actions",
+        "hostName": "Host Name",
+        "address": "Address",
+        "port": "Port",
+        "path": "Path"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "add": "Add"
+      },
+      "labels": {
+        "yes": "Yes",
+        "no": "No",
+        "authentication": "Authentication",
+        "mirrors": "Mirrors",
+        "username": "Username",
+        "password": "Password"
+      },
+      "placeholders": {
+        "registryName": "e.g., docker.io",
+        "hostName": "e.g., mirror.example.com",
+        "address": "x.x.x.x",
+        "path": "/v2"
+      },
+      "titles": {
+        "registryName": "Registry name, e.g., docker.io, quay.io",
+        "insecure": "Allow access via unencrypted HTTP or TLS with untrusted certificates",
+        "disable": "Disable this instance",
+        "username": "Authentication username",
+        "password": "Authentication password",
+        "hostName": "Host name for container registry mirror",
+        "address": "IP address of the mirror",
+        "port": "Port number for connection",
+        "path": "Mirror path, must start with / (optional)"
+      },
+      "modals": {
+        "editRegistry": "Edit Registry",
+        "createRegistry": "Create Registry",
+        "editMirror": "Edit Mirror",
+        "addMirror": "Add Mirror"
+      },
+      "errors": {
+        "loadFailed": "Failed to load",
+        "saveFailed": "Failed to save",
+        "selectRegistryToEdit": "Please select a registry to edit",
+        "registryNotFound": "Selected registry not found",
+        "selectRegistryToDelete": "Please select a registry to delete",
+        "registryNameRequired": "Registry name is required",
+        "selectMirrorToEdit": "Please select a mirror to edit",
+        "mirrorNotFound": "Selected mirror not found",
+        "selectMirrorToDelete": "Please select a mirror to delete",
+        "hostNameRequired": "Mirror host name is required",
+        "pathMustStartWithSlash": "Path must start with /"
+      },
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete"
+      }
+    }
+  },
+  "zh-TW": {
+    "containerRegistry": {
+      "pageTitle": "容器註冊表",
+      "columns": {
+        "registryName": "註冊表名稱",
+        "username": "認證使用者名稱",
+        "insecure": "不安全",
+        "disable": "停用",
+        "mirrorCount": "鏡像數",
+        "actions": "操作",
+        "hostName": "主機名稱",
+        "address": "位址",
+        "port": "連接埠",
+        "path": "路徑"
+      },
+      "buttons": {
+        "create": "建立",
+        "edit": "編輯",
+        "delete": "刪除",
+        "add": "新增"
+      },
+      "labels": {
+        "yes": "是",
+        "no": "否",
+        "authentication": "認證",
+        "mirrors": "鏡像",
+        "username": "使用者名稱",
+        "password": "密碼"
+      },
+      "placeholders": {
+        "registryName": "如 docker.io",
+        "hostName": "如 mirror.example.com",
+        "address": "x.x.x.x",
+        "path": "/v2"
+      },
+      "titles": {
+        "registryName": "註冊表名稱，如 docker.io、quay.io",
+        "insecure": "允許透過未加密 HTTP 或不受信任憑證的 TLS 連線存取註冊表",
+        "disable": "停用此執行個體",
+        "username": "認證使用者名稱",
+        "password": "認證密碼",
+        "hostName": "容器註冊表鏡像的主機名稱",
+        "address": "鏡像的 IP 位址",
+        "port": "連線使用的連接埠號",
+        "path": "鏡像路徑，必須以 / 開頭（選填）"
+      },
+      "modals": {
+        "editRegistry": "編輯註冊表",
+        "createRegistry": "新建註冊表",
+        "editMirror": "編輯鏡像",
+        "addMirror": "新增鏡像"
+      },
+      "errors": {
+        "loadFailed": "載入失敗",
+        "saveFailed": "儲存失敗",
+        "selectRegistryToEdit": "請選擇要編輯的註冊表",
+        "registryNotFound": "未找到選取的註冊表",
+        "selectRegistryToDelete": "請選擇要刪除的註冊表",
+        "registryNameRequired": "請輸入註冊表名稱",
+        "selectMirrorToEdit": "請選擇要編輯的鏡像",
+        "mirrorNotFound": "未找到選取的鏡像",
+        "selectMirrorToDelete": "請選擇要刪除的鏡像",
+        "hostNameRequired": "請輸入鏡像主機名稱",
+        "pathMustStartWithSlash": "路徑必須以 / 開頭"
+      },
+      "actions": {
+        "edit": "編輯",
+        "delete": "刪除"
+      }
+    }
+  },
+  "ru": {
+    "containerRegistry": {
+      "pageTitle": "Реестр контейнеров",
+      "columns": {
+        "registryName": "Имя реестра",
+        "username": "Имя пользователя",
+        "insecure": "Небезопасный",
+        "disable": "Отключить",
+        "mirrorCount": "Кол-во зеркал",
+        "actions": "Действия",
+        "hostName": "Имя хоста",
+        "address": "Адрес",
+        "port": "Порт",
+        "path": "Путь"
+      },
+      "buttons": {
+        "create": "Создать",
+        "edit": "Изменить",
+        "delete": "Удалить",
+        "add": "Добавить"
+      },
+      "labels": {
+        "yes": "Да",
+        "no": "Нет",
+        "authentication": "Аутентификация",
+        "mirrors": "Зеркала",
+        "username": "Имя пользователя",
+        "password": "Пароль"
+      },
+      "placeholders": {
+        "registryName": "напр., docker.io",
+        "hostName": "напр., mirror.example.com",
+        "address": "x.x.x.x",
+        "path": "/v2"
+      },
+      "titles": {
+        "registryName": "Имя реестра, напр., docker.io, quay.io",
+        "insecure": "Разрешить доступ по незашифрованному HTTP или TLS с недоверенными сертификатами",
+        "disable": "Отключить данный экземпляр",
+        "username": "Имя пользователя для аутентификации",
+        "password": "Пароль для аутентификации",
+        "hostName": "Имя хоста зеркала реестра контейнеров",
+        "address": "IP-адрес зеркала",
+        "port": "Номер порта для подключения",
+        "path": "Путь зеркала, должен начинаться с / (необязательно)"
+      },
+      "modals": {
+        "editRegistry": "Редактировать реестр",
+        "createRegistry": "Создать реестр",
+        "editMirror": "Редактировать зеркало",
+        "addMirror": "Добавить зеркало"
+      },
+      "errors": {
+        "loadFailed": "Ошибка загрузки",
+        "saveFailed": "Ошибка сохранения",
+        "selectRegistryToEdit": "Выберите реестр для редактирования",
+        "registryNotFound": "Выбранный реестр не найден",
+        "selectRegistryToDelete": "Выберите реестр для удаления",
+        "registryNameRequired": "Укажите имя реестра",
+        "selectMirrorToEdit": "Выберите зеркало для редактирования",
+        "mirrorNotFound": "Выбранное зеркало не найдено",
+        "selectMirrorToDelete": "Выберите зеркало для удаления",
+        "hostNameRequired": "Укажите имя хоста зеркала",
+        "pathMustStartWithSlash": "Путь должен начинаться с /"
+      },
+      "actions": {
+        "edit": "Изменить",
+        "delete": "Удалить"
+      }
+    }
+  },
+  "de": {
+    "containerRegistry": {
+      "pageTitle": "Container-Registry",
+      "columns": {
+        "registryName": "Registry-Name",
+        "username": "Benutzername",
+        "insecure": "Unsicher",
+        "disable": "Deaktivieren",
+        "mirrorCount": "Anzahl Spiegel",
+        "actions": "Aktionen",
+        "hostName": "Hostname",
+        "address": "Adresse",
+        "port": "Port",
+        "path": "Pfad"
+      },
+      "buttons": {
+        "create": "Erstellen",
+        "edit": "Bearbeiten",
+        "delete": "Löschen",
+        "add": "Hinzufügen"
+      },
+      "labels": {
+        "yes": "Ja",
+        "no": "Nein",
+        "authentication": "Authentifizierung",
+        "mirrors": "Spiegel",
+        "username": "Benutzername",
+        "password": "Passwort"
+      },
+      "placeholders": {
+        "registryName": "z.B. docker.io",
+        "hostName": "z.B. mirror.example.com",
+        "address": "x.x.x.x",
+        "path": "/v2"
+      },
+      "titles": {
+        "registryName": "Registry-Name, z.B. docker.io, quay.io",
+        "insecure": "Zugriff über unverschlüsseltes HTTP oder TLS mit nicht vertrauenswürdigen Zertifikaten erlauben",
+        "disable": "Diese Instanz deaktivieren",
+        "username": "Authentifizierungs-Benutzername",
+        "password": "Authentifizierungs-Passwort",
+        "hostName": "Hostname für Container-Registry-Spiegel",
+        "address": "IP-Adresse des Spiegels",
+        "port": "Portnummer für die Verbindung",
+        "path": "Spiegelpfad, muss mit / beginnen (optional)"
+      },
+      "modals": {
+        "editRegistry": "Registry bearbeiten",
+        "createRegistry": "Registry erstellen",
+        "editMirror": "Spiegel bearbeiten",
+        "addMirror": "Spiegel hinzufügen"
+      },
+      "errors": {
+        "loadFailed": "Laden fehlgeschlagen",
+        "saveFailed": "Speichern fehlgeschlagen",
+        "selectRegistryToEdit": "Bitte wählen Sie eine Registry zum Bearbeiten",
+        "registryNotFound": "Ausgewählte Registry nicht gefunden",
+        "selectRegistryToDelete": "Bitte wählen Sie eine Registry zum Löschen",
+        "registryNameRequired": "Registry-Name ist erforderlich",
+        "selectMirrorToEdit": "Bitte wählen Sie einen Spiegel zum Bearbeiten",
+        "mirrorNotFound": "Ausgewählter Spiegel nicht gefunden",
+        "selectMirrorToDelete": "Bitte wählen Sie einen Spiegel zum Löschen",
+        "hostNameRequired": "Spiegel-Hostname ist erforderlich",
+        "pathMustStartWithSlash": "Pfad muss mit / beginnen"
+      },
+      "actions": {
+        "edit": "Bearbeiten",
+        "delete": "Löschen"
+      }
+    }
+  },
+  "fr": {
+    "containerRegistry": {
+      "pageTitle": "Registre de conteneurs",
+      "columns": {
+        "registryName": "Nom du registre",
+        "username": "Nom d'utilisateur",
+        "insecure": "Non sécurisé",
+        "disable": "Désactiver",
+        "mirrorCount": "Nb. de miroirs",
+        "actions": "Actions",
+        "hostName": "Nom d'hôte",
+        "address": "Adresse",
+        "port": "Port",
+        "path": "Chemin"
+      },
+      "buttons": {
+        "create": "Créer",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "add": "Ajouter"
+      },
+      "labels": {
+        "yes": "Oui",
+        "no": "Non",
+        "authentication": "Authentification",
+        "mirrors": "Miroirs",
+        "username": "Nom d'utilisateur",
+        "password": "Mot de passe"
+      },
+      "placeholders": {
+        "registryName": "ex. docker.io",
+        "hostName": "ex. mirror.example.com",
+        "address": "x.x.x.x",
+        "path": "/v2"
+      },
+      "titles": {
+        "registryName": "Nom du registre, ex. docker.io, quay.io",
+        "insecure": "Autoriser l'accès via HTTP non chiffré ou TLS avec des certificats non approuvés",
+        "disable": "Désactiver cette instance",
+        "username": "Nom d'utilisateur pour l'authentification",
+        "password": "Mot de passe pour l'authentification",
+        "hostName": "Nom d'hôte du miroir du registre de conteneurs",
+        "address": "Adresse IP du miroir",
+        "port": "Numéro de port pour la connexion",
+        "path": "Chemin du miroir, doit commencer par / (facultatif)"
+      },
+      "modals": {
+        "editRegistry": "Modifier le registre",
+        "createRegistry": "Créer un registre",
+        "editMirror": "Modifier le miroir",
+        "addMirror": "Ajouter un miroir"
+      },
+      "errors": {
+        "loadFailed": "Échec du chargement",
+        "saveFailed": "Échec de l'enregistrement",
+        "selectRegistryToEdit": "Veuillez sélectionner un registre à modifier",
+        "registryNotFound": "Registre sélectionné introuvable",
+        "selectRegistryToDelete": "Veuillez sélectionner un registre à supprimer",
+        "registryNameRequired": "Le nom du registre est requis",
+        "selectMirrorToEdit": "Veuillez sélectionner un miroir à modifier",
+        "mirrorNotFound": "Miroir sélectionné introuvable",
+        "selectMirrorToDelete": "Veuillez sélectionner un miroir à supprimer",
+        "hostNameRequired": "Le nom d'hôte du miroir est requis",
+        "pathMustStartWithSlash": "Le chemin doit commencer par /"
+      },
+      "actions": {
+        "edit": "Modifier",
+        "delete": "Supprimer"
+      }
+    }
+  },
+  "ko": {
+    "containerRegistry": {
+      "pageTitle": "컨테이너 레지스트리",
+      "columns": {
+        "registryName": "레지스트리 이름",
+        "username": "인증 사용자명",
+        "insecure": "안전하지 않음",
+        "disable": "비활성화",
+        "mirrorCount": "미러 수",
+        "actions": "작업",
+        "hostName": "호스트 이름",
+        "address": "주소",
+        "port": "포트",
+        "path": "경로"
+      },
+      "buttons": {
+        "create": "생성",
+        "edit": "편집",
+        "delete": "삭제",
+        "add": "추가"
+      },
+      "labels": {
+        "yes": "예",
+        "no": "아니오",
+        "authentication": "인증",
+        "mirrors": "미러",
+        "username": "사용자명",
+        "password": "비밀번호"
+      },
+      "placeholders": {
+        "registryName": "예: docker.io",
+        "hostName": "예: mirror.example.com",
+        "address": "x.x.x.x",
+        "path": "/v2"
+      },
+      "titles": {
+        "registryName": "레지스트리 이름, 예: docker.io, quay.io",
+        "insecure": "암호화되지 않은 HTTP 또는 신뢰할 수 없는 인증서의 TLS를 통한 접근 허용",
+        "disable": "이 인스턴스 비활성화",
+        "username": "인증 사용자명",
+        "password": "인증 비밀번호",
+        "hostName": "컨테이너 레지스트리 미러의 호스트 이름",
+        "address": "미러의 IP 주소",
+        "port": "연결에 사용할 포트 번호",
+        "path": "미러 경로, /로 시작해야 함 (선택 사항)"
+      },
+      "modals": {
+        "editRegistry": "레지스트리 편집",
+        "createRegistry": "레지스트리 생성",
+        "editMirror": "미러 편집",
+        "addMirror": "미러 추가"
+      },
+      "errors": {
+        "loadFailed": "불러오기 실패",
+        "saveFailed": "저장 실패",
+        "selectRegistryToEdit": "편집할 레지스트리를 선택하세요",
+        "registryNotFound": "선택한 레지스트리를 찾을 수 없습니다",
+        "selectRegistryToDelete": "삭제할 레지스트리를 선택하세요",
+        "registryNameRequired": "레지스트리 이름을 입력하세요",
+        "selectMirrorToEdit": "편집할 미러를 선택하세요",
+        "mirrorNotFound": "선택한 미러를 찾을 수 없습니다",
+        "selectMirrorToDelete": "삭제할 미러를 선택하세요",
+        "hostNameRequired": "미러 호스트 이름을 입력하세요",
+        "pathMustStartWithSlash": "경로는 /로 시작해야 합니다"
+      },
+      "actions": {
+        "edit": "편집",
+        "delete": "삭제"
+      }
+    }
+  }
+}

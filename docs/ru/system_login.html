@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="login-user-management">
+<h1>Управление входом/пользователями</h1>
+<p>По умолчанию, учетная запись пользователя VyOS (<code class="docutils literal notranslate">vyos</code>), а также новые созданные учетные записи пользователей
+имеют полные привилегии конфигурации системы. Эти учетные записи получают привилегии sudo,
+что позволяет им выполнять команды от имени пользователя root.</p>
+<p>VyOS поддерживает локальную аутентификацию и удаленную аутентификацию через
+<abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>/ <abbr title="Terminal Access Controller Access-Control System">TACACS+</abbr>.</p>
+<section id="local-authentication">
+<h2>Локальная аутентификация</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user &lt;name&gt; full-name “&lt;string&gt;”
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-full-name-string" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте реальное имя или описание для системного пользователя.</strong></p>
+<p>Если описание включает пробелы, заключите <code class="docutils literal notranslate">&lt;string&gt;</code> в двойные кавычки.</p>
+<p>Если пользователь <code class="docutils literal notranslate">&lt;name&gt;</code> уже существует, команда обновляет текущее
+описание. Если нет, она создает нового пользователя с указанным описанием.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user &lt;name&gt; authentication plaintext-password &lt;password&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-authentication-plaintext-password-password" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте пароль для системного пользователя.</strong></p>
+<p>Введите пароль в виде обычного текста. При выполнении <code class="docutils literal notranslate">commit</code>, VyOS хэширует пароль для
+безопасного хранения и удаляет значение в исходном виде.</p>
+<p>Если пользователь <code class="docutils literal notranslate">&lt;name&gt;</code> уже существует, команда обновляет текущий пароль.
+Если нет, она создает нового пользователя с указанным паролем в открытом виде.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user &lt;name&gt; authentication encrypted-password &lt;password&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-authentication-encrypted-password-password" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте предварительно зашифрованный пароль для системного пользователя.</strong></p>
+<p>Введите пароль в его зашифрованной форме. При выполнении <code class="docutils literal notranslate">commit</code>, VyOS сохраняет это значение
+без изменений.</p>
+<p>Если пользователь <code class="docutils literal notranslate">&lt;name&gt;</code> уже существует, команда обновляет текущий пароль.
+Если нет, она создает нового пользователя с указанным предварительно зашифрованным паролем.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user &lt;name&gt; authentication principal &lt;principal&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-authentication-principal-principal" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте принципал SSH для системного пользователя.</strong></p>
+<p>Введите принципал (строка, содержащаяся в сертификате SSH пользователя).
+При выполнении <code class="docutils literal notranslate">commit</code>, VyOS сохраняет это сопоставление, позволяя пользователю войти, если
+сертификат, который он представляет, содержит этот принципал.</p>
+<p>Если пользователь <code class="docutils literal notranslate">&lt;name&gt;</code> уже существует, команда обновляет принципал. Если нет,
+она создает нового пользователя, связанного с указанным принципалом.</p>
+<p><strong>Если не настроено</strong>, принципал по умолчанию — <code class="docutils literal notranslate">&lt;name&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user &lt;name&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Отключить учетную запись системного пользователя.</strong></p>
+<p>VyOS блокирует учетную запись, запрещая пользователю войти.</p>
+</div>
+</div>
+</section>
+<section id="key-based-authentication">
+<h2>Аутентификация по ключам</h2>
+<p>Аутентификация по ключам — рекомендуемый метод обеспечения безопасности доступа по SSH в
+VyOS. Она использует <strong>пару открытого/закрытого ключей</strong> для проверки личности пользователя без
+необходимости ввода пароля. Чтобы разрешить доступ, вы назначаете <strong>открытые ключи SSH</strong>
+учетным записям пользователей на маршрутизаторе, тогда как закрытые ключи остаются на локальных устройствах.
+VyOS позволяет назначать несколько открытых ключей SSH одному учетному запись пользователя, что
+полезно для доступа к маршрутизатору с разных устройств.</p>
+<section id="generate-the-key-pair">
+<h3>Создание пары ключей</h3>
+<p>Создайте пару ключей SSH на вашем <strong>локальном компьютере</strong> с помощью команды <code class="docutils literal notranslate">ssh-keygen</code>.
+Это создает два файла:</p>
+<ul class="simple">
+<li><p><strong>Закрытый ключ</strong> (например, <code class="docutils literal notranslate">id_rsa</code>): Остается на вашем локальном компьютере и никогда
+не должен быть передан.</p></li>
+<li><p><strong>Открытый ключ</strong> (например, <code class="docutils literal notranslate">id_rsa.pub</code>): Используется для настройки учетной записи пользователя VyOS.
+По умолчанию он сохраняется в <code class="docutils literal notranslate">~/.ssh/id_rsa.pub</code>.</p></li>
+</ul>
+<p>Каждый открытый ключ SSH состоит из трех частей, разделенных пробелами:</p>
+<ul class="simple">
+<li><p><strong>Тип алгоритма шифрования:</strong> <code class="docutils literal notranslate">ssh-rsa</code>, <code class="docutils literal notranslate">ssh-ed25519</code> и т. д.</p></li>
+<li><p><strong>Ключ:</strong> Фактические данные (длинная строка, начинающаяся с <code class="docutils literal notranslate">AAAA...</code>).</p></li>
+<li><p><strong>Комментарий:</strong> Идентификатор для вашей справки (например, <code class="docutils literal notranslate">user&#64;host</code>).</p></li>
+</ul>
+<p>Только тип алгоритма шифрования и часть ключа необходимы для
+настройки записи авторизации в VyOS. Часть комментария является необязательной.</p>
+<div class="admonition seealso">
+<p class="admonition-title">См. также</p>
+<p>Работа SSH</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Предупреждение</p>
+<p>Строки SSH-ключей длинные. При копировании и вставке убедитесь, что ваш
+терминал не вставляет разрывы строк. Ключ должен быть введен как <strong>одна
+строка</strong>, чтобы работать правильно.</p>
+</div>
+</section>
+<section id="configure-the-router">
+<h3>Настройка маршрутизатора</h3>
+<p>Чтобы настроить аутентификацию по открытым ключам SSH для учетной записи пользователя, выполните
+следующие две команды, используя тот же <code class="docutils literal notranslate">&lt;identifier&gt;</code>:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user &lt;username&gt; authentication public-keys &lt;identifier&gt; key &lt;key&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-public-keys-identifier-key-key" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте открытый ключ SSH для учетной записи пользователя.</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">&lt;identifier&gt;</code>: Уникальная метка, которая идентифицирует эту конкретную запись ключа.</p></li>
+<li><p><code class="docutils literal notranslate">&lt;key&gt;</code>: Фактическая строка символов из вашего открытого ключа.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user &lt;username&gt; authentication public-keys &lt;identifier&gt; type &lt;type&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-public-keys-identifier-type-type" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте тип шифрования SSH-ключа.</strong></p>
+<p>Доступны следующие типы алгоритмов шифрования:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">ecdsa-sha2-nistp256</code></p></li>
+<li><p><code class="docutils literal notranslate">ecdsa-sha2-nistp384</code></p></li>
+<li><p><code class="docutils literal notranslate">ecdsa-sha2-nistp521</code></p></li>
+<li><p><code class="docutils literal notranslate">ssh-dss</code></p></li>
+<li><p><code class="docutils literal notranslate">ssh-ed25519</code></p></li>
+<li><p><code class="docutils literal notranslate">ssh-rsa</code></p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Чтобы назначить несколько открытых ключей SSH учетной записи пользователя, повторите
+вышеуказанные команды с уникальной меткой для каждого ключа.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user &lt;username&gt; authentication public-keys &lt;identifier&gt; options &lt;options&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-public-keys-identifier-options-options" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте конкретные ограничения или поведение для открытого ключа SSH.</strong></p>
+<p><code class="docutils literal notranslate">&lt;options&gt;</code>: Строка, разделенная запятыми, определяющая разрешения
+или ограничения для этого ключа.</p>
+<p>Команда принимает стандартные параметры OpenSSH, перечисленные в файле
+<code class="docutils literal notranslate">~/.ssh/authorized_keys</code> на маршрутизаторе.</p>
+<p>Чтобы включить символ <code class="docutils literal notranslate">&quot;</code> в строку параметров, используйте <code class="docutils literal notranslate">&amp;quot;</code>.</p>
+<p>Например, чтобы ограничить разрешенные IP-адреса для открытого ключа SSH,
+используйте: <code class="docutils literal notranslate">from=&amp;quot;10.0.0.0/24&amp;quot;</code>.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="otp-based-mfa">
+<h2>MFA на основе OTP</h2>
+<p>VyOS позволяет повысить безопасность доступа пользователей, включив <abbr title="One-time password">OTP</abbr>-based <abbr title="Multi-factor Authentication">MFA</abbr> для отдельных
+пользователей. Пользователи с <abbr title="One-time password">OTP</abbr>-based <abbr title="Multi-factor Authentication">MFA</abbr> должны ввести действительный <abbr title="One-time password">OTP</abbr> вместе со своим паролем при входе. Пользователи без <abbr title="One-time password">OTP</abbr>-based <abbr title="Multi-factor Authentication">MFA</abbr> используют
+стандартную аутентификацию.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user &lt;username&gt; authentication otp key &lt;key&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-key-key" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте</strong> <abbr title="One-time password">OTP</abbr><strong>-based</strong> <abbr title="Multi-factor Authentication">MFA</abbr> <strong>для пользователя.</strong></p>
+<p><code class="docutils literal notranslate">&lt;key&gt;</code>: Базовый ключ, закодированный в Base32. Этот ключ должен быть добавлен в приложение-аутентификатор пользователя для генерации действительных <abbr title="One-time passwords">OTPs</abbr>.</p>
+<p><strong>После настройки</strong>, пользователь должен ввести свой пароль, за которым следует
+действительный OTP для всех последующих входов.</p>
+</div>
+</div>
+<section id="otp-settings">
+<h3>Настройки OTP</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user &lt;username&gt; authentication otp rate-limit &lt;limit&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-rate-limit-limit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте количество</strong> <abbr title="One-time password">OTP</abbr> <strong>попыток аутентификации, разрешенных в заданный период времени.</strong></p>
+<p>Если это ограничение превышено, пользователь временно заблокирован.</p>
+<p>Значение по умолчанию — 3 попытки. Допустимый диапазон — 1–10 попыток.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user &lt;username&gt; authentication otp rate-time &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-rate-time-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте период времени, в секундах, для отслеживания</strong> <abbr title="One-time password">OTP</abbr> <strong>попыток аутентификации.</strong></p>
+<p>Значение по умолчанию — 30 секунд. Допустимый диапазон — 1–600 секунд.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user &lt;username&gt; authentication otp window-size &lt;size&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-window-size-size" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте размер окна</strong> <abbr title="One-time password">OTP</abbr> <strong>для пользователя.</strong></p>
+<p>Размер окна <abbr title="One-time password">OTP</abbr> определяет количество
+одновременно допустимых <abbr title="One-time passwords">OTPs</abbr>, которые сервер аутентификации принимает. Это настройка предполагает, что новый токен генерируется каждые 30 секунд.</p>
+<p>Значение по умолчанию — 3. Это позволяет 3 одновременных кода: код для
+текущего интервала 30 секунд, предыдущий код и следующий код. Это
+позволяет до 30 секунд смещения времени между сервером аутентификации и клиентом.</p>
+<p>Если размер окна увеличен до 17, система разрешает 17 одновременных кодов
+(текущий код, 8 предыдущих кодов и 8 последующих кодов). Это
+позволяет смещение времени до 4 минут.</p>
+<p>Допустимый диапазон — 1–21.</p>
+</div>
+</div>
+</section>
+<section id="generate-an-otp-key">
+<h3>Генерация OTP-ключа</h3>
+<p>Используйте следующую команду для генерации OTP-ключа:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+generate system login username &lt;username&gt; otp-key hotp-time rate-limit &lt;1-10&gt; rate-time &lt;15-600&gt; window-size &lt;1-21&gt;
+<a class="cmdlink" href="#cfgcmd-generate-system-login-username-username-otp-key-hotp-time-rate-limit-1-10-rate-time-15-600-window-size-1-21" title="Permalink to this Command"></a></div></div>
+<p>Пример генерации ключа:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ generate system login username otptester otp-key hotp-time rate-limit 2 rate-time 20 window-size 5
+# Вы можете поделиться им с пользователем, ему нужно будет сканировать QR-код в его приложении OTP
+# имя пользователя:  otptester
+# OTP КЛЮЧ:  J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY
+# URL OTP:  otpauth://totp/otptester@vyos?secret=J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY&amp;digits=6&amp;period=30
+█████████████████████████████████████████████
+█████████████████████████████████████████████
+████ ▄▄▄▄▄ █▀█ █▄   ▀▄▀▄█▀▄  ▀█▀ █ ▄▄▄▄▄ ████
+████ █   █ █▀▀▀█ ▄▀ █▄▀ ▀▄ ▄ ▀  ▄█ █   █ ████
+████ █▄▄▄█ █▀ █▀▀██▄▄ █ █ ██ ▀▄▀ █ █▄▄▄█ ████
+████▄▄▄▄▄▄▄█▄▀ ▀▄█ █ ▀ █ █ █ █▄█▄█▄▄▄▄▄▄▄████
+████ ▄   █▄ ▄ ▀▄▀▀▀▀▄▀▄▀▄▄▄▀▀▄▄▄  █ █▄█ █████
+████▄▄ ██▀▄▄▄▀▀█▀ ▄ ▄▄▄ ▄▀ ▀ █ ▄ ▄ ██▄█  ████
+█████▄  ██▄▄▀█▄█▄█▄ ▀█▄▀▄ ▀█▀▄ █▄▄▄ ▄   ▄████
+████▀▀▄   ▄█▀▄▀ ▄█▀█▀▄▄▄▀█▄ ██▄▄▄  ▀█ █  ████
+████ ▄▀▄█▀▄▄█▀▀▄▀▀▀▀█ ▄▀▄▀ ▄█ ▀▄  ▄ ▄▀ █▄████
+████▄ ██ ▀▄▀▀ ▄█▀ ▄ ██ ▀█▄█ ▄█ ▄ ▀▄   ▄▄ ████
+████▄█▀▀▄ ▄▄ █▄█▄█▄ █▄▄▀▄▄▀▀▄▄██▀ ▄▀▄▄ ▀▄████
+████▀▄▀ ▄ ▄▀█ ▄ ▄█▀ █  ▀▄▄  ▄█▀ ▄▄   ▀▄▄ ████
+████  ▀███▄ █▄█▄▀▀▀▀▄ ▄█▄▄▀ ▀███ ▄▄█▄▄  ▄████
+████ ███▀ ▄▄▀▀██▀ ▄▀▄█▄▄▄ ██▄▄▀▄▀  ███▄ ▄████
+████▄████▄▄▄▀▄ █▄█▄▀▄▄▄▄██▀ ▄▀ ▄ ▄▄▄ █▄▄█████
+████ ▄▄▄▄▄ █▄▄▄ ▄█▀█▀▀▀▀█▀█▀ █▄█ █▄█ ▄█  ████
+████ █   █ █ ██▄▀▀▀▀▄▄▄▀ ▄▄▄  ▀ ▄    ▄ ▄▄████
+████ █▄▄▄█ █ ▀▀█▀ ▄▄█ █▄▄██▀▀█▀ █▄▀▄██▄█ ████
+████▄▄▄▄▄▄▄█▄█▄█▄█▄▄▄▄▄█▄▄▄█▄██████▄██▄▄▄████
+█████████████████████████████████████████████
+█████████████████████████████████████████████
+# Чтобы добавить этот ключ OTP в конфигурацию, выполните следующие команды:
+set system login user otptester authentication otp key &#39;J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY&#39;
+set system login user otptester authentication otp rate-limit &#39;2&#39;
+set system login user otptester authentication otp rate-time &#39;20&#39;
+set system login user otptester authentication otp window-size &#39;5&#39;
+</pre></div>
+</div>
+</section>
+<section id="display-the-otp-key-for-a-user">
+<h3>Показать ключ OTP для пользователя</h3>
+<p>Используйте следующую команду, чтобы показать <abbr title="One-time password">OTP</abbr>
+ключ для пользователя:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+sh system login authentication user &lt;username&gt; otp &lt;full | key-b32 | qrcode | uri&gt;
+<a class="cmdlink" href="#cfgcmd-sh-system-login-authentication-user-username-otp-full-key-b32-qrcode-uri" title="Permalink to this Command"></a></div></div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ sh system login authentication user otptester otp full
+# Вы можете поделиться ключом OTP с пользователем. Они просто должны сканировать QR-код в их приложении OTP.
+# имя пользователя: otptester
+# OTP КЛЮЧ: J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY
+# URL OTP: otpauth://totp/otptester@vyos?secret=J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY&amp;digits=6&amp;period=30
+█████████████████████████████████████████████
+█████████████████████████████████████████████
+████ ▄▄▄▄▄ █▀█ █▄   ▀▄▀▄█▀▄  ▀█▀ █ ▄▄▄▄▄ ████
+████ █   █ █▀▀▀█ ▄▀ █▄▀ ▀▄ ▄ ▀  ▄█ █   █ ████
+████ █▄▄▄█ █▀ █▀▀██▄▄ █ █ ██ ▀▄▀ █ █▄▄▄█ ████
+████▄▄▄▄▄▄▄█▄▀ ▀▄█ █ ▀ █ █ █ █▄█▄█▄▄▄▄▄▄▄████
+████ ▄   █▄ ▄ ▀▄▀▀▀▀▄▀▄▀▄▄▄▀▀▄▄▄  █ █▄█ █████
+████▄▄ ██▀▄▄▄▀▀█▀ ▄ ▄▄▄ ▄▀ ▀ █ ▄ ▄ ██▄█  ████
+█████▄  ██▄▄▀█▄█▄█▄ ▀█▄▀▄ ▀█▀▄ █▄▄▄ ▄   ▄████
+████▀▀▄   ▄█▀▄▀ ▄█▀█▀▄▄▄▀█▄ ██▄▄▄  ▀█ █  ████
+████ ▄▀▄█▀▄▄█▀▀▄▀▀▀▀█ ▄▀▄▀ ▄█ ▀▄  ▄ ▄▀ █▄████
+████▄ ██ ▀▄▀▀ ▄█▀ ▄ ██ ▀█▄█ ▄█ ▄ ▀▄   ▄▄ ████
+████▄█▀▀▄ ▄▄ █▄█▄█▄ █▄▄▀▄▄▀▀▄▄██▀ ▄▀▄▄ ▀▄████
+████▀▄▀ ▄ ▄▀█ ▄ ▄█▀ █  ▀▄▄  ▄█▀ ▄▄   ▀▄▄ ████
+████  ▀███▄ █▄█▄▀▀▀▀▄ ▄█▄▄▀ ▀███ ▄▄█▄▄  ▄████
+████ ███▀ ▄▄▀▀██▀ ▄▀▄█▄▄▄ ██▄▄▀▄▀  ███▄ ▄████
+████▄████▄▄▄▀▄ █▄█▄▀▄▄▄▄██▀ ▄▀ ▄ ▄▄▄ █▄▄█████
+████ ▄▄▄▄▄ █▄▄▄ ▄█▀█▀▀▀▀█▀█▀ █▄█ █▄█ ▄█  ████
+████ █   █ █ ██▄▀▀▀▀▄▄▄▀ ▄▄▄  ▀ ▄    ▄ ▄▄████
+████ █▄▄▄█ █ ▀▀█▀ ▄▄█ █▄▄██▀▀█▀ █▄▀▄██▄█ ████
+████▄▄▄▄▄▄▄█▄█▄█▄█▄▄▄▄▄█▄▄▄█▄██████▄██▄▄▄████
+█████████████████████████████████████████████
+█████████████████████████████████████████████
+# Чтобы добавить этот ключ OTP в конфигурацию, выполните следующие команды:
+set system login user otptester authentication otp key &#39;J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY&#39;
+set system login user otptester authentication otp rate-limit &#39;2&#39;
+set system login user otptester authentication otp rate-time &#39;20&#39;
+set system login user otptester authentication otp window-size &#39;5&#39;
+</pre></div>
+</div>
+<p>После настройки OTP-based MFA для учетной записи пользователя, этот пользователь должен ввести свой
+стандартный пароль, за которым следует текущий 6-значный код OTP при входе. Например, если пароль пользователя —
+<code class="docutils literal notranslate">vyosrocks</code>, а OTP — <code class="docutils literal notranslate">817454</code>, он должен ввести <code class="docutils literal notranslate">vyosrocks817454</code>.</p>
+</section>
+</section>
+<section id="radius-authentication">
+<h2>Аутентификация RADIUS</h2>
+<p>Для масштабных развертываний управление индивидуальными учетными записями пользователей на нескольких
+экземплярах VyOS неэффективно. VyOS поддерживает централизованную аутентификацию через
+<abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>, объединяющую управление учетными записями пользователей на одном сервере.</p>
+<section id="configuration">
+<h3>Конфигурация</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login radius server &lt;address&gt; key &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-key-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте</strong> <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>
+<strong>IP-адрес сервера и общий секрет.</strong></p>
+<p>Общий секрет используется для проверки идентичности роутера и шифрования паролей пользователей во время аутентификации.</p>
+<p>Вы можете настроить несколько <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> серверов.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login radius server &lt;address&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте UDP-порт для связи с</strong> <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> <strong>сервером.</strong></p>
+<p>Порт по умолчанию — 1812.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login radius server &lt;address&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Отключить</strong> <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>
+<strong>сервер из процесса аутентификации.</strong></p>
+<p>Отключение конкретного <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> сервера не удаляет его настройки (IP-адрес сервера
+и общий секрет).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login radius server &lt;address&gt; timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Настройте продолжительность, в секундах, в течение которой роутер VyOS ждет ответа от
+<abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> сервера после отправки запроса на аутентификацию.</p>
+<p>Если сервер не отвечает в течение этого времени, роутер VyOS пытается подключиться к другому
+настроенному серверу или возвращается к локальной аутентификации.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login radius source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IP-адрес источника, который использует роутер для</strong> <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> <strong>запросов на аутентификацию.</strong></p>
+<p>Рекомендуется использовать постоянный IP-адрес источника, так как серверы RADIUS обычно принимают запросы только от известных, доверенных IP-адресов.</p>
+<p>Если не указано явно, роутер использует адрес выходного интерфейса, который может измениться (например, из-за сбоя линии), вызывая сбои в аутентификации.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login radius vrf &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте роутер на отправку всех</strong> <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> <strong>запросов на аутентификацию через определенный VRF.</strong></p>
+<p>По умолчанию, запросы на аутентификацию <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> отправляются через глобальную таблицу маршрутизации.</p>
+</div>
+</div>
+</section>
+<section id="configuration-example">
+<h3>Пример конфигурации</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system login radius server 192.168.0.2 key &#39;test-vyos&#39;
+set system login radius server 192.168.0.2 port &#39;1812&#39;
+set system login radius server 192.168.0.2 timeout &#39;5&#39;
+set system login radius source-address &#39;192.168.0.1&#39;
+</pre></div>
+</div>
+<p>Если связь с <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> сервером не удается, роутер возвращается к локальной аутентификации пользователя.
+Во время этого процесса пользователи могут испытывать задержку входа, пока система ждет
+ответа от <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> запроса.
+Эта задержка зависит от значения, установленного в настройках таймаута.</p>
+<div class="admonition hint">
+<p class="admonition-title">Подсказка</p>
+<p>Чтобы предоставить административные привилегии пользователям, аутентифицированным через <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>, сервер должен
+возвращать атрибут Cisco-AV-Pair, установленный в <code class="docutils literal notranslate">shell:priv-lvl=15</code>. В противном случае, пользователи
+получают стандартные привилегии и не могут выполнять задачи конфигурации.</p>
+</div>
+</section>
+</section>
+<section id="tacacs-authentication">
+<h2>Аутентификация TACACS+</h2>
+<p>Помимо <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>,
+VyOS поддерживает <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr>, который часто используется в крупных корпоративных средах.</p>
+<p>В отличие от <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>,
+<abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> разделяет
+Аутентификацию, Авторизацию и Учет (AAA) на независимые процессы
+и шифрует весь объем пакета для повышения безопасности.</p>
+<p><abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> определен
+в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc8907.html"><strong>RFC 8907</strong></a>.</p>
+<section id="tacacs-configuration">
+<h3>Конфигурация</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login tacacs server &lt;address&gt; key &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-key-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IP-адрес сервера</strong> <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> <strong>и общий секрет.</strong></p>
+<p>В отличие от <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>, который
+шифрует только пароли, <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> шифрует весь объем пакета для повышения безопасности.</p>
+<p>Вы можете настроить несколько <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> серверов.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login tacacs server &lt;address&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте TCP-порт для связи с</strong> <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> <strong>сервером.</strong></p>
+<p>Порт по умолчанию — 49.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login tacacs server &lt;address&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Отключить</strong> <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> <strong>сервер из процесса аутентификации.</strong></p>
+<p>Отключение конкретного <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> сервера не удаляет его настройки (IP-адрес сервера
+и общий секрет).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login tacacs server &lt;address&gt; timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Настройте продолжительность, в секундах, в течение которой роутер VyOS ждет ответа от
+<abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> сервера после отправки запроса на аутентификацию.</p>
+<p>Если сервер не отвечает в течение этого времени, роутер VyOS пытается подключиться к другому
+настроенному серверу или возвращается к локальной аутентификации.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login tacacs source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте IP-адрес источника, который использует роутер для</strong>
+<abbr title="Terminal Access Controller Access Control System">TACACS+</abbr>
+<strong>запросов на аутентификацию.</strong></p>
+<p>Рекомендуется использовать постоянный IP-адрес источника, так как серверы <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> обычно принимают запросы только от известных, доверенных IP-адресов.</p>
+<p>Если не указано явно, роутер использует адрес выходного интерфейса, который может измениться (например, из-за сбоя линии), вызывая сбои в аутентификации.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login tacacs vrf &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Настройте роутер на отправку всех <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> запросов на аутентификацию через определенный VRF.</p>
+<p>По умолчанию, запросы на аутентификацию <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> отправляются через глобальную таблицу маршрутизации.</p>
+</div>
+</div>
+</section>
+<section id="login-tacacs-example">
+<h3>Пример конфигурации</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system login tacacs server 192.168.0.2 key &#39;test-vyos&#39;
+set system login tacacs server 192.168.0.2 port &#39;49&#39;
+set system login tacacs source-address &#39;192.168.0.1&#39;
+</pre></div>
+</div>
+<p>Если связь с <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> сервером не удается, роутер возвращается к локальной аутентификации пользователя.</p>
+</section>
+</section>
+<section id="login-banners">
+<h2>Баннеры входа</h2>
+<p>VyOS позволяет настраивать <strong>до входа</strong> и <strong>после входа</strong> баннеры.
+Баннеры до входа обычно используются для идентификации системы, юридических отказов или предупреждений о безопасности
+отображаются до аутентификации, а баннеры после входа предоставляют информацию о системе
+или операционные уведомления пользователям после входа.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login banner pre-login &lt;message&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-banner-pre-login-message" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Настройте сообщение, которое будет показано пользователям до появления
+<code class="docutils literal notranslate">username</code> и <code class="docutils literal notranslate">password</code> запросов.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login banner post-login &lt;message&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-banner-post-login-message" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Настройте сообщение, которое будет показано пользователям после успешной аутентификации.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Используйте <code class="docutils literal notranslate">\\n</code>, чтобы вставить разрывы строк в многострочные сообщения баннера.</p>
+</div>
+</section>
+<section id="login-session-limits">
+<h2>Ограничения сессий входа</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login max-login-session &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-max-login-session-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте максимальное количество одновременных сессий входа.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если вы ограничиваете одновременные сессии входа, вы также должны настроить сессию
+<code class="docutils literal notranslate">&lt;timeout&gt;</code>. Это очищает неактивные сессии и предотвращает блокирование новых
+попыток входа.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте таймаут сессии входа, в секундах.</strong></p>
+<p>Неактивные сессии входа завершаются после этого периода.</p>
+</div>
+</div>
+</section>
+<section id="configuration-examples">
+<h2>Примеры конфигурации</h2>
+<p>Пример 1: Многоключевой SSH с MFA и ограничениями источника</p>
+<p>В этой конфигурации <code class="docutils literal notranslate">User1</code> и <code class="docutils literal notranslate">User2</code> оба используют учетную запись пользователя vyos,
+каждый с уникальным SSH-ключом. <code class="docutils literal notranslate">User1</code> ограничен аутентификацией только с одного IP-адреса.</p>
+<p>Для обоих пользователей вход по паролю требует <abbr title="One-time password">OTP</abbr>
+основанного <abbr title="Multi-factor Authentication">MFA</abbr>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system login user vyos authentication public-keys &#39;User1&#39; key &quot;AAAAB3Nz...KwEW&quot;
+set system login user vyos authentication public-keys &#39;User1&#39; type ssh-rsa
+set system login user vyos authentication public-keys &#39;User1&#39; options &quot;from=&amp;quot;192.168.0.100&amp;quot;&quot;
+
+set system login user vyos authentication public-keys &#39;User2&#39; key &quot;AAAAQ39x...fbV3&quot;
+set system login user vyos authentication public-keys &#39;User2&#39; type ssh-rsa
+
+set system login user vyos authentication otp key OHZ3OJ7U2N25BK4G7SOFFJTZDTCFUUE2
+set system login user vyos authentication plaintext-password vyos
+</pre></div>
+</div>
+<p>Пример 2: Контейнеризированная реализация <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr>
+с резервированием.</p>
+<p>В этой конфигурации маршрутизатор VyOS предоставляет свою инфраструктуру аутентификации, используя два контейнеризированных <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> сервера (<code class="docutils literal notranslate">tacacs1</code> и <code class="docutils literal notranslate">tacacs2</code>) на
+частной сети для резервирования.</p>
+<p>Системные входы аутентифицируются по учетным данным, хранящимся внутри этих внутренних контейнеров, а не в локальной базе данных маршрутизатора.</p>
+<p>Сначала загрузите образ в режиме операции:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>add container image lfkeitel/tacacs_plus:latest
+</pre></div>
+</div>
+<p>Далее, настройте контейнеры в режиме конфигурации:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container network tac-test prefix &#39;100.64.0.0/24&#39;
+
+set container name tacacs1 image &#39;lfkeitel/tacacs_plus:latest&#39;
+set container name tacacs1 network tac-test address &#39;100.64.0.11&#39;
+
+set container name tacacs2 image &#39;lfkeitel/tacacs_plus:latest&#39;
+set container name tacacs2 network tac-test address &#39;100.64.0.12&#39;
+
+set system login tacacs server 100.64.0.11 key &#39;tac_plus_key&#39;
+set system login tacacs server 100.64.0.12 key &#39;tac_plus_key&#39;
+
+commit
+</pre></div>
+</div>
+<p>Теперь вы можете войти через SSH или консоль, используя учетные данные <code class="docutils literal notranslate">admin/admin</code>, предоставленные образом контейнера.</p>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

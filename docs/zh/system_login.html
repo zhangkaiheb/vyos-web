@@ -1,0 +1,761 @@
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="login-user-management">
+<h1>日志in/user management</h1>
+<p>The default VyOS user account (<code class="docutils literal notranslate">vyos</code>), as well as newly created user accounts,
+possess full system configuration privileges. These accounts are granted sudo
+privileges, allowing them to execute commands as the root user.</p>
+<p>VyOS supports both local authentication and remote authentication via
+<abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>/ <abbr title="Terminal Access Controller Access-Control System">TACACS+</abbr>.</p>
+<section id="local-authentication">
+<h2>Local authentication</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user <name> full-name “<string>”
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-full-name-string" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the real name or description for a system user.</strong></p>
+<p>If the description includes spaces, enclose <code class="docutils literal notranslate"><string></code> in double quotes.</p>
+<p>If the user <code class="docutils literal notranslate"><name></code> already exists, the command updates the current
+description. If not, it creates a new user with the specified description.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user <name> authentication plaintext-password <password>
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-authentication-plaintext-password-password" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a password for a system user.</strong></p>
+<p>Enter the password in plaintext. Upon <code class="docutils literal notranslate">commit</code>, VyOS hashes the password for
+secure storage and removes the plaintext value.</p>
+<p>If the user <code class="docutils literal notranslate"><name></code> already exists, the command updates the current password.
+If not, it creates a new user with the specified plaintext password.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user <name> authentication encrypted-password <password>
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-authentication-encrypted-password-password" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a pre-encrypted password for a system user.</strong></p>
+<p>Enter the password in its hashed format. Upon <code class="docutils literal notranslate">commit</code>, VyOS stores this value
+directly without modification.</p>
+<p>If the user <code class="docutils literal notranslate"><name></code> already exists, the command updates the current password.
+If not, it creates a new user with the specified pre-encrypted password.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user <name> authentication principal <principal>
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-authentication-principal-principal" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure an SSH certificate principal for a system user.</strong></p>
+<p>Enter the principal (a string included in the user’s signed SSH certificate).
+Upon <code class="docutils literal notranslate">commit</code>, VyOS stores this mapping, allowing the user to log in if the
+certificate they present contains this principal.</p>
+<p>If the user <code class="docutils literal notranslate"><name></code> already exists, the command updates the principal. If not,
+it creates a new user linked to the specified principal.</p>
+<p><strong>If not configured</strong>, the principal defaults to <code class="docutils literal notranslate"><name></code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user <name> disable
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable a system user account.</strong></p>
+<p>VyOS locks the account, preventing the user from logging in.</p>
+</div>
+</div>
+</section>
+<section id="key-based-authentication">
+<h2>密钥-based authentication</h2>
+<p>密钥-based authentication is the recommended method for securing SSH access in
+VyOS. It uses a <strong>public/private key pair</strong> to verify user identity without
+requiring a password. To authorize access, you assign <strong>SSH public keys</strong> to
+user accounts on the router, while SSH private keys remain on local devices.
+VyOS allows assigning multiple SSH public keys to a single user account, which
+is useful for accessing a router from different devices.</p>
+<section id="generate-the-key-pair">
+<h3>Generate the key pair</h3>
+<p>Generate an SSH key pair on your <strong>local machine</strong> using the <code class="docutils literal notranslate">ssh-keygen</code>
+command. This creates two files:</p>
+<ul class="simple">
+<li><p><strong>Private key</strong> (e.g., <code class="docutils literal notranslate">id_rsa</code>): Remains on your local machine and must
+never be shared.</p></li>
+<li><p><strong>Public key</strong> (e.g., <code class="docutils literal notranslate">id_rsa.pub</code>): Is used to configure the VyOS user
+account. By default, it is saved to <code class="docutils literal notranslate">~/.ssh/id_rsa.pub</code>.</p></li>
+</ul>
+<p>Each SSH public key consists of three parts, separated by spaces:</p>
+<ul class="simple">
+<li><p><strong>Encryption algorithm type:</strong> <code class="docutils literal notranslate">ssh-rsa</code>, <code class="docutils literal notranslate">ssh-ed25519</code>, etc.</p></li>
+<li><p><strong>密钥:</strong> The actual data (a long string beginning with <code class="docutils literal notranslate">AAAA...</code>).</p></li>
+<li><p><strong>Comment:</strong> An identifier for your reference (e.g., <code class="docutils literal notranslate">user@host</code>).</p></li>
+</ul>
+<p>Only the encryption algorithm type and key parts are required to
+configure the authorization entry in VyOS. The comment part is optional.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>SSH operation</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>SSH key strings are long. When copying and pasting, ensure your
+terminal does not insert line breaks. The key 必须 entered as a <strong>single
+line</strong> to function correctly.</p>
+</div>
+</section>
+<section id="configure-the-router">
+<h3>Configure the router</h3>
+<p>To configure SSH public key authentication for a user account, run the
+following two commands using the same <code class="docutils literal notranslate"><identifier></code>:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user <username> authentication public-keys <identifier> key <key>
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-public-keys-identifier-key-key" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the SSH public key for the user account.</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><identifier></code>: A unique label that identifies this specific key entry.</p></li>
+<li><p><code class="docutils literal notranslate"><key></code>: The actual string of characters from your public key.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user <username> authentication public-keys <identifier> type <type>
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-public-keys-identifier-type-type" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the SSH key’s encryption type.</strong></p>
+<p>The following encryption algorithm types are available:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">ecdsa-sha2-nistp256</code></p></li>
+<li><p><code class="docutils literal notranslate">ecdsa-sha2-nistp384</code></p></li>
+<li><p><code class="docutils literal notranslate">ecdsa-sha2-nistp521</code></p></li>
+<li><p><code class="docutils literal notranslate">ssh-dss</code></p></li>
+<li><p><code class="docutils literal notranslate">ssh-ed25519</code></p></li>
+<li><p><code class="docutils literal notranslate">ssh-rsa</code></p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>To assign multiple SSH public keys to a user account, repeat the
+commands above with a unique identifier for each key.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user <username> authentication public-keys <identifier> options <options>
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-public-keys-identifier-options-options" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure specific restrictions or behaviors for an SSH public key.</strong></p>
+<p><code class="docutils literal notranslate"><options></code>: A string of comma-separated values that define permissions
+or restrictions for this key.</p>
+<p>The command accepts standard OpenSSH options listed in the router’s
+<code class="docutils literal notranslate">~/.ssh/authorized_keys</code> file.</p>
+<p>To include a <code class="docutils literal notranslate">"</code> character in the options string, use <code class="docutils literal notranslate">&quot;</code>.</p>
+<p>For example, to restrict allowed source IP addresses for an SSH public key,
+use: <code class="docutils literal notranslate">from=&quot;10.0.0.0/24&quot;</code>.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="otp-based-mfa">
+<h2>OTP-based MFA</h2>
+<p>VyOS lets you enhance user access security by enabling <abbr title="One-time password">OTP</abbr>-based <abbr title="Multi-factor Authentication">MFA</abbr> for individual
+users. 用户 with <abbr title="One-time password">OTP</abbr>-based <abbr title="Multi-factor Authentication">MFA</abbr> must enter a valid <abbr title="One-time password">OTP</abbr> along with their password at login. 用户 without <abbr title="One-time password">OTP</abbr>-based <abbr title="Multi-factor Authentication">MFA</abbr> use
+standard authentication.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user <username> authentication otp key <key>
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-key-key" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure</strong> <abbr title="One-time password">OTP</abbr><strong>-based</strong> <abbr title="Multi-factor Authentication">MFA</abbr> <strong>for a user.</strong></p>
+<p><code class="docutils literal notranslate"><key></code>: A Base32-encoded secret key. This key 必须 added to the user’s
+authenticator app to generate valid <abbr title="One-time passwords">OTPs</abbr>.</p>
+<p><strong>When configured</strong>, the user 需要 enter their password followed by
+a valid OTP for all subsequent logins.</p>
+</div>
+</div>
+<section id="otp-settings">
+<h3>OTP settings</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user <username> authentication otp rate-limit <limit>
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-rate-limit-limit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the number of</strong> <abbr title="One-time password">OTP</abbr> <strong>authentication
+attempts allowed within a specified time period.</strong></p>
+<p>If this limit is exceeded, the user is temporarily blocked.</p>
+<p>The default value is 3 attempts. The valid range is 1 to 10 attempts.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user <username> authentication otp rate-time <seconds>
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-rate-time-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the time period, in seconds, for tracking</strong> <abbr title="One-time password">OTP</abbr> <strong>authentication attempts.</strong></p>
+<p>The default value is 30 seconds. The valid range is 1 to 600 seconds.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user <username> authentication otp window-size <size>
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-window-size-size" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the</strong> <abbr title="One-time password">OTP</abbr> <strong>window size for a user.</strong></p>
+<p>The <abbr title="One-time password">OTP</abbr> window size defines the number of
+concurrently valid <abbr title="One-time passwords">OTPs</abbr> that the authentication
+server accepts. This setting assumes a new token is generated every 30 seconds.</p>
+<p>The default value is 3. This permits 3 concurrent codes: the code for the
+current 30-second interval, the preceding code, and the following code. This
+allows up to 30 seconds of time skew between the authentication server and
+client.</p>
+<p>If the window size is increased to 17, the system permits 17 concurrent codes
+(the current code, the 8 preceding codes, and the 8 following codes). This
+allows for a time skew of up to 4 minutes.</p>
+<p>The valid range is 1 to 21.</p>
+</div>
+</div>
+</section>
+<section id="generate-an-otp-key">
+<h3>Generate an OTP-key</h3>
+<p>Use the following command to generate an OTP key:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+generate system login username <username> otp-key hotp-time rate-limit <1-10> rate-time <15-600> window-size <1-21>
+<a class="cmdlink" href="#cfgcmd-generate-system-login-username-username-otp-key-hotp-time-rate-limit-1-10-rate-time-15-600-window-size-1-21" title="Permalink to this Command"></a></div></div>
+<p>密钥 generation example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ generate system login username otptester otp-key hotp-time rate-limit 2 rate-time 20 window-size 5
+# You can share it with the user, he just needs to scan the QR in his OTP app
+# username:  otptester
+# OTP KEY:  J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY
+# OTP URL:  otpauth://totp/otptester@vyos?secret=J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY&digits=6&period=30
+█████████████████████████████████████████████
+█████████████████████████████████████████████
+████ ▄▄▄▄▄ █▀█ █▄   ▀▄▀▄█▀▄  ▀█▀ █ ▄▄▄▄▄ ████
+████ █   █ █▀▀▀█ ▄▀ █▄▀ ▀▄ ▄ ▀  ▄█ █   █ ████
+████ █▄▄▄█ █▀ █▀▀██▄▄ █ █ ██ ▀▄▀ █ █▄▄▄█ ████
+████▄▄▄▄▄▄▄█▄▀ ▀▄█ █ ▀ █ █ █ █▄█▄█▄▄▄▄▄▄▄████
+████ ▄   █▄ ▄ ▀▄▀▀▀▀▄▀▄▀▄▄▄▀▀▄▄▄  █ █▄█ █████
+████▄▄ ██▀▄▄▄▀▀█▀ ▄ ▄▄▄ ▄▀ ▀ █ ▄ ▄ ██▄█  ████
+█████▄  ██▄▄▀█▄█▄█▄ ▀█▄▀▄ ▀█▀▄ █▄▄▄ ▄   ▄████
+████▀▀▄   ▄█▀▄▀ ▄█▀█▀▄▄▄▀█▄ ██▄▄▄  ▀█ █  ████
+████ ▄▀▄█▀▄▄█▀▀▄▀▀▀▀█ ▄▀▄▀ ▄█ ▀▄  ▄ ▄▀ █▄████
+████▄ ██ ▀▄▀▀ ▄█▀ ▄ ██ ▀█▄█ ▄█ ▄ ▀▄   ▄▄ ████
+████▄█▀▀▄ ▄▄ █▄█▄█▄ █▄▄▀▄▄▀▀▄▄██▀ ▄▀▄▄ ▀▄████
+████▀▄▀ ▄ ▄▀█ ▄ ▄█▀ █  ▀▄▄  ▄█▀ ▄▄   ▀▄▄ ████
+████  ▀███▄ █▄█▄▀▀▀▀▄ ▄█▄▄▀ ▀███ ▄▄█▄▄  ▄████
+████ ███▀ ▄▄▀▀██▀ ▄▀▄█▄▄▄ ██▄▄▀▄▀  ███▄ ▄████
+████▄████▄▄▄▀▄ █▄█▄▀▄▄▄▄██▀ ▄▀ ▄ ▄▄▄ █▄▄█████
+████ ▄▄▄▄▄ █▄▄▄ ▄█▀█▀▀▀▀█▀█▀ █▄█ █▄█ ▄█  ████
+████ █   █ █ ██▄▀▀▀▀▄▄▄▀ ▄▄▄  ▀ ▄    ▄ ▄▄████
+████ █▄▄▄█ █ ▀▀█▀ ▄▄█ █▄▄██▀▀█▀ █▄▀▄██▄█ ████
+████▄▄▄▄▄▄▄█▄█▄█▄█▄▄▄▄▄█▄▄▄█▄██████▄██▄▄▄████
+█████████████████████████████████████████████
+█████████████████████████████████████████████
+# To add this OTP key to configuration, run the following commands:
+set system login user otptester authentication otp key 'J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY'
+set system login user otptester authentication otp rate-limit '2'
+set system login user otptester authentication otp rate-time '20'
+set system login user otptester authentication otp window-size '5'
+</pre></div>
+</div>
+</section>
+<section id="display-the-otp-key-for-a-user">
+<h3>显示 the OTP key for a user</h3>
+<p>Use the following command to display the <abbr title="One-time password">OTP</abbr>
+key for a user:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+sh system login authentication user <username> otp <full | key-b32 | qrcode | uri>
+<a class="cmdlink" href="#cfgcmd-sh-system-login-authentication-user-username-otp-full-key-b32-qrcode-uri" title="Permalink to this Command"></a></div></div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ sh system login authentication user otptester otp full
+# You can share the OTP key with the user. They just need to scan the QR in their OTP app.
+# username: otptester
+# OTP KEY: J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY
+# OTP URL: otpauth://totp/otptester@vyos?secret=J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY&digits=6&period=30
+█████████████████████████████████████████████
+█████████████████████████████████████████████
+████ ▄▄▄▄▄ █▀█ █▄   ▀▄▀▄█▀▄  ▀█▀ █ ▄▄▄▄▄ ████
+████ █   █ █▀▀▀█ ▄▀ █▄▀ ▀▄ ▄ ▀  ▄█ █   █ ████
+████ █▄▄▄█ █▀ █▀▀██▄▄ █ █ ██ ▀▄▀ █ █▄▄▄█ ████
+████▄▄▄▄▄▄▄█▄▀ ▀▄█ █ ▀ █ █ █ █▄█▄█▄▄▄▄▄▄▄████
+████ ▄   █▄ ▄ ▀▄▀▀▀▀▄▀▄▀▄▄▄▀▀▄▄▄  █ █▄█ █████
+████▄▄ ██▀▄▄▄▀▀█▀ ▄ ▄▄▄ ▄▀ ▀ █ ▄ ▄ ██▄█  ████
+█████▄  ██▄▄▀█▄█▄█▄ ▀█▄▀▄ ▀█▀▄ █▄▄▄ ▄   ▄████
+████▀▀▄   ▄█▀▄▀ ▄█▀█▀▄▄▄▀█▄ ██▄▄▄  ▀█ █  ████
+████ ▄▀▄█▀▄▄█▀▀▄▀▀▀▀█ ▄▀▄▀ ▄█ ▀▄  ▄ ▄▀ █▄████
+████▄ ██ ▀▄▀▀ ▄█▀ ▄ ██ ▀█▄█ ▄█ ▄ ▀▄   ▄▄ ████
+████▄█▀▀▄ ▄▄ █▄█▄█▄ █▄▄▀▄▄▀▀▄▄██▀ ▄▀▄▄ ▀▄████
+████▀▄▀ ▄ ▄▀█ ▄ ▄█▀ █  ▀▄▄  ▄█▀ ▄▄   ▀▄▄ ████
+████  ▀███▄ █▄█▄▀▀▀▀▄ ▄█▄▄▀ ▀███ ▄▄█▄▄  ▄████
+████ ███▀ ▄▄▀▀██▀ ▄▀▄█▄▄▄ ██▄▄▀▄▀  ███▄ ▄████
+████▄████▄▄▄▀▄ █▄█▄▀▄▄▄▄██▀ ▄▀ ▄ ▄▄▄ █▄▄█████
+████ ▄▄▄▄▄ █▄▄▄ ▄█▀█▀▀▀▀█▀█▀ █▄█ █▄█ ▄█  ████
+████ █   █ █ ██▄▀▀▀▀▄▄▄▀ ▄▄▄  ▀ ▄    ▄ ▄▄████
+████ █▄▄▄█ █ ▀▀█▀ ▄▄█ █▄▄██▀▀█▀ █▄▀▄██▄█ ████
+████▄▄▄▄▄▄▄█▄█▄█▄█▄▄▄▄▄█▄▄▄█▄██████▄██▄▄▄████
+█████████████████████████████████████████████
+█████████████████████████████████████████████
+# To add this OTP key to configuration, run the following commands:
+set system login user otptester authentication otp key 'J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY'
+set system login user otptester authentication otp rate-limit '2'
+set system login user otptester authentication otp rate-time '20'
+set system login user otptester authentication otp window-size '5'
+</pre></div>
+</div>
+<p>Once <abbr title="One-time password">OTP</abbr>-based <abbr title="Multi-factor Authentication">MFA</abbr> is configured for a user account, this user must enter their
+standard password followed by the current 6-digit OTP code at login. For
+example, if the user’s password is <code class="docutils literal notranslate">vyosrocks</code> and the OTP is <code class="docutils literal notranslate">817454</code>, they
+should enter <code class="docutils literal notranslate">vyosrocks817454</code>.</p>
+</section>
+</section>
+<section id="radius-authentication">
+<h2>RADIUS authentication</h2>
+<p>For large-scale deployments, managing individual user accounts across multiple
+VyOS instances is inefficient. VyOS supports centralized authentication via
+<abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>, consolidating user
+account management on a single backend server.</p>
+<section id="configuration">
+<h3>配置</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login radius server <address> key <secret>
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-key-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the</strong> <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>
+<strong>server’s IP address and shared secret.</strong></p>
+<p>The shared secret 用于 verify the router’s identity and to encrypt user
+passwords during authentication.</p>
+<p>You can configure multiple <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> servers.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login radius server <address> port <port>
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the UDP port for communication with the</strong> <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> <strong>server.</strong></p>
+<p>The default port is 1812.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login radius server <address> disable
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable a</strong> <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>
+<strong>server from the authentication process.</strong></p>
+<p>Disabling a specific <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> server doesn’t remove its configuration settings (the server’s IP
+address and shared secret).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login radius server <address> timeout <timeout>
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configure the duration, in seconds, that the VyOS router waits for a
+response from the <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>
+server after sending an authentication request.</p>
+<p>If the server does not respond within this timeframe, the VyOS router tries to
+connect to another configured server or falls back to local authentication.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login radius source-address <address>
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the source IP address the router uses for</strong> <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> <strong>authentication requests.</strong></p>
+<p>A consistent source IP address is recommended as RADIUS servers typically
+accept requests only from known, trusted IP addresses.</p>
+<p>If not explicitly defined, the router uses the current egress interface
+address, which may change (e.g., due to a link outage), causing authentication
+failures.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login radius vrf <name>
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the router to send all</strong> <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> <strong>authentication requests via a specific VRF.</strong></p>
+<p>By default, <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>
+authentication requests are sent via the global routing table.</p>
+</div>
+</div>
+</section>
+<section id="configuration-example">
+<h3>配置 example</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system login radius server 192.168.0.2 key 'test-vyos'
+set system login radius server 192.168.0.2 port '1812'
+set system login radius server 192.168.0.2 timeout '5'
+set system login radius source-address '192.168.0.1'
+</pre></div>
+</div>
+<p>If communication with the <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> server fails, the router falls back to local user authentication.
+During this process, users may experience a login delay while the system waits
+for the <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> request to
+time out. This delay depends on the configured timeout value.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>To grant administrative privileges to <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>-authenticated users, the server must
+return the Cisco-AV-Pair attribute set to <code class="docutils literal notranslate">shell:priv-lvl=15</code>. Otherwise, users
+receive standard privileges and cannot perform configuration tasks.</p>
+</div>
+</section>
+</section>
+<section id="tacacs-authentication">
+<h2>TACACS+ authentication</h2>
+<p>In addition to <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>,
+VyOS supports <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr>, which is commonly used in large enterprise environments.</p>
+<p>Unlike <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>,
+<abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> separates
+认证, Authorization, and Accounting (AAA) into independent processes
+and encrypts the entire packet body for enhanced security.</p>
+<p><abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> is defined
+in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc8907.html"><strong>RFC 8907</strong></a>.</p>
+<section id="tacacs-configuration">
+<h3>配置</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login tacacs server <address> key <secret>
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-key-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the</strong> <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> <strong>server IP address and shared secret.</strong></p>
+<p>Unlike <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>, which
+encrypts only passwords, <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> encrypts the entire packet body for enhanced security.</p>
+<p>You can configure multiple <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> servers.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login tacacs server <address> port <port>
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the TCP port for communication with the</strong> <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> <strong>server.</strong></p>
+<p>The default port is 49.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login tacacs server <address> disable
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable a</strong> <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> <strong>server from the authentication process.</strong></p>
+<p>Disabling a specific <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> server doesn’t remove its configuration settings (the server’s IP
+address and shared secret).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login tacacs server <address> timeout <timeout>
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configure the duration, in seconds, that the VyOS router waits for a
+response from the <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> server after sending an authentication request.</p>
+<p>If the server does not respond within this timeframe, the VyOS router tries
+to connect to another configured server or falls back to local authentication.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login tacacs source-address <address>
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the source IP address the router uses for</strong>
+<abbr title="Terminal Access Controller Access Control System">TACACS+</abbr>
+<strong>authentication requests.</strong></p>
+<p>A consistent source IP address is recommended as <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> servers typically accept requests
+only from known, trusted IP addresses.</p>
+<p>If not explicitly defined, the router uses the current egress interface address,
+which may change (e.g., due to a link outage), causing authentication failures.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login tacacs vrf <name>
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configure the router to send all <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> authentication requests via a specific VRF.</p>
+<p>By default, <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr>
+authentication requests are sent via the global routing table.</p>
+</div>
+</div>
+</section>
+<section id="login-tacacs-example">
+<h3>配置 example</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system login tacacs server 192.168.0.2 key 'test-vyos'
+set system login tacacs server 192.168.0.2 port '49'
+set system login tacacs source-address '192.168.0.1'
+</pre></div>
+</div>
+<p>If communication with the <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> server fails, the router falls back to local user
+authentication.</p>
+</section>
+</section>
+<section id="login-banners">
+<h2>日志in banners</h2>
+<p>VyOS 允许您 configure <strong>pre-login</strong> and <strong>post-login</strong> banners.
+Pre-login banners are typically used for system identification, legal disclaimers, or security warnings
+displayed before authentication, while post-login banners provide system
+information or operational notices to users after login.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login banner pre-login <message>
+<a class="cmdlink" href="#cfgcmd-set-system-login-banner-pre-login-message" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configure a message to be shown to users before the <code class="docutils literal notranslate">username</code> and <code class="docutils literal notranslate">password</code>
+prompts appear.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login banner post-login <message>
+<a class="cmdlink" href="#cfgcmd-set-system-login-banner-post-login-message" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configure a message to be shown to users after successful authentication.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>Use <code class="docutils literal notranslate">\\n</code> to insert line breaks in multi-line banner messages.</p>
+</div>
+</section>
+<section id="login-session-limits">
+<h2>日志in session limits</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login max-login-session <number>
+<a class="cmdlink" href="#cfgcmd-set-system-login-max-login-session-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the maximum number of concurrent login sessions.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>If you limit concurrent login sessions, you must also configure a
+session <code class="docutils literal notranslate"><timeout></code>. This clears inactive sessions and prevents blocking new
+login attempts.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login timeout <timeout>
+<a class="cmdlink" href="#cfgcmd-set-system-login-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the login session timeout, （以秒为单位）。</strong></p>
+<p>Idle login sessions are terminated after this period.</p>
+</div>
+</div>
+</section>
+<section id="configuration-examples">
+<h2>配置 examples</h2>
+<p>示例 1: Multi-key SSH with MFA and source restrictions</p>
+<p>In this configuration, <code class="docutils literal notranslate">User1</code> and <code class="docutils literal notranslate">User2</code> both use the vyos user account,
+each with a unique SSH key. <code class="docutils literal notranslate">User1</code> is restricted to authentication from a
+single IP address.</p>
+<p>For both users, password-based logins require <abbr title="One-time password">OTP</abbr>
+-based <abbr title="Multi-factor Authentication">MFA</abbr>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system login user vyos authentication public-keys 'User1' key "AAAAB3Nz...KwEW"
+set system login user vyos authentication public-keys 'User1' type ssh-rsa
+set system login user vyos authentication public-keys 'User1' options "from=&quot;192.168.0.100&quot;"
+
+set system login user vyos authentication public-keys 'User2' key "AAAAQ39x...fbV3"
+set system login user vyos authentication public-keys 'User2' type ssh-rsa
+
+set system login user vyos authentication otp key OHZ3OJ7U2N25BK4G7SOFFJTZDTCFUUE2
+set system login user vyos authentication plaintext-password vyos
+</pre></div>
+</div>
+<p>示例 2: 容器ized <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr>
+deployment with redundancy.</p>
+<p>In this configuration, the VyOS router hosts its own authentication
+infrastructure using two containerized <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> servers (<code class="docutils literal notranslate">tacacs1</code> and <code class="docutils literal notranslate">tacacs2</code>) on a
+private network for redundancy.</p>
+<p>系统 logins are authenticated against credentials stored within these internal
+containers rather than the router’s local user database.</p>
+<p>First, download the image in operational mode:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>add container image lfkeitel/tacacs_plus:latest
+</pre></div>
+</div>
+<p>Next, configure the containers in configuration mode:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container network tac-test prefix '100.64.0.0/24'
+
+set container name tacacs1 image 'lfkeitel/tacacs_plus:latest'
+set container name tacacs1 network tac-test address '100.64.0.11'
+
+set container name tacacs2 image 'lfkeitel/tacacs_plus:latest'
+set container name tacacs2 network tac-test address '100.64.0.12'
+
+set system login tacacs server 100.64.0.11 key 'tac_plus_key'
+set system login tacacs server 100.64.0.12 key 'tac_plus_key'
+
+commit
+</pre></div>
+</div>
+<p>You can now log in via SSH or console using <code class="docutils literal notranslate">admin/admin</code> credentials supplied
+by the container image.</p>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

@@ -1,0 +1,177 @@
+{
+  "zh-CN": {
+    "activeConnections": {
+      "columns": {
+        "proto": "协议",
+        "recvQ": "接收队列",
+        "sendQ": "发送队列",
+        "localAddress": "本地地址",
+        "foreignAddress": "外部地址",
+        "state": "状态",
+        "pidProgram": "PID/程序"
+      },
+      "options": {
+        "allProtocols": "全部协议",
+        "allStates": "全部状态",
+        "none": "无"
+      },
+      "titles": {
+        "protocolFilter": "协议过滤",
+        "stateFilter": "状态过滤"
+      },
+      "buttons": {
+        "refresh": "刷新"
+      }
+    }
+  },
+  "en": {
+    "activeConnections": {
+      "columns": {
+        "proto": "Proto",
+        "recvQ": "Recv-Q",
+        "sendQ": "Send-Q",
+        "localAddress": "Local Address",
+        "foreignAddress": "Foreign Address",
+        "state": "State",
+        "pidProgram": "PID/Program"
+      },
+      "options": {
+        "allProtocols": "All Protocols",
+        "allStates": "All States",
+        "none": "None"
+      },
+      "titles": {
+        "protocolFilter": "Protocol Filter",
+        "stateFilter": "State Filter"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "zh-TW": {
+    "activeConnections": {
+      "columns": {
+        "proto": "Proto",
+        "recvQ": "Recv-Q",
+        "sendQ": "Send-Q",
+        "localAddress": "Local Address",
+        "foreignAddress": "Foreign Address",
+        "state": "State",
+        "pidProgram": "PID/Program"
+      },
+      "options": {
+        "allProtocols": "All Protocols",
+        "allStates": "All States",
+        "none": "None"
+      },
+      "titles": {
+        "protocolFilter": "Protocol Filter",
+        "stateFilter": "State Filter"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "ru": {
+    "activeConnections": {
+      "columns": {
+        "proto": "Proto",
+        "recvQ": "Recv-Q",
+        "sendQ": "Send-Q",
+        "localAddress": "Local Address",
+        "foreignAddress": "Foreign Address",
+        "state": "State",
+        "pidProgram": "PID/Program"
+      },
+      "options": {
+        "allProtocols": "All Protocols",
+        "allStates": "All States",
+        "none": "None"
+      },
+      "titles": {
+        "protocolFilter": "Protocol Filter",
+        "stateFilter": "State Filter"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "de": {
+    "activeConnections": {
+      "columns": {
+        "proto": "Proto",
+        "recvQ": "Recv-Q",
+        "sendQ": "Send-Q",
+        "localAddress": "Local Address",
+        "foreignAddress": "Foreign Address",
+        "state": "State",
+        "pidProgram": "PID/Program"
+      },
+      "options": {
+        "allProtocols": "All Protocols",
+        "allStates": "All States",
+        "none": "None"
+      },
+      "titles": {
+        "protocolFilter": "Protocol Filter",
+        "stateFilter": "State Filter"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "fr": {
+    "activeConnections": {
+      "columns": {
+        "proto": "Proto",
+        "recvQ": "Recv-Q",
+        "sendQ": "Send-Q",
+        "localAddress": "Local Address",
+        "foreignAddress": "Foreign Address",
+        "state": "State",
+        "pidProgram": "PID/Program"
+      },
+      "options": {
+        "allProtocols": "All Protocols",
+        "allStates": "All States",
+        "none": "None"
+      },
+      "titles": {
+        "protocolFilter": "Protocol Filter",
+        "stateFilter": "State Filter"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  },
+  "ko": {
+    "activeConnections": {
+      "columns": {
+        "proto": "Proto",
+        "recvQ": "Recv-Q",
+        "sendQ": "Send-Q",
+        "localAddress": "Local Address",
+        "foreignAddress": "Foreign Address",
+        "state": "State",
+        "pidProgram": "PID/Program"
+      },
+      "options": {
+        "allProtocols": "All Protocols",
+        "allStates": "All States",
+        "none": "None"
+      },
+      "titles": {
+        "protocolFilter": "Protocol Filter",
+        "stateFilter": "State Filter"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      }
+    }
+  }
+}

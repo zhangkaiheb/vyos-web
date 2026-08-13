@@ -1,0 +1,226 @@
+{
+  "zh-CN": {
+    "qosInterface": {
+      "direction": {
+        "egress": "出站 (egress)",
+        "ingress": "入站 (ingress)"
+      },
+      "column": {
+        "interface": "接口",
+        "egress": "出站策略 (egress)",
+        "ingress": "入站策略 (ingress)",
+        "actions": "操作"
+      },
+      "schema": {
+        "interface": "接口",
+        "egress": "出站策略 (egress)",
+        "ingress": "入站策略 (ingress)"
+      },
+      "error": {
+        "loadFailed": "加载失败",
+        "saveFailed": "保存失败",
+        "deleteFailed": "删除失败"
+      },
+      "modal": {
+        "editTitle": "编辑接口QoS",
+        "createTitle": "新建接口QoS",
+        "confirmDelete": "确认删除"
+      },
+      "message": {
+        "confirmDelete": "确认删除以下接口的 QoS 配置？"
+      }
+    }
+  },
+  "en": {
+    "qosInterface": {
+      "direction": {
+        "egress": "Egress",
+        "ingress": "Ingress"
+      },
+      "column": {
+        "interface": "Interface",
+        "egress": "Egress Policy",
+        "ingress": "Ingress Policy",
+        "actions": "Actions"
+      },
+      "schema": {
+        "interface": "Interface",
+        "egress": "Egress Policy",
+        "ingress": "Ingress Policy"
+      },
+      "error": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "deleteFailed": "Delete failed"
+      },
+      "modal": {
+        "editTitle": "Edit Interface QoS",
+        "createTitle": "Create Interface QoS",
+        "confirmDelete": "Confirm Delete"
+      },
+      "message": {
+        "confirmDelete": "Confirm delete QoS configuration for the following interface?"
+      }
+    }
+  },
+  "zh-TW": {
+    "qosInterface": {
+      "direction": {
+        "egress": "Egress",
+        "ingress": "Ingress"
+      },
+      "column": {
+        "interface": "Interface",
+        "egress": "Egress Policy",
+        "ingress": "Ingress Policy",
+        "actions": "Actions"
+      },
+      "schema": {
+        "interface": "Interface",
+        "egress": "Egress Policy",
+        "ingress": "Ingress Policy"
+      },
+      "error": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "deleteFailed": "Delete failed"
+      },
+      "modal": {
+        "editTitle": "Edit Interface QoS",
+        "createTitle": "Create Interface QoS",
+        "confirmDelete": "Confirm Delete"
+      },
+      "message": {
+        "confirmDelete": "Confirm delete QoS configuration for the following interface?"
+      }
+    }
+  },
+  "ru": {
+    "qosInterface": {
+      "direction": {
+        "egress": "Egress",
+        "ingress": "Ingress"
+      },
+      "column": {
+        "interface": "Interface",
+        "egress": "Egress Policy",
+        "ingress": "Ingress Policy",
+        "actions": "Actions"
+      },
+      "schema": {
+        "interface": "Interface",
+        "egress": "Egress Policy",
+        "ingress": "Ingress Policy"
+      },
+      "error": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "deleteFailed": "Delete failed"
+      },
+      "modal": {
+        "editTitle": "Edit Interface QoS",
+        "createTitle": "Create Interface QoS",
+        "confirmDelete": "Confirm Delete"
+      },
+      "message": {
+        "confirmDelete": "Confirm delete QoS configuration for the following interface?"
+      }
+    }
+  },
+  "de": {
+    "qosInterface": {
+      "direction": {
+        "egress": "Egress",
+        "ingress": "Ingress"
+      },
+      "column": {
+        "interface": "Interface",
+        "egress": "Egress Policy",
+        "ingress": "Ingress Policy",
+        "actions": "Actions"
+      },
+      "schema": {
+        "interface": "Interface",
+        "egress": "Egress Policy",
+        "ingress": "Ingress Policy"
+      },
+      "error": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "deleteFailed": "Delete failed"
+      },
+      "modal": {
+        "editTitle": "Edit Interface QoS",
+        "createTitle": "Create Interface QoS",
+        "confirmDelete": "Confirm Delete"
+      },
+      "message": {
+        "confirmDelete": "Confirm delete QoS configuration for the following interface?"
+      }
+    }
+  },
+  "fr": {
+    "qosInterface": {
+      "direction": {
+        "egress": "Egress",
+        "ingress": "Ingress"
+      },
+      "column": {
+        "interface": "Interface",
+        "egress": "Egress Policy",
+        "ingress": "Ingress Policy",
+        "actions": "Actions"
+      },
+      "schema": {
+        "interface": "Interface",
+        "egress": "Egress Policy",
+        "ingress": "Ingress Policy"
+      },
+      "error": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "deleteFailed": "Delete failed"
+      },
+      "modal": {
+        "editTitle": "Edit Interface QoS",
+        "createTitle": "Create Interface QoS",
+        "confirmDelete": "Confirm Delete"
+      },
+      "message": {
+        "confirmDelete": "Confirm delete QoS configuration for the following interface?"
+      }
+    }
+  },
+  "ko": {
+    "qosInterface": {
+      "direction": {
+        "egress": "Egress",
+        "ingress": "Ingress"
+      },
+      "column": {
+        "interface": "Interface",
+        "egress": "Egress Policy",
+        "ingress": "Ingress Policy",
+        "actions": "Actions"
+      },
+      "schema": {
+        "interface": "Interface",
+        "egress": "Egress Policy",
+        "ingress": "Ingress Policy"
+      },
+      "error": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "deleteFailed": "Delete failed"
+      },
+      "modal": {
+        "editTitle": "Edit Interface QoS",
+        "createTitle": "Create Interface QoS",
+        "confirmDelete": "Confirm Delete"
+      },
+      "message": {
+        "confirmDelete": "Confirm delete QoS configuration for the following interface?"
+      }
+    }
+  }
+}

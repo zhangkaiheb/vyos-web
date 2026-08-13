@@ -1,5 +1,7 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
@@ -64,6 +66,8 @@ function configToConfig(form) {
 export default defineComponent({
   name: 'IgmpProxyPage',
   setup() {
+    const configStore = useConfigStore();
+    const t = inject('i18n');
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -78,17 +82,21 @@ export default defineComponent({
       name: '', role: '', 'alt-subnet': [], threshold: '',
     });
 
-    const interfaceColumns = [
-      { key: 'name', title: '接口名称' },
-      { key: 'role', title: '角色' },
-      { key: 'threshold', title: '阈值' },
-    ];
+    const deleteModalVisible = ref(false);
+    const pendingDeleteName = ref('');
+    const pendingDeleteIndex = ref(-1);
 
-    const ROLE_OPTIONS = [
-      { value: '', label: '请选择' },
-      { value: 'upstream', label: '上游 (upstream)' },
-      { value: 'downstream', label: '下游 (downstream)' },
-    ];
+    const interfaceColumns = computed(() => [
+      { key: 'name', title: t('igmpProxy.interfaceName') },
+      { key: 'role', title: t('igmpProxy.role') },
+      { key: 'threshold', title: t('igmpProxy.threshold') },
+    ]);
+
+    const ROLE_OPTIONS = computed(() => [
+      { value: '', label: t('igmpProxy.selectRole') },
+      { value: 'upstream', label: t('igmpProxy.upstream') },
+      { value: 'downstream', label: t('igmpProxy.downstream') },
+    ]);
 
     const commandPath = computed(() => {
       if (activeTab.value === 'interfaces') return 'protocols igmp-proxy interface';
@@ -122,7 +130,8 @@ export default defineComponent({
       saved.value = false;
       try {
         const payload = configToConfig(config.value);
-        await configApi.set('protocols igmp-proxy', payload);
+        await configStore.setConfig('protocols igmp-proxy', payload);
+        configStore.markPending();
         saved.value = true;
         setTimeout(() => (saved.value = false), 2000);
         interfaceModalVisible.value = false;
@@ -145,8 +154,8 @@ export default defineComponent({
     }
 
     function saveInterface() {
-      if (!interfaceForm.value.name) return alert('请选择接口');
-      if (!interfaceForm.value.role) return alert('请选择角色');
+      if (!interfaceForm.value.name) return showError({ message: t('igmpProxy.pleaseSelectInterface') });
+      if (!interfaceForm.value.role) return showError({ message: t('igmpProxy.pleaseSelectRole') });
       if (editingInterfaceIndex.value >= 0) {
         config.value.interfaces.splice(editingInterfaceIndex.value, 1, JSON.parse(JSON.stringify(interfaceForm.value)));
       } else {
@@ -156,7 +165,16 @@ export default defineComponent({
     }
 
     function deleteInterface(index) {
-      if (confirm('确定删除此接口？')) config.value.interfaces.splice(index, 1);
+      pendingDeleteName.value = config.value.interfaces[index].name;
+      pendingDeleteIndex.value = index;
+      deleteModalVisible.value = true;
+    }
+
+    function confirmDeleteInterface() {
+      config.value.interfaces.splice(pendingDeleteIndex.value, 1);
+      deleteModalVisible.value = false;
+      pendingDeleteName.value = '';
+      pendingDeleteIndex.value = -1;
     }
 
     onMounted(() => {
@@ -165,34 +183,36 @@ export default defineComponent({
     });
 
     return {
+      t,
       loading, saving, saved, config, activeTab, writeDisabled,
       interfaces,
       interfaceModalVisible, editingInterfaceIndex, interfaceForm,
+      deleteModalVisible, pendingDeleteName, pendingDeleteIndex,
       interfaceColumns, ROLE_OPTIONS, commandPath,
-      openInterfaceModal, deleteInterface,
+      openInterfaceModal, deleteInterface, confirmDeleteInterface,
       saveInterface, save, configToConfig,
     };
   },
   components: { TabGroup, ToolbarButton, DataTable, DraggableModal },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('igmpProxy.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本设置' },
-        { key: 'interfaces', title: '接口' }
+        { key: 'basic', title: t('igmpProxy.basicSettings') },
+        { key: 'interfaces', title: t('igmpProxy.interfaces') }
       ]">
 
         <template #basic>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">全局设置</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ t('igmpProxy.globalSettings') }}</div>
               <div style="padding:16px;">
                 <div class="form-row">
-                  <label class="form-label">禁用实例</label>
+                  <label class="form-label">{{ t('igmpProxy.disableInstance') }}</label>
                   <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config.disable" /></label>
                 </div>
                 <div class="form-row">
-                  <label class="form-label">禁用快速离开</label>
+                  <label class="form-label">{{ t('igmpProxy.disableQuickLeave') }}</label>
                   <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="config['disable-quickleave']" /></label>
                 </div>
               </div>
@@ -206,34 +226,43 @@ export default defineComponent({
                      @create="openInterfaceModal(-1)" @edit="openInterfaceModal" @delete="deleteInterface" />
         </template>
       </TabGroup>
-
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
+      <div class="toolbar" style="margin-top:16px;">
+        <div class="toolbar-left">
+          <ToolbarButton icon="save" @click="save" :disabled="saving || loading || writeDisabled">{{ saving ? t('igmpProxy.saving') : t('igmpProxy.confirm') }}</ToolbarButton>
+        </div>
       </div>
 
       <!-- Interface Modal -->
-      <DraggableModal v-model:visible="interfaceModalVisible" :title="editingInterfaceIndex >= 0 ? '编辑 IGMP 代理接口' : '添加 IGMP 代理接口'" width="600px" @confirm="saveInterface">
+      <DraggableModal v-model:visible="interfaceModalVisible" :title="editingInterfaceIndex >= 0 ? t('igmpProxy.editInterface') : t('igmpProxy.addInterface')" width="600px" @confirm="saveInterface">
         <div class="form-row">
-          <label class="form-label">接口名称 *</label>
+          <label class="form-label">{{ t('igmpProxy.interfaceName') }} *</label>
           <template v-if="editingInterfaceIndex >= 0">
             <input type="text" class="form-control" v-model="interfaceForm.name" style="width:100%;" disabled />
           </template>
           <template v-else>
             <select class="form-control" v-model="interfaceForm.name" style="width:100%;">
-              <option value="">请选择接口</option>
+              <option value="">{{ t('igmpProxy.pleaseSelectInterface') }}</option>
               <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
             </select>
           </template>
         </div>
         <div class="form-row">
-          <label class="form-label">角色 *</label>
+          <label class="form-label">{{ t('igmpProxy.role') }} *</label>
           <select class="form-control" v-model="interfaceForm.role" style="width:100%;">
             <option v-for="opt in ROLE_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">阈值</label>
+          <label class="form-label">{{ t('igmpProxy.threshold') }}</label>
           <input type="number" class="form-control" v-model="interfaceForm.threshold" min="1" max="255" placeholder="1-255" style="width:100%;" />
+        </div>
+      </DraggableModal>
+
+      <!-- Delete Confirmation Modal -->
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('igmpProxy.confirmDelete')" width="400px" @confirm="confirmDeleteInterface">
+        <div>{{ t('igmpProxy.confirmDeleteMessage') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div style="padding:2px 0;">{{ pendingDeleteName }}</div>
         </div>
       </DraggableModal>
     </div>

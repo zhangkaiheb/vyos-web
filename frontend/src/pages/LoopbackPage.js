@@ -1,27 +1,31 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
+import { useConfigStore } from '/src/stores/config.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import { api, interfaceApi } from '/src/api/index.js';
-
-const COLUMNS = [
-  { key: 'name', title: '接口名称', width: 120 },
-  { key: 'description', title: '描述', width: 200 },
-  { key: 'address', title: 'IP 地址', width: 200 },
-  { key: 'actions', title: '操作', width: 100 },
-];
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { showError } from '/src/components/Layout/ErrorDisplay.js';
 
 const SOURCE_VALIDATION_OPTIONS = [
-  { value: 'strict', label: 'strict (严格)' },
-  { value: 'loose', label: 'loose (宽松)' },
-  { value: 'disable', label: 'disable (禁用)' },
+  { value: 'strict', labelKey: 'strict' },
+  { value: 'loose', labelKey: 'loose' },
+  { value: 'disable', labelKey: 'disable' },
 ];
 
 export default defineComponent({
   name: 'LoopbackPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
+    const configStore = useConfigStore();
+    const { t } = inject('i18n');
+    const COLUMNS = computed(() => [
+      { key: 'name', title: t('interface.loopback.name'), width: 120 },
+      { key: 'description', title: t('interface.loopback.description'), width: 200 },
+      { key: 'address', title: t('interface.loopback.address'), width: 200 },
+      { key: 'actions', title: t('interface.loopback.actions'), width: 100 },
+    ]);
     const loading = ref(false);
     const loopbacks = ref([]);
     const modalVisible = ref(false);
@@ -31,22 +35,22 @@ export default defineComponent({
 
     // Schema definitions
     const basicSchema = computed(() => [
-      { key: 'name', title: '接口名称', type: 'text', required: true, value: 'lo', disabled: true, help: 'Loopback 接口固定为 lo' },
-      { key: 'description', title: '描述', type: 'text', placeholder: '接口描述' },
-      { key: 'address', title: 'IP 地址', type: 'textarea', placeholder: '每行一个 IP 地址或 CIDR', help: 'IP 地址列表 (支持 IPv4/IPv6)' },
+      { key: 'name', title: t('interface.loopback.name'), type: 'text', required: true, value: 'lo', disabled: true, help: t('interface.loopback.name_help') },
+      { key: 'description', title: t('interface.loopback.description'), type: 'text', placeholder: t('interface.loopback.description_placeholder') },
+      { key: 'address', title: t('interface.loopback.address'), type: 'textarea', placeholder: t('interface.loopback.address_placeholder'), help: t('interface.loopback.address_help') },
     ]);
 
     const ipSchema = computed(() => [
-      { key: 'ip_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
+      { key: 'ip_source_validation', title: t('interface.loopback.source_validation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS.map(opt => ({ value: opt.value, label: opt.labelKey })), placeholder: t('interface.loopback.source_validation_placeholder'), help: t('interface.loopback.source_validation_help') },
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: '镜像出方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像出方向流量到目标接口' },
-      { key: 'mirror_ingress', title: '镜像入方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像入方向流量到目标接口' },
+      { key: 'mirror_egress', title: t('interface.loopback.mirror_egress'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.loopback.mirror_placeholder'), help: t('interface.loopback.mirror_egress_help') },
+      { key: 'mirror_ingress', title: t('interface.loopback.mirror_ingress'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.loopback.mirror_placeholder'), help: t('interface.loopback.mirror_ingress_help') },
     ]);
 
     const otherSchema = computed(() => [
-      { key: 'redirect', title: '重定向目标', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '重定向入站数据包到目标接口' },
+      { key: 'redirect', title: t('interface.loopback.redirect'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.loopback.mirror_placeholder'), help: t('interface.loopback.redirect_help') },
     ]);
 
     // Command text
@@ -67,15 +71,14 @@ export default defineComponent({
       if (l.mirror_ingress) lines.push(`set interfaces loopback ${name} mirror ingress ${l.mirror_ingress}`);
       if (l.redirect) lines.push(`set interfaces loopback ${name} redirect ${l.redirect}`);
 
-      return lines.length ? lines.join('\n') : '# 未配置任何参数';
+      return lines.length ? lines.join('\n') : '# ' + t('interface.loopback.no_config');
     });
 
     const modalTabs = computed(() => [
-      { key: 'basic', title: '基本配置' },
-      { key: 'ip', title: 'IPv4 参数' },
-      { key: 'mirror', title: '流量镜像' },
-      { key: 'other', title: '其他' },
-      { key: 'command', title: '命令预览' },
+      { key: 'basic', title: t('interface.loopback.basic_config') },
+      { key: 'ip', title: t('interface.loopback.ipv4_params') },
+      { key: 'mirror', title: t('interface.loopback.mirror_traffic') },
+      { key: 'other', title: t('interface.loopback.other') },
     ]);
 
     function getDefaultForm() {
@@ -143,7 +146,7 @@ export default defineComponent({
     }
 
     function showError(err) {
-      alert(`错误码: ${err.code || 'ERROR'}\n错误信息: ${err.message || err}`);
+      showError({ message: `${t('error.code')} ${err.code || 'ERROR'}\n${t('error.message')} ${err.message || err}` });
     }
 
     function openModal() {
@@ -161,21 +164,23 @@ export default defineComponent({
       try {
         const form = editingLoopback.value;
         const config = formToLoopback(form);
-        console.log('[Loopback] 保存配置:', JSON.stringify(config, null, 2));
+        console.log('[Loopback] ' + t('interface.loopback.save_log') + ' ' + JSON.stringify(config, null, 2));
 
         const path = 'interfaces loopback lo';
-        await api.put('/config', { path, value: config });
+        await configStore.setConfig(path, config);
+        configStore.markPending();
 
         modalVisible.value = false;
         await load();
       } catch (err) {
-        showError(err);
+        displayError(err);
       }
     }
 
-    onMounted(() => { load(); });
+    onMounted(() => { load(); onMenuRefresh(load); });
 
-    return {
+    return {t,
+
       loading, loopbacks, modalVisible, editingLoopback, interfaceOptions, activeTab,
       COLUMNS,
       basicSchema, ipSchema, mirrorSchema, otherSchema,
@@ -195,7 +200,7 @@ export default defineComponent({
         @refresh="load"
       />
 
-      <DraggableModal v-model:visible="modalVisible" title="编辑 Loopback 接口" width="800px">
+      <DraggableModal v-model:visible="modalVisible" :title="$t('interface.loopback.modal_edit')" width="800px">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic>
@@ -210,14 +215,11 @@ export default defineComponent({
             <template #other>
               <ConfigForm :schema="otherSchema" :model="editingLoopback" />
             </template>
-            <template #command>
-              <pre style="background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;font-size:13px;">{{ commandText }}</pre>
-            </template>
           </TabGroup>
         </template>
         <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">取消</button>
-          <button type="button" class="btn btn-primary" @click="save">确定</button>
+          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ $t('app.cancel') }}</button>
+          <button type="button" class="btn btn-primary" @click="save">{{ $t('app.confirm') }}</button>
         </template>
       </DraggableModal>
     </div>

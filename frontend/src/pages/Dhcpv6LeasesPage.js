@@ -3,6 +3,7 @@ import { opModeApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function parseTable(output) {
   const lines = String(output || '').split('\n').map(s => s.replace(/\r$/, ''));
@@ -55,23 +56,23 @@ function parseTable(output) {
 export default defineComponent({
   name: 'Dhcpv6LeasesPage',
   setup() {
+    const { t } = useI18n();
     const loading = ref(false);
     const leases = ref([]);
-    const rawOutput = ref('');
     const filterPool = ref('');
     const filterState = ref('');
     const sortKey = ref('');
 
-    const columns = [
-      { key: 'ipv6_address', title: 'IPv6 地址' },
-      { key: 'state', title: '状态' },
-      { key: 'last_communication', title: '最后通信' },
-      { key: 'lease_expiration', title: '租约到期' },
-      { key: 'remaining', title: '剩余时间' },
-      { key: 'type', title: '类型' },
-      { key: 'pool', title: '地址池' },
-      { key: 'duid', title: 'DUID' },
-    ];
+    const columns = computed(() => [
+      { key: 'ipv6_address', title: t('dhcpv6Leases.columns.ipv6Address') },
+      { key: 'state', title: t('dhcpv6Leases.columns.state') },
+      { key: 'last_communication', title: t('dhcpv6Leases.columns.lastCommunication') },
+      { key: 'lease_expiration', title: t('dhcpv6Leases.columns.leaseExpiration') },
+      { key: 'remaining', title: t('dhcpv6Leases.columns.remaining') },
+      { key: 'type', title: t('dhcpv6Leases.columns.type') },
+      { key: 'pool', title: t('dhcpv6Leases.columns.pool') },
+      { key: 'duid', title: t('dhcpv6Leases.columns.duid') },
+    ]);
 
     const poolOptions = computed(() => {
       const pools = new Set();
@@ -89,8 +90,7 @@ export default defineComponent({
         if (filterState.value) command += ' state ' + filterState.value;
         if (sortKey.value) command += ' sort ' + sortKey.value;
         const res = await opModeApi.show(command);
-        rawOutput.value = res.output || '';
-        leases.value = parseTable(rawOutput.value);
+        leases.value = parseTable(res.output || '');
       } catch (e) {
         showError(e);
         leases.value = [];
@@ -101,24 +101,24 @@ export default defineComponent({
 
     onMounted(load);
 
-    return {
-      loading, leases, columns, load, rawOutput,
+    return {t,
+
+      loading, leases, columns, load,
       filterPool, filterState, sortKey, poolOptions, filteredLeases,
     };
   },
   components: { DataTable, ToolbarButton },
   template: `
     <div class="page-container">
-      <div class="toolbar toolbar-split">
-        <div class="toolbar-left"><h3>DHCPv6 租约</h3></div>
-        <div class="toolbar-right">
-          <select v-model="filterPool" @change="load" title="按地址池过滤">
-            <option value="">全部地址池</option>
+      <DataTable :columns="columns" :data="filteredLeases" :loading="loading" :selectable="false" :actions="[]" @refresh="load">
+        <template #toolbar-right-extra>
+          <select v-model="filterPool" @change="load" :title="t('dhcpv6Leases.filter.byPool')">
+            <option value="">{{ t('dhcpv6Leases.filter.allPools') }}</option>
             <option v-for="p in poolOptions" :key="p" :value="p">{{ p }}</option>
           </select>
-          <select v-model="filterState" @change="load" title="按状态过滤">
-            <option value="">默认状态</option>
-            <option value="all">全部</option>
+          <select v-model="filterState" @change="load" :title="t('dhcpv6Leases.filter.byState')">
+            <option value="">{{ t('dhcpv6Leases.filter.defaultState') }}</option>
+            <option value="all">{{ t('dhcpv6Leases.filter.all') }}</option>
             <option value="active">active</option>
             <option value="abandoned">abandoned</option>
             <option value="backup">backup</option>
@@ -127,25 +127,20 @@ export default defineComponent({
             <option value="released">released</option>
             <option value="reset">reset</option>
           </select>
-          <select v-model="sortKey" @change="load" title="排序">
-            <option value="">默认排序</option>
+          <select v-model="sortKey" @change="load" :title="t('dhcpv6Leases.sort.title')">
+            <option value="">{{ t('dhcpv6Leases.sort.default') }}</option>
             <option value="duid">DUID</option>
-            <option value="end">到期时间</option>
+            <option value="end">{{ t('dhcpv6Leases.sort.expiration') }}</option>
             <option value="ip">IP</option>
-            <option value="last_communication">最后通信</option>
-            <option value="pool">地址池</option>
-            <option value="remaining">剩余时间</option>
-            <option value="state">状态</option>
-            <option value="type">类型</option>
+            <option value="last_communication">{{ t('dhcpv6Leases.sort.lastCommunication') }}</option>
+            <option value="pool">{{ t('dhcpv6Leases.sort.pool') }}</option>
+            <option value="remaining">{{ t('dhcpv6Leases.sort.remaining') }}</option>
+            <option value="state">{{ t('dhcpv6Leases.sort.state') }}</option>
+            <option value="type">{{ t('dhcpv6Leases.sort.type') }}</option>
           </select>
-          <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
-        </div>
-      </div>
-      <DataTable :columns="columns" :data="filteredLeases" :loading="loading" :selectable="false" :actions="[]" />
-      <div v-if="rawOutput" style="margin-top:16px;">
-        <div style="font-weight:bold;margin-bottom:4px;">原始输出</div>
-        <pre style="background:#f5f5f5;padding:8px;border:1px solid #ddd;font-size:12px;overflow:auto;">{{ rawOutput }}</pre>
-      </div>
+          <ToolbarButton icon="refresh" @click="load">{{ t('dhcpv6Leases.refresh') }}</ToolbarButton>
+        </template>
+      </DataTable>
     </div>
   `,
 });

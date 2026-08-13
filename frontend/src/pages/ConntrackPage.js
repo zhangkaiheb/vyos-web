@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
@@ -7,47 +7,50 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
-
-const TABS = [
-  { key: 'basic', title: '基本设置' },
-  { key: 'tcp', title: 'TCP 选项' },
-  { key: 'timeout', title: '超时设置' },
-  { key: 'ignore', title: '忽略规则' },
-  { key: 'log', title: '日志设置' },
-  { key: 'modules', title: '模块' },
-];
-
-const LOG_SCHEMA = [
-  { key: 'tcpNew', title: 'TCP 新建连接', type: 'checkbox' },
-  { key: 'tcpUpdate', title: 'TCP 连接更新', type: 'checkbox' },
-  { key: 'tcpDestroy', title: 'TCP 连接删除', type: 'checkbox' },
-  { key: 'udpNew', title: 'UDP 新建连接', type: 'checkbox' },
-  { key: 'udpUpdate', title: 'UDP 连接更新', type: 'checkbox' },
-  { key: 'udpDestroy', title: 'UDP 连接删除', type: 'checkbox' },
-  { key: 'icmpNew', title: 'ICMP 新建连接', type: 'checkbox' },
-  { key: 'icmpUpdate', title: 'ICMP 连接更新', type: 'checkbox' },
-  { key: 'icmpDestroy', title: 'ICMP 连接删除', type: 'checkbox' },
-  { key: 'otherNew', title: '其他协议新建连接', type: 'checkbox' },
-  { key: 'otherUpdate', title: '其他协议连接更新', type: 'checkbox' },
-  { key: 'otherDestroy', title: '其他协议连接删除', type: 'checkbox' },
-];
-
-const MODULES_SCHEMA = [
-  { key: 'ftp', title: 'FTP', type: 'checkbox' },
-  { key: 'h323', title: 'H.323', type: 'checkbox' },
-  { key: 'nfs', title: 'NFS', type: 'checkbox' },
-  { key: 'pptp', title: 'PPTP', type: 'checkbox' },
-  { key: 'rtsp', title: 'RTSP', type: 'checkbox' },
-  { key: 'sip', title: 'SIP', type: 'checkbox' },
-  { key: 'sqlnet', title: 'SQLnet', type: 'checkbox' },
-  { key: 'tftp', title: 'TFTP', type: 'checkbox' },
-];
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 
 export default defineComponent({
   name: 'ConntrackPage',
   setup() {
+    const { t } = inject('i18n');
     const route = useRoute();
     const configStore = useConfigStore();
+
+    const TABS = computed(() => [
+      { key: 'basic', title: t('conntrack.tabs.basic') },
+      { key: 'tcp', title: t('conntrack.tabs.tcp') },
+      { key: 'timeout', title: t('conntrack.tabs.timeout') },
+      { key: 'ignore', title: t('conntrack.tabs.ignore') },
+      { key: 'log', title: t('conntrack.tabs.log') },
+      { key: 'modules', title: t('conntrack.tabs.modules') },
+    ]);
+
+    const LOG_SCHEMA = computed(() => [
+      { key: 'tcpNew', title: t('conntrack.log.tcpNew'), type: 'checkbox' },
+      { key: 'tcpUpdate', title: t('conntrack.log.tcpUpdate'), type: 'checkbox' },
+      { key: 'tcpDestroy', title: t('conntrack.log.tcpDestroy'), type: 'checkbox' },
+      { key: 'udpNew', title: t('conntrack.log.udpNew'), type: 'checkbox' },
+      { key: 'udpUpdate', title: t('conntrack.log.udpUpdate'), type: 'checkbox' },
+      { key: 'udpDestroy', title: t('conntrack.log.udpDestroy'), type: 'checkbox' },
+      { key: 'icmpNew', title: t('conntrack.log.icmpNew'), type: 'checkbox' },
+      { key: 'icmpUpdate', title: t('conntrack.log.icmpUpdate'), type: 'checkbox' },
+      { key: 'icmpDestroy', title: t('conntrack.log.icmpDestroy'), type: 'checkbox' },
+      { key: 'otherNew', title: t('conntrack.log.otherNew'), type: 'checkbox' },
+      { key: 'otherUpdate', title: t('conntrack.log.otherUpdate'), type: 'checkbox' },
+      { key: 'otherDestroy', title: t('conntrack.log.otherDestroy'), type: 'checkbox' },
+    ]);
+
+    const MODULES_SCHEMA = computed(() => [
+      { key: 'ftp', title: 'FTP', type: 'checkbox' },
+      { key: 'h323', title: 'H.323', type: 'checkbox' },
+      { key: 'nfs', title: 'NFS', type: 'checkbox' },
+      { key: 'pptp', title: 'PPTP', type: 'checkbox' },
+      { key: 'rtsp', title: 'RTSP', type: 'checkbox' },
+      { key: 'sip', title: 'SIP', type: 'checkbox' },
+      { key: 'sqlnet', title: 'SQLnet', type: 'checkbox' },
+      { key: 'tftp', title: 'TFTP', type: 'checkbox' },
+    ]);
+
     const activeTab = ref('basic');
     const loading = ref(false);
     const writeDisabled = computed(() => configStore.sessionChanged);
@@ -105,22 +108,22 @@ export default defineComponent({
     const editingCustomIpv6 = ref(null);
 
     // Columns
-    const ignoreColumns = [
-      { key: 'id', title: '规则编号' },
-      { key: 'description', title: '描述' },
-      { key: 'protocol', title: '协议' },
-      { key: 'inboundInterface', title: '入站接口' },
-      { key: 'sourceAddress', title: '源地址' },
-      { key: 'sourcePort', title: '源端口' },
-      { key: 'destinationAddress', title: '目的地址' },
-      { key: 'destinationPort', title: '目的端口' },
-    ];
-    const customColumns = [
-      { key: 'id', title: '规则编号' },
-      { key: 'description', title: '描述' },
-      { key: 'protocol', title: '协议' },
-      { key: 'inboundInterface', title: '入站接口' },
-    ];
+    const ignoreColumns = computed(() => [
+      { key: 'id', title: t('conntrack.columns.ruleNumber') },
+      { key: 'description', title: t('conntrack.columns.description') },
+      { key: 'protocol', title: t('conntrack.columns.protocol') },
+      { key: 'inboundInterface', title: t('conntrack.columns.inboundInterface') },
+      { key: 'sourceAddress', title: t('conntrack.columns.sourceAddress') },
+      { key: 'sourcePort', title: t('conntrack.columns.sourcePort') },
+      { key: 'destinationAddress', title: t('conntrack.columns.destinationAddress') },
+      { key: 'destinationPort', title: t('conntrack.columns.destinationPort') },
+    ]);
+    const customColumns = computed(() => [
+      { key: 'id', title: t('conntrack.columns.ruleNumber') },
+      { key: 'description', title: t('conntrack.columns.description') },
+      { key: 'protocol', title: t('conntrack.columns.protocol') },
+      { key: 'inboundInterface', title: t('conntrack.columns.inboundInterface') },
+    ]);
 
     // Schemas
     const PROTOCOL_OPTIONS = [
@@ -133,19 +136,19 @@ export default defineComponent({
     ].map(v => ({ value: v, label: v }));
 
     const basicSchema = computed(() => [
-      { key: 'expectTableSize', title: 'Expect 表大小', type: 'number', min: 1, max: 50000000, defaultValue: 2048, help: '范围: 1-50000000, 默认: 2048' },
-      { key: 'hashSize', title: 'Hash 表大小', type: 'number', min: 1, max: 50000000, defaultValue: 32768, help: '范围: 1-50000000, 默认: 32768' },
-      { key: 'tableSize', title: '连接跟踪表大小', type: 'number', min: 1, max: 50000000, defaultValue: 262144, help: '范围: 1-50000000, 默认: 262144' },
-      { key: 'flowAccounting', title: '启用流量统计', type: 'checkbox' },
+      { key: 'expectTableSize', title: t('conntrack.basic.expectTableSize'), type: 'number', min: 1, max: 50000000, defaultValue: 2048, help: t('conntrack.basic.expectTableSizeHelp') },
+      { key: 'hashSize', title: t('conntrack.basic.hashSize'), type: 'number', min: 1, max: 50000000, defaultValue: 32768, help: t('conntrack.basic.hashSizeHelp') },
+      { key: 'tableSize', title: t('conntrack.basic.tableSize'), type: 'number', min: 1, max: 50000000, defaultValue: 262144, help: t('conntrack.basic.tableSizeHelp') },
+      { key: 'flowAccounting', title: t('conntrack.basic.flowAccounting'), type: 'checkbox' },
     ]);
 
     const tcpSchema = computed(() => [
-      { key: 'halfOpenConnections', title: '半开连接最大数', type: 'number', min: 1, max: 50000000, defaultValue: 512, help: '默认: 512' },
-      { key: 'loose', title: '宽松模式', type: 'select', options: [
-        { value: 'enable', label: '启用' },
-        { value: 'disable', label: '禁用' },
-      ], defaultValue: 'enable', help: '默认: enable' },
-      { key: 'maxRetrans', title: '最大重传次数', type: 'number', min: 1, max: 255, defaultValue: 3, help: '范围: 1-255, 默认: 3' },
+      { key: 'halfOpenConnections', title: t('conntrack.tcp.halfOpenConnections'), type: 'number', min: 1, max: 50000000, defaultValue: 512, help: t('conntrack.tcp.halfOpenConnectionsHelp') },
+      { key: 'loose', title: t('conntrack.tcp.loose'), type: 'select', options: [
+        { value: 'enable', label: t('app.enable') },
+        { value: 'disable', label: t('app.disable') },
+      ], defaultValue: 'enable', help: t('conntrack.tcp.looseHelp') },
+      { key: 'maxRetrans', title: t('conntrack.tcp.maxRetrans'), type: 'number', min: 1, max: 255, defaultValue: 3, help: t('conntrack.tcp.maxRetransHelp') },
     ]);
 
     const TCP_FLAGS_OPTIONS = [
@@ -153,46 +156,46 @@ export default defineComponent({
     ].map(v => ({ value: v, label: v.toUpperCase() }));
 
     const ignoreRuleSchema = computed(() => [
-      { key: 'id', title: '规则编号', type: 'number', min: 1, max: 999999, required: true, help: '范围: 1-999999' },
-      { key: 'description', title: '描述', type: 'text' },
-      { key: 'protocol', title: '协议', type: 'select', options: PROTOCOL_OPTIONS, placeholder: '选择协议' },
-      { key: 'inboundInterface', title: '入站接口', type: 'text', placeholder: '例如: eth0, any' },
-      { key: 'sourceAddress', title: '源地址', type: 'text', placeholder: 'IP/子网/范围, 例如: 192.168.1.0/24 或 !10.0.0.0/8' },
-      { key: 'sourceAddressGroup', title: '源地址组', type: 'text', placeholder: '地址组名称' },
-      { key: 'sourceDomainGroup', title: '源域名组', type: 'text', placeholder: '域名组名称' },
-      { key: 'sourceNetworkGroup', title: '源网络组', type: 'text', placeholder: '网络组名称' },
-      { key: 'sourcePort', title: '源端口', type: 'text', placeholder: '端口号/范围, 例如: 80 或 1001-1005' },
-      { key: 'sourcePortGroup', title: '源端口组', type: 'text', placeholder: '端口组名称' },
-      { key: 'destinationAddress', title: '目的地址', type: 'text', placeholder: 'IP/子网/范围, 例如: 10.0.0.0/8' },
-      { key: 'destinationAddressGroup', title: '目的地址组', type: 'text', placeholder: '地址组名称' },
-      { key: 'destinationDomainGroup', title: '目的域名组', type: 'text', placeholder: '域名组名称' },
-      { key: 'destinationNetworkGroup', title: '目的网络组', type: 'text', placeholder: '网络组名称' },
-      { key: 'destinationMacGroup', title: '目的MAC组 (IPv6)', type: 'text', placeholder: 'MAC组名称' },
-      { key: 'destinationPort', title: '目的端口', type: 'text', placeholder: '端口号/范围, 例如: 80 或 1001-1005' },
-      { key: 'destinationPortGroup', title: '目的端口组', type: 'text', placeholder: '端口组名称' },
-      { key: 'tcpFlags', title: 'TCP 标志位', type: 'multi-select', options: TCP_FLAGS_OPTIONS, placeholder: '选择 TCP 标志' },
-      { key: 'tcpFlagsNot', title: 'TCP 标志位(非)', type: 'multi-select', options: TCP_FLAGS_OPTIONS, placeholder: '选择未设置的标志' },
+      { key: 'id', title: t('conntrack.ignoreRule.id'), type: 'number', min: 1, max: 999999, required: true, help: t('conntrack.ignoreRule.idHelp') },
+      { key: 'description', title: t('conntrack.ignoreRule.description'), type: 'text' },
+      { key: 'protocol', title: t('conntrack.ignoreRule.protocol'), type: 'select', options: PROTOCOL_OPTIONS, placeholder: t('conntrack.ignoreRule.protocolPlaceholder') },
+      { key: 'inboundInterface', title: t('conntrack.ignoreRule.inboundInterface'), type: 'text', placeholder: t('conntrack.ignoreRule.inboundInterfacePlaceholder') },
+      { key: 'sourceAddress', title: t('conntrack.ignoreRule.sourceAddress'), type: 'text', placeholder: t('conntrack.ignoreRule.sourceAddressPlaceholder') },
+      { key: 'sourceAddressGroup', title: t('conntrack.ignoreRule.sourceAddressGroup'), type: 'text', placeholder: t('conntrack.ignoreRule.sourceAddressGroupPlaceholder') },
+      { key: 'sourceDomainGroup', title: t('conntrack.ignoreRule.sourceDomainGroup'), type: 'text', placeholder: t('conntrack.ignoreRule.sourceDomainGroupPlaceholder') },
+      { key: 'sourceNetworkGroup', title: t('conntrack.ignoreRule.sourceNetworkGroup'), type: 'text', placeholder: t('conntrack.ignoreRule.sourceNetworkGroupPlaceholder') },
+      { key: 'sourcePort', title: t('conntrack.ignoreRule.sourcePort'), type: 'text', placeholder: t('conntrack.ignoreRule.sourcePortPlaceholder') },
+      { key: 'sourcePortGroup', title: t('conntrack.ignoreRule.sourcePortGroup'), type: 'text', placeholder: t('conntrack.ignoreRule.sourcePortGroupPlaceholder') },
+      { key: 'destinationAddress', title: t('conntrack.ignoreRule.destinationAddress'), type: 'text', placeholder: t('conntrack.ignoreRule.destinationAddressPlaceholder') },
+      { key: 'destinationAddressGroup', title: t('conntrack.ignoreRule.destinationAddressGroup'), type: 'text', placeholder: t('conntrack.ignoreRule.destinationAddressGroupPlaceholder') },
+      { key: 'destinationDomainGroup', title: t('conntrack.ignoreRule.destinationDomainGroup'), type: 'text', placeholder: t('conntrack.ignoreRule.destinationDomainGroupPlaceholder') },
+      { key: 'destinationNetworkGroup', title: t('conntrack.ignoreRule.destinationNetworkGroup'), type: 'text', placeholder: t('conntrack.ignoreRule.destinationNetworkGroupPlaceholder') },
+      { key: 'destinationMacGroup', title: t('conntrack.ignoreRule.destinationMacGroup'), type: 'text', placeholder: t('conntrack.ignoreRule.destinationMacGroupPlaceholder') },
+      { key: 'destinationPort', title: t('conntrack.ignoreRule.destinationPort'), type: 'text', placeholder: t('conntrack.ignoreRule.destinationPortPlaceholder') },
+      { key: 'destinationPortGroup', title: t('conntrack.ignoreRule.destinationPortGroup'), type: 'text', placeholder: t('conntrack.ignoreRule.destinationPortGroupPlaceholder') },
+      { key: 'tcpFlags', title: t('conntrack.ignoreRule.tcpFlags'), type: 'multi-select', options: TCP_FLAGS_OPTIONS, placeholder: t('conntrack.ignoreRule.tcpFlagsPlaceholder') },
+      { key: 'tcpFlagsNot', title: t('conntrack.ignoreRule.tcpFlagsNot'), type: 'multi-select', options: TCP_FLAGS_OPTIONS, placeholder: t('conntrack.ignoreRule.tcpFlagsNotPlaceholder') },
     ]);
 
     const customRuleSchema = computed(() => [
-      { key: 'id', title: '规则编号', type: 'number', min: 1, max: 999999, required: true, help: '范围: 1-999999' },
-      { key: 'description', title: '描述', type: 'text' },
-      { key: 'protocol', title: '协议', type: 'select', options: PROTOCOL_OPTIONS, placeholder: '选择协议' },
-      { key: 'inboundInterface', title: '入站接口', type: 'text', placeholder: '例如: eth0' },
-      { key: 'sourceAddress', title: '源地址', type: 'text', placeholder: '例如: 192.168.1.0/24' },
-      { key: 'sourcePort', title: '源端口', type: 'text', placeholder: '端口号/范围, 例如: 80 或 1001-1005' },
-      { key: 'destinationAddress', title: '目的地址', type: 'text', placeholder: '例如: 10.0.0.0/8' },
-      { key: 'destinationPort', title: '目的端口', type: 'text', placeholder: '端口号/范围, 例如: 80 或 1001-1005' },
-      { key: 'tcpClose', title: 'TCP CLOSE 超时(秒)', type: 'number', min: 1, max: 21474836, help: '范围: 1-21474836' },
-      { key: 'tcpCloseWait', title: 'TCP CLOSE-WAIT 超时(秒)', type: 'number', min: 1, max: 21474836, help: '范围: 1-21474836' },
-      { key: 'tcpEstablished', title: 'TCP ESTABLISHED 超时(秒)', type: 'number', min: 1, max: 21474836, help: '范围: 1-21474836' },
-      { key: 'tcpFinWait', title: 'TCP FIN-WAIT 超时(秒)', type: 'number', min: 1, max: 21474836, help: '范围: 1-21474836' },
-      { key: 'tcpLastAck', title: 'TCP LAST-ACK 超时(秒)', type: 'number', min: 1, max: 21474836, help: '范围: 1-21474836' },
-      { key: 'tcpSynRecv', title: 'TCP SYN-RECV 超时(秒)', type: 'number', min: 1, max: 21474836, help: '范围: 1-21474836' },
-      { key: 'tcpSynSent', title: 'TCP SYN-SENT 超时(秒)', type: 'number', min: 1, max: 21474836, help: '范围: 1-21474836' },
-      { key: 'tcpTimeWait', title: 'TCP TIME-WAIT 超时(秒)', type: 'number', min: 1, max: 21474836, help: '范围: 1-21474836' },
-      { key: 'udpReplied', title: 'UDP 已回复超时(秒)', type: 'number', min: 1, max: 21474836, help: '范围: 1-21474836' },
-      { key: 'udpUnreplied', title: 'UDP 未回复超时(秒)', type: 'number', min: 1, max: 21474836, help: '范围: 1-21474836' },
+      { key: 'id', title: t('conntrack.customRule.id'), type: 'number', min: 1, max: 999999, required: true, help: t('conntrack.customRule.idHelp') },
+      { key: 'description', title: t('conntrack.customRule.description'), type: 'text' },
+      { key: 'protocol', title: t('conntrack.customRule.protocol'), type: 'select', options: PROTOCOL_OPTIONS, placeholder: t('conntrack.customRule.protocolPlaceholder') },
+      { key: 'inboundInterface', title: t('conntrack.customRule.inboundInterface'), type: 'text', placeholder: t('conntrack.customRule.inboundInterfacePlaceholder') },
+      { key: 'sourceAddress', title: t('conntrack.customRule.sourceAddress'), type: 'text', placeholder: t('conntrack.customRule.sourceAddressPlaceholder') },
+      { key: 'sourcePort', title: t('conntrack.customRule.sourcePort'), type: 'text', placeholder: t('conntrack.customRule.sourcePortPlaceholder') },
+      { key: 'destinationAddress', title: t('conntrack.customRule.destinationAddress'), type: 'text', placeholder: t('conntrack.customRule.destinationAddressPlaceholder') },
+      { key: 'destinationPort', title: t('conntrack.customRule.destinationPort'), type: 'text', placeholder: t('conntrack.customRule.destinationPortPlaceholder') },
+      { key: 'tcpClose', title: t('conntrack.customRule.tcpClose'), type: 'number', min: 1, max: 21474836, help: t('conntrack.customRule.tcpCloseHelp') },
+      { key: 'tcpCloseWait', title: t('conntrack.customRule.tcpCloseWait'), type: 'number', min: 1, max: 21474836, help: t('conntrack.customRule.tcpCloseWaitHelp') },
+      { key: 'tcpEstablished', title: t('conntrack.customRule.tcpEstablished'), type: 'number', min: 1, max: 21474836, help: t('conntrack.customRule.tcpEstablishedHelp') },
+      { key: 'tcpFinWait', title: t('conntrack.customRule.tcpFinWait'), type: 'number', min: 1, max: 21474836, help: t('conntrack.customRule.tcpFinWaitHelp') },
+      { key: 'tcpLastAck', title: t('conntrack.customRule.tcpLastAck'), type: 'number', min: 1, max: 21474836, help: t('conntrack.customRule.tcpLastAckHelp') },
+      { key: 'tcpSynRecv', title: t('conntrack.customRule.tcpSynRecv'), type: 'number', min: 1, max: 21474836, help: t('conntrack.customRule.tcpSynRecvHelp') },
+      { key: 'tcpSynSent', title: t('conntrack.customRule.tcpSynSent'), type: 'number', min: 1, max: 21474836, help: t('conntrack.customRule.tcpSynSentHelp') },
+      { key: 'tcpTimeWait', title: t('conntrack.customRule.tcpTimeWait'), type: 'number', min: 1, max: 21474836, help: t('conntrack.customRule.tcpTimeWaitHelp') },
+      { key: 'udpReplied', title: t('conntrack.customRule.udpReplied'), type: 'number', min: 1, max: 21474836, help: t('conntrack.customRule.udpRepliedHelp') },
+      { key: 'udpUnreplied', title: t('conntrack.customRule.udpUnreplied'), type: 'number', min: 1, max: 21474836, help: t('conntrack.customRule.udpUnrepliedHelp') },
     ]);
 
     async function load() {
@@ -354,7 +357,7 @@ export default defineComponent({
         modulesData.value.sqlnet = !!modules.sqlnet;
         modulesData.value.tftp = !!modules.tftp;
       } catch (e) {
-        showError('加载配置失败', e);
+        showError(t('conntrack.loadFailed'), e);
       } finally {
         loading.value = false;
       }
@@ -368,9 +371,10 @@ export default defineComponent({
         value['table-size'] = String(basicData.value.tableSize);
         if (basicData.value.flowAccounting) value['flow-accounting'] = '';
         await configStore.setConfig(path.value, value);
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError('保存基本设置失败', e);
+        showError(t('conntrack.saveBasicFailed'), e);
       }
     }
 
@@ -381,9 +385,10 @@ export default defineComponent({
         value.loose = tcpData.value.loose;
         value['max-retrans'] = String(tcpData.value.maxRetrans);
         await configStore.setConfig(`${path.value}/tcp`, value);
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError('保存 TCP 设置失败', e);
+        showError(t('conntrack.saveTcpFailed'), e);
       }
     }
 
@@ -411,9 +416,10 @@ export default defineComponent({
         if (logData.value.otherDestroy) other.destroy = '';
         if (Object.keys(other).length) value.other = other;
         await configStore.setConfig(`${path.value}/log`, value);
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError('保存日志设置失败', e);
+        showError(t('conntrack.saveLoggingFailed'), e);
       }
     }
 
@@ -429,9 +435,10 @@ export default defineComponent({
         if (modulesData.value.sqlnet) value.sqlnet = '';
         if (modulesData.value.tftp) value.tftp = '';
         await configStore.setConfig(`${path.value}/modules`, value);
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError('保存模块设置失败', e);
+        showError(t('conntrack.saveModuleFailed'), e);
       }
     }
 
@@ -481,17 +488,21 @@ export default defineComponent({
         }
         if (Object.keys(tcp).length) value.tcp = tcp;
         await configStore.setConfig(`${path.value}/ignore/ipv4/rule/${rule.id}`, value);
+        configStore.markPending();
         ignoreIpv4ModalVisible.value = false;
         await load();
-      } catch (e) { showError('保存忽略规则失败', e); }
+      } catch (e) { showError(t('conntrack.saveIgnoreRuleFailed'), e); }
     }
     async function deleteIgnoreIpv4() {
       if (!selectedIgnoreIpv4.value.length) return;
       try {
-        for (const id of selectedIgnoreIpv4.value) await configStore.deleteConfig(`${path.value}/ignore/ipv4/rule/${id}`);
+        for (const id of selectedIgnoreIpv4.value) {
+          await configStore.deleteConfig(`${path.value}/ignore/ipv4/rule/${id}`);
+          configStore.markPending();
+        }
         selectedIgnoreIpv4.value = [];
         await load();
-      } catch (e) { showError('删除忽略规则失败', e); }
+      } catch (e) { showError(t('conntrack.deleteIgnoreRuleFailed'), e); }
     }
     async function openIgnoreIpv6Modal(row) {
       editingIgnoreIpv6.value = row ? { ...row } : { id: 1, description: '', protocol: '', inboundInterface: '', sourceAddress: '', sourcePort: '', sourceAddressGroup: '', sourceDomainGroup: '', sourceNetworkGroup: '', sourcePortGroup: '', destinationAddress: '', destinationPort: '', destinationAddressGroup: '', destinationDomainGroup: '', destinationNetworkGroup: '', destinationMacGroup: '', destinationPortGroup: '', tcpFlags: [], tcpFlagsNot: [] };
@@ -538,17 +549,21 @@ export default defineComponent({
         }
         if (Object.keys(tcp).length) value.tcp = tcp;
         await configStore.setConfig(`${path.value}/ignore/ipv6/rule/${rule.id}`, value);
+        configStore.markPending();
         ignoreIpv6ModalVisible.value = false;
         await load();
-      } catch (e) { showError('保存忽略规则失败', e); }
+      } catch (e) { showError(t('conntrack.saveIgnoreRuleFailed'), e); }
     }
     async function deleteIgnoreIpv6() {
       if (!selectedIgnoreIpv6.value.length) return;
       try {
-        for (const id of selectedIgnoreIpv6.value) await configStore.deleteConfig(`${path.value}/ignore/ipv6/rule/${id}`);
+        for (const id of selectedIgnoreIpv6.value) {
+          await configStore.deleteConfig(`${path.value}/ignore/ipv6/rule/${id}`);
+          configStore.markPending();
+        }
         selectedIgnoreIpv6.value = [];
         await load();
-      } catch (e) { showError('删除忽略规则失败', e); }
+      } catch (e) { showError(t('conntrack.deleteIgnoreRuleFailed'), e); }
     }
 
     // Custom timeout handlers
@@ -588,17 +603,21 @@ export default defineComponent({
         if (Object.keys(udp).length) proto.udp = udp;
         if (Object.keys(proto).length) value.protocol = proto;
         await configStore.setConfig(`${path.value}/timeout/custom/ipv4/rule/${rule.id}`, value);
+        configStore.markPending();
         customIpv4ModalVisible.value = false;
         await load();
-      } catch (e) { showError('保存自定义超时规则失败', e); }
+      } catch (e) { showError(t('conntrack.saveTimeoutRuleFailed'), e); }
     }
     async function deleteCustomIpv4() {
       if (!selectedCustomIpv4.value.length) return;
       try {
-        for (const id of selectedCustomIpv4.value) await configStore.deleteConfig(`${path.value}/timeout/custom/ipv4/rule/${id}`);
+        for (const id of selectedCustomIpv4.value) {
+          await configStore.deleteConfig(`${path.value}/timeout/custom/ipv4/rule/${id}`);
+          configStore.markPending();
+        }
         selectedCustomIpv4.value = [];
         await load();
-      } catch (e) { showError('删除自定义超时规则失败', e); }
+      } catch (e) { showError(t('conntrack.deleteTimeoutRuleFailed'), e); }
     }
     async function openCustomIpv6Modal(row) {
       editingCustomIpv6.value = row ? { ...row } : { id: 1, description: '', protocol: '', inboundInterface: '', sourceAddress: '', sourcePort: '', destinationAddress: '', destinationPort: '' };
@@ -636,22 +655,27 @@ export default defineComponent({
         if (Object.keys(udp).length) proto.udp = udp;
         if (Object.keys(proto).length) value.protocol = proto;
         await configStore.setConfig(`${path.value}/timeout/custom/ipv6/rule/${rule.id}`, value);
+        configStore.markPending();
         customIpv6ModalVisible.value = false;
         await load();
-      } catch (e) { showError('保存自定义超时规则失败', e); }
+      } catch (e) { showError(t('conntrack.saveTimeoutRuleFailed'), e); }
     }
     async function deleteCustomIpv6() {
       if (!selectedCustomIpv6.value.length) return;
       try {
-        for (const id of selectedCustomIpv6.value) await configStore.deleteConfig(`${path.value}/timeout/custom/ipv6/rule/${id}`);
+        for (const id of selectedCustomIpv6.value) {
+          await configStore.deleteConfig(`${path.value}/timeout/custom/ipv6/rule/${id}`);
+          configStore.markPending();
+        }
         selectedCustomIpv6.value = [];
         await load();
-      } catch (e) { showError('删除自定义超时规则失败', e); }
+      } catch (e) { showError(t('conntrack.deleteTimeoutRuleFailed'), e); }
     }
 
-    onMounted(load);
+    onMounted(() => { load(); onMenuRefresh(load); });
 
-    return {
+    return {t,
+      
       TABS, activeTab, loading, writeDisabled, path,
       basicData, basicSchema, saveBasic,
       tcpData, tcpSchema, saveTcp,
@@ -676,7 +700,7 @@ export default defineComponent({
         <template #basic>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">基本设置</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ $t('conntrack.tabs.basic') }}</div>
               <div style="padding:16px;">
                 <ConfigForm v-model="basicData" :schema="basicSchema" :disabled="writeDisabled" :showAdvanced="true" />
               </div>
@@ -687,7 +711,7 @@ export default defineComponent({
         <template #tcp>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">TCP 选项</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ $t('conntrack.tabs.tcp') }}</div>
               <div style="padding:16px;">
                 <ConfigForm v-model="tcpData" :schema="tcpSchema" :disabled="writeDisabled" :showAdvanced="true" />
               </div>
@@ -698,26 +722,26 @@ export default defineComponent({
         <template #timeout>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden; margin-bottom:16px;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">自定义超时规则 - IPv4</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ $t('conntrack.customRulesIpv4') }}</div>
               <div style="padding:16px;">
                 <div class="toolbar toolbar-compact" style="margin-bottom:8px;">
                   <div class="toolbar-left">
-                    <ToolbarButton icon="create" @click="openCustomIpv4Modal(null)">创建</ToolbarButton>
-                    <ToolbarButton icon="edit" :disabled="selectedCustomIpv4.length !== 1" @click="openCustomIpv4Modal(customIpv4Rules.find(r => r.id === selectedCustomIpv4[0]))">编辑</ToolbarButton>
-                    <ToolbarButton icon="delete" :disabled="!selectedCustomIpv4.length" @click="deleteCustomIpv4">删除</ToolbarButton>
+                    <ToolbarButton icon="create" @click="openCustomIpv4Modal(null)">{{ $t('app.create') }}</ToolbarButton>
+                    <ToolbarButton icon="edit" :disabled="selectedCustomIpv4.length !== 1" @click="openCustomIpv4Modal(customIpv4Rules.find(r => r.id === selectedCustomIpv4[0]))">{{ $t('app.edit') }}</ToolbarButton>
+                    <ToolbarButton icon="delete" :disabled="!selectedCustomIpv4.length" @click="deleteCustomIpv4">{{ $t('app.delete') }}</ToolbarButton>
                   </div>
                 </div>
                 <DataTable :columns="customColumns" :data="customIpv4Rules" v-model:selectedRowKeys="selectedCustomIpv4" row-key="id" :selectable="true" :externalToolbar="true" />
               </div>
             </div>
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">自定义超时规则 - IPv6</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ $t('conntrack.customRulesIpv6') }}</div>
               <div style="padding:16px;">
                 <div class="toolbar toolbar-compact" style="margin-bottom:8px;">
                   <div class="toolbar-left">
-                    <ToolbarButton icon="create" @click="openCustomIpv6Modal(null)">创建</ToolbarButton>
-                    <ToolbarButton icon="edit" :disabled="selectedCustomIpv6.length !== 1" @click="openCustomIpv6Modal(customIpv6Rules.find(r => r.id === selectedCustomIpv6[0]))">编辑</ToolbarButton>
-                    <ToolbarButton icon="delete" :disabled="!selectedCustomIpv6.length" @click="deleteCustomIpv6">删除</ToolbarButton>
+                    <ToolbarButton icon="create" @click="openCustomIpv6Modal(null)">{{ $t('app.create') }}</ToolbarButton>
+                    <ToolbarButton icon="edit" :disabled="selectedCustomIpv6.length !== 1" @click="openCustomIpv6Modal(customIpv6Rules.find(r => r.id === selectedCustomIpv6[0]))">{{ $t('app.edit') }}</ToolbarButton>
+                    <ToolbarButton icon="delete" :disabled="!selectedCustomIpv6.length" @click="deleteCustomIpv6">{{ $t('app.delete') }}</ToolbarButton>
                   </div>
                 </div>
                 <DataTable :columns="customColumns" :data="customIpv6Rules" v-model:selectedRowKeys="selectedCustomIpv6" row-key="id" :selectable="true" :externalToolbar="true" />
@@ -729,26 +753,26 @@ export default defineComponent({
         <template #ignore>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden; margin-bottom:16px;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">忽略规则 - IPv4</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ $t('conntrack.ignoreRulesIpv4') }}</div>
               <div style="padding:16px;">
                 <div class="toolbar toolbar-compact" style="margin-bottom:8px;">
                   <div class="toolbar-left">
-                    <ToolbarButton icon="create" @click="openIgnoreIpv4Modal(null)">创建</ToolbarButton>
-                    <ToolbarButton icon="edit" :disabled="selectedIgnoreIpv4.length !== 1" @click="openIgnoreIpv4Modal(ignoreIpv4Rules.find(r => r.id === selectedIgnoreIpv4[0]))">编辑</ToolbarButton>
-                    <ToolbarButton icon="delete" :disabled="!selectedIgnoreIpv4.length" @click="deleteIgnoreIpv4">删除</ToolbarButton>
+                    <ToolbarButton icon="create" @click="openIgnoreIpv4Modal(null)">{{ $t('app.create') }}</ToolbarButton>
+                    <ToolbarButton icon="edit" :disabled="selectedIgnoreIpv4.length !== 1" @click="openIgnoreIpv4Modal(ignoreIpv4Rules.find(r => r.id === selectedIgnoreIpv4[0]))">{{ $t('app.edit') }}</ToolbarButton>
+                    <ToolbarButton icon="delete" :disabled="!selectedIgnoreIpv4.length" @click="deleteIgnoreIpv4">{{ $t('app.delete') }}</ToolbarButton>
                   </div>
                 </div>
                 <DataTable :columns="ignoreColumns" :data="ignoreIpv4Rules" v-model:selectedRowKeys="selectedIgnoreIpv4" row-key="id" :selectable="true" :externalToolbar="true" />
               </div>
             </div>
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">忽略规则 - IPv6</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ $t('conntrack.ignoreRulesIpv6') }}</div>
               <div style="padding:16px;">
                 <div class="toolbar toolbar-compact" style="margin-bottom:8px;">
                   <div class="toolbar-left">
-                    <ToolbarButton icon="create" @click="openIgnoreIpv6Modal(null)">创建</ToolbarButton>
-                    <ToolbarButton icon="edit" :disabled="selectedIgnoreIpv6.length !== 1" @click="openIgnoreIpv6Modal(ignoreIpv6Rules.find(r => r.id === selectedIgnoreIpv6[0]))">编辑</ToolbarButton>
-                    <ToolbarButton icon="delete" :disabled="!selectedIgnoreIpv6.length" @click="deleteIgnoreIpv6">删除</ToolbarButton>
+                    <ToolbarButton icon="create" @click="openIgnoreIpv6Modal(null)">{{ $t('app.create') }}</ToolbarButton>
+                    <ToolbarButton icon="edit" :disabled="selectedIgnoreIpv6.length !== 1" @click="openIgnoreIpv6Modal(ignoreIpv6Rules.find(r => r.id === selectedIgnoreIpv6[0]))">{{ $t('app.edit') }}</ToolbarButton>
+                    <ToolbarButton icon="delete" :disabled="!selectedIgnoreIpv6.length" @click="deleteIgnoreIpv6">{{ $t('app.delete') }}</ToolbarButton>
                   </div>
                 </div>
                 <DataTable :columns="ignoreColumns" :data="ignoreIpv6Rules" v-model:selectedRowKeys="selectedIgnoreIpv6" row-key="id" :selectable="true" :externalToolbar="true" />
@@ -760,7 +784,7 @@ export default defineComponent({
         <template #log>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">日志设置</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ $t('conntrack.tabs.log') }}</div>
               <div style="padding:16px;">
                 <ConfigForm v-model="logData" :schema="logSchema" :disabled="writeDisabled" :showAdvanced="true" />
               </div>
@@ -771,7 +795,7 @@ export default defineComponent({
         <template #modules>
           <div style="padding:16px;">
             <div style="border:1px solid #d9d9d9; border-radius:4px; overflow:hidden;">
-              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">模块</div>
+              <div style="background:#f5f5f5; padding:10px 16px; font-weight:bold; font-size:14px; border-bottom:1px solid #d9d9d9;">{{ $t('conntrack.tabs.modules') }}</div>
               <div style="padding:16px;">
                 <ConfigForm v-model="modulesData" :schema="modulesSchema" :disabled="writeDisabled" :showAdvanced="true" />
               </div>
@@ -781,43 +805,36 @@ export default defineComponent({
 
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton v-if="activeTab === 'basic'" icon="save" primary @click="saveBasic" :disabled="writeDisabled">保存</ToolbarButton>
-        <ToolbarButton v-if="activeTab === 'tcp'" icon="save" primary @click="saveTcp" :disabled="writeDisabled">保存</ToolbarButton>
-        <ToolbarButton v-if="activeTab === 'log'" icon="save" primary @click="saveLog" :disabled="writeDisabled">保存</ToolbarButton>
-        <ToolbarButton v-if="activeTab === 'modules'" icon="save" primary @click="saveModules" :disabled="writeDisabled">保存</ToolbarButton>
-      </div>
-
       <!-- Modals -->
-      <DraggableModal v-model:visible="ignoreIpv4ModalVisible" title="忽略规则 - IPv4" width="600px">
+      <DraggableModal v-model:visible="ignoreIpv4ModalVisible" :title="$t('conntrack.ignoreRulesIpv4')" width="600px">
         <ConfigForm v-model="editingIgnoreIpv4" :schema="ignoreRuleSchema" :showAdvanced="true" />
         <template #footer>
-          <button @click="ignoreIpv4ModalVisible = false">取消</button>
-          <button class="btn-primary" @click="saveIgnoreIpv4">确定</button>
+          <button @click="ignoreIpv4ModalVisible = false">{{ $t('app.cancel') }}</button>
+          <button class="btn-primary" @click="saveIgnoreIpv4">{{ $t('app.confirm') }}</button>
         </template>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="ignoreIpv6ModalVisible" title="忽略规则 - IPv6" width="600px">
+      <DraggableModal v-model:visible="ignoreIpv6ModalVisible" :title="$t('conntrack.ignoreRulesIpv6')" width="600px">
         <ConfigForm v-model="editingIgnoreIpv6" :schema="ignoreRuleSchema" :showAdvanced="true" />
         <template #footer>
-          <button @click="ignoreIpv6ModalVisible = false">取消</button>
-          <button class="btn-primary" @click="saveIgnoreIpv6">确定</button>
+          <button @click="ignoreIpv6ModalVisible = false">{{ $t('app.cancel') }}</button>
+          <button class="btn-primary" @click="saveIgnoreIpv6">{{ $t('app.confirm') }}</button>
         </template>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="customIpv4ModalVisible" title="自定义超时规则 - IPv4" width="700px">
+      <DraggableModal v-model:visible="customIpv4ModalVisible" :title="$t('conntrack.customRulesIpv4')" width="700px">
         <ConfigForm v-model="editingCustomIpv4" :schema="customRuleSchema" :showAdvanced="true" />
         <template #footer>
-          <button @click="customIpv4ModalVisible = false">取消</button>
-          <button class="btn-primary" @click="saveCustomIpv4">确定</button>
+          <button @click="customIpv4ModalVisible = false">{{ $t('app.cancel') }}</button>
+          <button class="btn-primary" @click="saveCustomIpv4">{{ $t('app.confirm') }}</button>
         </template>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="customIpv6ModalVisible" title="自定义超时规则 - IPv6" width="700px">
+      <DraggableModal v-model:visible="customIpv6ModalVisible" :title="$t('conntrack.customRulesIpv6')" width="700px">
         <ConfigForm v-model="editingCustomIpv6" :schema="customRuleSchema" :showAdvanced="true" />
         <template #footer>
-          <button @click="customIpv6ModalVisible = false">取消</button>
-          <button class="btn-primary" @click="saveCustomIpv6">确定</button>
+          <button @click="customIpv6ModalVisible = false">{{ $t('app.cancel') }}</button>
+          <button class="btn-primary" @click="saveCustomIpv6">{{ $t('app.confirm') }}</button>
         </template>
       </DraggableModal>
 

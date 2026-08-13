@@ -1,0 +1,2858 @@
+{
+  "zh-CN": {
+    "haproxy": {
+      "tabs": {
+        "global": "全局参数",
+        "timeout": "超时设置",
+        "backends": "后端服务器",
+        "services": "前端服务"
+      },
+      "common": {
+        "notSet": "未设置",
+        "yes": "是",
+        "exact": "精确匹配",
+        "begin": "开头匹配",
+        "end": "结尾匹配"
+      },
+      "columns": {
+        "name": "名称",
+        "description": "描述",
+        "mode": "模式",
+        "balance": "负载均衡算法",
+        "serverCount": "服务器数量",
+        "actions": "操作",
+        "address": "地址",
+        "port": "端口",
+        "backup": "备份",
+        "check": "健康检查",
+        "checkPort": "检查端口",
+        "proxy": "代理协议",
+        "rule": "规则",
+        "domainName": "域名",
+        "urlPath": "URL 路径",
+        "setServer": "设置服务器",
+        "setRedirect": "设置重定向",
+        "setBackend": "设置后端",
+        "listenAddress": "监听地址",
+        "backend": "后端"
+      },
+      "buttons": {
+        "edit": "编辑",
+        "delete": "删除"
+      },
+      "messages": {
+        "saveFailed": "保存失败: ",
+        "backendNameRequired": "请输入后端名称",
+        "serverNameRequired": "请输入服务器名称",
+        "serviceNameRequired": "请输入服务名称"
+      },
+      "preview": {
+        "noConfig": "未配置任何参数"
+      },
+      "global": {
+        "maxConnections": {
+          "title": "最大连接数",
+          "label": "最大连接数",
+          "help": "HAProxy 可以接受的最大并发连接数 (1-2000000)"
+        },
+        "tlsVersionMin": {
+          "title": "最低 TLS 版本",
+          "label": "最低 TLS 版本",
+          "help": "允许的最低 TLS 协议版本"
+        },
+        "sslCiphers": {
+          "title": "SSL 密码套件",
+          "label": "SSL 密码套件",
+          "placeholder": "每行一个密码套件",
+          "help": "允许的 SSL 密码套件列表（每行一个）"
+        },
+        "loggingFacility": {
+          "title": "日志设施",
+          "label": "日志设施",
+          "help": "Syslog 日志设施"
+        },
+        "loggingLevel": {
+          "title": "日志级别",
+          "label": "日志级别",
+          "help": "Syslog 日志级别"
+        }
+      },
+      "timeout": {
+        "client": {
+          "title": "客户端超时",
+          "label": "客户端超时 (秒)",
+          "help": "客户端非活动超时时间 (1-3600 秒)"
+        },
+        "connect": {
+          "title": "连接超时",
+          "label": "连接超时 (秒)",
+          "help": "连接到后端服务器超时时间 (1-3600 秒)"
+        },
+        "server": {
+          "title": "服务器超时",
+          "label": "服务器超时 (秒)",
+          "help": "服务器非活动超时时间 (1-3600 秒)"
+        },
+        "check": {
+          "title": "检查超时",
+          "label": "检查超时 (秒)",
+          "help": "健康检查超时时间 (1-3600 秒)"
+        }
+      },
+      "modal": {
+        "backend": {
+          "title": "后端服务器",
+          "tabs": {
+            "basic": "基本设置",
+            "servers": "服务器列表",
+            "health": "健康检查",
+            "rules": "规则"
+          },
+          "basic": {
+            "name": {
+              "title": "名称",
+              "label": "名称",
+              "help": "后端服务器的唯一标识名称"
+            },
+            "description": {
+              "title": "描述",
+              "label": "描述",
+              "help": "后端服务器的描述信息"
+            },
+            "mode": {
+              "title": "模式",
+              "label": "模式",
+              "help": "HTTP 模式会检查 HTTP 协议，TCP 模式透传流量"
+            },
+            "balance": {
+              "title": "负载均衡算法",
+              "label": "负载均衡算法",
+              "roundRobin": "轮询",
+              "leastConnection": "最少连接",
+              "sourceAddress": "源地址哈希",
+              "help": "选择分发流量的算法"
+            },
+            "healthCheck": {
+              "title": "健康检查类型",
+              "label": "健康检查类型",
+              "help": "用于检查服务器健康状态的协议"
+            },
+            "loggingFacility": {
+              "title": "日志设施",
+              "label": "日志设施",
+              "help": "此后端的 Syslog 日志设施"
+            },
+            "loggingLevel": {
+              "title": "日志级别",
+              "label": "日志级别",
+              "help": "此后端的 Syslog 日志级别"
+            },
+            "caCert": {
+              "title": "CA 证书",
+              "label": "CA 证书",
+              "placeholder": "CA 证书名称",
+              "help": "用于验证服务器证书的 CA 证书"
+            },
+            "sslNoVerify": {
+              "title": "不验证 SSL",
+              "label": "不验证 SSL 证书",
+              "help": "跳过服务器 SSL 证书验证"
+            },
+            "timeoutConnect": {
+              "title": "连接超时",
+              "label": "连接超时 (秒)",
+              "help": "连接到此后端的超时时间 (1-3600 秒)"
+            },
+            "timeoutServer": {
+              "title": "服务器超时",
+              "label": "服务器超时 (秒)",
+              "help": "此后端的服务器响应超时时间 (1-3600 秒)"
+            },
+            "timeoutCheck": {
+              "title": "检查超时",
+              "label": "检查超时 (秒)",
+              "help": "此后端健康检查的超时时间 (1-3600 秒)"
+            }
+          },
+          "health": {
+            "checkMethod": {
+              "title": "HTTP 检查方法",
+              "label": "HTTP 检查方法",
+              "help": "用于健康检查的 HTTP 方法"
+            },
+            "checkUri": {
+              "title": "检查 URI",
+              "label": "检查 URI",
+              "placeholder": "例如: /health",
+              "help": "用于健康检查的 URI 路径"
+            },
+            "expectStatus": {
+              "title": "期望状态码",
+              "label": "期望状态码",
+              "placeholder": "例如: 200",
+              "help": "期望的 HTTP 响应状态码"
+            },
+            "expectString": {
+              "title": "期望内容",
+              "label": "期望内容",
+              "help": "期望在响应中包含的字符串"
+            }
+          }
+        },
+        "server": {
+          "title": "服务器",
+          "name": {
+            "label": "名称",
+            "help": "服务器的唯一标识名称"
+          },
+          "address": {
+            "label": "地址",
+            "placeholder": "例如: 192.168.1.100",
+            "help": "服务器的 IP 地址或主机名"
+          },
+          "port": {
+            "label": "端口",
+            "help": "服务器的端口号 (1-65535)"
+          },
+          "backup": {
+            "label": "备份服务器",
+            "help": "仅在主服务器全部不可用时使用"
+          },
+          "check": {
+            "label": "启用健康检查",
+            "help": "对此服务器执行健康检查"
+          },
+          "checkPort": {
+            "label": "检查端口",
+            "help": "健康检查使用的端口（默认使用服务器端口）"
+          },
+          "sendProxy": {
+            "label": "发送 Proxy 协议 v1",
+            "help": "使用 PROXY 协议 v1 发送客户端信息"
+          },
+          "sendProxyV2": {
+            "label": "发送 Proxy 协议 v2",
+            "help": "使用 PROXY 协议 v2 发送客户端信息"
+          }
+        },
+        "backendRule": {
+          "title": "后端规则",
+          "ruleNumber": {
+            "label": "规则编号",
+            "help": "规则的执行顺序编号"
+          },
+          "domainName": {
+            "label": "域名",
+            "placeholder": "每行一个域名",
+            "help": "匹配的域名列表（每行一个）"
+          },
+          "urlPathExact": {
+            "label": "精确 URL 路径",
+            "placeholder": "每行一个路径",
+            "help": "精确匹配的 URL 路径（每行一个）"
+          },
+          "urlPathBegin": {
+            "label": "URL 路径前缀",
+            "placeholder": "每行一个前缀",
+            "help": "匹配开头的 URL 路径（每行一个）"
+          },
+          "urlPathEnd": {
+            "label": "URL 路径后缀",
+            "placeholder": "每行一个后缀",
+            "help": "匹配结尾的 URL 路径（每行一个）"
+          },
+          "setServer": {
+            "label": "设置服务器",
+            "help": "将请求转发到的服务器名称"
+          },
+          "redirectUrl": {
+            "label": "重定向 URL",
+            "help": "重定向到的 URL 地址"
+          }
+        },
+        "service": {
+          "title": "前端服务",
+          "tabs": {
+            "basic": "基本设置",
+            "ssl": "SSL",
+            "rules": "规则",
+            "compression": "压缩"
+          },
+          "basic": {
+            "name": {
+              "title": "名称",
+              "label": "名称",
+              "help": "前端服务的唯一标识名称"
+            },
+            "description": {
+              "title": "描述",
+              "label": "描述",
+              "help": "前端服务的描述信息"
+            },
+            "mode": {
+              "title": "模式",
+              "label": "模式",
+              "help": "HTTP 模式会解析 HTTP 协议，TCP 模式透传流量"
+            },
+            "port": {
+              "title": "端口",
+              "label": "监听端口",
+              "help": "服务监听的端口号 (1-65535)"
+            },
+            "listenAddress": {
+              "title": "监听地址",
+              "label": "监听地址",
+              "placeholder": "每行一个 IP 地址",
+              "help": "服务监听的 IP 地址（每行一个，留空表示监听所有地址）"
+            },
+            "acceptProxy": {
+              "title": "接受 Proxy 协议",
+              "label": "接受 Proxy 协议",
+              "help": "接受 PROXY 协议获取客户端真实 IP"
+            },
+            "backend": {
+              "title": "关联后端",
+              "label": "关联后端",
+              "placeholder": "每行一个后端名称",
+              "help": "关联的后端服务器组（每行一个）"
+            },
+            "redirectHttp": {
+              "title": "重定向 HTTP 到 HTTPS",
+              "label": "重定向 HTTP 到 HTTPS",
+              "help": "自动将 HTTP 请求重定向到 HTTPS"
+            },
+            "inspectDelay": {
+              "title": "TCP 检查延迟",
+              "label": "TCP 检查延迟 (毫秒)",
+              "help": "TCP 内容检查的延迟时间 (1-65535 毫秒)"
+            },
+            "timeoutClient": {
+              "title": "客户端超时",
+              "label": "客户端超时 (秒)",
+              "help": "客户端非活动超时时间 (1-3600 秒)"
+            },
+            "loggingFacility": {
+              "title": "日志设施",
+              "label": "日志设施",
+              "help": "此服务的 Syslog 日志设施"
+            },
+            "loggingLevel": {
+              "title": "日志级别",
+              "label": "日志级别",
+              "help": "此服务的 Syslog 日志级别"
+            }
+          },
+          "ssl": {
+            "certificate": {
+              "title": "SSL 证书",
+              "label": "SSL 证书",
+              "placeholder": "每行一个证书名称",
+              "help": "用于此服务的 SSL 证书（每行一个）"
+            }
+          },
+          "compression": {
+            "algorithm": {
+              "title": "压缩算法",
+              "label": "压缩算法",
+              "help": "HTTP 响应压缩算法"
+            },
+            "mimeTypes": {
+              "title": "MIME 类型",
+              "label": "MIME 类型",
+              "placeholder": "每行一个 MIME 类型",
+              "help": "需要压缩的 MIME 类型（每行一个）"
+            }
+          }
+        },
+        "serviceRule": {
+          "title": "服务规则",
+          "ruleNumber": {
+            "label": "规则编号",
+            "help": "规则的执行顺序编号"
+          },
+          "domainName": {
+            "label": "域名",
+            "placeholder": "每行一个域名",
+            "help": "匹配的域名列表（每行一个）"
+          },
+          "urlPathExact": {
+            "label": "精确 URL 路径",
+            "placeholder": "每行一个路径",
+            "help": "精确匹配的 URL 路径（每行一个）"
+          },
+          "urlPathBegin": {
+            "label": "URL 路径前缀",
+            "placeholder": "每行一个前缀",
+            "help": "匹配开头的 URL 路径（每行一个）"
+          },
+          "urlPathEnd": {
+            "label": "URL 路径后缀",
+            "placeholder": "每行一个后缀",
+            "help": "匹配结尾的 URL 路径（每行一个）"
+          },
+          "setBackend": {
+            "label": "设置后端",
+            "help": "将请求转发到的后端名称"
+          },
+          "redirectUrl": {
+            "label": "重定向 URL",
+            "help": "重定向到的 URL 地址"
+          }
+        },
+        "confirmDelete": {
+          "title": "确认删除",
+          "backendMessage": "确认删除此后端服务器？",
+          "serviceMessage": "确认删除此前端服务？"
+        }
+      }
+    }
+  },
+  "en": {
+    "haproxy": {
+      "tabs": {
+        "global": "Global",
+        "timeout": "Timeout",
+        "backends": "Backends",
+        "services": "Services"
+      },
+      "common": {
+        "notSet": "Not Set",
+        "yes": "Yes",
+        "exact": "Exact",
+        "begin": "Begin",
+        "end": "End"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "mode": "Mode",
+        "balance": "Balance",
+        "serverCount": "Servers",
+        "actions": "Actions",
+        "address": "Address",
+        "port": "Port",
+        "backup": "Backup",
+        "check": "Check",
+        "checkPort": "Check Port",
+        "proxy": "Proxy",
+        "rule": "Rule",
+        "domainName": "Domain",
+        "urlPath": "URL Path",
+        "setServer": "Set Server",
+        "setRedirect": "Set Redirect",
+        "setBackend": "Set Backend",
+        "listenAddress": "Listen Address",
+        "backend": "Backend"
+      },
+      "buttons": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "messages": {
+        "saveFailed": "Save failed: ",
+        "backendNameRequired": "Please enter backend name",
+        "serverNameRequired": "Please enter server name",
+        "serviceNameRequired": "Please enter service name"
+      },
+      "preview": {
+        "noConfig": "No parameters configured"
+      },
+      "global": {
+        "maxConnections": {
+          "title": "Max Connections",
+          "label": "Max Connections",
+          "help": "Maximum concurrent connections HAProxy can accept (1-2000000)"
+        },
+        "tlsVersionMin": {
+          "title": "Minimum TLS Version",
+          "label": "Minimum TLS Version",
+          "help": "Minimum allowed TLS protocol version"
+        },
+        "sslCiphers": {
+          "title": "SSL Ciphers",
+          "label": "SSL Ciphers",
+          "placeholder": "One cipher per line",
+          "help": "List of allowed SSL ciphers (one per line)"
+        },
+        "loggingFacility": {
+          "title": "Logging Facility",
+          "label": "Logging Facility",
+          "help": "Syslog logging facility"
+        },
+        "loggingLevel": {
+          "title": "Logging Level",
+          "label": "Logging Level",
+          "help": "Syslog logging level"
+        }
+      },
+      "timeout": {
+        "client": {
+          "title": "Client Timeout",
+          "label": "Client Timeout (sec)",
+          "help": "Client inactivity timeout (1-3600 seconds)"
+        },
+        "connect": {
+          "title": "Connect Timeout",
+          "label": "Connect Timeout (sec)",
+          "help": "Backend connection timeout (1-3600 seconds)"
+        },
+        "server": {
+          "title": "Server Timeout",
+          "label": "Server Timeout (sec)",
+          "help": "Server inactivity timeout (1-3600 seconds)"
+        },
+        "check": {
+          "title": "Check Timeout",
+          "label": "Check Timeout (sec)",
+          "help": "Health check timeout (1-3600 seconds)"
+        }
+      },
+      "modal": {
+        "backend": {
+          "title": "Backend Server",
+          "tabs": {
+            "basic": "Basic",
+            "servers": "Servers",
+            "health": "Health Check",
+            "rules": "Rules"
+          },
+          "basic": {
+            "name": {
+              "title": "Name",
+              "label": "Name",
+              "help": "Unique identifier name for the backend"
+            },
+            "description": {
+              "title": "Description",
+              "label": "Description",
+              "help": "Description of the backend server"
+            },
+            "mode": {
+              "title": "Mode",
+              "label": "Mode",
+              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+            },
+            "balance": {
+              "title": "Balance Algorithm",
+              "label": "Balance Algorithm",
+              "roundRobin": "Round Robin",
+              "leastConnection": "Least Connection",
+              "sourceAddress": "Source Address Hash",
+              "help": "Algorithm for distributing traffic"
+            },
+            "healthCheck": {
+              "title": "Health Check Type",
+              "label": "Health Check Type",
+              "help": "Protocol used to check server health"
+            },
+            "loggingFacility": {
+              "title": "Logging Facility",
+              "label": "Logging Facility",
+              "help": "Syslog logging facility for this backend"
+            },
+            "loggingLevel": {
+              "title": "Logging Level",
+              "label": "Logging Level",
+              "help": "Syslog logging level for this backend"
+            },
+            "caCert": {
+              "title": "CA Certificate",
+              "label": "CA Certificate",
+              "placeholder": "CA certificate name",
+              "help": "CA certificate for verifying server certificates"
+            },
+            "sslNoVerify": {
+              "title": "No SSL Verify",
+              "label": "Skip SSL Verification",
+              "help": "Skip server SSL certificate verification"
+            },
+            "timeoutConnect": {
+              "title": "Connect Timeout",
+              "label": "Connect Timeout (sec)",
+              "help": "Timeout for connecting to this backend (1-3600 seconds)"
+            },
+            "timeoutServer": {
+              "title": "Server Timeout",
+              "label": "Server Timeout (sec)",
+              "help": "Server response timeout for this backend (1-3600 seconds)"
+            },
+            "timeoutCheck": {
+              "title": "Check Timeout",
+              "label": "Check Timeout (sec)",
+              "help": "Health check timeout for this backend (1-3600 seconds)"
+            }
+          },
+          "health": {
+            "checkMethod": {
+              "title": "HTTP Check Method",
+              "label": "HTTP Check Method",
+              "help": "HTTP method used for health checks"
+            },
+            "checkUri": {
+              "title": "Check URI",
+              "label": "Check URI",
+              "placeholder": "e.g., /health",
+              "help": "URI path used for health checks"
+            },
+            "expectStatus": {
+              "title": "Expected Status",
+              "label": "Expected Status",
+              "placeholder": "e.g., 200",
+              "help": "Expected HTTP response status code"
+            },
+            "expectString": {
+              "title": "Expected Content",
+              "label": "Expected Content",
+              "help": "String expected to be found in the response"
+            }
+          }
+        },
+        "server": {
+          "title": "Server",
+          "name": {
+            "label": "Name",
+            "help": "Unique identifier name for the server"
+          },
+          "address": {
+            "label": "Address",
+            "placeholder": "e.g., 192.168.1.100",
+            "help": "Server IP address or hostname"
+          },
+          "port": {
+            "label": "Port",
+            "help": "Server port number (1-65535)"
+          },
+          "backup": {
+            "label": "Backup Server",
+            "help": "Only used when all primary servers are unavailable"
+          },
+          "check": {
+            "label": "Enable Health Check",
+            "help": "Perform health checks on this server"
+          },
+          "checkPort": {
+            "label": "Check Port",
+            "help": "Port used for health checks (defaults to server port)"
+          },
+          "sendProxy": {
+            "label": "Send Proxy Protocol v1",
+            "help": "Send client information using PROXY protocol v1"
+          },
+          "sendProxyV2": {
+            "label": "Send Proxy Protocol v2",
+            "help": "Send client information using PROXY protocol v2"
+          }
+        },
+        "backendRule": {
+          "title": "Backend Rule",
+          "ruleNumber": {
+            "label": "Rule Number",
+            "help": "Execution order number for the rule"
+          },
+          "domainName": {
+            "label": "Domain Name",
+            "placeholder": "One domain per line",
+            "help": "List of domains to match (one per line)"
+          },
+          "urlPathExact": {
+            "label": "Exact URL Path",
+            "placeholder": "One path per line",
+            "help": "URL paths to match exactly (one per line)"
+          },
+          "urlPathBegin": {
+            "label": "URL Path Prefix",
+            "placeholder": "One prefix per line",
+            "help": "URL paths to match by prefix (one per line)"
+          },
+          "urlPathEnd": {
+            "label": "URL Path Suffix",
+            "placeholder": "One suffix per line",
+            "help": "URL paths to match by suffix (one per line)"
+          },
+          "setServer": {
+            "label": "Set Server",
+            "help": "Server name to forward requests to"
+          },
+          "redirectUrl": {
+            "label": "Redirect URL",
+            "help": "URL address to redirect to"
+          }
+        },
+        "service": {
+          "title": "Frontend Service",
+          "tabs": {
+            "basic": "Basic",
+            "ssl": "SSL",
+            "rules": "Rules",
+            "compression": "Compression"
+          },
+          "basic": {
+            "name": {
+              "title": "Name",
+              "label": "Name",
+              "help": "Unique identifier name for the frontend service"
+            },
+            "description": {
+              "title": "Description",
+              "label": "Description",
+              "help": "Description of the frontend service"
+            },
+            "mode": {
+              "title": "Mode",
+              "label": "Mode",
+              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+            },
+            "port": {
+              "title": "Port",
+              "label": "Listen Port",
+              "help": "Port number the service listens on (1-65535)"
+            },
+            "listenAddress": {
+              "title": "Listen Address",
+              "label": "Listen Address",
+              "placeholder": "One IP address per line",
+              "help": "IP addresses to listen on (one per line, empty means all addresses)"
+            },
+            "acceptProxy": {
+              "title": "Accept Proxy Protocol",
+              "label": "Accept Proxy Protocol",
+              "help": "Accept PROXY protocol to get real client IP"
+            },
+            "backend": {
+              "title": "Associated Backends",
+              "label": "Associated Backends",
+              "placeholder": "One backend name per line",
+              "help": "Associated backend server groups (one per line)"
+            },
+            "redirectHttp": {
+              "title": "Redirect HTTP to HTTPS",
+              "label": "Redirect HTTP to HTTPS",
+              "help": "Automatically redirect HTTP requests to HTTPS"
+            },
+            "inspectDelay": {
+              "title": "TCP Inspect Delay",
+              "label": "TCP Inspect Delay (ms)",
+              "help": "Delay for TCP content inspection (1-65535 milliseconds)"
+            },
+            "timeoutClient": {
+              "title": "Client Timeout",
+              "label": "Client Timeout (sec)",
+              "help": "Client inactivity timeout (1-3600 seconds)"
+            },
+            "loggingFacility": {
+              "title": "Logging Facility",
+              "label": "Logging Facility",
+              "help": "Syslog logging facility for this service"
+            },
+            "loggingLevel": {
+              "title": "Logging Level",
+              "label": "Logging Level",
+              "help": "Syslog logging level for this service"
+            }
+          },
+          "ssl": {
+            "certificate": {
+              "title": "SSL Certificate",
+              "label": "SSL Certificate",
+              "placeholder": "One certificate name per line",
+              "help": "SSL certificates for this service (one per line)"
+            }
+          },
+          "compression": {
+            "algorithm": {
+              "title": "Compression Algorithm",
+              "label": "Compression Algorithm",
+              "help": "HTTP response compression algorithm"
+            },
+            "mimeTypes": {
+              "title": "MIME Types",
+              "label": "MIME Types",
+              "placeholder": "One MIME type per line",
+              "help": "MIME types to compress (one per line)"
+            }
+          }
+        },
+        "serviceRule": {
+          "title": "Service Rule",
+          "ruleNumber": {
+            "label": "Rule Number",
+            "help": "Execution order number for the rule"
+          },
+          "domainName": {
+            "label": "Domain Name",
+            "placeholder": "One domain per line",
+            "help": "List of domains to match (one per line)"
+          },
+          "urlPathExact": {
+            "label": "Exact URL Path",
+            "placeholder": "One path per line",
+            "help": "URL paths to match exactly (one per line)"
+          },
+          "urlPathBegin": {
+            "label": "URL Path Prefix",
+            "placeholder": "One prefix per line",
+            "help": "URL paths to match by prefix (one per line)"
+          },
+          "urlPathEnd": {
+            "label": "URL Path Suffix",
+            "placeholder": "One suffix per line",
+            "help": "URL paths to match by suffix (one per line)"
+          },
+          "setBackend": {
+            "label": "Set Backend",
+            "help": "Backend name to forward requests to"
+          },
+          "redirectUrl": {
+            "label": "Redirect URL",
+            "help": "URL address to redirect to"
+          }
+        },
+        "confirmDelete": {
+          "title": "Confirm Delete",
+          "backendMessage": "Confirm delete this backend server?",
+          "serviceMessage": "Confirm delete this frontend service?"
+        }
+      }
+    }
+  },
+  "zh-TW": {
+    "haproxy": {
+      "tabs": {
+        "global": "Global",
+        "timeout": "Timeout",
+        "backends": "Backends",
+        "services": "Services"
+      },
+      "common": {
+        "notSet": "Not Set",
+        "yes": "Yes",
+        "exact": "Exact",
+        "begin": "Begin",
+        "end": "End"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "mode": "Mode",
+        "balance": "Balance",
+        "serverCount": "Servers",
+        "actions": "Actions",
+        "address": "Address",
+        "port": "Port",
+        "backup": "Backup",
+        "check": "Check",
+        "checkPort": "Check Port",
+        "proxy": "Proxy",
+        "rule": "Rule",
+        "domainName": "Domain",
+        "urlPath": "URL Path",
+        "setServer": "Set Server",
+        "setRedirect": "Set Redirect",
+        "setBackend": "Set Backend",
+        "listenAddress": "Listen Address",
+        "backend": "Backend"
+      },
+      "buttons": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "messages": {
+        "saveFailed": "Save failed: ",
+        "backendNameRequired": "Please enter backend name",
+        "serverNameRequired": "Please enter server name",
+        "serviceNameRequired": "Please enter service name"
+      },
+      "preview": {
+        "noConfig": "No parameters configured"
+      },
+      "global": {
+        "maxConnections": {
+          "title": "Max Connections",
+          "label": "Max Connections",
+          "help": "Maximum concurrent connections HAProxy can accept (1-2000000)"
+        },
+        "tlsVersionMin": {
+          "title": "Minimum TLS Version",
+          "label": "Minimum TLS Version",
+          "help": "Minimum allowed TLS protocol version"
+        },
+        "sslCiphers": {
+          "title": "SSL Ciphers",
+          "label": "SSL Ciphers",
+          "placeholder": "One cipher per line",
+          "help": "List of allowed SSL ciphers (one per line)"
+        },
+        "loggingFacility": {
+          "title": "Logging Facility",
+          "label": "Logging Facility",
+          "help": "Syslog logging facility"
+        },
+        "loggingLevel": {
+          "title": "Logging Level",
+          "label": "Logging Level",
+          "help": "Syslog logging level"
+        }
+      },
+      "timeout": {
+        "client": {
+          "title": "Client Timeout",
+          "label": "Client Timeout (sec)",
+          "help": "Client inactivity timeout (1-3600 seconds)"
+        },
+        "connect": {
+          "title": "Connect Timeout",
+          "label": "Connect Timeout (sec)",
+          "help": "Backend connection timeout (1-3600 seconds)"
+        },
+        "server": {
+          "title": "Server Timeout",
+          "label": "Server Timeout (sec)",
+          "help": "Server inactivity timeout (1-3600 seconds)"
+        },
+        "check": {
+          "title": "Check Timeout",
+          "label": "Check Timeout (sec)",
+          "help": "Health check timeout (1-3600 seconds)"
+        }
+      },
+      "modal": {
+        "backend": {
+          "title": "Backend Server",
+          "tabs": {
+            "basic": "Basic",
+            "servers": "Servers",
+            "health": "Health Check",
+            "rules": "Rules"
+          },
+          "basic": {
+            "name": {
+              "title": "Name",
+              "label": "Name",
+              "help": "Unique identifier name for the backend"
+            },
+            "description": {
+              "title": "Description",
+              "label": "Description",
+              "help": "Description of the backend server"
+            },
+            "mode": {
+              "title": "Mode",
+              "label": "Mode",
+              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+            },
+            "balance": {
+              "title": "Balance Algorithm",
+              "label": "Balance Algorithm",
+              "roundRobin": "Round Robin",
+              "leastConnection": "Least Connection",
+              "sourceAddress": "Source Address Hash",
+              "help": "Algorithm for distributing traffic"
+            },
+            "healthCheck": {
+              "title": "Health Check Type",
+              "label": "Health Check Type",
+              "help": "Protocol used to check server health"
+            },
+            "loggingFacility": {
+              "title": "Logging Facility",
+              "label": "Logging Facility",
+              "help": "Syslog logging facility for this backend"
+            },
+            "loggingLevel": {
+              "title": "Logging Level",
+              "label": "Logging Level",
+              "help": "Syslog logging level for this backend"
+            },
+            "caCert": {
+              "title": "CA Certificate",
+              "label": "CA Certificate",
+              "placeholder": "CA certificate name",
+              "help": "CA certificate for verifying server certificates"
+            },
+            "sslNoVerify": {
+              "title": "No SSL Verify",
+              "label": "Skip SSL Verification",
+              "help": "Skip server SSL certificate verification"
+            },
+            "timeoutConnect": {
+              "title": "Connect Timeout",
+              "label": "Connect Timeout (sec)",
+              "help": "Timeout for connecting to this backend (1-3600 seconds)"
+            },
+            "timeoutServer": {
+              "title": "Server Timeout",
+              "label": "Server Timeout (sec)",
+              "help": "Server response timeout for this backend (1-3600 seconds)"
+            },
+            "timeoutCheck": {
+              "title": "Check Timeout",
+              "label": "Check Timeout (sec)",
+              "help": "Health check timeout for this backend (1-3600 seconds)"
+            }
+          },
+          "health": {
+            "checkMethod": {
+              "title": "HTTP Check Method",
+              "label": "HTTP Check Method",
+              "help": "HTTP method used for health checks"
+            },
+            "checkUri": {
+              "title": "Check URI",
+              "label": "Check URI",
+              "placeholder": "e.g., /health",
+              "help": "URI path used for health checks"
+            },
+            "expectStatus": {
+              "title": "Expected Status",
+              "label": "Expected Status",
+              "placeholder": "e.g., 200",
+              "help": "Expected HTTP response status code"
+            },
+            "expectString": {
+              "title": "Expected Content",
+              "label": "Expected Content",
+              "help": "String expected to be found in the response"
+            }
+          }
+        },
+        "server": {
+          "title": "Server",
+          "name": {
+            "label": "Name",
+            "help": "Unique identifier name for the server"
+          },
+          "address": {
+            "label": "Address",
+            "placeholder": "e.g., 192.168.1.100",
+            "help": "Server IP address or hostname"
+          },
+          "port": {
+            "label": "Port",
+            "help": "Server port number (1-65535)"
+          },
+          "backup": {
+            "label": "Backup Server",
+            "help": "Only used when all primary servers are unavailable"
+          },
+          "check": {
+            "label": "Enable Health Check",
+            "help": "Perform health checks on this server"
+          },
+          "checkPort": {
+            "label": "Check Port",
+            "help": "Port used for health checks (defaults to server port)"
+          },
+          "sendProxy": {
+            "label": "Send Proxy Protocol v1",
+            "help": "Send client information using PROXY protocol v1"
+          },
+          "sendProxyV2": {
+            "label": "Send Proxy Protocol v2",
+            "help": "Send client information using PROXY protocol v2"
+          }
+        },
+        "backendRule": {
+          "title": "Backend Rule",
+          "ruleNumber": {
+            "label": "Rule Number",
+            "help": "Execution order number for the rule"
+          },
+          "domainName": {
+            "label": "Domain Name",
+            "placeholder": "One domain per line",
+            "help": "List of domains to match (one per line)"
+          },
+          "urlPathExact": {
+            "label": "Exact URL Path",
+            "placeholder": "One path per line",
+            "help": "URL paths to match exactly (one per line)"
+          },
+          "urlPathBegin": {
+            "label": "URL Path Prefix",
+            "placeholder": "One prefix per line",
+            "help": "URL paths to match by prefix (one per line)"
+          },
+          "urlPathEnd": {
+            "label": "URL Path Suffix",
+            "placeholder": "One suffix per line",
+            "help": "URL paths to match by suffix (one per line)"
+          },
+          "setServer": {
+            "label": "Set Server",
+            "help": "Server name to forward requests to"
+          },
+          "redirectUrl": {
+            "label": "Redirect URL",
+            "help": "URL address to redirect to"
+          }
+        },
+        "service": {
+          "title": "Frontend Service",
+          "tabs": {
+            "basic": "Basic",
+            "ssl": "SSL",
+            "rules": "Rules",
+            "compression": "Compression"
+          },
+          "basic": {
+            "name": {
+              "title": "Name",
+              "label": "Name",
+              "help": "Unique identifier name for the frontend service"
+            },
+            "description": {
+              "title": "Description",
+              "label": "Description",
+              "help": "Description of the frontend service"
+            },
+            "mode": {
+              "title": "Mode",
+              "label": "Mode",
+              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+            },
+            "port": {
+              "title": "Port",
+              "label": "Listen Port",
+              "help": "Port number the service listens on (1-65535)"
+            },
+            "listenAddress": {
+              "title": "Listen Address",
+              "label": "Listen Address",
+              "placeholder": "One IP address per line",
+              "help": "IP addresses to listen on (one per line, empty means all addresses)"
+            },
+            "acceptProxy": {
+              "title": "Accept Proxy Protocol",
+              "label": "Accept Proxy Protocol",
+              "help": "Accept PROXY protocol to get real client IP"
+            },
+            "backend": {
+              "title": "Associated Backends",
+              "label": "Associated Backends",
+              "placeholder": "One backend name per line",
+              "help": "Associated backend server groups (one per line)"
+            },
+            "redirectHttp": {
+              "title": "Redirect HTTP to HTTPS",
+              "label": "Redirect HTTP to HTTPS",
+              "help": "Automatically redirect HTTP requests to HTTPS"
+            },
+            "inspectDelay": {
+              "title": "TCP Inspect Delay",
+              "label": "TCP Inspect Delay (ms)",
+              "help": "Delay for TCP content inspection (1-65535 milliseconds)"
+            },
+            "timeoutClient": {
+              "title": "Client Timeout",
+              "label": "Client Timeout (sec)",
+              "help": "Client inactivity timeout (1-3600 seconds)"
+            },
+            "loggingFacility": {
+              "title": "Logging Facility",
+              "label": "Logging Facility",
+              "help": "Syslog logging facility for this service"
+            },
+            "loggingLevel": {
+              "title": "Logging Level",
+              "label": "Logging Level",
+              "help": "Syslog logging level for this service"
+            }
+          },
+          "ssl": {
+            "certificate": {
+              "title": "SSL Certificate",
+              "label": "SSL Certificate",
+              "placeholder": "One certificate name per line",
+              "help": "SSL certificates for this service (one per line)"
+            }
+          },
+          "compression": {
+            "algorithm": {
+              "title": "Compression Algorithm",
+              "label": "Compression Algorithm",
+              "help": "HTTP response compression algorithm"
+            },
+            "mimeTypes": {
+              "title": "MIME Types",
+              "label": "MIME Types",
+              "placeholder": "One MIME type per line",
+              "help": "MIME types to compress (one per line)"
+            }
+          }
+        },
+        "serviceRule": {
+          "title": "Service Rule",
+          "ruleNumber": {
+            "label": "Rule Number",
+            "help": "Execution order number for the rule"
+          },
+          "domainName": {
+            "label": "Domain Name",
+            "placeholder": "One domain per line",
+            "help": "List of domains to match (one per line)"
+          },
+          "urlPathExact": {
+            "label": "Exact URL Path",
+            "placeholder": "One path per line",
+            "help": "URL paths to match exactly (one per line)"
+          },
+          "urlPathBegin": {
+            "label": "URL Path Prefix",
+            "placeholder": "One prefix per line",
+            "help": "URL paths to match by prefix (one per line)"
+          },
+          "urlPathEnd": {
+            "label": "URL Path Suffix",
+            "placeholder": "One suffix per line",
+            "help": "URL paths to match by suffix (one per line)"
+          },
+          "setBackend": {
+            "label": "Set Backend",
+            "help": "Backend name to forward requests to"
+          },
+          "redirectUrl": {
+            "label": "Redirect URL",
+            "help": "URL address to redirect to"
+          }
+        },
+        "confirmDelete": {
+          "title": "Confirm Delete",
+          "backendMessage": "Confirm delete this backend server?",
+          "serviceMessage": "Confirm delete this frontend service?"
+        }
+      }
+    }
+  },
+  "ru": {
+    "haproxy": {
+      "tabs": {
+        "global": "Global",
+        "timeout": "Timeout",
+        "backends": "Backends",
+        "services": "Services"
+      },
+      "common": {
+        "notSet": "Not Set",
+        "yes": "Yes",
+        "exact": "Exact",
+        "begin": "Begin",
+        "end": "End"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "mode": "Mode",
+        "balance": "Balance",
+        "serverCount": "Servers",
+        "actions": "Actions",
+        "address": "Address",
+        "port": "Port",
+        "backup": "Backup",
+        "check": "Check",
+        "checkPort": "Check Port",
+        "proxy": "Proxy",
+        "rule": "Rule",
+        "domainName": "Domain",
+        "urlPath": "URL Path",
+        "setServer": "Set Server",
+        "setRedirect": "Set Redirect",
+        "setBackend": "Set Backend",
+        "listenAddress": "Listen Address",
+        "backend": "Backend"
+      },
+      "buttons": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "messages": {
+        "saveFailed": "Save failed: ",
+        "backendNameRequired": "Please enter backend name",
+        "serverNameRequired": "Please enter server name",
+        "serviceNameRequired": "Please enter service name"
+      },
+      "preview": {
+        "noConfig": "No parameters configured"
+      },
+      "global": {
+        "maxConnections": {
+          "title": "Max Connections",
+          "label": "Max Connections",
+          "help": "Maximum concurrent connections HAProxy can accept (1-2000000)"
+        },
+        "tlsVersionMin": {
+          "title": "Minimum TLS Version",
+          "label": "Minimum TLS Version",
+          "help": "Minimum allowed TLS protocol version"
+        },
+        "sslCiphers": {
+          "title": "SSL Ciphers",
+          "label": "SSL Ciphers",
+          "placeholder": "One cipher per line",
+          "help": "List of allowed SSL ciphers (one per line)"
+        },
+        "loggingFacility": {
+          "title": "Logging Facility",
+          "label": "Logging Facility",
+          "help": "Syslog logging facility"
+        },
+        "loggingLevel": {
+          "title": "Logging Level",
+          "label": "Logging Level",
+          "help": "Syslog logging level"
+        }
+      },
+      "timeout": {
+        "client": {
+          "title": "Client Timeout",
+          "label": "Client Timeout (sec)",
+          "help": "Client inactivity timeout (1-3600 seconds)"
+        },
+        "connect": {
+          "title": "Connect Timeout",
+          "label": "Connect Timeout (sec)",
+          "help": "Backend connection timeout (1-3600 seconds)"
+        },
+        "server": {
+          "title": "Server Timeout",
+          "label": "Server Timeout (sec)",
+          "help": "Server inactivity timeout (1-3600 seconds)"
+        },
+        "check": {
+          "title": "Check Timeout",
+          "label": "Check Timeout (sec)",
+          "help": "Health check timeout (1-3600 seconds)"
+        }
+      },
+      "modal": {
+        "backend": {
+          "title": "Backend Server",
+          "tabs": {
+            "basic": "Basic",
+            "servers": "Servers",
+            "health": "Health Check",
+            "rules": "Rules"
+          },
+          "basic": {
+            "name": {
+              "title": "Name",
+              "label": "Name",
+              "help": "Unique identifier name for the backend"
+            },
+            "description": {
+              "title": "Description",
+              "label": "Description",
+              "help": "Description of the backend server"
+            },
+            "mode": {
+              "title": "Mode",
+              "label": "Mode",
+              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+            },
+            "balance": {
+              "title": "Balance Algorithm",
+              "label": "Balance Algorithm",
+              "roundRobin": "Round Robin",
+              "leastConnection": "Least Connection",
+              "sourceAddress": "Source Address Hash",
+              "help": "Algorithm for distributing traffic"
+            },
+            "healthCheck": {
+              "title": "Health Check Type",
+              "label": "Health Check Type",
+              "help": "Protocol used to check server health"
+            },
+            "loggingFacility": {
+              "title": "Logging Facility",
+              "label": "Logging Facility",
+              "help": "Syslog logging facility for this backend"
+            },
+            "loggingLevel": {
+              "title": "Logging Level",
+              "label": "Logging Level",
+              "help": "Syslog logging level for this backend"
+            },
+            "caCert": {
+              "title": "CA Certificate",
+              "label": "CA Certificate",
+              "placeholder": "CA certificate name",
+              "help": "CA certificate for verifying server certificates"
+            },
+            "sslNoVerify": {
+              "title": "No SSL Verify",
+              "label": "Skip SSL Verification",
+              "help": "Skip server SSL certificate verification"
+            },
+            "timeoutConnect": {
+              "title": "Connect Timeout",
+              "label": "Connect Timeout (sec)",
+              "help": "Timeout for connecting to this backend (1-3600 seconds)"
+            },
+            "timeoutServer": {
+              "title": "Server Timeout",
+              "label": "Server Timeout (sec)",
+              "help": "Server response timeout for this backend (1-3600 seconds)"
+            },
+            "timeoutCheck": {
+              "title": "Check Timeout",
+              "label": "Check Timeout (sec)",
+              "help": "Health check timeout for this backend (1-3600 seconds)"
+            }
+          },
+          "health": {
+            "checkMethod": {
+              "title": "HTTP Check Method",
+              "label": "HTTP Check Method",
+              "help": "HTTP method used for health checks"
+            },
+            "checkUri": {
+              "title": "Check URI",
+              "label": "Check URI",
+              "placeholder": "e.g., /health",
+              "help": "URI path used for health checks"
+            },
+            "expectStatus": {
+              "title": "Expected Status",
+              "label": "Expected Status",
+              "placeholder": "e.g., 200",
+              "help": "Expected HTTP response status code"
+            },
+            "expectString": {
+              "title": "Expected Content",
+              "label": "Expected Content",
+              "help": "String expected to be found in the response"
+            }
+          }
+        },
+        "server": {
+          "title": "Server",
+          "name": {
+            "label": "Name",
+            "help": "Unique identifier name for the server"
+          },
+          "address": {
+            "label": "Address",
+            "placeholder": "e.g., 192.168.1.100",
+            "help": "Server IP address or hostname"
+          },
+          "port": {
+            "label": "Port",
+            "help": "Server port number (1-65535)"
+          },
+          "backup": {
+            "label": "Backup Server",
+            "help": "Only used when all primary servers are unavailable"
+          },
+          "check": {
+            "label": "Enable Health Check",
+            "help": "Perform health checks on this server"
+          },
+          "checkPort": {
+            "label": "Check Port",
+            "help": "Port used for health checks (defaults to server port)"
+          },
+          "sendProxy": {
+            "label": "Send Proxy Protocol v1",
+            "help": "Send client information using PROXY protocol v1"
+          },
+          "sendProxyV2": {
+            "label": "Send Proxy Protocol v2",
+            "help": "Send client information using PROXY protocol v2"
+          }
+        },
+        "backendRule": {
+          "title": "Backend Rule",
+          "ruleNumber": {
+            "label": "Rule Number",
+            "help": "Execution order number for the rule"
+          },
+          "domainName": {
+            "label": "Domain Name",
+            "placeholder": "One domain per line",
+            "help": "List of domains to match (one per line)"
+          },
+          "urlPathExact": {
+            "label": "Exact URL Path",
+            "placeholder": "One path per line",
+            "help": "URL paths to match exactly (one per line)"
+          },
+          "urlPathBegin": {
+            "label": "URL Path Prefix",
+            "placeholder": "One prefix per line",
+            "help": "URL paths to match by prefix (one per line)"
+          },
+          "urlPathEnd": {
+            "label": "URL Path Suffix",
+            "placeholder": "One suffix per line",
+            "help": "URL paths to match by suffix (one per line)"
+          },
+          "setServer": {
+            "label": "Set Server",
+            "help": "Server name to forward requests to"
+          },
+          "redirectUrl": {
+            "label": "Redirect URL",
+            "help": "URL address to redirect to"
+          }
+        },
+        "service": {
+          "title": "Frontend Service",
+          "tabs": {
+            "basic": "Basic",
+            "ssl": "SSL",
+            "rules": "Rules",
+            "compression": "Compression"
+          },
+          "basic": {
+            "name": {
+              "title": "Name",
+              "label": "Name",
+              "help": "Unique identifier name for the frontend service"
+            },
+            "description": {
+              "title": "Description",
+              "label": "Description",
+              "help": "Description of the frontend service"
+            },
+            "mode": {
+              "title": "Mode",
+              "label": "Mode",
+              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+            },
+            "port": {
+              "title": "Port",
+              "label": "Listen Port",
+              "help": "Port number the service listens on (1-65535)"
+            },
+            "listenAddress": {
+              "title": "Listen Address",
+              "label": "Listen Address",
+              "placeholder": "One IP address per line",
+              "help": "IP addresses to listen on (one per line, empty means all addresses)"
+            },
+            "acceptProxy": {
+              "title": "Accept Proxy Protocol",
+              "label": "Accept Proxy Protocol",
+              "help": "Accept PROXY protocol to get real client IP"
+            },
+            "backend": {
+              "title": "Associated Backends",
+              "label": "Associated Backends",
+              "placeholder": "One backend name per line",
+              "help": "Associated backend server groups (one per line)"
+            },
+            "redirectHttp": {
+              "title": "Redirect HTTP to HTTPS",
+              "label": "Redirect HTTP to HTTPS",
+              "help": "Automatically redirect HTTP requests to HTTPS"
+            },
+            "inspectDelay": {
+              "title": "TCP Inspect Delay",
+              "label": "TCP Inspect Delay (ms)",
+              "help": "Delay for TCP content inspection (1-65535 milliseconds)"
+            },
+            "timeoutClient": {
+              "title": "Client Timeout",
+              "label": "Client Timeout (sec)",
+              "help": "Client inactivity timeout (1-3600 seconds)"
+            },
+            "loggingFacility": {
+              "title": "Logging Facility",
+              "label": "Logging Facility",
+              "help": "Syslog logging facility for this service"
+            },
+            "loggingLevel": {
+              "title": "Logging Level",
+              "label": "Logging Level",
+              "help": "Syslog logging level for this service"
+            }
+          },
+          "ssl": {
+            "certificate": {
+              "title": "SSL Certificate",
+              "label": "SSL Certificate",
+              "placeholder": "One certificate name per line",
+              "help": "SSL certificates for this service (one per line)"
+            }
+          },
+          "compression": {
+            "algorithm": {
+              "title": "Compression Algorithm",
+              "label": "Compression Algorithm",
+              "help": "HTTP response compression algorithm"
+            },
+            "mimeTypes": {
+              "title": "MIME Types",
+              "label": "MIME Types",
+              "placeholder": "One MIME type per line",
+              "help": "MIME types to compress (one per line)"
+            }
+          }
+        },
+        "serviceRule": {
+          "title": "Service Rule",
+          "ruleNumber": {
+            "label": "Rule Number",
+            "help": "Execution order number for the rule"
+          },
+          "domainName": {
+            "label": "Domain Name",
+            "placeholder": "One domain per line",
+            "help": "List of domains to match (one per line)"
+          },
+          "urlPathExact": {
+            "label": "Exact URL Path",
+            "placeholder": "One path per line",
+            "help": "URL paths to match exactly (one per line)"
+          },
+          "urlPathBegin": {
+            "label": "URL Path Prefix",
+            "placeholder": "One prefix per line",
+            "help": "URL paths to match by prefix (one per line)"
+          },
+          "urlPathEnd": {
+            "label": "URL Path Suffix",
+            "placeholder": "One suffix per line",
+            "help": "URL paths to match by suffix (one per line)"
+          },
+          "setBackend": {
+            "label": "Set Backend",
+            "help": "Backend name to forward requests to"
+          },
+          "redirectUrl": {
+            "label": "Redirect URL",
+            "help": "URL address to redirect to"
+          }
+        },
+        "confirmDelete": {
+          "title": "Confirm Delete",
+          "backendMessage": "Confirm delete this backend server?",
+          "serviceMessage": "Confirm delete this frontend service?"
+        }
+      }
+    }
+  },
+  "de": {
+    "haproxy": {
+      "tabs": {
+        "global": "Global",
+        "timeout": "Timeout",
+        "backends": "Backends",
+        "services": "Services"
+      },
+      "common": {
+        "notSet": "Not Set",
+        "yes": "Yes",
+        "exact": "Exact",
+        "begin": "Begin",
+        "end": "End"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "mode": "Mode",
+        "balance": "Balance",
+        "serverCount": "Servers",
+        "actions": "Actions",
+        "address": "Address",
+        "port": "Port",
+        "backup": "Backup",
+        "check": "Check",
+        "checkPort": "Check Port",
+        "proxy": "Proxy",
+        "rule": "Rule",
+        "domainName": "Domain",
+        "urlPath": "URL Path",
+        "setServer": "Set Server",
+        "setRedirect": "Set Redirect",
+        "setBackend": "Set Backend",
+        "listenAddress": "Listen Address",
+        "backend": "Backend"
+      },
+      "buttons": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "messages": {
+        "saveFailed": "Save failed: ",
+        "backendNameRequired": "Please enter backend name",
+        "serverNameRequired": "Please enter server name",
+        "serviceNameRequired": "Please enter service name"
+      },
+      "preview": {
+        "noConfig": "No parameters configured"
+      },
+      "global": {
+        "maxConnections": {
+          "title": "Max Connections",
+          "label": "Max Connections",
+          "help": "Maximum concurrent connections HAProxy can accept (1-2000000)"
+        },
+        "tlsVersionMin": {
+          "title": "Minimum TLS Version",
+          "label": "Minimum TLS Version",
+          "help": "Minimum allowed TLS protocol version"
+        },
+        "sslCiphers": {
+          "title": "SSL Ciphers",
+          "label": "SSL Ciphers",
+          "placeholder": "One cipher per line",
+          "help": "List of allowed SSL ciphers (one per line)"
+        },
+        "loggingFacility": {
+          "title": "Logging Facility",
+          "label": "Logging Facility",
+          "help": "Syslog logging facility"
+        },
+        "loggingLevel": {
+          "title": "Logging Level",
+          "label": "Logging Level",
+          "help": "Syslog logging level"
+        }
+      },
+      "timeout": {
+        "client": {
+          "title": "Client Timeout",
+          "label": "Client Timeout (sec)",
+          "help": "Client inactivity timeout (1-3600 seconds)"
+        },
+        "connect": {
+          "title": "Connect Timeout",
+          "label": "Connect Timeout (sec)",
+          "help": "Backend connection timeout (1-3600 seconds)"
+        },
+        "server": {
+          "title": "Server Timeout",
+          "label": "Server Timeout (sec)",
+          "help": "Server inactivity timeout (1-3600 seconds)"
+        },
+        "check": {
+          "title": "Check Timeout",
+          "label": "Check Timeout (sec)",
+          "help": "Health check timeout (1-3600 seconds)"
+        }
+      },
+      "modal": {
+        "backend": {
+          "title": "Backend Server",
+          "tabs": {
+            "basic": "Basic",
+            "servers": "Servers",
+            "health": "Health Check",
+            "rules": "Rules"
+          },
+          "basic": {
+            "name": {
+              "title": "Name",
+              "label": "Name",
+              "help": "Unique identifier name for the backend"
+            },
+            "description": {
+              "title": "Description",
+              "label": "Description",
+              "help": "Description of the backend server"
+            },
+            "mode": {
+              "title": "Mode",
+              "label": "Mode",
+              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+            },
+            "balance": {
+              "title": "Balance Algorithm",
+              "label": "Balance Algorithm",
+              "roundRobin": "Round Robin",
+              "leastConnection": "Least Connection",
+              "sourceAddress": "Source Address Hash",
+              "help": "Algorithm for distributing traffic"
+            },
+            "healthCheck": {
+              "title": "Health Check Type",
+              "label": "Health Check Type",
+              "help": "Protocol used to check server health"
+            },
+            "loggingFacility": {
+              "title": "Logging Facility",
+              "label": "Logging Facility",
+              "help": "Syslog logging facility for this backend"
+            },
+            "loggingLevel": {
+              "title": "Logging Level",
+              "label": "Logging Level",
+              "help": "Syslog logging level for this backend"
+            },
+            "caCert": {
+              "title": "CA Certificate",
+              "label": "CA Certificate",
+              "placeholder": "CA certificate name",
+              "help": "CA certificate for verifying server certificates"
+            },
+            "sslNoVerify": {
+              "title": "No SSL Verify",
+              "label": "Skip SSL Verification",
+              "help": "Skip server SSL certificate verification"
+            },
+            "timeoutConnect": {
+              "title": "Connect Timeout",
+              "label": "Connect Timeout (sec)",
+              "help": "Timeout for connecting to this backend (1-3600 seconds)"
+            },
+            "timeoutServer": {
+              "title": "Server Timeout",
+              "label": "Server Timeout (sec)",
+              "help": "Server response timeout for this backend (1-3600 seconds)"
+            },
+            "timeoutCheck": {
+              "title": "Check Timeout",
+              "label": "Check Timeout (sec)",
+              "help": "Health check timeout for this backend (1-3600 seconds)"
+            }
+          },
+          "health": {
+            "checkMethod": {
+              "title": "HTTP Check Method",
+              "label": "HTTP Check Method",
+              "help": "HTTP method used for health checks"
+            },
+            "checkUri": {
+              "title": "Check URI",
+              "label": "Check URI",
+              "placeholder": "e.g., /health",
+              "help": "URI path used for health checks"
+            },
+            "expectStatus": {
+              "title": "Expected Status",
+              "label": "Expected Status",
+              "placeholder": "e.g., 200",
+              "help": "Expected HTTP response status code"
+            },
+            "expectString": {
+              "title": "Expected Content",
+              "label": "Expected Content",
+              "help": "String expected to be found in the response"
+            }
+          }
+        },
+        "server": {
+          "title": "Server",
+          "name": {
+            "label": "Name",
+            "help": "Unique identifier name for the server"
+          },
+          "address": {
+            "label": "Address",
+            "placeholder": "e.g., 192.168.1.100",
+            "help": "Server IP address or hostname"
+          },
+          "port": {
+            "label": "Port",
+            "help": "Server port number (1-65535)"
+          },
+          "backup": {
+            "label": "Backup Server",
+            "help": "Only used when all primary servers are unavailable"
+          },
+          "check": {
+            "label": "Enable Health Check",
+            "help": "Perform health checks on this server"
+          },
+          "checkPort": {
+            "label": "Check Port",
+            "help": "Port used for health checks (defaults to server port)"
+          },
+          "sendProxy": {
+            "label": "Send Proxy Protocol v1",
+            "help": "Send client information using PROXY protocol v1"
+          },
+          "sendProxyV2": {
+            "label": "Send Proxy Protocol v2",
+            "help": "Send client information using PROXY protocol v2"
+          }
+        },
+        "backendRule": {
+          "title": "Backend Rule",
+          "ruleNumber": {
+            "label": "Rule Number",
+            "help": "Execution order number for the rule"
+          },
+          "domainName": {
+            "label": "Domain Name",
+            "placeholder": "One domain per line",
+            "help": "List of domains to match (one per line)"
+          },
+          "urlPathExact": {
+            "label": "Exact URL Path",
+            "placeholder": "One path per line",
+            "help": "URL paths to match exactly (one per line)"
+          },
+          "urlPathBegin": {
+            "label": "URL Path Prefix",
+            "placeholder": "One prefix per line",
+            "help": "URL paths to match by prefix (one per line)"
+          },
+          "urlPathEnd": {
+            "label": "URL Path Suffix",
+            "placeholder": "One suffix per line",
+            "help": "URL paths to match by suffix (one per line)"
+          },
+          "setServer": {
+            "label": "Set Server",
+            "help": "Server name to forward requests to"
+          },
+          "redirectUrl": {
+            "label": "Redirect URL",
+            "help": "URL address to redirect to"
+          }
+        },
+        "service": {
+          "title": "Frontend Service",
+          "tabs": {
+            "basic": "Basic",
+            "ssl": "SSL",
+            "rules": "Rules",
+            "compression": "Compression"
+          },
+          "basic": {
+            "name": {
+              "title": "Name",
+              "label": "Name",
+              "help": "Unique identifier name for the frontend service"
+            },
+            "description": {
+              "title": "Description",
+              "label": "Description",
+              "help": "Description of the frontend service"
+            },
+            "mode": {
+              "title": "Mode",
+              "label": "Mode",
+              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+            },
+            "port": {
+              "title": "Port",
+              "label": "Listen Port",
+              "help": "Port number the service listens on (1-65535)"
+            },
+            "listenAddress": {
+              "title": "Listen Address",
+              "label": "Listen Address",
+              "placeholder": "One IP address per line",
+              "help": "IP addresses to listen on (one per line, empty means all addresses)"
+            },
+            "acceptProxy": {
+              "title": "Accept Proxy Protocol",
+              "label": "Accept Proxy Protocol",
+              "help": "Accept PROXY protocol to get real client IP"
+            },
+            "backend": {
+              "title": "Associated Backends",
+              "label": "Associated Backends",
+              "placeholder": "One backend name per line",
+              "help": "Associated backend server groups (one per line)"
+            },
+            "redirectHttp": {
+              "title": "Redirect HTTP to HTTPS",
+              "label": "Redirect HTTP to HTTPS",
+              "help": "Automatically redirect HTTP requests to HTTPS"
+            },
+            "inspectDelay": {
+              "title": "TCP Inspect Delay",
+              "label": "TCP Inspect Delay (ms)",
+              "help": "Delay for TCP content inspection (1-65535 milliseconds)"
+            },
+            "timeoutClient": {
+              "title": "Client Timeout",
+              "label": "Client Timeout (sec)",
+              "help": "Client inactivity timeout (1-3600 seconds)"
+            },
+            "loggingFacility": {
+              "title": "Logging Facility",
+              "label": "Logging Facility",
+              "help": "Syslog logging facility for this service"
+            },
+            "loggingLevel": {
+              "title": "Logging Level",
+              "label": "Logging Level",
+              "help": "Syslog logging level for this service"
+            }
+          },
+          "ssl": {
+            "certificate": {
+              "title": "SSL Certificate",
+              "label": "SSL Certificate",
+              "placeholder": "One certificate name per line",
+              "help": "SSL certificates for this service (one per line)"
+            }
+          },
+          "compression": {
+            "algorithm": {
+              "title": "Compression Algorithm",
+              "label": "Compression Algorithm",
+              "help": "HTTP response compression algorithm"
+            },
+            "mimeTypes": {
+              "title": "MIME Types",
+              "label": "MIME Types",
+              "placeholder": "One MIME type per line",
+              "help": "MIME types to compress (one per line)"
+            }
+          }
+        },
+        "serviceRule": {
+          "title": "Service Rule",
+          "ruleNumber": {
+            "label": "Rule Number",
+            "help": "Execution order number for the rule"
+          },
+          "domainName": {
+            "label": "Domain Name",
+            "placeholder": "One domain per line",
+            "help": "List of domains to match (one per line)"
+          },
+          "urlPathExact": {
+            "label": "Exact URL Path",
+            "placeholder": "One path per line",
+            "help": "URL paths to match exactly (one per line)"
+          },
+          "urlPathBegin": {
+            "label": "URL Path Prefix",
+            "placeholder": "One prefix per line",
+            "help": "URL paths to match by prefix (one per line)"
+          },
+          "urlPathEnd": {
+            "label": "URL Path Suffix",
+            "placeholder": "One suffix per line",
+            "help": "URL paths to match by suffix (one per line)"
+          },
+          "setBackend": {
+            "label": "Set Backend",
+            "help": "Backend name to forward requests to"
+          },
+          "redirectUrl": {
+            "label": "Redirect URL",
+            "help": "URL address to redirect to"
+          }
+        },
+        "confirmDelete": {
+          "title": "Confirm Delete",
+          "backendMessage": "Confirm delete this backend server?",
+          "serviceMessage": "Confirm delete this frontend service?"
+        }
+      }
+    }
+  },
+  "fr": {
+    "haproxy": {
+      "tabs": {
+        "global": "Global",
+        "timeout": "Timeout",
+        "backends": "Backends",
+        "services": "Services"
+      },
+      "common": {
+        "notSet": "Not Set",
+        "yes": "Yes",
+        "exact": "Exact",
+        "begin": "Begin",
+        "end": "End"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "mode": "Mode",
+        "balance": "Balance",
+        "serverCount": "Servers",
+        "actions": "Actions",
+        "address": "Address",
+        "port": "Port",
+        "backup": "Backup",
+        "check": "Check",
+        "checkPort": "Check Port",
+        "proxy": "Proxy",
+        "rule": "Rule",
+        "domainName": "Domain",
+        "urlPath": "URL Path",
+        "setServer": "Set Server",
+        "setRedirect": "Set Redirect",
+        "setBackend": "Set Backend",
+        "listenAddress": "Listen Address",
+        "backend": "Backend"
+      },
+      "buttons": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "messages": {
+        "saveFailed": "Save failed: ",
+        "backendNameRequired": "Please enter backend name",
+        "serverNameRequired": "Please enter server name",
+        "serviceNameRequired": "Please enter service name"
+      },
+      "preview": {
+        "noConfig": "No parameters configured"
+      },
+      "global": {
+        "maxConnections": {
+          "title": "Max Connections",
+          "label": "Max Connections",
+          "help": "Maximum concurrent connections HAProxy can accept (1-2000000)"
+        },
+        "tlsVersionMin": {
+          "title": "Minimum TLS Version",
+          "label": "Minimum TLS Version",
+          "help": "Minimum allowed TLS protocol version"
+        },
+        "sslCiphers": {
+          "title": "SSL Ciphers",
+          "label": "SSL Ciphers",
+          "placeholder": "One cipher per line",
+          "help": "List of allowed SSL ciphers (one per line)"
+        },
+        "loggingFacility": {
+          "title": "Logging Facility",
+          "label": "Logging Facility",
+          "help": "Syslog logging facility"
+        },
+        "loggingLevel": {
+          "title": "Logging Level",
+          "label": "Logging Level",
+          "help": "Syslog logging level"
+        }
+      },
+      "timeout": {
+        "client": {
+          "title": "Client Timeout",
+          "label": "Client Timeout (sec)",
+          "help": "Client inactivity timeout (1-3600 seconds)"
+        },
+        "connect": {
+          "title": "Connect Timeout",
+          "label": "Connect Timeout (sec)",
+          "help": "Backend connection timeout (1-3600 seconds)"
+        },
+        "server": {
+          "title": "Server Timeout",
+          "label": "Server Timeout (sec)",
+          "help": "Server inactivity timeout (1-3600 seconds)"
+        },
+        "check": {
+          "title": "Check Timeout",
+          "label": "Check Timeout (sec)",
+          "help": "Health check timeout (1-3600 seconds)"
+        }
+      },
+      "modal": {
+        "backend": {
+          "title": "Backend Server",
+          "tabs": {
+            "basic": "Basic",
+            "servers": "Servers",
+            "health": "Health Check",
+            "rules": "Rules"
+          },
+          "basic": {
+            "name": {
+              "title": "Name",
+              "label": "Name",
+              "help": "Unique identifier name for the backend"
+            },
+            "description": {
+              "title": "Description",
+              "label": "Description",
+              "help": "Description of the backend server"
+            },
+            "mode": {
+              "title": "Mode",
+              "label": "Mode",
+              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+            },
+            "balance": {
+              "title": "Balance Algorithm",
+              "label": "Balance Algorithm",
+              "roundRobin": "Round Robin",
+              "leastConnection": "Least Connection",
+              "sourceAddress": "Source Address Hash",
+              "help": "Algorithm for distributing traffic"
+            },
+            "healthCheck": {
+              "title": "Health Check Type",
+              "label": "Health Check Type",
+              "help": "Protocol used to check server health"
+            },
+            "loggingFacility": {
+              "title": "Logging Facility",
+              "label": "Logging Facility",
+              "help": "Syslog logging facility for this backend"
+            },
+            "loggingLevel": {
+              "title": "Logging Level",
+              "label": "Logging Level",
+              "help": "Syslog logging level for this backend"
+            },
+            "caCert": {
+              "title": "CA Certificate",
+              "label": "CA Certificate",
+              "placeholder": "CA certificate name",
+              "help": "CA certificate for verifying server certificates"
+            },
+            "sslNoVerify": {
+              "title": "No SSL Verify",
+              "label": "Skip SSL Verification",
+              "help": "Skip server SSL certificate verification"
+            },
+            "timeoutConnect": {
+              "title": "Connect Timeout",
+              "label": "Connect Timeout (sec)",
+              "help": "Timeout for connecting to this backend (1-3600 seconds)"
+            },
+            "timeoutServer": {
+              "title": "Server Timeout",
+              "label": "Server Timeout (sec)",
+              "help": "Server response timeout for this backend (1-3600 seconds)"
+            },
+            "timeoutCheck": {
+              "title": "Check Timeout",
+              "label": "Check Timeout (sec)",
+              "help": "Health check timeout for this backend (1-3600 seconds)"
+            }
+          },
+          "health": {
+            "checkMethod": {
+              "title": "HTTP Check Method",
+              "label": "HTTP Check Method",
+              "help": "HTTP method used for health checks"
+            },
+            "checkUri": {
+              "title": "Check URI",
+              "label": "Check URI",
+              "placeholder": "e.g., /health",
+              "help": "URI path used for health checks"
+            },
+            "expectStatus": {
+              "title": "Expected Status",
+              "label": "Expected Status",
+              "placeholder": "e.g., 200",
+              "help": "Expected HTTP response status code"
+            },
+            "expectString": {
+              "title": "Expected Content",
+              "label": "Expected Content",
+              "help": "String expected to be found in the response"
+            }
+          }
+        },
+        "server": {
+          "title": "Server",
+          "name": {
+            "label": "Name",
+            "help": "Unique identifier name for the server"
+          },
+          "address": {
+            "label": "Address",
+            "placeholder": "e.g., 192.168.1.100",
+            "help": "Server IP address or hostname"
+          },
+          "port": {
+            "label": "Port",
+            "help": "Server port number (1-65535)"
+          },
+          "backup": {
+            "label": "Backup Server",
+            "help": "Only used when all primary servers are unavailable"
+          },
+          "check": {
+            "label": "Enable Health Check",
+            "help": "Perform health checks on this server"
+          },
+          "checkPort": {
+            "label": "Check Port",
+            "help": "Port used for health checks (defaults to server port)"
+          },
+          "sendProxy": {
+            "label": "Send Proxy Protocol v1",
+            "help": "Send client information using PROXY protocol v1"
+          },
+          "sendProxyV2": {
+            "label": "Send Proxy Protocol v2",
+            "help": "Send client information using PROXY protocol v2"
+          }
+        },
+        "backendRule": {
+          "title": "Backend Rule",
+          "ruleNumber": {
+            "label": "Rule Number",
+            "help": "Execution order number for the rule"
+          },
+          "domainName": {
+            "label": "Domain Name",
+            "placeholder": "One domain per line",
+            "help": "List of domains to match (one per line)"
+          },
+          "urlPathExact": {
+            "label": "Exact URL Path",
+            "placeholder": "One path per line",
+            "help": "URL paths to match exactly (one per line)"
+          },
+          "urlPathBegin": {
+            "label": "URL Path Prefix",
+            "placeholder": "One prefix per line",
+            "help": "URL paths to match by prefix (one per line)"
+          },
+          "urlPathEnd": {
+            "label": "URL Path Suffix",
+            "placeholder": "One suffix per line",
+            "help": "URL paths to match by suffix (one per line)"
+          },
+          "setServer": {
+            "label": "Set Server",
+            "help": "Server name to forward requests to"
+          },
+          "redirectUrl": {
+            "label": "Redirect URL",
+            "help": "URL address to redirect to"
+          }
+        },
+        "service": {
+          "title": "Frontend Service",
+          "tabs": {
+            "basic": "Basic",
+            "ssl": "SSL",
+            "rules": "Rules",
+            "compression": "Compression"
+          },
+          "basic": {
+            "name": {
+              "title": "Name",
+              "label": "Name",
+              "help": "Unique identifier name for the frontend service"
+            },
+            "description": {
+              "title": "Description",
+              "label": "Description",
+              "help": "Description of the frontend service"
+            },
+            "mode": {
+              "title": "Mode",
+              "label": "Mode",
+              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+            },
+            "port": {
+              "title": "Port",
+              "label": "Listen Port",
+              "help": "Port number the service listens on (1-65535)"
+            },
+            "listenAddress": {
+              "title": "Listen Address",
+              "label": "Listen Address",
+              "placeholder": "One IP address per line",
+              "help": "IP addresses to listen on (one per line, empty means all addresses)"
+            },
+            "acceptProxy": {
+              "title": "Accept Proxy Protocol",
+              "label": "Accept Proxy Protocol",
+              "help": "Accept PROXY protocol to get real client IP"
+            },
+            "backend": {
+              "title": "Associated Backends",
+              "label": "Associated Backends",
+              "placeholder": "One backend name per line",
+              "help": "Associated backend server groups (one per line)"
+            },
+            "redirectHttp": {
+              "title": "Redirect HTTP to HTTPS",
+              "label": "Redirect HTTP to HTTPS",
+              "help": "Automatically redirect HTTP requests to HTTPS"
+            },
+            "inspectDelay": {
+              "title": "TCP Inspect Delay",
+              "label": "TCP Inspect Delay (ms)",
+              "help": "Delay for TCP content inspection (1-65535 milliseconds)"
+            },
+            "timeoutClient": {
+              "title": "Client Timeout",
+              "label": "Client Timeout (sec)",
+              "help": "Client inactivity timeout (1-3600 seconds)"
+            },
+            "loggingFacility": {
+              "title": "Logging Facility",
+              "label": "Logging Facility",
+              "help": "Syslog logging facility for this service"
+            },
+            "loggingLevel": {
+              "title": "Logging Level",
+              "label": "Logging Level",
+              "help": "Syslog logging level for this service"
+            }
+          },
+          "ssl": {
+            "certificate": {
+              "title": "SSL Certificate",
+              "label": "SSL Certificate",
+              "placeholder": "One certificate name per line",
+              "help": "SSL certificates for this service (one per line)"
+            }
+          },
+          "compression": {
+            "algorithm": {
+              "title": "Compression Algorithm",
+              "label": "Compression Algorithm",
+              "help": "HTTP response compression algorithm"
+            },
+            "mimeTypes": {
+              "title": "MIME Types",
+              "label": "MIME Types",
+              "placeholder": "One MIME type per line",
+              "help": "MIME types to compress (one per line)"
+            }
+          }
+        },
+        "serviceRule": {
+          "title": "Service Rule",
+          "ruleNumber": {
+            "label": "Rule Number",
+            "help": "Execution order number for the rule"
+          },
+          "domainName": {
+            "label": "Domain Name",
+            "placeholder": "One domain per line",
+            "help": "List of domains to match (one per line)"
+          },
+          "urlPathExact": {
+            "label": "Exact URL Path",
+            "placeholder": "One path per line",
+            "help": "URL paths to match exactly (one per line)"
+          },
+          "urlPathBegin": {
+            "label": "URL Path Prefix",
+            "placeholder": "One prefix per line",
+            "help": "URL paths to match by prefix (one per line)"
+          },
+          "urlPathEnd": {
+            "label": "URL Path Suffix",
+            "placeholder": "One suffix per line",
+            "help": "URL paths to match by suffix (one per line)"
+          },
+          "setBackend": {
+            "label": "Set Backend",
+            "help": "Backend name to forward requests to"
+          },
+          "redirectUrl": {
+            "label": "Redirect URL",
+            "help": "URL address to redirect to"
+          }
+        },
+        "confirmDelete": {
+          "title": "Confirm Delete",
+          "backendMessage": "Confirm delete this backend server?",
+          "serviceMessage": "Confirm delete this frontend service?"
+        }
+      }
+    }
+  },
+  "ko": {
+    "haproxy": {
+      "tabs": {
+        "global": "Global",
+        "timeout": "Timeout",
+        "backends": "Backends",
+        "services": "Services"
+      },
+      "common": {
+        "notSet": "Not Set",
+        "yes": "Yes",
+        "exact": "Exact",
+        "begin": "Begin",
+        "end": "End"
+      },
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "mode": "Mode",
+        "balance": "Balance",
+        "serverCount": "Servers",
+        "actions": "Actions",
+        "address": "Address",
+        "port": "Port",
+        "backup": "Backup",
+        "check": "Check",
+        "checkPort": "Check Port",
+        "proxy": "Proxy",
+        "rule": "Rule",
+        "domainName": "Domain",
+        "urlPath": "URL Path",
+        "setServer": "Set Server",
+        "setRedirect": "Set Redirect",
+        "setBackend": "Set Backend",
+        "listenAddress": "Listen Address",
+        "backend": "Backend"
+      },
+      "buttons": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "messages": {
+        "saveFailed": "Save failed: ",
+        "backendNameRequired": "Please enter backend name",
+        "serverNameRequired": "Please enter server name",
+        "serviceNameRequired": "Please enter service name"
+      },
+      "preview": {
+        "noConfig": "No parameters configured"
+      },
+      "global": {
+        "maxConnections": {
+          "title": "Max Connections",
+          "label": "Max Connections",
+          "help": "Maximum concurrent connections HAProxy can accept (1-2000000)"
+        },
+        "tlsVersionMin": {
+          "title": "Minimum TLS Version",
+          "label": "Minimum TLS Version",
+          "help": "Minimum allowed TLS protocol version"
+        },
+        "sslCiphers": {
+          "title": "SSL Ciphers",
+          "label": "SSL Ciphers",
+          "placeholder": "One cipher per line",
+          "help": "List of allowed SSL ciphers (one per line)"
+        },
+        "loggingFacility": {
+          "title": "Logging Facility",
+          "label": "Logging Facility",
+          "help": "Syslog logging facility"
+        },
+        "loggingLevel": {
+          "title": "Logging Level",
+          "label": "Logging Level",
+          "help": "Syslog logging level"
+        }
+      },
+      "timeout": {
+        "client": {
+          "title": "Client Timeout",
+          "label": "Client Timeout (sec)",
+          "help": "Client inactivity timeout (1-3600 seconds)"
+        },
+        "connect": {
+          "title": "Connect Timeout",
+          "label": "Connect Timeout (sec)",
+          "help": "Backend connection timeout (1-3600 seconds)"
+        },
+        "server": {
+          "title": "Server Timeout",
+          "label": "Server Timeout (sec)",
+          "help": "Server inactivity timeout (1-3600 seconds)"
+        },
+        "check": {
+          "title": "Check Timeout",
+          "label": "Check Timeout (sec)",
+          "help": "Health check timeout (1-3600 seconds)"
+        }
+      },
+      "modal": {
+        "backend": {
+          "title": "Backend Server",
+          "tabs": {
+            "basic": "Basic",
+            "servers": "Servers",
+            "health": "Health Check",
+            "rules": "Rules"
+          },
+          "basic": {
+            "name": {
+              "title": "Name",
+              "label": "Name",
+              "help": "Unique identifier name for the backend"
+            },
+            "description": {
+              "title": "Description",
+              "label": "Description",
+              "help": "Description of the backend server"
+            },
+            "mode": {
+              "title": "Mode",
+              "label": "Mode",
+              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+            },
+            "balance": {
+              "title": "Balance Algorithm",
+              "label": "Balance Algorithm",
+              "roundRobin": "Round Robin",
+              "leastConnection": "Least Connection",
+              "sourceAddress": "Source Address Hash",
+              "help": "Algorithm for distributing traffic"
+            },
+            "healthCheck": {
+              "title": "Health Check Type",
+              "label": "Health Check Type",
+              "help": "Protocol used to check server health"
+            },
+            "loggingFacility": {
+              "title": "Logging Facility",
+              "label": "Logging Facility",
+              "help": "Syslog logging facility for this backend"
+            },
+            "loggingLevel": {
+              "title": "Logging Level",
+              "label": "Logging Level",
+              "help": "Syslog logging level for this backend"
+            },
+            "caCert": {
+              "title": "CA Certificate",
+              "label": "CA Certificate",
+              "placeholder": "CA certificate name",
+              "help": "CA certificate for verifying server certificates"
+            },
+            "sslNoVerify": {
+              "title": "No SSL Verify",
+              "label": "Skip SSL Verification",
+              "help": "Skip server SSL certificate verification"
+            },
+            "timeoutConnect": {
+              "title": "Connect Timeout",
+              "label": "Connect Timeout (sec)",
+              "help": "Timeout for connecting to this backend (1-3600 seconds)"
+            },
+            "timeoutServer": {
+              "title": "Server Timeout",
+              "label": "Server Timeout (sec)",
+              "help": "Server response timeout for this backend (1-3600 seconds)"
+            },
+            "timeoutCheck": {
+              "title": "Check Timeout",
+              "label": "Check Timeout (sec)",
+              "help": "Health check timeout for this backend (1-3600 seconds)"
+            }
+          },
+          "health": {
+            "checkMethod": {
+              "title": "HTTP Check Method",
+              "label": "HTTP Check Method",
+              "help": "HTTP method used for health checks"
+            },
+            "checkUri": {
+              "title": "Check URI",
+              "label": "Check URI",
+              "placeholder": "e.g., /health",
+              "help": "URI path used for health checks"
+            },
+            "expectStatus": {
+              "title": "Expected Status",
+              "label": "Expected Status",
+              "placeholder": "e.g., 200",
+              "help": "Expected HTTP response status code"
+            },
+            "expectString": {
+              "title": "Expected Content",
+              "label": "Expected Content",
+              "help": "String expected to be found in the response"
+            }
+          }
+        },
+        "server": {
+          "title": "Server",
+          "name": {
+            "label": "Name",
+            "help": "Unique identifier name for the server"
+          },
+          "address": {
+            "label": "Address",
+            "placeholder": "e.g., 192.168.1.100",
+            "help": "Server IP address or hostname"
+          },
+          "port": {
+            "label": "Port",
+            "help": "Server port number (1-65535)"
+          },
+          "backup": {
+            "label": "Backup Server",
+            "help": "Only used when all primary servers are unavailable"
+          },
+          "check": {
+            "label": "Enable Health Check",
+            "help": "Perform health checks on this server"
+          },
+          "checkPort": {
+            "label": "Check Port",
+            "help": "Port used for health checks (defaults to server port)"
+          },
+          "sendProxy": {
+            "label": "Send Proxy Protocol v1",
+            "help": "Send client information using PROXY protocol v1"
+          },
+          "sendProxyV2": {
+            "label": "Send Proxy Protocol v2",
+            "help": "Send client information using PROXY protocol v2"
+          }
+        },
+        "backendRule": {
+          "title": "Backend Rule",
+          "ruleNumber": {
+            "label": "Rule Number",
+            "help": "Execution order number for the rule"
+          },
+          "domainName": {
+            "label": "Domain Name",
+            "placeholder": "One domain per line",
+            "help": "List of domains to match (one per line)"
+          },
+          "urlPathExact": {
+            "label": "Exact URL Path",
+            "placeholder": "One path per line",
+            "help": "URL paths to match exactly (one per line)"
+          },
+          "urlPathBegin": {
+            "label": "URL Path Prefix",
+            "placeholder": "One prefix per line",
+            "help": "URL paths to match by prefix (one per line)"
+          },
+          "urlPathEnd": {
+            "label": "URL Path Suffix",
+            "placeholder": "One suffix per line",
+            "help": "URL paths to match by suffix (one per line)"
+          },
+          "setServer": {
+            "label": "Set Server",
+            "help": "Server name to forward requests to"
+          },
+          "redirectUrl": {
+            "label": "Redirect URL",
+            "help": "URL address to redirect to"
+          }
+        },
+        "service": {
+          "title": "Frontend Service",
+          "tabs": {
+            "basic": "Basic",
+            "ssl": "SSL",
+            "rules": "Rules",
+            "compression": "Compression"
+          },
+          "basic": {
+            "name": {
+              "title": "Name",
+              "label": "Name",
+              "help": "Unique identifier name for the frontend service"
+            },
+            "description": {
+              "title": "Description",
+              "label": "Description",
+              "help": "Description of the frontend service"
+            },
+            "mode": {
+              "title": "Mode",
+              "label": "Mode",
+              "help": "HTTP mode inspects HTTP protocol, TCP mode passes through traffic"
+            },
+            "port": {
+              "title": "Port",
+              "label": "Listen Port",
+              "help": "Port number the service listens on (1-65535)"
+            },
+            "listenAddress": {
+              "title": "Listen Address",
+              "label": "Listen Address",
+              "placeholder": "One IP address per line",
+              "help": "IP addresses to listen on (one per line, empty means all addresses)"
+            },
+            "acceptProxy": {
+              "title": "Accept Proxy Protocol",
+              "label": "Accept Proxy Protocol",
+              "help": "Accept PROXY protocol to get real client IP"
+            },
+            "backend": {
+              "title": "Associated Backends",
+              "label": "Associated Backends",
+              "placeholder": "One backend name per line",
+              "help": "Associated backend server groups (one per line)"
+            },
+            "redirectHttp": {
+              "title": "Redirect HTTP to HTTPS",
+              "label": "Redirect HTTP to HTTPS",
+              "help": "Automatically redirect HTTP requests to HTTPS"
+            },
+            "inspectDelay": {
+              "title": "TCP Inspect Delay",
+              "label": "TCP Inspect Delay (ms)",
+              "help": "Delay for TCP content inspection (1-65535 milliseconds)"
+            },
+            "timeoutClient": {
+              "title": "Client Timeout",
+              "label": "Client Timeout (sec)",
+              "help": "Client inactivity timeout (1-3600 seconds)"
+            },
+            "loggingFacility": {
+              "title": "Logging Facility",
+              "label": "Logging Facility",
+              "help": "Syslog logging facility for this service"
+            },
+            "loggingLevel": {
+              "title": "Logging Level",
+              "label": "Logging Level",
+              "help": "Syslog logging level for this service"
+            }
+          },
+          "ssl": {
+            "certificate": {
+              "title": "SSL Certificate",
+              "label": "SSL Certificate",
+              "placeholder": "One certificate name per line",
+              "help": "SSL certificates for this service (one per line)"
+            }
+          },
+          "compression": {
+            "algorithm": {
+              "title": "Compression Algorithm",
+              "label": "Compression Algorithm",
+              "help": "HTTP response compression algorithm"
+            },
+            "mimeTypes": {
+              "title": "MIME Types",
+              "label": "MIME Types",
+              "placeholder": "One MIME type per line",
+              "help": "MIME types to compress (one per line)"
+            }
+          }
+        },
+        "serviceRule": {
+          "title": "Service Rule",
+          "ruleNumber": {
+            "label": "Rule Number",
+            "help": "Execution order number for the rule"
+          },
+          "domainName": {
+            "label": "Domain Name",
+            "placeholder": "One domain per line",
+            "help": "List of domains to match (one per line)"
+          },
+          "urlPathExact": {
+            "label": "Exact URL Path",
+            "placeholder": "One path per line",
+            "help": "URL paths to match exactly (one per line)"
+          },
+          "urlPathBegin": {
+            "label": "URL Path Prefix",
+            "placeholder": "One prefix per line",
+            "help": "URL paths to match by prefix (one per line)"
+          },
+          "urlPathEnd": {
+            "label": "URL Path Suffix",
+            "placeholder": "One suffix per line",
+            "help": "URL paths to match by suffix (one per line)"
+          },
+          "setBackend": {
+            "label": "Set Backend",
+            "help": "Backend name to forward requests to"
+          },
+          "redirectUrl": {
+            "label": "Redirect URL",
+            "help": "URL address to redirect to"
+          }
+        },
+        "confirmDelete": {
+          "title": "Confirm Delete",
+          "backendMessage": "Confirm delete this backend server?",
+          "serviceMessage": "Confirm delete this frontend service?"
+        }
+      }
+    }
+  }
+}

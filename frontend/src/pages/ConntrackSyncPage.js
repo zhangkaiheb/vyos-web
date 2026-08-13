@@ -1,10 +1,13 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
 import { configApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const ACCEPT_PROTOCOL_OPTIONS = ['tcp', 'udp', 'icmp', 'icmp6', 'sctp', 'dccp'];
 const EXPECT_SYNC_OPTIONS = ['all', 'ftp', 'h323', 'nfs', 'sip', 'sqlnet'];
@@ -22,65 +25,6 @@ function isPresent(value) {
   if (Array.isArray(value) && value.length === 0) return false;
   if (typeof value === 'object' && Object.keys(value).length === 0) return false;
   return true;
-}
-
-function validateIPv4(value) {
-  if (!value) return '';
-  const re = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-  if (!re.test(value)) return 'IPv4 地址格式错误';
-  return '';
-}
-
-function validateIPv6(value) {
-  if (!value) return '';
-  const re = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}$|^(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}$|^(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}$|^:(?::[0-9a-fA-F]{1,4}){1,7}$|^::$/;
-  if (!re.test(value)) return 'IPv6 地址格式错误';
-  return '';
-}
-
-function validateIPPrefix(value) {
-  if (!value) return '';
-  const parts = value.split('/');
-  if (parts.length !== 2) return 'IP 子网格式应为 地址/长度';
-  const v4 = validateIPv4(parts[0]);
-  const v6 = validateIPv6(parts[0]);
-  if (v4 && v6) return v4;
-  const p = parseInt(parts[1], 10);
-  if (isNaN(p)) return '前缀长度格式错误';
-  if (!v4 && (p < 0 || p > 32)) return 'IPv4 前缀长度范围为 0-32';
-  if (!v6 && (p < 0 || p > 128)) return 'IPv6 前缀长度范围为 0-128';
-  return '';
-}
-
-function validateAddressOrPrefix(value) {
-  if (!value) return '地址不能为空';
-  if (value.includes('/')) return validateIPPrefix(value);
-  const v4 = validateIPv4(value);
-  const v6 = validateIPv6(value);
-  if (v4 && v6) return '请输入有效的 IPv4/IPv6 地址或前缀';
-  return '';
-}
-
-function validateIPv4Only(value) {
-  if (!value) return '地址不能为空';
-  return validateIPv4(value);
-}
-
-function validateQueueSize(value, name) {
-  if (value === '' || value === undefined || value === null) return '';
-  const n = Number(value);
-  if (isNaN(n) || n < 0 || n > 4294967295) return `${name} 范围为 0-4294967295`;
-  return '';
-}
-
-function validateMcastGroup(value) {
-  if (!value) return '组播地址不能为空';
-  return validateIPv4(value);
-}
-
-function validateInterface(value) {
-  if (!value || !String(value).trim()) return '接口不能为空';
-  return '';
 }
 
 function parseMultiText(text) {
@@ -137,12 +81,73 @@ function conntrackSyncToConfig(form) {
 export default defineComponent({
   name: 'ConntrackSyncPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const config = ref(conntrackSyncToForm());
     const saving = ref(false);
     const saved = ref(false);
 
     const commandPath = 'service conntrack-sync';
     const activeTab = ref('protocol');
+
+    function validateIPv4(value) {
+      if (!value) return '';
+      const re = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+      if (!re.test(value)) return t('conntrackSync.validation.ipv4FormatError');
+      return '';
+    }
+
+    function validateIPv6(value) {
+      if (!value) return '';
+      const re = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}$|^(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}$|^(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}$|^:(?::[0-9a-fA-F]{1,4}){1,7}$|^::$/;
+      if (!re.test(value)) return t('conntrackSync.validation.ipv6FormatError');
+      return '';
+    }
+
+    function validateIPPrefix(value) {
+      if (!value) return '';
+      const parts = value.split('/');
+      if (parts.length !== 2) return t('conntrackSync.validation.subnetFormatError');
+      const v4 = validateIPv4(parts[0]);
+      const v6 = validateIPv6(parts[0]);
+      if (v4 && v6) return v4;
+      const p = parseInt(parts[1], 10);
+      if (isNaN(p)) return t('conntrackSync.validation.prefixLengthFormatError');
+      if (!v4 && (p < 0 || p > 32)) return t('conntrackSync.validation.ipv4PrefixRange');
+      if (!v6 && (p < 0 || p > 128)) return t('conntrackSync.validation.ipv6PrefixRange');
+      return '';
+    }
+
+    function validateAddressOrPrefix(value) {
+      if (!value) return t('conntrackSync.validation.addressRequired');
+      if (value.includes('/')) return validateIPPrefix(value);
+      const v4 = validateIPv4(value);
+      const v6 = validateIPv6(value);
+      if (v4 && v6) return t('conntrackSync.validation.invalidAddressOrPrefix');
+      return '';
+    }
+
+    function validateIPv4Only(value) {
+      if (!value) return t('conntrackSync.validation.addressRequired');
+      return validateIPv4(value);
+    }
+
+    function validateQueueSize(value, name) {
+      if (value === '' || value === undefined || value === null) return '';
+      const n = Number(value);
+      if (isNaN(n) || n < 0 || n > 4294967295) return t('conntrackSync.validation.queueSizeRange', { name });
+      return '';
+    }
+
+    function validateMcastGroup(value) {
+      if (!value) return t('conntrackSync.validation.mcastAddressRequired');
+      return validateIPv4(value);
+    }
+
+    function validateInterface(value) {
+      if (!value || !String(value).trim()) return t('conntrackSync.validation.interfaceRequired');
+      return '';
+    }
 
     const addressRows = computed(() => (config.value.ignoreAddress || []).map((addr, idx) => ({
       _key: String(idx),
@@ -160,13 +165,13 @@ export default defineComponent({
     })));
 
     const addressColumns = [
-      { key: 'address', title: '忽略地址', title_en: 'Ignore Address' },
+      { key: 'address', title: t('conntrackSync.columns.ignoreAddress'), title_en: 'Ignore Address' },
     ];
     const interfaceColumns = [
-      { key: 'interface', title: '同步接口', title_en: 'Interface' },
+      { key: 'interface', title: t('conntrackSync.columns.syncInterface'), title_en: 'Interface' },
     ];
     const listenColumns = [
-      { key: 'address', title: '监听地址', title_en: 'Listen Address' },
+      { key: 'address', title: t('conntrackSync.columns.listenAddress'), title_en: 'Listen Address' },
     ];
 
     const showAddressModal = ref(false);
@@ -195,6 +200,7 @@ export default defineComponent({
       saving.value = true;
       configApi.set('service conntrack-sync', payload)
         .then(() => {
+          configStore.markPending();
           saved.value = true;
           setTimeout(() => saved.value = false, 2000);
         })
@@ -299,19 +305,22 @@ export default defineComponent({
     }
 
     function validateForm() {
-      const err = validateQueueSize(config.value.eventListenQueueSize, '事件监听队列大小');
+      const err = validateQueueSize(config.value.eventListenQueueSize, t('conntrackSync.validation.eventListenQueueSizeName'));
       if (err) return err;
-      const err2 = validateQueueSize(config.value.syncQueueSize, '同步队列大小');
+      const err2 = validateQueueSize(config.value.syncQueueSize, t('conntrackSync.validation.syncQueueSizeName'));
       if (err2) return err2;
       const err3 = validateMcastGroup(config.value.mcastGroup);
       if (err3) return err3;
       if (isPresent(config.value.failoverVrrpSyncGroup)) {
-        if (!String(config.value.failoverVrrpSyncGroup).trim()) return 'VRRP 同步组不能为空';
+        if (!String(config.value.failoverVrrpSyncGroup).trim()) return t('conntrackSync.validation.vrrpSyncGroupRequired');
       }
       return '';
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
     return {
       config,
@@ -348,21 +357,22 @@ export default defineComponent({
       validateForm,
       ACCEPT_PROTOCOL_OPTIONS,
       EXPECT_SYNC_OPTIONS,
+      t,
     };
   },
   components: { ToolbarButton, DraggableModal, DataTable, TabGroup },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('conntrackSync.messages.saved') }}</div>
 
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'protocol', title: '同步协议' },
-        { key: 'basic', title: '基本设置' },
-        { key: 'interfaces', title: '地址与接口' }
+        { key: 'protocol', title: t('conntrackSync.tabs.protocol') },
+        { key: 'basic', title: t('conntrackSync.tabs.basic') },
+        { key: 'interfaces', title: t('conntrackSync.tabs.interfaces') }
       ]">
         <template #protocol>
           <div class="form-row">
-            <label class="form-label">接受协议</label>
+            <label class="form-label">{{ t('conntrackSync.labels.acceptProtocol') }}</label>
             <div class="form-control checkbox-group">
               <label v-for="p in ACCEPT_PROTOCOL_OPTIONS" :key="p" class="checkbox-item">
                 <input type="checkbox" :value="p" v-model="config.acceptProtocol" /> {{ p }}
@@ -370,7 +380,7 @@ export default defineComponent({
             </div>
           </div>
           <div class="form-row">
-            <label class="form-label">期望同步</label>
+            <label class="form-label">{{ t('conntrackSync.labels.expectSync') }}</label>
             <div class="form-control checkbox-group">
               <label v-for="p in EXPECT_SYNC_OPTIONS" :key="p" class="checkbox-item">
                 <input type="checkbox" :value="p" v-model="config.expectSync" /> {{ p }}
@@ -381,34 +391,34 @@ export default defineComponent({
 
         <template #basic>
           <div class="form-row">
-            <label class="form-label">事件监听队列大小</label>
+            <label class="form-label">{{ t('conntrackSync.labels.eventListenQueueSize') }}</label>
             <input class="form-control" type="number" v-model="config.eventListenQueueSize" min="0" max="4294967295" />
           </div>
           <div class="form-row">
-            <label class="form-label">同步队列大小</label>
+            <label class="form-label">{{ t('conntrackSync.labels.syncQueueSize') }}</label>
             <input class="form-control" type="number" v-model="config.syncQueueSize" min="0" max="4294967295" />
           </div>
           <div class="form-row">
-            <label class="form-label">组播组</label>
-            <input class="form-control" v-model="config.mcastGroup" placeholder="225.0.0.50" />
+            <label class="form-label">{{ t('conntrackSync.labels.mcastGroup') }}</label>
+            <input class="form-control" v-model="config.mcastGroup" :placeholder="t('conntrackSync.placeholders.mcastGroup')" />
           </div>
           <div class="form-row">
-            <label class="form-label">VRRP 同步组</label>
-            <input class="form-control" v-model="config.failoverVrrpSyncGroup" placeholder="VRRP sync group" />
+            <label class="form-label">{{ t('conntrackSync.labels.vrrpSyncGroup') }}</label>
+            <input class="form-control" v-model="config.failoverVrrpSyncGroup" :placeholder="t('conntrackSync.placeholders.vrrpSyncGroup')" />
           </div>
           <div class="form-row">
-            <label class="form-label">选项</label>
+            <label class="form-label">{{ t('conntrackSync.labels.options') }}</label>
             <div class="form-control checkbox-group">
-              <label class="checkbox-item"><input type="checkbox" v-model="config.disableExternalCache" /> 禁用外部缓存</label>
-              <label class="checkbox-item"><input type="checkbox" v-model="config.disableSyslog" /> 禁用 Syslog</label>
-              <label class="checkbox-item"><input type="checkbox" v-model="config.startupResync" /> 启动时全量同步</label>
+              <label class="checkbox-item"><input type="checkbox" v-model="config.disableExternalCache" /> {{ t('conntrackSync.labels.disableExternalCache') }}</label>
+              <label class="checkbox-item"><input type="checkbox" v-model="config.disableSyslog" /> {{ t('conntrackSync.labels.disableSyslog') }}</label>
+              <label class="checkbox-item"><input type="checkbox" v-model="config.startupResync" /> {{ t('conntrackSync.labels.startupResync') }}</label>
             </div>
           </div>
         </template>
 
         <template #interfaces>
           <div class="form-row-block">
-            <h4>忽略地址</h4>
+            <h4>{{ t('conntrackSync.columns.ignoreAddress') }}</h4>
             <div class="data-table-wrapper">
               <DataTable :columns="addressColumns" :data="addressRows" row-key="_key" :selectable="true"
                 :actions="['create','edit','delete','refresh']"
@@ -416,7 +426,7 @@ export default defineComponent({
             </div>
           </div>
           <div class="form-row-block">
-            <h4>同步接口</h4>
+            <h4>{{ t('conntrackSync.columns.syncInterface') }}</h4>
             <div class="data-table-wrapper">
               <DataTable :columns="interfaceColumns" :data="interfaceRows" row-key="_key" :selectable="true"
                 :actions="['create','edit','delete','refresh']"
@@ -424,7 +434,7 @@ export default defineComponent({
             </div>
           </div>
           <div class="form-row-block">
-            <h4>监听地址</h4>
+            <h4>{{ t('conntrackSync.columns.listenAddress') }}</h4>
             <div class="data-table-wrapper">
               <DataTable :columns="listenColumns" :data="listenRows" row-key="_key" :selectable="true"
                 :actions="['create','edit','delete','refresh']"
@@ -434,33 +444,29 @@ export default defineComponent({
         </template>
       </TabGroup>
 
-      <DraggableModal v-model:visible="showAddressModal" title="忽略地址">
-        <div class="form-row"><label class="form-label">地址/前缀</label><input class="form-control" v-model="addressEdit.address" placeholder="x.x.x.x 或 x.x.x.x/x 或 IPv6" /></div>
+      <DraggableModal v-model:visible="showAddressModal" :title="t('conntrackSync.modals.ignoreAddress')">
+        <div class="form-row"><label class="form-label">{{ t('conntrackSync.labels.addressPrefix') }}</label><input class="form-control" v-model="addressEdit.address" :placeholder="t('conntrackSync.placeholders.addressPrefix')" /></div>
         <template #footer>
-          <ToolbarButton @click="showAddressModal = false">取消</ToolbarButton>
-          <ToolbarButton icon="save" primary @click="saveAddress">保存</ToolbarButton>
+          <ToolbarButton @click="showAddressModal = false">{{ t('conntrackSync.buttons.cancel') }}</ToolbarButton>
+          <ToolbarButton icon="save" primary @click="saveAddress">{{ t('conntrackSync.buttons.save') }}</ToolbarButton>
         </template>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showInterfaceModal" title="同步接口">
-        <div class="form-row"><label class="form-label">接口</label><input class="form-control" v-model="interfaceEdit.interface" placeholder="eth0" /></div>
+      <DraggableModal v-model:visible="showInterfaceModal" :title="t('conntrackSync.modals.syncInterface')">
+        <div class="form-row"><label class="form-label">{{ t('conntrackSync.labels.interface') }}</label><input class="form-control" v-model="interfaceEdit.interface" :placeholder="t('conntrackSync.placeholders.interface')" /></div>
         <template #footer>
-          <ToolbarButton @click="showInterfaceModal = false">取消</ToolbarButton>
-          <ToolbarButton icon="save" primary @click="saveInterface">保存</ToolbarButton>
+          <ToolbarButton @click="showInterfaceModal = false">{{ t('conntrackSync.buttons.cancel') }}</ToolbarButton>
+          <ToolbarButton icon="save" primary @click="saveInterface">{{ t('conntrackSync.buttons.save') }}</ToolbarButton>
         </template>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showListenModal" title="监听地址">
-        <div class="form-row"><label class="form-label">IPv4 地址</label><input class="form-control" v-model="listenEdit.address" placeholder="x.x.x.x" /></div>
+      <DraggableModal v-model:visible="showListenModal" :title="t('conntrackSync.modals.listenAddress')">
+        <div class="form-row"><label class="form-label">{{ t('conntrackSync.labels.ipv4Address') }}</label><input class="form-control" v-model="listenEdit.address" :placeholder="t('conntrackSync.placeholders.ipv4Address')" /></div>
         <template #footer>
-          <ToolbarButton @click="showListenModal = false">取消</ToolbarButton>
-          <ToolbarButton icon="save" primary @click="saveListen">保存</ToolbarButton>
+          <ToolbarButton @click="showListenModal = false">{{ t('conntrackSync.buttons.cancel') }}</ToolbarButton>
+          <ToolbarButton icon="save" primary @click="saveListen">{{ t('conntrackSync.buttons.save') }}</ToolbarButton>
         </template>
       </DraggableModal>
-
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
     </div>
   `,
 });

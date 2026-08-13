@@ -1087,9 +1087,15 @@ class ConfigService:
                 suggestions = self._list_config_keys(['firewall', 'group', 'interface-group'])
             # Firewall groups
             elif field == 'address-group':
-                suggestions = self._list_config_keys(['firewall', 'group', 'address-group'])
+                if 'ipv6' in path_list:
+                    suggestions = self._list_config_keys(['firewall', 'group', 'ipv6-address-group'])
+                else:
+                    suggestions = self._list_config_keys(['firewall', 'group', 'address-group'])
             elif field == 'network-group':
-                suggestions = self._list_config_keys(['firewall', 'group', 'network-group'])
+                if 'ipv6' in path_list:
+                    suggestions = self._list_config_keys(['firewall', 'group', 'ipv6-network-group'])
+                else:
+                    suggestions = self._list_config_keys(['firewall', 'group', 'network-group'])
             elif field == 'port-group':
                 suggestions = self._list_config_keys(['firewall', 'group', 'port-group'])
             elif field == 'domain-group':
@@ -1201,42 +1207,50 @@ class ConfigService:
 
     # ---------- help documentation ----------
 
-    def get_help(self, path):
-        """Return help markdown content for a given frontend route path."""
+    def get_help(self, path, lang='en'):
+        """Return help content (html or markdown) for a given frontend route path and language."""
         try:
             base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
             docs_dir = os.path.join(base_dir, 'docs')
             mapping_file = os.path.join(base_dir, 'backend', 'data', 'help_mapping.json')
 
+            # Supported languages
+            supported_langs = ['en', 'zh', 'ru', 'fr', 'de']
+            if lang not in supported_langs:
+                lang = 'en'
+
             # Try mapping file first
-            mapped_file = None
+            mapped_filename = None
             if os.path.exists(mapping_file):
                 try:
                     with open(mapping_file, 'r', encoding='utf-8') as f:
                         mapping = json.load(f)
-                    mapped = mapping.get(path)
-                    if mapped:
-                        mapped_file = os.path.join(docs_dir, mapped)
+                    mapped_filename = mapping.get(path)
                 except Exception:
                     pass
 
-            # Fallback: docs/{sanitized_path}.md
-            if not mapped_file or not os.path.exists(mapped_file):
+            # Fallback: derive filename from path
+            if not mapped_filename:
                 safe_path = re.sub(r'[^\w\-/.]', '_', path).strip('/').replace('/', '_')
-                if not safe_path:
-                    safe_path = 'index'
-                mapped_file = os.path.join(docs_dir, f'{safe_path}.md')
+                mapped_filename = f'{safe_path}.html'
 
-            if os.path.exists(mapped_file) and os.path.isfile(mapped_file):
-                with open(mapped_file, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                return {'success': True, 'path': path, 'content': content}
+            # Try language-specific file first, then fallback to English
+            lang_dirs = [lang, 'en']
+            for ldir in lang_dirs:
+                mapped_file = os.path.join(docs_dir, ldir, mapped_filename)
+                if os.path.exists(mapped_file) and os.path.isfile(mapped_file):
+                    with open(mapped_file, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                    fmt = 'html' if mapped_file.endswith('.html') else 'md'
+                    return {'success': True, 'path': path, 'content': content, 'format': fmt, 'lang': ldir}
 
-            # Final fallback: return a default hint with the expected file path
+            # Final fallback
             return {
                 'success': True,
                 'path': path,
-                'content': f'暂无 {path} 的帮助文档。\n可在 {mapped_file} 添加 Markdown 格式的帮助内容。'
+                'content': f'暂无 {path} 的帮助文档。\n可在 {docs_dir}/en/{mapped_filename} 添加 HTML 格式的帮助内容。',
+                'format': 'md',
+                'lang': lang
             }
         except Exception as e:
             return _structured_error('HELP_ERROR', str(e), traceback.format_exc())

@@ -1,0 +1,429 @@
+{
+  "zh-CN": {
+    "accesslistv6": {
+      "buttons": {
+        "create": "创建",
+        "delete": "删除",
+        "edit": "编辑",
+        "refresh": "刷新"
+      },
+      "columns": {
+        "action": "action",
+        "description": "描述",
+        "ipv6Prefix": "ipv6Prefix",
+        "listName": "list 名称",
+        "ruleCount": "ruleCount",
+        "ruleNumber": "ruleNumber",
+        "source": "source",
+        "type": "类型"
+      },
+      "help": {
+        "listName": "list 名称",
+        "ruleRange": "rule 范围"
+      },
+      "messages": {
+        "confirmDeleteList": "确定 删除 list",
+        "confirmDeleteRule": "确定 删除 rule",
+        "selectList": "请选择 list",
+        "selectRule": "请选择 rule"
+      },
+      "modals": {
+        "confirmDelete": "确定 删除",
+        "createList": "创建 list",
+        "createRule": "创建 rule",
+        "editList": "编辑 list",
+        "editRule": "编辑 rule"
+      },
+      "placeholder": {
+        "ipv6Prefix": "ipv6Prefix"
+      },
+      "sections": {
+        "rules": "rules"
+      },
+      "sourceTypes": {
+        "exactMatch": "exactMatch",
+        "network": "network"
+      },
+      "tabs": {
+        "basic": "basic",
+        "source": "source"
+      },
+      "typeLabel": "类型 label",
+      "validation": {
+        "enterListName": "enter list 名称",
+        "enterRuleNumber": "enterRuleNumber",
+        "enterSourceIpv6Prefix": "enterSourceIpv6Prefix",
+        "listNameExists": "list 名称 exists",
+        "ruleNumberExists": "ruleNumberExists",
+        "ruleNumberRange": "rule number 范围",
+        "selectAction": "请选择 action"
+      }
+    }
+  },
+  "en": {
+    "accesslistv6": {
+      "buttons": {
+        "create": "Create",
+        "delete": "Delete",
+        "edit": "Edit",
+        "refresh": "Refresh"
+      },
+      "columns": {
+        "action": "Action",
+        "description": "Description",
+        "ipv6Prefix": "Ipv6 Prefix",
+        "listName": "List Name",
+        "ruleCount": "Rule Count",
+        "ruleNumber": "Rule Number",
+        "source": "Source",
+        "type": "Type"
+      },
+      "help": {
+        "listName": "List Name",
+        "ruleRange": "Rule Range"
+      },
+      "messages": {
+        "confirmDeleteList": "Confirm Delete List",
+        "confirmDeleteRule": "Confirm Delete Rule",
+        "selectList": "Select List",
+        "selectRule": "Select Rule"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "createList": "Create List",
+        "createRule": "Create Rule",
+        "editList": "Edit List",
+        "editRule": "Edit Rule"
+      },
+      "placeholder": {
+        "ipv6Prefix": "Ipv6 Prefix"
+      },
+      "sections": {
+        "rules": "Rules"
+      },
+      "sourceTypes": {
+        "exactMatch": "Exact Match",
+        "network": "Network"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "source": "Source"
+      },
+      "typeLabel": "Type Label",
+      "validation": {
+        "enterListName": "Enter List Name",
+        "enterRuleNumber": "Enter Rule Number",
+        "enterSourceIpv6Prefix": "Enter Source Ipv6 Prefix",
+        "listNameExists": "List Name Exists",
+        "ruleNumberExists": "Rule Number Exists",
+        "ruleNumberRange": "Rule Number Range",
+        "selectAction": "Select Action"
+      }
+    }
+  },
+  "zh-TW": {
+    "accesslistv6": {
+      "buttons": {
+        "create": "Create",
+        "delete": "Delete",
+        "edit": "Edit",
+        "refresh": "Refresh"
+      },
+      "columns": {
+        "action": "Action",
+        "description": "Description",
+        "ipv6Prefix": "Ipv6 Prefix",
+        "listName": "List Name",
+        "ruleCount": "Rule Count",
+        "ruleNumber": "Rule Number",
+        "source": "Source",
+        "type": "Type"
+      },
+      "help": {
+        "listName": "List Name",
+        "ruleRange": "Rule Range"
+      },
+      "messages": {
+        "confirmDeleteList": "Confirm Delete List",
+        "confirmDeleteRule": "Confirm Delete Rule",
+        "selectList": "Select List",
+        "selectRule": "Select Rule"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "createList": "Create List",
+        "createRule": "Create Rule",
+        "editList": "Edit List",
+        "editRule": "Edit Rule"
+      },
+      "placeholder": {
+        "ipv6Prefix": "Ipv6 Prefix"
+      },
+      "sections": {
+        "rules": "Rules"
+      },
+      "sourceTypes": {
+        "exactMatch": "Exact Match",
+        "network": "Network"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "source": "Source"
+      },
+      "typeLabel": "Type Label",
+      "validation": {
+        "enterListName": "Enter List Name",
+        "enterRuleNumber": "Enter Rule Number",
+        "enterSourceIpv6Prefix": "Enter Source Ipv6 Prefix",
+        "listNameExists": "List Name Exists",
+        "ruleNumberExists": "Rule Number Exists",
+        "ruleNumberRange": "Rule Number Range",
+        "selectAction": "Select Action"
+      }
+    }
+  },
+  "ru": {
+    "accesslistv6": {
+      "buttons": {
+        "create": "Create",
+        "delete": "Delete",
+        "edit": "Edit",
+        "refresh": "Refresh"
+      },
+      "columns": {
+        "action": "Action",
+        "description": "Description",
+        "ipv6Prefix": "Ipv6 Prefix",
+        "listName": "List Name",
+        "ruleCount": "Rule Count",
+        "ruleNumber": "Rule Number",
+        "source": "Source",
+        "type": "Type"
+      },
+      "help": {
+        "listName": "List Name",
+        "ruleRange": "Rule Range"
+      },
+      "messages": {
+        "confirmDeleteList": "Confirm Delete List",
+        "confirmDeleteRule": "Confirm Delete Rule",
+        "selectList": "Select List",
+        "selectRule": "Select Rule"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "createList": "Create List",
+        "createRule": "Create Rule",
+        "editList": "Edit List",
+        "editRule": "Edit Rule"
+      },
+      "placeholder": {
+        "ipv6Prefix": "Ipv6 Prefix"
+      },
+      "sections": {
+        "rules": "Rules"
+      },
+      "sourceTypes": {
+        "exactMatch": "Exact Match",
+        "network": "Network"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "source": "Source"
+      },
+      "typeLabel": "Type Label",
+      "validation": {
+        "enterListName": "Enter List Name",
+        "enterRuleNumber": "Enter Rule Number",
+        "enterSourceIpv6Prefix": "Enter Source Ipv6 Prefix",
+        "listNameExists": "List Name Exists",
+        "ruleNumberExists": "Rule Number Exists",
+        "ruleNumberRange": "Rule Number Range",
+        "selectAction": "Select Action"
+      }
+    }
+  },
+  "de": {
+    "accesslistv6": {
+      "buttons": {
+        "create": "Create",
+        "delete": "Delete",
+        "edit": "Edit",
+        "refresh": "Refresh"
+      },
+      "columns": {
+        "action": "Action",
+        "description": "Description",
+        "ipv6Prefix": "Ipv6 Prefix",
+        "listName": "List Name",
+        "ruleCount": "Rule Count",
+        "ruleNumber": "Rule Number",
+        "source": "Source",
+        "type": "Type"
+      },
+      "help": {
+        "listName": "List Name",
+        "ruleRange": "Rule Range"
+      },
+      "messages": {
+        "confirmDeleteList": "Confirm Delete List",
+        "confirmDeleteRule": "Confirm Delete Rule",
+        "selectList": "Select List",
+        "selectRule": "Select Rule"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "createList": "Create List",
+        "createRule": "Create Rule",
+        "editList": "Edit List",
+        "editRule": "Edit Rule"
+      },
+      "placeholder": {
+        "ipv6Prefix": "Ipv6 Prefix"
+      },
+      "sections": {
+        "rules": "Rules"
+      },
+      "sourceTypes": {
+        "exactMatch": "Exact Match",
+        "network": "Network"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "source": "Source"
+      },
+      "typeLabel": "Type Label",
+      "validation": {
+        "enterListName": "Enter List Name",
+        "enterRuleNumber": "Enter Rule Number",
+        "enterSourceIpv6Prefix": "Enter Source Ipv6 Prefix",
+        "listNameExists": "List Name Exists",
+        "ruleNumberExists": "Rule Number Exists",
+        "ruleNumberRange": "Rule Number Range",
+        "selectAction": "Select Action"
+      }
+    }
+  },
+  "fr": {
+    "accesslistv6": {
+      "buttons": {
+        "create": "Create",
+        "delete": "Delete",
+        "edit": "Edit",
+        "refresh": "Refresh"
+      },
+      "columns": {
+        "action": "Action",
+        "description": "Description",
+        "ipv6Prefix": "Ipv6 Prefix",
+        "listName": "List Name",
+        "ruleCount": "Rule Count",
+        "ruleNumber": "Rule Number",
+        "source": "Source",
+        "type": "Type"
+      },
+      "help": {
+        "listName": "List Name",
+        "ruleRange": "Rule Range"
+      },
+      "messages": {
+        "confirmDeleteList": "Confirm Delete List",
+        "confirmDeleteRule": "Confirm Delete Rule",
+        "selectList": "Select List",
+        "selectRule": "Select Rule"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "createList": "Create List",
+        "createRule": "Create Rule",
+        "editList": "Edit List",
+        "editRule": "Edit Rule"
+      },
+      "placeholder": {
+        "ipv6Prefix": "Ipv6 Prefix"
+      },
+      "sections": {
+        "rules": "Rules"
+      },
+      "sourceTypes": {
+        "exactMatch": "Exact Match",
+        "network": "Network"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "source": "Source"
+      },
+      "typeLabel": "Type Label",
+      "validation": {
+        "enterListName": "Enter List Name",
+        "enterRuleNumber": "Enter Rule Number",
+        "enterSourceIpv6Prefix": "Enter Source Ipv6 Prefix",
+        "listNameExists": "List Name Exists",
+        "ruleNumberExists": "Rule Number Exists",
+        "ruleNumberRange": "Rule Number Range",
+        "selectAction": "Select Action"
+      }
+    }
+  },
+  "ko": {
+    "accesslistv6": {
+      "buttons": {
+        "create": "Create",
+        "delete": "Delete",
+        "edit": "Edit",
+        "refresh": "Refresh"
+      },
+      "columns": {
+        "action": "Action",
+        "description": "Description",
+        "ipv6Prefix": "Ipv6 Prefix",
+        "listName": "List Name",
+        "ruleCount": "Rule Count",
+        "ruleNumber": "Rule Number",
+        "source": "Source",
+        "type": "Type"
+      },
+      "help": {
+        "listName": "List Name",
+        "ruleRange": "Rule Range"
+      },
+      "messages": {
+        "confirmDeleteList": "Confirm Delete List",
+        "confirmDeleteRule": "Confirm Delete Rule",
+        "selectList": "Select List",
+        "selectRule": "Select Rule"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "createList": "Create List",
+        "createRule": "Create Rule",
+        "editList": "Edit List",
+        "editRule": "Edit Rule"
+      },
+      "placeholder": {
+        "ipv6Prefix": "Ipv6 Prefix"
+      },
+      "sections": {
+        "rules": "Rules"
+      },
+      "sourceTypes": {
+        "exactMatch": "Exact Match",
+        "network": "Network"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "source": "Source"
+      },
+      "typeLabel": "Type Label",
+      "validation": {
+        "enterListName": "Enter List Name",
+        "enterRuleNumber": "Enter Rule Number",
+        "enterSourceIpv6Prefix": "Enter Source Ipv6 Prefix",
+        "listNameExists": "List Name Exists",
+        "ruleNumberExists": "Rule Number Exists",
+        "ruleNumberRange": "Rule Number Range",
+        "selectAction": "Select Action"
+      }
+    }
+  }
+}

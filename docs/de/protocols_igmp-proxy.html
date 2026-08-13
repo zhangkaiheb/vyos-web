@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="igmp-proxy">
+<h1>IGMP Proxy</h1>
+<p>Der <abbr title="Internet Group Management Protocol">IGMP</abbr>-Proxy ermöglicht es Routern, Multicast-Datenverkehr, wie IPTV oder Video-Streams, zwischen verschiedenen Netzwerken, wie Heimnetzwerken und ISP's, zu übertragen. Der IGMP-Proxy verlässt sich auf eine Upstream-Schnittstelle, die gegenüber Upstream-Multicast-Quellen liegt, und eine oder mehrere Downstream-Schnittstellen, die gegenüber lokalen Netzwerken oder Hosts liegen und den Datenverkehr an anfragende Clients weiterleiten.</p>
+<p>Die IGMP-Proxy-Konfiguration erfordert genau eine Upstream-Schnittstelle und mindestens eine Downstream-Schnittstelle.</p>
+<section id="configuration">
+<h2>Konfiguration</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols igmp-proxy interface &lt;interface&gt; role &lt;upstream | downstream&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-igmp-proxy-interface-interface-role-upstream-downstream" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie den Betriebsmodus für die angegebene IGMP-Proxy-Schnittstelle.</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">upstream</code>: Kommuniziert mit Upstream-Multicast-Quellen, um den Multicast-Datenverkehr abzufragen. Eine gültige Konfiguration erfordert genau eine Upstream-Schnittstelle.</p></li>
+<li><p><code class="docutils literal notranslate">downstream</code>: Kommuniziert mit Downstream-Lokalnetzen oder Hosts, um den angeforderten Datenverkehr zu verteilen. Eine gültige Konfiguration erfordert mindestens eine Downstream-Schnittstelle.</p></li>
+</ul>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols igmp-proxy interface eth0 role upstream
+set protocols igmp-proxy interface eth1 role downstream
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols igmp-proxy interface &lt;interface&gt; alt-subnet &lt;network&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-igmp-proxy-interface-interface-alt-subnet-network" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie ein erlaubtes Remote-Subnetz für eingehenden Multicast-Datenverkehr auf der angegebenen IGMP-Proxy-Schnittstelle</strong></p>
+<p>Standardmäßig akzeptiert der IGMP-Proxy Multicast-Datenverkehr nur von direkt angeschlossenen Subnetzen. Wenn eine Multicast-Quelle auf einem entfernten Netzwerk liegt, müssen Sie das erlaubte Remote-Subnetz explizit definieren, um den Datenverkehr zu erlauben.</p>
+<p>Sie können mehrere Remote-Subnetze für eine <strong>Upstream</strong>-IGMP-Proxy-Schnittstelle konfigurieren.</p>
+<p>Upstream-Schnittstellen benötigen häufig diese Konfiguration, da Multicast-Quellen typischerweise auf externen Subnetzen liegen.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols igmp-proxy interface eth0 alt-subnet 10.0.0.0/8
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols igmp-proxy interface &lt;interface&gt; whitelist &lt;network&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-igmp-proxy-interface-interface-whitelist-network" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie ein erlaubtes Zielnetzwerk für Multicast-Datenverkehrsanfragen auf der angegebenen IGMP-Proxy-Schnittstelle.</strong></p>
+<p>Standardmäßig akzeptiert der IGMP-Proxy Anfragen für alle Multicast-Zielnetze. Wenn Sie eine Whitelist definieren, leitet der IGMP-Proxy Anfragen nur für die angegebenen Multicast-Netze weiter.</p>
+<p>Sie können pro <strong>Downstream</strong>-IGMP-Proxy-Schnittstelle mehrere Whitelist-Einträge konfigurieren.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols igmp-proxy interface eth1 whitelist 239.0.0.0/8
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols igmp-proxy interface &lt;interface&gt; threshold &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-igmp-proxy-interface-interface-threshold-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie den TTL-Schwellwert für die angegebene IGMP-Proxy-Schnittstelle.</strong></p>
+<p>Der IGMP-Proxy verwirft jedes Multicast-Paket mit einem TTL-Wert unter dem konfigurierten Schwellwert.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols igmp-proxy interface eth0 threshold 5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols igmp-proxy disable-quickleave
+<a class="cmdlink" href="#cfgcmd-set-protocols-igmp-proxy-disable-quickleave" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie den Quickleave-Modus für den IGMP-Proxy.</strong></p>
+<p>Wenn deaktiviert, sendet der IGMP-Proxy kein Upstream-Leave-Nachricht, wenn eine Downstream-Leave-Nachricht empfangen wird, wodurch die sofortige Beendigung des Upstream-Multicast-Datenverkehrs verhindert wird. Der IGMP-Proxy hört auch auf, Downstream-Schnittstellen nach Mitgliedschaftsberichten zu fragen. Wenn ein Downstream-Klient einen neuen Bericht sendet, verwirft der IGMP-Proxy die Nachricht und nimmt den Datenverkehr nicht wieder auf.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Das Deaktivieren des Quickleave-Modus führt dazu, dass der IGMP-Proxy sich exakt wie ein standardmäßiger Multicast-Client auf der Upstream-Schnittstelle verhält.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Das Deaktivieren des Quickleave-Modus erhöht das Risiko einer Bandbreitenüberlastung im Netzwerk.</p>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols igmp-proxy disable-quickleave
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols igmp-proxy disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-igmp-proxy-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie den IGMP-Proxy auf dem Router.</strong></p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols igmp-proxy disable
+</pre></div>
+</div>
+</section>
+<section id="operation">
+<h2>Betrieb</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+restart igmp-proxy
+<a class="cmdlink" href="#opcmd-restart-igmp-proxy" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Starten Sie den IGMP-Proxy-Prozess neu.</p>
+</div>
+</div>
+</section>
+<section id="example">
+<h2>Beispiel</h2>
+<p>In diesem Beispiel betreibt die lokale LAN-Schnittstelle eth1 hinter NAT. Um den lokalen Clients zu ermöglichen, Multicast-Datenverkehr zu empfangen, der aus dem Quellnetzwerk 198.51.100.0/24 auf der WAN-Schnittstelle (eth0) stammt, konfigurieren Sie den IGMP-Proxy wie folgt:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols igmp-proxy interface eth0 role upstream
+set protocols igmp-proxy interface eth0 alt-subnet 198.51.100.0/24
+set protocols igmp-proxy interface eth1 role downstream
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

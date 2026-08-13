@@ -5,14 +5,7 @@ import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
-
-const TABS = [
-  { key: 'basic', title: '基本设置' },
-  { key: 'neighbor', title: '邻居缓存' },
-  { key: 'multipath', title: '多路径' },
-  { key: 'nht', title: 'NHT' },
-  { key: 'protocol', title: '协议' },
-];
+import { useI18n } from '/src/i18n/index.js';
 
 const PROTOCOLS = ['any', 'babel', 'bgp', 'eigrp', 'isis', 'ospf', 'rip', 'static'];
 const NEIGHBOR_SIZES = ['1024', '2048', '4096', '8192', '16384', '32768'];
@@ -21,11 +14,19 @@ export default defineComponent({
   name: 'SystemIpv6Page',
   components: { TabGroup, ToolbarButton },
   setup() {
+    const { t } = useI18n();
     const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
     const activeTab = ref('basic');
+
+    const TABS = computed(() => [
+      { key: 'basic', title: t('systemIpv6.tabs.basic') },
+      { key: 'neighbor', title: t('systemIpv6.tabs.neighbor') },
+      { key: 'multipath', title: t('systemIpv6.tabs.multipath') },
+      { key: 'nht', title: t('systemIpv6.tabs.nht') },
+      { key: 'protocol', title: t('systemIpv6.tabs.protocol') },
+    ]);
 
     const config = ref({
       'disable-forwarding': false,
@@ -40,7 +41,6 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('system ipv6', true);
         const d = res.data || {};
@@ -64,7 +64,7 @@ export default defineComponent({
         }
         config.value = c;
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('systemIpv6.errors.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -87,11 +87,10 @@ export default defineComponent({
         for (const [proto, rm] of Object.entries(c.protocol)) {
           if (rm) await configApi.set(`system ipv6 protocol ${proto} route-map`, rm);
         }
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('systemIpv6.errors.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -99,61 +98,58 @@ export default defineComponent({
 
     onMounted(() => { load(); onMenuRefresh(load); });
 
-    return {
-      loading, saving, saved, config, activeTab, commandPath,
+    return {t,
+      
+      loading, saving, config, activeTab, commandPath,
       TABS, PROTOCOLS, NEIGHBOR_SIZES,
       load, save,
     };
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
       <TabGroup v-model="activeTab" :tabs="TABS">
         <template #basic>
           <div class="form-row">
-            <label class="form-label">禁用 IPv6 转发</label>
+            <label class="form-label">{{ t('systemIpv6.labels.disableIpv6Forwarding') }}</label>
             <input type="checkbox" v-model="config['disable-forwarding']" />
-            <span class="form-hint">禁用所有接口的 IPv6 转发</span>
+            <span class="form-hint">{{ t('systemIpv6.hints.disableIpv6Forwarding') }}</span>
           </div>
           <div class="form-row">
-            <label class="form-label">Strict DAD</label>
+            <label class="form-label">{{ t('systemIpv6.labels.strictDad') }}</label>
             <input type="checkbox" v-model="config['strict-dad']" />
-            <span class="form-hint">当 DAD 失败时禁用接口 IPv6 操作</span>
+            <span class="form-hint">{{ t('systemIpv6.hints.strictDad') }}</span>
           </div>
         </template>
         <template #neighbor>
           <div class="form-row">
-            <label class="form-label">邻居表大小</label>
+            <label class="form-label">{{ t('systemIpv6.labels.neighborTableSize') }}</label>
             <select v-model="config.neighbor['table-size']" class="form-control" style="width:150px">
               <option v-for="s in NEIGHBOR_SIZES" :key="s" :value="s">{{ s }}</option>
             </select>
-            <span class="form-hint">邻居发现缓存最大条目数（默认: 8192）</span>
+            <span class="form-hint">{{ t('systemIpv6.hints.neighborTableSize') }}</span>
           </div>
         </template>
         <template #multipath>
           <div class="form-row">
-            <label class="form-label">Layer4 哈希</label>
+            <label class="form-label">{{ t('systemIpv6.labels.layer4Hash') }}</label>
             <input type="checkbox" v-model="config.multipath['layer4-hashing']" />
-            <span class="form-hint">使用 Layer 4 信息进行 ECMP 哈希</span>
+            <span class="form-hint">{{ t('systemIpv6.hints.layer4Hash') }}</span>
           </div>
         </template>
         <template #nht>
           <div class="form-row">
-            <label class="form-label">不通过默认路由解析</label>
+            <label class="form-label">{{ t('systemIpv6.labels.resolveViaDefault') }}</label>
             <input type="checkbox" v-model="config.nht['no-resolve-via-default']" />
-            <span class="form-hint">不通过默认路由解析下一跳</span>
+            <span class="form-hint">{{ t('systemIpv6.hints.resolveViaDefault') }}</span>
           </div>
         </template>
         <template #protocol>
           <div v-for="proto in PROTOCOLS" :key="proto" class="form-row">
             <label class="form-label">{{ proto }}</label>
-            <input class="form-control" v-model="config.protocol[proto]" placeholder="Route-map 名称" />
+            <input class="form-control" v-model="config.protocol[proto]" :placeholder="t('systemIpv6.placeholders.routeMapName')" />
           </div>
         </template>
       </TabGroup>
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-      </div>
     </div>
   `,
 });

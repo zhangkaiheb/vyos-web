@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, watch, onMounted, onUnmounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, watch, onMounted, onUnmounted, inject } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
@@ -10,84 +10,84 @@ import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh, offMenuRefresh } from '/src/utils/eventBus.js';
 
 const DYNAMIC_SUB_TYPES = [
-  { key: 'address-group', title: 'IPv4 动态地址组', memberTitle: '地址组', memberKey: null },
-  { key: 'ipv6-address-group', title: 'IPv6 动态地址组', memberTitle: '地址组', memberKey: null },
+  { key: 'address-group', titleKey: 'firewall.group.ipv4DynamicAddressGroup', memberTitleKey: 'firewall.group.addressGroup' },
+  { key: 'ipv6-address-group', titleKey: 'firewall.group.ipv6DynamicAddressGroup', memberTitleKey: 'firewall.group.addressGroup' },
 ];
 
 const GROUP_META = {
   'address-group': {
-    title: '地址组',
+    titleKey: 'firewall.group.addressGroup',
     memberKey: 'address',
-    memberTitle: '地址',
+    memberTitleKey: 'firewall.group.address',
     memberValidate: 'ip-segment',
-    memberPlaceholder: '每行一个值，支持单个 IPv4 地址或地址段（如 1.1.1.1 或 1.1.1.1-1.1.1.10）',
+    memberPlaceholderKey: 'firewall.group.ipv4AddressPlaceholder',
     includeKey: 'include',
     hasDescription: true,
   },
   'domain-group': {
-    title: '域名组',
+    titleKey: 'firewall.group.domainGroup',
     memberKey: 'address',
-    memberTitle: '域名',
-    memberPlaceholder: '每行一个域名（如 example.com）',
+    memberTitleKey: 'firewall.group.domain',
+    memberPlaceholderKey: 'firewall.group.domainPlaceholder',
     includeKey: null,
     hasDescription: true,
   },
   'interface-group': {
-    title: '接口组',
+    titleKey: 'firewall.group.interfaceGroup',
     memberKey: 'interface',
-    memberTitle: '接口',
-    memberPlaceholder: '每行一个接口名（如 eth0 或 eth1.10）',
+    memberTitleKey: 'firewall.group.interface',
+    memberPlaceholderKey: 'firewall.group.interfacePlaceholder',
     dynamicSuggestions: true,
     includeKey: 'include',
     hasDescription: true,
   },
   'ipv6-address-group': {
-    title: 'IPv6 地址组',
+    titleKey: 'firewall.group.ipv6AddressGroup',
     memberKey: 'address',
-    memberTitle: '地址',
+    memberTitleKey: 'firewall.group.address',
     memberValidate: 'ipv6',
-    memberPlaceholder: '每行一个值，支持单个 IPv6 地址或地址段（如 2001::1 或 2001::1-2001::ff）',
+    memberPlaceholderKey: 'firewall.group.ipv6AddressPlaceholder',
     includeKey: 'include',
     hasDescription: true,
   },
   'ipv6-network-group': {
-    title: 'IPv6 网络组',
+    titleKey: 'firewall.group.ipv6NetworkGroup',
     memberKey: 'network',
-    memberTitle: '网络',
+    memberTitleKey: 'firewall.group.network',
     memberValidate: 'ipv6-prefix',
-    memberPlaceholder: '每行一个 IPv6 网络（如 2001::/64）',
+    memberPlaceholderKey: 'firewall.group.ipv6NetworkPlaceholder',
     includeKey: 'include',
     hasDescription: true,
   },
   'mac-group': {
-    title: 'MAC 组',
+    titleKey: 'firewall.group.macGroup',
     memberKey: 'mac-address',
-    memberTitle: 'MAC 地址',
+    memberTitleKey: 'firewall.group.macAddress',
     memberValidate: 'mac',
-    memberPlaceholder: '每行一个 MAC 地址（如 00:11:22:33:44:55）',
+    memberPlaceholderKey: 'firewall.group.macPlaceholder',
     includeKey: null,
     hasDescription: true,
   },
   'network-group': {
-    title: '网络组',
+    titleKey: 'firewall.group.networkGroup',
     memberKey: 'network',
-    memberTitle: '网络',
+    memberTitleKey: 'firewall.group.network',
     memberValidate: 'ipv4-prefix',
-    memberPlaceholder: '每行一个 IPv4 网络（如 192.168.1.0/24）',
+    memberPlaceholderKey: 'firewall.group.ipv4NetworkPlaceholder',
     includeKey: 'include',
     hasDescription: true,
   },
   'port-group': {
-    title: '端口组',
+    titleKey: 'firewall.group.portGroup',
     memberKey: 'port',
-    memberTitle: '端口',
+    memberTitleKey: 'firewall.group.port',
     memberValidate: 'port',
-    memberPlaceholder: '每行一个端口或端口段（如 80 或 1000-2000）',
+    memberPlaceholderKey: 'firewall.group.portPlaceholder',
     includeKey: 'include',
     hasDescription: true,
   },
   'dynamic-group': {
-    title: '动态组',
+    titleKey: 'firewall.group.dynamicGroup',
     isDynamic: true,
   },
 };
@@ -127,6 +127,7 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const configStore = useConfigStore();
+    const { t } = inject('i18n');
     const data = ref([]);
     const loading = ref(false);
     const modalVisible = ref(false);
@@ -134,6 +135,8 @@ export default defineComponent({
     const selected = ref([]);
     const activeDynamicTab = ref(DYNAMIC_SUB_TYPES[0].key);
     const availableIncludes = ref([]);
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
 
     const groupType = computed(() => {
       const parts = route.path.replace(/^\//, '').split('/').filter(Boolean);
@@ -151,27 +154,41 @@ export default defineComponent({
 
     const dynamicBasePath = computed(() => `${basePath.value} ${activeDynamicTab.value}`);
 
+    const resolvedDynamicSubTypes = computed(() =>
+      DYNAMIC_SUB_TYPES.map(dt => ({ ...dt, title: t(dt.titleKey), memberTitle: t(dt.memberTitleKey) }))
+    );
+
+    const resolvedMeta = computed(() => {
+      const m = meta.value;
+      return {
+        ...m,
+        title: m.titleKey ? t(m.titleKey) : '',
+        memberTitle: m.memberTitleKey ? t(m.memberTitleKey) : '',
+        memberPlaceholder: m.memberPlaceholderKey ? t(m.memberPlaceholderKey) : '',
+      };
+    });
+
     const columns = computed(() => {
-      const cols = [{ key: 'name', title: '名称' }];
-      if (meta.value.hasDescription) cols.push({ key: 'description', title: '描述' });
-      if (meta.value.memberKey) cols.push({ key: 'members', title: meta.value.memberTitle });
-      if (meta.value.includeKey) cols.push({ key: 'includes', title: '包含组' });
+      const cols = [{ key: 'name', title: t('rule.name') }];
+      if (resolvedMeta.value.hasDescription) cols.push({ key: 'description', title: t('rule.description') });
+      if (resolvedMeta.value.memberKey) cols.push({ key: 'members', title: resolvedMeta.value.memberTitle });
+      if (resolvedMeta.value.includeKey) cols.push({ key: 'includes', title: t('firewall.group.includeGroup') });
       return cols;
     });
 
     const dynamicColumns = computed(() => [
-      { key: 'name', title: '名称' },
-      { key: 'description', title: '描述' },
+      { key: 'name', title: t('rule.name') },
+      { key: 'description', title: t('rule.description') },
     ]);
 
     const tableData = computed(() => {
       return data.value.map(item => {
         const row = { ...item };
-        if (meta.value.memberKey) {
-          row.members = toArray(item[meta.value.memberKey]).join(', ');
+        if (resolvedMeta.value.memberKey) {
+          row.members = toArray(item[resolvedMeta.value.memberKey]).join(', ');
         }
-        if (meta.value.includeKey) {
-          row.includes = toArray(item[meta.value.includeKey]).join(', ');
+        if (resolvedMeta.value.includeKey) {
+          row.includes = toArray(item[resolvedMeta.value.includeKey]).join(', ');
         }
         return row;
       });
@@ -192,7 +209,7 @@ export default defineComponent({
     }
 
     async function loadIncludes() {
-      if (!meta.value.includeKey) {
+      if (!resolvedMeta.value.includeKey) {
         availableIncludes.value = [];
         return;
       }
@@ -236,14 +253,14 @@ export default defineComponent({
     }
 
     function edit() {
-      if (!selected.value.length) return alert('请选择一行');
+      if (!selected.value.length) return showError({ message: t('firewall.selectRow') });
       const row = data.value.find(r => r.id === selected.value[0]) || {};
       const item = { ...row };
-      if (meta.value.memberKey) {
-        item.members = joinMembers(row[meta.value.memberKey]);
+      if (resolvedMeta.value.memberKey) {
+        item.members = joinMembers(row[resolvedMeta.value.memberKey]);
       }
-      if (meta.value.includeKey) {
-        item.includes = toArray(row[meta.value.includeKey]);
+      if (resolvedMeta.value.includeKey) {
+        item.includes = toArray(row[resolvedMeta.value.includeKey]);
       }
       editingItem.value = item;
       loadIncludes();
@@ -251,24 +268,35 @@ export default defineComponent({
     }
 
     async function remove() {
-      if (!selected.value.length) return alert('请选择一行');
-      if (!confirm('确认删除选中的组？')) return;
+      if (!selected.value.length) return showError({ message: t('firewall.selectRow') });
+      pendingDeleteNames.value = selected.value.map(id => {
+        const row = data.value.find(r => r.id === id);
+        return row ? (row.name || row.id) : id;
+      });
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemove() {
+      deleteModalVisible.value = false;
       const path = isDynamic.value ? dynamicBasePath.value : basePath.value;
-      for (const id of selected.value) {
-        await configStore.deleteConfig(`${path} ${id}`);
+      for (const name of pendingDeleteNames.value) {
+        await configStore.deleteConfig(`${path} ${name}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selected.value = [];
+      pendingDeleteNames.value = [];
       await load();
     }
 
     async function save() {
       const id = editingItem.value.name;
-      if (!id) return alert('请输入名称');
+      if (!id) return showError({ message: t('firewall.enterName') });
       const path = isDynamic.value ? dynamicBasePath.value : basePath.value;
-      const value = buildSaveValue(editingItem.value, meta.value);
+      const value = buildSaveValue(editingItem.value, resolvedMeta.value);
       try {
         await configStore.setConfig(`${path} ${id}`, value);
+        configStore.markPending();
         modalVisible.value = false;
         await configStore.checkSessionChanged();
         await load();
@@ -279,46 +307,51 @@ export default defineComponent({
 
     const formSchema = computed(() => {
       const schema = [];
-      schema.push({ key: 'name', title: '名称', type: 'text' });
-      if (meta.value.hasDescription) {
-        schema.push({ key: 'description', title: '描述', type: 'text' });
+      schema.push({ key: 'name', title: t('rule.name'), type: 'text' });
+      if (resolvedMeta.value.hasDescription) {
+        schema.push({ key: 'description', title: t('rule.description'), type: 'text' });
       }
-      if (meta.value.memberKey) {
+      if (resolvedMeta.value.memberKey) {
         schema.push({
           key: 'members',
-          title: meta.value.memberTitle,
+          title: resolvedMeta.value.memberTitle,
           type: 'textarea',
-          placeholder: meta.value.memberPlaceholder || '每行一个值',
+          placeholder: resolvedMeta.value.memberPlaceholder || t('firewall.group.onePerLine'),
           multi: true,
-          validate: meta.value.memberValidate,
-          dynamic: meta.value.dynamicSuggestions,
+          validate: resolvedMeta.value.memberValidate,
+          dynamic: resolvedMeta.value.dynamicSuggestions,
         });
       }
-      if (meta.value.includeKey) {
+      if (resolvedMeta.value.includeKey) {
         const currentName = editingItem.value?.name || '';
-        const selected = toArray(editingItem.value?.includes);
+        const sel = toArray(editingItem.value?.includes);
         const options = Array.from(new Set([
           ...availableIncludes.value.filter(n => n !== currentName),
-          ...selected,
+          ...sel,
         ]));
         schema.push({
           key: 'includes',
-          title: '包含组',
+          title: t('firewall.group.includeGroup'),
           type: 'dual-list',
           options,
-          titleLeft: '可选组',
-          titleRight: '已选组',
+          titleLeft: t('firewall.group.availableGroups'),
+          titleRight: t('firewall.group.selectedGroups'),
         });
       }
       return schema;
     });
 
     const dynamicFormSchema = computed(() => [
-      { key: 'name', title: '名称', type: 'text' },
-      { key: 'description', title: '描述', type: 'text' },
+      { key: 'name', title: t('rule.name'), type: 'text' },
+      { key: 'description', title: t('rule.description'), type: 'text' },
     ]);
 
-    return {
+    const modalTitle = computed(() =>
+      editingItem.value?.id ? t('firewall.group.editGroup') : t('firewall.group.createGroup')
+    );
+
+    return {t,
+      
       data: tableData,
       loading,
       columns,
@@ -330,14 +363,18 @@ export default defineComponent({
       meta,
       isDynamic,
       activeDynamicTab,
-      DYNAMIC_SUB_TYPES,
+      resolvedDynamicSubTypes,
       writeDisabled,
       formSchema,
       dynamicFormSchema,
+      deleteModalVisible,
+      pendingDeleteNames,
+      modalTitle,
       load,
       create,
       edit,
       remove,
+      confirmRemove,
       save,
     };
   },
@@ -351,8 +388,8 @@ export default defineComponent({
         </div>
       </div>
       <template v-if="isDynamic">
-        <TabGroup v-model="activeDynamicTab" :tabs="DYNAMIC_SUB_TYPES">
-          <template v-for="tab in DYNAMIC_SUB_TYPES" :key="tab.key" #[tab.key]>
+        <TabGroup v-model="activeDynamicTab" :tabs="resolvedDynamicSubTypes">
+          <template v-for="tab in resolvedDynamicSubTypes" :key="tab.key" #[tab.key]>
             <DataTable :columns="dynamicColumns" :data="data" :loading="loading" :disabled="writeDisabled"
                        @selection-change="selected = $event" :selectable="true" :externalToolbar="true" />
           </template>
@@ -360,8 +397,14 @@ export default defineComponent({
       </template>
       <DataTable v-else :columns="columns" :data="data" :loading="loading" :disabled="writeDisabled"
                  @selection-change="selected = $event" :selectable="true" :externalToolbar="true" />
-      <DraggableModal v-model:visible="modalVisible" :title="editingItem?.id ? '编辑组' : '创建组'" width="600px" @confirm="save">
+      <DraggableModal v-model:visible="modalVisible" :title="modalTitle" width="600px" @confirm="save">
         <ConfigForm v-model="editingItem" :schema="isDynamic ? dynamicFormSchema : formSchema" :disabled="writeDisabled" :showAdvanced="true" />
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="$t('firewall.confirmDelete')" width="400px" @confirm="confirmRemove">
+        <div>{{ $t('firewall.confirmDeleteGroup') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

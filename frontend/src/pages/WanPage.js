@@ -8,29 +8,36 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
-const TEST_TYPE_OPTIONS = [
-  { value: 'ping', label: 'ping (ICMP echo)' },
-  { value: 'ttl', label: 'ttl (UDP TTL expired)' },
-  { value: 'user-defined', label: 'user-defined (自定义脚本)' },
-];
+function getTestTypeOptions(t) {
+  return [
+    { value: 'ping', label: t('wan.options.testType.ping') },
+    { value: 'ttl', label: t('wan.options.testType.ttl') },
+    { value: 'user-defined', label: t('wan.options.testType.userDefined') },
+  ];
+}
 
-const PROTOCOL_OPTIONS = [
-  { value: 'all', label: 'all (所有协议)' },
-  { value: 'tcp_udp', label: 'tcp_udp (TCP和UDP)' },
-  { value: 'tcp', label: 'tcp' },
-  { value: 'udp', label: 'udp' },
-  { value: 'icmp', label: 'icmp' },
-  { value: 'gre', label: 'gre' },
-  { value: 'esp', label: 'esp' },
-  { value: 'ah', label: 'ah' },
-  { value: 'custom', label: '自定义 (输入协议编号)' },
-];
+function getProtocolOptions(t) {
+  return [
+    { value: 'all', label: t('wan.options.protocol.all') },
+    { value: 'tcp_udp', label: t('wan.options.protocol.tcpUdp') },
+    { value: 'tcp', label: t('wan.options.protocol.tcp') },
+    { value: 'udp', label: t('wan.options.protocol.udp') },
+    { value: 'icmp', label: t('wan.options.protocol.icmp') },
+    { value: 'gre', label: t('wan.options.protocol.gre') },
+    { value: 'esp', label: t('wan.options.protocol.esp') },
+    { value: 'ah', label: t('wan.options.protocol.ah') },
+    { value: 'custom', label: t('wan.options.protocol.custom') },
+  ];
+}
 
-const BALANCE_OPTIONS = [
-  { value: 'flow', label: 'flow (按流)' },
-  { value: 'per-packet-balancing', label: 'per-packet (按包)' },
-];
+function getBalanceOptions(t) {
+  return [
+    { value: 'flow', label: t('wan.options.balance.flow') },
+    { value: 'per-packet-balancing', label: t('wan.options.balance.perPacket') },
+  ];
+}
 
 function emptyHealth() {
   return {
@@ -164,12 +171,12 @@ function healthToCommands(h) {
     cmds.push(`${base} nexthop ${h.nexthop}`);
   }
   if (h.test) {
-    const t = h.test;
-    if (t['resp-time'] && t['resp-time'] !== 5) cmds.push(`${base} test resp-time ${t['resp-time']}`);
-    if (t.target) cmds.push(`${base} test target ${t.target}`);
-    if (t['test-script']) cmds.push(`${base} test test-script ${t['test-script']}`);
-    if (t['ttl-limit'] && t['ttl-limit'] !== 1) cmds.push(`${base} test ttl-limit ${t['ttl-limit']}`);
-    if (t.type && t.type !== 'ping') cmds.push(`${base} test type ${t.type}`);
+    const testObj = h.test;
+    if (testObj['resp-time'] && testObj['resp-time'] !== 5) cmds.push(`${base} test resp-time ${testObj['resp-time']}`);
+    if (testObj.target) cmds.push(`${base} test target ${testObj.target}`);
+    if (testObj['test-script']) cmds.push(`${base} test test-script ${testObj['test-script']}`);
+    if (testObj['ttl-limit'] && testObj['ttl-limit'] !== 1) cmds.push(`${base} test ttl-limit ${testObj['ttl-limit']}`);
+    if (testObj.type && testObj.type !== 'ping') cmds.push(`${base} test type ${testObj.type}`);
   }
   return cmds;
 }
@@ -225,6 +232,7 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const configStore = useConfigStore();
+    const { t } = useI18n();
     const loading = ref(false);
     const globalConfig = ref({
       'disable-source-nat': false,
@@ -244,66 +252,66 @@ export default defineComponent({
     const interfaces = ref([]);
 
     const globalSchema = computed(() => [
-      { key: 'disable-source-nat', title: '禁用源 NAT', type: 'checkbox', help: '禁止为WAN负载均衡配置源NAT规则' },
-      { key: 'enable-local-traffic', title: '启用本地流量', type: 'checkbox', help: '为本地发起的流量启用WAN负载均衡' },
-      { key: 'flush-connections', title: '刷新连接跟踪', type: 'checkbox', help: '连接状态变化时刷新连接跟踪表' },
-      { key: 'hook', title: '状态变更脚本', type: 'text', help: '接口状态变化时执行的脚本路径 (/config/scripts)', placeholder: '如: wlb-hook.sh' },
-      { key: 'sticky-inbound', title: '粘性连接(入方向)', type: 'checkbox', help: '启用粘性入方向WAN连接' },
+      { key: 'disable-source-nat', title: t('wan.global.disableSourceNat'), type: 'checkbox', help: t('wan.global.disableSourceNatHelp') },
+      { key: 'enable-local-traffic', title: t('wan.global.enableLocalTraffic'), type: 'checkbox', help: t('wan.global.enableLocalTrafficHelp') },
+      { key: 'flush-connections', title: t('wan.global.flushConnections'), type: 'checkbox', help: t('wan.global.flushConnectionsHelp') },
+      { key: 'hook', title: t('wan.global.hook'), type: 'text', help: t('wan.global.hookHelp'), placeholder: t('wan.global.hookPlaceholder') },
+      { key: 'sticky-inbound', title: t('wan.global.stickyInbound'), type: 'checkbox', help: t('wan.global.stickyInboundHelp') },
     ]);
 
     const healthSchema = computed(() => [
-      { key: 'interface', title: '接口名称', type: 'select', options: interfaces.value, required: true, placeholder: '选择接口', help: '要监控健康状态的接口' },
-      { key: 'nexthop', title: '下一跳地址', type: 'text', required: true, placeholder: 'IPv4 地址或 dhcp', help: '出方向接口的下一跳地址，可设为 dhcp 或 IPv4 地址' },
-      { key: 'failure-count', title: '失败次数', type: 'number', min: 1, max: 10, default: 1, help: '连续失败多少次判定为不可用 (默认: 1)' },
-      { key: 'success-count', title: '成功次数', type: 'number', min: 1, max: 10, default: 1, help: '连续成功多少次判定为可用 (默认: 1)' },
+      { key: 'interface', title: t('wan.health.interface'), type: 'select', options: interfaces.value, required: true, placeholder: t('wan.health.interfacePlaceholder'), help: t('wan.health.interfaceHelp') },
+      { key: 'nexthop', title: t('wan.health.nexthop'), type: 'text', required: true, placeholder: t('wan.health.nexthopPlaceholder'), help: t('wan.health.nexthopHelp') },
+      { key: 'failure-count', title: t('wan.health.failureCount'), type: 'number', min: 1, max: 10, default: 1, help: t('wan.health.failureCountHelp') },
+      { key: 'success-count', title: t('wan.health.successCount'), type: 'number', min: 1, max: 10, default: 1, help: t('wan.health.successCountHelp') },
     ]);
 
     const testSchema = computed(() => [
-      { key: 'type', title: '测试类型', type: 'select', options: TEST_TYPE_OPTIONS, default: 'ping', help: 'WLB 测试类型 (默认: ping)' },
-      { key: 'target', title: '测试目标地址', type: 'text', placeholder: 'IPv4 地址', help: '健康检查目标地址' },
-      { key: 'resp-time', title: '响应超时时间', type: 'number', min: 1, max: 30, default: 5, help: 'Ping 响应超时时间(秒) (默认: 5)' },
-      { key: 'ttl-limit', title: 'TTL 限制', type: 'number', min: 1, max: 254, default: 1, help: 'TTL 限制(跳数) (默认: 1)' },
-      { key: 'test-script', title: '自定义脚本', type: 'text', placeholder: '脚本名', help: '/config/scripts 中的用户自定义脚本路径' },
+      { key: 'type', title: t('wan.health.testType'), type: 'select', options: getTestTypeOptions(t), default: 'ping', help: t('wan.health.testTypeHelp') },
+      { key: 'target', title: t('wan.health.target'), type: 'text', placeholder: t('wan.health.targetPlaceholder'), help: t('wan.health.targetHelp') },
+      { key: 'resp-time', title: t('wan.health.respTime'), type: 'number', min: 1, max: 30, default: 5, help: t('wan.health.respTimeHelp') },
+      { key: 'ttl-limit', title: t('wan.health.ttlLimit'), type: 'number', min: 1, max: 254, default: 1, help: t('wan.health.ttlLimitHelp') },
+      { key: 'test-script', title: t('wan.health.testScript'), type: 'text', placeholder: t('wan.health.testScriptPlaceholder'), help: t('wan.health.testScriptHelp') },
     ]);
 
     const ruleBasicSchema = computed(() => [
-      { key: 'rule', title: '规则编号', type: 'number', min: 1, max: 9999, required: true, help: '规则编号 (1-9999)' },
-      { key: 'description', title: '描述', type: 'text', placeholder: '规则描述' },
-      { key: 'inbound-interface', title: '入方向接口', type: 'select', options: ['any', ...interfaces.value], required: true, help: '入方向接口名称 (必填)' },
-      { key: 'interface', title: '出方向接口', type: 'multi-select', options: interfaces.value, required: true, help: '出方向接口列表 (必填，可多选)' },
-      { key: 'protocol', title: '协议', type: 'select', options: PROTOCOL_OPTIONS, default: 'all', help: '匹配的协议 (默认: all)' },
-      { key: 'protocolNumber', title: '协议编号', type: 'number', min: 0, max: 255, placeholder: '0-255', help: 'IP 协议编号 (0-255)，选择自定义协议时使用' },
-      { key: 'exclude', title: '排除', type: 'checkbox', help: '排除匹配此规则的数据包，不进行 WAN 负载均衡' },
-      { key: 'failover', title: '故障转移', type: 'checkbox', help: '为匹配此规则的数据包启用故障转移' },
-      { key: 'per-packet-balancing', title: '按包负载均衡', type: 'checkbox', help: '按包而非按流进行负载均衡' },
-      { key: 'limit', title: '限速', type: 'group', children: [
-        { key: 'burst', title: '突发值', type: 'text', placeholder: '如 10/second', help: '限速突发值 (如 10/second, 5/minute)' },
-        { key: 'rate', title: '速率', type: 'text', placeholder: '如 10/second', help: '限速速率 (如 10/second, 5/minute)' },
+      { key: 'rule', title: t('wan.rules.rule'), type: 'number', min: 1, max: 9999, required: true, help: t('wan.rules.ruleHelp') },
+      { key: 'description', title: t('wan.rules.description'), type: 'text', placeholder: t('wan.rules.descriptionPlaceholder') },
+      { key: 'inbound-interface', title: t('wan.rules.inboundInterface'), type: 'select', options: ['any', ...interfaces.value], required: true, help: t('wan.rules.inboundInterfaceHelp') },
+      { key: 'interface', title: t('wan.rules.outboundInterface'), type: 'multi-select', options: interfaces.value, required: true, help: t('wan.rules.outboundInterfaceHelp') },
+      { key: 'protocol', title: t('wan.rules.protocol'), type: 'select', options: getProtocolOptions(t), default: 'all', help: t('wan.rules.protocolHelp') },
+      { key: 'protocolNumber', title: t('wan.rules.protocolNumber'), type: 'number', min: 0, max: 255, placeholder: t('wan.rules.protocolNumberPlaceholder'), help: t('wan.rules.protocolNumberHelp') },
+      { key: 'exclude', title: t('wan.rules.exclude'), type: 'checkbox', help: t('wan.rules.excludeHelp') },
+      { key: 'failover', title: t('wan.rules.failover'), type: 'checkbox', help: t('wan.rules.failoverHelp') },
+      { key: 'per-packet-balancing', title: t('wan.rules.perPacketBalancing'), type: 'checkbox', help: t('wan.rules.perPacketBalancingHelp') },
+      { key: 'limit', title: t('wan.rules.limit'), type: 'group', children: [
+        { key: 'burst', title: t('wan.rules.burst'), type: 'text', placeholder: t('wan.rules.burstPlaceholder'), help: t('wan.rules.burstHelp') },
+        { key: 'rate', title: t('wan.rules.rate'), type: 'text', placeholder: t('wan.rules.ratePlaceholder'), help: t('wan.rules.rateHelp') },
       ]},
     ]);
 
     const ruleDestSchema = computed(() => [
-      { key: 'destination', title: '目的', type: 'group', children: [
-        { key: 'address', title: '目的地址', type: 'text', placeholder: 'IPv4 地址/子网/范围', help: '目的 IP 地址、子网或范围 (如 10.0.0.0/24, 10.0.0.1-10.0.0.10)' },
-        { key: 'port', title: '目的端口', type: 'text', placeholder: '端口/范围/名称', help: '目的端口 (如 80, 1001-1005, http)' },
-        { key: 'group', title: '目的组', type: 'group', children: [
-          { key: 'address-group', title: '目的地址组', type: 'text', placeholder: '地址组名称', help: '目的地址组名称' },
-          { key: 'domain-group', title: '目的域名组', type: 'text', placeholder: '域名组名称', help: '目的域名组名称' },
-          { key: 'network-group', title: '目的网络组', type: 'text', placeholder: '网络组名称', help: '目的网络组名称' },
-          { key: 'port-group', title: '目的端口组', type: 'text', placeholder: '端口组名称', help: '目的端口组名称' },
+      { key: 'destination', title: t('wan.rules.destination'), type: 'group', children: [
+        { key: 'address', title: t('wan.rules.destinationAddress'), type: 'text', placeholder: t('wan.rules.destinationAddressPlaceholder'), help: t('wan.rules.destinationAddressHelp') },
+        { key: 'port', title: t('wan.rules.destinationPort'), type: 'text', placeholder: t('wan.rules.destinationPortPlaceholder'), help: t('wan.rules.destinationPortHelp') },
+        { key: 'group', title: t('wan.rules.destinationGroup'), type: 'group', children: [
+          { key: 'address-group', title: t('wan.rules.destinationAddressGroup'), type: 'text', placeholder: t('wan.rules.destinationAddressGroupPlaceholder'), help: t('wan.rules.destinationAddressGroupHelp') },
+          { key: 'domain-group', title: t('wan.rules.destinationDomainGroup'), type: 'text', placeholder: t('wan.rules.destinationDomainGroupPlaceholder'), help: t('wan.rules.destinationDomainGroupHelp') },
+          { key: 'network-group', title: t('wan.rules.destinationNetworkGroup'), type: 'text', placeholder: t('wan.rules.destinationNetworkGroupPlaceholder'), help: t('wan.rules.destinationNetworkGroupHelp') },
+          { key: 'port-group', title: t('wan.rules.destinationPortGroup'), type: 'text', placeholder: t('wan.rules.destinationPortGroupPlaceholder'), help: t('wan.rules.destinationPortGroupHelp') },
         ]},
       ]},
     ]);
 
     const ruleSourceSchema = computed(() => [
-      { key: 'source', title: '源', type: 'group', children: [
-        { key: 'address', title: '源地址', type: 'text', placeholder: 'IPv4 地址/子网/范围', help: '源 IP 地址、子网或范围' },
-        { key: 'port', title: '源端口', type: 'text', placeholder: '端口/范围/名称', help: '源端口 (如 80, 1001-1005, http)' },
-        { key: 'group', title: '源组', type: 'group', children: [
-          { key: 'address-group', title: '源地址组', type: 'text', placeholder: '地址组名称', help: '源地址组名称' },
-          { key: 'domain-group', title: '源域名组', type: 'text', placeholder: '域名组名称', help: '源域名组名称' },
-          { key: 'network-group', title: '源网络组', type: 'text', placeholder: '网络组名称', help: '源网络组名称' },
-          { key: 'port-group', title: '源端口组', type: 'text', placeholder: '端口组名称', help: '源端口组名称' },
+      { key: 'source', title: t('wan.rules.source'), type: 'group', children: [
+        { key: 'address', title: t('wan.rules.sourceAddress'), type: 'text', placeholder: t('wan.rules.sourceAddressPlaceholder'), help: t('wan.rules.sourceAddressHelp') },
+        { key: 'port', title: t('wan.rules.sourcePort'), type: 'text', placeholder: t('wan.rules.sourcePortPlaceholder'), help: t('wan.rules.sourcePortHelp') },
+        { key: 'group', title: t('wan.rules.sourceGroup'), type: 'group', children: [
+          { key: 'address-group', title: t('wan.rules.sourceAddressGroup'), type: 'text', placeholder: t('wan.rules.sourceAddressGroupPlaceholder'), help: t('wan.rules.sourceAddressGroupHelp') },
+          { key: 'domain-group', title: t('wan.rules.sourceDomainGroup'), type: 'text', placeholder: t('wan.rules.sourceDomainGroupPlaceholder'), help: t('wan.rules.sourceDomainGroupHelp') },
+          { key: 'network-group', title: t('wan.rules.sourceNetworkGroup'), type: 'text', placeholder: t('wan.rules.sourceNetworkGroupPlaceholder'), help: t('wan.rules.sourceNetworkGroupHelp') },
+          { key: 'port-group', title: t('wan.rules.sourcePortGroup'), type: 'text', placeholder: t('wan.rules.sourcePortGroupPlaceholder'), help: t('wan.rules.sourcePortGroupHelp') },
         ]},
       ]},
     ]);
@@ -351,7 +359,7 @@ export default defineComponent({
         }
         interfaces.value = ifaceList;
       } catch (e) {
-        showError(e, '加载WAN负载均衡配置失败');
+        showError(e, t('wan.errors.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -369,17 +377,17 @@ export default defineComponent({
 
     function saveHealth() {
       const h = editingHealth.value;
-      if (!h.interface) { showError(null, '请输入接口名称'); return; }
-      if (!h.nexthop) { showError(null, '请设置下一跳地址'); return; }
+      if (!h.interface) { showError(null, t('wan.errors.interfaceRequired')); return; }
+      if (!h.nexthop) { showError(null, t('wan.errors.nexthopRequired')); return; }
       showHealthModal.value = false;
       loadConfig();
     }
 
     function saveRule() {
       const r = editingRule.value;
-      if (!r.rule) { showError(null, '请输入规则编号'); return; }
-      if (!r['inbound-interface']) { showError(null, '请选择入方向接口'); return; }
-      if (r.interface.length === 0) { showError(null, '请选择出方向接口'); return; }
+      if (!r.rule) { showError(null, t('wan.errors.ruleRequired')); return; }
+      if (!r['inbound-interface']) { showError(null, t('wan.errors.inboundInterfaceRequired')); return; }
+      if (r.interface.length === 0) { showError(null, t('wan.errors.outboundInterfaceRequired')); return; }
       showRuleModal.value = false;
       loadConfig();
     }
@@ -392,13 +400,15 @@ export default defineComponent({
       ruleList.value = ruleList.value.filter(x => x.rule !== r.rule);
     }
 
-    function getTestTypeLabel(type) {
-      const opt = TEST_TYPE_OPTIONS.find(o => o.value === type);
+    function getTestTypeLabel(type, tFunc) {
+      const options = getTestTypeOptions(tFunc);
+      const opt = options.find(o => o.value === type);
       return opt ? opt.label : type;
     }
 
-    function getProtocolLabel(proto) {
-      const opt = PROTOCOL_OPTIONS.find(o => o.value === proto);
+    function getProtocolLabel(proto, tFunc) {
+      const options = getProtocolOptions(tFunc);
+      const opt = options.find(o => o.value === proto);
       return opt ? opt.label : proto;
     }
 
@@ -480,10 +490,10 @@ export default defineComponent({
           if (r.source?.group?.['port-group']) await configStore.setConfig(`${base} source group port-group`, r.source.group['port-group']);
         }
 
-        await configStore.commit();
+        configStore.markPending();
         await loadConfig();
       } catch (e) {
-        showError(e, '保存WAN负载均衡配置失败');
+        showError(e, t('wan.errors.saveFailed'));
       } finally {
         loading.value = false;
       }
@@ -501,67 +511,65 @@ export default defineComponent({
       saveHealth, saveRule,
       deleteHealth, deleteRule,
       getTestTypeLabel, getProtocolLabel,
+      t,
     };
   },
   template: `
     <div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'global', title: '全局设置' },
-        { key: 'health', title: '接口健康检查' },
-        { key: 'rules', title: '规则' },
+        { key: 'global', title: t('wan.tabs.global') },
+        { key: 'health', title: t('wan.tabs.health') },
+        { key: 'rules', title: t('wan.tabs.rules') },
       ]">
         <template #global>
           <div style="padding: 16px;">
             <div style="max-width: 600px;">
               <div class="form-row">
-                <label class="form-label" title="禁止为 WAN 负载均衡配置源 NAT 规则">禁用源 NAT</label>
+                <label class="form-label" :title="t('wan.global.disableSourceNatHelp')">{{ t('wan.global.disableSourceNat') }}</label>
                 <input type="checkbox" v-model="globalConfig['disable-source-nat']" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">禁止为 WAN 负载均衡配置源 NAT 规则</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('wan.global.disableSourceNatHelp') }}</div>
               <div class="form-row">
-                <label class="form-label" title="为本地发起的流量启用 WAN 负载均衡">启用本地流量</label>
+                <label class="form-label" :title="t('wan.global.enableLocalTrafficHelp')">{{ t('wan.global.enableLocalTraffic') }}</label>
                 <input type="checkbox" v-model="globalConfig['enable-local-traffic']" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">为本地发起的流量启用 WAN 负载均衡</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('wan.global.enableLocalTrafficHelp') }}</div>
               <div class="form-row">
-                <label class="form-label" title="连接状态变化时刷新连接跟踪表">刷新连接跟踪</label>
+                <label class="form-label" :title="t('wan.global.flushConnectionsHelp')">{{ t('wan.global.flushConnections') }}</label>
                 <input type="checkbox" v-model="globalConfig['flush-connections']" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">连接状态变化时刷新连接跟踪表</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('wan.global.flushConnectionsHelp') }}</div>
               <div class="form-row">
-                <label class="form-label" title="接口状态变化时执行的脚本路径 (/config/scripts)">状态变更脚本</label>
-                <input type="text" v-model="globalConfig.hook" placeholder="如：wlb-hook.sh" style="width: 200px;" />
+                <label class="form-label" :title="t('wan.global.hookHelp')">{{ t('wan.global.hook') }}</label>
+                <input type="text" v-model="globalConfig.hook" :placeholder="t('wan.global.hookPlaceholder')" style="width: 200px;" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">接口状态变化时执行的脚本路径 (/config/scripts)</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('wan.global.hookHelp') }}</div>
               <div class="form-row">
-                <label class="form-label" title="启用粘性入方向 WAN 连接">粘性连接 (入方向)</label>
+                <label class="form-label" :title="t('wan.global.stickyInboundHelp')">{{ t('wan.global.stickyInbound') }}</label>
                 <input type="checkbox" v-model="globalConfig['sticky-inbound']" />
               </div>
-              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">启用粘性入方向 WAN 连接</div>
+              <div style="margin-left: 162px; margin-top: -10px; margin-bottom: 14px; color: #999; font-size: 12px;">{{ t('wan.global.stickyInboundHelp') }}</div>
             </div>
-          </div>
-          <div class="page-actions-bottom">
-            <ToolbarButton icon="save" primary @click="saveConfig" :disabled="loading">{{ loading ? '保存中...' : '保存配置' }}</ToolbarButton>
           </div>
         </template>
 
         <template #health>
           <DataTable :columns="[
-              { key: 'interface', title: '接口', width: 120 },
-              { key: 'nexthop', title: '下一跳', width: 150 },
-              { key: 'failureCount', title: '失败次数', width: 100 },
-              { key: 'successCount', title: '成功次数', width: 100 },
-              { key: 'testType', title: '测试类型', width: 120 },
-              { key: 'testTarget', title: '测试目标', width: 150 },
-              { key: 'respTime', title: '响应时间', width: 100 },
-              { key: 'ttlLimit', title: 'TTL限制', width: 100 },
-              { key: 'actions', title: '操作', width: 120 },
+              { key: 'interface', title: t('wan.health.columns.interface'), width: 120 },
+              { key: 'nexthop', title: t('wan.health.columns.nexthop'), width: 150 },
+              { key: 'failureCount', title: t('wan.health.columns.failureCount'), width: 100 },
+              { key: 'successCount', title: t('wan.health.columns.successCount'), width: 100 },
+              { key: 'testType', title: t('wan.health.columns.testType'), width: 120 },
+              { key: 'testTarget', title: t('wan.health.columns.testTarget'), width: 150 },
+              { key: 'respTime', title: t('wan.health.columns.respTime'), width: 100 },
+              { key: 'ttlLimit', title: t('wan.health.columns.ttlLimit'), width: 100 },
+              { key: 'actions', title: t('app.actions'), width: 120 },
             ]" :data="healthList.map(h => ({
               interface: h.interface,
               nexthop: h.nexthop,
               failureCount: h['failure-count'],
               successCount: h['success-count'],
-              testType: getTestTypeLabel(h.test?.type || 'ping'),
+              testType: getTestTypeLabel(h.test?.type || 'ping', t),
               testTarget: h.test?.target || '-',
               respTime: h.test?.['resp-time'] + 's',
               ttlLimit: h.test?.['ttl-limit'],
@@ -573,35 +581,32 @@ export default defineComponent({
             @delete="deleteHealth($event)"
             @refresh="loadConfig">
               <template #actions="{ record }">
-                <button class="btn btn-link" @click="openHealthModal(record.actions)">编辑</button>
-                <button class="btn btn-link btn-danger" @click="deleteHealth(record.actions)">删除</button>
+                <button class="btn btn-link" @click="openHealthModal(record.actions)">{{ t('wan.buttons.edit') }}</button>
+                <button class="btn btn-link btn-danger" @click="deleteHealth(record.actions)">{{ t('wan.buttons.delete') }}</button>
               </template>
             </DataTable>
-          <div class="page-actions-bottom">
-            <ToolbarButton icon="save" primary @click="saveConfig" :disabled="loading">{{ loading ? '保存中...' : '保存配置' }}</ToolbarButton>
-          </div>
         </template>
 
         <template #rules>
           <DataTable :columns="[
-              { key: 'rule', title: '规则编号', width: 100 },
-              { key: 'description', title: '描述', width: 150 },
-              { key: 'inboundInterface', title: '入方向接口', width: 120 },
-              { key: 'interface', title: '出方向接口', width: 150 },
-              { key: 'protocol', title: '协议', width: 100 },
-              { key: 'exclude', title: '排除', width: 60 },
-              { key: 'failover', title: '故障转移', width: 80 },
-              { key: 'destination', title: '目的', width: 150 },
-              { key: 'source', title: '源', width: 150 },
-              { key: 'actions', title: '操作', width: 120 },
+              { key: 'rule', title: t('wan.rules.columns.rule'), width: 100 },
+              { key: 'description', title: t('wan.rules.columns.description'), width: 150 },
+              { key: 'inboundInterface', title: t('wan.rules.columns.inboundInterface'), width: 120 },
+              { key: 'interface', title: t('wan.rules.columns.outboundInterface'), width: 150 },
+              { key: 'protocol', title: t('wan.rules.columns.protocol'), width: 100 },
+              { key: 'exclude', title: t('wan.rules.columns.exclude'), width: 60 },
+              { key: 'failover', title: t('wan.rules.columns.failover'), width: 80 },
+              { key: 'destination', title: t('wan.rules.columns.destination'), width: 150 },
+              { key: 'source', title: t('wan.rules.columns.source'), width: 150 },
+              { key: 'actions', title: t('app.actions'), width: 120 },
             ]" :data="ruleList.map(r => ({
               rule: r.rule,
               description: r.description || '-',
               inboundInterface: r['inbound-interface'],
               interface: r.interface.join(', '),
-              protocol: getProtocolLabel(r.protocol),
-              exclude: r.exclude ? '是' : '-',
-              failover: r.failover ? '是' : '-',
+              protocol: getProtocolLabel(r.protocol, t),
+              exclude: r.exclude ? t('wan.options.yes') : '-',
+              failover: r.failover ? t('wan.options.yes') : '-',
               destination: r.destination.address || r.destination.port || r.destination.group['address-group'] || '-',
               source: r.source.address || r.source.port || r.source.group['address-group'] || '-',
               actions: r,
@@ -612,33 +617,30 @@ export default defineComponent({
             @delete="deleteRule($event)"
             @refresh="loadConfig">
               <template #actions="{ record }">
-                <button class="btn btn-link" @click="openRuleModal(record.actions)">编辑</button>
-                <button class="btn btn-link btn-danger" @click="deleteRule(record.actions)">删除</button>
+                <button class="btn btn-link" @click="openRuleModal(record.actions)">{{ t('wan.buttons.edit') }}</button>
+                <button class="btn btn-link btn-danger" @click="deleteRule(record.actions)">{{ t('wan.buttons.delete') }}</button>
               </template>
             </DataTable>
-          <div class="page-actions-bottom">
-            <ToolbarButton icon="save" primary @click="saveConfig" :disabled="loading">{{ loading ? '保存中...' : '保存配置' }}</ToolbarButton>
-          </div>
         </template>
 
       </TabGroup>
 
 
-      <!-- 健康检查弹窗 -->
-      <DraggableModal v-model:visible="showHealthModal" title="接口健康检查" width="600px" @ok="saveHealth">
+      <!-- Health Check Modal -->
+      <DraggableModal v-model:visible="showHealthModal" :title="t('wan.health.modalTitle')" width="600px" @ok="saveHealth">
         <ConfigForm :schema="healthSchema" :model="editingHealth" />
         <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0f0f0;">
-          <h4 style="margin-bottom: 12px;">测试参数</h4>
+          <h4 style="margin-bottom: 12px;">{{ t('wan.health.testParams') }}</h4>
           <ConfigForm :schema="testSchema" :model="editingHealth.test" />
         </div>
       </DraggableModal>
 
-      <!-- 规则弹窗 -->
-      <DraggableModal v-model:visible="showRuleModal" title="WAN负载均衡规则" width="700px" @ok="saveRule">
+      <!-- Rule Modal -->
+      <DraggableModal v-model:visible="showRuleModal" :title="t('wan.rules.modalTitle')" width="700px" @ok="saveRule">
         <TabGroup v-model="activeRuleTab" :tabs="[
-          { key: 'basic', title: '基本配置' },
-          { key: 'destination', title: '目的匹配' },
-          { key: 'source', title: '源匹配' },
+          { key: 'basic', title: t('wan.tabs.basic') },
+          { key: 'destination', title: t('wan.tabs.destination') },
+          { key: 'source', title: t('wan.tabs.source') },
         ]">
           <template #basic>
             <ConfigForm :schema="ruleBasicSchema" :model="editingRule" />

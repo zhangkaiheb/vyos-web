@@ -1,0 +1,212 @@
+{
+  "zh-CN": {
+    "dhcpLeases": {
+      "title": "DHCP 租约",
+      "columns": {
+        "ipAddress": "IP 地址",
+        "macAddress": "MAC 地址",
+        "state": "状态",
+        "leaseStart": "租约开始",
+        "leaseExpiration": "租约到期",
+        "remaining": "剩余时间",
+        "pool": "地址池",
+        "hostname": "主机名",
+        "origin": "来源"
+      },
+      "filterByPool": "按地址池过滤",
+      "allPools": "全部地址池",
+      "filterByOrigin": "按来源过滤",
+      "allOrigins": "全部来源",
+      "sort": "排序",
+      "defaultSort": "默认排序",
+      "sortByExpiration": "到期时间",
+      "sortByHostname": "主机名",
+      "sortByPool": "地址池",
+      "sortByRemaining": "剩余时间",
+      "sortByStart": "开始时间",
+      "sortByState": "状态",
+      "refresh": "刷新",
+      "rawOutput": "原始输出"
+    }
+  },
+  "en": {
+    "dhcpLeases": {
+      "title": "DHCP Leases",
+      "columns": {
+        "ipAddress": "IP Address",
+        "macAddress": "MAC Address",
+        "state": "State",
+        "leaseStart": "Lease Start",
+        "leaseExpiration": "Lease Expiration",
+        "remaining": "Remaining",
+        "pool": "Pool",
+        "hostname": "Hostname",
+        "origin": "Origin"
+      },
+      "filterByPool": "Filter by pool",
+      "allPools": "All pools",
+      "filterByOrigin": "Filter by origin",
+      "allOrigins": "All origins",
+      "sort": "Sort",
+      "defaultSort": "Default sort",
+      "sortByExpiration": "Expiration time",
+      "sortByHostname": "Hostname",
+      "sortByPool": "Pool",
+      "sortByRemaining": "Remaining time",
+      "sortByStart": "Start time",
+      "sortByState": "State",
+      "refresh": "Refresh",
+      "rawOutput": "Raw output"
+    }
+  },
+  "zh-TW": {
+    "dhcpLeases": {
+      "title": "DHCP Leases",
+      "columns": {
+        "ipAddress": "IP Address",
+        "macAddress": "MAC Address",
+        "state": "State",
+        "leaseStart": "Lease Start",
+        "leaseExpiration": "Lease Expiration",
+        "remaining": "Remaining",
+        "pool": "Pool",
+        "hostname": "Hostname",
+        "origin": "Origin"
+      },
+      "filterByPool": "Filter by pool",
+      "allPools": "All pools",
+      "filterByOrigin": "Filter by origin",
+      "allOrigins": "All origins",
+      "sort": "Sort",
+      "defaultSort": "Default sort",
+      "sortByExpiration": "Expiration time",
+      "sortByHostname": "Hostname",
+      "sortByPool": "Pool",
+      "sortByRemaining": "Remaining time",
+      "sortByStart": "Start time",
+      "sortByState": "State",
+      "refresh": "Refresh",
+      "rawOutput": "Raw output"
+    }
+  },
+  "ru": {
+    "dhcpLeases": {
+      "title": "DHCP Leases",
+      "columns": {
+        "ipAddress": "IP Address",
+        "macAddress": "MAC Address",
+        "state": "State",
+        "leaseStart": "Lease Start",
+        "leaseExpiration": "Lease Expiration",
+        "remaining": "Remaining",
+        "pool": "Pool",
+        "hostname": "Hostname",
+        "origin": "Origin"
+      },
+      "filterByPool": "Filter by pool",
+      "allPools": "All pools",
+      "filterByOrigin": "Filter by origin",
+      "allOrigins": "All origins",
+      "sort": "Sort",
+      "defaultSort": "Default sort",
+      "sortByExpiration": "Expiration time",
+      "sortByHostname": "Hostname",
+      "sortByPool": "Pool",
+      "sortByRemaining": "Remaining time",
+      "sortByStart": "Start time",
+      "sortByState": "State",
+      "refresh": "Refresh",
+      "rawOutput": "Raw output"
+    }
+  },
+  "de": {
+    "dhcpLeases": {
+      "title": "DHCP Leases",
+      "columns": {
+        "ipAddress": "IP Address",
+        "macAddress": "MAC Address",
+        "state": "State",
+        "leaseStart": "Lease Start",
+        "leaseExpiration": "Lease Expiration",
+        "remaining": "Remaining",
+        "pool": "Pool",
+        "hostname": "Hostname",
+        "origin": "Origin"
+      },
+      "filterByPool": "Filter by pool",
+      "allPools": "All pools",
+      "filterByOrigin": "Filter by origin",
+      "allOrigins": "All origins",
+      "sort": "Sort",
+      "defaultSort": "Default sort",
+      "sortByExpiration": "Expiration time",
+      "sortByHostname": "Hostname",
+      "sortByPool": "Pool",
+      "sortByRemaining": "Remaining time",
+      "sortByStart": "Start time",
+      "sortByState": "State",
+      "refresh": "Refresh",
+      "rawOutput": "Raw output"
+    }
+  },
+  "fr": {
+    "dhcpLeases": {
+      "title": "DHCP Leases",
+      "columns": {
+        "ipAddress": "IP Address",
+        "macAddress": "MAC Address",
+        "state": "State",
+        "leaseStart": "Lease Start",
+        "leaseExpiration": "Lease Expiration",
+        "remaining": "Remaining",
+        "pool": "Pool",
+        "hostname": "Hostname",
+        "origin": "Origin"
+      },
+      "filterByPool": "Filter by pool",
+      "allPools": "All pools",
+      "filterByOrigin": "Filter by origin",
+      "allOrigins": "All origins",
+      "sort": "Sort",
+      "defaultSort": "Default sort",
+      "sortByExpiration": "Expiration time",
+      "sortByHostname": "Hostname",
+      "sortByPool": "Pool",
+      "sortByRemaining": "Remaining time",
+      "sortByStart": "Start time",
+      "sortByState": "State",
+      "refresh": "Refresh",
+      "rawOutput": "Raw output"
+    }
+  },
+  "ko": {
+    "dhcpLeases": {
+      "title": "DHCP Leases",
+      "columns": {
+        "ipAddress": "IP Address",
+        "macAddress": "MAC Address",
+        "state": "State",
+        "leaseStart": "Lease Start",
+        "leaseExpiration": "Lease Expiration",
+        "remaining": "Remaining",
+        "pool": "Pool",
+        "hostname": "Hostname",
+        "origin": "Origin"
+      },
+      "filterByPool": "Filter by pool",
+      "allPools": "All pools",
+      "filterByOrigin": "Filter by origin",
+      "allOrigins": "All origins",
+      "sort": "Sort",
+      "defaultSort": "Default sort",
+      "sortByExpiration": "Expiration time",
+      "sortByHostname": "Hostname",
+      "sortByPool": "Pool",
+      "sortByRemaining": "Remaining time",
+      "sortByStart": "Start time",
+      "sortByState": "State",
+      "refresh": "Refresh",
+      "rawOutput": "Raw output"
+    }
+  }
+}

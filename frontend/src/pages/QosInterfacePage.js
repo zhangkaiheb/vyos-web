@@ -7,16 +7,13 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh, offMenuRefresh } from '/src/utils/eventBus.js';
-
-const DIRECTION_OPTIONS = [
-  { value: 'egress', label: '出站 (egress)' },
-  { value: 'ingress', label: '入站 (ingress)' },
-];
+import { useI18n } from '/src/i18n/index.js';
 
 export default defineComponent({
   name: 'QosInterfacePage',
   components: { DataTable, DraggableModal, ConfigForm, ToolbarButton },
   setup() {
+    const { t } = useI18n();
     const configStore = useConfigStore();
     const loading = ref(false);
     const interfaces = ref([]);
@@ -25,13 +22,15 @@ export default defineComponent({
     const modalVisible = ref(false);
     const editingItem = ref(null);
     const dataTableRef = ref(null);
+    const deleteModalVisible = ref(false);
+    const pendingDeleteRecord = ref(null);
 
-    const columns = [
-      { key: 'interface', title: '接口', dataIndex: 'interface', width: 150 },
-      { key: 'egress', title: '出站策略 (egress)', dataIndex: 'egress', width: 200 },
-      { key: 'ingress', title: '入站策略 (ingress)', dataIndex: 'ingress', width: 200 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const columns = computed(() => [
+      { key: 'interface', title: t('qosInterface.column.interface'), dataIndex: 'interface', width: 150 },
+      { key: 'egress', title: t('qosInterface.column.egress'), dataIndex: 'egress', width: 200 },
+      { key: 'ingress', title: t('qosInterface.column.ingress'), dataIndex: 'ingress', width: 200 },
+      { key: 'actions', title: t('qosInterface.column.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
     const tableData = computed(() => {
       return interfaces.value.map(iface => ({
@@ -44,9 +43,9 @@ export default defineComponent({
     });
 
     const schema = computed(() => [
-      { key: 'interface', title: '接口', type: 'select', options: interfaces.value.map(i => ({ value: i.name, label: i.name })), required: true },
-      { key: 'egress', title: '出站策略 (egress)', type: 'select', options: policies.value.map(p => ({ value: p, label: p })), dynamic: true },
-      { key: 'ingress', title: '入站策略 (ingress)', type: 'select', options: policies.value.map(p => ({ value: p, label: p })), dynamic: true },
+      { key: 'interface', title: t('qosInterface.schema.interface'), type: 'select', options: interfaces.value.map(i => ({ value: i.name, label: i.name })), required: true },
+      { key: 'egress', title: t('qosInterface.schema.egress'), type: 'select', options: policies.value.map(p => ({ value: p, label: p })), dynamic: true },
+      { key: 'ingress', title: t('qosInterface.schema.ingress'), type: 'select', options: policies.value.map(p => ({ value: p, label: p })), dynamic: true },
     ]);
 
     const commandText = computed(() => {
@@ -88,7 +87,7 @@ export default defineComponent({
         }
         policies.value = allPolicies;
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('qosInterface.error.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -118,16 +117,23 @@ export default defineComponent({
         if (ingress) {
           await configApi.set(`qos interface ${iface} ingress`, ingress);
         }
-        await configStore.commit();
+        configStore.markPending();
         modalVisible.value = false;
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('qosInterface.error.saveFailed'));
       }
     }
 
     async function remove(record) {
-      if (!confirm(`确定删除接口 ${record.interface} 的 QoS 配置？`)) return;
+      pendingDeleteRecord.value = record;
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemove() {
+      deleteModalVisible.value = false;
+      const record = pendingDeleteRecord.value;
+      if (!record) return;
       try {
         if (record.egress) {
           await configApi.delete(`qos interface ${record.interface} egress`);
@@ -135,10 +141,11 @@ export default defineComponent({
         if (record.ingress) {
           await configApi.delete(`qos interface ${record.interface} ingress`);
         }
-        await configStore.commit();
+        configStore.markPending();
+        pendingDeleteRecord.value = null;
         await load();
       } catch (e) {
-        showError(e.message || '删除失败');
+        showError(e.message || t('qosInterface.error.deleteFailed'));
       }
     }
 
@@ -148,8 +155,9 @@ export default defineComponent({
     });
 
     return {
-      loading, tableData, columns, selected, modalVisible, editingItem, schema, commandText, dataTableRef,
-      load, create, edit, save, remove,
+      t, loading, tableData, columns, selected, modalVisible, editingItem, schema, commandText, dataTableRef,
+      deleteModalVisible, pendingDeleteRecord,
+      load, create, edit, save, remove, confirmRemove,
     };
   },
   template: `
@@ -169,18 +177,24 @@ export default defineComponent({
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'actions'">
-            <a @click="edit(record)" style="margin-right: 8px">编辑</a>
-            <a @click="remove(record)" style="color: #ff4d4f">删除</a>
+            <a @click="edit(record)" style="margin-right: 8px">{{ t('app.edit') }}</a>
+            <a @click="remove(record)" style="color: #ff4d4f">{{ t('app.delete') }}</a>
           </template>
         </template>
       </DataTable>
       <DraggableModal
         v-model:visible="modalVisible"
-        :title="editingItem && tableData.find(d => d.interface === editingItem.interface) ? '编辑接口QoS' : '新建接口QoS'"
+        :title="editingItem && tableData.find(d => d.interface === editingItem.interface) ? t('qosInterface.modal.editTitle') : t('qosInterface.modal.createTitle')"
         @confirm="save"
         @close="modalVisible = false"
       >
         <ConfigForm v-if="editingItem" v-model="editingItem" :schema="schema" />
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('qosInterface.modal.confirmDelete')" width="400px" @confirm="confirmRemove">
+        <div>{{ t('qosInterface.message.confirmDelete') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div style="padding:2px 0;">{{ pendingDeleteRecord?.interface }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

@@ -8,9 +8,11 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const BASE_PROTOCOL_OPTIONS = [
-  { value: 'all', label: 'all (默认)' },
+  { value: 'all', label: 'all (default)' },
   { value: 'tcp_udp', label: 'tcp_udp' },
   { value: 'tcp', label: 'tcp' },
   { value: 'udp', label: 'udp' },
@@ -19,12 +21,6 @@ const BASE_PROTOCOL_OPTIONS = [
   { value: 'esp', label: 'esp' },
   { value: 'ah', label: 'ah' },
   { value: 'sctp', label: 'sctp' },
-];
-
-const RULE_TABS = [
-  { key: 'basic', title: '基本' },
-  { key: 'source', title: '源/目的' },
-  { key: 'set', title: '设置' },
 ];
 
 function emptyRule() {
@@ -103,6 +99,7 @@ function formatEndpoint(ep) {
 export default defineComponent({
   name: 'LocalRoutePage',
   setup() {
+    const { t } = useI18n();
     const route = useRoute();
     const configStore = useConfigStore();
     const rules = ref([]);
@@ -115,62 +112,70 @@ export default defineComponent({
     const editingRuleOriginalNumber = ref('');
     const activeTab = ref('basic');
     const dataTableRef = ref(null);
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
 
     const path = computed(() => route.path.replace(/^\//, '').replace(/\//g, ' '));
     const isIPv6 = computed(() => path.value.includes('local-route6'));
     const writeDisabled = computed(() => route.meta?.menuItem?.permission === 'read');
 
-    const columns = [
-      { key: 'rule', title: '规则编号' },
-      { key: 'protocol', title: '协议' },
+    const columns = computed(() => [
+      { key: 'rule', title: t('localRoute.columns.rule') },
+      { key: 'protocol', title: t('localRoute.columns.protocol') },
       { key: 'fwmark', title: 'fwmark' },
-      { key: 'inbound-interface', title: '入接口' },
-      { key: 'source', title: '源' },
-      { key: 'destination', title: '目的' },
-      { key: 'set_table', title: '路由表' },
-    ];
+      { key: 'inbound-interface', title: t('localRoute.columns.inboundInterface') },
+      { key: 'source', title: t('localRoute.columns.source') },
+      { key: 'destination', title: t('localRoute.columns.destination') },
+      { key: 'set_table', title: t('localRoute.columns.routingTable') },
+    ]);
 
     const addressValidate = computed(() => isIPv6.value ? 'ipv6' : 'ip-segment');
 
-    const basicSchema = [
-      { key: 'rule', title: '规则编号', type: 'number', min: 1, max: 32765, required: true, help: '范围 1-32765' },
-      { key: 'protocol', title: '协议', type: 'select', options: protocolOptions.value, default: 'all', help: '默认 all' },
-      { key: 'fwmark', title: 'fwmark', type: 'number', min: 1, max: 2147483647, help: '范围 1-2147483647' },
-      { key: 'inbound-interface', title: '入接口', type: 'select', options: interfaces.value },
-    ];
+    const basicSchema = computed(() => [
+      { key: 'rule', title: t('localRoute.schema.rule'), type: 'number', min: 1, max: 32765, required: true, help: t('localRoute.schema.ruleHelp') },
+      { key: 'protocol', title: t('localRoute.schema.protocol'), type: 'select', options: protocolOptions.value, default: 'all', help: t('localRoute.schema.protocolHelp') },
+      { key: 'fwmark', title: 'fwmark', type: 'number', min: 1, max: 2147483647, help: t('localRoute.schema.fwmarkHelp') },
+      { key: 'inbound-interface', title: t('localRoute.schema.inboundInterface'), type: 'select', options: interfaces.value },
+    ]);
 
-    const sourceDestinationSchema = [
+    const sourceDestinationSchema = computed(() => [
       {
-        key: 'source', title: '源', type: 'group', children: [
-          { key: 'address', title: '地址', type: 'text', validate: addressValidate.value, placeholder: isIPv6.value ? 'IPv6 地址或前缀' : 'IP 地址或前缀，可 ! 排除', help: isIPv6.value ? 'IPv6 地址或前缀' : '可前缀 ! 表示排除' },
-          { key: 'port', title: '端口', type: 'number', min: 1, max: 65535, help: '范围 1-65535，仅单个端口' },
+        key: 'source', title: t('localRoute.schema.source'), type: 'group', children: [
+          { key: 'address', title: t('localRoute.schema.address'), type: 'text', validate: addressValidate.value, placeholder: isIPv6.value ? t('localRoute.schema.ipv6AddressPlaceholder') : t('localRoute.schema.ipv4AddressPlaceholder'), help: isIPv6.value ? t('localRoute.schema.ipv6AddressHelp') : t('localRoute.schema.ipv4AddressHelp') },
+          { key: 'port', title: t('localRoute.schema.port'), type: 'number', min: 1, max: 65535, help: t('localRoute.schema.portHelp') },
         ],
       },
       {
-        key: 'destination', title: '目的', type: 'group', children: [
-          { key: 'address', title: '地址', type: 'text', validate: addressValidate.value, placeholder: isIPv6.value ? 'IPv6 地址或前缀' : 'IP 地址或前缀，可 ! 排除', help: isIPv6.value ? 'IPv6 地址或前缀' : '可前缀 ! 表示排除' },
-          { key: 'port', title: '端口', type: 'number', min: 1, max: 65535, help: '范围 1-65535，仅单个端口' },
+        key: 'destination', title: t('localRoute.schema.destination'), type: 'group', children: [
+          { key: 'address', title: t('localRoute.schema.address'), type: 'text', validate: addressValidate.value, placeholder: isIPv6.value ? t('localRoute.schema.ipv6AddressPlaceholder') : t('localRoute.schema.ipv4AddressPlaceholder'), help: isIPv6.value ? t('localRoute.schema.ipv6AddressHelp') : t('localRoute.schema.ipv4AddressHelp') },
+          { key: 'port', title: t('localRoute.schema.port'), type: 'number', min: 1, max: 65535, help: t('localRoute.schema.portHelp') },
         ],
       },
-    ];
+    ]);
 
-    const setSchema = [
+    const setSchema = computed(() => [
       {
-        key: 'set', title: '设置', type: 'group', children: [
-          { key: 'table', title: '路由表', type: 'text', placeholder: '1-200 或 main', help: '1-200 或 main' },
+        key: 'set', title: t('localRoute.schema.set'), type: 'group', children: [
+          { key: 'table', title: t('localRoute.schema.routingTable'), type: 'text', placeholder: t('localRoute.schema.routingTablePlaceholder'), help: t('localRoute.schema.routingTableHelp') },
         ],
       },
-    ];
+    ]);
 
     const tabSchemas = computed(() => ({
-      basic: basicSchema.map(f => {
+      basic: basicSchema.value.map(f => {
         if (f.key === 'inbound-interface') return { ...f, options: interfaces.value };
         if (f.key === 'protocol') return { ...f, options: protocolOptions.value };
         return f;
       }),
-      source: sourceDestinationSchema,
-      set: setSchema,
+      source: sourceDestinationSchema.value,
+      set: setSchema.value,
     }));
+
+    const ruleTabs = computed(() => [
+      { key: 'basic', title: t('localRoute.tabs.basic') },
+      { key: 'source', title: t('localRoute.tabs.source') },
+      { key: 'set', title: t('localRoute.tabs.set') },
+    ]);
 
     const tableData = computed(() => {
       return rules.value.map(r => ({
@@ -194,7 +199,7 @@ export default defineComponent({
       try {
         const res = await firewallApi.protocols();
         const list = (res.protocols || []).map(p => ({ value: p.name, label: `${p.name} (${p.number})` }));
-        protocolOptions.value = [{ value: 'all', label: 'all (默认)' }, ...list];
+        protocolOptions.value = [{ value: 'all', label: t('localRoute.protocol.allDefault') }, ...list];
       } catch (e) {
         protocolOptions.value = [...BASE_PROTOCOL_OPTIONS];
       }
@@ -214,6 +219,7 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      onMenuRefresh(load);
       loadInterfaces();
       loadProtocols();
     });
@@ -227,7 +233,7 @@ export default defineComponent({
     }
 
     function editRule() {
-      if (!selected.value.length) return alert('请选择一行');
+      if (!selected.value.length) return showError({ message: t('localRoute.messages.selectRow') });
       const row = rules.value.find(r => String(r.rule) === String(selected.value[0]));
       if (!row) return;
       editingRule.value = JSON.parse(JSON.stringify(row));
@@ -236,35 +242,43 @@ export default defineComponent({
       modalVisible.value = true;
     }
 
-    async function removeRule() {
-      if (!selected.value.length) return alert('请选择一行');
-      if (!confirm('确认删除选中的规则？')) return;
-      for (const num of selected.value) {
+    function removeRule() {
+      if (!selected.value.length) return showError({ message: t('localRoute.messages.selectRow') });
+      pendingDeleteNames.value = [...selected.value];
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemove() {
+      for (const num of pendingDeleteNames.value) {
         await configStore.deleteConfig(`${path.value} rule ${num}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selected.value = [];
+      pendingDeleteNames.value = [];
       await load();
     }
 
     function validateRule() {
       const r = editingRule.value;
-      if (!r.rule) return '请输入规则编号';
+      if (!r.rule) return t('localRoute.validation.ruleRequired');
       const n = parseInt(r.rule, 10);
-      if (isNaN(n) || n < 1 || n > 32765) return '规则编号范围 1-32765';
+      if (isNaN(n) || n < 1 || n > 32765) return t('localRoute.validation.ruleRange');
       return '';
     }
 
     async function saveRule() {
       const err = validateRule();
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       const original = editingRuleOriginalNumber.value;
       const value = formRuleToConfig(editingRule.value);
       try {
         if (original && String(original) !== String(editingRule.value.rule)) {
           await configStore.deleteConfig(`${path.value} rule ${original}`);
+          configStore.markPending();
         }
         await configStore.setConfig(`${path.value} rule ${editingRule.value.rule}`, value);
+        configStore.markPending();
         modalVisible.value = false;
         await configStore.checkSessionChanged();
         await load();
@@ -285,25 +299,26 @@ export default defineComponent({
     return {
       rules, tableData, loading, selected, modalVisible, editingRule,
       editingRuleOriginalNumber, activeTab, dataTableRef, columns,
-      tabSchemas, RULE_TABS, writeDisabled, commandText,
-      load, createRule, editRule, removeRule, saveRule,
+      tabSchemas, ruleTabs, writeDisabled, commandText,
+      deleteModalVisible, pendingDeleteNames,
+      load, createRule, editRule, removeRule, confirmRemove, saveRule, t,
     };
   },
   template: `
     <div class="page-container">
       <div class="toolbar">
         <div class="toolbar-left">
-          <ToolbarButton icon="create" @click="createRule" :disabled="writeDisabled">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editRule" :disabled="writeDisabled || !selected.length || selected.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeRule" :disabled="writeDisabled || !selected.length">删除</ToolbarButton>
-          <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+          <ToolbarButton icon="create" @click="createRule" :disabled="writeDisabled">{{ t('localRoute.buttons.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editRule" :disabled="writeDisabled || !selected.length || selected.length > 1">{{ t('localRoute.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeRule" :disabled="writeDisabled || !selected.length">{{ t('localRoute.buttons.delete') }}</ToolbarButton>
+          <ToolbarButton icon="refresh" @click="load">{{ t('localRoute.buttons.refresh') }}</ToolbarButton>
         </div>
       </div>
       <DataTable ref="dataTableRef" :columns="columns" :data="tableData" :loading="loading" :disabled="writeDisabled"
                  @selection-change="selected = $event" :selectable="true" :externalToolbar="true" row-key="rule">
       </DataTable>
-      <DraggableModal v-model:visible="modalVisible" :title="editingRule?.rule ? '编辑本地策略路由规则' : '创建本地策略路由规则'" width="780px" @confirm="saveRule">
-        <TabGroup v-model="activeTab" :tabs="RULE_TABS">
+      <DraggableModal v-model:visible="modalVisible" :title="editingRule?.rule ? t('localRoute.modals.editRule') : t('localRoute.modals.createRule')" width="780px" @confirm="saveRule">
+        <TabGroup v-model="activeTab" :tabs="ruleTabs">
           <template #basic>
             <ConfigForm v-model="editingRule" :schema="tabSchemas.basic" :disabled="writeDisabled" :showAdvanced="true" />
           </template>
@@ -314,6 +329,12 @@ export default defineComponent({
             <ConfigForm v-model="editingRule" :schema="tabSchemas.set" :disabled="writeDisabled" :showAdvanced="true" />
           </template>
         </TabGroup>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('localRoute.modals.confirmDelete')" width="400px" @confirm="confirmRemove">
+        <div>{{ t('localRoute.messages.confirmDelete') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="num in pendingDeleteNames" :key="num" style="padding:2px 0;">{{ num }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

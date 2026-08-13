@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="openconnect">
+<h1>OpenConnect</h1>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">À faire</p>
+<p>Convertir les blocs de commandes brutes dans ce fichier en directives cfgcmd/opcmd pour le suivi de la couverture des commandes.</p>
+</div>
+<p>La fonctionnalité du serveur compatible OpenConnect est disponible depuis Equuleus (1.3).
+Le VPN OpenConnect prend en charge la connexion SSL et offre un accès complet au réseau. L'extension de réseau SSL connecte le système utilisateur à l'entreprise avec des contrôles d'accès basés uniquement sur des informations de couche réseau, comme l'adresse IP de destination et le numéro de port. Ainsi, il fournit une communication sécurisée pour tous les types de trafic d'appareil sur les réseaux publics et privés, et chiffre également le trafic avec le protocole SSL.</p>
+<p>L'utilisateur distant utilisera le client openconnect pour se connecter au routeur et recevra une adresse IP d'une plage de VPN, permettant un accès complet au réseau.</p>
+<section id="configuration">
+<h2>Configuration</h2>
+<section id="ssl-certificates">
+<h3>Certificats SSL</h3>
+<p>Nous devons générer le certificat qui authentifie les utilisateurs qui tentent d'accéder aux ressources réseau via les tunnels SSL. Les commandes suivantes créeront des certificats auto-signés et seront stockées dans la configuration :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>run generate pki ca install &lt;CA name&gt;
+run generate pki certificate sign &lt;CA name&gt; install &lt;Server name&gt;
+</pre></div>
+</div>
+<p>Nous pouvons également créer les certificats en utilisant Certbot, un client facile à utiliser qui obtient un certificat de Let’s Encrypt, une autorité de certification ouverte lancée par l'EFF, Mozilla et d'autres, et le déploie sur un serveur web.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>sudo certbot certonly --standalone --preferred-challenges http -d &lt;domain name&gt;
+</pre></div>
+</div>
+</section>
+<section id="server-configuration">
+<h3>Configuration du serveur</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn openconnect authentication local-users username &lt;user&gt; password &lt;pass&gt;
+set vpn openconnect authentication mode &lt;local password|radius|certificate&gt;
+set vpn openconnect network-settings client-ip-settings subnet &lt;subnet&gt;
+set vpn openconnect network-settings name-server &lt;address&gt;
+set vpn openconnect network-settings name-server &lt;address&gt;
+set vpn openconnect ssl ca-certificate &lt;pki-ca-name&gt;
+set vpn openconnect ssl certificate &lt;pki-cert-name&gt;
+set vpn openconnect ssl passphrase &lt;pki-password&gt;
+</pre></div>
+</div>
+</section>
+<section id="fa-otp-support">
+<h3>Prise en charge du 2FA OTP</h3>
+<p>Au lieu de l'authentification par mot de passe uniquement, l'authentification par mot de passe + clé OTP peut être utilisée. Alternativement, l'authentification par OTP seule, sans mot de passe, peut être utilisée.
+Pour cela, une configuration OTP doit être ajoutée à la configuration ci-dessus :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn openconnect authentication mode local &lt;password-otp|otp&gt;
+set vpn openconnect authentication local-users username &lt;user&gt; otp &lt;key&gt;
+set vpn openconnect authentication local-users username &lt;user&gt; interval &lt;interval (optional)&gt;
+set vpn openconnect authentication local-users username &lt;user&gt; otp-length &lt;otp-length (optional)&gt;
+set vpn openconnect authentication local-users username &lt;user&gt; token-type &lt;token-type (optional)&gt;
+</pre></div>
+</div>
+<p>Pour générer une clé OTP dans VyOS, vous pouvez utiliser la commande CLI (mode opérationnel) :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>generate openconnect username &lt;user&gt; otp-key hotp-time
+</pre></div>
+</div>
+</section>
+<section id="user-certificate-authentication">
+<h3>Authentification par certificat utilisateur</h3>
+<p>Vous pouvez configurer les utilisateurs pour qu'ils soient authentifiés par certificat en définissant le mode d'authentification sur certificat, et en définissant quel champ (par OID) du certificat sera utilisé pour identifier le nom d'utilisateur. Deux raccourcis prédéfinis pour le Common Name (OID 2.5.4.3) et le User ID (OID 0.9.2342.19200300.100.1.1) ont été fournis sous les noms cn ou uid.</p>
+<p>Autrement dit, une valeur OID spécifique doit être fournie.</p>
+<p>Le certificat de l'utilisateur doit être signé par l'autorité de certification définie dans la configuration pour qu'il soit validé pour l'authentification.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn openconnect authentication mode certificate
+set vpn openconnect authentication mode certificate user-identifier-field cn
+set vpn openconnect ssl ca-certificate &lt;cert&gt;
+</pre></div>
+</div>
+</section>
+</section>
+<section id="verification">
+<h2>Vérification</h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ sh openconnect-server sessions
+interface    username    ip             remote IP    RX       TX         state      uptime
+-----------  ----------  -------------  -----------  -------  ---------  ---------  --------
+sslvpn0      tst         172.20.20.198  192.168.6.1  0 bytes  152 bytes  connected  3s
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Il est compatible avec les clients Cisco (R) AnyConnect (R).</p>
+</div>
+</section>
+<section id="example">
+<h2>Exemple</h2>
+<section id="ssl-certificates-generation">
+<h3>Génération des certificats SSL</h3>
+<p>Suivez les instructions pour générer le certificat CA (en mode configuration) :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# run generate pki ca install ca-ocserv
+Enter private key type: [rsa, dsa, ec] (Default: rsa)
+Enter private key bits: (Default: 2048)
+Enter country code: (Default: GB) US
+Enter state: (Default: Some-State) Delaware
+Enter locality: (Default: Some-City) Mycity
+Enter organization name: (Default: VyOS) MyORG
+Enter common name: (Default: vyos.io) oc-ca
+Enter how many days certificate will be valid: (Default: 1825) 3650
+Note: If you plan to use the generated key on this router, do not encrypt the private key.
+Do you want to encrypt the private key with a passphrase? [y/N] N
+2 value(s) installed. Use &quot;compare&quot; to see the pending changes, and &quot;commit&quot; to apply.
+[edit]
+</pre></div>
+</div>
+<p>Suivez les instructions pour générer le certificat serveur (en mode configuration) :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# run generate pki certificate sign ca-ocserv install srv-ocserv
+Do you already have a certificate request? [y/N] N
+Enter private key type: [rsa, dsa, ec] (Default: rsa)
+Enter private key bits: (Default: 2048)
+Enter country code: (Default: GB) US
+Enter state: (Default: Some-State) Delaware
+Enter locality: (Default: Some-City) Mycity
+Enter organization name: (Default: VyOS) MyORG
+Enter common name: (Default: vyos.io) oc-srv
+Do you want to configure Subject Alternative Names? [y/N] N
+Enter how many days certificate will be valid: (Default: 365) 1830
+Enter certificate type: (client, server) (Default: server)
+Note: If you plan to use the generated key on this router, do not encrypt the private key.
+Do you want to encrypt the private key with a passphrase? [y/N] N
+2 value(s) installed. Use &quot;compare&quot; to see the pending changes, and &quot;commit&quot; to apply.
+[edit]
+</pre></div>
+</div>
+<p>Chaque commande d'installation doit être appliquée à la configuration et commitée avant d'être utilisée dans la configuration openconnect :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# commit
+[edit]
+vyos@vyos# save
+Saving configuration to &#39;/config/config.boot&#39;...
+Done
+[edit]
+</pre></div>
+</div>
+</section>
+<section id="openconnect-configuration">
+<h3>Configuration Openconnect</h3>
+<p>Configuration simple avec un utilisateur ajouté et authentification par mot de passe :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn openconnect authentication local-users username tst password &#39;OC_bad_Secret&#39;
+set vpn openconnect authentication mode local password
+set vpn openconnect network-settings client-ip-settings subnet &#39;172.20.20.0/24&#39;
+set vpn openconnect network-settings name-server &#39;10.1.1.1&#39;
+set vpn openconnect network-settings name-server &#39;10.1.1.2&#39;
+set vpn openconnect ssl ca-certificate &#39;ca-ocserv&#39;
+set vpn openconnect ssl certificate &#39;srv-ocserv&#39;
+</pre></div>
+</div>
+<p>Pour activer les en-têtes de sécurité HTTP dans le fichier de configuration, utilisez la commande :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn openconnect http-security-headers
+</pre></div>
+</div>
+</section>
+<section id="adding-a-2fa-with-an-otp-key">
+<h3>Ajout d'un 2FA avec une clé OTP</h3>
+<p>En premier lieu, les clés OTP doivent être générées et envoyées à l'utilisateur et à la configuration :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ generate openconnect username tst otp-key hotp-time
+# Vous pouvez le partager avec l'utilisateur, il suffit qu'il scanne le QR dans son application OTP
+# username:  tst
+# OTP KEY:  5PA4SGYTQSGOBO3H3EQSSNCUNZAYAPH2
+# OTP URL:  otpauth://totp/tst@vyos?secret=5PA4SGYTQSGOBO3H3EQSSNCUNZAYAPH2&amp;digits=6&amp;period=30
+█████████████████████████████████████████
+█████████████████████████████████████████
+████ ▄▄▄▄▄ █▀ ██▄▀ ▄█▄▀▀▄▄▄▄██ ▄▄▄▄▄ ████
+████ █   █ █▀ █▄▄▀▀▀▄█  ▄▄▀▄ █ █   █ ████
+████ █▄▄▄█ █▀█▀▄▄▀  ▄▀ █▀ ▀▄██ █▄▄▄█ ████
+████▄▄▄▄▄▄▄█▄█▄▀ ▀▄█ ▀ ▀ ▀ █▄█▄▄▄▄▄▄▄████
+████  ▄▄▄▀▄▄  ▄███▀▄▀█▄██▀ ▀▄ ▀▄█ ▀ ▀████
+████ ▀▀ ▀ ▄█▄ ▀ ▀▄ ▄█▀ ▄█ ▄▀▀▄██    █████
+████▄ █▄▀▀▄█▀ ▀█▄█▄▄▄▄ ▄▀█▀▀█ ▀ ▄ ▀█▀████
+█████  ▀█▀▄▄ █ ▀▄▄  ▄█▄    ▀█▀▀ █▀ ▄█████
+████▀██▀█▄▄ ▀▀▀▀█▄▀ ▀█▄▄▀▀▀ ▀ ▀█▄██▀▀████
+████▄ ▄ ▄▀▄██▀█ ▄ ▀▄██ ▄▄  ▀▀▄█▄██ ▄█████
+████▀▀ ▄▀ ▄ ▀█▀█▀█  █▀█▄▄▀█▀█▄██▄▄█ ▀████
+████ █ ▀█▄▄█▄ ▀ ▄▄▀▀  ▀ █▄█▀████ █▀ ▀████
+████▄██▄██▄█▀ ▄▀ ▄▄▀▄  ▄▀█ ▄ ▄▄▄ ▀█▄ ████
+████ ▄▄▄▄▄ █▄  ▀█▄█ ▄ ▀ ▄ ▄  █▄█ ▄▀▄█████
+████ █   █ █ ▀▄██▄▄▀█▄▀▄██▄▀  ▄  ▀██▀████
+████ █▄▄▄█ █ ██▀▄▄  ▀▄▄▀█▀ ▀█ ▄▀█ ▀██████
+████▄▄▄▄▄▄▄█▄███▄███▄█▄▄▄▄█▄▄█▄██▄█▄█████
+█████████████████████████████████████████
+█████████████████████████████████████████
+# Pour ajouter cette clé OTP à la configuration, exécutez les commandes suivantes :
+set vpn openconnect authentication local-users username tst otp key &#39;ebc1c91b13848ce0bb67d9212934546e41803cfa&#39;
+</pre></div>
+</div>
+<p>Ensuite, il est nécessaire de configurer le 2FA pour OpenConnect :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn openconnect authentication mode local password-otp
+set vpn openconnect authentication local-users username tst otp key &#39;ebc1c91b13848ce0bb67d9212934546e41803cfa&#39;
+</pre></div>
+</div>
+<p>Maintenant, lors de la connexion, l'utilisateur sera d'abord demandé de saisir le mot de passe puis la clé OTP.</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Lors de l'utilisation d'un mot de passe unique basé sur le temps (TOTP) (OTP HOTP-time), assurez-vous que l'heure du serveur et du générateur de jeton OTP sont synchronisés par NTP</p>
+</div>
+<p>Pour afficher les paramètres d'utilisateur configurés OTP, utilisez la commande :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>show openconnect-server user &lt;username&gt; otp &lt;full|key-b32|key-hex|qrcode|uri&gt;
+</pre></div>
+</div>
+</section>
+<section id="identity-based-configuration">
+<h3>Configuration basée sur l'identité</h3>
+<p>OpenConnect prend en charge un sous-ensemble de ses options de configuration pour être appliqué par utilisateur/groupe, pour des raisons de configuration, nous faisons référence à cette fonctionnalité comme « configuration basée sur l'identité ». Le manuel suivant d'OpenConnect Server <a class="reference external" href="https://ocserv.gitlab.io/www/manual.html#:~:text=Configuration%20files%20that%20will%20be%20applied%20per%20user%20connection%20or%0A%23%20per%20group">ouvre la liste des options de configuration autorisées. Cela peut être utilisé pour appliquer différents ensembles de configurations à différents utilisateurs ou groupes d'utilisateurs.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>sudo mkdir -p /config/auth/ocserv/config-per-user
+sudo touch /config/auth/ocserv/default-user.conf
+
+set vpn openconnect authentication identity-based-config mode user
+set vpn openconnect authentication identity-based-config directory /config/auth/ocserv/config-per-user
+set vpn openconnect authentication identity-based-config default-config /config/auth/ocserv/default-user.conf
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Le répertoire ci-dessus et le default-config doivent être un sous-répertoire de /config/auth, car les fichiers en dehors de ce répertoire ne sont pas persistants après une mise à jour d'image.</p>
+</div>
+<p>Une fois que vous avez validé les modifications ci-dessus, vous pouvez créer un fichier de configuration dans le répertoire /config/auth/ocserv/config-per-user qui correspond à un nom d'utilisateur que vous avez créé, par exemple « tst ». Maintenant, lors de la connexion avec l'utilisateur « tst », les options de configuration que vous avez définies dans ce fichier seront chargées.</p>
+<p>Assurez-vous de définir une configuration par défaut raisonnable dans le fichier de configuration par défaut, celle-ci sera chargée dans le cas où un utilisateur s'authentifie et qu'aucun fichier ne se trouve dans le répertoire configuré correspondant au nom d'utilisateur/groupe.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>sudo nano /config/auth/ocserv/config-per-user/tst
+</pre></div>
+</div>
+<p>Les mêmes options de configuration s'appliquent lorsque la configuration basée sur l'identité est configurée en mode groupe, sauf que le mode groupe ne peut être utilisé qu'avec l'authentification RADIUS.</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Le serveur OpenConnect correspond au nom de fichier de manière sensible à la casse, assurez-vous que le nom d'utilisateur/groupe que vous configurez correspond exactement au nom de fichier.</p>
+</div>
+</section>
+<section id="configuring-radius-accounting">
+<h3>Configuration de la comptabilité RADIUS</h3>
+<p>OpenConnect peut être configuré pour envoyer des informations de comptabilité à un serveur RADIUS afin de capturer les données de session utilisateur telles que le moment de connexion/déconnexion, les données transférées, etc.</p>
+<p>Configurez un serveur de comptabilité et activez la comptabilité avec :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn openconnect accounting mode radius
+set vpn openconnect accounting radius server 172.20.20.10
+set vpn openconnect accounting radius server 172.20.20.10 port 1813
+set vpn openconnect accounting radius server 172.20.20.10 key your_radius_secret
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>La fonctionnalité de comptabilité RADIUS doit être utilisée avec le mode d'authentification OpenConnect RADIUS. Elle ne peut pas être utilisée avec l'authentification locale.
+Vous devez configurer le mode d'authentification OpenConnect en « radius ».</p>
+</div>
+<p>Un exemple des données capturées par un serveur FREERADIUS avec comptabilité sql :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>mysql&gt; SELECT username, nasipaddress, acctstarttime, acctstoptime, acctinputoctets, acctoutputoctets, callingstationid, framedipaddress, connectinfo_start FROM radacct;
++----------+---------------+---------------------+---------------------+-----------------+------------------+-------------------+-----------------+-----------------------------------+
+| username | nasipaddress  | acctstarttime       | acctstoptime        | acctinputoctets | acctoutputoctets | callingstationid  | framedipaddress | connectinfo_start                 |
++----------+---------------+---------------------+---------------------+-----------------+------------------+-------------------+-----------------+-----------------------------------+
+| test     | 198.51.100.15 | 2023-01-13 00:59:15 | 2023-01-13 00:59:21 |           10606 |              152 | 192.168.6.1       | 172.20.20.198   | Open AnyConnect VPN Agent v8.05-1 |
++----------+---------------+---------------------+---------------------+-----------------+------------------+-------------------+-----------------+-----------------------------------+
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

@@ -1,12 +1,16 @@
 import { defineComponent, ref, onMounted } from '/src/utils/vue-import.js';
 import { userApi, quotasApi, configApi, conntrackLogApi } from '/src/api/index.js';
-import { locale, localeNames, LOCALES } from '/src/i18n/index.js';
+import { locale, localeNames, LOCALES, useI18n } from '/src/i18n/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useConfigStore } from '/src/stores/config.js';
 
 export default defineComponent({
   name: 'SettingsPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const user = ref(null);
     const lang = ref(locale.value);
     const commitMode = ref('manual');
@@ -42,6 +46,10 @@ export default defineComponent({
           other: cfg.conntrack_other || false,
         };
       } catch (e) {}
+      onMenuRefresh(() => {
+        // Reload settings on menu refresh
+        window.location.reload();
+      });
     });
 
     async function save() {
@@ -58,13 +66,15 @@ export default defineComponent({
         for (const [type, maxEntries] of Object.entries(quotas.value)) {
           await quotasApi.set({ type, max_entries: maxEntries });
         }
-        message.value = '已保存';
+        configStore.markPending();
+        message.value = t('settings.saved');
       } catch (e) {
         showError(e);
       }
     }
 
-    return { user, lang, commitMode, conntrackLog, quotas, message, save, localeNames, LOCALES };
+    return { t,
+      user, lang, commitMode, conntrackLog, quotas, message, save, localeNames, LOCALES };
   },
   template: `
     <div>

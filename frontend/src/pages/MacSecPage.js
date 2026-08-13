@@ -1,41 +1,29 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { useConfigStore } from '/src/stores/config.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import { api, interfaceApi } from '/src/api/index.js';
-
-const COLUMNS = [
-  { key: 'name', title: '接口名称', width: 120 },
-  { key: 'description', title: '描述', width: 160 },
-  { key: 'source_interface', title: '源接口', width: 120 },
-  { key: 'cipher', title: '加密算法', width: 120 },
-  { key: 'mtu', title: 'MTU', width: 80 },
-  { key: 'disable', title: '禁用', width: 80 },
-  { key: 'actions', title: '操作', width: 100 },
-];
-
-const CIPHER_OPTIONS = [
-  { value: 'gcm-aes-128', label: 'gcm-aes-128 (128位)' },
-  { value: 'gcm-aes-256', label: 'gcm-aes-256 (256位)' },
-];
-
-const SOURCE_VALIDATION_OPTIONS = [
-  { value: 'strict', label: 'strict (严格)' },
-  { value: 'loose', label: 'loose (宽松)' },
-  { value: 'disable', label: 'disable (禁用)' },
-];
-
-const ACCEPT_DAD_OPTIONS = [
-  { value: '0', label: '0 (禁用 DAD)' },
-  { value: '1', label: '1 (启用 DAD - 默认)' },
-  { value: '2', label: '2 (启用 DAD - MAC 重复时禁用 IPv6)' },
-];
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { showError } from '/src/components/Layout/ErrorDisplay.js';
+import { useI18n } from '/src/i18n/index.js';
 
 export default defineComponent({
   name: 'MacSecPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
+    const COLUMNS = computed(() => [
+      { key: 'name', title: t('macsec.columns.name'), width: 120 },
+      { key: 'description', title: t('macsec.columns.description'), width: 160 },
+      { key: 'source_interface', title: t('macsec.columns.source_interface'), width: 120 },
+      { key: 'cipher', title: t('macsec.columns.cipher'), width: 120 },
+      { key: 'mtu', title: t('macsec.columns.mtu'), width: 80 },
+      { key: 'disable', title: t('macsec.columns.disable'), width: 80 },
+      { key: 'actions', title: t('macsec.columns.actions'), width: 100 },
+    ]);
     const loading = ref(false);
     const macsecs = ref([]);
     const modalVisible = ref(false);
@@ -43,90 +31,109 @@ export default defineComponent({
     const interfaceOptions = ref([]);
     const activeTab = ref('basic');
     const selectedMacsec = ref([]);
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
+
+    const CIPHER_OPTIONS = computed(() => [
+      { value: 'gcm-aes-128', label: t('macsec.options.cipher_128') },
+      { value: 'gcm-aes-256', label: t('macsec.options.cipher_256') },
+    ]);
+
+    const SOURCE_VALIDATION_OPTIONS = computed(() => [
+      { value: 'strict', label: t('macsec.options.source_strict') },
+      { value: 'loose', label: t('macsec.options.source_loose') },
+      { value: 'disable', label: t('macsec.options.source_disable') },
+    ]);
+
+    const ACCEPT_DAD_OPTIONS = computed(() => [
+      { value: '0', label: t('macsec.options.accept_dad_0') },
+      { value: '1', label: t('macsec.options.accept_dad_1') },
+      { value: '2', label: t('macsec.options.accept_dad_2') },
+    ]);
 
     const basicSchema = computed(() => [
-      { key: 'name', title: '接口名称', type: 'text', required: true, placeholder: '如 macsec0, macsec1', help: '格式: macsecN' },
-      { key: 'description', title: '描述', type: 'text', placeholder: '接口描述' },
-      { key: 'address', title: 'IP 地址', type: 'textarea', placeholder: '每行一个 IPv4/IPv6 地址或 CIDR', help: '接口 IP 地址 (支持多行)' },
-      { key: 'source_interface', title: '源接口', type: 'select', options: interfaceOptions.value, placeholder: '选择物理接口', help: '流量通过的物理接口' },
-      { key: 'mtu', title: 'MTU', type: 'number', min: 68, max: 16000, placeholder: '68-16000', help: '最大传输单元 (默认: 1460)' },
-      { key: 'disable', title: '禁用接口', type: 'checkbox', help: '管理性禁用接口' },
+      { key: 'name', title: t('macsec.fields.name'), type: 'text', required: true, placeholder: t('macsec.fields.name_placeholder'), help: t('macsec.fields.name_help') },
+      { key: 'description', title: t('macsec.fields.description'), type: 'text', placeholder: t('macsec.fields.description_placeholder') },
+      { key: 'address', title: t('macsec.fields.ip_address'), type: 'textarea', placeholder: t('macsec.fields.address_placeholder'), help: t('macsec.fields.address_help') },
+      { key: 'source_interface', title: t('macsec.fields.source_interface'), type: 'select', options: interfaceOptions.value, placeholder: t('macsec.fields.source_interface_placeholder'), help: t('macsec.fields.source_interface_help') },
+      { key: 'mtu', title: t('macsec.fields.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('macsec.fields.mtu_placeholder'), help: t('macsec.fields.mtu_help') },
+      { key: 'disable', title: t('macsec.fields.disable'), type: 'checkbox', help: t('macsec.fields.disable_help') },
     ]);
 
     const securitySchema = computed(() => [
-      { key: 'security_cipher', title: '加密算法', type: 'select', options: CIPHER_OPTIONS, placeholder: '选择加密算法', help: 'MACsec 加密套件' },
-      { key: 'security_encrypt', title: '启用加密', type: 'checkbox', help: '启用可选 MACsec 加密' },
-      { key: 'security_replay_window', title: '重放窗口', type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: 'IEEE 802.1X/MACsec 重放保护窗口 (0=严格检查)' },
+      { key: 'security_cipher', title: t('macsec.fields.security.cipher'), type: 'select', options: CIPHER_OPTIONS.value, placeholder: t('macsec.fields.security.cipher_placeholder'), help: t('macsec.fields.security.cipher_help') },
+      { key: 'security_encrypt', title: t('macsec.fields.security.encrypt'), type: 'checkbox', help: t('macsec.fields.security.encrypt_help') },
+      { key: 'security_replay_window', title: t('macsec.fields.security.replay_window'), type: 'number', min: 0, max: 4294967295, placeholder: t('macsec.fields.security.replay_window_placeholder'), help: t('macsec.fields.security.replay_window_help') },
     ]);
 
     const mkaSchema = computed(() => [
-      { key: 'security_mka_cak', title: 'CAK', type: 'text', placeholder: '32 或 64 位十六进制字符串', help: '安全连接关联密钥 (128位=32hex, 256位=64hex)' },
-      { key: 'security_mka_ckn', title: 'CKN', type: 'text', placeholder: '2-64 位十六进制字符串', help: '安全连接关联密钥名称 (8-256 bit)' },
-      { key: 'security_mka_priority', title: 'MKA 优先级', type: 'number', min: 0, max: 255, placeholder: '0-255', help: 'MKA 参与者优先级 (默认: 255)' },
+      { key: 'security_mka_cak', title: t('macsec.fields.mka.cak'), type: 'text', placeholder: t('macsec.fields.mka.cak_placeholder'), help: t('macsec.fields.mka.cak_help') },
+      { key: 'security_mka_ckn', title: t('macsec.fields.mka.ckn'), type: 'text', placeholder: t('macsec.fields.mka.ckn_placeholder'), help: t('macsec.fields.mka.ckn_help') },
+      { key: 'security_mka_priority', title: t('macsec.fields.mka.priority'), type: 'number', min: 0, max: 255, placeholder: t('macsec.fields.mka.priority_placeholder'), help: t('macsec.fields.mka.priority_help') },
     ]);
 
     const staticSchema = computed(() => [
-      { key: 'security_static_key', title: '静态密钥', type: 'text', placeholder: '32 或 64 位十六进制字符串', help: 'MACsec 静态密钥' },
-      { key: 'security_static_peers', title: '对端列表', type: 'textarea', placeholder: '每行一个对端: name,mac,key', help: '格式: 对端名称,MAC地址,密钥 (每行一个)' },
+      { key: 'security_static_key', title: t('macsec.fields.static.key'), type: 'text', placeholder: t('macsec.fields.static.key_placeholder'), help: t('macsec.fields.static.key_help') },
+      { key: 'security_static_peers', title: t('macsec.fields.static.peers'), type: 'textarea', placeholder: t('macsec.fields.static.peers_placeholder'), help: t('macsec.fields.static.peers_help') },
     ]);
 
     const ipSchema = computed(() => [
-      { key: 'ip_adjust_mss', title: '调整 MSS', type: 'text', placeholder: 'clamp-mss-to-pmtu 或 536-65535', help: 'TCP MSS 值' },
-      { key: 'ip_arp_cache_timeout', title: 'ARP 缓存超时', type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: 'ARP 缓存条目超时 (秒, 默认: 30)' },
-      { key: 'ip_disable_arp_filter', title: '禁用 ARP 过滤', type: 'checkbox', help: '禁用 ARP 过滤' },
-      { key: 'ip_disable_forwarding', title: '禁用转发', type: 'checkbox', help: '禁用 IP 转发' },
-      { key: 'ip_enable_arp_accept', title: '启用 ARP 接受', type: 'checkbox', help: '启用 ARP 接受' },
-      { key: 'ip_enable_arp_announce', title: '启用 ARP 通告', type: 'checkbox', help: '启用 ARP 通告' },
-      { key: 'ip_enable_arp_ignore', title: '启用 ARP 忽略', type: 'checkbox', help: '启用 ARP 忽略' },
-      { key: 'ip_enable_directed_broadcast', title: '启用定向广播', type: 'checkbox', help: '启用定向广播转发' },
-      { key: 'ip_enable_proxy_arp', title: '启用代理 ARP', type: 'checkbox', help: '启用代理 ARP' },
-      { key: 'ip_proxy_arp_pvlan', title: '私有 VLAN 代理 ARP', type: 'checkbox', help: '启用私有 VLAN 代理 ARP' },
-      { key: 'ip_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
+      { key: 'ip_adjust_mss', title: t('macsec.fields.ip.adjust_mss'), type: 'text', placeholder: t('macsec.fields.ip.adjust_mss_placeholder'), help: t('macsec.fields.ip.adjust_mss_help') },
+      { key: 'ip_arp_cache_timeout', title: t('macsec.fields.ip.arp_cache_timeout'), type: 'number', min: 1, max: 86400, placeholder: t('macsec.fields.ip.arp_cache_timeout_placeholder'), help: t('macsec.fields.ip.arp_cache_timeout_help') },
+      { key: 'ip_disable_arp_filter', title: t('macsec.fields.ip.disable_arp_filter'), type: 'checkbox', help: t('macsec.fields.ip.disable_arp_filter_help') },
+      { key: 'ip_disable_forwarding', title: t('macsec.fields.ip.disable_forwarding'), type: 'checkbox', help: t('macsec.fields.ip.disable_forwarding_help') },
+      { key: 'ip_enable_arp_accept', title: t('macsec.fields.ip.enable_arp_accept'), type: 'checkbox', help: t('macsec.fields.ip.enable_arp_accept_help') },
+      { key: 'ip_enable_arp_announce', title: t('macsec.fields.ip.enable_arp_announce'), type: 'checkbox', help: t('macsec.fields.ip.enable_arp_announce_help') },
+      { key: 'ip_enable_arp_ignore', title: t('macsec.fields.ip.enable_arp_ignore'), type: 'checkbox', help: t('macsec.fields.ip.enable_arp_ignore_help') },
+      { key: 'ip_enable_directed_broadcast', title: t('macsec.fields.ip.enable_directed_broadcast'), type: 'checkbox', help: t('macsec.fields.ip.enable_directed_broadcast_help') },
+      { key: 'ip_enable_proxy_arp', title: t('macsec.fields.ip.enable_proxy_arp'), type: 'checkbox', help: t('macsec.fields.ip.enable_proxy_arp_help') },
+      { key: 'ip_proxy_arp_pvlan', title: t('macsec.fields.ip.proxy_arp_pvlan'), type: 'checkbox', help: t('macsec.fields.ip.proxy_arp_pvlan_help') },
+      { key: 'ip_source_validation', title: t('macsec.fields.ip.source_validation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS.value, placeholder: t('macsec.fields.ip.source_validation_placeholder'), help: t('macsec.fields.ip.source_validation_help') },
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: '接受 DAD', type: 'select', options: ACCEPT_DAD_OPTIONS, help: '重复地址检测 (默认: 1)' },
-      { key: 'ipv6_autoconf', title: '自动配置', type: 'checkbox', help: '使用 SLAAC 获取 IPv6 地址' },
-      { key: 'ipv6_eui64', title: 'EUI-64 前缀', type: 'text', placeholder: 'IPv6 前缀', help: '基于 MAC 的 EUI-64 地址前缀' },
-      { key: 'ipv6_no_default_link_local', title: '无默认链路本地地址', type: 'checkbox', help: '移除默认链路本地地址' },
-      { key: 'ipv6_adjust_mss', title: '调整 MSS', type: 'text', placeholder: 'clamp-mss-to-pmtu 或 536-65535', help: 'TCP MSS 值' },
-      { key: 'ipv6_base_reachable_time', title: '基础可达时间', type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: '基础可达时间 (秒, 默认: 30)' },
-      { key: 'ipv6_disable_forwarding', title: '禁用转发', type: 'checkbox', help: '禁用 IPv6 转发' },
-      { key: 'ipv6_dup_addr_detect_transmits', title: 'DAD 传输次数', type: 'number', min: 0, max: 100, placeholder: '0-100', help: 'DAD 期间发送的 NS 消息数 (默认: 1, 0=禁用)' },
-      { key: 'ipv6_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
+      { key: 'ipv6_accept_dad', title: t('macsec.fields.ipv6.accept_dad'), type: 'select', options: ACCEPT_DAD_OPTIONS.value, help: t('macsec.fields.ipv6.accept_dad_help') },
+      { key: 'ipv6_autoconf', title: t('macsec.fields.ipv6.autoconf'), type: 'checkbox', help: t('macsec.fields.ipv6.autoconf_help') },
+      { key: 'ipv6_eui64', title: t('macsec.fields.ipv6.eui64'), type: 'text', placeholder: t('macsec.fields.ipv6.eui64_placeholder'), help: t('macsec.fields.ipv6.eui64_help') },
+      { key: 'ipv6_no_default_link_local', title: t('macsec.fields.ipv6.no_default_link_local'), type: 'checkbox', help: t('macsec.fields.ipv6.no_default_link_local_help') },
+      { key: 'ipv6_adjust_mss', title: t('macsec.fields.ipv6.adjust_mss'), type: 'text', placeholder: t('macsec.fields.ipv6.adjust_mss_placeholder'), help: t('macsec.fields.ipv6.adjust_mss_help') },
+      { key: 'ipv6_base_reachable_time', title: t('macsec.fields.ipv6.base_reachable_time'), type: 'number', min: 1, max: 86400, placeholder: t('macsec.fields.ipv6.base_reachable_time_placeholder'), help: t('macsec.fields.ipv6.base_reachable_time_help') },
+      { key: 'ipv6_disable_forwarding', title: t('macsec.fields.ipv6.disable_forwarding'), type: 'checkbox', help: t('macsec.fields.ipv6.disable_forwarding_help') },
+      { key: 'ipv6_dup_addr_detect_transmits', title: t('macsec.fields.ipv6.dup_addr_detect_transmits'), type: 'number', min: 0, max: 100, placeholder: t('macsec.fields.ipv6.dup_addr_detect_transmits_placeholder'), help: t('macsec.fields.ipv6.dup_addr_detect_transmits_help') },
+      { key: 'ipv6_source_validation', title: t('macsec.fields.ipv6.source_validation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS.value, placeholder: t('macsec.fields.ipv6.source_validation_placeholder'), help: t('macsec.fields.ipv6.source_validation_help') },
     ]);
 
     const dhcpSchema = computed(() => [
-      { key: 'dhcp_client_id', title: '客户端 ID', type: 'text', placeholder: 'DHCP 选项字符串', help: '用于向 DHCP 服务器标识客户端' },
-      { key: 'dhcp_default_route_distance', title: '默认路由距离', type: 'number', min: 1, max: 255, placeholder: '1-255', help: '默认路由的距离 (默认: 210)' },
-      { key: 'dhcp_host_name', title: '主机名', type: 'text', placeholder: '主机名', help: '覆盖系统主机名' },
-      { key: 'dhcp_mtu', title: '使用 DHCP MTU', type: 'checkbox', help: '使用 DHCP 服务器提供的 MTU' },
-      { key: 'dhcp_no_default_route', title: '不安装默认路由', type: 'checkbox', help: '不安装默认路由' },
-      { key: 'dhcp_reject', title: '拒绝地址', type: 'textarea', placeholder: '每行一个 IP 或子网', help: '拒绝 DHCP 租约的地址' },
-      { key: 'dhcp_user_class', title: '用户类别', type: 'text', placeholder: 'DHCP 选项字符串', help: '用户可配置选项' },
-      { key: 'dhcp_vendor_class_id', title: '厂商类别 ID', type: 'text', placeholder: 'DHCP 选项字符串', help: '标识厂商客户端类型' },
+      { key: 'dhcp_client_id', title: t('macsec.fields.dhcp.client_id'), type: 'text', placeholder: t('macsec.fields.dhcp.client_id_placeholder'), help: t('macsec.fields.dhcp.client_id_help') },
+      { key: 'dhcp_default_route_distance', title: t('macsec.fields.dhcp.default_route_distance'), type: 'number', min: 1, max: 255, placeholder: t('macsec.fields.dhcp.default_route_distance_placeholder'), help: t('macsec.fields.dhcp.default_route_distance_help') },
+      { key: 'dhcp_host_name', title: t('macsec.fields.dhcp.host_name'), type: 'text', placeholder: t('macsec.fields.dhcp.host_name_placeholder'), help: t('macsec.fields.dhcp.host_name_help') },
+      { key: 'dhcp_mtu', title: t('macsec.fields.dhcp.use_mtu'), type: 'checkbox', help: t('macsec.fields.dhcp.use_mtu_help') },
+      { key: 'dhcp_no_default_route', title: t('macsec.fields.dhcp.no_default_route'), type: 'checkbox', help: t('macsec.fields.dhcp.no_default_route_help') },
+      { key: 'dhcp_reject', title: t('macsec.fields.dhcp.reject'), type: 'textarea', placeholder: t('macsec.fields.dhcp.reject_placeholder'), help: t('macsec.fields.dhcp.reject_help') },
+      { key: 'dhcp_user_class', title: t('macsec.fields.dhcp.user_class'), type: 'text', placeholder: t('macsec.fields.dhcp.user_class_placeholder'), help: t('macsec.fields.dhcp.user_class_help') },
+      { key: 'dhcp_vendor_class_id', title: t('macsec.fields.dhcp.vendor_class_id'), type: 'text', placeholder: t('macsec.fields.dhcp.vendor_class_id_placeholder'), help: t('macsec.fields.dhcp.vendor_class_id_help') },
     ]);
 
     const dhcpv6Schema = computed(() => [
-      { key: 'dhcpv6_duid', title: 'DUID', type: 'text', placeholder: 'DHCP 唯一标识符', help: '客户端发送的 DUID' },
-      { key: 'dhcpv6_no_release', title: '不发送 Release', type: 'checkbox', help: '客户端退出时不发送 release 消息' },
-      { key: 'dhcpv6_no_request_dns', title: '不请求 DNS', type: 'checkbox', help: '不请求 DNS 服务器' },
-      { key: 'dhcpv6_no_request_domain_name', title: '不请求域名', type: 'checkbox', help: '不请求域名' },
-      { key: 'dhcpv6_parameters_only', title: '仅获取参数', type: 'checkbox', help: '仅获取配置参数，不获取地址' },
-      { key: 'dhcpv6_pd_instances', title: '前缀委派实例', type: 'textarea', placeholder: '每行一个: instance,interface,address,sla-id', help: '格式: 实例号,接口名,地址,SLA-ID (每行一个, 地址和 SLA-ID 可选)' },
-      { key: 'dhcpv6_pd_length', title: '前缀长度', type: 'number', min: 32, max: 64, placeholder: '32-64', help: '请求的 IPv6 前缀长度 (默认: 64)' },
-      { key: 'dhcpv6_rapid_commit', title: '快速提交', type: 'checkbox', help: '等待立即回复而非通告' },
-      { key: 'dhcpv6_temporary', title: '临时地址', type: 'checkbox', help: 'IPv6 临时地址' },
+      { key: 'dhcpv6_duid', title: t('macsec.fields.dhcpv6.duid'), type: 'text', placeholder: t('macsec.fields.dhcpv6.duid_placeholder'), help: t('macsec.fields.dhcpv6.duid_help') },
+      { key: 'dhcpv6_no_release', title: t('macsec.fields.dhcpv6.no_release'), type: 'checkbox', help: t('macsec.fields.dhcpv6.no_release_help') },
+      { key: 'dhcpv6_no_request_dns', title: t('macsec.fields.dhcpv6.no_request_dns'), type: 'checkbox', help: t('macsec.fields.dhcpv6.no_request_dns_help') },
+      { key: 'dhcpv6_no_request_domain_name', title: t('macsec.fields.dhcpv6.no_request_domain_name'), type: 'checkbox', help: t('macsec.fields.dhcpv6.no_request_domain_name_help') },
+      { key: 'dhcpv6_parameters_only', title: t('macsec.fields.dhcpv6.parameters_only'), type: 'checkbox', help: t('macsec.fields.dhcpv6.parameters_only_help') },
+      { key: 'dhcpv6_pd_instances', title: t('macsec.fields.dhcpv6.pd_instances'), type: 'textarea', placeholder: t('macsec.fields.dhcpv6.pd_instances_placeholder'), help: t('macsec.fields.dhcpv6.pd_instances_help') },
+      { key: 'dhcpv6_pd_length', title: t('macsec.fields.dhcpv6.pd_length'), type: 'number', min: 32, max: 64, placeholder: t('macsec.fields.dhcpv6.pd_length_placeholder'), help: t('macsec.fields.dhcpv6.pd_length_help') },
+      { key: 'dhcpv6_rapid_commit', title: t('macsec.fields.dhcpv6.rapid_commit'), type: 'checkbox', help: t('macsec.fields.dhcpv6.rapid_commit_help') },
+      { key: 'dhcpv6_temporary', title: t('macsec.fields.dhcpv6.temporary'), type: 'checkbox', help: t('macsec.fields.dhcpv6.temporary_help') },
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: '镜像出方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像出方向流量到目标接口' },
-      { key: 'mirror_ingress', title: '镜像入方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像入方向流量到目标接口' },
+      { key: 'mirror_egress', title: t('macsec.fields.mirror.egress'), type: 'select', options: interfaceOptions.value, placeholder: t('macsec.fields.mirror.placeholder'), help: t('macsec.fields.mirror.egress_help') },
+      { key: 'mirror_ingress', title: t('macsec.fields.mirror.ingress'), type: 'select', options: interfaceOptions.value, placeholder: t('macsec.fields.mirror.placeholder'), help: t('macsec.fields.mirror.ingress_help') },
     ]);
 
     const otherSchema = computed(() => [
-      { key: 'redirect', title: '重定向目标', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '重定向入站数据包到目标接口' },
-      { key: 'vrf', title: 'VRF 实例', type: 'text', placeholder: 'VRF 实例名称', help: 'VRF 实例名称' },
+      { key: 'redirect', title: t('macsec.fields.other.redirect'), type: 'select', options: interfaceOptions.value, placeholder: t('macsec.fields.other.redirect_placeholder'), help: t('macsec.fields.other.redirect_help') },
+      { key: 'vrf', title: t('macsec.fields.other.vrf'), type: 'text', placeholder: t('macsec.fields.other.vrf_placeholder'), help: t('macsec.fields.other.vrf_help') },
     ]);
 
     const commandText = computed(() => {
@@ -234,21 +241,20 @@ export default defineComponent({
       if (m.redirect) lines.push(`set interfaces macsec ${name} redirect ${m.redirect}`);
       if (m.vrf) lines.push(`set interfaces macsec ${name} vrf ${m.vrf}`);
 
-      return lines.length ? lines.join('\n') : '# 未配置任何参数';
+      return lines.length ? lines.join('\n') : t('macsec.messages.no_config');
     });
 
     const modalTabs = computed(() => [
-      { key: 'basic', title: '基本配置' },
-      { key: 'security', title: '安全设置' },
-      { key: 'mka', title: 'MKA 协议' },
-      { key: 'static', title: '静态密钥' },
-      { key: 'ip', title: 'IPv4 参数' },
-      { key: 'ipv6', title: 'IPv6 参数' },
-      { key: 'dhcp', title: 'DHCP' },
-      { key: 'dhcpv6', title: 'DHCPv6' },
-      { key: 'mirror', title: '流量镜像' },
-      { key: 'other', title: '其他' },
-      { key: 'command', title: '命令预览' },
+      { key: 'basic', title: t('macsec.tabs.basic') },
+      { key: 'security', title: t('macsec.tabs.security') },
+      { key: 'mka', title: t('macsec.tabs.mka') },
+      { key: 'static', title: t('macsec.tabs.static') },
+      { key: 'ip', title: t('macsec.tabs.ip') },
+      { key: 'ipv6', title: t('macsec.tabs.ipv6') },
+      { key: 'dhcp', title: t('macsec.tabs.dhcp') },
+      { key: 'dhcpv6', title: t('macsec.tabs.dhcpv6') },
+      { key: 'mirror', title: t('macsec.tabs.mirror') },
+      { key: 'other', title: t('macsec.tabs.other') },
     ]);
 
     function getDefaultForm() {
@@ -494,10 +500,6 @@ export default defineComponent({
       }
     }
 
-    function showError(err) {
-      alert(`错误码: ${err.code || 'ERROR'}\n错误信息: ${err.message || err}`);
-    }
-
     function openModal(index = -1) {
       if (index >= 0) {
         editingMacsec.value = macsecToForm(macsecs.value[index]);
@@ -511,10 +513,11 @@ export default defineComponent({
     async function save() {
       try {
         const form = editingMacsec.value;
-        if (!form.name) { alert('请输入接口名称'); return; }
+        if (!form.name) { showError({ message: t('macsec.messages.enter_name') }); return; }
         const config = formToMacsec(form);
-        console.log('[MACSec] 保存配置:', JSON.stringify(config, null, 2));
-        await api.put('/config', { path: `interfaces macsec ${form.name}`, value: config });
+        console.log('[MACSec] Saving config:', JSON.stringify(config, null, 2));
+        await configStore.setConfig(`interfaces macsec ${form.name}`, config);
+        configStore.markPending();
         modalVisible.value = false;
         await load();
       } catch (err) {
@@ -522,28 +525,35 @@ export default defineComponent({
       }
     }
 
-    async function remove() {
-      if (!selectedMacsec.value.length) { alert('请先选择要删除的 MACSec 接口'); return; }
-      if (!confirm(`确定删除选中的 ${selectedMacsec.value.length} 个 MACSec 接口?`)) return;
+    function remove() {
+      if (!selectedMacsec.value.length) { showError({ message: t('macsec.messages.select_delete') }); return; }
+      pendingDeleteNames.value = selectedMacsec.value.map(m => m.name);
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemove() {
       try {
-        for (const m of selectedMacsec.value) {
-          await api.delete('/config', { path: `interfaces macsec ${m.name}` });
+        for (const name of pendingDeleteNames.value) {
+          await configStore.deleteConfig(`interfaces macsec ${name}`);
+          configStore.markPending();
         }
         selectedMacsec.value = [];
+        pendingDeleteNames.value = [];
         await load();
       } catch (err) {
         showError(err);
       }
     }
 
-    onMounted(() => { load(); });
+    onMounted(() => { load(); onMenuRefresh(load); });
 
     return {
       loading, macsecs, selected: selectedMacsec, modalVisible, editingMacsec, interfaceOptions, activeTab,
+      deleteModalVisible, pendingDeleteNames,
       COLUMNS,
       basicSchema, securitySchema, mkaSchema, staticSchema, ipSchema, ipv6Schema, dhcpSchema, dhcpv6Schema, mirrorSchema, otherSchema,
       commandText, modalTabs,
-      openModal, save, remove, load,
+      openModal, save, remove, confirmRemove, load, t,
     };
   },
   template: `
@@ -560,7 +570,7 @@ export default defineComponent({
         @refresh="load"
         @selection-change="selected = $event"
       />
-      <DraggableModal v-model:visible="modalVisible" :title="editingMacsec?.name ? '编辑 MACSec 接口' : '创建 MACSec 接口'" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingMacsec?.name ? t('macsec.modal.edit') : t('macsec.modal.create')" width="900px">
         <template #default>
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic><ConfigForm :schema="basicSchema" :model="editingMacsec" /></template>
@@ -573,13 +583,18 @@ export default defineComponent({
             <template #dhcpv6><ConfigForm :schema="dhcpv6Schema" :model="editingMacsec" /></template>
             <template #mirror><ConfigForm :schema="mirrorSchema" :model="editingMacsec" /></template>
             <template #other><ConfigForm :schema="otherSchema" :model="editingMacsec" /></template>
-            <template #command><pre style="background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;font-size:13px;">{{ commandText }}</pre></template>
           </TabGroup>
         </template>
         <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">取消</button>
-          <button type="button" class="btn btn-primary" @click="save">确定</button>
+          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('common.cancel') }}</button>
+          <button type="button" class="btn btn-primary" @click="save">{{ t('common.confirm') }}</button>
         </template>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('common.confirm_delete')" width="400px" @confirm="confirmRemove">
+        <div>{{ t('macsec.modal.delete_confirm') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

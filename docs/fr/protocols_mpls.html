@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="mpls">
+<h1>MPLS</h1>
+<p><abbr title="Multiprotocol Label Switching">MPLS</abbr> est une méthode de transfert de paquets
+qui diffère du transfert IP traditionnel. Au lieu d'effectuer des recherches d'adresses IP,
+les routeurs MPLS transmettent le trafic en utilisant des recherches d'exact match sur les étiquettes MPLS
+insérées entre le niveau 2 (Ethernet) et le niveau 3 (IP).</p>
+<p>Les étiquettes MPLS peuvent être attribuées statiquement ou dynamiquement. Cette section se concentre sur
+l'allocation dynamique des étiquettes à l'aide de protocoles de distribution d'étiquettes tels que le
+<abbr title="Label Distribution Protocol">LDP</abbr> et
+<abbr title="Resource Reservation Protocol for Traffic Engineering">RSVP-TE</abbr>, ou
+via les extensions <abbr title="Segment Routing">SR</abbr> d'OSPF ou IS-IS.</p>
+<p>Ces protocoles établissent un chemin unidirectionnel appelé un
+<abbr title="Label-Switched Path">LSP</abbr> à travers le réseau. Lorsqu'un paquet entre dans le réseau MPLS, le routeur d'entrée insère une étiquette MPLS sur celui-ci en fonction
+de la destination et le transmet le long du LSP. Chaque routeur intermédiaire utilise l'étiquette entrante pour rechercher l'interface de sortie et la valeur de l'étiquette suivante,
+remplace l'étiquette et transmet le paquet sur cette interface. Le routeur de sortie supprime l'étiquette et transmet le paquet original en utilisant le routage IP normal.</p>
+<section id="mpls-support-in-vyos">
+<h2>Prise en charge MPLS dans VyOS</h2>
+<p>La prise en charge MPLS dans VyOS est en cours de développement, donc son ensemble de fonctionnalités est actuellement
+limité. Le transfert MPLS de base fonctionne, car la pile de routage FRR sous-jacente prend en charge
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc3031">RFC 3031</a>.</p>
+<p>Fonctionnalités prises en charge :</p>
+<ul class="simple">
+<li><p><strong>LDP</strong>: Implémenté conformément à
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5036">RFC 5036</a>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>D'autres normes LDP connexes incluent les RFCs
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6720">6720</a>,
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6667">6667</a>,
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5919">5919</a>,
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5561">5561</a>, et
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7552">7552</a>.</p>
+</div>
+<p>Limitations actuelles :</p>
+<ul class="simple">
+<li><p><strong>VNP MPLS</strong>: Aucune prise en charge pour les services VNP MPLS, tels que
+les L2VPNs et mVPNs.</p></li>
+<li><p><strong>RSVP-TE</strong>: Non pris en charge, car la pile FRR sous-jacente ne l'implémente pas actuellement.</p></li>
+</ul>
+</section>
+<section id="label-distribution-protocol-ldp">
+<h2>Protocole de distribution d'étiquettes (LDP)</h2>
+<p>MPLS prend en charge plusieurs protocoles pour la création de chemins. VyOS implémente le LDP via
+la pile de routage FRR sous-jacente, selon
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5036">RFC 5036</a>.</p>
+<p>Le LDP est un protocole de signalisation MPLS basé sur TCP qui distribue dynamiquement
+des étiquettes pour créer des chemins commutés par étiquettes. Il n'est pas un protocole de routage et
+dépend des protocoles de routage existants pour les décisions de transfert et
+la communication avec d'autres routeurs LDP.</p>
+<p>Pour échanger les annonces d'étiquettes, le LDP établit des sessions TCP avec
+des pairs automatiquement découverts ou configurés statiquement. Chaque session est formée en utilisant l'adresse de transport du pair, qui doit être présente dans le tableau de routage et continuellement accessible.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Il est recommandé d'utiliser la même adresse pour l'ID du routeur LDP
+et l'adresse de transport de la découverte. Pour que le LDP fonctionne dans VyOS,
+les deux paramètres doivent être configurés explicitement.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Le LDP n'a aucun mécanisme pour rafraîchir une session existante. Pour appliquer une
+modification de configuration ou un changement dans les capacités de session négociées, il faut réinitialiser
+le pair LDP sur le routeur local.</p>
+</div>
+</section>
+<section id="configuration">
+<h2>Configuration</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activer le MPLS sur l'interface spécifiée.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls interface eth1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls parameters no-propagate-ttl
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-parameters-no-propagate-ttl" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactiver la propagation de la TTL IP dans l'en-tête MPLS lors de l'imposition de l'étiquette.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls parameters no-propagate-ttl
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls parameters maximum-ttl &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-parameters-maximum-ttl-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer la valeur maximale de TTL pour les paquets MPLS.</strong></p>
+<p>Cette valeur est utilisée lorsque la TTL n'est pas propagée depuis l'en-tête IP.
+La valeur par défaut est 255.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls parameters maximum-ttl 15
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activer le LDP sur l'interface spécifiée.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp interface eth1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp interface &lt;interface&gt; disable-establish-hello
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-interface-interface-disable-establish-hello" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactiver le Hello déclenché que le routeur envoie sur l'interface spécifiée en réponse à la réception d'un Hello LDP d'un pair.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp interface eth0 disable-establish-hello
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp router-id &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-router-id-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer l'adresse IP utilisée comme ID de routeur LDP pour l'appareil local.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp router-id 192.0.2.1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery transport-ipv4-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-transport-ipv4-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer l'adresse de transport IPv4 pour les connexions LDP IPv4.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery transport-ipv4-address 192.0.2.1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery transport-ipv6-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-transport-ipv6-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer l'adresse de transport IPv6 pour les connexions LDP IPv6.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery transport-ipv6-address 2001:db8::1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp neighbor &lt;ipv4-address&gt; password &lt;password&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-neighbor-ipv4-address-password-password" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer l'authentification pour la session LDP avec le pair spécifié.</strong></p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Pour que la session s'établisse correctement, les deux pairs doivent être configurés
+avec le même mot de passe.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp neighbor 192.0.2.2 password mysharedsecret
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp neighbor &lt;ipv4-address&gt; session-holdtime &lt;15-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-neighbor-ipv4-address-session-holdtime-15-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le temps d'attente de la session LDP, en secondes, annoncé au
+pair spécifié.</strong></p>
+<p>Le pair doit être réinitialisé pour que ce changement prenne effet.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp neighbor 192.0.2.2 session-holdtime 180
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp neighbor &lt;ipv4-address&gt; ttl-security &lt;disable | 1-254&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-neighbor-ipv4-address-ttl-security-disable-1-254" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer la sécurité TTL (<abbr title="Generalized TTL Security Mechanism">GTSM</abbr>)
+pour la session LDP avec le pair spécifié.</strong></p>
+<p>Utilisez <code class="docutils literal notranslate">disable</code> pour désactiver la sécurité TTL, ou définissez une valeur de compteur de sauts (1-254) pour
+restreindre les paquets entrants acceptés en fonction de leur TTL.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp neighbor 192.0.2.2 ttl-security 5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery hello-ipv4-interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv4-interval-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer l'intervalle, en secondes, à partir duquel le routeur envoie des messages Hello IPv4 LDP.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery hello-ipv4-interval 5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery hello-ipv4-holdtime &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv4-holdtime-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le délai d'attente, en secondes, annoncé dans les messages Hello IPv4 LDP.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery hello-ipv4-holdtime 15
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery hello-ipv6-interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv6-interval-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer l'intervalle, en secondes, à partir duquel le routeur envoie des messages Hello IPv6 LDP.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery hello-ipv6-interval 5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery hello-ipv6-holdtime &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv6-holdtime-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le délai d'attente, en secondes, annoncé dans les messages Hello IPv6 LDP.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery hello-ipv6-holdtime 15
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery session-ipv4-holdtime &lt;15-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-session-ipv4-holdtime-15-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le délai d'attente de la session LDP, en secondes, annoncé dans les messages d'initialisation IPv4 LDP.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery session-ipv4-holdtime 180
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp discovery session-ipv6-holdtime &lt;15-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-session-ipv6-holdtime-15-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le délai d'attente de la session LDP, en secondes, annoncé dans les messages d'initialisation IPv6 LDP.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery session-ipv6-holdtime 180
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp import ipv4 import-filter filter-access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv4-import-filter-filter-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Filtrer les liaisons d'étiquettes IPv4 (associations entre un préfixe IPv4 et
+une étiquette MPLS) provenant des pairs LDP à l'aide de la liste d'accès spécifiée.</strong></p>
+<p>Seules les liaisons d'étiquettes dont le préfixe est autorisé par la liste d'accès sont
+acceptées.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp import ipv4 import-filter filter-access-list 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp import ipv4 import-filter neighbor-access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv4-import-filter-neighbor-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Filtrer les liaisons d'étiquettes IPv4 (associations entre un préfixe IPv4
+et une étiquette MPLS) provenant des pairs LDP à l'aide de la liste d'accès spécifiée.</strong></p>
+<p>Seules les liaisons d'étiquettes reçues d'un pair dont l'adresse IPv4 est autorisée
+par la liste d'accès sont acceptées.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp import ipv4 import-filter neighbor-access-list 20
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp import ipv6 import-filter filter-access-list6 &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv6-import-filter-filter-access-list6-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Filtrer les liaisons d'étiquettes IPv6 (associations entre un préfixe IPv6 et
+une étiquette MPLS) provenant des pairs LDP à l'aide de la liste d'accès spécifiée.</strong></p>
+<p>Seules les liaisons d'étiquettes dont le préfixe est autorisé par la liste d'accès sont
+acceptées.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp import ipv6 import-filter filter-access-list6 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp import ipv6 import-filter neighbor-access-list6 &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv6-import-filter-neighbor-access-list6-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Filtrer les liaisons d'étiquettes IPv6 (associations entre un préfixe IPv6
+et une étiquette MPLS) provenant des pairs LDP à l'aide de la liste d'accès spécifiée.</strong></p>
+<p>Seules les liaisons d'étiquettes reçues d'un pair dont l'adresse IPv6 est autorisée
+par la liste d'accès sont acceptées.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp import ipv6 import-filter neighbor-access-list6 20
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp export ipv4 export-filter filter-access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv4-export-filter-filter-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Filtrer les liaisons d'étiquettes IPv4 (associations entre un préfixe IPv4 et
+une étiquette MPLS) annoncées aux pairs LDP à l'aide de la liste d'accès spécifiée.</strong></p>
+<p>Seules les liaisons d'étiquettes dont le préfixe est autorisé par la liste d'accès sont
+annoncées.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv4 export-filter filter-access-list 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp export ipv4 export-filter neighbor-access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv4-export-filter-neighbor-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Filtrer les liaisons d'étiquettes IPv4 (associations entre un préfixe IPv4
+et une étiquette MPLS) annoncées aux pairs LDP à l'aide de la liste d'accès spécifiée.</strong></p>
+<p>Les liaisons d'étiquettes sont annoncées uniquement aux pairs dont l'adresse IPv4 est
+autorisée par la liste d'accès.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv4 export-filter neighbor-access-list 20
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp export ipv6 export-filter filter-access-list6 &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv6-export-filter-filter-access-list6-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Filtrer les liaisons d'étiquettes IPv6 (associations entre un préfixe IPv6 et
+une étiquette MPLS) annoncées aux pairs LDP à l'aide de la liste d'accès spécifiée.</strong></p>
+<p>Seules les liaisons d'étiquettes dont le préfixe est autorisé par la liste d'accès sont
+annoncées.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv6 export-filter filter-access-list6 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp export ipv6 export-filter neighbor-access-list6 &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv6-export-filter-neighbor-access-list6-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Filtrer les liaisons d'étiquettes IPv6 (associations entre un préfixe IPv6
+et une étiquette MPLS) annoncées aux pairs LDP à l'aide de la liste d'accès spécifiée.</strong></p>
+<p>Les liaisons d'étiquettes sont annoncées uniquement aux pairs dont l'adresse IPv6 est
+autorisée par la liste d'accès.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv6 export-filter neighbor-access-list6 20
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp export ipv4 explicit-null
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv4-explicit-null" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le routeur pour annoncer l'étiquette Explicit Null pour ses préfixes IPv4 directement connectés aux pairs LDP.</strong></p>
+<p>Cela indique au routeur de la dernière étape de saut de transmettre les paquets étiquetés
+sans les modifier et sans supprimer l'étiquette MPLS.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv4 explicit-null
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp export ipv6 explicit-null
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv6-explicit-null" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le routeur pour annoncer l'étiquette Explicit Null pour ses préfixes IPv6 directement connectés aux pairs LDP.</strong></p>
+<p>Cela indique au routeur de la dernière étape de saut de transmettre les paquets étiquetés
+sans les modifier et sans supprimer l'étiquette MPLS.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv6 explicit-null
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp allocation ipv4 access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-allocation-ipv4-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Restreindre l'allocation d'étiquettes MPLS aux préfixes IPv4 autorisés par la
+liste d'accès spécifiée.</strong></p>
+<p>Par défaut, le LDP alloue une étiquette pour chaque préfixe IPv4 dans le tableau de routage.
+Une pratique courante est de limiter l'allocation aux adresses de boucle.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp allocation ipv4 access-list 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp allocation ipv6 access-list6 &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-allocation-ipv6-access-list6-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Restreindre l'allocation d'étiquettes MPLS aux préfixes IPv6 autorisés par la
+liste d'accès spécifiée.</strong></p>
+<p>Par défaut, le LDP alloue une étiquette pour chaque préfixe IPv6 dans le tableau de routage.
+Une pratique courante est de limiter l'allocation aux adresses de boucle.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp allocation ipv6 access-list6 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp parameters cisco-interop-tlv
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-parameters-cisco-interop-tlv" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le routeur pour négocier la capacité Dual-Stack
+<abbr title="Type-Length-Value">TLV</abbr>
+(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7552">RFC 7552</a>) en utilisant un format non conforme Cisco pour les sessions LDP dual-stack.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp parameters cisco-interop-tlv
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp parameters ordered-control
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-parameters-ordered-control" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activer le mode de contrôle de distribution d'étiquettes LDP ordonné
+(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5036">RFC 5036</a>) pour le
+routeur.</strong></p>
+<p>Par défaut, le routeur fonctionne en mode de contrôle de distribution d'étiquettes indépendant.</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp parameters ordered-control
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp parameters transport-prefer-ipv4
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-parameters-transport-prefer-ipv4" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le routeur pour privilégier une connexion TCP IPv4 pour le peering LDP lorsqu'il est configuré pour une opération dual-stack (les familles d'adresses IPv4 et IPv6 sont activées).</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp parameters transport-prefer-ipv4
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv4 enable
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activer le routeur pour accepter les sessions IPv4 LDP ciblées.</strong></p>
+<p>Cela permet au routeur d'établir des adjacences LDP avec des pairs non directement connectés en répondant aux messages Hello LDP ciblés (unicast).</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv4 enable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv6 enable
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activer le routeur pour accepter les sessions IPv6 LDP ciblées.</strong></p>
+<p>Cela permet au routeur d'établir des adjacences LDP avec des pairs non directement connectés en répondant aux messages Hello LDP ciblés (unicast).</p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv6 enable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv4 address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le routeur pour initier une session IPv4 LDP ciblée avec le
+LSR distant spécifié.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv4 address 192.0.2.5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv6 address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le routeur pour initier une session IPv6 LDP ciblée avec le
+LSR distant spécifié.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv6 address 2001:db8::5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv4 hello-holdtime &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-hello-holdtime-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le délai d'attente, en secondes, annoncé dans les messages Hello IPv4 LDP ciblés.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv4 hello-holdtime 45
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv4 hello-interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-hello-interval-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer l'intervalle, en secondes, entre les messages Hello IPv4 LDP ciblés envoyés aux LSR distants.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv4 hello-interval 15
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv6 hello-holdtime &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-hello-holdtime-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le délai d'attente, en secondes, annoncé dans les messages Hello IPv6 LDP ciblés.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv6 hello-holdtime 45
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols mpls ldp targeted-neighbor ipv6 hello-interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-hello-interval-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer l'intervalle, en secondes, entre les messages Hello IPv6 LDP ciblés envoyés aux LSR distants.</strong></p>
+</div>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv6 hello-interval 15
+</pre></div>
+</div>
+</section>
+<section id="operation">
+<h2>Opération</h2>
+<p>Lorsque le LDP est établi, vous pouvez visualiser les affectations d'étiquettes directement dans les sorties de
+<code class="docutils literal notranslate">show ip route</code> ou <code class="docutils literal notranslate">show ipv6 route</code>. Pour inspecter les états opérationnels du LDP, utilisez les commandes suivantes.</p>
+<section id="show">
+<h3>Afficher</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp binding
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher la <abbr title="Label Information Base">LIB</abbr>.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp binding &lt;prefix&gt;
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-prefix" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les liaisons d'étiquettes LDP pour le préfixe spécifié.</p>
+<p>Le paramètre <code class="docutils literal notranslate">&lt;prefix&gt;</code> accepte un préfixe IPv4 (<code class="docutils literal notranslate">x.x.x.x/x</code>) ou un préfixe IPv6
+(<code class="docutils literal notranslate">h:h:h:h:h:h:h:h/h</code>).</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp binding detail
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-detail" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les entrées détaillées de la base d'informations d'étiquettes LDP (LIB).</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp binding neighbor &lt;address&gt;
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-neighbor-address" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les liaisons d'étiquettes LDP apprises du pair spécifié.</p>
+<p>Le paramètre <code class="docutils literal notranslate">&lt;address&gt;</code> accepte une adresse IPv4 ou IPv6.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp binding local-label &lt;label&gt;
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-local-label-label" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les liaisons d'étiquettes LDP associées à une valeur d'étiquette localement
+assignée.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp binding remote-label &lt;label&gt;
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-remote-label-label" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les liaisons d'étiquettes LDP associées à une valeur d'étiquette assignée à distance.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp discovery
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-discovery" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les informations de découverte Hello LDP.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp discovery detail
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-discovery-detail" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les informations détaillées de découverte Hello LDP.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp interface
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les informations d'interface LDP.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp neighbor
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les informations de base sur les pairs LDP.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp neighbor detail
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-detail" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les informations détaillées sur les pairs LDP.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp neighbor capabilities
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-capabilities" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les capacités LDP négociées avec chaque pair pendant l'initialisation de la session.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp neighbor &lt;address&gt;
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-address" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les informations de pair LDP pour le pair spécifié.</p>
+<p>Le paramètre <code class="docutils literal notranslate">&lt;address&gt;</code> accepte une adresse IPv4 ou IPv6.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp neighbor &lt;address&gt; detail
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-address-detail" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les informations détaillées sur la session LDP pour le pair spécifié.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls ldp neighbor &lt;address&gt; capabilities
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-address-capabilities" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les capacités LDP négociées avec le pair spécifié.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls table
+<a class="cmdlink" href="#opcmd-show-mpls-table" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher le tableau MPLS.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show mpls pseudowire
+<a class="cmdlink" href="#opcmd-show-mpls-pseudowire" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les interfaces pseudowire MPLS.</p>
+</div>
+</div>
+</section>
+<section id="reset">
+<h3>Réinitialiser</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+reset mpls ldp neighbor &lt;address&gt;
+<a class="cmdlink" href="#opcmd-reset-mpls-ldp-neighbor-address" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Réinitialiser la session LDP établie avec le pair spécifié.</p>
+<p>Le paramètre <code class="docutils literal notranslate">&lt;address&gt;</code> accepte une adresse IPv4 ou IPv6.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="example">
+<h2>Exemple</h2>
+<p>La configuration suivante met en place un routeur MPLS LDP de base.
+OSPF est utilisé comme IGP sous-jacent pour fournir la connectivité entre les adresses de boucle des pairs LDP, qui sont ensuite utilisées comme adresses de transport LDP et IDs de routeur. Le transfert MPLS et le LDP sont activés sur l'interface connectée au réseau.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospf area 0 network &#39;192.0.2.1/32&#39;
+set protocols ospf area 0 network &#39;192.0.2.4/31&#39;
+set protocols ospf parameters router-id &#39;192.0.2.1&#39;
+set protocols mpls interface &#39;eth1&#39;
+set protocols mpls ldp discovery transport-ipv4-address &#39;192.0.2.1&#39;
+set protocols mpls ldp interface &#39;eth1&#39;
+set protocols mpls ldp interface &#39;lo&#39;
+set protocols mpls ldp router-id &#39;192.0.2.1&#39;
+set interfaces ethernet eth1 address &#39;192.0.2.5/31&#39;
+set interfaces loopback lo address &#39;192.0.2.1/32&#39;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cet exemple suppose un rôle de routeur transit (P-router) : le transfert MPLS est
+activé uniquement sur l'interface de transit, pas sur la boucle. Si le routeur doit terminer le trafic encapsulé MPLS sur sa boucle
+(rôle PE-router), configurez également <code class="docutils literal notranslate">set protocols mpls interface 'lo'</code>.</p>
+</div>
+<p>Appliquez la même configuration au pair LDP (en utilisant ses propres adresses de boucle et
+d'interface de transit) pour établir une session LDP de base.</p>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

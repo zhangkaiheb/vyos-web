@@ -3,6 +3,9 @@ import { configApi, interfaceApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const DIRECTION_OPTIONS = ['in', 'out', 'in-out'];
 const MODE_OPTIONS = ['mirror', 'netflow', 'pcap', 'sflow'];
@@ -94,6 +97,8 @@ function idsDdosToConfig(form) {
 export default defineComponent({
   name: 'IdsDdosPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -137,18 +142,19 @@ export default defineComponent({
 
     async function save() {
       if (isPresent(config.value.sflow?.port) && !inRange(config.value.sflow.port, 1, 65535)) {
-        return alert('Sflow 端口范围为 1-65535');
+        return showError({ message: t('idsddos.errors.sflowPortRange') });
       }
       for (const proto of ['tcp', 'udp', 'icmp', 'general']) {
         const val = config.value.threshold?.[proto];
         if (isPresent(val) && Number(val) < 0) {
-          return alert(`阈值 ${proto} 不能为负数`);
+          return showError({ message: t('idsddos.errors.thresholdNegative', { proto }) });
         }
       }
 
       saving.value = true;
       try {
-        await configApi.set('service ids ddos-protection', idsDdosToConfig(config.value));
+        await configStore.setConfig('service ids ddos-protection', idsDdosToConfig(config.value));
+        configStore.markPending();
         saved.value = true;
         await load();
       } catch (e) {
@@ -158,9 +164,13 @@ export default defineComponent({
       }
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
     return {
+      t,
       loading, saving, saved, config, activeTab, writeDisabled, interfaces, commandPath,
       load, save, appendListenInterface,
       DIRECTION_OPTIONS, MODE_OPTIONS,
@@ -169,19 +179,19 @@ export default defineComponent({
   components: { TabGroup, ToolbarButton },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('idsddos.messages.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本' },
-        { key: 'network', title: '网络' },
-        { key: 'threshold', title: '阈值' },
-        { key: 'sflow', title: 'Sflow' }
+        { key: 'basic', title: t('idsddos.tabs.basic') },
+        { key: 'network', title: t('idsddos.tabs.network') },
+        { key: 'threshold', title: t('idsddos.tabs.threshold') },
+        { key: 'sflow', title: t('idsddos.tabs.sflow') }
       ]">
 
         <template #basic>
-          <div class="form-row"><label class="form-label">告警脚本</label><input class="form-control" v-model="config.alert_script" placeholder="脚本路径" title="检测到攻击时触发的脚本路径" /></div>
-          <div class="form-row"><label class="form-label">封禁时间</label><input type="number" min="0" class="form-control" v-model="config.ban_time" placeholder="1900" title="攻击源封禁时间（秒），默认 1900" /></div>
+          <div class="form-row"><label class="form-label">{{ t('idsddos.labels.alertScript') }}</label><input class="form-control" v-model="config.alert_script" :placeholder="t('idsddos.placeholders.alertScript')" :title="t('idsddos.titles.alertScript')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('idsddos.labels.banTime') }}</label><input type="number" min="0" class="form-control" v-model="config.ban_time" placeholder="1900" :title="t('idsddos.titles.banTime')" /></div>
           <div class="form-row">
-            <label class="form-label">方向</label>
+            <label class="form-label">{{ t('idsddos.labels.direction') }}</label>
             <div style="display:flex;gap:16px;align-items:center;">
               <label v-for="d in DIRECTION_OPTIONS" :key="d" style="display:flex;align-items:center;gap:4px;cursor:pointer;">
                 <input type="checkbox" :value="d" v-model="config.direction" /> {{ d }}
@@ -189,45 +199,41 @@ export default defineComponent({
             </div>
           </div>
           <div class="form-row">
-            <label class="form-label">模式</label>
-            <select class="form-control" v-model="config.mode" title="DDoS 防护工作模式">
-              <option value="">未选择</option>
+            <label class="form-label">{{ t('idsddos.labels.mode') }}</label>
+            <select class="form-control" v-model="config.mode" :title="t('idsddos.titles.mode')">
+              <option value="">{{ t('idsddos.options.notSet') }}</option>
               <option v-for="m in MODE_OPTIONS" :key="m" :value="m">{{ m }}</option>
             </select>
           </div>
           <div class="form-row">
-            <label class="form-label">监听接口</label>
+            <label class="form-label">{{ t('idsddos.labels.listenInterface') }}</label>
             <div style="display:flex;flex-direction:column;gap:4px;">
-              <select class="form-control" @change="appendListenInterface($event.target.value); $event.target.value = ''" title="选择接口追加到下方">
-                <option value="">选择接口追加</option>
+              <select class="form-control" @change="appendListenInterface($event.target.value); $event.target.value = ''" :title="t('idsddos.titles.listenInterface')">
+                <option value="">{{ t('idsddos.options.selectInterface') }}</option>
                 <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
               </select>
-              <textarea class="form-control" v-model="config.listen_interface" rows="3" placeholder="每行一个接口名" title="监听接口列表" />
+              <textarea class="form-control" v-model="config.listen_interface" rows="3" :placeholder="t('idsddos.placeholders.listenInterface')" :title="t('idsddos.titles.listenInterfaceList')" />
             </div>
           </div>
         </template>
 
         <template #network>
-          <div class="form-row"><label class="form-label">保护网络</label><textarea class="form-control" v-model="config.network" rows="5" placeholder="每行一个 IPv4/IPv6 网络" title="需要保护的 IPv4/IPv6 网络列表" /></div>
-          <div class="form-row"><label class="form-label">排除网络</label><textarea class="form-control" v-model="config.excluded_network" rows="5" placeholder="每行一个 IPv4/IPv6 网络" title="不参与防护的 IPv4/IPv6 网络列表" /></div>
+          <div class="form-row"><label class="form-label">{{ t('idsddos.labels.network') }}</label><textarea class="form-control" v-model="config.network" rows="5" :placeholder="t('idsddos.placeholders.network')" :title="t('idsddos.titles.network')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('idsddos.labels.excludedNetwork') }}</label><textarea class="form-control" v-model="config.excluded_network" rows="5" :placeholder="t('idsddos.placeholders.network')" :title="t('idsddos.titles.excludedNetwork')" /></div>
         </template>
 
         <template #threshold>
-          <div class="form-row"><label class="form-label">TCP 包速率</label><input type="number" min="0" class="form-control" v-model="config.threshold.tcp" placeholder="packets-per-second" title="TCP 每秒包数阈值" /></div>
-          <div class="form-row"><label class="form-label">UDP 包速率</label><input type="number" min="0" class="form-control" v-model="config.threshold.udp" placeholder="packets-per-second" title="UDP 每秒包数阈值" /></div>
-          <div class="form-row"><label class="form-label">ICMP 包速率</label><input type="number" min="0" class="form-control" v-model="config.threshold.icmp" placeholder="packets-per-second" title="ICMP 每秒包数阈值" /></div>
-          <div class="form-row"><label class="form-label">通用包速率</label><input type="number" min="0" class="form-control" v-model="config.threshold.general" placeholder="packets-per-second" title="通用协议每秒包数阈值" /></div>
+          <div class="form-row"><label class="form-label">{{ t('idsddos.labels.tcpRate') }}</label><input type="number" min="0" class="form-control" v-model="config.threshold.tcp" placeholder="packets-per-second" :title="t('idsddos.titles.tcpRate')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('idsddos.labels.udpRate') }}</label><input type="number" min="0" class="form-control" v-model="config.threshold.udp" placeholder="packets-per-second" :title="t('idsddos.titles.udpRate')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('idsddos.labels.icmpRate') }}</label><input type="number" min="0" class="form-control" v-model="config.threshold.icmp" placeholder="packets-per-second" :title="t('idsddos.titles.icmpRate')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('idsddos.labels.generalRate') }}</label><input type="number" min="0" class="form-control" v-model="config.threshold.general" placeholder="packets-per-second" :title="t('idsddos.titles.generalRate')" /></div>
         </template>
 
         <template #sflow>
-          <div class="form-row"><label class="form-label">端口</label><input type="number" min="1" max="65535" class="form-control" v-model="config.sflow.port" placeholder="sFlow 端口" title="sFlow 监听端口" /></div>
-          <div class="form-row"><label class="form-label">收集器</label><textarea class="form-control" v-model="config.sflow.collector" rows="3" placeholder="每行一个收集器地址" title="sFlow 收集器地址列表" /></div>
+          <div class="form-row"><label class="form-label">{{ t('idsddos.labels.port') }}</label><input type="number" min="1" max="65535" class="form-control" v-model="config.sflow.port" :placeholder="t('idsddos.placeholders.sflowPort')" :title="t('idsddos.titles.sflowPort')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('idsddos.labels.collector') }}</label><textarea class="form-control" v-model="config.sflow.collector" rows="3" :placeholder="t('idsddos.placeholders.collector')" :title="t('idsddos.titles.collector')" /></div>
         </template>
       </TabGroup>
-
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
     </div>
   `,
 });

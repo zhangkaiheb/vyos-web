@@ -1,0 +1,261 @@
+{
+  "zh-CN": {
+    "taskScheduler": {
+      "title": "任务调度器",
+      "columns": {
+        "name": "任务名称",
+        "crontabSpec": "Crontab 表达式",
+        "executablePath": "可执行文件",
+        "executableArguments": "参数",
+        "interval": "执行间隔"
+      },
+      "form": {
+        "name": "任务名称",
+        "nameHelp": "定时任务名称",
+        "crontabSpec": "Crontab 表达式",
+        "crontabSpecHelp": "UNIX crontab 时间规范字符串（如: 0 * * * *）",
+        "executablePath": "可执行文件路径",
+        "executablePathHelp": "可执行文件的路径",
+        "executableArguments": "参数",
+        "executableArgumentsHelp": "传递给可执行文件的参数",
+        "interval": "执行间隔",
+        "intervalHelp": "执行间隔（如: 30, 30m, 2h, 1d；纯数字表示分钟）"
+      },
+      "buttons": {
+        "refresh": "刷新",
+        "create": "新建定时任务",
+        "edit": "编辑定时任务"
+      },
+      "modal": {
+        "confirmDelete": "确认删除",
+        "confirmDeleteMessage": "确认删除以下定时任务？"
+      },
+      "errors": {
+        "loadFailed": "加载失败",
+        "saveFailed": "保存失败"
+      }
+    }
+  },
+  "en": {
+    "taskScheduler": {
+      "title": "Task Scheduler",
+      "columns": {
+        "name": "Task Name",
+        "crontabSpec": "Crontab Expression",
+        "executablePath": "Executable",
+        "executableArguments": "Arguments",
+        "interval": "Interval"
+      },
+      "form": {
+        "name": "Task Name",
+        "nameHelp": "Scheduled task name",
+        "crontabSpec": "Crontab Expression",
+        "crontabSpecHelp": "UNIX crontab time specification string (e.g., 0 * * * *)",
+        "executablePath": "Executable Path",
+        "executablePathHelp": "Path to the executable file",
+        "executableArguments": "Arguments",
+        "executableArgumentsHelp": "Arguments passed to the executable",
+        "interval": "Interval",
+        "intervalHelp": "Execution interval (e.g., 30, 30m, 2h, 1d; pure numbers represent minutes)"
+      },
+      "buttons": {
+        "refresh": "Refresh",
+        "create": "Create Task",
+        "edit": "Edit Task"
+      },
+      "modal": {
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteMessage": "Confirm delete the following scheduled task?"
+      },
+      "errors": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed"
+      }
+    }
+  },
+  "zh-TW": {
+    "taskScheduler": {
+      "title": "任務排程器",
+      "columns": {
+        "name": "任務名稱",
+        "crontabSpec": "Crontab 表達式",
+        "executablePath": "可執行文件",
+        "executableArguments": "參數",
+        "interval": "執行間隔"
+      },
+      "form": {
+        "name": "任務名稱",
+        "nameHelp": "排程任務名稱",
+        "crontabSpec": "Crontab 表達式",
+        "crontabSpecHelp": "UNIX crontab 時間規範字串（如: 0 * * * *）",
+        "executablePath": "可執行文件路徑",
+        "executablePathHelp": "可執行文件的路徑",
+        "executableArguments": "參數",
+        "executableArgumentsHelp": "傳遞給可執行文件的參數",
+        "interval": "執行間隔",
+        "intervalHelp": "執行間隔（如: 30, 30m, 2h, 1d；純數字表示分鐘）"
+      },
+      "buttons": {
+        "refresh": "重新整理",
+        "create": "新建排程任務",
+        "edit": "編輯排程任務"
+      },
+      "modal": {
+        "confirmDelete": "確認刪除",
+        "confirmDeleteMessage": "確認刪除以下排程任務？"
+      },
+      "errors": {
+        "loadFailed": "載入失敗",
+        "saveFailed": "儲存失敗"
+      }
+    }
+  },
+  "ru": {
+    "taskScheduler": {
+      "title": "Планировщик задач",
+      "columns": {
+        "name": "Имя задачи",
+        "crontabSpec": "Crontab выражение",
+        "executablePath": "Исполняемый файл",
+        "executableArguments": "Аргументы",
+        "interval": "Интервал"
+      },
+      "form": {
+        "name": "Имя задачи",
+        "nameHelp": "Имя запланированной задачи",
+        "crontabSpec": "Crontab выражение",
+        "crontabSpecHelp": "Строка спецификации времени UNIX crontab (например, 0 * * * *)",
+        "executablePath": "Путь к исполняемому файлу",
+        "executablePathHelp": "Путь к исполняемому файлу",
+        "executableArguments": "Аргументы",
+        "executableArgumentsHelp": "Аргументы, передаваемые исполняемому файлу",
+        "interval": "Интервал",
+        "intervalHelp": "Интервал выполнения (например, 30, 30m, 2h, 1d; числа без единиц - минуты)"
+      },
+      "buttons": {
+        "refresh": "Обновить",
+        "create": "Создать задачу",
+        "edit": "Редактировать задачу"
+      },
+      "modal": {
+        "confirmDelete": "Подтвердить удаление",
+        "confirmDeleteMessage": "Подтвердить удаление следующей запланированной задачи?"
+      },
+      "errors": {
+        "loadFailed": "Ошибка загрузки",
+        "saveFailed": "Ошибка сохранения"
+      }
+    }
+  },
+  "de": {
+    "taskScheduler": {
+      "title": "Aufgabenplaner",
+      "columns": {
+        "name": "Aufgabenname",
+        "crontabSpec": "Crontab-Ausdruck",
+        "executablePath": "Ausführbare Datei",
+        "executableArguments": "Argumente",
+        "interval": "Intervall"
+      },
+      "form": {
+        "name": "Aufgabenname",
+        "nameHelp": "Name der geplanten Aufgabe",
+        "crontabSpec": "Crontab-Ausdruck",
+        "crontabSpecHelp": "UNIX crontab Zeitangabe-Zeichenfolge (z.B. 0 * * * *)",
+        "executablePath": "Pfad zur ausführbaren Datei",
+        "executablePathHelp": "Pfad zur ausführbaren Datei",
+        "executableArguments": "Argumente",
+        "executableArgumentsHelp": "An die ausführbare Datei übergebene Argumente",
+        "interval": "Intervall",
+        "intervalHelp": "Ausführungsintervall (z.B. 30, 30m, 2h, 1d; reine Zahlen bedeuten Minuten)"
+      },
+      "buttons": {
+        "refresh": "Aktualisieren",
+        "create": "Aufgabe erstellen",
+        "edit": "Aufgabe bearbeiten"
+      },
+      "modal": {
+        "confirmDelete": "Löschen bestätigen",
+        "confirmDeleteMessage": "Löschen der folgenden geplanten Aufgabe bestätigen?"
+      },
+      "errors": {
+        "loadFailed": "Laden fehlgeschlagen",
+        "saveFailed": "Speichern fehlgeschlagen"
+      }
+    }
+  },
+  "fr": {
+    "taskScheduler": {
+      "title": "Planificateur de tâches",
+      "columns": {
+        "name": "Nom de la tâche",
+        "crontabSpec": "Expression Crontab",
+        "executablePath": "Exécutable",
+        "executableArguments": "Arguments",
+        "interval": "Intervalle"
+      },
+      "form": {
+        "name": "Nom de la tâche",
+        "nameHelp": "Nom de la tâche planifiée",
+        "crontabSpec": "Expression Crontab",
+        "crontabSpecHelp": "Chaîne de spécification de temps UNIX crontab (ex: 0 * * * *)",
+        "executablePath": "Chemin de l'exécutable",
+        "executablePathHelp": "Chemin vers le fichier exécutable",
+        "executableArguments": "Arguments",
+        "executableArgumentsHelp": "Arguments passés à l'exécutable",
+        "interval": "Intervalle",
+        "intervalHelp": "Intervalle d'exécution (ex: 30, 30m, 2h, 1d; les nombres purs représentent des minutes)"
+      },
+      "buttons": {
+        "refresh": "Actualiser",
+        "create": "Créer une tâche",
+        "edit": "Modifier la tâche"
+      },
+      "modal": {
+        "confirmDelete": "Confirmer la suppression",
+        "confirmDeleteMessage": "Confirmer la suppression de la tâche planifiée suivante?"
+      },
+      "errors": {
+        "loadFailed": "Échec du chargement",
+        "saveFailed": "Échec de la sauvegarde"
+      }
+    }
+  },
+  "ko": {
+    "taskScheduler": {
+      "title": "작업 스케줄러",
+      "columns": {
+        "name": "작업 이름",
+        "crontabSpec": "Crontab 표현식",
+        "executablePath": "실행 파일",
+        "executableArguments": "인수",
+        "interval": "실행 간격"
+      },
+      "form": {
+        "name": "작업 이름",
+        "nameHelp": "예약된 작업 이름",
+        "crontabSpec": "Crontab 표현식",
+        "crontabSpecHelp": "UNIX crontab 시간 지정 문자열 (예: 0 * * * *)",
+        "executablePath": "실행 파일 경로",
+        "executablePathHelp": "실행 파일의 경로",
+        "executableArguments": "인수",
+        "executableArgumentsHelp": "실행 파일에 전달되는 인수",
+        "interval": "실행 간격",
+        "intervalHelp": "실행 간격 (예: 30, 30m, 2h, 1d; 순수 숫자는 분을 나타냄)"
+      },
+      "buttons": {
+        "refresh": "새로고침",
+        "create": "작업 생성",
+        "edit": "작업 편집"
+      },
+      "modal": {
+        "confirmDelete": "삭제 확인",
+        "confirmDeleteMessage": "다음 예약된 작업을 삭제하시겠습니까?"
+      },
+      "errors": {
+        "loadFailed": "로드 실패",
+        "saveFailed": "저장 실패"
+      }
+    }
+  }
+}

@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="ospf">
+<h1>OSPF</h1>
+<p><abbr title="Open Shortest Path First">OSPF</abbr> — это протокол маршрутизации для сетей Internet Protocol (IP). Он использует алгоритм маршрутизации состояния ссылки (LSR) и относится к группе внутренних шлюзов протоколов (IGP), работающих в пределах одного автономного системы (AS). Он определен как OSPF версии 2 в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2328.html"><strong>RFC 2328</strong></a> (1998) для IPv4. Обновления для IPv6 указаны как OSPF версии 3 в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5340.html"><strong>RFC 5340</strong></a> (2008). OSPF поддерживает модель адресации CIDR.</p>
+<p>OSPF широко используется в крупных корпоративных сетях.</p>
+<section id="ospfv2-ipv4">
+<h2>OSPFv2 (IPv4)</h2>
+<section id="configuration">
+<h3>Конфигурация</h3>
+<section id="general">
+<h4>Общие сведения</h4>
+<p>VyOS не имеет специальной команды для запуска процесса OSPF. Процесс OSPF начинается, когда первый интерфейс, включенный в OSPF, конфигурируется.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf area &lt;number&gt; network &lt;A.B.C.D/M&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-network-a-b-c-d-m" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Эта команда указывает интерфейсы, включенные в OSPF. Если интерфейс имеет адрес из определенного диапазона, то команда включает OSPF на этом интерфейсе, так что маршрутизатор может предоставить информацию о сети другим роутерам OSPF через этот интерфейс.</p>
+<p>Эта команда также используется для включения процесса OSPF. Номер области можно указать в десятичной нотации в диапазоне от 0 до 4294967295. Или он может быть указан в точечной десятичной нотации, аналогичной IP-адресу.</p>
+<p>Длина префикса на интерфейсе должна быть равна или больше (то есть меньше сети) длины префикса в объявлении сети. Например, вышеупомянутая команда не включает OSPF на интерфейсе с адресом 192.168.1.1/23, но включает его на интерфейсе с адресом 192.168.1.129/25.</p>
+<p>В некоторых случаях может быть удобнее включить OSPF на уровне интерфейса/подсети <code class="docutils literal notranslate">set protocols ospf interface &lt;interface&gt; area &lt;x.x.x.x | x&gt;</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf auto-cost reference-bandwidth &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-auto-cost-reference-bandwidth-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Эта команда устанавливает эталонную пропускную способность для расчета стоимости, где пропускная способность может быть в диапазоне от 1 до 4294967, указанная в Мбит/с. По умолчанию 100 Мбит/с (то есть связь с пропускной способностью 100 Мбит/с или выше будет иметь стоимость 1. Стоимость связей с меньшей пропускной способностью будет масштабироваться относительно этой стоимости).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf parameters router-id &lt;rid&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-parameters-router-id-rid" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Эта команда устанавливает идентификатор маршрутизатора для процесса OSPF. Идентификатор маршрутизатора может быть IP-адресом маршрутизатора, но не обязательно — это может быть любое произвольное 32-битное число. Однако он ДОЛЖЕН быть уникальным в пределах всей области OSPF для OSPF-спикера — если несколько OSPF-спикеров будут настроены с одинаковым идентификатором маршрутизатора, произойдут плохие последствия!</p>
+</div>
+</div>
+</section>
+<section id="optional">
+<h4>Дополнительные параметры</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf default-information originate [always] [metric &lt;number&gt;] [metric-type &lt;1|2&gt;] [route-map &lt;name&gt;]
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-default-information-originate-always-metric-number-metric-type-1-2-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Создание AS-External (тип-5) LSA, описывающего маршрут по умолчанию во всех областях, способных к внешней маршрутизации, с заданным метрикой и типом метрики. Если ключевое слово <code class="docutils literal notranslate">always</code> указано, маршрут по умолчанию всегда объявляется, даже если его нет в таблице маршрутизации. Аргумент <code class="docutils literal notranslate">route-map</code> указывает на то, что маршрут по умолчанию объявляется, если маршрут удовлетворяет условию.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf distance global &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-distance-global-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Эта команда изменяет значение расстояния OSPF глобально.
+Диапазон расстояний — 1 до 255.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf distance ospf &lt;external|inter-area|intra-area&gt; &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-distance-ospf-external-inter-area-intra-area-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Эта команда изменяет значение расстояния OSPF. Аргументы — это значения расстояний для внешних маршрутов, межобластных маршрутов и внутриобластных маршрутов соответственно. Диапазон расстояний — 1 до 255.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Маршруты с расстоянием 255 считаются недействительными и не устанавливаются в ядро.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf log-adjacency-changes [detail]
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-log-adjacency-changes-detail" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Эта команда позволяет регистрировать изменения в соседстве. С необязательным аргументом <code class="docutils literal notranslate">detail</code> показываются все изменения в состоянии соседства. Без <code class="docutils literal notranslate">detail</code> показываются только изменения в полном состоянии или регрессии.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf max-metric router-lsa &lt;administrative|on-shutdown &lt;seconds&gt;|on-startup &lt;seconds&gt;&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-max-metric-router-lsa-administrative-on-shutdown-seconds-on-startup-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Это включает поддержку <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3137.html"><strong>RFC 3137</strong></a>, где процесс OSPF описывает свои транзитные ссылки в своем маршрутизаторе-LSA как имеющие бесконечное расстояние, чтобы другие маршрутизаторы избегали вычисления транзитных путей через этот маршрутизатор, при этом все еще могут достичь сетей через этот маршрутизатор.</p>
+<p>Эта поддержка может быть включена административно (и неограниченно) с помощью команды <code class="docutils literal notranslate">administrative</code>. Она также может быть включена условно. Условное включение максимальной метрики маршрутизатора-LSA может быть выполнено на период секунд после запуска с помощью команды <code class="docutils literal notranslate">on-startup &lt;seconds&gt;</code> и/или на период секунд до завершения с помощью команды <code class="docutils literal notranslate">on-shutdown &lt;seconds&gt;</code>. Диапазон времени — 5 до 86400.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf parameters abr-type &lt;cisco|ibm|shortcut|standard&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-parameters-abr-type-cisco-ibm-shortcut-standard" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Эта команда выбирает модель ABR. OSPF-роутер поддерживает четыре модели ABR:</p>
+<p><strong>cisco</strong> – роутер считается ABR, если у него несколько настроенных ссылок на сети в разных областях, одна из которых является основной областью. Кроме того, ссылка на основную область должна быть активной (работающей).
+<strong>ibm</strong> – идентично модели «cisco», но в этом случае ссылка на основную область может не быть активной.
+<strong>standard</strong> – роутер имеет несколько активных ссылок на разные области.
+<strong>shortcut</strong> – идентично модели «standard», но в этой модели роутер разрешен использовать топологию соединенных областей без участия основной области для межобластных соединений.</p>
+<p>Дополнительная информация о различиях между моделями «cisco» и «ibm» можно найти в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3509.html"><strong>RFC 3509</strong></a>. Модель «shortcut» позволяет ABR создавать маршруты между областями на основе топологии областей, подключенных к этому роутеру, но без использования основной области, если небазовая маршрутизация будет дешевле. Для получения дополнительной информации о модели «shortcut», см. ospf-shortcut-abr-02.txt</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf parameters rfc1583-compatibility
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-parameters-rfc1583-compatibility" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2328.html"><strong>RFC 2328</strong></a>, который является продолжением <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1583.html"><strong>RFC 1583</strong></a>, предлагает согласно разделу G.2 (изменения) в разделе 16.4.1 изменение алгоритма предпочтения пути, которое предотвращает возможные циклы маршрутизации, которые были возможны в старой версии OSPFv2. Более конкретно, это требует, чтобы межобластные пути и внутренние пути основной области теперь имели одинаковое предпочтение, но оба по-прежнему предпочтительнее внешних путей.</p>
+<p>Эта команда НЕ ДОЛЖНА устанавливаться обычно.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf interface &lt;interface&gt; passive [disable]
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-passive-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Эта команда указывает интерфейс как пассивный. Пассивный интерфейс объявляет свой адрес, но не запускает протокол OSPF (не формируются соседства и не генерируются пакеты Hello).</p>
+<p>Опциональный параметр disable позволяет исключить интерфейс из пассивного состояния. Эта команда используется, если была настроена команда <code class="docutils literal notranslate">passive-interface default</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf passive-interface default
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-passive-interface-default" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Эта команда указывает все интерфейсы как пассивные по умолчанию. Поскольку эта команда изменяет логику конфигурации на пассивный по умолчанию; поэтому интерфейсы, где ожидается соседство роутеров, должны быть настроены с помощью команды <code class="docutils literal notranslate">passive-interface-exclude</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf maximum-paths &lt;1-64&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-maximum-paths-1-64" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду для контроля максимального количества равных путей для достижения конкретного назначения. Верхний предел может отличаться, если вы измените значение MULTIPATH_NUM во время компиляции. По умолчанию используется MULTIPATH_NUM (64).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf refresh timers &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-refresh-timers-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Роутер автоматически обновляет информацию о состоянии ссылок с соседями. Обновляется только устаревшая информация, срок действия которой превышает определенный порог. Эта переменная изменяет значение порога, которое по умолчанию составляет 1800 секунд (полчаса). Значение применяется ко всему маршрутизатору OSPF. Диапазон таймера — 10–1800.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf timers throttle spf &lt;delay|initial-holdtime|max-holdtime&gt; &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-timers-throttle-spf-delay-initial-holdtime-max-holdtime-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Эта команда устанавливает начальную задержку, начальное время ожидания и максимальное время ожидания между расчетом SPF и событием, вызвавшим расчет. Время указано в миллисекундах и должно находиться в диапазоне от 0 до 600000 миллисекунд. <code class="docutils literal notranslate">delay</code> устанавливает начальный временной интервал для планирования SPF в миллисекундах. Значение по умолчанию — 200 мс. <code class="docutils literal notranslate">initial-holdtime</code> устанавливает минимальное время ожидания между двумя последовательными расчетами SPF. Значение по умолчанию — 1000 мс. <code class="docutils literal notranslate">max-holdtime</code> устанавливает максимальное время ожидания между двумя последовательными расчетами SPF. Значение по умолчанию — 10000 мс.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf ldp-sync
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-ldp-sync" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Эта команда включает синхронизацию IGP-LDP глобально для OSPF. Это требует, чтобы LDP был функционален. Это описано в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5443.html"><strong>RFC 5443</strong></a>. По умолчанию все интерфейсы, работающие в OSPF, включены в синхронизацию. Петли исключены.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf ldp-sync holddown &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-ldp-sync-holddown-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Эта команда изменяет значение времени ожидания глобально для синхронизации IGP-LDP во время сходимости/событий переключения интерфейса.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf capability opaque
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-capability-opaque" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>ospfd поддерживает Opaque LSA <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2370.html"><strong>RFC 2370</strong></a> как частичную поддержку LSA для MPLS Traffic Engineering. Необходимо включить возможность Opaque-LSA в конфигурации.</p>
+<p>Альтернативная команда может быть «mpls-te on» (Traffic Engineering)</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>FRR предлагает только частичную поддержку некоторых расширений протокола маршрутизации, используемых с MPLS-TE; он не поддерживает полное решение RSVP-TE.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="area-configuration">
+<h4>Конфигурация области</h4>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf area &lt;number&gt; area-type stub
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-stub" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Эта команда указывает область как Stub Area. То есть проблема</section>
+</span>...</span>
+section:="1</code="</code</style="style="</code</span>
+</code="span>
+</code</span</code</span</code</code</span</code</span</code</span</code</span>code</span</code</span</code</code</span</
+<p>Эo>
+   code</span></code</span>
+code:code</span</code</span</code</span>
+code</span</code</span</code</span</code</code</span>
+code</span</code</span</span>
+   </span>
+code</span</code</span</code</spancode</span</code</span>
+</span</span>
+span>span></code</span</span</code</span</code</span</code</span</code</span</code</span</code</span"</span</codeлл</span>
+</spancode</span</span</span</code</span</code</span</code</span</code</span:</span</code</span</code</span</code</span</span</code</span</span</code</span>
+code</span</code</span</code<span style="</
+<p>Эа</
+<p>Эа</
+<p>Эпа</span</span</code</</</span</span</code</span</code</span</</code</span</code</span</code</span</code</span</span</code</span</span</code</span</code</span</code</span</code</span</code</span</code</span</code</span</</</</span</code</span</code</span</code</span</code</span
+</code</span</span</code</span</code</span</span</span</span</code</span</code</span</code</span</span</code</</span</span</code</span</code</spancode</span
+<p>Эта команда указывает область как Totally Stub Area. Помимо ограничений Stub Area</span</code</span>
+</span</span</span</code</span</</span</span</code</span></code</spanspanspan</span</span</span</code</span</span>
+</span</span</code
+<p>span</span="span</span="span</span</spanp</span</span</span</span</span</span</span</span</span</span</span</span</span</span</spanspan</span
+<p>Эпользоват</span</span</span</span</spanspanspan</span</span</span</span</span</span</span</spanspanp>span</span</span</span</span</span</span</span</span</span</</span> </span>
+</span>span</span</spanspan</span</span</span>span</span</span>span</span</span</span</code</span</span</span</span</span</span</span</spanspan</span</span</span</span</spanspan></span</span</span</span</span</spanspan</span</spanspan<span</span</span</span</span="span</span</span</span="span
+<p>Эта команда указывает область как NSSA. Проблема</p>
+<p>Эта команда указывает область как NSSA Totally Stub Area.а</
+<p>аа</p>
+<p>Эа</
+<p>а</p>
+<p>Проблема</
+<pа</p>
+<p>Проблема</
+<p>Проблема</
+<p>а</
+<p>Проблема</
+<p>Проблема</p>
+<p>а</p>
+<p>Проблема</p>
+<p>Пробъ</span</span</span></span</span</span</span</span</span</spanspanан</spanspanspan</spanа</span</span</span</span</span</span</span></spanspan</span</span</span</span</span</span</spanspan код</span</span</span</span</spanspanнe</spanпос</spanаодл</span</span</spanа</spanпояредравc:байл</послод</пe</span</пос</span</spanедллe</span</пo</пос</span</проверлe</spanа</spanа</p>
+<p>Проблема</p>
+<p>Проблема</а</а</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</а</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</pоказ</span</покалілo</покредаклэ</spanацлпсод</spanылглпсодлцнач</spanпараметлeсли</послад</послесллцллцеклокодлёлллекллодллполлододпкодллослккодлпкпкодлкодлкодлпокрклокодлкккллклклклоклкодлпкодкодлкодлккккодлоклкодллллклкодлкодлоклкодлкодлкодпклкодклкодцкпослкллдoкодлпклрлккепкодлкодолкодлклкодлкодлкодлкодло</клклкодркодллкодлкодллллкодлкодллкодекликоличестволкллллллклкликликлокодлкодллкодклкодлпкпкллкллллкододллллкмкододлкпкодкпкпккодлкодлкодлкллккодлллллллкодккодлллллллллллллллкмкодлклкмлллккодлкодркодрлeхклл</pкодмклклкодлкликдкодлллкодлкод.кодлкодлкодлкодлклкодлкодллкодкодкл</код</пклкл</пкодкодкодлкодллкодлркодлкодкклкодлкодлкодкл</пкодлкод.кодкпост.км</кодлкодлкод.кп.кодлллкликдкликлкликр.кодлкликкликлклллкликлкодлкликлклкллклкл.кодлллпкпкликлклкплкод</пклкодлпкодкпклкмкл</кпкакодлкод</клклклклк</пкод</пкодкпкодлкллкодклкплллклкпкликлклккодлкликодлклклкликлк</p
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</p>
+<p>Проблема</клик</кодлкод.клклкл</кликлкл</клкликлклкликллклкликлклклк</клкодллклклк</
+<p>Проблем</клкликлклклклик</клклклклклкликллклконткллкликлклклик</кликллклкллклклклллкликликлклк</клкликллк</клик</кликлкл</ккликодллк</клклк</к</к</кодлкликллклк</кпклклклккликлклкодлклкликлк</пкпкклклкклкклик</лкклккккклклклкпкплкллкликлклкодлклклкодлкпк</лклкпклкллкллклклик</клклклклклклкклклклклкклклклклкликлкодлкпклкклик.5клкккл.ккллклкп.клклкл.к.кл.к.кл.к.кл.кл.к.кл.к.к.кл.кл.клк..кл.к.кл.к.кл.к.ккл.кл.кл.кл.кл.к</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</pклкодл</кл</кл</к</клкл</к</кодлкл</к</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</pк</клклк</кодлклкл</кклоклкл</клклклклклкмклкллл</кллклклклкликывеклллклк</к</клклклклкклклклк</к</клклк.клкл.клк.кпклкл.клкплклкл.клк.клклк.клллкл.клкллллкл.к</кллл.</к</клллллл</к</кллкл.к</к</к</кллллк</клллклклклклклк</к</клклкл.к</клкллкл</кп.клл.клкллклкликллллкмкпклклклллклклклклклклклклкллкллклклклклклклкллклккллклклкллклкллклклклклкл</клклкллклл</к</клллллл.клллллл.кллклкллк.км.кллл.кл.кллкл.кмлклклллл.кл.кл.кл.к.кллк</.кллл.к</к</кллллл.кл.кл.кл.клллл.кл.клл.кл.к.клкпллллллллкллллл.к.кллкл.клл.кп.кл..кплл.кмкл.к</кл.кл.клкл.кл.кл.кл.кл.кл.кллл.кл.кл.клллл.клкл.кл.кллл.кл.кллл.кл.к</клк</кл.к</кл.кпл.</к</плл.кл.к</кл.л.кл.к.лл.к</к</к</к</p
+<p>Проблема</</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</клклклклл</к</клклкллклклклл</кл</клкллллклллллкллклкллклллкллллкллл</пллллллллк</клллллкллллллллл</клклллкллллллллллла</пл</клллллллклл</клллклллл</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</кллклллллл</клллллллллллллллл</пллллллллллллллллллллллллллллллпллллллллллллллллллллллллллллллл</кллл</</пллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл</p
+</клллллл.ллл</клллллл</лллллл</п</клллллллл</пллллл</.</плллл</пллллллллл</пллллллл</пллллллл</пл</пллллллллллллл</пллллллл</кллл</п</кл</</пллл</пллллллл</плллпл.п</кл</кллллллллллллл</кллллллл</пллл</клл</плллллллллллллллллллллллллллллллллллллллплллл</p
+кллплллллплпллллллл</плллллл</пл</пллллллллллллллллллл</</пллллллллл</</плллл</плпллл</пллл</пллпл</плл</плллл</пл</пл</плл</пл</плл</пллл</плллл</</пллллл</пллллллллллплллллллл</</пл</плллллллллл</пллллл</пллл</плл</пллллл</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</а</p
+<p>Проблема</p
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблемалк</к</к</пл</п</кл</к</пл</</пл</к</кл</клллкл</кл</пл</к</плл</клллклл</</клл</клл</</плк</к</пл</кл</к</пл</клллккл</к</пл</к</пл</</кллл</плл</кл</клллплллллллллллл</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>кллл</пллл</плл</кллл</кллллллллллллл</пл</пллллллаглллллллллл</плллллллллллл</пллллл</пллллллл</пллллллл</плл</</клллл</пллллл</пл</к</клллл</пл</p
+<p>Проблема</p
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<pл</кллллллллллллллллллллллллллллллллллл</клллллллл</плллллл</кллл</пл</плллллл</пл</плл</плл</плллллллллллл</плл</кллллллл</</пл</пллл</пллллл</п</клл</клллллллллллллллллллллллллллллллллллллллллллллллл</</пллллллл</пллллл</пллллллллл</пллллллл</плллллл</</пллллл</п</плл</пл</п</плл</пл</к</плллл</пл</пл</л</пл</</пллл</</п
+<p>Проблема</p
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</плллллллллллллллллллллллллл</плллллллл</кллллл</</</кллллллллллллллллллллллллллллллкллл</плллллллллллллллклллллллллкллллллллллллллллл</плллллллллллллллллллллллллллллллл</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблемклллллллллллл</pлллл</p
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</плллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл</p
+<p>Проблема</p
+<p>Проблема</p
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>ллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл</плллллллплллллллплллллллллплллллллплплллллллпллллллллплллллллл</плллллллллплллллллллллллллллплллллллллллллллллпллллллллллллллллллл</p
+<p>Проблема</p
+</пллпллллллллллллллллллллллллллпллллллллллллллллл</p
+<p>Проблема</p
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Прлллллллллллллллллллллллллллллллллллллллллллллллллллллллл</p
+<p>Проблема</p
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>Проблема</п
+<p>пллллллллллллллллллллллллллллллллллллллллллллллллллпллллллллл
+</плллллпллллллллл
+
+ пллллллллллллллллллллллллллллллллла</пллллллллллллллллллллллл</пллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллплллллллпллллллллллллллллллллллллллллллллллллпллллллллплллллллллллллллллллпллллллллпллллллллпллллллллллллллллллллллллллллллллллллллллллллплллллплпллллллллллллллллл
+пллллллл
+пллллллллллллллллпллл</p
+<p>Проблема</p
+<p>Проблема</п
+<p>Проблема</пл</пллллллллллллллллллллллллллллллллллллллллллллллллл</пл</плллл</пл</плллллл</пллллллл</пллллллл</пллллллл</плллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллплллллллл
+плллллллплллллллплпллллллл
+</плллллплплллллл</плллллллл
+плл
+</плллллл
+</пл
+</
+пллллллл
+пл</пл
+пл</плплл
+плллллллплл</пллллл

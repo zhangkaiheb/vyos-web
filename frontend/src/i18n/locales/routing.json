@@ -1,0 +1,72 @@
+{
+  "zh-CN": {
+    "routing": {
+      "ospfv3": {
+        "modal": {
+          "metric": "metric",
+          "metricType": "metric 类型"
+        }
+      }
+    }
+  },
+  "en": {
+    "routing": {
+      "ospfv3": {
+        "modal": {
+          "metric": "Metric",
+          "metricType": "Metric Type"
+        }
+      }
+    }
+  },
+  "zh-TW": {
+    "routing": {
+      "ospfv3": {
+        "modal": {
+          "metric": "Metric",
+          "metricType": "Metric Type"
+        }
+      }
+    }
+  },
+  "ru": {
+    "routing": {
+      "ospfv3": {
+        "modal": {
+          "metric": "Metric",
+          "metricType": "Metric Type"
+        }
+      }
+    }
+  },
+  "de": {
+    "routing": {
+      "ospfv3": {
+        "modal": {
+          "metric": "Metric",
+          "metricType": "Metric Type"
+        }
+      }
+    }
+  },
+  "fr": {
+    "routing": {
+      "ospfv3": {
+        "modal": {
+          "metric": "Metric",
+          "metricType": "Metric Type"
+        }
+      }
+    }
+  },
+  "ko": {
+    "routing": {
+      "ospfv3": {
+        "modal": {
+          "metric": "Metric",
+          "metricType": "Metric Type"
+        }
+      }
+    }
+  }
+}

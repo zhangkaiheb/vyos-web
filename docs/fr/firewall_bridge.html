@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="bridge-firewall-configuration">
+<h1>Configuration du pare-feu de pont</h1>
+<section id="overview">
+<h2>Aperçu</h2>
+<p>Découvrez-en plus sur la configuration du pare-feu de pont
+et les commandes op-mode associées.</p>
+<p>Les commandes suivantes sont abordées dans cette section :</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge &lt;options&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-options" title="Permalink to this Command"></a></div></div>
+<p>À partir de la structure principale définie dans
+<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Aperçu du pare-feu</a>
+dans cette section, vous pouvez trouver des informations détaillées uniquement pour la prochaine partie
+de la structure générale :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
+    * bridge
+         - forward
+            + filter
+         - input
+            + filter
+         - output
+            + filter
+         - prerouting
+            + filter
+         - name
+            + custom_name
+</pre></div>
+</div>
+<p>Le trafic reçu par le routeur sur une interface qui est membre d'un
+pont est traité sur le <strong>Niveau Pont</strong>. Avant que la décision du pont ne soit prise,
+tous les paquets sont analysés au <strong>Prerouting</strong>. Des filtres peuvent être appliqués ici, ainsi que des règles pour ignorer le système de suivi des connexions.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">set firewall bridge prerouting filter ...</code>.</p></li>
+</ul>
+<p>Pour le trafic qui doit être commuté internement par le pont, la chaîne de base est <strong>forward</strong>, et sa commande de base pour le filtrage est <code class="docutils literal notranslate">set firewall bridge forward filter ...</code>, qui se produit à l'étape 4, surlignée en rouge.</p>
+<figure class="align-default">
+<img alt="../../_images/firewall-bridge-forward.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-forward.webp" />
+</figure>
+<p>Pour le trafic destiné au routeur lui-même ou qui doit être routé
+(à supposer qu'un pont de couche 3 soit configuré), la chaîne de base est <strong>input</strong>, et la
+commande de base est <code class="docutils literal notranslate">set firewall bridge input filter ...</code> et le chemin est :</p>
+<figure class="align-default">
+<img alt="../../_images/firewall-bridge-input.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-input.webp" />
+</figure>
+<p>Si ce n'est pas supprimé, le paquet est envoyé au <strong>Niveau IP</strong>, et sera
+traité par le pare-feu du <strong>Niveau IP</strong> : ensemble de règles IPv4 ou IPv6. Vérifiez à nouveau
+le <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">diagramme du flux de paquet général</a> si nécessaire.</p>
+<p>Pour le trafic provenant du pont lui-même, la chaîne de base est
+<strong>output</strong>, et la commande de base est <code class="docutils literal notranslate">set firewall bridge output filter ...</code>, et le chemin est :</p>
+<figure class="align-default">
+<img alt="../../_images/firewall-bridge-output.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-output.webp" />
+</figure>
+<p>Des chaînes de pare-feu de pont personnalisées peuvent être créées avec la commande <code class="docutils literal notranslate">set firewall bridge name &lt;name&gt; ...</code>. Pour utiliser une telle chaîne personnalisée, une règle avec une action jump et la cible appropriée doit être définie dans une chaîne de base.</p>
+</section>
+<section id="bridge-rules">
+<h2>Règles de pont</h2>
+<p>Pour le filtrage du pare-feu, des règles de pare-feu doivent être créées. Chaque règle est
+numérotée, a une action à appliquer si la règle est matchée, et la possibilité
+de spécifier plusieurs critères de correspondance. Les paquets passent par les règles
+de 1 à 999999, donc l'ordre est crucial. À la première correspondance, l'action de la
+règle sera exécutée.</p>
+<section id="actions">
+<h3>Actions</h3>
+<p>Si une règle est définie, une action doit également être définie pour celle-ci. Cela indique au
+pare-feu quoi faire si tous les critères de correspondance de la règle sont remplis.</p>
+<p>Dans les règles de pare-feu de pont, l'action peut être :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">accept</code> : accepter le paquet.</p></li>
+<li><p><code class="docutils literal notranslate">continue</code> : continuer à analyser la règle suivante.</p></li>
+<li><p><code class="docutils literal notranslate">drop</code> : supprimer le paquet.</p></li>
+<li><p><code class="docutils literal notranslate">jump</code> : passer à une autre chaîne personnalisée.</p></li>
+<li><p><code class="docutils literal notranslate">return</code> : retourner depuis la chaîne actuelle et continuer à la règle suivante
+de la dernière chaîne.</p></li>
+<li><p><code class="docutils literal notranslate">queue</code> : mettre en file d'attente le paquet vers l'espace utilisateur.</p></li>
+<li><p><code class="docutils literal notranslate">notrack</code> : ignorer le système de suivi des connexions. Cette action est disponible uniquement
+dans la chaîne prerouting.</p></li>
+</ul>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; action [accept | continue | drop | jump | queue | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-action-accept-continue-drop-jump-queue-return" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; action [accept | continue | drop | jump | queue | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-action-accept-continue-drop-jump-queue-return" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; action [accept | continue | drop | jump | queue | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-action-accept-continue-drop-jump-queue-return" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; action [accept | continue | drop | jump | notrack | queue | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-action-accept-continue-drop-jump-notrack-queue-return" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; action [accept | continue | drop | jump | queue | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-action-accept-continue-drop-jump-queue-return" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette configuration requise définit l'action de la règle actuelle. Si l'action est
+définie sur jump, alors jump-target est également nécessaire.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-jump-target-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-jump-target-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-jump-target-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-jump-target-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-jump-target-text" title="Permalink to this Command"></a></div></div>
+<p>Si l'action est définie sur <code class="docutils literal notranslate">queue</code>, utilisez la commande suivante pour spécifier la cible
+de la file d'attente. La plage est également prise en charge :</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; queue &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-queue-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; queue &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-queue-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; queue &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-queue-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; queue &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-queue-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; queue &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-queue-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>De plus, si l'action est définie sur <code class="docutils literal notranslate">queue</code>, utilisez la commande suivante pour spécifier la file d'attente
+options. Les options possibles sont <code class="docutils literal notranslate">bypass</code> et <code class="docutils literal notranslate">fanout</code> :</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-queue-options-bypass" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-queue-options-bypass" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-queue-options-bypass" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-queue-options-bypass" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-queue-options-bypass" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-queue-options-fanout" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-queue-options-fanout" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-queue-options-fanout" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-queue-options-fanout" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-queue-options-fanout" title="Permalink to this Command"></a></div></div>
+<p>De plus, <strong>default-action</strong> est une action qui s'exécute lorsque un paquet ne correspond à aucune règle dans sa chaîne. Pour les chaînes de base, les options possibles pour <strong>default-action</strong> sont <strong>accept</strong> ou <strong>drop</strong>.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter default-action [accept | drop]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-default-action-accept-drop" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter default-action [accept | drop]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-default-action-accept-drop" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter default-action [accept | drop]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-default-action-accept-drop" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter default-action [accept | drop]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-default-action-accept-drop" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; default-action [accept | continue | drop | jump | reject | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-default-action-accept-continue-drop-jump-reject-return" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cela définit l'action par défaut de l'ensemble de règles si un paquet ne correspond à aucune des règles de cette chaîne. Si default-action est défini sur <code class="docutils literal notranslate">jump</code>, alors <code class="docutils literal notranslate">default-jump-target</code> est également nécessaire. Notez que pour les chaînes de base, l'action par défaut ne peut être définie que sur <code class="docutils literal notranslate">accept</code> ou <code class="docutils literal notranslate">drop</code>, tandis que sur les chaînes personnalisées, davantage d'actions sont disponibles.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; default-jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-default-jump-target-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>À utiliser uniquement lorsqu'<code class="docutils literal notranslate">default-action</code> est défini sur <code class="docutils literal notranslate">jump</code>. Utilisez cette
+commande pour spécifier la cible de saut pour la règle par défaut.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Remarque importante sur les actions par défaut :</strong>
+Si l'action par défaut pour toute chaîne de base n'est pas définie, alors l'action par défaut
+est définie sur <strong>accept</strong> pour cette chaîne. Pour les chaînes personnalisées, si l'action par défaut
+n'est pas définie, alors l'action par défaut est définie sur <strong>drop</strong>.</p>
+</div>
+</section>
+<section id="firewall-logs">
+<h3>Journaux du pare-feu</h3>
+<p>Vous pouvez activer le journalisation pour chaque règle du pare-feu. Si activé, d'autres options de journalisation
+peuvent être configurées.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-log" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Activez la journalisation du paquet correspondant. Si cette commande de configuration n'est pas présente, alors le journal n'est pas activé.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-default-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-default-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-default-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-default-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-default-log" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour activer la journalisation de l'action par défaut sur
+la chaîne spécifiée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le niveau de journalisation. N'applicable que si la règle log est activée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; log-options group &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-log-options-group-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; log-options group &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-log-options-group-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; log-options group &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-log-options-group-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; log-options group &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-log-options-group-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; log-options group &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-log-options-group-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le groupe de journalisation à envoyer aux messages. N'applicable que si la règle log est
+activée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; log-options snapshot-length &lt;0-9000&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; log-options snapshot-length &lt;0-9000&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; log-options snapshot-length &lt;0-9000&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; log-options snapshot-length &lt;0-9000&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; log-options snapshot-length &lt;0-9000&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-log-options-snapshot-length-0-9000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la longueur du payload du paquet à inclure dans le message netlink. N'est applicable que
+si la règle log est activée et que le groupe de journalisation est défini.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; log-options queue-threshold &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; log-options queue-threshold &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; log-options queue-threshold &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; log-options queue-threshold &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; log-options queue-threshold &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-log-options-queue-threshold-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le nombre de paquets à mettre en file d'attente dans le noyau avant de les envoyer
+à l'espace utilisateur. N'est applicable que si la règle log est activée et que le groupe de journalisation est
+défini.</p>
+</div>
+</div>
+</section>
+<section id="firewall-description">
+<h3>Description du pare-feu</h3>
+<p>Vous pouvez définir une description pour référence pour chaque chaîne personnalisée.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Fournir une description de l'ensemble de règles à une chaîne de pare-feu personnalisée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-description-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-description-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-description-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-description-text" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Fournir une description pour chaque règle.</p>
+</div>
+</div>
+</section>
+<section id="rule-status">
+<h3>Statut de la règle</h3>
+<p>Par défaut, lorsqu'une règle est définie, elle est activée. Dans certains cas, il est
+utile de désactiver la règle au lieu de la supprimer.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-disable" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-disable" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-disable" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-disable" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Commande pour désactiver une règle mais la garder dans la configuration.</p>
+</div>
+</div>
+</section>
+<section id="matching-criteria">
+<h3>Critères de correspondance</h3>
+<p>Il existe de nombreux critères de correspondance contre lesquels un paquet peut être testé. Se référer
+à <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv4.html">IPv4</a> et
+<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv6.html">IPv6</a> pour plus de détails.</p>
+<p>Comme les ponts fonctionnent au niveau 2, les deux matchers pour IPv4 et IPv6 sont
+pris en charge dans la configuration du pare-feu de pont. La même chose s'applique aux groupes de pare-feu.</p>
+<p>Les critères de correspondance spécifiques qui peuvent être utilisés dans le pare-feu de pont sont
+décrits dans cette section :</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Correspondre en fonction du type Ethernet du paquet.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; vlan ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-vlan-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; vlan ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-vlan-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; vlan ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-vlan-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; vlan ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-vlan-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; vlan ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-vlan-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Correspondre en fonction du type Ethernet du paquet lorsqu'il est étiqueté VLAN.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; vlan id &lt;0-4096&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-vlan-id-0-4096" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; vlan id &lt;0-4096&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-vlan-id-0-4096" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; vlan id &lt;0-4096&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-vlan-id-0-4096" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; vlan id &lt;0-4096&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-vlan-id-0-4096" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; vlan id &lt;0-4096&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-vlan-id-0-4096" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Correspondre en fonction de l'identifiant VLAN. La plage est également prise en charge.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge forward filter rule &lt;1-999999&gt; vlan priority &lt;0-7&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-vlan-priority-0-7" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge input filter rule &lt;1-999999&gt; vlan priority &lt;0-7&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-vlan-priority-0-7" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge output filter rule &lt;1-999999&gt; vlan priority &lt;0-7&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-vlan-priority-0-7" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge prerouting filter rule &lt;1-999999&gt; vlan priority &lt;0-7&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-vlan-priority-0-7" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; vlan priority &lt;0-7&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-vlan-priority-0-7" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Correspondre en fonction de la priorité VLAN (Code Point de Priorité - PCP). La plage est également
+prise en charge.</p>
+</div>
+</div>
+</section>
+<section id="packet-modifications">
+<h3>Modifications des paquets</h3>
+<p>À partir de <strong>VyOS-1.5-rolling-202410060007</strong>, le pare-feu peut modifier
+les paquets avant qu'ils ne soient envoyés. Cette fonctionnalité offre plus de flexibilité dans
+la gestion des paquets.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge [prerouting | forward | output] filter rule &lt;1-999999&gt; set dscp &lt;0-63&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-forward-output-filter-rule-1-999999-set-dscp-0-63" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir une valeur spécifique du Differentiated Services Codepoint (DSCP).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge [prerouting | forward | output] filter rule &lt;1-999999&gt; set mark &lt;1-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-forward-output-filter-rule-1-999999-set-mark-1-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir une valeur spécifique de marque de paquet.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge [prerouting | forward | output] filter rule &lt;1-999999&gt; set tcp-mss &lt;500-1460&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-forward-output-filter-rule-1-999999-set-tcp-mss-500-1460" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la taille maximale de segment TCP (TCP-MSS) pour la connexion.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge [prerouting | forward | output] filter rule &lt;1-999999&gt; set ttl &lt;0-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-forward-output-filter-rule-1-999999-set-ttl-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la valeur TTL (Time to Live).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge [prerouting | forward | output] filter rule &lt;1-999999&gt; set hop-limit &lt;0-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-forward-output-filter-rule-1-999999-set-hop-limit-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la valeur de limite de saut.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge [forward | output] filter rule &lt;1-999999&gt; set connection-mark &lt;0-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-output-filter-rule-1-999999-set-connection-mark-0-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la valeur de marque de connexion.</p>
+</div>
+</div>
+</section>
+<section id="use-ip-firewall">
+<h3>Utiliser le pare-feu IP</h3>
+<p>Par défaut, pour le trafic commuté, seules les règles définies sous <code class="docutils literal notranslate">set firewall bridge</code> sont appliquées. Il y a deux options globales qui peuvent être configurées afin de forcer une analyse plus approfondie du paquet au niveau IP. Ces options
+sont :</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options apply-to-bridged-traffic ipv4
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-apply-to-bridged-traffic-ipv4" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande active le pare-feu IPv4 pour le trafic bridgé. Si cette option
+est utilisée, les paquets sont également analysés par les règles définies dans <code class="docutils literal notranslate">set firewall ipv4 ...</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options apply-to-bridged-traffic ipv6
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-apply-to-bridged-traffic-ipv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande active le pare-feu IPv6 pour le trafic bridgé. Si cette option
+est utilisée, les paquets sont également analysés par les règles définies dans <code class="docutils literal notranslate">set firewall ipv6 ...</code></p>
+</div>
+</div>
+</section>
+</section>
+<section id="operation-mode-firewall">
+<h2>Pare-feu en mode opérationnel</h2>
+<section id="rule-set-overview">
+<h3>Aperçu de l'ensemble de règles</h3>
+<p>Dans cette section, vous trouverez toutes les commandes utiles du pare-feu en mode opérationnel.
+Commandes générales pour la configuration du pare-feu, les compteurs et les statistiques :</p>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall
+<a class="cmdlink" href="#opcmd-show-firewall" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall summary
+<a class="cmdlink" href="#opcmd-show-firewall-summary" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall statistics
+<a class="cmdlink" href="#opcmd-show-firewall-statistics" title="Permalink to this Command"></a></div></div>
+<p>Et, pour afficher uniquement les informations du pare-feu de pont :</p>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall bridge
+<a class="cmdlink" href="#opcmd-show-firewall-bridge" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall bridge forward filter
+<a class="cmdlink" href="#opcmd-show-firewall-bridge-forward-filter" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall bridge forward filter rule &lt;rule&gt;
+<a class="cmdlink" href="#opcmd-show-firewall-bridge-forward-filter-rule-rule" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall bridge name &lt;name&gt;
+<a class="cmdlink" href="#opcmd-show-firewall-bridge
+</div>
+</div>
+<div class<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show firewall bridge name &lt;name&gt; rule &lt;rule&gt;
+<a class="cmdlink" href="#opcmd-show-firewall-bridge-name-name-rule-rule" title="Permalink to this Command"></a></div></div>
+</section>
+<section id="show-firewall-log">
+<h3>Afficher le journal du pare-feu</h3>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall
+<a class="cmdlink" href="#opcmd-show-log-firewall" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+
+div</label>
+</div>
+"""
+
+</div
+</div>
+</div
+"
+</div</div
+</div
+</div
+"
+
+</div
+</div
+nbsp
+</
+"
+div</div
+"
+code</div">
+"/>
+div>
+</div</div
+section>
+</div
+code>
+
+
+div
+div
+span>
+</div
+div
+div
+div
+div
+"
+</div
+div
+section"
+</div</div
+</div
+</div
+</div
+div"
+div"
+</div
+code>
+div"
+code
+div
+</div</div
+div</code>
+div"
+</div</div
+code</div</div
+</div
+</div
+div
+div"
+div
+code</div
+div>
+</div</div</div
+div
+div
+div</div
+div
+"
+class:</div
+</div
+</div</code</div"
+</div</div>
+</div</div
+div>
+div</div</div</div</div"
+</div</div</div</code</div</div</div</div</div
+</div
+</div
+</div
+code</div</div</code
+</div</div</div</div</div</div
+div</div</div</div</div</div</div</div</div</div
+div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall bridge
+<a class="cmdlink" href="#opcmd-show-log-firewall-bridge" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall bridge forward
+<a class="cmdlink" href="#opcmd-show-log-firewall-bridge-forward" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log firewall bridge forward filter
+<a class="cmdlink" href="#opcmd-show-log-firewall-bridge-forward-filter" title="Permalink to this Command

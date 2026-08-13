@@ -1,0 +1,429 @@
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="suricata">
+<h1>Suricata</h1>
+<p><a class="reference external" href="https://suricata.io/">Suricata</a> is an open-source network threat
+detection engine that performs intrusion detection
+(<abbr title="Intrusion Detection System">IDS</abbr>), inline intrusion
+prevention (<abbr title="Intrusion Prevention System">IPS</abbr>), and network
+security monitoring (<abbr title="Network Security Monitoring">NSM</abbr>) by
+matching live traffic against a set of rules, also called signatures.
+Each event is recorded in the <abbr title="Extensible Event Format">EVE</abbr>
+event log in <abbr title="JavaScript Object Notation">JSON</abbr> format.</p>
+<p>VyOS integrates Suricata as a managed service, configurable under
+<code class="docutils literal notranslate">service suricata</code>. When the configuration is committed, VyOS generates
+Suricata configuration from these settings and starts the service.</p>
+<p>Under <code class="docutils literal notranslate">service suricata</code>, you can configure the following:</p>
+<ul class="simple">
+<li><p><strong>Monitored interfaces</strong>: One or more interfaces on which Suricata
+captures traffic.</p></li>
+<li><p><strong>地址 groups</strong>: 名称d lists of IPv4/IPv6 addresses or prefixes,
+used in place of literal IP addresses in Suricata rules.</p></li>
+<li><p><strong>端口 groups</strong>: 名称d lists of ports or port ranges, used in place
+of literal ports in Suricata rules.</p></li>
+<li><p><strong>EVE log</strong>: 目的 (regular file or syslog), file name or
+path, and the event types to log.</p></li>
+</ul>
+<p>规则s are fetched separately by running <code class="docutils literal notranslate">update suricata</code> from
+operational mode. Until this command is run, the service has no rules
+to match against.</p>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>A Suricata configuration is committable only when at least one
+interface, one address group, and one port group are defined.
+Otherwise, the commit fails.</p>
+</div>
+<section id="configuration">
+<h2>配置</h2>
+<section id="monitored-interfaces">
+<h3>Monitored interfaces</h3>
+<p>Use the following command to configure the interfaces Suricata
+monitors.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service suricata interface <interface>
+<a class="cmdlink" href="#cfgcmd-set-service-suricata-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure an interface on which Suricata captures and inspects
+traffic.</strong></p>
+<p>Repeat the command to monitor several interfaces. At least one
+interface 必须 configured for a successful commit.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service suricata interface eth1
+</pre></div>
+</div>
+</section>
+<section id="address-groups">
+<h3>地址 groups</h3>
+<p>Use the following commands to configure address groups.</p>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>组 names 必须 lowercase letters, digits, or hyphens.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>Suricata rules reference a conventional set of group names, such as
+<code class="docutils literal notranslate">home-net</code>, <code class="docutils literal notranslate">external-net</code>, <code class="docutils literal notranslate">http-servers</code>, and others. Defining a
+group with a non-standard name is allowed, but no shipped rules will
+reference it. Typical address groups include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">home-net</code>: the networks Suricata should treat as internal (for
+example, <code class="docutils literal notranslate">192.0.2.0/24</code> and <code class="docutils literal notranslate">2001:db8::/32</code>).</p></li>
+<li><p><code class="docutils literal notranslate">external-net</code>: everything not in <code class="docutils literal notranslate">home-net</code>.</p></li>
+<li><p><code class="docutils literal notranslate">http-servers</code>, <code class="docutils literal notranslate">sql-servers</code>, <code class="docutils literal notranslate">dns-servers</code>: hosts running the
+corresponding services.</p></li>
+</ul>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service suricata address-group <name> address <address>
+<a class="cmdlink" href="#cfgcmd-set-service-suricata-address-group-name-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure an IPv4 or IPv6 address or prefix as a member of the
+specified address group.</strong></p>
+<p><code class="docutils literal notranslate"><address></code> accepts an IPv4 or IPv6 address, an IPv4 or IPv6 prefix,
+or any of these prefixed with <code class="docutils literal notranslate">!</code> to exclude it from matches.</p>
+<p>Repeat the command to add more addresses or prefixes to the same
+group.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service suricata address-group home-net address 192.0.2.0/24
+set service suricata address-group home-net address 2001:db8::/32
+set service suricata address-group home-net address !192.0.2.5
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service suricata address-group <name> group <name>
+<a class="cmdlink" href="#cfgcmd-set-service-suricata-address-group-name-group-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure another address group as a member of the specified
+address group.</strong></p>
+<p>Prefix the referenced name with <code class="docutils literal notranslate">!</code> to exclude that group’s members.
+The referenced group 必须 defined at commit time, and cyclic
+references between groups are rejected.</p>
+<p>Repeat the command to add more groups to the same parent group.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service suricata address-group home-net address 192.0.2.0/24
+set service suricata address-group external-net group !home-net
+</pre></div>
+</div>
+</section>
+<section id="port-groups">
+<h3>端口 groups</h3>
+<p>Use the following commands to configure port groups.</p>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>组 names 必须 lowercase letters, digits, or hyphens.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>Suricata rules reference a conventional set of port-group names, such
+as <code class="docutils literal notranslate">http-ports</code>, <code class="docutils literal notranslate">ssh-ports</code>, <code class="docutils literal notranslate">oracle-ports</code>, <code class="docutils literal notranslate">shellcode-ports</code>, and
+others. Defining a port group with a non-standard name is allowed,
+but no shipped rules will reference it. Typical port groups include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">http-ports</code>: ports where HTTP services run.</p></li>
+<li><p><code class="docutils literal notranslate">ssh-ports</code>: ports where SSH services listen.</p></li>
+<li><p><code class="docutils literal notranslate">oracle-ports</code>: ports used by Oracle database services.</p></li>
+<li><p><code class="docutils literal notranslate">shellcode-ports</code>: ports inspected by shellcode-detection rules.</p></li>
+</ul>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service suricata port-group <name> port <port>
+<a class="cmdlink" href="#cfgcmd-set-service-suricata-port-group-name-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a port or port range as a member of the specified port
+group.</strong></p>
+<p><code class="docutils literal notranslate"><port></code> accepts a single port (1–65535), a numeric range in
+<code class="docutils literal notranslate">start-end</code> form (e.g., <code class="docutils literal notranslate">1001-1005</code>), or either form prefixed with
+<code class="docutils literal notranslate">!</code> to exclude it from matches.</p>
+<p>Repeat the command to add more ports or port ranges to the same
+group.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service suricata port-group http-ports port 80
+set service suricata port-group http-ports port 443
+set service suricata port-group http-ports port 8000-8999
+set service suricata port-group http-ports port !8080
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service suricata port-group <name> group <name>
+<a class="cmdlink" href="#cfgcmd-set-service-suricata-port-group-name-group-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure another port group as a member of the specified port
+group.</strong></p>
+<p>Prefix the referenced name with <code class="docutils literal notranslate">!</code> to exclude that group’s members
+from matches. The referenced group 必须 defined at commit time,
+and cyclic references between groups are rejected.</p>
+<p>Repeat the command to add multiple groups to the same parent group.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service suricata port-group http-ports port 80
+set service suricata port-group shellcode-ports group !http-ports
+</pre></div>
+</div>
+</section>
+<section id="eve-log">
+<h3>EVE log</h3>
+<p>Use the following commands to configure the EVE log.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service suricata log eve filename <filename>
+<a class="cmdlink" href="#cfgcmd-set-service-suricata-log-eve-filename-filename" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the filename or path for the Suricata EVE log.</strong></p>
+<p>A bare filename (e.g., <code class="docutils literal notranslate">eve.json</code>) places the log in Suricata’s
+default log directory, <code class="docutils literal notranslate">/var/log/suricata/</code>. An absolute path is used
+as-is.</p>
+<p>The default is <code class="docutils literal notranslate">eve.json</code>.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service suricata log eve filename eve.json
+set service suricata log eve filename /var/log/custom/suricata-eve.json
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service suricata log eve filetype <regular | syslog>
+<a class="cmdlink" href="#cfgcmd-set-service-suricata-log-eve-filetype-regular-syslog" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the destination for the Suricata EVE log:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">regular</code>: 写入s the EVE log to the file specified by
+<code class="docutils literal notranslate">set service suricata log eve filename</code>.</p></li>
+<li><p><code class="docutils literal notranslate">syslog</code>: Sends the EVE log to syslog.</p></li>
+</ul>
+<p>The default is <code class="docutils literal notranslate">regular</code>.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service suricata log eve filetype syslog
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service suricata log eve type <type>
+<a class="cmdlink" href="#cfgcmd-set-service-suricata-log-eve-type-type" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure which EVE event types are logged.</strong></p>
+<p>接受ed values:</p>
+<ul class="simple">
+<li><p>General event types: <code class="docutils literal notranslate">alert</code>, <code class="docutils literal notranslate">anomaly</code>, <code class="docutils literal notranslate">drop</code>, <code class="docutils literal notranslate">files</code>, <code class="docutils literal notranslate">flow</code>,
+<code class="docutils literal notranslate">netflow</code>.</p></li>
+<li><p>Per-protocol event types: <code class="docutils literal notranslate">http</code>, <code class="docutils literal notranslate">http2</code>, <code class="docutils literal notranslate">dns</code>, <code class="docutils literal notranslate">tls</code>, <code class="docutils literal notranslate">smtp</code>,
+<code class="docutils literal notranslate">ftp</code>, <code class="docutils literal notranslate">smb</code>, <code class="docutils literal notranslate">ssh</code>, <code class="docutils literal notranslate">dhcp</code>, <code class="docutils literal notranslate">tftp</code>, <code class="docutils literal notranslate">nfs</code>, <code class="docutils literal notranslate">rdp</code>, <code class="docutils literal notranslate">sip</code>, <code class="docutils literal notranslate">snmp</code>,
+<code class="docutils literal notranslate">ikev2</code>, <code class="docutils literal notranslate">krb5</code>, <code class="docutils literal notranslate">dcerpc</code>, <code class="docutils literal notranslate">dnp3</code>, <code class="docutils literal notranslate">rfb</code>, <code class="docutils literal notranslate">mqtt</code>.</p></li>
+</ul>
+<p>Repeat the command to log multiple event types.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service suricata log eve type alert
+set service suricata log eve type flow
+set service suricata log eve type http
+</pre></div>
+</div>
+</section>
+</section>
+<section id="operation">
+<h2>Operation</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+update suricata
+<a class="cmdlink" href="#opcmd-update-suricata" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p><strong>Fetch the current rule set with <code class="docutils literal notranslate">suricata-update</code> and restart the
+Suricata service to load it.</strong></p>
+<p>If <code class="docutils literal notranslate">service suricata</code> is not configured, the command outputs an error
+message and exits.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>update suricata
+</pre></div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+restart suricata
+<a class="cmdlink" href="#opcmd-restart-suricata" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p><strong>Restart the Suricata service.</strong></p>
+<p>If the service is not configured (no <code class="docutils literal notranslate">service suricata</code> configuration
+exists), or a configuration commit is in progress, the command prints
+an error message and exits.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>restart suricata
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

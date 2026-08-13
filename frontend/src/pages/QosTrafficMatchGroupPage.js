@@ -8,6 +8,7 @@ import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { onMenuRefresh, offMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const DSCP_OPTIONS = [
   { value: 'default', label: 'default (000000)' },
@@ -110,6 +111,7 @@ export default defineComponent({
   name: 'QosTrafficMatchGroupPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
+    const { t } = useI18n();
     const configStore = useConfigStore();
     const loading = ref(false);
     const matchGroups = ref([]);
@@ -123,26 +125,31 @@ export default defineComponent({
     const dataTableRef = ref(null);
     const editingRules = ref([]);
 
+    const deleteGroupModalVisible = ref(false);
+    const pendingDeleteGroupName = ref('');
+    const deleteMatchModalVisible = ref(false);
+    const pendingDeleteMatchInfo = ref({ groupName: '', matchName: '' });
+
     const groupColumns = [
-      { key: 'name', title: '匹配组名称', dataIndex: 'name', width: 150 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-      { key: 'matchCount', title: '匹配规则数', dataIndex: 'matchCount', width: 120 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 180, fixed: 'right' },
+      { key: 'name', title: t('qosMatch.columns.groupName'), dataIndex: 'name', width: 150 },
+      { key: 'description', title: t('qosMatch.columns.description'), dataIndex: 'description', width: 200 },
+      { key: 'matchCount', title: t('qosMatch.columns.matchCount'), dataIndex: 'matchCount', width: 120 },
+      { key: 'actions', title: t('qosMatch.columns.actions'), dataIndex: 'actions', width: 180, fixed: 'right' },
     ];
 
     const matchColumns = [
-      { key: 'name', title: '匹配规则名称', dataIndex: 'name', width: 150 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 150 },
-      { key: 'type', title: '类型', dataIndex: 'type', width: 100 },
-      { key: 'details', title: '详情', dataIndex: 'details', width: 200 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'name', title: t('qosMatch.columns.matchName'), dataIndex: 'name', width: 150 },
+      { key: 'description', title: t('qosMatch.columns.description'), dataIndex: 'description', width: 150 },
+      { key: 'type', title: t('qosMatch.columns.type'), dataIndex: 'type', width: 100 },
+      { key: 'details', title: t('qosMatch.columns.details'), dataIndex: 'details', width: 200 },
+      { key: 'actions', title: t('qosMatch.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
     const ruleColumns = [
-      { key: 'name', title: '规则名称', dataIndex: 'name', width: 120 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 150 },
-      { key: 'type', title: '类型', dataIndex: 'type', width: 80 },
-      { key: 'details', title: '详情', dataIndex: 'details', width: 200 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
+      { key: 'name', title: t('qosMatch.columns.ruleName'), dataIndex: 'name', width: 120 },
+      { key: 'description', title: t('qosMatch.columns.description'), dataIndex: 'description', width: 150 },
+      { key: 'type', title: t('qosMatch.columns.type'), dataIndex: 'type', width: 80 },
+      { key: 'details', title: t('qosMatch.columns.details'), dataIndex: 'details', width: 200 },
+      { key: 'actions', title: t('qosMatch.columns.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
     ];
 
 
@@ -205,16 +212,16 @@ export default defineComponent({
     });
 
     const groupSchema = computed(() => [
-      { key: 'name', title: '匹配组名称', type: 'text', required: true },
-      { key: 'description', title: '描述', type: 'text' },
-      { key: 'match-group', title: 'QoS 策略过滤组', type: 'text', help: '用于 QoS 策略的过滤组名称' },
+      { key: 'name', title: t('qosMatch.columns.groupName'), type: 'text', required: true },
+      { key: 'description', title: t('qosMatch.columns.description'), type: 'text' },
+      { key: 'match-group', title: t('qosMatch.schema.matchGroup'), type: 'text', help: t('qosMatch.schema.matchGroupHelp') },
     ]);
 
     // Match rule schema with tabs and nested groups
     const matchBasicSchema = [
-      { key: 'name', title: '匹配规则名称', type: 'text', required: true },
-      { key: 'description', title: '描述', type: 'text' },
-      { key: 'type', title: '类型', type: 'select', options: [
+      { key: 'name', title: t('qosMatch.columns.matchName'), type: 'text', required: true },
+      { key: 'description', title: t('qosMatch.columns.description'), type: 'text' },
+      { key: 'type', title: t('qosMatch.columns.type'), type: 'select', options: [
         { value: 'ip', label: 'IPv4' },
         { value: 'ipv6', label: 'IPv6' },
         { value: 'mark', label: 'Mark' },
@@ -224,26 +231,26 @@ export default defineComponent({
 
     const matchIpv4Schema = [
       {
-        key: 'ip', title: 'IPv4 匹配', type: 'group', children: [
+        key: 'ip', title: t('qosMatch.schema.ipv4Match'), type: 'group', children: [
           {
-            key: 'destination', title: '目标', type: 'group', children: [
-              { key: 'address', title: '地址', type: 'text', validate: 'ip-segment', placeholder: 'IPv4 地址或前缀，如 192.168.1.0/24' },
-              { key: 'port', title: '端口', type: 'number', min: 1, max: 65535, placeholder: '1-65535' },
+            key: 'destination', title: t('qosMatch.schema.destination'), type: 'group', children: [
+              { key: 'address', title: t('qosMatch.schema.address'), type: 'text', validate: 'ip-segment', placeholder: t('qosMatch.placeholders.ipv4Address') },
+              { key: 'port', title: t('qosMatch.schema.port'), type: 'number', min: 1, max: 65535, placeholder: t('qosMatch.placeholders.port') },
             ],
           },
           {
-            key: 'source', title: '源', type: 'group', children: [
-              { key: 'address', title: '地址', type: 'text', validate: 'ip-segment', placeholder: 'IPv4 地址或前缀，如 10.0.0.0/8' },
-              { key: 'port', title: '端口', type: 'number', min: 1, max: 65535, placeholder: '1-65535' },
+            key: 'source', title: t('qosMatch.schema.source'), type: 'group', children: [
+              { key: 'address', title: t('qosMatch.schema.address'), type: 'text', validate: 'ip-segment', placeholder: t('qosMatch.placeholders.ipv4SourceAddress') },
+              { key: 'port', title: t('qosMatch.schema.port'), type: 'number', min: 1, max: 65535, placeholder: t('qosMatch.placeholders.port') },
             ],
           },
           { key: 'dscp', title: 'DSCP', type: 'select', options: DSCP_OPTIONS },
-          { key: 'protocol', title: '协议', type: 'select', options: IP_PROTOCOL_OPTIONS, dynamic: true },
-          { key: 'protocol-not', title: '取反协议', type: 'checkbox', help: '匹配除所选协议外的所有协议' },
-          { key: 'max-length', title: '最大包长', type: 'number', min: 1, max: 65535, placeholder: '1-65535' },
-          { key: 'tcp', title: 'TCP 标志', type: 'group', children: [
-            { key: 'flags', title: '标志', type: 'multi-select', options: TCP_FLAG_OPTIONS },
-            { key: 'not', title: '取反', type: 'checkbox', help: '匹配除所选标志外的所有标志' },
+          { key: 'protocol', title: t('qosMatch.schema.protocol'), type: 'select', options: IP_PROTOCOL_OPTIONS, dynamic: true },
+          { key: 'protocol-not', title: t('qosMatch.schema.protocolNot'), type: 'checkbox', help: t('qosMatch.schema.protocolNotHelp') },
+          { key: 'max-length', title: t('qosMatch.schema.maxLength'), type: 'number', min: 1, max: 65535, placeholder: t('qosMatch.placeholders.port') },
+          { key: 'tcp', title: t('qosMatch.schema.tcpFlags'), type: 'group', children: [
+            { key: 'flags', title: t('qosMatch.schema.flags'), type: 'multi-select', options: TCP_FLAG_OPTIONS },
+            { key: 'not', title: t('qosMatch.schema.not'), type: 'checkbox', help: t('qosMatch.schema.notHelp') },
           ]},
         ],
       },
@@ -251,41 +258,41 @@ export default defineComponent({
 
     const matchIpv6Schema = [
       {
-        key: 'ipv6', title: 'IPv6 匹配', type: 'group', children: [
+        key: 'ipv6', title: t('qosMatch.schema.ipv6Match'), type: 'group', children: [
           {
-            key: 'destination', title: '目标', type: 'group', children: [
-              { key: 'address', title: '地址', type: 'text', validate: 'ipv6-segment', placeholder: 'IPv6 地址或前缀，如 2001:db8::/32' },
-              { key: 'port', title: '端口', type: 'number', min: 1, max: 65535, placeholder: '1-65535' },
+            key: 'destination', title: t('qosMatch.schema.destination'), type: 'group', children: [
+              { key: 'address', title: t('qosMatch.schema.address'), type: 'text', validate: 'ipv6-segment', placeholder: t('qosMatch.placeholders.ipv6Address') },
+              { key: 'port', title: t('qosMatch.schema.port'), type: 'number', min: 1, max: 65535, placeholder: t('qosMatch.placeholders.port') },
             ],
           },
           {
-            key: 'source', title: '源', type: 'group', children: [
-              { key: 'address', title: '地址', type: 'text', validate: 'ipv6-segment', placeholder: 'IPv6 地址或前缀' },
-              { key: 'port', title: '端口', type: 'number', min: 1, max: 65535, placeholder: '1-65535' },
+            key: 'source', title: t('qosMatch.schema.source'), type: 'group', children: [
+              { key: 'address', title: t('qosMatch.schema.address'), type: 'text', validate: 'ipv6-segment', placeholder: t('qosMatch.placeholders.ipv6SourceAddress') },
+              { key: 'port', title: t('qosMatch.schema.port'), type: 'number', min: 1, max: 65535, placeholder: t('qosMatch.placeholders.port') },
             ],
           },
           { key: 'dscp', title: 'DSCP', type: 'select', options: DSCP_OPTIONS },
-          { key: 'protocol', title: '协议', type: 'select', options: IP_PROTOCOL_OPTIONS, dynamic: true },
-          { key: 'protocol-not', title: '取反协议', type: 'checkbox', help: '匹配除所选协议外的所有协议' },
-          { key: 'max-length', title: '最大包长', type: 'number', min: 1, max: 65535, placeholder: '1-65535' },
-          { key: 'tcp', title: 'TCP 标志', type: 'group', children: [
-            { key: 'flags', title: '标志', type: 'multi-select', options: TCP_FLAG_OPTIONS },
-            { key: 'not', title: '取反', type: 'checkbox', help: '匹配除所选标志外的所有标志' },
+          { key: 'protocol', title: t('qosMatch.schema.protocol'), type: 'select', options: IP_PROTOCOL_OPTIONS, dynamic: true },
+          { key: 'protocol-not', title: t('qosMatch.schema.protocolNot'), type: 'checkbox', help: t('qosMatch.schema.protocolNotHelp') },
+          { key: 'max-length', title: t('qosMatch.schema.maxLength'), type: 'number', min: 1, max: 65535, placeholder: t('qosMatch.placeholders.port') },
+          { key: 'tcp', title: t('qosMatch.schema.tcpFlags'), type: 'group', children: [
+            { key: 'flags', title: t('qosMatch.schema.flags'), type: 'multi-select', options: TCP_FLAG_OPTIONS },
+            { key: 'not', title: t('qosMatch.schema.not'), type: 'checkbox', help: t('qosMatch.schema.notHelp') },
           ]},
         ],
       },
     ];
 
     const matchAdvancedSchema = [
-      { key: 'mark', title: '匹配 Mark', type: 'checkbox', valueless: true, help: '匹配防火墙设置的 mark（无需值）' },
-      { key: 'vif', title: 'VLAN ID', type: 'number', min: 0, max: 4095, placeholder: '0-4095' },
+      { key: 'mark', title: t('qosMatch.schema.matchMark'), type: 'checkbox', valueless: true, help: t('qosMatch.schema.matchMarkHelp') },
+      { key: 'vif', title: t('qosMatch.schema.vifId'), type: 'number', min: 0, max: 4095, placeholder: t('qosMatch.placeholders.vif') },
     ];
 
     const matchTabs = [
-      { key: 'basic', title: '基本' },
+      { key: 'basic', title: t('qosMatch.tabs.basic') },
       { key: 'ipv4', title: 'IPv4' },
       { key: 'ipv6', title: 'IPv6' },
-      { key: 'advanced', title: '高级' },
+      { key: 'advanced', title: t('qosMatch.tabs.advanced') },
     ];
 
     function getMatchTabSchema(tabKey) {
@@ -377,7 +384,7 @@ export default defineComponent({
 
         matchGroups.value = groups;
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('qosMatch.messages.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -466,22 +473,28 @@ export default defineComponent({
           }
         }
 
-        await configStore.commit();
+        configStore.markPending();
         modalVisible.value = false;
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('qosMatch.messages.saveFailed'));
       }
     }
 
     async function removeGroup(group) {
-      if (!confirm(`确定删除匹配组 ${group.name}？`)) return;
+      pendingDeleteGroupName.value = group.name;
+      deleteGroupModalVisible.value = true;
+    }
+
+    async function confirmRemoveGroup() {
+      deleteGroupModalVisible.value = false;
       try {
-        await configApi.delete(`qos traffic-match-group ${group.name}`);
-        await configStore.commit();
+        await configApi.delete(`qos traffic-match-group ${pendingDeleteGroupName.value}`);
+        configStore.markPending();
+        pendingDeleteGroupName.value = '';
         await load();
       } catch (e) {
-        showError(e.message || '删除失败');
+        showError(e.message || t('qosMatch.messages.deleteFailed'));
       }
     }
 
@@ -662,22 +675,28 @@ export default defineComponent({
           }
         }
 
-        await configStore.commit();
+        configStore.markPending();
         matchModalVisible.value = false;
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('qosMatch.messages.saveFailed'));
       }
     }
 
     async function removeMatch(match) {
-      if (!confirm(`确定删除匹配规则 ${match.name}？`)) return;
+      pendingDeleteMatchInfo.value = { groupName: editingGroup.value.name, matchName: match.name };
+      deleteMatchModalVisible.value = true;
+    }
+
+    async function confirmRemoveMatch() {
+      deleteMatchModalVisible.value = false;
       try {
-        await configApi.delete(`qos traffic-match-group ${match.groupName} match ${match.name}`);
-        await configStore.commit();
+        await configApi.delete(`qos traffic-match-group ${pendingDeleteMatchInfo.value.groupName} match ${pendingDeleteMatchInfo.value.matchName}`);
+        configStore.markPending();
+        pendingDeleteMatchInfo.value = { groupName: '', matchName: '' };
         await load();
       } catch (e) {
-        showError(e.message || '删除失败');
+        showError(e.message || t('qosMatch.messages.deleteFailed'));
       }
     }
 
@@ -785,13 +804,19 @@ export default defineComponent({
     }
 
     async function removeMatchInGroup(m) {
-      if (!confirm(`确定删除匹配规则 ${m.name}？`)) return;
+      pendingDeleteMatchInfo.value = { groupName: editingGroup.value.name, matchName: m.name };
+      deleteMatchModalVisible.value = true;
+    }
+
+    async function confirmRemoveMatchInGroup() {
+      deleteMatchModalVisible.value = false;
       try {
-        await configApi.delete(`qos traffic-match-group ${editingGroup.value.name} match ${m.name}`);
-        await configStore.commit();
+        await configApi.delete(`qos traffic-match-group ${pendingDeleteMatchInfo.value.groupName} match ${pendingDeleteMatchInfo.value.matchName}`);
+        configStore.markPending();
+        pendingDeleteMatchInfo.value = { groupName: '', matchName: '' };
         await load();
       } catch (e) {
-        showError(e.message || '删除失败');
+        showError(e.message || t('qosMatch.messages.deleteFailed'));
       }
     }
 
@@ -961,13 +986,14 @@ export default defineComponent({
       onMenuRefresh(load);
     });
 
-    return {
+    return {t,
+      
       loading, tableData, currentGroupMatches, groupColumns, matchColumns, ruleColumns, selected,
       modalVisible, matchModalVisible, editingGroup, editingMatch, activeTab, matchActiveTab,
       groupSchema, matchTabs, getMatchTabSchema, commandText, matchCommandText, dataTableRef,
-      editingRules,
-      load, createGroup, editGroup, saveGroup, removeGroup,
-      createMatch, editMatch, saveMatch, removeMatch, manageMatches,
+      editingRules, deleteGroupModalVisible, pendingDeleteGroupName, deleteMatchModalVisible, pendingDeleteMatchInfo,
+      load, createGroup, editGroup, saveGroup, removeGroup, confirmRemoveGroup,
+      createMatch, editMatch, saveMatch, removeMatch, confirmRemoveMatch, manageMatches,
       createRule, editRule, saveRule, removeRule,
     };
   },
@@ -989,9 +1015,9 @@ export default defineComponent({
         >
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'actions'">
-              <a @click="manageMatches(record)" style="margin-right: 8px">管理规则</a>
-              <a @click="editGroup(record)" style="margin-right: 8px">编辑</a>
-              <a @click="removeGroup(record)" style="color: #ff4d4f">删除</a>
+              <a @click="manageMatches(record)" style="margin-right: 8px">{{ t('qosMatch.buttons.manageRules') }}</a>
+              <a @click="editGroup(record)" style="margin-right: 8px">{{ t('qosMatch.buttons.edit') }}</a>
+              <a @click="removeGroup(record)" style="color: #ff4d4f">{{ t('qosMatch.buttons.delete') }}</a>
             </template>
           </template>
         </DataTable>
@@ -999,9 +1025,9 @@ export default defineComponent({
 
       <div v-if="activeTab === 'matches' && editingGroup">
         <div class="toolbar">
-          <ToolbarButton @click="activeTab = 'groups'" icon="cancel">返回</ToolbarButton>
-          <ToolbarButton @click="createMatch" icon="create">新建匹配规则</ToolbarButton>
-          <span style="margin-left: 16px; font-weight: bold;">匹配组: {{ editingGroup.name }}</span>
+          <ToolbarButton @click="activeTab = 'groups'" icon="cancel">{{ t('qosMatch.buttons.back') }}</ToolbarButton>
+          <ToolbarButton @click="createMatch" icon="create">{{ t('qosMatch.buttons.createMatch') }}</ToolbarButton>
+          <span style="margin-left: 16px; font-weight: bold;">{{ t('qosMatch.labels.matchGroup') }}: {{ editingGroup.name }}</span>
         </div>
         <DataTable
           :columns="matchColumns"
@@ -1011,8 +1037,8 @@ export default defineComponent({
         >
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'actions'">
-              <a @click="editMatch(record)" style="margin-right: 8px">编辑</a>
-              <a @click="removeMatch(record)" style="color: #ff4d4f">删除</a>
+              <a @click="editMatch(record)" style="margin-right: 8px">{{ t('qosMatch.buttons.edit') }}</a>
+              <a @click="removeMatch(record)" style="color: #ff4d4f">{{ t('qosMatch.buttons.delete') }}</a>
             </template>
           </template>
         </DataTable>
@@ -1020,7 +1046,7 @@ export default defineComponent({
 
       <DraggableModal
         v-model:visible="modalVisible"
-        :title="editingGroup && tableData.find(d => d.key === editingGroup.key) ? '编辑匹配组' : '新建匹配组'"
+        :title="editingGroup && tableData.find(d => d.key === editingGroup.key) ? t('qosMatch.modals.editMatchGroup') : t('qosMatch.modals.createMatchGroup')"
         @confirm="saveGroup"
         @close="modalVisible = false"
         width="900px"
@@ -1028,7 +1054,7 @@ export default defineComponent({
         <ConfigForm v-if="editingGroup" v-model="editingGroup" :schema="groupSchema" />
 
         <div v-if="editingGroup" style="margin-top:20px;border-top:1px solid #e8e8e8;padding-top:16px;">
-          <h4 style="margin:0 0 12px 0;">匹配规则</h4>
+          <h4 style="margin:0 0 12px 0;">{{ t('qosMatch.messages.matchRules') }}</h4>
           <DataTable
             rowKey="name"
             :columns="ruleColumns"
@@ -1040,18 +1066,18 @@ export default defineComponent({
           >
             <template #bodyCell="{ column, record }">
               <template v-if="column.key === 'actions'">
-                <a @click="editRule(record)" style="margin-right:8px">编辑</a>
-                <a @click="removeRule(record)" style="color:#ff4d4f">删除</a>
+                <a @click="editRule(record)" style="margin-right:8px">{{ t('qosMatch.buttons.edit') }}</a>
+                <a @click="removeRule(record)" style="color:#ff4d4f">{{ t('qosMatch.buttons.delete') }}</a>
               </template>
             </template>
           </DataTable>
-          <div v-if="editingRules.length === 0" style="text-align:center;color:#999;padding:20px;">暂无规则</div>
+          <div v-if="editingRules.length === 0" style="text-align:center;color:#999;padding:20px;">{{ t('qosMatch.messages.noRules') }}</div>
         </div>
       </DraggableModal>
 
       <DraggableModal
         v-model:visible="matchModalVisible"
-        :title="editingMatch ? '编辑匹配规则' : '新建匹配规则'"
+        :title="editingMatch ? t('qosMatch.modals.editMatchRule') : t('qosMatch.modals.createMatchRule')"
         @confirm="saveRule"
         @close="matchModalVisible = false"
         width="750"
@@ -1070,6 +1096,20 @@ export default defineComponent({
             <ConfigForm v-if="editingMatch" v-model="editingMatch" :schema="getMatchTabSchema('advanced')" />
           </template>
         </TabGroup>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="deleteGroupModalVisible" :title="t('qosMatch.modals.confirmDelete')" width="400px" @confirm="confirmRemoveGroup">
+        <div>{{ t('qosMatch.modals.confirmDeleteGroup') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div style="padding:2px 0;">{{ pendingDeleteGroupName }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="deleteMatchModalVisible" :title="t('qosMatch.modals.confirmDelete')" width="400px" @confirm="confirmRemoveMatch">
+        <div>{{ t('qosMatch.modals.confirmDeleteMatch') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div style="padding:2px 0;">{{ pendingDeleteMatchInfo.matchName }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="lldp">
+<h1>LLDP</h1>
+<p><abbr title="Link Layer Discovery Protocol">LLDP</abbr> est un protocole de couche liaison indépendant du fournisseur dans le suite de protocoles Internet utilisé par les appareils réseau pour annoncer leur identité, leurs capacités et leurs voisins sur un réseau local IEEE 802, principalement Ethernet filaire. Le protocole est formellement désigné par l'IEEE comme la découverte de la connectivité des stations et des contrôles d'accès au média spécifiée dans l'IEEE 802.1AB et l'IEEE 802.3-2012 section 6 clause 79.</p>
+<p>LLDP effectue des fonctions similaires à plusieurs protocoles propriétaires, tels que
+<abbr title="Cisco Discovery Protocol">CDP</abbr>,
+<abbr title="Foundry Discovery Protocol">FDP</abbr>,
+<abbr title="Nortel Discovery Protocol">NDP</abbr> et <abbr title="Link Layer Topology Discovery">LLTD</abbr>.</p>
+<p>Les informations recueillies avec LLDP sont stockées dans l'appareil en tant que base de données d'informations de gestion (MIB) et peuvent être interrogées avec le protocole de gestion réseau simple (SNMP) tel que spécifié dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2922.html"><strong>RFC 2922</strong></a>. La topologie d'un réseau LLDP activé peut être découverte en parcourant les hôtes et en interrogeant cette base de données. Les informations pouvant être récupérées incluent :</p>
+<ul class="simple">
+<li><p>Nom et description du système</p></li>
+<li><p>Nom et description du port</p></li>
+<li><p>Nom du VLAN</p></li>
+<li><p>Adresse de gestion IP</p></li>
+<li><p>Capacités du système (commutation, routage, etc.)</p></li>
+<li><p>Informations MAC/PHY</p></li>
+<li><p>Puissance MDI</p></li>
+<li><p>Regroupement de lien</p></li>
+</ul>
+<section id="configuration">
+<h2>Configuration</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service lldp
+<a class="cmdlink" href="#cfgcmd-set-service-lldp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Activer le service LLDP</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service lldp management-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-lldp-management-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir l'adresse de gestion IPv4/IPv6 transmise via LLDP. Plusieurs adresses peuvent être définies. Seules les adresses connectées au système seront transmises.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service lldp interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-lldp-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Activer la transmission d'informations LLDP sur une interface donnée &lt;interface&gt;. Vous pouvez également dire <code class="docutils literal notranslate">all</code> ici afin que LLDP soit activé sur chaque interface.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service lldp interface &lt;interface&gt; mode [disable|rx-tx|rx|tx]
+<a class="cmdlink" href="#cfgcmd-set-service-lldp-interface-interface-mode-disable-rx-tx-rx-tx" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurer le statut administratif du port donné.</p>
+<p>Par défaut, tous les ports sont configurés en mode rx-tx. Cela signifie qu'ils peuvent recevoir et transmettre des trames LLDP.</p>
+<p>En mode rx, ils ne produisent aucune trame. En mode tx, ils ne reçoivent aucune trame. En mode désactivé, aucune trame ne sera envoyée et toute trame entrante sera supprimée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service lldp snmp
+<a class="cmdlink" href="#cfgcmd-set-service-lldp-snmp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Activer les requêtes SNMP de la base de données LLDP</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service lldp legacy-protocols &lt;cdp|edp|fdp|sonmp&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-lldp-legacy-protocols-cdp-edp-fdp-sonmp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Activer le protocole hérité donné sur cette instance LLDP. Les protocoles hérités comprennent :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">cdp</code> - Écouter le CDP pour les routeurs/switches Cisco</p></li>
+<li><p><code class="docutils literal notranslate">edp</code> - Écouter l'EDP pour les routeurs/switches Extreme</p></li>
+<li><p><code class="docutils literal notranslate">fdp</code> - Écouter le FDP pour les routeurs/switches Foundry</p></li>
+<li><p><code class="docutils literal notranslate">sonmp</code> - Écouter le SONMP pour les routeurs/switches Nortel</p></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="operation">
+<h2>Fonctionnement</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show lldp neighbors
+<a class="cmdlink" href="#opcmd-show-lldp-neighbors" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Affiche les informations sur tous les voisins découverts via LLDP.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show lldp neighbors
+Capability Codes: R - Router, B - Bridge, W - Wlan r - Repeater, S - Station
+                  D - Docsis, T - Telephone, O - Other
+
+Device ID                 Local     Proto  Cap   Platform             Port ID
+---------                 -----     -----  ---   --------             -------
+BR2.vyos.net              eth0      LLDP   R     VyOS 1.2.4           eth1
+BR3.vyos.net              eth0      LLDP   RB    VyOS 1.2.4           eth2
+SW1.vyos.net              eth0      LLDP   B     Cisco IOS Software   GigabitEthernet0/6
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show lldp neighbors detail
+<a class="cmdlink" href="#opcmd-show-lldp-neighbors-detail" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Obtenir des informations détaillées sur les voisins LLDP.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show lldp neighbors detail
+-------------------------------------------------------------------------------
+LLDP neighbors:
+-------------------------------------------------------------------------------
+Interface:    eth0, via: LLDP, RID: 28, Time: 0 day, 00:24:33
+Chassis:
+  ChassisID:    mac 00:53:00:01:02:c9
+  SysName:      BR2.vyos.net
+  SysDescr:     VyOS 1.3-rolling-201912230217
+  MgmtIP:       192.0.2.1
+  MgmtIP:       2001:db8::ffff
+  Capability:   Bridge, on
+  Capability:   Router, on
+  Capability:   Wlan, off
+  Capability:   Station, off
+Port:
+  PortID:       mac 00:53:00:01:02:c9
+  PortDescr:    eth0
+  TTL:          120
+  PMD autoneg:  supported: no, enabled: no
+      MAU oper type: 10GigBaseCX4 - X copper over 8 pair 100-Ohm balanced cable
+VLAN:         201 eth0.201
+VLAN:         205 eth0.205
+LLDP-MED:
+  Device Type:  Network Connectivity Device
+  Capability:   Capabilities, yes
+  Capability:   Policy, yes
+  Capability:   Location, yes
+  Capability:   MDI/PSE, yes
+  Capability:   MDI/PD, yes
+  Capability:   Inventory, yes
+  Inventory:
+      Hardware Revision: None
+      Software Revision: 4.19.89-amd64-vyos
+      Firmware Revision: 6.00
+      Serial Number: VMware-42 1d 83 b9 fe c1 bd b2-7
+      Manufacturer: VMware, Inc.
+      Model:        VMware Virtual Platform
+      Asset ID:     No Asset Tag
+-------------------------------------------------------------------------------
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show lldp neighbors interface &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-show-lldp-neighbors-interface-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Afficher les voisins LLDP connectés via l'interface &lt;interface&gt;.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log lldp
+<a class="cmdlink" href="#opcmd-show-log-lldp" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Utilisé pour le débogage.</p>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

@@ -4,6 +4,7 @@ import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import HelpButton from '/src/components/Layout/HelpButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const HEADERS = ['Proto', 'Recv-Q', 'Send-Q', 'Local Address', 'Foreign Address', 'State', 'PID/Program name'];
 const KEY_MAP = ['proto', 'recv_q', 'send_q', 'local_address', 'foreign_address', 'state', 'pid_program'];
@@ -51,28 +52,29 @@ function parseIpPorts(output) {
 export default defineComponent({
   name: 'ActiveConnectionsPage',
   setup() {
+    const { t } = useI18n();
     const loading = ref(false);
     const rows = ref([]);
     const protocolFilter = ref('');
     const stateFilter = ref('');
 
-    const columns = [
-      { key: 'proto', title: '协议' },
-      { key: 'recv_q', title: '接收队列' },
-      { key: 'send_q', title: '发送队列' },
-      { key: 'local_address', title: '本地地址' },
-      { key: 'foreign_address', title: '外部地址' },
-      { key: 'state', title: '状态' },
-      { key: 'pid_program', title: 'PID/程序' },
-    ];
+    const columns = computed(() => [
+      { key: 'proto', title: t('activeConnections.columns.proto') },
+      { key: 'recv_q', title: t('activeConnections.columns.recvQ') },
+      { key: 'send_q', title: t('activeConnections.columns.sendQ') },
+      { key: 'local_address', title: t('activeConnections.columns.localAddress') },
+      { key: 'foreign_address', title: t('activeConnections.columns.foreignAddress') },
+      { key: 'state', title: t('activeConnections.columns.state') },
+      { key: 'pid_program', title: t('activeConnections.columns.pidProgram') },
+    ]);
 
-    const protocolOptions = [
-      { value: '', label: '全部协议' },
+    const protocolOptions = computed(() => [
+      { value: '', label: t('activeConnections.options.allProtocols') },
       { value: 'tcp', label: 'TCP' },
       { value: 'tcp6', label: 'TCP6' },
       { value: 'udp', label: 'UDP' },
       { value: 'udp6', label: 'UDP6' },
-    ];
+    ]);
 
     const stateOptions = computed(() => {
       const states = new Set();
@@ -80,9 +82,9 @@ export default defineComponent({
         const s = r.state || '';
         states.add(s);
       });
-      const opts = [{ value: '', label: '全部状态' }];
+      const opts = [{ value: '', label: t('activeConnections.options.allStates') }];
       Array.from(states).sort().forEach(s => {
-        opts.push({ value: s, label: s || '无' });
+        opts.push({ value: s, label: s || t('activeConnections.options.none') });
       });
       return opts;
     });
@@ -111,6 +113,7 @@ export default defineComponent({
     onMounted(load);
 
     return {
+      t,
       loading,
       rows,
       filteredRows,
@@ -127,13 +130,13 @@ export default defineComponent({
     <div class="page-container">
       <div class="toolbar toolbar-compact">
         <div class="toolbar-left">
-          <select v-model="protocolFilter" title="协议过滤">
+          <select v-model="protocolFilter" :title="t('activeConnections.titles.protocolFilter')">
             <option v-for="opt in protocolOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
-          <select v-model="stateFilter" title="状态过滤">
+          <select v-model="stateFilter" :title="t('activeConnections.titles.stateFilter')">
             <option v-for="opt in stateOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
-          <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+          <ToolbarButton icon="refresh" @click="load">{{ t('activeConnections.buttons.refresh') }}</ToolbarButton>
           <HelpButton routePath="/monitor/network/active-connections" />
         </div>
       </div>

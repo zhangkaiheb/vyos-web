@@ -1,0 +1,520 @@
+{
+  "zh-CN": {
+    "vppIpfix": {
+      "columns": {
+        "address": "地址",
+        "port": "端口",
+        "pathMtu": "Path MTU",
+        "sourceAddress": "源地址",
+        "templateInterval": "模板间隔",
+        "udpChecksum": "UDP校验",
+        "actions": "操作",
+        "interface": "接口",
+        "direction": "方向",
+        "flowVariant": "流类型"
+      },
+      "labels": {
+        "activeTimeout": "活跃超时",
+        "inactiveTimeout": "非活跃超时",
+        "flowprobeRecord": "Flowprobe记录",
+        "collectors": "收集器",
+        "interfaces": "接口",
+        "address": "地址",
+        "port": "端口",
+        "pathMtu": "Path MTU",
+        "sourceAddress": "源地址",
+        "templateInterval": "模板间隔",
+        "udpChecksum": "UDP校验和",
+        "interface": "接口",
+        "direction": "方向",
+        "flowVariant": "流类型"
+      },
+      "tooltips": {
+        "activeTimeout": "活跃流超时时间（秒），默认15",
+        "inactiveTimeout": "非活跃流超时时间（秒），默认120",
+        "collectorAddress": "收集器IP地址",
+        "collectorPort": "收集器端口，默认4739",
+        "pathMtu": "路径MTU，默认512",
+        "sourceAddress": "源IP地址",
+        "templateInterval": "模板发送间隔（秒），默认20",
+        "udpChecksum": "启用UDP校验和",
+        "interfaceName": "接口名称",
+        "trafficDirection": "流量方向",
+        "flowVariant": "流变体"
+      },
+      "buttons": {
+        "add": "添加",
+        "edit": "编辑",
+        "delete": "删除",
+        "confirm": "确定",
+        "saving": "保存中..."
+      },
+      "modals": {
+        "editCollector": "编辑收集器",
+        "addCollector": "添加收集器",
+        "editInterface": "编辑接口",
+        "addInterface": "添加接口"
+      },
+      "messages": {
+        "loadFailed": "加载失败",
+        "saveFailed": "保存失败",
+        "selectCollectorToEdit": "请选择要编辑的收集器",
+        "collectorNotFound": "未找到选中的收集器",
+        "selectCollectorToDelete": "请选择要删除的收集器",
+        "enterCollectorAddress": "请输入收集器地址",
+        "selectInterfaceToEdit": "请选择要编辑的接口",
+        "interfaceNotFound": "未找到选中的接口",
+        "selectInterfaceToDelete": "请选择要删除的接口",
+        "enterInterfaceName": "请输入接口名称"
+      },
+      "options": {
+        "bothDefault": "Both (默认)",
+        "ipv4Default": "IPv4 (默认)"
+      }
+    }
+  },
+  "en": {
+    "vppIpfix": {
+      "columns": {
+        "address": "Address",
+        "port": "Port",
+        "pathMtu": "Path MTU",
+        "sourceAddress": "Source Address",
+        "templateInterval": "Template Interval",
+        "udpChecksum": "UDP Checksum",
+        "actions": "Actions",
+        "interface": "Interface",
+        "direction": "Direction",
+        "flowVariant": "Flow Variant"
+      },
+      "labels": {
+        "activeTimeout": "Active Timeout",
+        "inactiveTimeout": "Inactive Timeout",
+        "flowprobeRecord": "Flowprobe Record",
+        "collectors": "Collectors",
+        "interfaces": "Interfaces",
+        "address": "Address",
+        "port": "Port",
+        "pathMtu": "Path MTU",
+        "sourceAddress": "Source Address",
+        "templateInterval": "Template Interval",
+        "udpChecksum": "UDP Checksum",
+        "interface": "Interface",
+        "direction": "Direction",
+        "flowVariant": "Flow Variant"
+      },
+      "tooltips": {
+        "activeTimeout": "Active flow timeout (seconds), default 15",
+        "inactiveTimeout": "Inactive flow timeout (seconds), default 120",
+        "collectorAddress": "Collector IP address",
+        "collectorPort": "Collector port, default 4739",
+        "pathMtu": "Path MTU, default 512",
+        "sourceAddress": "Source IP address",
+        "templateInterval": "Template send interval (seconds), default 20",
+        "udpChecksum": "Enable UDP checksum",
+        "interfaceName": "Interface name",
+        "trafficDirection": "Traffic direction",
+        "flowVariant": "Flow variant"
+      },
+      "buttons": {
+        "add": "Add",
+        "edit": "Edit",
+        "delete": "Delete",
+        "confirm": "Confirm",
+        "saving": "Saving..."
+      },
+      "modals": {
+        "editCollector": "Edit Collector",
+        "addCollector": "Add Collector",
+        "editInterface": "Edit Interface",
+        "addInterface": "Add Interface"
+      },
+      "messages": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "selectCollectorToEdit": "Please select a collector to edit",
+        "collectorNotFound": "Selected collector not found",
+        "selectCollectorToDelete": "Please select a collector to delete",
+        "enterCollectorAddress": "Please enter collector address",
+        "selectInterfaceToEdit": "Please select an interface to edit",
+        "interfaceNotFound": "Selected interface not found",
+        "selectInterfaceToDelete": "Please select an interface to delete",
+        "enterInterfaceName": "Please enter interface name"
+      },
+      "options": {
+        "bothDefault": "Both (default)",
+        "ipv4Default": "IPv4 (default)"
+      }
+    }
+  },
+  "zh-TW": {
+    "vppIpfix": {
+      "columns": {
+        "address": "Address",
+        "port": "Port",
+        "pathMtu": "Path MTU",
+        "sourceAddress": "Source Address",
+        "templateInterval": "Template Interval",
+        "udpChecksum": "UDP Checksum",
+        "actions": "Actions",
+        "interface": "Interface",
+        "direction": "Direction",
+        "flowVariant": "Flow Variant"
+      },
+      "labels": {
+        "activeTimeout": "Active Timeout",
+        "inactiveTimeout": "Inactive Timeout",
+        "flowprobeRecord": "Flowprobe Record",
+        "collectors": "Collectors",
+        "interfaces": "Interfaces",
+        "address": "Address",
+        "port": "Port",
+        "pathMtu": "Path MTU",
+        "sourceAddress": "Source Address",
+        "templateInterval": "Template Interval",
+        "udpChecksum": "UDP Checksum",
+        "interface": "Interface",
+        "direction": "Direction",
+        "flowVariant": "Flow Variant"
+      },
+      "tooltips": {
+        "activeTimeout": "Active flow timeout (seconds), default 15",
+        "inactiveTimeout": "Inactive flow timeout (seconds), default 120",
+        "collectorAddress": "Collector IP address",
+        "collectorPort": "Collector port, default 4739",
+        "pathMtu": "Path MTU, default 512",
+        "sourceAddress": "Source IP address",
+        "templateInterval": "Template send interval (seconds), default 20",
+        "udpChecksum": "Enable UDP checksum",
+        "interfaceName": "Interface name",
+        "trafficDirection": "Traffic direction",
+        "flowVariant": "Flow variant"
+      },
+      "buttons": {
+        "add": "Add",
+        "edit": "Edit",
+        "delete": "Delete",
+        "confirm": "Confirm",
+        "saving": "Saving..."
+      },
+      "modals": {
+        "editCollector": "Edit Collector",
+        "addCollector": "Add Collector",
+        "editInterface": "Edit Interface",
+        "addInterface": "Add Interface"
+      },
+      "messages": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "selectCollectorToEdit": "Please select a collector to edit",
+        "collectorNotFound": "Selected collector not found",
+        "selectCollectorToDelete": "Please select a collector to delete",
+        "enterCollectorAddress": "Please enter collector address",
+        "selectInterfaceToEdit": "Please select an interface to edit",
+        "interfaceNotFound": "Selected interface not found",
+        "selectInterfaceToDelete": "Please select an interface to delete",
+        "enterInterfaceName": "Please enter interface name"
+      },
+      "options": {
+        "bothDefault": "Both (default)",
+        "ipv4Default": "IPv4 (default)"
+      }
+    }
+  },
+  "ru": {
+    "vppIpfix": {
+      "columns": {
+        "address": "Address",
+        "port": "Port",
+        "pathMtu": "Path MTU",
+        "sourceAddress": "Source Address",
+        "templateInterval": "Template Interval",
+        "udpChecksum": "UDP Checksum",
+        "actions": "Actions",
+        "interface": "Interface",
+        "direction": "Direction",
+        "flowVariant": "Flow Variant"
+      },
+      "labels": {
+        "activeTimeout": "Active Timeout",
+        "inactiveTimeout": "Inactive Timeout",
+        "flowprobeRecord": "Flowprobe Record",
+        "collectors": "Collectors",
+        "interfaces": "Interfaces",
+        "address": "Address",
+        "port": "Port",
+        "pathMtu": "Path MTU",
+        "sourceAddress": "Source Address",
+        "templateInterval": "Template Interval",
+        "udpChecksum": "UDP Checksum",
+        "interface": "Interface",
+        "direction": "Direction",
+        "flowVariant": "Flow Variant"
+      },
+      "tooltips": {
+        "activeTimeout": "Active flow timeout (seconds), default 15",
+        "inactiveTimeout": "Inactive flow timeout (seconds), default 120",
+        "collectorAddress": "Collector IP address",
+        "collectorPort": "Collector port, default 4739",
+        "pathMtu": "Path MTU, default 512",
+        "sourceAddress": "Source IP address",
+        "templateInterval": "Template send interval (seconds), default 20",
+        "udpChecksum": "Enable UDP checksum",
+        "interfaceName": "Interface name",
+        "trafficDirection": "Traffic direction",
+        "flowVariant": "Flow variant"
+      },
+      "buttons": {
+        "add": "Add",
+        "edit": "Edit",
+        "delete": "Delete",
+        "confirm": "Confirm",
+        "saving": "Saving..."
+      },
+      "modals": {
+        "editCollector": "Edit Collector",
+        "addCollector": "Add Collector",
+        "editInterface": "Edit Interface",
+        "addInterface": "Add Interface"
+      },
+      "messages": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "selectCollectorToEdit": "Please select a collector to edit",
+        "collectorNotFound": "Selected collector not found",
+        "selectCollectorToDelete": "Please select a collector to delete",
+        "enterCollectorAddress": "Please enter collector address",
+        "selectInterfaceToEdit": "Please select an interface to edit",
+        "interfaceNotFound": "Selected interface not found",
+        "selectInterfaceToDelete": "Please select an interface to delete",
+        "enterInterfaceName": "Please enter interface name"
+      },
+      "options": {
+        "bothDefault": "Both (default)",
+        "ipv4Default": "IPv4 (default)"
+      }
+    }
+  },
+  "de": {
+    "vppIpfix": {
+      "columns": {
+        "address": "Address",
+        "port": "Port",
+        "pathMtu": "Path MTU",
+        "sourceAddress": "Source Address",
+        "templateInterval": "Template Interval",
+        "udpChecksum": "UDP Checksum",
+        "actions": "Actions",
+        "interface": "Interface",
+        "direction": "Direction",
+        "flowVariant": "Flow Variant"
+      },
+      "labels": {
+        "activeTimeout": "Active Timeout",
+        "inactiveTimeout": "Inactive Timeout",
+        "flowprobeRecord": "Flowprobe Record",
+        "collectors": "Collectors",
+        "interfaces": "Interfaces",
+        "address": "Address",
+        "port": "Port",
+        "pathMtu": "Path MTU",
+        "sourceAddress": "Source Address",
+        "templateInterval": "Template Interval",
+        "udpChecksum": "UDP Checksum",
+        "interface": "Interface",
+        "direction": "Direction",
+        "flowVariant": "Flow Variant"
+      },
+      "tooltips": {
+        "activeTimeout": "Active flow timeout (seconds), default 15",
+        "inactiveTimeout": "Inactive flow timeout (seconds), default 120",
+        "collectorAddress": "Collector IP address",
+        "collectorPort": "Collector port, default 4739",
+        "pathMtu": "Path MTU, default 512",
+        "sourceAddress": "Source IP address",
+        "templateInterval": "Template send interval (seconds), default 20",
+        "udpChecksum": "Enable UDP checksum",
+        "interfaceName": "Interface name",
+        "trafficDirection": "Traffic direction",
+        "flowVariant": "Flow variant"
+      },
+      "buttons": {
+        "add": "Add",
+        "edit": "Edit",
+        "delete": "Delete",
+        "confirm": "Confirm",
+        "saving": "Saving..."
+      },
+      "modals": {
+        "editCollector": "Edit Collector",
+        "addCollector": "Add Collector",
+        "editInterface": "Edit Interface",
+        "addInterface": "Add Interface"
+      },
+      "messages": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "selectCollectorToEdit": "Please select a collector to edit",
+        "collectorNotFound": "Selected collector not found",
+        "selectCollectorToDelete": "Please select a collector to delete",
+        "enterCollectorAddress": "Please enter collector address",
+        "selectInterfaceToEdit": "Please select an interface to edit",
+        "interfaceNotFound": "Selected interface not found",
+        "selectInterfaceToDelete": "Please select an interface to delete",
+        "enterInterfaceName": "Please enter interface name"
+      },
+      "options": {
+        "bothDefault": "Both (default)",
+        "ipv4Default": "IPv4 (default)"
+      }
+    }
+  },
+  "fr": {
+    "vppIpfix": {
+      "columns": {
+        "address": "Address",
+        "port": "Port",
+        "pathMtu": "Path MTU",
+        "sourceAddress": "Source Address",
+        "templateInterval": "Template Interval",
+        "udpChecksum": "UDP Checksum",
+        "actions": "Actions",
+        "interface": "Interface",
+        "direction": "Direction",
+        "flowVariant": "Flow Variant"
+      },
+      "labels": {
+        "activeTimeout": "Active Timeout",
+        "inactiveTimeout": "Inactive Timeout",
+        "flowprobeRecord": "Flowprobe Record",
+        "collectors": "Collectors",
+        "interfaces": "Interfaces",
+        "address": "Address",
+        "port": "Port",
+        "pathMtu": "Path MTU",
+        "sourceAddress": "Source Address",
+        "templateInterval": "Template Interval",
+        "udpChecksum": "UDP Checksum",
+        "interface": "Interface",
+        "direction": "Direction",
+        "flowVariant": "Flow Variant"
+      },
+      "tooltips": {
+        "activeTimeout": "Active flow timeout (seconds), default 15",
+        "inactiveTimeout": "Inactive flow timeout (seconds), default 120",
+        "collectorAddress": "Collector IP address",
+        "collectorPort": "Collector port, default 4739",
+        "pathMtu": "Path MTU, default 512",
+        "sourceAddress": "Source IP address",
+        "templateInterval": "Template send interval (seconds), default 20",
+        "udpChecksum": "Enable UDP checksum",
+        "interfaceName": "Interface name",
+        "trafficDirection": "Traffic direction",
+        "flowVariant": "Flow variant"
+      },
+      "buttons": {
+        "add": "Add",
+        "edit": "Edit",
+        "delete": "Delete",
+        "confirm": "Confirm",
+        "saving": "Saving..."
+      },
+      "modals": {
+        "editCollector": "Edit Collector",
+        "addCollector": "Add Collector",
+        "editInterface": "Edit Interface",
+        "addInterface": "Add Interface"
+      },
+      "messages": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "selectCollectorToEdit": "Please select a collector to edit",
+        "collectorNotFound": "Selected collector not found",
+        "selectCollectorToDelete": "Please select a collector to delete",
+        "enterCollectorAddress": "Please enter collector address",
+        "selectInterfaceToEdit": "Please select an interface to edit",
+        "interfaceNotFound": "Selected interface not found",
+        "selectInterfaceToDelete": "Please select an interface to delete",
+        "enterInterfaceName": "Please enter interface name"
+      },
+      "options": {
+        "bothDefault": "Both (default)",
+        "ipv4Default": "IPv4 (default)"
+      }
+    }
+  },
+  "ko": {
+    "vppIpfix": {
+      "columns": {
+        "address": "Address",
+        "port": "Port",
+        "pathMtu": "Path MTU",
+        "sourceAddress": "Source Address",
+        "templateInterval": "Template Interval",
+        "udpChecksum": "UDP Checksum",
+        "actions": "Actions",
+        "interface": "Interface",
+        "direction": "Direction",
+        "flowVariant": "Flow Variant"
+      },
+      "labels": {
+        "activeTimeout": "Active Timeout",
+        "inactiveTimeout": "Inactive Timeout",
+        "flowprobeRecord": "Flowprobe Record",
+        "collectors": "Collectors",
+        "interfaces": "Interfaces",
+        "address": "Address",
+        "port": "Port",
+        "pathMtu": "Path MTU",
+        "sourceAddress": "Source Address",
+        "templateInterval": "Template Interval",
+        "udpChecksum": "UDP Checksum",
+        "interface": "Interface",
+        "direction": "Direction",
+        "flowVariant": "Flow Variant"
+      },
+      "tooltips": {
+        "activeTimeout": "Active flow timeout (seconds), default 15",
+        "inactiveTimeout": "Inactive flow timeout (seconds), default 120",
+        "collectorAddress": "Collector IP address",
+        "collectorPort": "Collector port, default 4739",
+        "pathMtu": "Path MTU, default 512",
+        "sourceAddress": "Source IP address",
+        "templateInterval": "Template send interval (seconds), default 20",
+        "udpChecksum": "Enable UDP checksum",
+        "interfaceName": "Interface name",
+        "trafficDirection": "Traffic direction",
+        "flowVariant": "Flow variant"
+      },
+      "buttons": {
+        "add": "Add",
+        "edit": "Edit",
+        "delete": "Delete",
+        "confirm": "Confirm",
+        "saving": "Saving..."
+      },
+      "modals": {
+        "editCollector": "Edit Collector",
+        "addCollector": "Add Collector",
+        "editInterface": "Edit Interface",
+        "addInterface": "Add Interface"
+      },
+      "messages": {
+        "loadFailed": "Load failed",
+        "saveFailed": "Save failed",
+        "selectCollectorToEdit": "Please select a collector to edit",
+        "collectorNotFound": "Selected collector not found",
+        "selectCollectorToDelete": "Please select a collector to delete",
+        "enterCollectorAddress": "Please enter collector address",
+        "selectInterfaceToEdit": "Please select an interface to edit",
+        "interfaceNotFound": "Selected interface not found",
+        "selectInterfaceToDelete": "Please select an interface to delete",
+        "enterInterfaceName": "Please enter interface name"
+      },
+      "options": {
+        "bothDefault": "Both (default)",
+        "ipv4Default": "IPv4 (default)"
+      }
+    }
+  }
+}

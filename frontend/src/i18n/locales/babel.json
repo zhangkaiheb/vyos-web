@@ -1,0 +1,443 @@
+{
+  "zh-CN": {
+    "babel": {
+      "tabs": {
+        "basic": "基本设置",
+        "interfaces": "接口",
+        "redistribute": "重分发",
+        "parameters": "参数"
+      },
+      "columns": {
+        "interfaceName": "接口名称",
+        "cost": "成本",
+        "helloInterval": "Hello 间隔",
+        "type": "类型",
+        "protocol": "协议",
+        "metric": "度量值",
+        "routeMap": "路由映射"
+      },
+      "labels": {
+        "distributeList": "分发列表",
+        "ipv4AccessList": "IPv4 访问列表",
+        "ipv4PrefixList": "IPv4 前缀列表",
+        "ipv6AccessList": "IPv6 访问列表",
+        "ipv6PrefixList": "IPv6 前缀列表",
+        "updateInterval": "更新间隔",
+        "interfaceNameRequired": "接口名称 *",
+        "cost": "成本",
+        "helloInterval": "Hello 间隔",
+        "interfaceType": "接口类型",
+        "protocolRequired": "协议 *",
+        "metric": "度量值",
+        "routeMap": "路由映射"
+      },
+      "placeholders": {
+        "accessListName": "访问列表名称",
+        "prefixListName": "前缀列表名称",
+        "updateInterval": "默认: 120 秒",
+        "helloInterval": "默认: 4 秒",
+        "routeMapName": "路由映射名称"
+      },
+      "options": {
+        "default": "默认",
+        "wired": "有线",
+        "wireless": "无线"
+      },
+      "modals": {
+        "editBabelInterface": "编辑 Babel 接口",
+        "addBabelInterface": "添加 Babel 接口",
+        "editRedistribute": "编辑重分发",
+        "addRedistribute": "添加重分发",
+        "confirmDelete": "确认删除"
+      },
+      "messages": {
+        "saved": "已保存",
+        "selectInterface": "请选择接口",
+        "selectProtocol": "请选择协议",
+        "confirmDeleteInterface": "确认删除以下接口？",
+        "confirmDeleteRedistribute": "确认删除以下重分发配置？"
+      },
+      "errors": {
+        "ipv4Format": "IPv4 地址格式错误"
+      }
+    }
+  },
+  "en": {
+    "babel": {
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "redistribute": "Redistribute",
+        "parameters": "Parameters"
+      },
+      "columns": {
+        "interfaceName": "Interface Name",
+        "cost": "Cost",
+        "helloInterval": "Hello Interval",
+        "type": "Type",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "labels": {
+        "distributeList": "Distribute List",
+        "ipv4AccessList": "IPv4 Access List",
+        "ipv4PrefixList": "IPv4 Prefix List",
+        "ipv6AccessList": "IPv6 Access List",
+        "ipv6PrefixList": "IPv6 Prefix List",
+        "updateInterval": "Update Interval",
+        "interfaceNameRequired": "Interface Name *",
+        "cost": "Cost",
+        "helloInterval": "Hello Interval",
+        "interfaceType": "Interface Type",
+        "protocolRequired": "Protocol *",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "placeholders": {
+        "accessListName": "Access list name",
+        "prefixListName": "Prefix list name",
+        "updateInterval": "Default: 120 seconds",
+        "helloInterval": "Default: 4 seconds",
+        "routeMapName": "Route map name"
+      },
+      "options": {
+        "default": "Default",
+        "wired": "Wired",
+        "wireless": "Wireless"
+      },
+      "modals": {
+        "editBabelInterface": "Edit Babel Interface",
+        "addBabelInterface": "Add Babel Interface",
+        "editRedistribute": "Edit Redistribute",
+        "addRedistribute": "Add Redistribute",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "saved": "Saved",
+        "selectInterface": "Please select an interface",
+        "selectProtocol": "Please select a protocol",
+        "confirmDeleteInterface": "Confirm delete the following interface?",
+        "confirmDeleteRedistribute": "Confirm delete the following redistribute configuration?"
+      },
+      "errors": {
+        "ipv4Format": "Invalid IPv4 address format"
+      }
+    }
+  },
+  "zh-TW": {
+    "babel": {
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "redistribute": "Redistribute",
+        "parameters": "Parameters"
+      },
+      "columns": {
+        "interfaceName": "Interface Name",
+        "cost": "Cost",
+        "helloInterval": "Hello Interval",
+        "type": "Type",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "labels": {
+        "distributeList": "Distribute List",
+        "ipv4AccessList": "IPv4 Access List",
+        "ipv4PrefixList": "IPv4 Prefix List",
+        "ipv6AccessList": "IPv6 Access List",
+        "ipv6PrefixList": "IPv6 Prefix List",
+        "updateInterval": "Update Interval",
+        "interfaceNameRequired": "Interface Name *",
+        "cost": "Cost",
+        "helloInterval": "Hello Interval",
+        "interfaceType": "Interface Type",
+        "protocolRequired": "Protocol *",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "placeholders": {
+        "accessListName": "Access list name",
+        "prefixListName": "Prefix list name",
+        "updateInterval": "Default: 120 seconds",
+        "helloInterval": "Default: 4 seconds",
+        "routeMapName": "Route map name"
+      },
+      "options": {
+        "default": "Default",
+        "wired": "Wired",
+        "wireless": "Wireless"
+      },
+      "modals": {
+        "editBabelInterface": "Edit Babel Interface",
+        "addBabelInterface": "Add Babel Interface",
+        "editRedistribute": "Edit Redistribute",
+        "addRedistribute": "Add Redistribute",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "saved": "Saved",
+        "selectInterface": "Please select an interface",
+        "selectProtocol": "Please select a protocol",
+        "confirmDeleteInterface": "Confirm delete the following interface?",
+        "confirmDeleteRedistribute": "Confirm delete the following redistribute configuration?"
+      },
+      "errors": {
+        "ipv4Format": "Invalid IPv4 address format"
+      }
+    }
+  },
+  "ru": {
+    "babel": {
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "redistribute": "Redistribute",
+        "parameters": "Parameters"
+      },
+      "columns": {
+        "interfaceName": "Interface Name",
+        "cost": "Cost",
+        "helloInterval": "Hello Interval",
+        "type": "Type",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "labels": {
+        "distributeList": "Distribute List",
+        "ipv4AccessList": "IPv4 Access List",
+        "ipv4PrefixList": "IPv4 Prefix List",
+        "ipv6AccessList": "IPv6 Access List",
+        "ipv6PrefixList": "IPv6 Prefix List",
+        "updateInterval": "Update Interval",
+        "interfaceNameRequired": "Interface Name *",
+        "cost": "Cost",
+        "helloInterval": "Hello Interval",
+        "interfaceType": "Interface Type",
+        "protocolRequired": "Protocol *",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "placeholders": {
+        "accessListName": "Access list name",
+        "prefixListName": "Prefix list name",
+        "updateInterval": "Default: 120 seconds",
+        "helloInterval": "Default: 4 seconds",
+        "routeMapName": "Route map name"
+      },
+      "options": {
+        "default": "Default",
+        "wired": "Wired",
+        "wireless": "Wireless"
+      },
+      "modals": {
+        "editBabelInterface": "Edit Babel Interface",
+        "addBabelInterface": "Add Babel Interface",
+        "editRedistribute": "Edit Redistribute",
+        "addRedistribute": "Add Redistribute",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "saved": "Saved",
+        "selectInterface": "Please select an interface",
+        "selectProtocol": "Please select a protocol",
+        "confirmDeleteInterface": "Confirm delete the following interface?",
+        "confirmDeleteRedistribute": "Confirm delete the following redistribute configuration?"
+      },
+      "errors": {
+        "ipv4Format": "Invalid IPv4 address format"
+      }
+    }
+  },
+  "de": {
+    "babel": {
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "redistribute": "Redistribute",
+        "parameters": "Parameters"
+      },
+      "columns": {
+        "interfaceName": "Interface Name",
+        "cost": "Cost",
+        "helloInterval": "Hello Interval",
+        "type": "Type",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "labels": {
+        "distributeList": "Distribute List",
+        "ipv4AccessList": "IPv4 Access List",
+        "ipv4PrefixList": "IPv4 Prefix List",
+        "ipv6AccessList": "IPv6 Access List",
+        "ipv6PrefixList": "IPv6 Prefix List",
+        "updateInterval": "Update Interval",
+        "interfaceNameRequired": "Interface Name *",
+        "cost": "Cost",
+        "helloInterval": "Hello Interval",
+        "interfaceType": "Interface Type",
+        "protocolRequired": "Protocol *",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "placeholders": {
+        "accessListName": "Access list name",
+        "prefixListName": "Prefix list name",
+        "updateInterval": "Default: 120 seconds",
+        "helloInterval": "Default: 4 seconds",
+        "routeMapName": "Route map name"
+      },
+      "options": {
+        "default": "Default",
+        "wired": "Wired",
+        "wireless": "Wireless"
+      },
+      "modals": {
+        "editBabelInterface": "Edit Babel Interface",
+        "addBabelInterface": "Add Babel Interface",
+        "editRedistribute": "Edit Redistribute",
+        "addRedistribute": "Add Redistribute",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "saved": "Saved",
+        "selectInterface": "Please select an interface",
+        "selectProtocol": "Please select a protocol",
+        "confirmDeleteInterface": "Confirm delete the following interface?",
+        "confirmDeleteRedistribute": "Confirm delete the following redistribute configuration?"
+      },
+      "errors": {
+        "ipv4Format": "Invalid IPv4 address format"
+      }
+    }
+  },
+  "fr": {
+    "babel": {
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "redistribute": "Redistribute",
+        "parameters": "Parameters"
+      },
+      "columns": {
+        "interfaceName": "Interface Name",
+        "cost": "Cost",
+        "helloInterval": "Hello Interval",
+        "type": "Type",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "labels": {
+        "distributeList": "Distribute List",
+        "ipv4AccessList": "IPv4 Access List",
+        "ipv4PrefixList": "IPv4 Prefix List",
+        "ipv6AccessList": "IPv6 Access List",
+        "ipv6PrefixList": "IPv6 Prefix List",
+        "updateInterval": "Update Interval",
+        "interfaceNameRequired": "Interface Name *",
+        "cost": "Cost",
+        "helloInterval": "Hello Interval",
+        "interfaceType": "Interface Type",
+        "protocolRequired": "Protocol *",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "placeholders": {
+        "accessListName": "Access list name",
+        "prefixListName": "Prefix list name",
+        "updateInterval": "Default: 120 seconds",
+        "helloInterval": "Default: 4 seconds",
+        "routeMapName": "Route map name"
+      },
+      "options": {
+        "default": "Default",
+        "wired": "Wired",
+        "wireless": "Wireless"
+      },
+      "modals": {
+        "editBabelInterface": "Edit Babel Interface",
+        "addBabelInterface": "Add Babel Interface",
+        "editRedistribute": "Edit Redistribute",
+        "addRedistribute": "Add Redistribute",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "saved": "Saved",
+        "selectInterface": "Please select an interface",
+        "selectProtocol": "Please select a protocol",
+        "confirmDeleteInterface": "Confirm delete the following interface?",
+        "confirmDeleteRedistribute": "Confirm delete the following redistribute configuration?"
+      },
+      "errors": {
+        "ipv4Format": "Invalid IPv4 address format"
+      }
+    }
+  },
+  "ko": {
+    "babel": {
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "redistribute": "Redistribute",
+        "parameters": "Parameters"
+      },
+      "columns": {
+        "interfaceName": "Interface Name",
+        "cost": "Cost",
+        "helloInterval": "Hello Interval",
+        "type": "Type",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "labels": {
+        "distributeList": "Distribute List",
+        "ipv4AccessList": "IPv4 Access List",
+        "ipv4PrefixList": "IPv4 Prefix List",
+        "ipv6AccessList": "IPv6 Access List",
+        "ipv6PrefixList": "IPv6 Prefix List",
+        "updateInterval": "Update Interval",
+        "interfaceNameRequired": "Interface Name *",
+        "cost": "Cost",
+        "helloInterval": "Hello Interval",
+        "interfaceType": "Interface Type",
+        "protocolRequired": "Protocol *",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "placeholders": {
+        "accessListName": "Access list name",
+        "prefixListName": "Prefix list name",
+        "updateInterval": "Default: 120 seconds",
+        "helloInterval": "Default: 4 seconds",
+        "routeMapName": "Route map name"
+      },
+      "options": {
+        "default": "Default",
+        "wired": "Wired",
+        "wireless": "Wireless"
+      },
+      "modals": {
+        "editBabelInterface": "Edit Babel Interface",
+        "addBabelInterface": "Add Babel Interface",
+        "editRedistribute": "Edit Redistribute",
+        "addRedistribute": "Add Redistribute",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "saved": "Saved",
+        "selectInterface": "Please select an interface",
+        "selectProtocol": "Please select a protocol",
+        "confirmDeleteInterface": "Confirm delete the following interface?",
+        "confirmDeleteRedistribute": "Confirm delete the following redistribute configuration?"
+      },
+      "errors": {
+        "ipv4Format": "Invalid IPv4 address format"
+      }
+    }
+  }
+}

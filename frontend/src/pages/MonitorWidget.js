@@ -1,9 +1,10 @@
-import { defineComponent, ref, onMounted, onUnmounted, watch, computed } from '/src/utils/vue-import.js';
+import { defineComponent, ref, onMounted, onUnmounted, watch, computed, inject } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { monitorApi, opModeApi } from '/src/api/index.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function drawLineChart(canvas, data, label, color = '#5B9BD5') {
   if (!canvas) return;
@@ -144,6 +145,7 @@ const CONNTRACK_COLUMNS = [
 export default defineComponent({
   name: 'MonitorWidget',
   setup() {
+    const { t } = useI18n();
     const route = useRoute();
     const type = computed(() => {
       const parts = route.path.split('/').filter(Boolean);
@@ -203,18 +205,18 @@ export default defineComponent({
         await loadConntrack();
         return;
       }
-      const t = type.value;
-      const metric = t === 'conntrack' ? 'count' : 'usage';
+      const currentType = type.value;
+      const metric = currentType === 'conntrack' ? 'count' : 'usage';
       const iface = isInterface.value ? selectedInterface.value : '';
       try {
-        const res = await monitorApi.get(t, iface, duration.value);
+        const res = await monitorApi.get(currentType, iface, duration.value);
         if (res.value !== undefined) value.value = res.value;
-        const hist = await monitorApi.history(t, metric, duration.value, iface || null);
+        const hist = await monitorApi.history(currentType, metric, duration.value, iface || null);
         data.value = hist.data || [];
       } catch (e) {
         data.value = [];
       }
-      const label = `${title.value}: ${value.value}${t === 'cpu' || t === 'memory' ? '%' : ''}`;
+      const label = `${title.value}: ${value.value}${currentType === 'cpu' || currentType === 'memory' ? '%' : ''}`;
       drawLineChart(canvas.value, data.value, label);
     }
 
@@ -246,6 +248,7 @@ export default defineComponent({
     watch([type, duration, selectedInterface], () => { load(); startStream(); });
 
     return {
+      t,
       title,
       type,
       duration,
@@ -300,7 +303,7 @@ export default defineComponent({
             >
               <template #toolbar-left-extra>
                 <span style="display:flex;align-items:center;gap:16px;margin-left:8px;">
-                  <span>总数：{{ ipv4Count }}</span>
+                  <span>{{ t('monitorWidget.total') }}: {{ ipv4Count }}</span>
                 </span>
               </template>
             </DataTable>
@@ -318,7 +321,7 @@ export default defineComponent({
             >
               <template #toolbar-left-extra>
                 <span style="display:flex;align-items:center;gap:16px;margin-left:8px;">
-                  <span>总数：{{ ipv6Count }}</span>
+                  <span>{{ t('monitorWidget.total') }}: {{ ipv6Count }}</span>
                 </span>
               </template>
             </DataTable>

@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="route-and-route6-policy">
+<h1>Политики маршрутизации и маршрутизации IPv6</h1>
+<p>Политики маршрутизации IPv4 и IPv6 определяются в этом разделе. Эти политики маршрутизации могут быть связаны с интерфейсами.</p>
+<section id="rule-sets">
+<h2>Наборы правил</h2>
+<p>Набор правил — это именованный набор правил, которые могут быть применены к интерфейсу. Каждое правило имеет номер, действие, которое применяется, если правило совпадает, и возможность указать критерии для совпадения. Пакеты проходят через правила от 1 до 999999, и при первом совпадении действие правила будет выполнено.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-description-text" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-description-text" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Укажите описание набора правил.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; default-log
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-default-log" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; default-log
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-default-log" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Опция для ведения журнала пакетов, попадающих под действие по умолчанию.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-interface-interface" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-interface-interface" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Применить политику маршрутизации к интерфейсу</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-description-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-description-text" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Укажите описание каждого правила.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; log &lt;enable|disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-log-enable-disable" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; log &lt;enable|disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-log-enable-disable" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Опция для включения или отключения журналирования совпадающего правила.</p>
+</div>
+</div>
+<section id="matching-criteria">
+<h3>Критерии совпадения</h3>
+<p>Доступно множество вариантов критериев совпадения как для <code class="docutils literal notranslate">policy route</code>, так и для <code class="docutils literal notranslate">policy route6</code>. Эти параметры перечислены в этом разделе.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; connection-mark &lt;1-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-connection-mark-1-2147483647" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; connection-mark &lt;1-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-connection-mark-1-2147483647" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите критерии совпадения на основе маркировки соединения.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; mark &lt;match_criteria&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-mark-match-criteria" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; mark &lt;match_criteria&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-mark-match-criteria" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Совпадение на основе маркировки огневой стены (fwmark), где &lt;match_criteria&gt; может быть:</p>
+<ul class="simple">
+<li><p>&lt;0-2147483647&gt; — отдельная маркировка fwmark</p></li>
+<li><p>!&lt;0-2147483647&gt; — все, кроме отдельной маркировки fwmark</p></li>
+<li><p>&lt;start-end&gt; — диапазон маркировок</p></li>
+<li><p>!&lt;start-end&gt; — все, кроме диапазона маркировок</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>При использовании команд <code class="docutils literal notranslate">set table</code> или <code class="docutils literal notranslate">set vrf</code> настройки маркировки игнорируются и заменяются маркировкой, специфичной для таблицы, которая устанавливается в 0x7FFFFFFF — идентификатор таблицы/VRF.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; source address &lt;match_criteria&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-source-address-match-criteria" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; destination address &lt;match_criteria&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-destination-address-match-criteria" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; source address &lt;match_criteria&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-source-address-match-criteria" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; destination address &lt;match_criteria&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-destination-address-match-criteria" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите критерии совпадения на основе исходного или целевого адреса IPv4/IPv6, где &lt;match_criteria&gt; может быть:</p>
+</div>
+</div>
+<dl class="simple myst">
+<dt>Для IPv4:</dt><dd><ul class="simple">
+<li><p>&lt;x.x.x.x&gt;: IP-адрес для совпадения.</p></li>
+<li><p>&lt;x.x.x.x/x&gt;: Подсеть для совпадения.</p></li>
+<li><p>&lt;x.x.x.x&gt;-&lt;x.x.x.x&gt;: Диапазон IP-адресов для совпадения.</p></li>
+<li><p>!&lt;x.x.x.x&gt;: Совпадение со всем, кроме указанного адреса.</p></li>
+<li><p>!&lt;x.x.x.x/x&gt;: Совпадение со всем, кроме указанной подсети.</p></li>
+<li><p>!&lt;x.x.x.x&gt;-&lt;x.x.x.x&gt;: Совпадение со всем, кроме указанного диапазона.</p></li>
+</ul>
+</dd>
+<dt>И для IPv6:</dt><dd><ul class="simple">
+<li><p>&lt;h:h:h:h:h:h:h:h&gt;: IPv6-адрес для совпадения.</p></li>
+<li><p>&lt;h:h:h:h:h:h:h:h/x&gt;: Префикс IPv6 для совпадения.</p></li>
+<li><p>&lt;h:h:h:h:h:h:h:h&gt;-&lt;h:h:h:h:h:h:h:h&gt;: Диапазон IPv6 для совпадения.</p></li>
+<li><p>!&lt;h:h:h:h:h:h:h:h&gt;: Совпадение со всем, кроме указанного адреса.</p></li>
+<li><p>!&lt;h:h:h:h:h:h:h:h/x&gt;: Совпадение со всем, кроме указанного префикса.</p></li>
+<li><p>!&lt;h:h:h:h:h:h:h:h&gt;-&lt;h:h:h:h:h:h:h:h&gt;: Совпадение со всем, кроме указанного диапазона.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; source group &lt;address-group|domain-group|mac-group|network-group|port-group&gt; &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-source-group-address-group-domain-group-mac-group-network-group-port-group-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; destination group &lt;address-group|domain-group|mac-group|network-group|port-group&gt; &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-destination-group-address-group-domain-group-mac-group-network-group-port-group-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; source group &lt;address-group|domain-group|mac-group|network-group|port-group&gt; &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-source-group-address-group-domain-group-mac-group-network-group-port-group-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; destination group &lt;address-group|domain-group|mac-group|network-group|port-group&gt; &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-destination-group-address-group-domain-group-mac-group-network-group-port-group-text" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите критерии совпадения на основе исходного или целевого групп, где &lt;text&gt; будет именем группы/идентификатором. Добавьте символ «!» перед критерием для инвертирования совпадения.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; destination port &lt;match_criteria&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-destination-port-match-criteria" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; destination port &lt;match_criteria&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-destination-port-match-criteria" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите критерии совпадения на основе порта назначения, где &lt;match_criteria&gt; может быть:</p>
+<ul class="simple">
+<li><p>&lt;имя порта&gt;: Именованный порт (любое имя в /etc/services, например, http).</p></li>
+<li><p>&lt;1-65535&gt;: Номер порта.</p></li>
+<li><p>&lt;start&gt;-&lt;end&gt;: Диапазон номеров портов (например, 1001-1005).</p></li>
+</ul>
+<p>Можно указать несколько портов назначения в виде списка, разделенного запятыми. Целый список также можно «инвертировать», используя «!». Например: «!22,telnet,http,123,1001-1005»</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-disable" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-disable" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Опция для отключения правила.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; dscp &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-dscp-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; dscp &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-dscp-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; dscp-exclude &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-dscp-exclude-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; dscp-exclude &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-dscp-exclude-text" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Совпадение на основе критериев значения DSCP. Поддерживаются несколько значений от 0 до 63 и диапазоны.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; fragment &lt;match-grag|match-non-frag&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-fragment-match-grag-match-non-frag" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; fragment &lt;match-grag|match-non-frag&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-fragment-match-grag-match-non-frag" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите совпадение фрагментов IP, где:</p>
+<ul class="simple">
+<li><p>match-frag: Вторые и последующие фрагменты фрагментированных пакетов.</p></li>
+<li><p>match-non-frag: Головные фрагменты или нефрагментированные пакеты.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; icmp &lt;code | type&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-icmp-code-type" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; icmpv6 &lt;code | type&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-icmpv6-code-type" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Совпадение на основе кода и типа ICMP/ICMPv6.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; icmp type-name &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-icmp-type-name-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; icmpv6 type-name &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-icmpv6-type-name-text" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Совпадение на основе критериев типа ICMP/ICMPv6. Используйте клавишу Tab для получения информации о том, какие критерии типа поддерживаются.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; ipsec &lt;match-ipsec|match-none&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-ipsec-match-ipsec-match-none" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; ipsec &lt;match-ipsec|match-none&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-ipsec-match-ipsec-match-none" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите критерии совпадения входящих IPSec-пакетов, где:</p>
+<ul class="simple">
+<li><p>match-ipsec: совпадение входящих IPSec-пакетов.</p></li>
+<li><p>match-none: совпадение входящих не-IPSec-пакетов.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; limit burst &lt;0-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-limit-burst-0-4294967295" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; limit burst &lt;0-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-limit-burst-0-4294967295" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите максимальное количество пакетов, разрешенных сверх скорости.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; limit rate &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-limit-rate-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; limit rate &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-limit-rate-text" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите максимальную среднюю скорость совпадения. Формат скорости: целое число/единица времени, где единица времени может быть любой из: секунда, минута, час или день. Например, 1/секунда означает, что правило должно совпадать в среднем один раз в секунду.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; protocol &lt;text | 0-255 | tcp_udp | all &gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-protocol-text-0-255-tcp-udp-all" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; protocol &lt;text | 0-255 | tcp_udp | all &gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-protocol-text-0-255-tcp-udp-all" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Совпадение по критериям протокола. Номер протокола или имя, определенное в: <code class="docutils literal notranslate">/etc/protocols</code>. Специальные имена: <code class="docutils literal notranslate">all</code> для всех протоколов и <code class="docutils literal notranslate">tcp_udp</code> для пакетов TCP и UDP. Символ <code class="docutils literal notranslate">!</code> инвертирует выбранный протокол.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; packet-length &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-packet-length-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; packet-length &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-packet-length-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; packet-length-exclude &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-packet-length-exclude-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; packet-length-exclude &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-packet-length-exclude-text" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Совпадение на основе критериев длины пакета. Поддерживаются несколько значений от 1 до 65535 и диапазоны.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; packet-type [broadcast | host | multicast | other]
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-packet-type-broadcast-host-multicast-other" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; packet-type [broadcast | host | multicast | other]
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-packet-type-broadcast-host-multicast-other" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Совпадение на основе критериев типа пакета.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; recent count &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-recent-count-1-255" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; recent count &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-recent-count-1-255" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; recent time &lt;1-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-recent-time-1-4294967295" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; recent time &lt;1-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-recent-time-1-4294967295" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите параметры для совпадения недавно обнаруженных источников. Это совпадение может быть использовано, установив счет (адрес источника, видимый более чем &lt;1-255&gt; раз) и/или время (адрес источника, видимый за последние &lt;0-4294967295&gt; секунд).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; state &lt;established | invalid | new | related&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-state-established-invalid-new-related" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; state &lt;established | invalid | new | related&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-state-established-invalid-new-related" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите критерии совпадения на основе состояния сессии.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; tcp flags &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-tcp-flags-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; tcp flags &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-tcp-flags-text" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите критерии совпадения на основе флагов TCP. Допустимые значения для флагов TCP: SYN ACK FIN RST URG PSH ALL. При указании более одного флага флаги должны быть разделены запятой. Например: значение 'SYN,!ACK,!FIN,!RST' будет совпадать только с пакетами, у которых установлен флаг SYN, а флаги ACK, FIN и RST не установлены.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; time monthdays &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-time-monthdays-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; time monthdays &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-time-monthdays-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; time startdate &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-time-startdate-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; time startdate &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-time-startdate-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; time starttime &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-time-starttime-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; time starttime &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-time-starttime-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; time stopdate &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-time-stopdate-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; time stopdate &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-time-stopdate-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; time stoptime &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-time-stoptime-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; time stoptime &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-time-stoptime-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; time weekdays &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-time-weekdays-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; time weekdays &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-time-weekdays-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; time utc
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-time-utc" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; time utc
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-time-utc" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Время для совпадения определенного правила.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; ttl &lt;eq | gt | lt&gt; &lt;0-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-ttl-eq-gt-lt-0-255" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Совпадение параметра времени жизни, где «eq» означает «равно»; «gt» означает «больше чем», а «lt» означает «меньше чем».</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; hop-limit &lt;eq | gt | lt&gt; &lt;0-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-hop-limit-eq-gt-lt-0-255" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Совпадение параметра ограничения количества хопов, где «eq» означает «равно»; «gt» означает «больше чем», а «lt» означает «меньше чем».</p>
+</div>
+</div>
+</section>
+<section id="actions">
+<h3>Действия</h3>
+<p>При совпадении всех шаблонов, определенных в правиле, можно выполнить различные действия. Это включает в себя отбрасывание пакета, модификацию определенных данных или установку другой таблицы маршрутизации.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; action drop
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-action-drop" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; action drop
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-action-drop" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите действие правила как «отбросить».</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; set connection-mark &lt;1-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-set-connection-mark-1-2147483647" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; set connection-mark &lt;1-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-set-connection-mark-1-2147483647" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите конкретную маркировку соединения.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; set dscp &lt;0-63&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-set-dscp-0-63" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; set dscp &lt;0-63&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-set-dscp-0-63" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите модификации пакета: Различимый сервисный кодпункт (DSCP)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; set mark &lt;1-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-set-mark-1-2147483647" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; set mark &lt;1-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-set-mark-1-2147483647" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите конкретную маркировку пакета.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; set table &lt;main | 1-200&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-set-table-main-1-200" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; set table &lt;main | 1-200&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-set-table-main-1-200" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите таблицу маршрутизации для передачи пакета.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>При использовании команд <code class="docutils literal notranslate">set table</code> или <code class="docutils literal notranslate">set vrf</code> совпадение по марке невозможно, потому что оно перезаписывается специфичной для таблицы маркой, равной 0x7FFFFFFF — идентификатору таблицы/VRF.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; set tcp-mss &lt;500-1460&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-set-tcp-mss-500-1460" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; set tcp-mss &lt;500-1460&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-set-tcp-mss-500-1460" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите модификации пакета: явно установите значение максимального размера сегмента TCP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route &lt;name&gt; rule &lt;n&gt; set vrf &lt;default | text &gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-name-rule-n-set-vrf-default-text" title="Ссылка на эту команду"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route6 &lt;name&gt; rule &lt;n&gt; set vrf &lt;default | text &gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route6-name-rule-n-set-vrf-default-text" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Установите VRF для передачи пакета.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>При использовании команд <code class="docutils literal notranslate">set table</code> или <code class="docutils literal notranslate">set vrf</code> совпадение по марке невозможно, потому что оно перезаписывается специфичной для таблицы маркой, равной 0x7FFFFFFF — идентификатору таблицы/VRF.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

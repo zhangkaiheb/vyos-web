@@ -1,0 +1,366 @@
+{
+  "zh-CN": {
+    "nhrp": {
+      "buttons": {
+        "addNbma": "添加 nbma"
+      },
+      "columns": {
+        "holdtime": "holdtime",
+        "nbmaAddress": "nbma 添加ress",
+        "nbmaCount": "nbmaCount",
+        "remoteIp": "remoteIp",
+        "tunnelName": "tunnel 名称"
+      },
+      "errors": {
+        "nbmaAddressRequired": "nbma 添加ress 为必填项",
+        "tunnelNameRequired": "tunnel 名称 为必填项"
+      },
+      "labels": {
+        "authenticationKey": "authentication 密钥",
+        "enableRedirect": "启用 redirect",
+        "holdtime": "holdtime",
+        "nbmaAddress": "nbma 添加ress",
+        "nbmaList": "nbmaList",
+        "register": "register",
+        "remoteIp": "remoteIp",
+        "shortCut": "shortCut",
+        "tunnelName": "tunnel 名称"
+      },
+      "messages": {
+        "confirmDeleteTunnel": "确定 删除 tunnel",
+        "saved": "保存d"
+      },
+      "modals": {
+        "addNbma": "添加 nbma",
+        "addTunnel": "添加 tunnel",
+        "confirmDelete": "确定 删除",
+        "editNbma": "编辑 nbma",
+        "editTunnel": "编辑 tunnel"
+      },
+      "placeholders": {
+        "authenticationKey": "authentication 密钥",
+        "holdtime": "holdtime",
+        "ipv4Address": "ipv4 添加ress",
+        "tunnelName": "tunnel 名称"
+      },
+      "tabs": {
+        "tunnels": "tunnels"
+      },
+      "validation": {
+        "ipv4": "ipv4"
+      }
+    }
+  },
+  "en": {
+    "nhrp": {
+      "buttons": {
+        "addNbma": "Add Nbma"
+      },
+      "columns": {
+        "holdtime": "Holdtime",
+        "nbmaAddress": "Nbma Address",
+        "nbmaCount": "Nbma Count",
+        "remoteIp": "Remote Ip",
+        "tunnelName": "Tunnel Name"
+      },
+      "errors": {
+        "nbmaAddressRequired": "Nbma Address Required",
+        "tunnelNameRequired": "Tunnel Name Required"
+      },
+      "labels": {
+        "authenticationKey": "Authentication Key",
+        "enableRedirect": "Enable Redirect",
+        "holdtime": "Holdtime",
+        "nbmaAddress": "Nbma Address",
+        "nbmaList": "Nbma List",
+        "register": "Register",
+        "remoteIp": "Remote Ip",
+        "shortCut": "Short Cut",
+        "tunnelName": "Tunnel Name"
+      },
+      "messages": {
+        "confirmDeleteTunnel": "Confirm Delete Tunnel",
+        "saved": "Saved"
+      },
+      "modals": {
+        "addNbma": "Add Nbma",
+        "addTunnel": "Add Tunnel",
+        "confirmDelete": "Confirm Delete",
+        "editNbma": "Edit Nbma",
+        "editTunnel": "Edit Tunnel"
+      },
+      "placeholders": {
+        "authenticationKey": "Authentication Key",
+        "holdtime": "Holdtime",
+        "ipv4Address": "Ipv4 Address",
+        "tunnelName": "Tunnel Name"
+      },
+      "tabs": {
+        "tunnels": "Tunnels"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  },
+  "zh-TW": {
+    "nhrp": {
+      "buttons": {
+        "addNbma": "Add Nbma"
+      },
+      "columns": {
+        "holdtime": "Holdtime",
+        "nbmaAddress": "Nbma Address",
+        "nbmaCount": "Nbma Count",
+        "remoteIp": "Remote Ip",
+        "tunnelName": "Tunnel Name"
+      },
+      "errors": {
+        "nbmaAddressRequired": "Nbma Address Required",
+        "tunnelNameRequired": "Tunnel Name Required"
+      },
+      "labels": {
+        "authenticationKey": "Authentication Key",
+        "enableRedirect": "Enable Redirect",
+        "holdtime": "Holdtime",
+        "nbmaAddress": "Nbma Address",
+        "nbmaList": "Nbma List",
+        "register": "Register",
+        "remoteIp": "Remote Ip",
+        "shortCut": "Short Cut",
+        "tunnelName": "Tunnel Name"
+      },
+      "messages": {
+        "confirmDeleteTunnel": "Confirm Delete Tunnel",
+        "saved": "Saved"
+      },
+      "modals": {
+        "addNbma": "Add Nbma",
+        "addTunnel": "Add Tunnel",
+        "confirmDelete": "Confirm Delete",
+        "editNbma": "Edit Nbma",
+        "editTunnel": "Edit Tunnel"
+      },
+      "placeholders": {
+        "authenticationKey": "Authentication Key",
+        "holdtime": "Holdtime",
+        "ipv4Address": "Ipv4 Address",
+        "tunnelName": "Tunnel Name"
+      },
+      "tabs": {
+        "tunnels": "Tunnels"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  },
+  "ru": {
+    "nhrp": {
+      "buttons": {
+        "addNbma": "Add Nbma"
+      },
+      "columns": {
+        "holdtime": "Holdtime",
+        "nbmaAddress": "Nbma Address",
+        "nbmaCount": "Nbma Count",
+        "remoteIp": "Remote Ip",
+        "tunnelName": "Tunnel Name"
+      },
+      "errors": {
+        "nbmaAddressRequired": "Nbma Address Required",
+        "tunnelNameRequired": "Tunnel Name Required"
+      },
+      "labels": {
+        "authenticationKey": "Authentication Key",
+        "enableRedirect": "Enable Redirect",
+        "holdtime": "Holdtime",
+        "nbmaAddress": "Nbma Address",
+        "nbmaList": "Nbma List",
+        "register": "Register",
+        "remoteIp": "Remote Ip",
+        "shortCut": "Short Cut",
+        "tunnelName": "Tunnel Name"
+      },
+      "messages": {
+        "confirmDeleteTunnel": "Confirm Delete Tunnel",
+        "saved": "Saved"
+      },
+      "modals": {
+        "addNbma": "Add Nbma",
+        "addTunnel": "Add Tunnel",
+        "confirmDelete": "Confirm Delete",
+        "editNbma": "Edit Nbma",
+        "editTunnel": "Edit Tunnel"
+      },
+      "placeholders": {
+        "authenticationKey": "Authentication Key",
+        "holdtime": "Holdtime",
+        "ipv4Address": "Ipv4 Address",
+        "tunnelName": "Tunnel Name"
+      },
+      "tabs": {
+        "tunnels": "Tunnels"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  },
+  "de": {
+    "nhrp": {
+      "buttons": {
+        "addNbma": "Add Nbma"
+      },
+      "columns": {
+        "holdtime": "Holdtime",
+        "nbmaAddress": "Nbma Address",
+        "nbmaCount": "Nbma Count",
+        "remoteIp": "Remote Ip",
+        "tunnelName": "Tunnel Name"
+      },
+      "errors": {
+        "nbmaAddressRequired": "Nbma Address Required",
+        "tunnelNameRequired": "Tunnel Name Required"
+      },
+      "labels": {
+        "authenticationKey": "Authentication Key",
+        "enableRedirect": "Enable Redirect",
+        "holdtime": "Holdtime",
+        "nbmaAddress": "Nbma Address",
+        "nbmaList": "Nbma List",
+        "register": "Register",
+        "remoteIp": "Remote Ip",
+        "shortCut": "Short Cut",
+        "tunnelName": "Tunnel Name"
+      },
+      "messages": {
+        "confirmDeleteTunnel": "Confirm Delete Tunnel",
+        "saved": "Saved"
+      },
+      "modals": {
+        "addNbma": "Add Nbma",
+        "addTunnel": "Add Tunnel",
+        "confirmDelete": "Confirm Delete",
+        "editNbma": "Edit Nbma",
+        "editTunnel": "Edit Tunnel"
+      },
+      "placeholders": {
+        "authenticationKey": "Authentication Key",
+        "holdtime": "Holdtime",
+        "ipv4Address": "Ipv4 Address",
+        "tunnelName": "Tunnel Name"
+      },
+      "tabs": {
+        "tunnels": "Tunnels"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  },
+  "fr": {
+    "nhrp": {
+      "buttons": {
+        "addNbma": "Add Nbma"
+      },
+      "columns": {
+        "holdtime": "Holdtime",
+        "nbmaAddress": "Nbma Address",
+        "nbmaCount": "Nbma Count",
+        "remoteIp": "Remote Ip",
+        "tunnelName": "Tunnel Name"
+      },
+      "errors": {
+        "nbmaAddressRequired": "Nbma Address Required",
+        "tunnelNameRequired": "Tunnel Name Required"
+      },
+      "labels": {
+        "authenticationKey": "Authentication Key",
+        "enableRedirect": "Enable Redirect",
+        "holdtime": "Holdtime",
+        "nbmaAddress": "Nbma Address",
+        "nbmaList": "Nbma List",
+        "register": "Register",
+        "remoteIp": "Remote Ip",
+        "shortCut": "Short Cut",
+        "tunnelName": "Tunnel Name"
+      },
+      "messages": {
+        "confirmDeleteTunnel": "Confirm Delete Tunnel",
+        "saved": "Saved"
+      },
+      "modals": {
+        "addNbma": "Add Nbma",
+        "addTunnel": "Add Tunnel",
+        "confirmDelete": "Confirm Delete",
+        "editNbma": "Edit Nbma",
+        "editTunnel": "Edit Tunnel"
+      },
+      "placeholders": {
+        "authenticationKey": "Authentication Key",
+        "holdtime": "Holdtime",
+        "ipv4Address": "Ipv4 Address",
+        "tunnelName": "Tunnel Name"
+      },
+      "tabs": {
+        "tunnels": "Tunnels"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  },
+  "ko": {
+    "nhrp": {
+      "buttons": {
+        "addNbma": "Add Nbma"
+      },
+      "columns": {
+        "holdtime": "Holdtime",
+        "nbmaAddress": "Nbma Address",
+        "nbmaCount": "Nbma Count",
+        "remoteIp": "Remote Ip",
+        "tunnelName": "Tunnel Name"
+      },
+      "errors": {
+        "nbmaAddressRequired": "Nbma Address Required",
+        "tunnelNameRequired": "Tunnel Name Required"
+      },
+      "labels": {
+        "authenticationKey": "Authentication Key",
+        "enableRedirect": "Enable Redirect",
+        "holdtime": "Holdtime",
+        "nbmaAddress": "Nbma Address",
+        "nbmaList": "Nbma List",
+        "register": "Register",
+        "remoteIp": "Remote Ip",
+        "shortCut": "Short Cut",
+        "tunnelName": "Tunnel Name"
+      },
+      "messages": {
+        "confirmDeleteTunnel": "Confirm Delete Tunnel",
+        "saved": "Saved"
+      },
+      "modals": {
+        "addNbma": "Add Nbma",
+        "addTunnel": "Add Tunnel",
+        "confirmDelete": "Confirm Delete",
+        "editNbma": "Edit Nbma",
+        "editTunnel": "Edit Tunnel"
+      },
+      "placeholders": {
+        "authenticationKey": "Authentication Key",
+        "holdtime": "Holdtime",
+        "ipv4Address": "Ipv4 Address",
+        "tunnelName": "Tunnel Name"
+      },
+      "tabs": {
+        "tunnels": "Tunnels"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  }
+}

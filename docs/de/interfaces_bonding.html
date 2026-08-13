@@ -1,0 +1,2438 @@
+<!-- Translated to Deutsch -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="bond-link-aggregation">
+<h1>Bond / link aggregation</h1>
+<p>A <strong>bonding interface</strong> aggregates multiple network interfaces into a single
+logical interface (referred to as a bond, <abbr title="Link Aggregation Group">LAG</abbr>,
+EtherChannel, or port-channel).</p>
+<p>The behavior of a bonding interface depends on the selected mode. Modes provide
+either fault tolerance or a combination of load balancing and fault tolerance.
+Additionally, the bonding interface can be configured for link integrity
+monitoring.</p>
+<section id="configuration">
+<h2>Configuration</h2>
+<section id="common-interface-configuration">
+<h3>Common interface configuration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; address &lt;address | dhcp |  dhcpv6&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-address-address-dhcp-dhcpv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interface with one or more IP addresses.</strong></p>
+<p>The following options are available:</p>
+<ul class="simple">
+<li><p><strong>address:</strong> Assign one or more IPv4 or IPv6 addresses to the interface.
+For example, use 192.0.2.1/24 for IPv4 or 2001:db8::1/64 for IPv6.</p></li>
+<li><p><strong>dhcp:</strong> The interface obtains an IPv4 address from a DHCP server on the
+same network segment.</p></li>
+<li><p><strong>dhcpv6:</strong> The interface obtains an IPv6 address from a DHCPv6 server on
+the same network segment.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the interface obtains an IPv4 address via DHCP, and specific
+adjustments are needed before/after the IP address is obtained, use the
+provided hook scripts:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/pre-hooks.d/</code></p></li>
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/post-hooks.d/</code></p></li>
+</ul>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 address 192.0.2.1/24
+set interfaces bonding bond0 address 2001:db8::1/64
+set interfaces bonding bond0 address dhcp
+set interfaces bonding bond0 address dhcpv6
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a clear, descriptive alias for the interface.</strong></p>
+<p>This alias appears in the <code class="docutils literal notranslate">show interfaces</code> command and SNMP-based
+monitoring tools.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable the interface.</strong></p>
+<p>The interface will be set to the administratively down
+(<code class="docutils literal notranslate">A/D</code>) state.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt;  disable-flow-control
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-disable-flow-control" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable Ethernet flow control (IEEE 802.3x pause frames) on the interface.</strong></p>
+<blockquote>
+<div><p>Ethernet flow control, defined by the IEEE 802.3x standard, temporarily stops
+data transmission to prevent packet loss during network congestion. For
+example, when a sender transmits data faster than the receiver can process it.</p>
+<p>Disabling Ethernet flow control means the interface will not signal the
+connected device to pause transmission and will drop packets if overwhelmed.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 disable-flow-control
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; disable-link-detect
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-disable-link-detect" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable physical link-state change detection on the interface, such as
+when a cable is unplugged.</strong></p>
+<p>By default, the interface detects physical link-state changes.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 disable-link-detect
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; mac &lt;xx:xx:xx:xx:xx:xx&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-mac-xx-xx-xx-xx-xx-xx" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a custom MAC address on the interface.</strong></p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 mac &#39;00:53:01:02:03:04&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the MTU on the interface.</strong></p>
+<p>This value defines the largest packet size, in bytes, that the interface
+transmits without fragmentation.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>advertised in outgoing
+TCP SYN packets on the specified interface.</strong></p>
+<p>By clamping the MSS value in TCP SYN packets, you explicitly inform the
+remote side not to send packets larger than that size. This prevents
+connection issues that occur when Path MTU Discovery (PMTUD) fails.</p>
+<p>The following options are available:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Sets the MSS to a specific value, in bytes. Use this option if
+you need to enforce a specific MSS, for example, to troubleshoot
+connectivity issues or accommodate specific network requirements.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> The router automatically calculates the MSS to be
+the interface’s MTU minus 40 bytes for IPv4 traffic (20 bytes for the IPv4
+header and 20 bytes for the TCP header). This option is recommended to
+automatically set the proper value.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-arp-cache-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure how long an ARP entry remains valid after learning an IP-to-MAC
+address mapping on this interface.</strong></p>
+<p>The default duration is 30 seconds.</p>
+<p>An ARP entry remains valid if it receives positive feedback from
+higher-level protocols.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-disable-arp-filter" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure ARP filtering on this interface.</strong></p>
+<p><strong>Default behavior:</strong> The kernel responds to ARP requests on this interface
+only if the traffic would be routed back to the ARP sender through that
+specific interface.</p>
+<p><strong>If configured:</strong> The kernel responds to ARP requests on this interface for any
+IP address configured on the local host, regardless of which specific interface
+that IP address is assigned to, and regardless of the routing table. This
+reflects the Linux concept that IP addresses belong to the host, not individual
+interfaces.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip disable-arp-filter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interface for host or router behavior.</strong></p>
+<p>If configured, the interface switches to host mode, and IPv4 forwarding is
+disabled on it.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure whether to forward IP-directed broadcast packets received on this
+interface.</strong></p>
+<p><strong>Default behavior:</strong> IP-directed broadcast packets are dropped.</p>
+<p><strong>If configured:</strong> IP-directed broadcast packets are forwarded to all hosts
+on the destination subnet, as defined in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> and <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-enable-arp-accept" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure how to process gratuitous ARPs on this interface.</strong></p>
+<p>If configured, an IP-to-MAC address mapping is added to the ARP table based
+on gratuitous ARP requests or replies.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the ARP table already contains the IP address from a gratuitous
+ARP, its entry is updated regardless of whether this setting is configured.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-enable-arp-announce" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the source IP selection for ARP requests on this interface.</strong></p>
+<p><strong>Default behavior:</strong> The kernel can use any IP address the host owns as
+the source IP address in ARP requests on this interface.</p>
+<p><strong>If configured:</strong> The kernel first attempts to select a source IP address
+configured on the interface that shares a common subnet with the target
+IP address. If there is no such subnet, the kernel selects the IP address
+it would normally use (based on the routing table to reach the target
+destination).</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-enable-arp-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure which ARP requests will be ignored on this interface.</strong></p>
+<p><strong>Default behavior:</strong> The kernel responds to ARP requests for any local
+IP addresses, regardless of which interface they are assigned to.</p>
+<p><strong>If configured:</strong> The kernel responds to ARP requests only if the target
+IP address is assigned to this specific interface.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-enable-proxy-arp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure proxy ARP on this interface.</strong></p>
+<p>If configured, the router (kernel) intercepts ARP requests for non-local IP
+addresses and replies with the <abbr title="Media Access Control">MAC</abbr> address
+of the interface that received the request. Subsequent packets destined
+to these IP addresses are forwarded to their actual destinations on remote
+subnets.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ip enable-proxy-arp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-proxy-arp-pvlan" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure local proxy ARP on the interface.</strong></p>
+<p>If configured, the router (kernel) responds to ARP requests on this VLAN
+interface even if the target IP address resides on the same subnet and
+interface.</p>
+<p>This is used to support network isolation requirements (RFC 3069) for private
+VLANs (PVLANs). In PVLAN configurations, hosts on isolated ports are NOT
+allowed to communicate directly with each other at Layer 2, but they can
+communicate with the upstream router.</p>
+<p>By replying to inter-host ARP requests with its own <abbr title="Media Access Control">MAC</abbr>
+address, the router (kernel) directs inter-host traffic through itself instead of
+directly between hosts.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command works independently and does not require enabling
+the standard proxy ARP on the interface.</p>
+</div>
+<p>Local proxy ARP is also known as:</p>
+<ul class="simple">
+<li><p>VLAN aggregation (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>Private VLAN  (Cisco, Allied Telesyn).</p></li>
+<li><p>Source-port filtering or port isolation (Hewlett-Packard).</p></li>
+<li><p>MAC-Forced Forwarding (Ericsson).</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure source IP address validation using</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>on this interface, as specified in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p>The following options are available:</p>
+<ul class="simple">
+<li><p><strong>strict:</strong> Each incoming packet’s source IP address is checked against the
+Forwarding Information Base (FIB). If the interface is not the best route
+back to that source, validation fails, and the packet is dropped.</p></li>
+<li><p><strong>loose:</strong> Each incoming packet’s source IP address is checked against the
+FIB. If the source IP address is unreachable through any interface, validation
+fails.</p></li>
+<li><p><strong>disable:</strong> No source IP address validation is performed. All incoming
+packets are accepted.</p></li>
+</ul>
+<p>RFC 3704 recommends enabling strict mode to prevent IP spoofing, such as
+DDoS attacks. For asymmetric or other complex routing scenarios, use loose
+mode.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interface to automatically obtain an IPv6 address using</strong>
+<abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>as specified in</strong>
+<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<p>IPv6 hosts can configure themselves automatically when connected to an
+IPv6 network using the Neighbor Discovery Protocol via ICMPv6 router
+discovery messages. When first connected to a network, a host sends a
+link-local router solicitation multicast request for its configuration
+parameters. The router responds with a router advertisement packet
+containing Internet Layer configuration parameters.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method automatically disables IPv6 traffic forwarding
+on the interface.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ipv6 address autoconf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ipv6-address-eui64-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interface to assign itself an IPv6 address using the</strong>
+<abbr title="64-Bit Extended Unique Identifier">EUI-64</abbr> <strong>method, as
+specified</strong> in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ipv6 address eui64 2001:db8:beef::/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ipv6 address no-default-link-local
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ipv6-address-no-default-link-local" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable the automatic assignment of a link-local IPv6 address to
+this interface.</strong></p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ipv6 address no-default-link-local
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ipv6-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interface for host or router behavior.</strong></p>
+<p>If configured, the interface switches to host mode, and IPv6 forwarding is
+disabled on it.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ipv6 disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ipv6 adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>advertised in outgoing
+TCP SYN packets on the specified interface.</strong></p>
+<p>By clamping the MSS value in TCP SYN packets, you explicitly inform
+the remote side not to send packets larger than that size. This prevents
+connection issues when Path MTU Discovery (PMTUD) fails.</p>
+<p>The following options are available:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Set the MSS to a specific value, in bytes. Use this option to
+enforce a specific MSS, for example, to troubleshoot connectivity issues
+or accommodate specific network requirements.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> The router calculates the MSS to be the interface’s
+MTU minus 60 bytes for IPv6 traffic (40 bytes for the IPv6 header and 20
+bytes for the TCP header). This option is recommended to automatically
+set the proper value.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ipv6 accept-dad &lt;0 | 1 | 2&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ipv6-accept-dad-0-1-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure IPv6</strong> <abbr title="Duplicate Address Detection">DAD</abbr> <strong>on the
+interface.</strong></p>
+<p>The following options are available:</p>
+<ul class="simple">
+<li><p><strong>0:</strong> Disables DAD. No duplicate address detection is performed.</p></li>
+<li><p><strong>1:</strong> Enables DAD (default). Duplicate addresses are detected. The
+interface’s IPv6 operation continues for valid IPv6 addresses.</p></li>
+<li><p><strong>2:</strong> Enables DAD and, if a MAC-based duplicate link-local address
+is found, disables IPv6 operation on this interface.</p></li>
+</ul>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ipv6 accept-dad 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; ipv6 dup-addr-detect-transmits &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-ipv6-dup-addr-detect-transmits-n" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the number of</strong> <abbr title="Duplicate Address Detection">DAD</abbr>
+<strong>messages that the router (kernel) sends during IPv6 address assignment
+on this interface.</strong></p>
+<p>The default value is 1.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 ipv6 dup-addr-detect-transmits 5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vrf &lt;vrf&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vrf-vrf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Assign the interface to a specific</strong> <abbr title="Virtual Routing and Forwarding">VRF</abbr> <strong>instance.</strong></p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>For information on configuring a VRF, refer to the <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>
+section.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vrf red
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>DHCP(v6)</strong></p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcp-options client-id &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcp-options-client-id-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a DHCP client identifier for the interface, as specified in</strong>
+<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2131.html"><strong>RFC 2131</strong></a>.</p>
+<p>The <code class="docutils literal notranslate">client-id</code> is an identifier that the DHCP client sends to the DHCP
+server to uniquely identify itself for IP address assignment. By default,
+the client uses its MAC address. The <code class="docutils literal notranslate">&lt;description&gt;</code> is a user-defined
+string that will be sent to the DHCP server as the DHCP client identifier.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcp-options client-id &#39;foo-bar&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcp-options host-name &lt;hostname&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcp-options-host-name-hostname" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a specific hostname for the interface.</strong></p>
+<p>Instead of the real hostname, the DHCP client will send the specific hostname
+to the DHCP server when requesting an IP address.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcp-options host-name &#39;VyOS&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcp-options vendor-class-id &lt;vendor-id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcp-options-vendor-class-id-vendor-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the DHCP client to include a vendor-class identifier in its DHCP
+requests on this interface.</strong></p>
+<p>The vendor-class identifier is a vendor-specific byte string that enables
+the DHCP server to identify the device and, in some cases, provide
+configuration options.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcp-options vendor-class-id &#39;VyOS&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcp-options no-default-route
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcp-options-no-default-route" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the DHCP client to obtain an IP address, but ignore any default
+gateway provided by the DHCP server on this interface.</strong></p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcp-options no-default-route
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcp-options default-route-distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcp-options-default-route-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the distance for the default route obtained from the DHCP server
+on this interface.</strong></p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcp-options default-route-distance 220
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcp-options reject &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcp-options-reject-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the DHCP client to reject the specific IP address or IP address
+range from the DHCP server on this interface.</strong></p>
+<p>This is useful when a modem assigns a local IP address upon start. To reject
+multiple addresses, run this command multiple times with different values.
+You can reject individual addresses (192.168.100.1) or entire subnets
+(192.168.100.0/24).</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcp-options reject 192.168.100.0/24
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcp-options user-class &lt;string&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcp-options-user-class-string" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the DHCP client to send a specific user-class identifier in its
+DHCP requests on this interface.</strong></p>
+<p>The DHCP server can interpret this identifier and provide specific
+configuration options based on it (for example, default routes).
+The user-class value typically groups DHCP clients with similar configuration
+needs (for example, employees, guests, or printers).</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcp-options user-class VyOS
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options duid &lt;duid&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-duid-duid" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a specific</strong> <abbr title="DHCP Unique Identifier">DUID</abbr> <strong>for the
+DHCPv6 client on this interface.</strong></p>
+<p>The DUID is an identifier used by a DHCPv6 client to get an IPv6 address from
+a DHCPv6 server. It consists of a 2-byte type field, followed by a
+variable-length identifier field up to 128 bytes. The format of the identifier
+part depends on the DUID type:</p>
+<ul class="simple">
+<li><p><strong>DUID-LLT:</strong> The most common type, which includes a hardware type, a timestamp, and a MAC address.</p></li>
+<li><p><strong>DUID-EN:</strong> Is based on a vendor’s enterprise number and a unique identifier assigned by the vendor.</p></li>
+<li><p><strong>DUID-LL:</strong> Includes only a MAC address.</p></li>
+</ul>
+<p>The DHCP server matches the DUID against its database and provides
+configuration data (such as address, lease times, DNS servers, etc.)
+to the DHCP client.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 duid &#39;0e:00:00:01:00:01:27:71:db:f0:00:50:56:bf:c5:6d&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options no-release
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-no-release" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the DHCP client not to send a release message when it stops
+running on this interface.</strong></p>
+<p>This helps retain the assigned address or prefix.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcpv6-options no-release
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options parameters-only
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-parameters-only" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable a stateless DHCPv6 client mode on this interface.</strong></p>
+<p>In stateless mode, the DHCPv6 client requests only stateless configuration
+parameters from the DHCP server (for example, DNS server addresses). It
+doesn’t request a stateful configuration, such as IPv6 addresses or prefixes.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcpv6-options parameters-only
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options rapid-commit
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-rapid-commit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable DHCPv6 rapid commit on this interface.</strong></p>
+<p>When enabled, the DHCP client and server skip the negotiation steps
+(Advertise and Request), completing the DHCPv6 configuration process
+in just two messages (Solicit and final Reply).</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcpv6-options rapid-commit
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options temporary
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-temporary" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the DHCPv6 client to request a temporary IPv6 address on this
+interface.</strong></p>
+<p>When configured, the DHCP client doesn’t form an Identity Association for
+Non-temporary Addresses (IA_NA) partnership. Consequently, it only obtains
+a temporary IPv6 address and doesn’t obtain a permanent one.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcpv6-options temporary
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>DHCPv6 Prefix Delegation (PD)</strong></p>
+<p>VyOS supports DHCPv6 Prefix Delegation (DHCPv6-PD) as described in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3633.html"><strong>RFC 3633</strong></a>.
+DHCPv6-PD is supported by most ISPs that provide native IPv6 for consumers on
+fixed networks.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options pd &lt;id&gt; length &lt;length&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-pd-id-length-length" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a specific prefix length for DHCPv6-PD requests on this
+interface.</strong></p>
+<p>Some ISPs provide only a /64 prefix by default. Use this command to
+request a different prefix length for a specific DHCPv6-PD request,
+ranging from /32 (if allowed by your ISP) down to /64. &lt;id&gt; is a
+unique identifier for the DHCPv6-PD request.</p>
+<p>The default value is 64.</p>
+<p>To request a /56 prefix from your ISP, use:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcpv6-options pd 0 length 56
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options pd &lt;id&gt; interface &lt;delegatee&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-pd-id-interface-delegatee-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IPv6 interface identifier (host portion) for the delegatee
+interface.</strong></p>
+<p>The value must be a decimal integer. It is appended to the delegated prefix
+and the configured <abbr title="Site-Level Aggregation ID">SLA ID</abbr> to form the
+final IPv6 address.</p>
+<p>By default, the host portion is generated based on the parent interface’s
+MAC address (EUI-64 format).</p>
+<blockquote>
+<div></div></blockquote>
+<p><strong>Example:</strong></p>
+<p>If a /64 prefix is delegated to interface eth8 and you configure the host
+portion as 65535, the resulting IPv6 address will end with ::ffff, as
+65535 corresponds to ffff in hexadecimal notation.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcpv6-options pd 0 interface eth8 address 65534
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; dhcpv6-options pd &lt;id&gt; interface &lt;delegatee&gt; sla-id &lt;id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-dhcpv6-options-pd-id-interface-delegatee-sla-id-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the</strong> <abbr title="Site-Level Aggregation ID">SLA ID</abbr> <strong>for the
+delegatee interface.</strong></p>
+<p>The value must be a decimal integer greater than 0 and fit in the length of
+SLA IDs. It is converted to hexadecimal and appended to the delegated prefix
+to form the specific subnet prefix for the delegatee interface.</p>
+<p><strong>Example:</strong></p>
+<p>If SLA ID is 1 and the delegated prefix is <code class="docutils literal notranslate">2001:db8:ffff::/48</code>, the
+resulting subnet prefix for the delegatee interface will be
+<code class="docutils literal notranslate">2001:db8:ffff:1::/64</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 dhcpv6-options pd 0 interface eth8 sla-id 1
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="member-interfaces">
+<h3>Member interfaces</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; member interface &lt;member&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-member-interface-member" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Add an interface to the bonding group.</strong></p>
+<p><strong>Example:</strong></p>
+<p>To configure eth0 and eth1 as members of the bonding interface bond0, execute
+the following commands:</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 member interface eth0
+set interfaces bonding bond0 member interface eth1
+</pre></div>
+</div>
+</section>
+<section id="bond-modes">
+<h3>Bond modes</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; mode &lt;802.3ad | active-backup | broadcast | round-robin | transmit-load-balance | adaptive-load-balance | xor-hash&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-mode-802-3ad-active-backup-broadcast-round-robin-transmit-load-balance-adaptive-load-balance-xor-hash" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the bonding mode on the interface. The default mode is</strong>
+<code class="docutils literal notranslate">802.3ad</code>.</p>
+<p>The available modes are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">802.3ad</code></p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Description:</strong></p></td>
+<td><p>IEEE 802.3ad Dynamic Link Aggregation. Groups only member
+interfaces with the same speed (e.g., 1 Gbps) and duplex
+settings. Member interfaces with different speed and duplex
+settings are not included in the active bond.</p>
+<p>Provides load balancing and fault tolerance. Uses the
+<abbr title="Link Aggregation Control Protocol">LACP</abbr> to
+negotiate the bond with the switch.</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><strong>Traffic distribution:</strong></p></td>
+<td><p>Traffic is distributed according to the <strong>transmit hash
+policy</strong> (default: XOR).</p>
+<p>The bonding driver applies an XOR operation to specific
+packet header fields, generating a hash value that maps to
+a particular member interface. This ensures the same network
+flow is consistently transmitted over the same member
+interface.</p>
+<p>The transmit hash policy is configured via the <code class="docutils literal notranslate">hash-policy</code> option.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><strong>Failover:</strong></p></td>
+<td><p>If a member interface fails, the hash is recalculated to distribute
+traffic among the remaining active member interfaces.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not all transmit hash policies comply with 802.3ad, particularly
+section 43.2.4. Using a non-compliant policy may result in out-of-order
+packet delivery.</p>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">active-backup</code></p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Description:</strong></p></td>
+<td><p>Provides fault tolerance. Only one member interface is active
+at a time. Other member interfaces remain in a standby mode.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Traffic distribution:</strong></p></td>
+<td><p>All traffic (incoming and outgoing) is routed via one active
+member interface.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Failover:</strong></p></td>
+<td><p>If the designated member interface fails, all traffic is
+routed to another member interface. The bonding driver sends
+a Gratuitous ARP to update the peer’s MAC address table,
+linking the bond’s MAC address to another physical port.</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">broadcast</code></p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Description:</strong></p></td>
+<td><p>Provides maximum fault tolerance by duplicating traffic.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Traffic distribution:</strong></p></td>
+<td><p>Every packet is duplicated and transmitted on <strong>all</strong> member
+interfaces.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Failover:</strong></p></td>
+<td><p>Traffic flow is not interrupted as long as at least one
+member interface remains active.</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">round-robin</code></p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Description:</strong></p></td>
+<td><p>Provides load balancing and fault tolerance.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Traffic distribution:</strong></p></td>
+<td><p>Packets are transmitted in sequential order across the member
+interfaces (e.g., packet 1 &gt; interface A, packet 2 &gt;
+interface B, etc.).</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Failover:</strong></p></td>
+<td><p>If a member interface fails, the sequence skips the failed
+interface and continues with the remaining active members.</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">transmit-load-balance</code></p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Description:</strong></p></td>
+<td><p>Provides adaptive transmit load balancing and fault tolerance.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Traffic distribution:</strong></p></td>
+<td><p><strong>Outgoing:</strong> Distributed across all active member interfaces
+based on the current load.</p>
+<p><strong>Incoming:</strong> Received by a designated member interface
+(active receiver).</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><strong>Failover:</strong></p></td>
+<td><p>If the active receiver fails, another member interface takes
+over as the new active receiver.</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">adaptive-load-balance</code></p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>Description:</strong></p></td>
+<td><p>Provides adaptive transmit load balancing identical to
+<code class="docutils literal notranslate">transmit-load-balance</code>, receive load balancing for IPv4
+traffic, and fault tolerance for both incoming and outgoing
+traffic.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Traffic distribution:</strong></p></td>
+<td><p><strong>Outgoing:</strong> Identical to <code class="docutils literal notranslate">transmit-load-balance</code>.</p>
+<p><strong>Incoming:</strong> Distributed based on ARP manipulation. For
+both local and remote connections, the bonding driver
+intercepts ARP traffic and changes the source MAC address
+to the MAC address of the least loaded member interface.</p>
+<p>All traffic from that peer is then routed to the chosen
+member interface.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p><strong>Failover:</strong></p></td>
+<td><p>If a member interface’s state changes (fails, recovers, is
+added, or excluded), the traffic is redistributed among all
+active member interfaces.</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">xor-hash</code>: Provides load balancing and fault tolerance
+based on a hash formula. Distributes traffic and handles
+failover identically to <code class="docutils literal notranslate">802.3ad</code>, but operates without
+the <abbr title="Link Aggregation Control Protocol">LACP</abbr>.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; min-links &lt;0-16&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-min-links-0-16" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure how many member interfaces must be active (in the
+link-up state) to mark the bonding interface UP (carrier
+asserted).</strong></p>
+<p>This command applies only when the bonding interface is configured
+in 802.3ad mode and functions like the Cisco EtherChannel min-links
+feature. It ensures that a bonding interface is marked UP (carrier
+asserted) only when a specified number of member interfaces are
+active (in the link-up state). This helps guarantee a minimum level
+of bandwidth for higher-level services (such as clustering) relying
+on the bonding interface.</p>
+<p>The default value is 0. This marks the bonding interface UP
+(carrier asserted) whenever an active LACP aggregator exists,
+regardless of the number of member interfaces in that aggregator.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In 802.3ad mode, a bond cannot be active without at least one active
+member interface. Therefore, setting min-links to 0 or 1 has the same result:
+the bonding interface is marked UP (carrier asserted).</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; lacp-rate &lt;slow|fast&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-lacp-rate-slow-fast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the rate at which the bonding interface requests its link
+partner to send</strong> <abbr title="Link Aggregation Control Protocol Data Units">LACPDUs</abbr> <strong>in 802.3ad mode.</strong></p>
+<p>This command applies only when the bonding interface is configured in
+802.3ad mode.</p>
+<p>The following options are available:</p>
+<ul class="simple">
+<li><p><strong>slow (default):</strong> Requests the link partner to transmit LACPDUs every 30 seconds.</p></li>
+<li><p><strong>fast:</strong> Requests the link partner to transmit LACPDUs every 1 second.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; system-mac &lt;mac address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-system-mac-mac-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a specific MAC address for the bonding interface.</strong></p>
+<p>This sets the 802.3ad system MAC address, which is used for <abbr title="Link Aggregation Control Protocol Data Unit">LACPDU</abbr> exchanges with the link partner.
+You can assign a fixed MAC address or generate a random one for these
+<abbr title="Link Aggregation Control Protocol Data Unit">LACPDU</abbr> exchanges.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; hash-policy &lt;policy&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-hash-policy-policy" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure which transmit hash policy to use for distributing traffic across
+member interfaces.</strong></p>
+<p>The following policies are available:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">layer2</code></p></li>
+</ul>
+<p><strong>Description:</strong> Routes all traffic destined for a specific network peer through
+the same member interface. The policy is 802.3ad-compliant.</p>
+<p><strong>Hash inputs:</strong> Source MAC address, destination MAC address, and Ethernet packet
+type ID.</p>
+<p><strong>Formula:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>hash = source MAC address XOR destination MAC address XOR packet type ID
+member interface number = hash modulo member interface count
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">layer2+3</code></p></li>
+</ul>
+<p><strong>Description:</strong> Similar to <code class="docutils literal notranslate">layer2</code>, routes all traffic destined for a specific
+network peer through the same member interface and is IEEE 802.3ad-compliant. Uses
+both Layer 2 and Layer 3 information to provide a more balanced traffic distribution.</p>
+<p><strong>Hash inputs:</strong></p>
+<ul class="simple">
+<li><p>Source MAC address, destination MAC address, and Ethernet packet type ID.</p></li>
+<li><p>Source IP address, destination IP address. IPv6 addresses are first hashed
+using <code class="docutils literal notranslate">IPv6_addr_hash</code>.</p></li>
+</ul>
+<p><strong>Formula:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>hash = source MAC address XOR destination MAC address XOR packet type ID
+hash = hash XOR source IP address XOR destination IP address
+hash = hash XOR (hash RSHIFT 16)
+hash = hash XOR (hash RSHIFT 8)
+member interface number = hash modulo member interface count
+</pre></div>
+</div>
+<p>For non-IP traffic, the formula is the same as for <code class="docutils literal notranslate">layer2</code>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">layer3+4</code></p></li>
+</ul>
+<p><strong>Description:</strong> Routes different connections (flows) destined for a specific
+network peer through multiple member interfaces, but ensures each individual
+flow is routed through only one member interface.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This policy is not fully 802.3ad-compliant. When a single TCP or UDP flow
+contains both fragmented and unfragmented packets, the algorithm may distribute
+them across different member interfaces. This may result in out-of-order packet
+delivery, violating the 802.3ad standard.</p>
+</div>
+<p><strong>Hash inputs:</strong></p>
+<ul class="simple">
+<li><p>Source port, destination port (if available).</p></li>
+<li><p>Source IP address, destination IP address. IPv6 addresses are first hashed
+using <code class="docutils literal notranslate">IPv6_addr_hash</code>.</p></li>
+</ul>
+<p><strong>Formula:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>hash = source port, destination port (as in the header)
+hash = hash XOR source IP address XOR destination IP address
+hash = hash XOR (hash RSHIFT 16)
+hash = hash XOR (hash RSHIFT 8)
+member interface number = hash modulo member interface count
+</pre></div>
+</div>
+<p>For fragmented TCP or UDP packets and all other IPv4 and IPv6 traffic, the
+source and destination port information is omitted.</p>
+<p>For non-IP traffic, the formula is the same as for <code class="docutils literal notranslate">layer2</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; primary &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-primary-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the primary member interface in the bond.</strong></p>
+<p>The primary member interface remains active as long as it is operational;
+alternative member interfaces are used only if it fails.</p>
+<p>Use this configuration when a specific member interface is preferred,
+such as one with higher throughput.</p>
+<p>This command applies only to <code class="docutils literal notranslate">active-backup</code>, <code class="docutils literal notranslate">transmit-load-balance</code>, and
+<code class="docutils literal notranslate">adaptive-load-balance</code> modes.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; arp-monitor interval &lt;time&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-arp-monitor-interval-time" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the ARP monitoring interval, in seconds, for the bonding interface.</strong></p>
+<p>ARP monitoring periodically assesses the health of each member interface by
+checking whether it has recently sent or received traffic (this criterion
+varies depending on the bonding mode and the member interface’s state). ARP
+probes are sent to the IP addresses specified with the arp-monitor target option.</p>
+<p>When ARP monitoring is used with EtherChannel-compatible modes (such as
+<code class="docutils literal notranslate">round-robin</code> or <code class="docutils literal notranslate">xor-hash</code>), the switch should be configured to distribute
+traffic across all member interfaces. If the switch distributes traffic using
+an XOR-based policy, all ARP replies will be received on one member interface,
+causing other member interfaces to be incorrectly marked as failed.</p>
+<p>Setting this value to 0 disables ARP monitoring.</p>
+<p>The default value is 0.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; arp-monitor target &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-arp-monitor-target-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IP addresses for ARP monitoring requests.</strong></p>
+<p>The bonding driver sends ARP requests to these IP addresses to check the
+state of member interfaces.</p>
+<p>To enable ARP monitoring, configure at least one IP address (up to 16 per
+bonding interface).</p>
+<p>By default, no IP addresses are configured.</p>
+</div>
+</div>
+</section>
+<section id="vlan">
+<h3><abbr title="Virtual Local Area Network">VLAN</abbr></h3>
+<p>IEEE <a class="reference internal" href="#q">802.1q</a>, often referred to as Dot1q, is the industry standard for
+implementing VLANs on Ethernet networks. It defines VLAN tagging for
+Ethernet frames and outlines procedures for bridges and switches. The
+standard also includes quality-of-service prioritization (IEEE 802.1p)
+and defines the Generic Attribute Registration Protocol.</p>
+<p>VLAN-aware network segments  (i.e., IEEE <a class="reference internal" href="#q">802.1q</a> conformant) use VLAN tags.
+When a frame enters such a segment, a tag is added to indicate VLAN membership.
+Each frame can belong to only one VLAN. If a frame arrives without a tag, it
+is assumed to be part of the native VLAN.</p>
+<p>IEEE 802.1, a working group of the IEEE 802 standards committee, has developed
+the standard and continues to revise it. One notable revision is 802.1Q-2014,
+which incorporated IEEE 802.1aq (Shortest Path Bridging) and much of the IEEE
+802.1d standard.</p>
+<p>In VyOS, 802.1q VLAN interfaces are represented as virtual subinterfaces,
+referred to as  <code class="docutils literal notranslate">vif</code>.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a VLAN interface with a unique VLAN ID.</strong></p>
+<p>VLAN ID identifies a specific VLAN and ranges from 0 to 4094.</p>
+<p>You can configure multiple VLAN interfaces on a single physical interface.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only 802.1Q-tagged packets are accepted on Ethernet vifs.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; address &lt;address | dhcp |  dhcpv6&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-address-address-dhcp-dhcpv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interface with one or more IP addresses.</strong></p>
+<p>The following options are available:</p>
+<ul class="simple">
+<li><p><strong>address:</strong> Assign one or more IPv4 or IPv6 addresses to the interface.
+For example, use 192.0.2.1/24 for IPv4 or 2001:db8::1/64 for IPv6.</p></li>
+<li><p><strong>dhcp:</strong> The interface obtains an IPv4 address from a DHCP server on the
+same network segment.</p></li>
+<li><p><strong>dhcpv6:</strong> The interface obtains an IPv6 address from a DHCPv6 server on
+the same network segment.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the interface obtains an IPv4 address via DHCP, and specific
+adjustments are needed before/after the IP address is obtained, use the
+provided hook scripts:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/pre-hooks.d/</code></p></li>
+<li><p><code class="docutils literal notranslate">/config/scripts/dhcp-client/post-hooks.d/</code></p></li>
+</ul>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 address 192.0.2.1/24
+set interfaces bonding bond0 vif 10 address 2001:db8::1/64
+set interfaces bonding bond0 vif 10 address dhcp
+set interfaces bonding bond0 vif 10 address dhcpv6
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a clear, descriptive alias for the interface.</strong></p>
+<p>This alias appears in the <code class="docutils literal notranslate">show interfaces</code> command and SNMP-based
+monitoring tools.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable the interface.</strong></p>
+<p>The interface will be set to the administratively down
+(<code class="docutils literal notranslate">A/D</code>) state.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; disable-link-detect
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-disable-link-detect" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable physical link-state change detection on the interface, such as
+when a cable is unplugged.</strong></p>
+<p>By default, the interface detects physical link-state changes.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 disable-link-detect
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; mac &lt;xx:xx:xx:xx:xx:xx&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-mac-xx-xx-xx-xx-xx-xx" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a custom MAC address on the interface.</strong></p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 mac &#39;00:53:01:02:03:04&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the MTU on the interface.</strong></p>
+<p>This value defines the largest packet size, in bytes, that the interface
+transmits without fragmentation.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>advertised in outgoing
+TCP SYN packets on the specified interface.</strong></p>
+<p>By clamping the MSS value in TCP SYN packets, you explicitly inform the
+remote side not to send packets larger than that size. This prevents
+connection issues that occur when Path MTU Discovery (PMTUD) fails.</p>
+<p>The following options are available:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Sets the MSS to a specific value, in bytes. Use this option if
+you need to enforce a specific MSS, for example, to troubleshoot
+connectivity issues or accommodate specific network requirements.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> The router automatically calculates the MSS to be
+the interface’s MTU minus 40 bytes for IPv4 traffic (20 bytes for the IPv4
+header and 20 bytes for the TCP header). This option is recommended to
+automatically set the proper value.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ip-arp-cache-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure how long an ARP entry remains valid after learning an IP-to-MAC
+address mapping on this interface.</strong></p>
+<p>The default duration is 30 seconds.</p>
+<p>An ARP entry remains valid if it receives positive feedback from
+higher-level protocols.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ip-disable-arp-filter" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure ARP filtering on this interface.</strong></p>
+<p><strong>Default behavior:</strong> The kernel responds to ARP requests on this interface
+only if the traffic would be routed back to the ARP sender through that
+specific interface.</p>
+<p><strong>If configured:</strong> The kernel responds to ARP requests on this interface for any
+IP address configured on the local host, regardless of which specific interface
+that IP address is assigned to, and regardless of the routing table. This
+reflects the Linux concept that IP addresses belong to the host, not individual
+interfaces.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 ip disable-arp-filter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interface for host or router behavior.</strong></p>
+<p>If configured, the interface switches to host mode, and IPv4 forwarding is
+disabled on it.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure whether to forward IP-directed broadcast packets received on this
+interface.</strong></p>
+<p><strong>Default behavior:</strong> IP-directed broadcast packets are dropped.</p>
+<p><strong>If configured:</strong> IP-directed broadcast packets are forwarded to all hosts
+on the destination subnet, as defined in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> and <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ip-enable-arp-accept" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure how to process gratuitous ARPs on this interface.</strong></p>
+<p>If configured, an IP-to-MAC address mapping is added to the ARP table based
+on gratuitous ARP requests or replies.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the ARP table already contains the IP address from a gratuitous
+ARP, its entry is updated regardless of whether this setting is configured.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ip-enable-arp-announce" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the source IP selection for ARP requests on this interface.</strong></p>
+<p><strong>Default behavior:</strong> The kernel can use any IP address the host owns as
+the source IP address in ARP requests on this interface.</p>
+<p><strong>If configured:</strong> The kernel first attempts to select a source IP address
+configured on the interface that shares a common subnet with the target
+IP address. If there is no such subnet, the kernel selects the IP address
+it would normally use (based on the routing table to reach the target
+destination).</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ip-enable-arp-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure which ARP requests will be ignored on this interface.</strong></p>
+<p><strong>Default behavior:</strong> The kernel responds to ARP requests for any local
+IP addresses, regardless of which interface they are assigned to.</p>
+<p><strong>If configured:</strong> The kernel responds to ARP requests only if the target
+IP address is assigned to this specific interface.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ip-enable-proxy-arp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure proxy ARP on this interface.</strong></p>
+<p>If configured, the router (kernel) intercepts ARP requests for non-local IP
+addresses and replies with the <abbr title="Media Access Control">MAC</abbr> address
+of the interface that received the request. Subsequent packets destined
+to these IP addresses are forwarded to their actual destinations on remote
+subnets.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 ip enable-proxy-arp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ip-proxy-arp-pvlan" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure local proxy ARP on the interface.</strong></p>
+<p>If configured, the router (kernel) responds to ARP requests on this VLAN
+interface even if the target IP address resides on the same subnet and
+interface.</p>
+<p>This is used to support network isolation requirements (RFC 3069) for private
+VLANs (PVLANs). In PVLAN configurations, hosts on isolated ports are NOT
+allowed to communicate directly with each other at Layer 2, but they can
+communicate with the upstream router.</p>
+<p>By replying to inter-host ARP requests with its own <abbr title="Media Access Control">MAC</abbr>
+address, the router (kernel) directs inter-host traffic through itself instead of
+directly between hosts.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This command works independently and does not require enabling
+the standard proxy ARP on the interface.</p>
+</div>
+<p>Local proxy ARP is also known as:</p>
+<ul class="simple">
+<li><p>VLAN aggregation (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>Private VLAN  (Cisco, Allied Telesyn).</p></li>
+<li><p>Source-port filtering or port isolation (Hewlett-Packard).</p></li>
+<li><p>MAC-Forced Forwarding (Ericsson).</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure source IP address validation using</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>on this interface, as specified in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p>The following options are available:</p>
+<ul class="simple">
+<li><p><strong>strict:</strong> Each incoming packet’s source IP address is checked against the
+Forwarding Information Base (FIB). If the interface is not the best route
+back to that source, validation fails, and the packet is dropped.</p></li>
+<li><p><strong>loose:</strong> Each incoming packet’s source IP address is checked against the
+FIB. If the source IP address is unreachable through any interface, validation
+fails.</p></li>
+<li><p><strong>disable:</strong> No source IP address validation is performed. All incoming
+packets are accepted.</p></li>
+</ul>
+<p>RFC 3704 recommends enabling strict mode to prevent IP spoofing, such as
+DDoS attacks. For asymmetric or other complex routing scenarios, use loose
+mode.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interface to automatically obtain an IPv6 address using</strong>
+<abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>as specified in</strong>
+<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<p>IPv6 hosts can configure themselves automatically when connected to an
+IPv6 network using the Neighbor Discovery Protocol via ICMPv6 router
+discovery messages. When first connected to a network, a host sends a
+link-local router solicitation multicast request for its configuration
+parameters. The router responds with a router advertisement packet
+containing Internet Layer configuration parameters.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method automatically disables IPv6 traffic forwarding
+on the interface.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 ipv6 address autoconf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ipv6 address eui64 &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ipv6-address-eui64-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interface to assign itself an IPv6 address using the</strong>
+<abbr title="64-Bit Extended Unique Identifier">EUI-64</abbr> <strong>method, as
+specified</strong> in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 ipv6 address eui64 2001:db8:beef::/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ipv6 address no-default-link-local
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ipv6-address-no-default-link-local" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Disable the automatic assignment of a link-local IPv6 address to
+this interface.</strong></p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 ipv6 address no-default-link-local
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ipv6-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the interface for host or router behavior.</strong></p>
+<p>If configured, the interface switches to host mode, and IPv6 forwarding is
+disabled on it.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 ipv6 disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ipv6 adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>advertised in outgoing
+TCP SYN packets on the specified interface.</strong></p>
+<p>By clamping the MSS value in TCP SYN packets, you explicitly inform
+the remote side not to send packets larger than that size. This prevents
+connection issues when Path MTU Discovery (PMTUD) fails.</p>
+<p>The following options are available:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Set the MSS to a specific value, in bytes. Use this option to
+enforce a specific MSS, for example, to troubleshoot connectivity issues
+or accommodate specific network requirements.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> The router calculates the MSS to be the interface’s
+MTU minus 60 bytes for IPv6 traffic (40 bytes for the IPv6 header and 20
+bytes for the TCP header). This option is recommended to automatically
+set the proper value.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ipv6 accept-dad &lt;0 | 1 | 2&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ipv6-accept-dad-0-1-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure IPv6</strong> <abbr title="Duplicate Address Detection">DAD</abbr> <strong>on the
+interface.</strong></p>
+<p>The following options are available:</p>
+<ul class="simple">
+<li><p><strong>0:</strong> Disables DAD. No duplicate address detection is performed.</p></li>
+<li><p><strong>1:</strong> Enables DAD (default). Duplicate addresses are detected. The
+interface’s IPv6 operation continues for valid IPv6 addresses.</p></li>
+<li><p><strong>2:</strong> Enables DAD and, if a MAC-based duplicate link-local address
+is found, disables IPv6 operation on this interface.</p></li>
+</ul>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 ipv6 accept-dad 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; ipv6 dup-addr-detect-transmits &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-ipv6-dup-addr-detect-transmits-n" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the number of</strong> <abbr title="Duplicate Address Detection">DAD</abbr>
+<strong>messages that the router (kernel) sends during IPv6 address assignment
+on this interface.</strong></p>
+<p>The default value is 1.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 ipv6 dup-addr-detect-transmits 5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; vrf &lt;vrf&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-vrf-vrf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Assign the interface to a specific</strong> <abbr title="Virtual Routing and Forwarding">VRF</abbr> <strong>instance.</strong></p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>For information on configuring a VRF, refer to the <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>
+section.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 vrf red
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>DHCP(v6)</strong></p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; dhcp-options client-id &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-dhcp-options-client-id-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a DHCP client identifier for the interface, as specified in</strong>
+<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2131.html"><strong>RFC 2131</strong></a>.</p>
+<p>The <code class="docutils literal notranslate">client-id</code> is an identifier that the DHCP client sends to the DHCP
+server to uniquely identify itself for IP address assignment. By default,
+the client uses its MAC address. The <code class="docutils literal notranslate">&lt;description&gt;</code> is a user-defined
+string that will be sent to the DHCP server as the DHCP client identifier.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 dhcp-options client-id &#39;foo-bar&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; dhcp-options host-name &lt;hostname&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-dhcp-options-host-name-hostname" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a specific hostname for the interface.</strong></p>
+<p>Instead of the real hostname, the DHCP client will send the specific hostname
+to the DHCP server when requesting an IP address.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 dhcp-options host-name &#39;VyOS&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; dhcp-options vendor-class-id &lt;vendor-id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-dhcp-options-vendor-class-id-vendor-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the DHCP client to include a vendor-class identifier in its DHCP
+requests on this interface.</strong></p>
+<p>The vendor-class identifier is a vendor-specific byte string that enables
+the DHCP server to identify the device and, in some cases, provide
+configuration options.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 dhcp-options vendor-class-id &#39;VyOS&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; dhcp-options no-default-route
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-dhcp-options-no-default-route" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the DHCP client to obtain an IP address, but ignore any default
+gateway provided by the DHCP server on this interface.</strong></p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 dhcp-options no-default-route
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; dhcp-options default-route-distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-dhcp-options-default-route-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the distance for the default route obtained from the DHCP server
+on this interface.</strong></p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 dhcp-options default-route-distance 220
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; dhcp-options reject &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-dhcp-options-reject-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the DHCP client to reject the specific IP address or IP address
+range from the DHCP server on this interface.</strong></p>
+<p>This is useful when a modem assigns a local IP address upon start. To reject
+multiple addresses, run this command multiple times with different values.
+You can reject individual addresses (192.168.100.1) or entire subnets
+(192.168.100.0/24).</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 dhcp-options reject 192.168.100.0/24
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; dhcp-options user-class &lt;string&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-dhcp-options-user-class-string" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the DHCP client to send a specific user-class identifier in its
+DHCP requests on this interface.</strong></p>
+<p>The DHCP server can interpret this identifier and provide specific
+configuration options based on it (for example, default routes).
+The user-class value typically groups DHCP clients with similar configuration
+needs (for example, employees, guests, or printers).</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 dhcp-options user-class VyOS
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; dhcpv6-options duid &lt;duid&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-dhcpv6-options-duid-duid" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a specific</strong> <abbr title="DHCP Unique Identifier">DUID</abbr> <strong>for the
+DHCPv6 client on this interface.</strong></p>
+<p>The DUID is an identifier used by a DHCPv6 client to get an IPv6 address from
+a DHCPv6 server. It consists of a 2-byte type field, followed by a
+variable-length identifier field up to 128 bytes. The format of the identifier
+part depends on the DUID type:</p>
+<ul class="simple">
+<li><p><strong>DUID-LLT:</strong> The most common type, which includes a hardware type, a timestamp, and a MAC address.</p></li>
+<li><p><strong>DUID-EN:</strong> Is based on a vendor’s enterprise number and a unique identifier assigned by the vendor.</p></li>
+<li><p><strong>DUID-LL:</strong> Includes only a MAC address.</p></li>
+</ul>
+<p>The DHCP server matches the DUID against its database and provides
+configuration data (such as address, lease times, DNS servers, etc.)
+to the DHCP client.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 duid &#39;0e:00:00:01:00:01:27:71:db:f0:00:50:56:bf:c5:6d&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; dhcpv6-options no-release
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-dhcpv6-options-no-release" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the DHCP client not to send a release message when it stops
+running on this interface.</strong></p>
+<p>This helps retain the assigned address or prefix.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 dhcpv6-options no-release
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; dhcpv6-options parameters-only
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-dhcpv6-options-parameters-only" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable a stateless DHCPv6 client mode on this interface.</strong></p>
+<p>In stateless mode, the DHCPv6 client requests only stateless configuration
+parameters from the DHCP server (for example, DNS server addresses). It
+doesn’t request a stateful configuration, such as IPv6 addresses or prefixes.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 dhcpv6-options parameters-only
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; dhcpv6-options rapid-commit
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-dhcpv6-options-rapid-commit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable DHCPv6 rapid commit on this interface.</strong></p>
+<p>When enabled, the DHCP client and server skip the negotiation steps
+(Advertise and Request), completing the DHCPv6 configuration process
+in just two messages (Solicit and final Reply).</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 dhcpv6-options rapid-commit
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; dhcpv6-options temporary
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-dhcpv6-options-temporary" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the DHCPv6 client to request a temporary IPv6 address on this
+interface.</strong></p>
+<p>When configured, the DHCP client doesn’t form an Identity Association for
+Non-temporary Addresses (IA_NA) partnership. Consequently, it only obtains
+a temporary IPv6 address and doesn’t obtain a permanent one.</p>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 dhcpv6-options temporary
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>DHCPv6 Prefix Delegation (PD)</strong></p>
+<p>VyOS supports DHCPv6 Prefix Delegation (DHCPv6-PD) as described in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3633.html"><strong>RFC 3633</strong></a>.
+DHCPv6-PD is supported by most ISPs that provide native IPv6 for consumers on
+fixed networks.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; dhcpv6-options pd &lt;id&gt; length &lt;length&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-dhcpv6-options-pd-id-length-length" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a specific prefix length for DHCPv6-PD requests on this
+interface.</strong></p>
+<p>Some ISPs provide only a /64 prefix by default. Use this command to
+request a different prefix length for a specific DHCPv6-PD request,
+ranging from /32 (if allowed by your ISP) down to /64. &lt;id&gt; is a
+unique identifier for the DHCPv6-PD request.</p>
+<p>The default value is 64.</p>
+<p>To request a /56 prefix from your ISP, use:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 dhcpv6-options pd 0 length 56
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; dhcpv6-options pd &lt;id&gt; interface &lt;delegatee&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-dhcpv6-options-pd-id-interface-delegatee-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the IPv6 interface identifier (host portion) for the delegatee
+interface.</strong></p>
+<p>The value must be a decimal integer. It is appended to the delegated prefix
+and the configured <abbr title="Site-Level Aggregation ID">SLA ID</abbr> to form the
+final IPv6 address.</p>
+<p>By default, the host portion is generated based on the parent interface’s
+MAC address (EUI-64 format).</p>
+<blockquote>
+<div></div></blockquote>
+<p><strong>Example:</strong></p>
+<p>If a /64 prefix is delegated to interface eth8 and you configure the host
+portion as 65535, the resulting IPv6 address will end with ::ffff, as
+65535 corresponds to ffff in hexadecimal notation.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 dhcpv6-options pd 0 interface eth8 address 65534
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; vif &lt;vlan-id&gt; dhcpv6-options pd &lt;id&gt; interface &lt;delegatee&gt; sla-id &lt;id&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-vif-vlan-id-dhcpv6-options-pd-id-interface-delegatee-sla-id-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the</strong> <abbr title="Site-Level Aggregation ID">SLA ID</abbr> <strong>for the
+delegatee interface.</strong></p>
+<p>The value must be a decimal integer greater than 0 and fit in the length of
+SLA IDs. It is converted to hexadecimal and appended to the delegated prefix
+to form the specific subnet prefix for the delegatee interface.</p>
+<p><strong>Example:</strong></p>
+<p>If SLA ID is 1 and the delegated prefix is <code class="docutils literal notranslate">2001:db8:ffff::/48</code>, the
+resulting subnet prefix for the delegatee interface will be
+<code class="docutils literal notranslate">2001:db8:ffff:1::/64</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 vif 10 dhcpv6-options pd 0 interface eth8 sla-id 1
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="span-port-mirroring">
+<h3>SPAN port mirroring</h3>
+<p><abbr title="Switched Port Analyser">SPAN</abbr> port mirroring copies inbound and
+outbound traffic from one interface to another specified interface.</p>
+<p>The destination interface is usually connected to specialized equipment,
+such as a behavior control system, an intrusion detection system, or
+a traffic collector, and copies all related traffic from this port. The
+benefit of mirroring traffic is that the application is isolated from the
+source traffic, so application processing does not affect the traffic or
+system performance.</p>
+<p>To configure <abbr title="Switched Port Analyser">SPAN</abbr> port mirroring, VyOS uses
+the <code class="docutils literal notranslate">mirror</code> parameter. You can mirror ingress traffic (traffic entering the
+router) and egress traffic (traffic leaving the router) separately. Both
+directions can be mirrored to the same destination interface or split to
+different ones.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; mirror ingress &lt;monitor-interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-mirror-ingress-monitor-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Mirror ingress traffic from a bonding interface to the specified monitoring
+interface.</strong></p>
+<p>Example: Mirror the ingress traffic from <cite>bond1</cite> to <cite>eth3</cite>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond1 mirror ingress eth3
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; mirror egress &lt;monitor-interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-mirror-egress-monitor-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Mirror egress traffic from a bonding interface to the specified monitoring
+interface.</strong></p>
+<p>Example: Mirror the egress traffic from <cite>bond1</cite> to <cite>eth3</cite>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond1 mirror egress eth3
+</pre></div>
+</div>
+</div>
+</div>
+<section id="evpn-multihoming">
+<h4>EVPN multihoming</h4>
+<p>EVPN multihoming (EVPN-MH) is a standards-based solution (RFC 7432, RFC 8365)
+that enables Customer Edge (CE) devices, such as servers, to connect to two
+or more Provider Edge (PE) devices for redundancy and load balancing.</p>
+<p>EVPN-MH is often used as a modern, standards-based alternative to
+<abbr title="Multi-Chassis Link Aggregation">MLAG</abbr> and <abbr title="Virtual Tunnel Endpoints">VTEPs</abbr>.</p>
+<p><strong>Ethernet Segment (ES) and Ethernet Segment Identifier (ESI)</strong></p>
+<p>Physical links that connect a CE device to PE devices are bundled using link
+aggregation. This logical bundle is called an Ethernet Segment (ES) and is
+uniquely identified by an Ethernet Segment Identifier (ESI) within the
+EVPN domain.</p>
+<p>To enable EVPN-MH, configure the same ESI on the bonding interfaces of all
+PE devices connected to a single CE device.</p>
+<p>An ESI is configured by specifying either a system MAC address and a local
+discriminator, or an Ethernet Segment Identifier Name (ESINAME).</p>
+<p>The following two commands generate a 10-byte Type-3 ESI by combining the
+system MAC and local discriminator:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; evpn es-id &lt;1-16777215|10-byte ID&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-evpn-es-id-1-16777215-10-byte-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; evpn es-sys-mac &lt;xx:xx:xx:xx:xx:xx&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-evpn-es-sys-mac-xx-xx-xx-xx-xx-xx" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Alternatively, assign an ESINAME directly as a 10-byte Type-0 ESI using the
+following format: 00:AA:BB:CC:DD:EE:FF:GG:HH:II.</p>
+<p><strong>BGP-EVPN route usage</strong></p>
+<p>EVPN-MH uses BGP-EVPN route types 1 and 2 for ES discovery and MAC-IP
+synchronization:</p>
+<ul class="simple">
+<li><p><strong>Type 1 (EAD-per-ES and EAD-per-EVI)</strong> routes advertise the locally
+attached ESs and discover remote ESs in the network.</p></li>
+<li><p><strong>Type 2 (MAC-IP advertisement)</strong> routes are advertised with a
+destination ESI, enabling MAC-IP synchronization between ES peers.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; evpn es-df-pref &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-evpn-es-df-pref-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the</strong> <abbr title="Designated Forwarder">DF</abbr> <strong>preference (1-65535) for
+the interface. A higher value indicates a higher preference to become the</strong>
+<abbr title="Designated Forwarder">DF</abbr>. <strong>The</strong> <abbr title="Designated Forwarder">DF</abbr>
+<strong>preference is configured per-ES.</strong></p>
+<p>The DF election process determines which interface in a specific ES forwards
+<abbr title="Broadcast, Unknown Unicast, and Multicast">BUM</abbr> traffic from the EVPN
+overlay to the connected CE device. EVPN Type-4 (Ethernet Segment) routes are
+used to elect the DF, implementing the preference-based election method defined
+in RFC 9785.</p>
+<p>Interfaces not elected as the DF drop any BUM traffic from the EVPN overlay
+using non-DF filters. Similarly, traffic received from ES peers via the EVPN
+overlay is blocked from forwarding to the CE device to maintain split-horizon
+filtering with local bias.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces bonding &lt;interface&gt; evpn uplink
+<a class="cmdlink" href="#cfgcmd-set-interfaces-bonding-interface-evpn-uplink" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure this interface as an EVPN-MH uplink interface.</strong></p>
+<p>If all uplink interfaces on a PE device go down, this PE device loses access
+to the VXLAN overlay. To prevent traffic blackholing, the PE device forces a
+protocol shutdown (protodown) of its downstream EVPN-MH interfaces.</p>
+<p>The following example configures bond0 as an EVPN-MH uplink interface:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bonding bond0 evpn uplink
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="example">
+<h2>Example</h2>
+<p>The following configuration example applies to all listed third-party vendors.
+It creates a bonding interface with two member interfaces, defines VLANs 10
+and 100 on the bonding interface, and assigns an IPv4 address to each VLAN
+subinterface.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># Create the bonding interface bond0 with 802.3ad LACP
+set interfaces bonding bond0 hash-policy &#39;layer2&#39;
+set interfaces bonding bond0 mode &#39;802.3ad&#39;
+
+# Add the required VLANs and IPv4 addresses on them
+set interfaces bonding bond0 vif 10 address 192.168.0.1/24
+set interfaces bonding bond0 vif 100 address 10.10.10.1/24
+
+# Add the member interfaces to the bonding interface
+set interfaces bonding bond0 member interface eth1
+set interfaces bonding bond0 member interface eth2
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you are running this configuration in a virtual environment like
+EVE-NG, ensure the e1000 driver is chosen for your VyOS NIC. The default
+drivers, such as <code class="docutils literal notranslate">virtio-net-pci</code> or <code class="docutils literal notranslate">vmxnet3</code>, are incompatible with
+this configuration. Specifically, ICMP messages will not be processed
+correctly.</p>
+<p>To check your NIC driver, use the following command:
+<code class="docutils literal notranslate">show interfaces ethernet eth0 physical | grep -i driver</code></p>
+</div>
+<section id="cisco-catalyst-configuration">
+<h3>Cisco Catalyst configuration</h3>
+<p>Configure a Cisco Catalyst switch to integrate with a two-member VyOS bonding
+interface.</p>
+<p>Assign member interfaces to PortChannel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>interface GigabitEthernet1/0/23
+ description VyOS eth1
+ channel-group 1 mode active
+!
+interface GigabitEthernet1/0/24
+ description VyOS eth2
+ channel-group 1 mode active
+!
+</pre></div>
+</div>
+<p>A new interface, <code class="docutils literal notranslate">Port-channel1</code>, becomes available; all configuration,
+such as allowed VLAN interfaces and STP, is applied here.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>interface Port-channel1
+ description LACP Channel for VyOS
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 10,100
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+</pre></div>
+</div>
+</section>
+<section id="juniper-ex-switch-configuration">
+<h3>Juniper EX Switch configuration</h3>
+<p>Configure a Juniper EX Series switch to integrate with a two-member VyOS bonding
+interface.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># Create aggregated ethernet device with 802.3ad LACP and port speeds of 10gbit/s
+set interfaces ae0 aggregated-ether-options link-speed 10g
+set interfaces ae0 aggregated-ether-options lacp active
+
+# Create layer 2 on the aggregated ethernet device with trunking for our VLANs
+set interfaces ae0 unit 0 family ethernet-switching port-mode trunk
+
+# Add the required vlans to the device
+set interfaces ae0 unit 0 family ethernet-switching vlan members 10
+set interfaces ae0 unit 0 family ethernet-switching vlan members 100
+
+# Add the two interfaces to the aggregated ethernet device, in this setup both
+# ports are on the same switch (switch 0, module 1, port 0 and 1)
+set interfaces xe-0/1/0 ether-options 802.3ad ae0
+set interfaces xe-0/1/1 ether-options 802.3ad ae0
+
+# But this can also be done with multiple switches in a stack, a virtual
+# chassis on Juniper (switch 0 and switch 1, module 1, port 0 on both switches)
+set interfaces xe-0/1/0 ether-options 802.3ad ae0
+set interfaces xe-1/1/0 ether-options 802.3ad ae0
+</pre></div>
+</div>
+</section>
+<section id="aruba-hp-configuration">
+<h3>Aruba/HP configuration</h3>
+<p>Configure an Aruba/HP 2510G switch to integrate with a two-member VyOS bonding
+interface.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># Create trunk with 2 member interfaces (interface 1 and 2) and LACP
+trunk 1-2 Trk1 LACP
+
+# Add the required VLANs to the trunk
+vlan 10 tagged Trk1
+vlan 100 tagged Trk1
+</pre></div>
+</div>
+</section>
+<section id="arista-eos-configuration">
+<h3>Arista EOS configuration</h3>
+<p>When deploying VyOS in environments with Arista switches, use the following
+blueprint as an initial setup to configure an operational LACP port-channel
+between the two devices.</p>
+<p>Let’s assume the following topology:</p>
+<figure class="align-default">
+<img alt="VyOS Arista EOS setup" src="https://docs.vyos.io/en/rolling/_images/vyos_arista_bond_lacp.webp" />
+</figure>
+<p><strong>R1</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>interfaces {
+    bonding bond10 {
+        hash-policy layer3+4
+        member {
+            interface eth1
+            interface eth2
+        }
+        mode 802.3ad
+        vif 100 {
+            address 192.0.2.1/30
+            address 2001:db8::1/64
+        }
+    }
+</pre></div>
+</div>
+<p><strong>R2</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>interfaces {
+    bonding bond10 {
+        hash-policy layer3+4
+        member {
+            interface eth1
+            interface eth2
+        }
+        mode 802.3ad
+        vif 100 {
+            address 192.0.2.2/30
+            address 2001:db8::2/64
+        }
+    }
+</pre></div>
+</div>
+<p><strong>SW1</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>!
+vlan 100
+   name FOO
+!
+interface Port-Channel10
+   switchport trunk allowed vlan 100
+   switchport mode trunk
+   spanning-tree portfast
+!
+interface Port-Channel20
+   switchport mode trunk
+   no spanning-tree portfast auto
+   spanning-tree portfast network
+!
+interface Ethernet1
+   channel-group 10 mode active
+!
+interface Ethernet2
+   channel-group 10 mode active
+!
+interface Ethernet3
+   channel-group 20 mode active
+!
+interface Ethernet4
+   channel-group 20 mode active
+!
+</pre></div>
+</div>
+<p><strong>SW2</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>!
+vlan 100
+   name FOO
+!
+interface Port-Channel10
+   switchport trunk allowed vlan 100
+   switchport mode trunk
+   spanning-tree portfast
+!
+interface Port-Channel20
+   switchport mode trunk
+   no spanning-tree portfast auto
+   spanning-tree portfast network
+!
+interface Ethernet1
+   channel-group 10 mode active
+!
+interface Ethernet2
+   channel-group 10 mode active
+!
+interface Ethernet3
+   channel-group 20 mode active
+!
+interface Ethernet4
+   channel-group 20 mode active
+!
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When testing this environment in EVE-NG, ensure the e1000 driver
+is chosen for your VyOS network interfaces. If the default virtio driver
+is used, VyOS will not transmit LACP PDUs, preventing the port-channel
+from ever becoming active.</p>
+</div>
+</section>
+</section>
+<section id="operation">
+<h2>Operation</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show interfaces bonding
+<a class="cmdlink" href="#opcmd-show-interfaces-bonding" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show brief interface information.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show interfaces bonding
+Codes: S - State, L - Link, u - Up, D - Down, A - Admin Down
+Interface        IP Address                        S/L  Description
+---------        ----------                        ---  -----------
+bond0            -                                 u/u  my-sw1 int 23 and 24
+bond0.10         192.168.0.1/24                    u/u  office-net
+bond0.100        10.10.10.1/24                     u/u  management-net
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show interfaces bonding &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-show-interfaces-bonding-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show detailed interface information.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show interfaces bonding bond5
+bond5: &lt;NO-CARRIER,BROADCAST,MULTICAST,MASTER,UP&gt; mtu 1500 qdisc noqueue state DOWN group default qlen 1000
+    link/ether 00:50:56:bf:ef:aa brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::e862:26ff:fe72:2dac/64 scope link tentative
+       valid_lft forever preferred_lft forever
+
+    RX:  bytes  packets  errors  dropped  overrun       mcast
+             0        0       0        0        0           0
+    TX:  bytes  packets  errors  dropped  carrier  collisions
+             0        0       0        0        0           0
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show interfaces bonding &lt;interface&gt; detail
+<a class="cmdlink" href="#opcmd-show-interfaces-bonding-interface-detail" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Show detailed information about the underlying physical links on the given
+bonding interface.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show interfaces bonding bond5 detail
+Ethernet Channel Bonding Driver: v3.7.1 (April 27, 2011)
+Bonding Mode: IEEE 802.3ad Dynamic link aggregation
+Transmit Hash Policy: layer2 (0)
+MII Status: down
+MII Polling Interval (ms): 100
+Up Delay (ms): 0
+Down Delay (ms): 0
+802.3ad info
+LACP rate: slow
+Min links: 0
+Aggregator selection policy (ad_select): stable
+Slave Interface: eth1
+MII Status: down
+Speed: Unknown
+Duplex: Unknown
+Link Failure Count: 0
+Permanent HW addr: 00:50:56:bf:ef:aa
+Slave queue ID: 0
+Aggregator ID: 1
+Actor Churn State: churned
+Partner Churn State: churned
+Actor Churned Count: 1
+Partner Churned Count: 1
+Slave Interface: eth2
+MII Status: down
+Speed: Unknown
+Duplex: Unknown
+Link Failure Count: 0
+Permanent HW addr: 00:50:56:bf:19:26
+Slave queue ID: 0
+Aggregator ID: 2
+Actor Churn State: churned
+Partner Churn State: churned
+Actor Churned Count: 1
+Partner Churned Count: 1
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

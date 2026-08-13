@@ -1,0 +1,486 @@
+
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="http-api">
+<h1>HTTP API</h1>
+<p>VyOS provides an HTTP API. You can use it to run operational-mode
+commands or to change or delete configuration. The API is available as
+both a REST API and a GraphQL API.</p>
+<p>For REST API request examples, endpoints, and authentication details,
+see <a class="reference internal" href="../../automation/vyos-api.html#vyosapi">VyOS API</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>If no PKI certificate is configured for the service, VyOS automatically
+generates a self-signed certificate. This is not recommended for production use.</p>
+</div>
+<section id="configuration">
+<h2>配置</h2>
+<section id="https-listener">
+<h3>HTTPS listener</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https listen-address <address>
+<a class="cmdlink" href="#cfgcmd-set-service-https-listen-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure a local IPv4 or IPv6 address on which the HTTPS listener
+accepts incoming connections.</strong></p>
+<p>The IP address must already be assigned to a local interface. Repeat
+the command to configure multiple IP addresses.</p>
+<p>When unset, the listener accepts incoming connections on all local IP
+addresses.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https listen-address 192.0.2.1
+set service https listen-address 2001:db8::1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https port <1-65535>
+<a class="cmdlink" href="#cfgcmd-set-service-https-port-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the TCP port on which the HTTPS listener accepts incoming
+connections.</strong></p>
+<p>The default is 443.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注意</p>
+<p>If the chosen port is already in use by another service, the commit
+fails.</p>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https port 8443
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https vrf <name>
+<a class="cmdlink" href="#cfgcmd-set-service-https-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>绑定 the HTTPS listener to the specified
+<abbr title="Virtual Routing and Forwarding">VRF</abbr> instance.</strong></p>
+<p>The VRF must already be configured under <code class="docutils literal notranslate">set vrf name <name></code>.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https vrf mgmt
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https allow-client address <address>
+<a class="cmdlink" href="#cfgcmd-set-service-https-allow-client-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Restrict access to the HTTPS API endpoints to the specified IPv4 or
+IPv6 address or prefix.</strong></p>
+<p>Repeat the command to allow multiple IP addresses or prefixes.</p>
+<p>When unset, the API accepts connections from any IP address.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https allow-client address 192.0.2.0/24
+set service https allow-client address 2001:db8::/32
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https enable-http-redirect
+<a class="cmdlink" href="#cfgcmd-set-service-https-enable-http-redirect" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable redirection of incoming HTTP requests (port 80) to HTTPS.</strong></p>
+<p>The redirect sends traffic to the default HTTPS port (443). If you
+have changed the HTTPS port, the redirect will not work.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https enable-http-redirect
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https request-body-size-limit <1-256>
+<a class="cmdlink" href="#cfgcmd-set-service-https-request-body-size-limit-1-256" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the maximum size, in megabytes, of an HTTP request body
+accepted by the listener.</strong></p>
+<p>Requests exceeding this limit are rejected.</p>
+<p>The default is 1.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https request-body-size-limit 10
+</pre></div>
+</div>
+</section>
+<section id="tls">
+<h3>TLS</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https tls-version <1.2 | 1.3>
+<a class="cmdlink" href="#cfgcmd-set-service-https-tls-version-1-2-1-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable a specific TLS protocol version for the HTTPS listener.</strong></p>
+<p>Repeat the command to enable multiple protocol versions.</p>
+<p>By default, both TLS 1.2 and TLS 1.3 are enabled.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https tls-version 1.3
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https certificates certificate <name>
+<a class="cmdlink" href="#cfgcmd-set-service-https-certificates-certificate-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>绑定 a TLS certificate from the PKI subsystem to the HTTPS
+listener.</strong></p>
+<p>The certificate must already be defined under
+<code class="docutils literal notranslate">set pki certificate <name></code> with both a certificate and a private
+key.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https certificates certificate my-server-cert
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https certificates ca-certificate <name>
+<a class="cmdlink" href="#cfgcmd-set-service-https-certificates-ca-certificate-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>绑定 a <abbr title="Certificate Authority">CA</abbr> certificate from the PKI
+subsystem to the HTTPS listener.</strong></p>
+<p>The CA must already be defined under <code class="docutils literal notranslate">set pki ca <name></code>. The CA
+certificate is appended to the TLS certificate to form a full chain
+presented to clients during the TLS handshake.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https certificates ca-certificate my-internal-ca
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https certificates dh-params <name>
+<a class="cmdlink" href="#cfgcmd-set-service-https-certificates-dh-params-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Choose Diffie-Hellman parameters from the PKI subsystem for the HTTPS
+listener.</strong></p>
+<p>The parameters must already be defined under <code class="docutils literal notranslate">set pki dh <name></code> with
+a key size of at least 2048 bits. The parameters are used by DHE
+cipher suites in TLS 1.2. TLS 1.3 does not use them.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https certificates dh-params my-dh-2048
+</pre></div>
+</div>
+</section>
+<section id="api-authentication">
+<h3>API authentication</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api keys id <name> key <apikey>
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-keys-id-name-key-apikey" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure an HTTP API key to authenticate REST requests, and GraphQL
+requests unless GraphQL is switched to JWT token authentication.</strong></p>
+<p>The key is specified in plaintext and grants full access to the API.</p>
+<p>At least one key must be configured to use the REST API. GraphQL can
+run without keys if JWT token authentication is enabled.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api keys id MY-HTTPS-API-ID key 'MY-HTTPS-API-PLAINTEXT-KEY'
+</pre></div>
+</div>
+</section>
+<section id="rest">
+<h3>REST</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api rest
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-rest" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable the REST API for managing VyOS over HTTPS.</strong></p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api rest
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api rest strict
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-rest-strict" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>拒绝 delete requests on the <code class="docutils literal notranslate">/configure</code> endpoint when the target
+configuration path does not exist.</strong></p>
+<p>Without this flag, such requests succeed silently.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api rest strict
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api rest debug
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-rest-debug" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>日志 detailed error messages to the systemd journal when API
+configuration requests fail.</strong></p>
+<p>Without this flag, only short error messages are logged.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api rest debug
+</pre></div>
+</div>
+</section>
+<section id="graphql">
+<h3>GraphQL</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api graphql introspection
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-graphql-introspection" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable GraphQL schema introspection.</strong></p>
+<p>Authenticated clients can then query the endpoint for the full schema.
+已禁用 by default, and typically kept disabled in production due to
+security concerns.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api graphql introspection
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api graphql authentication type <key | token>
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-graphql-authentication-type-key-token" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the authentication type for GraphQL requests:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">key</code>: Uses the API keys configured in <code class="docutils literal notranslate">service https api keys</code>.</p></li>
+<li><p><code class="docutils literal notranslate">token</code>: Uses <abbr title="JSON Web Token">JWT</abbr> tokens.</p></li>
+</ul>
+<p>The default is <code class="docutils literal notranslate">key</code>.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api graphql authentication type token
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api graphql authentication expiration <60-31536000>
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-graphql-authentication-expiration-60-31536000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the lifetime, in seconds, of JWT tokens.</strong></p>
+<p>The default is 3600.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api graphql authentication expiration 86400
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api graphql authentication secret-length <16-65535>
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-graphql-authentication-secret-length-16-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure the length, in bytes, of the shared secret used to sign
+JWT tokens.</strong></p>
+<p>The default is 32.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api graphql authentication secret-length 64
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service https api graphql cors allow-origin <origin>
+<a class="cmdlink" href="#cfgcmd-set-service-https-api-graphql-cors-allow-origin-origin" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configure which websites (origins) can read responses from the
+GraphQL API in a browser, using
+<abbr title="Cross-Origin Resource Sharing">CORS</abbr>.</strong></p>
+<p>Repeat the command to allow multiple origins.</p>
+</div>
+</div>
+<p>示例:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api graphql cors allow-origin https://app.example.com
+</pre></div>
+</div>
+</section>
+</section>
+<section id="example">
+<h2>示例</h2>
+<p>The minimal configuration for a working REST API requires enabling REST
+and configuring at least one API key:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api keys id MY-HTTPS-API-ID key MY-HTTPS-API-PLAINTEXT-KEY
+set service https api rest
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

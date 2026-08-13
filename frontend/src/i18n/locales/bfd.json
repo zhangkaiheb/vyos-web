@@ -1,0 +1,373 @@
+{
+  "zh-CN": {
+    "bfd": {
+      "alerts": {
+        "saved": "保存d"
+      },
+      "columns": {
+        "address": "添加ress",
+        "multiplier": "multiplier",
+        "name": "名称",
+        "profile": "profile",
+        "receiveInterval": "receiveInterval",
+        "sourceAddress": "source 添加ress",
+        "transmitInterval": "transmitInterval"
+      },
+      "errors": {
+        "peerAddressRequired": "peer 添加ress 为必填项",
+        "profileNameRequired": "profile 名称 为必填项"
+      },
+      "labels": {
+        "multiplier": "multiplier",
+        "nameRequired": "名称 为必填项",
+        "peerAddressRequired": "peer 添加ress 为必填项",
+        "profile": "profile",
+        "receiveInterval": "receiveInterval",
+        "sourceAddress": "source 添加ress",
+        "transmitInterval": "transmitInterval"
+      },
+      "messages": {
+        "confirmDeletePeer": "确定 删除 peer",
+        "confirmDeleteProfile": "确定 删除 profile"
+      },
+      "modals": {
+        "addPeer": "添加 peer",
+        "addProfile": "添加 profile",
+        "confirmDelete": "确定 删除",
+        "editPeer": "编辑 peer",
+        "editProfile": "编辑 profile"
+      },
+      "placeholders": {
+        "intervalMs": "intervalMs",
+        "ipv4": "ipv4",
+        "multiplier": "multiplier",
+        "profileName": "profile 名称"
+      },
+      "tabs": {
+        "peer": "peer",
+        "profile": "profile"
+      },
+      "validation": {
+        "ipv4": "ipv4"
+      }
+    }
+  },
+  "en": {
+    "bfd": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "columns": {
+        "address": "Address",
+        "multiplier": "Multiplier",
+        "name": "Name",
+        "profile": "Profile",
+        "receiveInterval": "Receive Interval",
+        "sourceAddress": "Source Address",
+        "transmitInterval": "Transmit Interval"
+      },
+      "errors": {
+        "peerAddressRequired": "Peer Address Required",
+        "profileNameRequired": "Profile Name Required"
+      },
+      "labels": {
+        "multiplier": "Multiplier",
+        "nameRequired": "Name Required",
+        "peerAddressRequired": "Peer Address Required",
+        "profile": "Profile",
+        "receiveInterval": "Receive Interval",
+        "sourceAddress": "Source Address",
+        "transmitInterval": "Transmit Interval"
+      },
+      "messages": {
+        "confirmDeletePeer": "Confirm Delete Peer",
+        "confirmDeleteProfile": "Confirm Delete Profile"
+      },
+      "modals": {
+        "addPeer": "Add Peer",
+        "addProfile": "Add Profile",
+        "confirmDelete": "Confirm Delete",
+        "editPeer": "Edit Peer",
+        "editProfile": "Edit Profile"
+      },
+      "placeholders": {
+        "intervalMs": "Interval Ms",
+        "ipv4": "Ipv4",
+        "multiplier": "Multiplier",
+        "profileName": "Profile Name"
+      },
+      "tabs": {
+        "peer": "Peer",
+        "profile": "Profile"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  },
+  "zh-TW": {
+    "bfd": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "columns": {
+        "address": "Address",
+        "multiplier": "Multiplier",
+        "name": "Name",
+        "profile": "Profile",
+        "receiveInterval": "Receive Interval",
+        "sourceAddress": "Source Address",
+        "transmitInterval": "Transmit Interval"
+      },
+      "errors": {
+        "peerAddressRequired": "Peer Address Required",
+        "profileNameRequired": "Profile Name Required"
+      },
+      "labels": {
+        "multiplier": "Multiplier",
+        "nameRequired": "Name Required",
+        "peerAddressRequired": "Peer Address Required",
+        "profile": "Profile",
+        "receiveInterval": "Receive Interval",
+        "sourceAddress": "Source Address",
+        "transmitInterval": "Transmit Interval"
+      },
+      "messages": {
+        "confirmDeletePeer": "Confirm Delete Peer",
+        "confirmDeleteProfile": "Confirm Delete Profile"
+      },
+      "modals": {
+        "addPeer": "Add Peer",
+        "addProfile": "Add Profile",
+        "confirmDelete": "Confirm Delete",
+        "editPeer": "Edit Peer",
+        "editProfile": "Edit Profile"
+      },
+      "placeholders": {
+        "intervalMs": "Interval Ms",
+        "ipv4": "Ipv4",
+        "multiplier": "Multiplier",
+        "profileName": "Profile Name"
+      },
+      "tabs": {
+        "peer": "Peer",
+        "profile": "Profile"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  },
+  "ru": {
+    "bfd": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "columns": {
+        "address": "Address",
+        "multiplier": "Multiplier",
+        "name": "Name",
+        "profile": "Profile",
+        "receiveInterval": "Receive Interval",
+        "sourceAddress": "Source Address",
+        "transmitInterval": "Transmit Interval"
+      },
+      "errors": {
+        "peerAddressRequired": "Peer Address Required",
+        "profileNameRequired": "Profile Name Required"
+      },
+      "labels": {
+        "multiplier": "Multiplier",
+        "nameRequired": "Name Required",
+        "peerAddressRequired": "Peer Address Required",
+        "profile": "Profile",
+        "receiveInterval": "Receive Interval",
+        "sourceAddress": "Source Address",
+        "transmitInterval": "Transmit Interval"
+      },
+      "messages": {
+        "confirmDeletePeer": "Confirm Delete Peer",
+        "confirmDeleteProfile": "Confirm Delete Profile"
+      },
+      "modals": {
+        "addPeer": "Add Peer",
+        "addProfile": "Add Profile",
+        "confirmDelete": "Confirm Delete",
+        "editPeer": "Edit Peer",
+        "editProfile": "Edit Profile"
+      },
+      "placeholders": {
+        "intervalMs": "Interval Ms",
+        "ipv4": "Ipv4",
+        "multiplier": "Multiplier",
+        "profileName": "Profile Name"
+      },
+      "tabs": {
+        "peer": "Peer",
+        "profile": "Profile"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  },
+  "de": {
+    "bfd": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "columns": {
+        "address": "Address",
+        "multiplier": "Multiplier",
+        "name": "Name",
+        "profile": "Profile",
+        "receiveInterval": "Receive Interval",
+        "sourceAddress": "Source Address",
+        "transmitInterval": "Transmit Interval"
+      },
+      "errors": {
+        "peerAddressRequired": "Peer Address Required",
+        "profileNameRequired": "Profile Name Required"
+      },
+      "labels": {
+        "multiplier": "Multiplier",
+        "nameRequired": "Name Required",
+        "peerAddressRequired": "Peer Address Required",
+        "profile": "Profile",
+        "receiveInterval": "Receive Interval",
+        "sourceAddress": "Source Address",
+        "transmitInterval": "Transmit Interval"
+      },
+      "messages": {
+        "confirmDeletePeer": "Confirm Delete Peer",
+        "confirmDeleteProfile": "Confirm Delete Profile"
+      },
+      "modals": {
+        "addPeer": "Add Peer",
+        "addProfile": "Add Profile",
+        "confirmDelete": "Confirm Delete",
+        "editPeer": "Edit Peer",
+        "editProfile": "Edit Profile"
+      },
+      "placeholders": {
+        "intervalMs": "Interval Ms",
+        "ipv4": "Ipv4",
+        "multiplier": "Multiplier",
+        "profileName": "Profile Name"
+      },
+      "tabs": {
+        "peer": "Peer",
+        "profile": "Profile"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  },
+  "fr": {
+    "bfd": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "columns": {
+        "address": "Address",
+        "multiplier": "Multiplier",
+        "name": "Name",
+        "profile": "Profile",
+        "receiveInterval": "Receive Interval",
+        "sourceAddress": "Source Address",
+        "transmitInterval": "Transmit Interval"
+      },
+      "errors": {
+        "peerAddressRequired": "Peer Address Required",
+        "profileNameRequired": "Profile Name Required"
+      },
+      "labels": {
+        "multiplier": "Multiplier",
+        "nameRequired": "Name Required",
+        "peerAddressRequired": "Peer Address Required",
+        "profile": "Profile",
+        "receiveInterval": "Receive Interval",
+        "sourceAddress": "Source Address",
+        "transmitInterval": "Transmit Interval"
+      },
+      "messages": {
+        "confirmDeletePeer": "Confirm Delete Peer",
+        "confirmDeleteProfile": "Confirm Delete Profile"
+      },
+      "modals": {
+        "addPeer": "Add Peer",
+        "addProfile": "Add Profile",
+        "confirmDelete": "Confirm Delete",
+        "editPeer": "Edit Peer",
+        "editProfile": "Edit Profile"
+      },
+      "placeholders": {
+        "intervalMs": "Interval Ms",
+        "ipv4": "Ipv4",
+        "multiplier": "Multiplier",
+        "profileName": "Profile Name"
+      },
+      "tabs": {
+        "peer": "Peer",
+        "profile": "Profile"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  },
+  "ko": {
+    "bfd": {
+      "alerts": {
+        "saved": "Saved"
+      },
+      "columns": {
+        "address": "Address",
+        "multiplier": "Multiplier",
+        "name": "Name",
+        "profile": "Profile",
+        "receiveInterval": "Receive Interval",
+        "sourceAddress": "Source Address",
+        "transmitInterval": "Transmit Interval"
+      },
+      "errors": {
+        "peerAddressRequired": "Peer Address Required",
+        "profileNameRequired": "Profile Name Required"
+      },
+      "labels": {
+        "multiplier": "Multiplier",
+        "nameRequired": "Name Required",
+        "peerAddressRequired": "Peer Address Required",
+        "profile": "Profile",
+        "receiveInterval": "Receive Interval",
+        "sourceAddress": "Source Address",
+        "transmitInterval": "Transmit Interval"
+      },
+      "messages": {
+        "confirmDeletePeer": "Confirm Delete Peer",
+        "confirmDeleteProfile": "Confirm Delete Profile"
+      },
+      "modals": {
+        "addPeer": "Add Peer",
+        "addProfile": "Add Profile",
+        "confirmDelete": "Confirm Delete",
+        "editPeer": "Edit Peer",
+        "editProfile": "Edit Profile"
+      },
+      "placeholders": {
+        "intervalMs": "Interval Ms",
+        "ipv4": "Ipv4",
+        "multiplier": "Multiplier",
+        "profileName": "Profile Name"
+      },
+      "tabs": {
+        "peer": "Peer",
+        "profile": "Profile"
+      },
+      "validation": {
+        "ipv4": "Ipv4"
+      }
+    }
+  }
+}

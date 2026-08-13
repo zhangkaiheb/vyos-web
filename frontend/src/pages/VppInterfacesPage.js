@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { configApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
@@ -32,9 +32,9 @@ export default defineComponent({
   components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
     const configStore = useConfigStore();
+    const { t } = inject('i18n');
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
     const activeTab = ref('bonding');
 
     const config = ref({
@@ -47,61 +47,61 @@ export default defineComponent({
       xconnect: [],
     });
 
-    const bondingColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 120 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-      { key: 'mode', title: '模式', dataIndex: 'mode', width: 120 },
-      { key: 'hash_policy', title: '哈希策略', dataIndex: 'hash_policy', width: 120 },
-      { key: 'member_interfaces', title: '成员接口', dataIndex: 'member_interfaces', width: 200 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const bondingColumns = computed(() => [
+      { key: 'name', title: t('vppInterfaces.name'), dataIndex: 'name', width: 120 },
+      { key: 'description', title: t('vppInterfaces.description'), dataIndex: 'description', width: 200 },
+      { key: 'mode', title: t('vppInterfaces.mode'), dataIndex: 'mode', width: 120 },
+      { key: 'hash_policy', title: t('vppInterfaces.hash_policy'), dataIndex: 'hash_policy', width: 120 },
+      { key: 'member_interfaces', title: t('vppInterfaces.member_interfaces'), dataIndex: 'member_interfaces', width: 200 },
+      { key: 'actions', title: t('vppInterfaces.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
-    const bridgeColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 120 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-      { key: 'member_interfaces', title: '成员接口', dataIndex: 'member_interfaces', width: 300 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const bridgeColumns = computed(() => [
+      { key: 'name', title: t('vppInterfaces.name'), dataIndex: 'name', width: 120 },
+      { key: 'description', title: t('vppInterfaces.description'), dataIndex: 'description', width: 200 },
+      { key: 'member_interfaces', title: t('vppInterfaces.member_interfaces'), dataIndex: 'member_interfaces', width: 300 },
+      { key: 'actions', title: t('vppInterfaces.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
-    const greColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 120 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-      { key: 'mode', title: '模式', dataIndex: 'mode', width: 120 },
-      { key: 'remote', title: '远端', dataIndex: 'remote', width: 150 },
-      { key: 'source_address', title: '源地址', dataIndex: 'source_address', width: 150 },
-      { key: 'tunnel_type', title: '隧道类型', dataIndex: 'tunnel_type', width: 120 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const greColumns = computed(() => [
+      { key: 'name', title: t('vppInterfaces.name'), dataIndex: 'name', width: 120 },
+      { key: 'description', title: t('vppInterfaces.description'), dataIndex: 'description', width: 200 },
+      { key: 'mode', title: t('vppInterfaces.mode'), dataIndex: 'mode', width: 120 },
+      { key: 'remote', title: t('vppInterfaces.remote'), dataIndex: 'remote', width: 150 },
+      { key: 'source_address', title: t('vppInterfaces.source_address'), dataIndex: 'source_address', width: 150 },
+      { key: 'tunnel_type', title: t('vppInterfaces.tunnel_type'), dataIndex: 'tunnel_type', width: 120 },
+      { key: 'actions', title: t('vppInterfaces.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
-    const ipipColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 120 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-      { key: 'remote', title: '远端', dataIndex: 'remote', width: 150 },
-      { key: 'source_address', title: '源地址', dataIndex: 'source_address', width: 150 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const ipipColumns = computed(() => [
+      { key: 'name', title: t('vppInterfaces.name'), dataIndex: 'name', width: 120 },
+      { key: 'description', title: t('vppInterfaces.description'), dataIndex: 'description', width: 200 },
+      { key: 'remote', title: t('vppInterfaces.remote'), dataIndex: 'remote', width: 150 },
+      { key: 'source_address', title: t('vppInterfaces.source_address'), dataIndex: 'source_address', width: 150 },
+      { key: 'actions', title: t('vppInterfaces.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
-    const loopbackColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 120 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 300 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const loopbackColumns = computed(() => [
+      { key: 'name', title: t('vppInterfaces.name'), dataIndex: 'name', width: 120 },
+      { key: 'description', title: t('vppInterfaces.description'), dataIndex: 'description', width: 300 },
+      { key: 'actions', title: t('vppInterfaces.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
-    const vxlanColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 120 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-      { key: 'remote', title: '远端', dataIndex: 'remote', width: 150 },
-      { key: 'source_address', title: '源地址', dataIndex: 'source_address', width: 150 },
-      { key: 'vni', title: 'VNI', dataIndex: 'vni', width: 100 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const vxlanColumns = computed(() => [
+      { key: 'name', title: t('vppInterfaces.name'), dataIndex: 'name', width: 120 },
+      { key: 'description', title: t('vppInterfaces.description'), dataIndex: 'description', width: 200 },
+      { key: 'remote', title: t('vppInterfaces.remote'), dataIndex: 'remote', width: 150 },
+      { key: 'source_address', title: t('vppInterfaces.source_address'), dataIndex: 'source_address', width: 150 },
+      { key: 'vni', title: t('vppInterfaces.vni'), dataIndex: 'vni', width: 100 },
+      { key: 'actions', title: t('vppInterfaces.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
-    const xconnectColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 120 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-      { key: 'member_interfaces', title: '成员接口', dataIndex: 'member_interfaces', width: 300 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const xconnectColumns = computed(() => [
+      { key: 'name', title: t('vppInterfaces.name'), dataIndex: 'name', width: 120 },
+      { key: 'description', title: t('vppInterfaces.description'), dataIndex: 'description', width: 200 },
+      { key: 'member_interfaces', title: t('vppInterfaces.member_interfaces'), dataIndex: 'member_interfaces', width: 300 },
+      { key: 'actions', title: t('vppInterfaces.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
     const selectedItems = ref([]);
     const showModal = ref(false);
@@ -278,12 +278,11 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('vpp interfaces', true);
         config.value = interfacesToForm(res.data || {});
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('vppInterfaces.load_failed'));
       } finally {
         loading.value = false;
       }
@@ -297,11 +296,10 @@ export default defineComponent({
         if (Object.keys(payload).length) {
           await configApi.set('vpp interfaces', payload);
         }
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('vppInterfaces.save_failed'));
       } finally {
         saving.value = false;
       }
@@ -323,23 +321,23 @@ export default defineComponent({
     }
 
     function editItem() {
-      if (!selectedItems.value.length) return alert('请选择要编辑的项目');
+      if (!selectedItems.value.length) return showError({ message: t('vppInterfaces.select_to_edit') });
       const type = activeTab.value;
       const row = config.value[type].find(i => i.name === selectedItems.value[0]);
-      if (!row) return alert('未找到选中的项目');
+      if (!row) return showError({ message: t('vppInterfaces.item_not_found') });
       editingItem.value = JSON.parse(JSON.stringify(row));
       showModal.value = true;
     }
 
     function removeItem() {
-      if (!selectedItems.value.length) return alert('请选择要删除的项目');
+      if (!selectedItems.value.length) return showError({ message: t('vppInterfaces.select_to_delete') });
       const type = activeTab.value;
       config.value[type] = config.value[type].filter(i => i.name !== selectedItems.value[0]);
       selectedItems.value = [];
     }
 
     function saveItem() {
-      if (!editingItem.value.name) return alert('请输入名称');
+      if (!editingItem.value.name) return showError({ message: t('vppInterfaces.enter_name') });
       const type = activeTab.value;
       const list = config.value[type];
       const idx = list.findIndex(i => i._name === editingItem.value._name);
@@ -355,7 +353,8 @@ export default defineComponent({
     });
 
     return {
-      loading, saving, saved, config, activeTab, commandPath,
+      t,
+      loading, saving, config, activeTab, commandPath,
       bondingColumns, bridgeColumns, greColumns, ipipColumns, loopbackColumns, vxlanColumns, xconnectColumns,
       selectedItems, showModal, editingItem,
       load, save, createItem, editItem, removeItem, saveItem,
@@ -363,91 +362,86 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'bonding', title: 'Bonding' },
-        { key: 'bridge', title: 'Bridge' },
-        { key: 'gre', title: 'GRE' },
-        { key: 'ipip', title: 'IPIP' },
-        { key: 'loopback', title: 'Loopback' },
-        { key: 'vxlan', title: 'VXLAN' },
-        { key: 'xconnect', title: 'XConnect' }
+        { key: 'bonding', title: t('vppInterfaces.tab_bonding') },
+        { key: 'bridge', title: t('vppInterfaces.tab_bridge') },
+        { key: 'gre', title: t('vppInterfaces.tab_gre') },
+        { key: 'ipip', title: t('vppInterfaces.tab_ipip') },
+        { key: 'loopback', title: t('vppInterfaces.tab_loopback') },
+        { key: 'vxlan', title: t('vppInterfaces.tab_vxlan') },
+        { key: 'xconnect', title: t('vppInterfaces.tab_xconnect') }
       ]">
 
       <template #bonding>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createItem">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editItem" :disabled="!selectedItems.length || selectedItems.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeItem" :disabled="!selectedItems.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createItem">{{ t('vppInterfaces.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editItem" :disabled="!selectedItems.length || selectedItems.length > 1">{{ t('vppInterfaces.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeItem" :disabled="!selectedItems.length">{{ t('vppInterfaces.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="bondingColumns" :data="config.bonding" rowKey="name" :externalToolbar="true" @selection-change="selectedItems = $event" :selectable="true" />
       </template>
 
       <template #bridge>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createItem">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editItem" :disabled="!selectedItems.length || selectedItems.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeItem" :disabled="!selectedItems.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createItem">{{ t('vppInterfaces.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editItem" :disabled="!selectedItems.length || selectedItems.length > 1">{{ t('vppInterfaces.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeItem" :disabled="!selectedItems.length">{{ t('vppInterfaces.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="bridgeColumns" :data="config.bridge" rowKey="name" :externalToolbar="true" @selection-change="selectedItems = $event" :selectable="true" />
       </template>
 
       <template #gre>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createItem">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editItem" :disabled="!selectedItems.length || selectedItems.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeItem" :disabled="!selectedItems.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createItem">{{ t('vppInterfaces.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editItem" :disabled="!selectedItems.length || selectedItems.length > 1">{{ t('vppInterfaces.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeItem" :disabled="!selectedItems.length">{{ t('vppInterfaces.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="greColumns" :data="config.gre" rowKey="name" :externalToolbar="true" @selection-change="selectedItems = $event" :selectable="true" />
       </template>
 
       <template #ipip>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createItem">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editItem" :disabled="!selectedItems.length || selectedItems.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeItem" :disabled="!selectedItems.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createItem">{{ t('vppInterfaces.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editItem" :disabled="!selectedItems.length || selectedItems.length > 1">{{ t('vppInterfaces.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeItem" :disabled="!selectedItems.length">{{ t('vppInterfaces.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="ipipColumns" :data="config.ipip" rowKey="name" :externalToolbar="true" @selection-change="selectedItems = $event" :selectable="true" />
       </template>
 
       <template #loopback>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createItem">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editItem" :disabled="!selectedItems.length || selectedItems.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeItem" :disabled="!selectedItems.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createItem">{{ t('vppInterfaces.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editItem" :disabled="!selectedItems.length || selectedItems.length > 1">{{ t('vppInterfaces.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeItem" :disabled="!selectedItems.length">{{ t('vppInterfaces.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="loopbackColumns" :data="config.loopback" rowKey="name" :externalToolbar="true" @selection-change="selectedItems = $event" :selectable="true" />
       </template>
 
       <template #vxlan>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createItem">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editItem" :disabled="!selectedItems.length || selectedItems.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeItem" :disabled="!selectedItems.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createItem">{{ t('vppInterfaces.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editItem" :disabled="!selectedItems.length || selectedItems.length > 1">{{ t('vppInterfaces.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeItem" :disabled="!selectedItems.length">{{ t('vppInterfaces.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="vxlanColumns" :data="config.vxlan" rowKey="name" :externalToolbar="true" @selection-change="selectedItems = $event" :selectable="true" />
       </template>
 
       <template #xconnect>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createItem">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editItem" :disabled="!selectedItems.length || selectedItems.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeItem" :disabled="!selectedItems.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createItem">{{ t('vppInterfaces.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editItem" :disabled="!selectedItems.length || selectedItems.length > 1">{{ t('vppInterfaces.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeItem" :disabled="!selectedItems.length">{{ t('vppInterfaces.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="xconnectColumns" :data="config.xconnect" rowKey="name" :externalToolbar="true" @selection-change="selectedItems = $event" :selectable="true" />
       </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="showModal" :title="editingItem && editingItem._name ? '编辑' : '新建'" @confirm="saveItem" @close="showModal = false" width="700px">
+      <DraggableModal v-model:visible="showModal" :title="editingItem && editingItem._name ? t('vppInterfaces.edit') : t('vppInterfaces.create_new')" @confirm="saveItem" @close="showModal = false" width="700px">
         <div v-if="activeTab === 'bonding'">
-          <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingItem.name" :disabled="editingItem._name" placeholder="bondN" title="Bonding接口名称" /></div>
-          <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingItem.description" title="描述" /></div>
-          <div class="form-row"><label class="form-label">模式</label>
-            <select class="form-control" v-model="editingItem.mode" title="Bonding模式">
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.name') }}</label><input class="form-control" v-model="editingItem.name" :disabled="editingItem._name" placeholder="bondN" :title="t('vppInterfaces.bonding_name_help')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.description') }}</label><input class="form-control" v-model="editingItem.description" :title="t('vppInterfaces.description')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.mode') }}</label>
+            <select class="form-control" v-model="editingItem.mode" :title="t('vppInterfaces.bonding_mode')">
               <option value="802.3ad">802.3ad</option>
               <option value="active-backup">Active-Backup</option>
               <option value="broadcast">Broadcast</option>
@@ -455,65 +449,65 @@ export default defineComponent({
               <option value="xor-hash">XOR-Hash</option>
             </select>
           </div>
-          <div class="form-row"><label class="form-label">哈希策略</label>
-            <select class="form-control" v-model="editingItem.hash_policy" title="哈希策略">
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.hash_policy') }}</label>
+            <select class="form-control" v-model="editingItem.hash_policy" :title="t('vppInterfaces.hash_policy')">
               <option value="layer2">Layer2</option>
               <option value="layer2+3">Layer2+3</option>
               <option value="layer3+4">Layer3+4</option>
             </select>
           </div>
-          <div class="form-row"><label class="form-label">内核接口</label><input class="form-control" v-model="editingItem.kernel_interface" placeholder="vpptunN" title="内核接口" /></div>
-          <div class="form-row"><label class="form-label">MAC地址</label><input class="form-control" v-model="editingItem.mac" placeholder="xx:xx:xx:xx:xx:xx" title="MAC地址" /></div>
-          <div class="form-row"><label class="form-label">成员接口</label><textarea class="form-control" v-model="editingItem.member_interfaces" rows="3" placeholder="每行一个接口" title="成员接口" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.kernel_interface') }}</label><input class="form-control" v-model="editingItem.kernel_interface" placeholder="vpptunN" :title="t('vppInterfaces.kernel_interface')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.mac_address') }}</label><input class="form-control" v-model="editingItem.mac" placeholder="xx:xx:xx:xx:xx:xx" :title="t('vppInterfaces.mac_address')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.member_interfaces') }}</label><textarea class="form-control" v-model="editingItem.member_interfaces" rows="3" :placeholder="t('vppInterfaces.one_per_line')" :title="t('vppInterfaces.member_interfaces')" /></div>
         </div>
         <div v-if="activeTab === 'bridge'">
-          <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingItem.name" :disabled="editingItem._name" placeholder="brN" title="Bridge接口名称" /></div>
-          <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingItem.description" title="描述" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.name') }}</label><input class="form-control" v-model="editingItem.name" :disabled="editingItem._name" placeholder="brN" :title="t('vppInterfaces.bridge_name_help')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.description') }}</label><input class="form-control" v-model="editingItem.description" :title="t('vppInterfaces.description')" /></div>
         </div>
         <div v-if="activeTab === 'gre'">
-          <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingItem.name" :disabled="editingItem._name" placeholder="greN" title="GRE接口名称" /></div>
-          <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingItem.description" title="描述" /></div>
-          <div class="form-row"><label class="form-label">模式</label>
-            <select class="form-control" v-model="editingItem.mode" title="GRE模式">
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.name') }}</label><input class="form-control" v-model="editingItem.name" :disabled="editingItem._name" placeholder="greN" :title="t('vppInterfaces.gre_name_help')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.description') }}</label><input class="form-control" v-model="editingItem.description" :title="t('vppInterfaces.description')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.mode') }}</label>
+            <select class="form-control" v-model="editingItem.mode" :title="t('vppInterfaces.gre_mode')">
               <option value="point-to-point">Point-to-Point</option>
               <option value="point-to-multipoint">Point-to-Multipoint</option>
             </select>
           </div>
-          <div class="form-row"><label class="form-label">远端地址</label><input class="form-control" v-model="editingItem.remote" placeholder="x.x.x.x" title="远端IP地址" /></div>
-          <div class="form-row"><label class="form-label">源地址</label><input class="form-control" v-model="editingItem.source_address" placeholder="x.x.x.x" title="源IP地址" /></div>
-          <div class="form-row"><label class="form-label">隧道类型</label>
-            <select class="form-control" v-model="editingItem.tunnel_type" title="隧道类型">
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.remote_address') }}</label><input class="form-control" v-model="editingItem.remote" placeholder="x.x.x.x" :title="t('vppInterfaces.remote_ip')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.source_address') }}</label><input class="form-control" v-model="editingItem.source_address" placeholder="x.x.x.x" :title="t('vppInterfaces.source_ip')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.tunnel_type') }}</label>
+            <select class="form-control" v-model="editingItem.tunnel_type" :title="t('vppInterfaces.tunnel_type')">
               <option value="erspan">ERSPAN</option>
               <option value="l3">L3</option>
               <option value="teb">TEB</option>
             </select>
           </div>
-          <div class="form-row"><label class="form-label">内核接口</label><input class="form-control" v-model="editingItem.kernel_interface" placeholder="vpptunN" title="内核接口" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.kernel_interface') }}</label><input class="form-control" v-model="editingItem.kernel_interface" placeholder="vpptunN" :title="t('vppInterfaces.kernel_interface')" /></div>
         </div>
         <div v-if="activeTab === 'ipip'">
-          <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingItem.name" :disabled="editingItem._name" placeholder="ipipN" title="IPIP接口名称" /></div>
-          <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingItem.description" title="描述" /></div>
-          <div class="form-row"><label class="form-label">远端地址</label><input class="form-control" v-model="editingItem.remote" placeholder="x.x.x.x" title="远端IP地址" /></div>
-          <div class="form-row"><label class="form-label">源地址</label><input class="form-control" v-model="editingItem.source_address" placeholder="x.x.x.x" title="源IP地址" /></div>
-          <div class="form-row"><label class="form-label">内核接口</label><input class="form-control" v-model="editingItem.kernel_interface" placeholder="vpptunN" title="内核接口" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.name') }}</label><input class="form-control" v-model="editingItem.name" :disabled="editingItem._name" placeholder="ipipN" :title="t('vppInterfaces.ipip_name_help')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.description') }}</label><input class="form-control" v-model="editingItem.description" :title="t('vppInterfaces.description')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.remote_address') }}</label><input class="form-control" v-model="editingItem.remote" placeholder="x.x.x.x" :title="t('vppInterfaces.remote_ip')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.source_address') }}</label><input class="form-control" v-model="editingItem.source_address" placeholder="x.x.x.x" :title="t('vppInterfaces.source_ip')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.kernel_interface') }}</label><input class="form-control" v-model="editingItem.kernel_interface" placeholder="vpptunN" :title="t('vppInterfaces.kernel_interface')" /></div>
         </div>
         <div v-if="activeTab === 'loopback'">
-          <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingItem.name" :disabled="editingItem._name" placeholder="loN" title="Loopback接口名称" /></div>
-          <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingItem.description" title="描述" /></div>
-          <div class="form-row"><label class="form-label">内核接口</label><input class="form-control" v-model="editingItem.kernel_interface" placeholder="vpptunN" title="内核接口" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.name') }}</label><input class="form-control" v-model="editingItem.name" :disabled="editingItem._name" placeholder="loN" :title="t('vppInterfaces.loopback_name_help')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.description') }}</label><input class="form-control" v-model="editingItem.description" :title="t('vppInterfaces.description')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.kernel_interface') }}</label><input class="form-control" v-model="editingItem.kernel_interface" placeholder="vpptunN" :title="t('vppInterfaces.kernel_interface')" /></div>
         </div>
         <div v-if="activeTab === 'vxlan'">
-          <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingItem.name" :disabled="editingItem._name" placeholder="vxlanN" title="VXLAN接口名称" /></div>
-          <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingItem.description" title="描述" /></div>
-          <div class="form-row"><label class="form-label">远端地址</label><input class="form-control" v-model="editingItem.remote" placeholder="x.x.x.x" title="远端IP地址" /></div>
-          <div class="form-row"><label class="form-label">源地址</label><input class="form-control" v-model="editingItem.source_address" placeholder="x.x.x.x" title="源IP地址" /></div>
-          <div class="form-row"><label class="form-label">VNI</label><input class="form-control" type="number" min="0" max="16777214" v-model="editingItem.vni" title="VXLAN Network Identifier" /></div>
-          <div class="form-row"><label class="form-label">内核接口</label><input class="form-control" v-model="editingItem.kernel_interface" placeholder="vpptapN" title="内核接口" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.name') }}</label><input class="form-control" v-model="editingItem.name" :disabled="editingItem._name" placeholder="vxlanN" :title="t('vppInterfaces.vxlan_name_help')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.description') }}</label><input class="form-control" v-model="editingItem.description" :title="t('vppInterfaces.description')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.remote_address') }}</label><input class="form-control" v-model="editingItem.remote" placeholder="x.x.x.x" :title="t('vppInterfaces.remote_ip')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.source_address') }}</label><input class="form-control" v-model="editingItem.source_address" placeholder="x.x.x.x" :title="t('vppInterfaces.source_ip')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.vni') }}</label><input class="form-control" type="number" min="0" max="16777214" v-model="editingItem.vni" title="VXLAN Network Identifier" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.kernel_interface') }}</label><input class="form-control" v-model="editingItem.kernel_interface" placeholder="vpptapN" :title="t('vppInterfaces.kernel_interface')" /></div>
         </div>
         <div v-if="activeTab === 'xconnect'">
-          <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingItem.name" :disabled="editingItem._name" placeholder="xconN" title="XConnect接口名称" /></div>
-          <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingItem.description" title="描述" /></div>
-          <div class="form-row"><label class="form-label">成员接口</label><textarea class="form-control" v-model="editingItem.member_interfaces" rows="3" placeholder="每行一个接口" title="成员接口" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.name') }}</label><input class="form-control" v-model="editingItem.name" :disabled="editingItem._name" placeholder="xconN" :title="t('vppInterfaces.xconnect_name_help')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.description') }}</label><input class="form-control" v-model="editingItem.description" :title="t('vppInterfaces.description')" /></div>
+          <div class="form-row"><label class="form-label">{{ t('vppInterfaces.member_interfaces') }}</label><textarea class="form-control" v-model="editingItem.member_interfaces" rows="3" :placeholder="t('vppInterfaces.one_per_line')" :title="t('vppInterfaces.member_interfaces')" /></div>
         </div>
       </DraggableModal>
     </div>

@@ -3,6 +3,7 @@ import { opModeApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function parseTable(output) {
   const lines = String(output || '').split('\n').map(s => s.replace(/\r$/, ''));
@@ -55,6 +56,7 @@ function parseTable(output) {
 export default defineComponent({
   name: 'DhcpLeasesPage',
   setup() {
+    const { t } = useI18n();
     const loading = ref(false);
     const leases = ref([]);
     const rawOutput = ref('');
@@ -62,17 +64,17 @@ export default defineComponent({
     const filterOrigin = ref('');
     const sortKey = ref('');
 
-    const columns = [
-      { key: 'ip_address', title: 'IP 地址' },
-      { key: 'mac_address', title: 'MAC 地址' },
-      { key: 'state', title: '状态' },
-      { key: 'lease_start', title: '租约开始' },
-      { key: 'lease_expiration', title: '租约到期' },
-      { key: 'remaining', title: '剩余时间' },
-      { key: 'pool', title: '地址池' },
-      { key: 'hostname', title: '主机名' },
-      { key: 'origin', title: '来源' },
-    ];
+    const columns = computed(() => [
+      { key: 'ip_address', title: t('dhcpLeases.columns.ipAddress') },
+      { key: 'mac_address', title: t('dhcpLeases.columns.macAddress') },
+      { key: 'state', title: t('dhcpLeases.columns.state') },
+      { key: 'lease_start', title: t('dhcpLeases.columns.leaseStart') },
+      { key: 'lease_expiration', title: t('dhcpLeases.columns.leaseExpiration') },
+      { key: 'remaining', title: t('dhcpLeases.columns.remaining') },
+      { key: 'pool', title: t('dhcpLeases.columns.pool') },
+      { key: 'hostname', title: t('dhcpLeases.columns.hostname') },
+      { key: 'origin', title: t('dhcpLeases.columns.origin') },
+    ]);
 
     const poolOptions = computed(() => {
       const pools = new Set();
@@ -111,42 +113,37 @@ export default defineComponent({
 
     onMounted(load);
 
-    return { loading, leases, columns, load, rawOutput, filterPool, filterOrigin, sortKey, poolOptions, filteredLeases };
+    return { t,
+      loading, leases, columns, load, rawOutput, filterPool, filterOrigin, sortKey, poolOptions, filteredLeases };
   },
   components: { DataTable, ToolbarButton },
   template: `
     <div class="page-container">
-      <div class="toolbar toolbar-split">
-        <div class="toolbar-left"><h3>DHCP 租约</h3></div>
-        <div class="toolbar-right">
-          <select v-model="filterPool" @change="load" title="按地址池过滤">
-            <option value="">全部地址池</option>
+      <DataTable :columns="columns" :data="filteredLeases" :loading="loading" :selectable="false" :actions="[]" @refresh="load">
+        <template #toolbar-right-extra>
+          <select v-model="filterPool" @change="load" :title="t('dhcpLeases.filterByPool')">
+            <option value="">{{ t('dhcpLeases.allPools') }}</option>
             <option v-for="p in poolOptions" :key="p" :value="p">{{ p }}</option>
           </select>
-          <select v-model="filterOrigin" @change="load" title="按来源过滤">
-            <option value="">全部来源</option>
+          <select v-model="filterOrigin" @change="load" :title="t('dhcpLeases.filterByOrigin')">
+            <option value="">{{ t('dhcpLeases.allOrigins') }}</option>
             <option value="local">local</option>
             <option value="remote">remote</option>
           </select>
-          <select v-model="sortKey" @change="load" title="排序">
-            <option value="">默认排序</option>
-            <option value="end">到期时间</option>
-            <option value="hostname">主机名</option>
+          <select v-model="sortKey" @change="load" :title="t('dhcpLeases.sort')">
+            <option value="">{{ t('dhcpLeases.defaultSort') }}</option>
+            <option value="end">{{ t('dhcpLeases.sortByExpiration') }}</option>
+            <option value="hostname">{{ t('dhcpLeases.sortByHostname') }}</option>
             <option value="ip">IP</option>
             <option value="mac">MAC</option>
-            <option value="pool">地址池</option>
-            <option value="remaining">剩余时间</option>
-            <option value="start">开始时间</option>
-            <option value="state">状态</option>
+            <option value="pool">{{ t('dhcpLeases.sortByPool') }}</option>
+            <option value="remaining">{{ t('dhcpLeases.sortByRemaining') }}</option>
+            <option value="start">{{ t('dhcpLeases.sortByStart') }}</option>
+            <option value="state">{{ t('dhcpLeases.sortByState') }}</option>
           </select>
-          <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
-        </div>
-      </div>
-      <DataTable :columns="columns" :data="filteredLeases" :loading="loading" :selectable="false" :actions="[]" />
-      <div v-if="rawOutput" style="margin-top:16px;">
-        <div style="font-weight:bold;margin-bottom:4px;">原始输出</div>
-        <pre style="background:#f5f5f5;padding:8px;border:1px solid #ddd;font-size:12px;overflow:auto;">{{ rawOutput }}</pre>
-      </div>
+          <ToolbarButton icon="refresh" @click="load">{{ t('dhcpLeases.refresh') }}</ToolbarButton>
+        </template>
+      </DataTable>
     </div>
   `,
 });

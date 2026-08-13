@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="tunnel">
+<h1>Tunnel</h1>
+<p>Tunnel-Schnittstellen sind virtuelle Verbindungen, die verschlüsselten Datenverkehr zwischen privaten Netzwerken oder Hosts über öffentliche Infrastruktur, wie das Internet, übertragen. Sie verwenden Verschlüsselungsprotokolle, um den ursprünglichen Datenverkehr für die Übertragung zu verpacken. Die unterstützten Protokolle umfassen <abbr title="Generic Routing Encapsulation">GRE</abbr>, IPIP, IPIP6, IP6IP6 und 6in4 (SIT).</p>
+<p>Obwohl <abbr title="Generic Routing Encapsulation">GRE</abbr> aufgrund seiner Vielseitigkeit oft die bevorzugte Lösung ist, können andere Verschlüsselungsprotokolle für bestimmte Anwendungsfälle besser geeignet sein.</p>
+<p>VyOS verwendet eine einzige Tunnel-Schnittstelltabelle für alle diese Protokolle. Es gibt keine separaten <abbr title="Generic Routing Encapsulation">GRE</abbr>, IPIP oder IP6IP6-Schnittstellen; stattdessen wird das gewünschte Verschlüsselungsprotokoll innerhalb der Konfiguration <code class="docutils literal notranslate">set interfaces tunnel</code> ausgewählt.</p>
+<p>Konfigurationsoptionen für jedes Protokoll werden unten beschrieben.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warnung</p>
+<p>Ändern Sie nicht den Verschlüsselungstyp für bereits konfigurierte Tunnel-Schnittstellen, da dies deren abhängige Konfigurationen beeinträchtigen könnte.</p>
+</div>
+<section id="common-interface-configuration">
+<h2>Gemeinsame Schnittstellenkonfiguration</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine oder mehrere Schnittstellen-IP-Adressen.</strong></p>
+<p><code class="docutils literal notranslate">&lt;address&gt;</code> unterstützt IPv4 und IPv6 in CIDR-Schreibweise. Zum Beispiel verwenden Sie <code class="docutils literal notranslate">192.0.2.1/24</code> für IPv4 oder <code class="docutils literal notranslate">2001:db8::1/64</code> für IPv6.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 address 192.0.2.1/24
+set interfaces tunnel tun0 address 2001:db8::1/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie ein klares, beschreibendes Alias für die Schnittstelle.</strong></p>
+<p>Dieses Alias erscheint im Befehl <code class="docutils literal notranslate">show interfaces</code> und in SNMP-basierten Überwachungstools.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Schalten Sie die Schnittstelle aus.</strong></p>
+<p>Die Schnittstelle wird auf den administrativ heruntergefahrenen Zustand (<code class="docutils literal notranslate">A/D</code>) gesetzt.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt;  disable-flow-control
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-disable-flow-control" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie die Ethernet-Flusssteuerung (IEEE 802.3x Pause Frames) auf der Schnittstelle.</strong></p>
+<blockquote>
+<div><p>Die Ethernet-Flusssteuerung, definiert durch das IEEE 802.3x-Standard, unterbricht vorübergehend die Datenübertragung, um Paketverluste während der Netzwerkbelastung zu vermeiden. Zum Beispiel, wenn ein Sender Daten schneller überträgt, als der Empfänger verarbeiten kann.</p>
+<p>Das Deaktivieren der Ethernet-Flusssteuerung bedeutet, dass die Schnittstelle kein Signal an das verbundene Gerät sendet, um die Übertragung zu pausieren, und Pakete abwirft, wenn sie überfordert ist.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 disable-flow-control
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; disable-link-detect
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-disable-link-detect" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie die Erkennung physischer Link-Zustandsänderungen auf der Schnittstelle, z. B. wenn ein Kabel entfernt wird.</strong></p>
+<p>Standardmäßig erkennt die Schnittstelle physische Link-Zustandsänderungen.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 disable-link-detect
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie das MTU auf der Schnittstelle.</strong></p>
+<p>Der Wert definiert die größte Paketgröße in Bytes, die die Schnittstelle ohne Fragmentierung überträgt.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie den</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>, der in ausgehenden TCP SYN-Paketen auf der angegebenen Schnittstelle angegeben wird.</strong></p>
+<p>Durch das Begrenzen des MSS-Werts in TCP SYN-Paketen informieren Sie den Remote-Partner explizit, dass keine Pakete größer als dieser Wert gesendet werden sollen. Dies verhindert Verbindungsprobleme, die auftreten, wenn die Pfad-MTU-Erkennung (PMTUD) fehlschlägt.</p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Legt den MSS auf einen spezifischen Wert in Bytes fest. Nutzen Sie diese Option, wenn Sie einen spezifischen MSS erzwingen müssen, z. B. zur Fehlerbehebung von Verbindungsproblemen oder zur Berücksichtigung spezifischer Netzwerkanforderungen.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> Der Router berechnet den MSS automatisch als den MTU der Schnittstelle minus 40 Bytes für IPv4-Datenverkehr (20 Bytes für den IPv4-Header und 20 Bytes für den TCP-Header). Diese Option wird empfohlen, um den richtigen Wert automatisch zu setzen.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-arp-cache-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie, wie lange ein ARP-Eintrag gültig bleibt, nachdem eine IP-zu-MAC-Adresse-Zuordnung auf dieser Schnittstelle gelernt wurde.</strong></p>
+<p>Die Standarddauer beträgt 30 Sekunden.</p>
+<p>Eine ARP-Eintrag bleibt gültig, wenn er positive Rückmeldungen von höheren Protokollen erhält.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-disable-arp-filter" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die ARP-Filterung auf dieser Schnittstelle.</strong></p>
+<p><strong>Standardverhalten:</strong> Das Kernel antwortet auf ARP-Anfragen auf dieser Schnittstelle nur dann, wenn der Datenverkehr über diese spezifische Schnittstelle zurück zum ARP-Sender gerichtet wird.</p>
+<p><strong>Wenn konfiguriert:</strong> Das Kernel antwortet auf ARP-Anfragen auf dieser Schnittstelle für jede IP-Adresse, die auf dem lokalen Host konfiguriert ist, unabhängig davon, welche spezifische Schnittstelle diese IP-Adresse zugewiesen ist, und unabhängig vom Routing-Tabellen. Dies spiegelt das Linux-Konzept wider, dass IP-Adressen dem Host gehören, nicht einzelnen Schnittstellen.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip disable-arp-filter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Schnittstelle für Host- oder Router-Verhalten.</strong></p>
+<p>Wenn konfiguriert, wechselt die Schnittstelle in Hostmodus, und IPv4-Weiterleitung wird auf ihr deaktiviert.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie, ob IP-gerichtete Broadcast-Pakete, die auf dieser Schnittstelle empfangen werden, weitergeleitet werden.</strong></p>
+<p><strong>Standardverhalten:</strong> IP-gerichtete Broadcast-Pakete werden abgeworfen.</p>
+<p><strong>Wenn konfiguriert:</strong> IP-gerichtete Broadcast-Pakete werden an alle Hosts auf dem Ziel-Subnetz weitergeleitet, wie in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> und <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a> definiert.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-enable-arp-accept" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie, wie mit kostenlosen ARPs auf dieser Schnittstelle umgegangen wird.</strong></p>
+<p>Wenn konfiguriert, wird eine IP-zu-MAC-Zuordnung basierend auf kostenlosen ARP-Anfragen oder Antworten in die ARP-Tabelle eingefügt.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Wenn die ARP-Tabelle bereits eine IP-Adresse aus einem kostenlosen ARP enthält, wird der Eintrag aktualisiert, unabhängig davon, ob diese Einstellung konfiguriert ist.</p>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-enable-arp-announce" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Quell-IP-Auswahl für ARP-Anfragen auf dieser Schnittstelle.</strong></p>
+<p><strong>Standardverhalten:</strong> Das Kernel kann jede IP-Adresse verwenden, die der Host besitzt, als Quell-IP-Adresse in ARP-Anfragen auf dieser Schnittstelle.</p>
+<p><strong>Wenn konfiguriert:</strong> Das Kernel versucht zunächst, eine Quell-IP-Adresse zu wählen, die auf der Schnittstelle konfiguriert ist und eine gemeinsame Subnetz mit der Ziel-IP-Adresse hat. Wenn es keine solche Subnetz gibt, wählt das Kernel die IP-Adresse aus, die es normalerweise verwenden würde (basierend auf der Routing-Tabelle, um das Zielziel zu erreichen).</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-enable-arp-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie, welche ARP-Anfragen auf dieser Schnittstelle ignoriert werden.</strong></p>
+<p><strong>Standardverhalten:</strong> Das Kernel antwortet auf ARP-Anfragen für beliebige lokale IP-Adressen, unabhängig davon, welcher Schnittstelle sie zugewiesen sind.</p>
+<p><strong>Wenn konfiguriert:</strong> Das Kernel antwortet nur auf ARP-Anfragen, wenn die Ziel-IP-Adresse dieser spezifischen Schnittstelle zugewiesen ist.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-enable-proxy-arp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie Proxy-ARP auf dieser Schnittstelle.</strong></p>
+<p>Wenn konfiguriert, greift der Router (Kernel) auf ARP-Anfragen für nicht lokale IP-Adressen zu und antwortet mit der <abbr title="Media Access Control">MAC</abbr>-Adresse der Schnittstelle, die die Anfrage empfangen hat. Danach werden Pakete, die an diese IP-Adressen gerichtet sind, an ihre tatsächlichen Ziele auf entfernten Subnetzen weitergeleitet.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ip enable-proxy-arp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-proxy-arp-pvlan" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie lokale Proxy-ARP auf der Schnittstelle.</strong></p>
+<p>Wenn konfiguriert, antwortet der Router (Kernel) auf ARP-Anfragen auf dieser VLAN-Schnittstelle, auch wenn die Ziel-IP-Adresse auf dem gleichen Subnetz und der gleichen Schnittstelle liegt.</p>
+<p>Dies wird verwendet, um Netzwerkisolationsanforderungen (RFC 3069) für private VLANs (PVLANs) zu unterstützen. In PVLAN-Konfigurationen dürfen Hosts auf isolierten Ports nicht direkt miteinander kommunizieren, aber sie können mit dem Upstream-Router kommunizieren.</p>
+<p>Durch die Antwort auf interne ARP-Anfragen mit ihrer eigenen <abbr title="Media Access Control">MAC</abbr>-Adresse leitet der Router den inter-HOST-Datenverkehr durch sich selbst anstatt direkt zwischen Hosts.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Dieser Befehl funktioniert unabhängig und erfordert nicht, dass der Standard-Proxy-ARP auf der Schnittstelle aktiviert wird.</p>
+</div>
+<p>Lokaler Proxy-ARP ist auch bekannt als:</p>
+<ul class="simple">
+<li><p>VLAN-Aggregation (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>Private VLAN (Cisco, Allied Telesyn).</p></li>
+<li><p>Quellport-Filterung oder Port-Isolation (Hewlett-Packard).</p></li>
+<li><p>MAC-Forced Forwarding (Ericsson).</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Quell-IP-Adressen-Überprüfung mit</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>auf dieser Schnittstelle, wie in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> <strong>angegeben.</strong></p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><strong>strict:</strong> Jedes ankommende Paket wird auf seine Quell-IP-Adresse gegen die Forwarding Information Base (FIB) geprüft. Wenn die Schnittstelle nicht der beste Weg zurück zu dieser Quelle ist, schlägt die Validierung fehl und das Paket wird abgeworfen.</p></li>
+<li><p><strong>loose:</strong> Jedes ankommende Paket wird auf seine Quell-IP-Adresse gegen die FIB geprüft. Wenn die Quell-IP-Adresse durch irgendeine Schnittstelle nicht erreichbar ist, schlägt die Validierung fehl.</p></li>
+<li><p><strong>disable:</strong> Keine Quell-IP-Adressen-Überprüfung wird durchgeführt. Alle ankommenden Pakete werden akzeptiert.</p></li>
+</ul>
+<p>RFC 3704 empfiehlt, den strengen Modus zu aktivieren, um IP-Spoofing, wie DDoS-Angriffe, zu verhindern. Für asynchrone oder komplexe Routing-Szenarien verwenden Sie den lockeren Modus.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Schnittstelle, um automatisch eine IPv6-Adresse mit</strong> <abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>zu erhalten, wie in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a> <strong>festgelegt.</strong></p>
+<p>IPv6-Hosts können sich automatisch konfigurieren, wenn sie sich einem IPv6-Netzwerk anschließen, indem sie das Neighbor Discovery Protocol über ICMPv6-Router-Discovery-Nachrichten verwenden. Bei der ersten Verbindung zu einem Netzwerk sendet ein Host eine Link-Local-Router-Solicitation-Multicast-Anfrage für seine Konfigurationsparameter. Der Router antwortet mit einer Router-Advertisement-Paket, das Internet-Layer-Konfigurationsparameter enthält.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Diese Methode deaktiviert automatisch die IPv6-Verkehrsweiterleitung auf der Schnittstelle.</p>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ipv6 address autoconf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ipv6-address-eui64-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Schnittstelle, um sich selbst eine IPv6-Adresse mit dem</strong> <abbr title="64-Bit Extended Unique Identifier">EUI-64</abbr> <strong>-Methode zu zuweisen, wie in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a> <strong>festgelegt.</strong></p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ipv6 address eui64 2001:db8:beef::/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ipv6 address no-default-link-local
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ipv6-address-no-default-link-local" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie die automatische Zuweisung einer link-lokalen IPv6-Adresse zu dieser Schnittstelle.</strong></p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ipv6 address no-default-link-local
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ipv6-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Schnittstelle für Host- oder Router-Verhalten.</strong></p>
+<p>Wenn konfiguriert, wechselt die Schnittstelle in Hostmodus, und IPv6-Weiterleitung wird auf ihr deaktiviert.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ipv6 disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ipv6 adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie den</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>, der in ausgehenden TCP SYN-Paketen auf der angegebenen Schnittstelle angegeben wird.</strong></p>
+<p>Durch das Begrenzen des MSS-Werts in TCP SYN-Paketen informieren Sie den Remote-Partner explizit, dass keine Pakete größer als dieser Wert gesendet werden sollen. Dies verhindert Verbindungsprobleme, die auftreten, wenn die Pfad-MTU-Erkennung (PMTUD) fehlschlägt.</p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><strong>mss:</strong> Setzt den MSS auf einen spezifischen Wert in Bytes. Nutzen Sie diese Option, um einen spezifischen MSS zu erzwingen, z. B. zur Fehlerbehebung von Verbindungsproblemen oder zur Berücksichtigung spezifischer Netzwerkbedürfnisse.</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> Der Router berechnet den MSS als den MTU der Schnittstelle minus 60 Bytes für IPv6-Datenverkehr (40 Bytes für den IPv6-Header und 20 Bytes für den TCP-Header). Diese Option wird empfohlen, um den richtigen Wert automatisch zu setzen.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ipv6 accept-dad &lt;0 | 1 | 2&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ipv6-accept-dad-0-1-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie IPv6</strong> <abbr title="Duplicate Address Detection">DAD</abbr> <strong>auf der Schnittstelle.</strong></p>
+<p>Die folgenden Optionen sind verfügbar:</p>
+<ul class="simple">
+<li><p><strong>0:</strong> Deaktiviert DAD. Es wird keine Duplicate Address Detection durchgeführt.</p></li>
+<li><p><strong>1:</strong> Aktiviert DAD (Standard). Duplicate Addresses werden erkannt. Die IPv6-Operation der Schnittstelle wird für gültige IPv6-Adressen fortgesetzt.</p></li>
+<li><p><strong>2:</strong> Aktiviert DAD und, falls eine MAC-basierte doppelte Link-Local-Adresse gefunden wird, deaktiviert IPv6-Operation auf dieser Schnittstelle.</p></li>
+</ul>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ipv6 accept-dad 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; ipv6 dup-addr-detect-transmits &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-ipv6-dup-addr-detect-transmits-n" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die Anzahl der</strong> <abbr title="Duplicate Address Detection">DAD</abbr> <strong>-Nachrichten, die der Router (Kernel) während der IPv6-Adresszuweisung auf dieser Schnittstelle sendet.</strong></p>
+<p>Der Standardwert ist 1.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 ipv6 dup-addr-detect-transmits 5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces tunnel &lt;interface&gt; vrf &lt;vrf&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-tunnel-interface-vrf-vrf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Weisen Sie die Schnittstelle einem spezifischen</strong> <abbr title="Virtual Routing and Forwarding">VRF</abbr> <strong>Instanz zu.</strong></p>
+<div class="admonition seealso">
+<p class="admonition-title">Siehe auch</p>
+<p>Für Informationen zur Konfiguration eines VRF, siehe den <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>-Abschnitt.</p>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 vrf red
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="ipip">
+<h2>IPIP</h2>
+<p>IPIP ist ein einfaches Verschlüsselungsprotokoll, das in RFC 2003 definiert ist. Es umschließt ein IPv4-Paket innerhalb eines anderen IPv4-Pakets.</p>
+<p>Tunnels mit IPIP-Verschlüsselung haben keine protokollspezifischen Konfigurationsoptionen, außer dass der Verschlüsselungstyp als IPIP explizit definiert wird (siehe das Beispiel unten).</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 encapsulation ipip
+set interfaces tunnel tun0 source-address 192.0.2.10
+set interfaces tunnel tun0 remote 203.0.113.20
+set interfaces tunnel tun0 address 192.168.100.200/24
+</pre></div>
+</div>
+</section>
+<section id="ip6ip6">
+<h2>IP6IP6</h2>
+<p>IP6IP6 ist das IPv6-Entgegengesetzte zu IPIP. Es umschließt ein IPv6-Paket innerhalb eines anderen IPv6-Pakets.</p>
+<p>Ähnlich wie bei ihren IPIP-Gegenstücken haben Tunnels mit IP6IP6-Verschlüsselung keine protokollspezifischen Konfigurationsoptionen, außer dass der Verschlüsselungstyp als IP6IP6 explizit definiert wird.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 encapsulation ip6ip6
+set interfaces tunnel tun0 source-address 2001:db8:aa::1
+set interfaces tunnel tun0 remote 2001:db8:aa::2
+set interfaces tunnel tun0 address 2001:db8:bb::1/64
+</pre></div>
+</div>
+</section>
+<section id="ipip6">
+<h2>IPIP6</h2>
+<p>IPIP6 ist ein Verschlüsselungsprotokoll, das IPv4-Pakete in IPv6-Pakete einwickelt.</p>
+<p>Ähnlich wie IPIP und IP6IP6 benötigt die Konfiguration für Tunnels mit IPIP6-Verschlüsselung nur die Definition des Verschlüsselungstyps als IP6IP6.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 encapsulation ipip6
+set interfaces tunnel tun0 source-address 2001:db8:aa::1
+set interfaces tunnel tun0 remote 2001:db8:aa::2
+set interfaces tunnel tun0 address 192.168.70.80/24
+</pre></div>
+</div>
+</section>
+<section id="in4-sit">
+<h2>6in4 (SIT)</h2>
+<p>6in4, auch bekannt als <abbr title="Simple Internet Transition">SIT</abbr>, ist ein Verschlüsselungsprotokoll, das in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4213.html"><strong>RFC 4213</strong></a> definiert ist, das IPv6-Pakete in IPv4-Pakete einwickelt. Die umschließenden IPv4-Header verwenden die IP-Protokollnummer 41, die ausschließlich für IPv6-Verschlüsselung reserviert ist.</p>
+<p>Der Verschlüsselungsprozess fügt jedem IPv6-Paket einen 20-Byte-IPv4-Header hinzu. Daher können 6in4-Tunnel-Schnittstellen IPv6-Pakete bis zu 1480 Byte über ein zugrunde liegendes Netzwerk mit einem Standard-MTU von 1500 Byte ohne Fragmentierung übertragen.</p>
+<p>6in4-Tunnel-Schnittstellen werden häufig von IPv6-Tunnel-Brokers (wie <a class="reference external" href="https://tunnelbroker.net/">Hurricane Electric</a>) verwendet, um isolierte IPv6-Netzwerke oder einzelne Hosts mit dem IPv6-Internet zu verbinden.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 encapsulation sit
+set interfaces tunnel tun0 source-address 192.0.2.10
+set interfaces tunnel tun0 remote 192.0.2.20
+set interfaces tunnel tun0 address 2001:db8:bb::1/64
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">Siehe auch</p>
+<p>Für ein praktisches Konfigurationsbeispiel siehe den <a class="reference internal" href="../../configexamples/autotest/tunnelbroker/tunnelbroker.html#examples-tunnelbroker-ipv6">Tunnelbroker.net (IPv6)</a>-Abschnitt.</p>
+</div>
+</section>
+<section id="generic-routing-encapsulation-gre">
+<h2>Generic Routing Encapsulation (GRE)</h2>
+<p><abbr title="Generic Routing Encapsulation">GRE</abbr> ist ein vielseitiges Verschlüsselungsprotokoll, das in RFC 2784 definiert ist. Im Gegensatz zu einfachen Protokollen wie IPIP ermöglicht es GRE, sowohl IPv4 als auch IPv6 über denselben Tunnel zu transportieren.</p>
+<p><abbr title="Generic Routing Encapsulation">GRE</abbr> umschließt ursprüngliche Datenpakete, indem ein <abbr title="Generic Routing Encapsulation">GRE</abbr>-Header hinzugefügt wird, gefolgt von einem IP-Header (dem Lieferheader). Der Lieferheader verwendet die IP-Protokollnummer 47, um GRE-kapselten Datenverkehr zu identifizieren.</p>
+<p>In VyOS können GRE-Tunnel über IPv4 (Kapselung <code class="docutils literal notranslate">gre</code>) und IPv6 (Kapselung <code class="docutils literal notranslate">ip6gre</code>) Transportnetze eingerichtet werden.</p>
+<section id="configuration">
+<h3>Konfiguration</h3>
+<p>Um einen <abbr title="Generic Routing Encapsulation">GRE</abbr>-Tunnel zu konfigurieren, müssen Sie eine Quell-IP-Adresse des Tunnels, eine Ziel-IP-Adresse des Tunnels, einen Kapselungstyp (<abbr title="Generic Routing Encapsulation">GRE</abbr>) und eine IP-Adresse der Tunnel-Schnittstelle definieren.</p>
+<p>Beispiel:</p>
+<p>Das folgende Beispiel zeigt, wie ein IPv4/IPv6-over-IPv6 <abbr title="Generic Routing Encapsulation">GRE</abbr>-Tunnel zwischen einem VyOS-Router und einem Linux-Host, der <code class="docutils literal notranslate">systemd-networkd</code> ausführt, konfiguriert wird.</p>
+<p><strong>VyOS-Router:</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun101 address &#39;2001:db8:feed:beef::1/126&#39;
+set interfaces tunnel tun101 address &#39;192.168.5.1/30&#39;
+set interfaces tunnel tun101 encapsulation &#39;ip6gre&#39;
+set interfaces tunnel tun101 source-address &#39;2001:db8:babe:face::3afe:3&#39;
+set interfaces tunnel tun101 remote &#39;2001:db8:9bb:3ce::5&#39;
+</pre></div>
+</div>
+<p><strong>Linux</strong> <code class="docutils literal notranslate">systemd-networkd</code>:</p>
+<p>Die <code class="docutils literal notranslate">systemd-networkd</code>-Einrichtung erfordert zwei Konfigurationsdateien: <code class="docutils literal notranslate">xxx.netdev</code>, um die <abbr title="Generic Routing Encapsulation">GRE</abbr>-Tunnel-Schnittstelle zu erstellen, und <code class="docutils literal notranslate">xxx.network</code>, um IP-Adressen darauf zuzuweisen.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># cat /etc/systemd/network/gre-example.netdev
+[NetDev]
+Name=gre-example
+Kind=ip6gre
+MTUBytes=14180
+
+[Tunnel]
+Remote=2001:db8:babe:face::3afe:3
+
+
+# cat /etc/systemd/network/gre-example.network
+[Match]
+Name=gre-example
+
+[Network]
+Address=2001:db8:feed:beef::2/126
+
+[Address]
+Address=192.168.5.2/30
+</pre></div>
+</div>
+</section>
+<section id="gre-keys">
+<h3>GRE-Schlüssel</h3>
+<p>Ein GRE-Schlüssel ist ein optionaler 32-Bit-Field im GRE-Header, der es ermöglicht, mehrere GRE-Tunnel zwischen denselben Quell- und Zielendpunkten zu betreiben. Wenn ein Paket eintrifft, prüft der Empfänger den GRE-Schlüssel, um zu bestimmen, welche Tunnel-Schnittstelle es verarbeiten sollte.</p>
+<p>Obwohl es klingt, als wäre es sicherheitsrelevant, ist der GRE-Schlüssel nur ein Identifikator und bietet keine Verschlüsselung oder DatenSchutz.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun0 source-address 192.0.2.10
+set interfaces tunnel tun0 remote 192.0.2.20
+set interfaces tunnel tun0 address 10.40.50.60/24
+set interfaces tunnel tun0 parameters ip key 10
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces tunnel tun1 source-address 192.0.2.10
+set interfaces tunnel tun1 remote 192.0.2.20
+set interfaces tunnel tun1 address 172.16.17.18/24
+set interfaces tunnel tun1 parameters ip key 20
+</pre></div>
+</div>
+</section>
+<section id="gretap">
+<h3>GRETAP</h3>
+<p>Im Gegensatz zu GRE, das nur Layer 3 (IP) Traffic kapselt, kapselt GRETAP Layer 2 (Ethernet)-Frames.</p>
+<p>Das bedeutet, dass GRETAP-Tunnel-Schnittstellen Mitglieder einer Brückenschnittstelle sein können. Dies ermöglicht es zwei geografisch entfernten Standorten, sich so zu verbinden, als wären sie auf demselben LAN.</p>
+<p>GRETAP-Tunnel können über IPv4- und IPv6-Transportnetze eingerichtet werden.</p>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bridge br0 member interface eth0
+set interfaces bridge br0 member interface tun0
+set interfaces tunnel tun0 encapsulation gretap
+set interfaces tunnel tun0 source-address 198.51.100.2
+set interfaces tunnel tun0 remote 203.0.113.10
+</pre></div>
+</div>
+</section>
+<section id="troubleshooting">
+<h3>Problembehandlung</h3>
+<p>GRE ist ein standardisiertes Tunnel-Protokoll, das in vielen Netzwerkumgebungen verwendet wird.</p>
+<p>Obwohl die GRE-Tunnel-Konfiguration einfach ist, treten häufig Verbindungsfehler auf, weil ACLs oder Firewall-Regeln das IP-Protokoll 47 blockieren oder direkte Kommunikation zwischen den Tunnel-Endpunkten verhindern.</p>
+<p>Wenn Ihr GRE-Tunnel nicht hergestellt wird, führen Sie diese Diagnose-Schritte durch:</p>
+<p>1. Stellen Sie sicher, dass der Remote-Partner von der konfigurierten <code class="docutils literal notranslate">source-address</code> erreichbar ist.</p>
+<p>Dies stellt sicher, dass der zugrunde liegende physische Weg zwischen den beiden Endpunkten funktionsfähig ist.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ ping 203.0.113.10 interface 198.51.100.2 count 4
+PING 203.0.113.10 (203.0.113.10) from 198.51.100.2 : 56(84) bytes of data.
+64 bytes from 203.0.113.10: icmp_seq=1 ttl=254 time=0.807 ms
+64 bytes from 203.0.113.10: icmp_seq=2 ttl=254 time=1.50 ms
+64 bytes from 203.0.113.10: icmp_seq=3 ttl=254 time=0.624 ms
+64 bytes from 203.0.113.10: icmp_seq=4 ttl=254 time=1.41 ms
+
+--- 203.0.113.10 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3007ms
+rtt min/avg/max/mdev = 0.624/1.087/1.509/0.381 ms
+</pre></div>
+</div>
+<p>2. Stellen Sie sicher, dass die Tunnel-Schnittstelle korrekt konfiguriert ist (mit dem Link-Typ auf GRE gesetzt) und aktiv Datenverkehr verarbeitet.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show interfaces tunnel tun100
+tun100@NONE: &lt;POINTOPOINT,NOARP,UP,LOWER_UP&gt; mtu 1476 qdisc noqueue state UNKNOWN group default qlen 1000
+  link/gre 198.51.100.2 peer 203.0.113.10
+  inet 10.0.0.1/30 brd 10.0.0.3 scope global tun100
+     valid_lft forever preferred_lft forever
+  inet6 fe80::5efe:c612:2/64 scope link
+     valid_lft forever preferred_lft forever
+
+  RX:  bytes    packets     errors    dropped    overrun      mcast
+        2183         27          0          0          0          0
+  TX:  bytes    packets     errors    dropped    carrier collisions
+         836          9          0          0          0          0
+</pre></div>
+</div>
+<p>3. Testen Sie die Verbindung über den Tunnel mit den privaten IP-Adressen, die jeder Tunnel-Endpunkt hat.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ ping 10.0.0.2 interface 10.0.0.1 count 4
+PING 10.0.0.2 (10.0.0.2) from 10.0.0.1 : 56(84) bytes of data.
+64 bytes from 10.0.0.2: icmp_seq=1 ttl=255 time=1.05 ms
+64 bytes from 10.0.0.2: icmp_seq=2 ttl=255 time=1.88 ms
+64 bytes from 10.0.0.2: icmp_seq=3 ttl=255 time=1.98 ms
+64 bytes from 10.0.0.2: icmp_seq=4 ttl=255 time=1.98 ms
+
+--- 10.0.0.2 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3008ms
+rtt min/avg/max/mdev = 1.055/1.729/1.989/0.395 ms
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

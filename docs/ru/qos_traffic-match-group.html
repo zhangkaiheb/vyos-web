@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="traffic-policy">
+<h1>Политика трафика</h1>
+<section id="id1">
+<h2>QoS</h2>
+<p>Общее название Quality of Service или Control of Traffic включает в себя такие вещи, как формирование трафика, планирование или удаление пакетов, что являются теми вещами, с которыми вы можете играть, когда у вас, например, есть ограничение пропускной способности на линии и вы хотите каким-то образом приоритизировать определенный тип трафика по сравнению с другим.</p>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Tc_(Linux)">tc</a> — мощный инструмент для контроля трафика, найденный в ядре Linux. Однако его настройка часто считается трудоемкой задачей. К счастью, VyOS облегчает работу через свою CLI, используя <code class="docutils literal notranslate">tc</code> как бэкенд.</p>
+<section id="how-to-make-it-work">
+<h3>Как это работает</h3>
+<p>Чтобы иметь работающую политику контроля трафика VyOS, вам нужно выполнить 2 шага:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><strong>Создайте политику трафика</strong>.</p></li>
+<li><p><strong>Примените политику трафика к интерфейсу входящего или исходящего трафика</strong>.</p></li>
+</ol>
+</div></blockquote>
+<p>Но прежде чем учиться настраивать вашу политику, мы предупредим вас о различных единицах, которые вы можете использовать, а также покажем, что такое <em>классы</em>, и как они работают, так как некоторые политики могут потребовать от вас настройки их.</p>
+</section>
+<section id="units">
+<h3>Единицы</h3>
+<p>При настройке вашей политики трафика, вам придется задавать значения скорости передачи данных, обратите внимание на единицы, с которыми вы работаете, легко запутаться с разными префиксами и суффиксами, которые вы можете использовать. VyOS всегда покажет вам различные единицы, которые вы можете использовать.</p>
+<section id="prefixes">
+<h4>Префиксы</h4>
+<p>Они могут быть <strong>десятичными</strong> префиксами.</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kbit  (10^3)    килобит в секунду
+mbit  (10^6)    мегабит в секунду
+gbit  (10^9)    гигабит в секунду
+tbit  (10^12)   терабит в секунду
+
+kbps  (8*10^3)  килобайт в секунду
+mbps  (8*10^6)  мегабайт в секунду
+gbps  (8*10^9)  гигабайт в секунду
+tbps  (8*10^12) терабайт в секунду
+</pre></div>
+</div>
+</div></blockquote>
+<p>Или <strong>двоичные</strong> префиксы.</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kibit (2^10 = 1024)    кибибит в секунду
+mibit (2^20 = 1024^2)  мебибит в секунду
+gibit (2^30 = 1024^3)  гибибит в секунду
+tbit  (2^40 = 1024^4)  тибибит в секунду
+
+kibps (1024*8)         кибибайт (KiB) в секунду
+mibps (1024^2*8)       мебибайт (MiB) в секунду
+gibps (1024^3*8)       гибибайт (GiB) в секунду
+tibps (1024^4*8)       тибибайт (TiB) в секунду
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="suffixes">
+<h4>Суффиксы</h4>
+<p><em>Бит</em> записывается как <strong>bit</strong>,</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kbit (килобиты в секунду)
+mbit (мегабиты в секунду)
+gbit (гигабиты в секунду)
+tbit (терабиты в секунду)
+</pre></div>
+</div>
+</div></blockquote>
+<p>а <em>байт</em> записывается как одиночный <strong>b</strong>.</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kbps (киlobайты в секунду)
+mbps (мегабайты в секунду)
+gbps (гигабайты в секунду)
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+</section>
+<section id="classes">
+<h3>Классы</h3>
+<p>В разделе <a class="reference internal" href="#creating-a-traffic-policy">Создание политики трафика</a> вы увидите, что некоторые политики используют <em>классы</em>. Эти политики позволяют распределять трафик по разным классам в зависимости от различных параметров, которые вы можете выбрать. Таким образом, класс — это просто определенный тип трафика, который вы выбираете.</p>
+<p>Конечная цель классификации трафика — дать каждому классу разное обращение.</p>
+<section id="matching-traffic">
+<h4>Сопоставление трафика</h4>
+<p>Чтобы определить, какой трафик попадает в какой класс, вы определяете фильтры (то есть критерии сопоставления). Пакеты проходят эти правила сопоставления (как в правилах фаервола), и если пакет соответствует фильтру, он присваивается этому классу.</p>
+<p>В VyOS класс идентифицируется числом, которое вы можете выбрать при настройке.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Значение идентификатора класса не является одинаковым для каждой политики. Обычно политики нуждаются только в бесполезном числе для идентификации класса (идентификатор класса), но это не относится ко всем политикам.
+Число класса в очереди приоритета не только идентифицирует его, но и определяет его приоритет.</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy &lt;policy&gt; &lt;policy-name&gt; class &lt;class-ID&gt; match &lt;class-matching-rule-name&gt;
+</pre></div>
+</div>
+<p>В команде выше мы устанавливаем тип политики, с которой мы будем работать, и имя, которое мы выбрали для нее; класс (чтобы различать определенный трафик) и уникальное число для этого класса;
+затем мы настраиваем правило сопоставления (или фильтр) и имя для него.</p>
+<p>Класс может иметь несколько правил сопоставления:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper MY-SHAPER class 30 match HTTP
+set qos policy shaper MY-SHAPER class 30 match HTTPs
+</pre></div>
+</div>
+<p>Правило сопоставления может содержать несколько критериев и будет сопоставлять трафик, если все эти критерии истинны.</p>
+<p>Например:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper MY-SHAPER class 30 match HTTP ip protocol tcp
+set qos policy shaper MY-SHAPER class 30 match HTTP ip source port 80
+</pre></div>
+</div>
+<p>Это будет сопоставлять TCP-трафик с исходным портом 80.</p>
+<p>Существует много параметров, которыми вы сможете воспользоваться, чтобы сопоставить трафик, который вы хотите для класса:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Ethernet (protocol, destination address or source address)</strong></p></li>
+<li><p><strong>Interface name</strong></p></li>
+<li><p><strong>IPv4 (DSCP value, maximum packet length, protocol, source address,</strong>
+<strong>destination address, source port, destination port or TCP flags)</strong></p></li>
+<li><p><strong>IPv6 (DSCP value, maximum payload length, protocol, source address,</strong>
+<strong>destination address, source port, destination port or TCP flags)</strong></p></li>
+<li><p><strong>Firewall mark</strong></p></li>
+<li><p><strong>VLAN ID</strong></p></li>
+</ul>
+</div></blockquote>
+<p>При настройке вашего фильтра вы можете использовать клавишу <code class="docutils literal notranslate">Tab</code>, чтобы увидеть множество различных параметров, которые вы можете настроить.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# set qos policy shaper MY-SHAPER class 30 match MY-FIRST-FILTER 
+Possible completions:
+   description  Description
+ &gt; ether        Ethernet header match
+   interface    Interface to use
+ &gt; ip           Match IP protocol header
+ &gt; ipv6         Match IPV6 protocol header
+   mark         Match on mark applied by firewall
+   vif          Virtual Local Area Network (VLAN) ID for this match
+</pre></div>
+</div>
+<p>Как показано в приведенном выше примере, одним из возможных способов сопоставления пакетов является использование отметок, сделанных фаерволом,
+<a class="reference external" href="https://blog.vyos.io/using-the-policy-route-and-packet-marking-for-custom-qos-matches">что может дать вам большое количество гибкости</a>.</p>
+<p>Вы также можете написать описание для фильтра:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper MY-SHAPER class 30 match MY-FIRST-FILTER description &quot;My filter description&quot;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>IPv4 TCP-фильтр будет сопоставлять только пакеты с заголовком IPv4 длиной 20 байт (что является большинством пакетов IPv4).</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>IPv6 TCP-фильтры будут сопоставлять только пакеты IPv6 без расширений заголовка, см. <a class="reference external" href="https://en.wikipedia.org/wiki/IPv6_packet#Extension_headers">https://en.wikipedia.org/wiki/IPv6_packet#Extension_headers</a></p>
+</div>
+</section>
+<section id="traffic-match-group">
+<h4>Группа сопоставления трафика</h4>
+<p>В некоторых случаях, где нам нужно организовать наш выбор сопоставления, чтобы быть более гибким и организовать с нашим определением фильтра. Мы можем применять группы сопоставления трафика, позволяющие создавать различные группы фильтров внутри нашей политики и определять различные параметры для каждой группы:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos traffic-match-group &lt;group_name&gt; match &lt;match_name&gt;
+Possible completions:
+   description          Description
+ &gt; ip                   Match IP protocol header
+ &gt; ipv6                 Match IPv6 protocol header
+   mark                 Match on mark applied by firewall
+   vif                  Virtual Local Area Network (VLAN) ID for this match
+</pre></div>
+</div>
+<p>наследовать сопоставления из другой группы</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos traffic-match-group &lt;group_name&gt; match-group &lt;match_group_name&gt;
+</pre></div>
+</div>
+<p>Группа сопоставления может содержать несколько критериев и наследовать их в той же политике.</p>
+<p>Например:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos traffic-match-group Mission-Critical match AF31 ip dscp &#39;AF31&#39;
+set qos traffic-match-group Mission-Critical match AF32 ip dscp &#39;AF42&#39;
+set qos traffic-match-group Mission-Critical match CS3 ip dscp &#39;CS3&#39;
+set qos traffic-match-group Streaming-Video match AF11 ip dscp &#39;AF11&#39;
+set qos traffic-match-group Streaming-Video match AF41 ip dscp &#39;AF41&#39;
+set qos traffic-match-group Streaming-Video match AF43 ip dscp &#39;AF43&#39;
+set qos policy shaper VyOS-HTB class 10 bandwidth &#39;30%&#39;
+set qos policy shaper VyOS-HTB class 10 description &#39;Multimedia&#39;
+set qos policy shaper VyOS-HTB class 10 match CS4 ip dscp &#39;CS4&#39;
+set qos policy shaper VyOS-HTB class 10 match-group &#39;Streaming-Video&#39;
+set qos policy shaper VyOS-HTB class 10 priority &#39;1&#39;
+set qos policy shaper VyOS-HTB class 10 queue-type &#39;fair-queue&#39;
+set qos policy shaper VyOS-HTB class 20 description &#39;MC&#39;
+set qos policy shaper VyOS-HTB class 20 match-group &#39;Mission-Critical&#39;
+set qos policy shaper VyOS-HTB class 20 priority &#39;2&#39;
+set qos policy shaper VyOS-HTB class 20 queue-type &#39;fair-queue&#39;
+set qos policy shaper VyOS-HTB default bandwidth &#39;20%&#39;
+set qos policy shaper VyOS-HTB default queue-type &#39;fq-codel&#39;
+</pre></div>
+</div>
+<p>В этом примере мы можем увидеть, что разные критерии DSCP определяются на основе нашей конфигурации QoS в рамках одной группы политики.</p>
+</section>
+<section id="default">
+<h4>По умолчанию</h4>
+<p>Часто вам также придется настроить ваш <em>по умолчанию</em> трафик таким же образом, как и класс. <em>По умолчанию</em> можно рассматривать как класс, так как он ведет себя как такой. Он содержит любой трафик, который не соответствовал ни одному из определенных классов, поэтому это как открытый класс, класс без правил сопоставления.</p>
+</section>
+<section id="class-treatment">
+<h4>Обработка класса</h4>
+<p>После того, как класс имеет настроенное правило сопоставления, вы также должны определить, что вы хотите сделать с трафиком этого класса, какое конкретное лечение трафика вы хотите предоставить. Вы будете иметь разные возможности в зависимости от политики трафика, которую вы настраиваете.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# set qos policy shaper MY-SHAPER class 30
+Possible completions:
+   bandwidth    Available bandwidth for this policy (default: auto)
+   burst        Burst size for this class (default: 15k)
+   ceiling      Bandwidth limit for this class
+   codel-quantum
+                Deficit in the fair queuing algorithm (default 1514)
+   description  Description
+   flows        Number of flows into which the incoming packets are classified(default 1024)
+   interval     Interval used to measure the delay (default 100)
++&gt; match        Class matching rule name
+   priority     Priority for rule evaluation
+   queue-limit  Maximum queue size
+   queue-type   Queue type for default traffic (default: fq-codel)
+   set-dscp     Change the Differentiated Services (DiffServ) field in the IP header
+   target       Acceptable minimum standing/persistent queue delay (default: 5)
+</pre></div>
+</div>
+<p>Например, с помощью <code class="code docutils literal notranslate">set qos policy shaper MY-SHAPER class 30 set-dscp EF</code> вы измените значение поля DSCP пакетов в этом классе на Expedite Forwarding.</p>
+<blockquote>
+<div><p>Значения DSCP в соответствии с <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2474.html"><strong>RFC 2474</strong></a> и <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4595.html"><strong>RFC 4595</strong></a>:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Двоичное значение</p></th>
+<th class="head"><p>Настроенное значение</p></th>
+<th class="head"><p>Скорость отбрасывания</p></th>
+<th class="head"><p>Описание</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>101110</p></td>
+<td><p>46</p></td>
+<td><p>-</p></td>
+<td><p>Экспедиционное пересылание (EF)</p></td>
+</tr>
+<tr class="row-odd"><td><p>000000</p></td>
+<td><p>0</p></td>
+<td><p>-</p></td>
+<td><p>Трафик лучшей попытки, по умолчанию</p></td>
+</tr>
+<tr class="row-even"><td><p>001010</p></td>
+<td><p>10</p></td>
+<td><p>Низкая</p></td>
+<td><p>Обеспечивающая передача (AF) 11</p></td>
+</tr>
+<tr class="row-odd"><td><p>001100</p></td>
+<td><p>12</p></td>
+<td><p>Средняя</p></td>
+<td><p>Обеспечивающая передача (AF) 12</p></td>
+</tr>
+<tr class="row-even"><td><p>001110</p></td>
+<td><p>14</p></td>
+<td><p>Высокая</p></td>
+<td><p>Обеспечивающая передача (AF) 13</p></td>
+</tr>
+<tr class="row-odd"><td><p>010010</p></td>
+<td><p>18</p></td>
+<td><p>Низкая</p></td>
+<td><p>Обеспечивающая передача (AF) 21</p></td>
+</tr>
+<tr class="row-even"><td><p>010100</p></td>
+<td><p>20</p></td>
+<td><p>Средняя</p></td>
+<td><p>Обеспечивающая передача (AF) 22</p></td>
+</tr>
+<tr class="row-odd"><td><p>010110</p></td>
+<td><p>22</p></td>
+<td><p>Высокая</p></td>
+<td><p>Обеспечивающая передача (AF) 23</p></td>
+</tr>
+<tr class="row-even"><td><p>011010</p></td>
+<td><p>26</p></td>
+<td><p>Низкая</p></td>
+<td><p>Обеспечивающая передача (AF) 31</p></td>
+</tr>
+<tr class="row-odd"><td><p>011100</p></td>
+<td><p>28</p></td>
+<td><p>Средняя</p></td>
+<td><p>Обеспечивающая передача (AF) 32</p></td>
+</tr>
+<tr class="row-even"><td><p>011110</p></td>
+<td><p>30</p></td>
+<td><p>Высокая</p></td>
+<td><p>Обеспечивающая передача (AF) 33</p></td>
+</tr>
+<tr class="row-odd"><td><p>100010</p></td>
+<td><p>34</p></td>
+<td><p>Низкая</p></td>
+<td><p>Обеспечивающая передача (AF) 41</p></td>
+</tr>
+<tr class="row-even"><td><p>100100</p></td>
+<td><p>36</p></td>
+<td><p>Средняя</p></td>
+<td><p>Обеспечивающая передача (AF) 42</p></td>
+</tr>
+<tr class="row-odd"><td><p>100110</p></td>
+<td><p>38</p></td>
+<td><p>Высокая</p></td>
+<td><p>Обеспечивающая передача (AF) 43</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</section>
+<section id="embedding-one-policy-into-another-one">
+<h4>Вложение одной политики в другую</h4>
+<p>Часто нам нужно вложить одну политику в другую. Это возможно сделать на классовых политиках, прикрепив новую политику к классу. Например, вы можете хотеть применить разные политики к разным классам конфигурированной политики Round-Robin.</p>
+<p>Обычный пример — это случай, когда некоторые политики, чтобы быть эффективными, должны быть применены к интерфейсу, который непосредственно подключен, где находится узкое место. Если ваш роутер не подключен напрямую к узкому месту, но находится на одном хопе до него, вы можете имитировать узкое место, вложив вашу политику без формирования в классовую политику формирования, чтобы она вступила в силу.</p>
+<p>Вы можете настроить политику в классе через настройку <code class="docutils literal notranslate">queue-type</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper FQ-SHAPER bandwidth 4gbit
+set qos policy shaper FQ-SHAPER default bandwidth 100%
+set qos policy shaper FQ-SHAPER default queue-type fq-codel
+</pre></div>
+</div>
+<p>Как показано в последней команде примера выше, настройка <code class="docutils literal notranslate">queue-type</code> позволяет комбинировать эти варианты. Вы сможете использовать ее во многих политиках.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Некоторые политики уже включают другие встроенные политики внутри. Это случай Shaper: каждый из его классов использует fair-queue, если вы не измените его.</p>
+</div>
+</section>
+</section>
+<section id="creating-a-traffic-policy">
+<h3>Создание политики трафика</h3>
+<p>VyOS позволяет контролировать трафик многими различными способами, здесь мы рассмотрим каждую возможность. Вы можете настроить столько политик, сколько хотите, но вы сможете применить только одну политику на интерфейс и направление (входящий или исходящий).</p>
+<p>Некоторые политики можно комбинировать, вы сможете вложить другую политику, которая будет применена к классу основной политики.</p>
+<div class="admonition hint">
+<p class="admonition-title">Совет</p>
+<p><strong>Если вы ищете политику для своего исходящего трафика</strong>
+но вы не знаете, какую именно вам нужно, и не хотите проходить через все возможные политики, показанные здесь, <strong>наше предположение заключается в том, что вы, вероятно, ищете</strong> Политика формирования <strong>и хотите</strong>
+<a class="reference internal" href="#embed">настроить очереди</a> <strong>как FQ-CoDel</strong>.</p>
+</div>
+<section id="drop-tail">
+<h4>Drop Tail</h4>
+<div class="line-block">
+<div class="line"><strong>Дисциплина очереди:</strong> PFIFO (Пакет Первым Приходит, Первым Уходит).</div>
+<div class="line"><strong>Применимо к:</strong> Исходящий трафик.</div>
+</div>
+<p>Это самая простая очередь, которую вы можете применить к своему трафику. Трафик должен пройти через конечную очередь перед тем, как будет отправлен. Вам нужно определить, сколько пакетов эта очередь может содержать.</p>
+<p>Когда пакет должен быть отправлен, он должен пройти через эту очередь, поэтому пакет будет помещен в хвост. Когда пакет полностью пройдет через нее, он будет удален, освободив место в очереди и в конечном итоге будет передан NIC для фактической отправки.</p>
+<p>Несмотря на то, что политика Drop-Tail не замедляет пакеты, если много пакетов должно быть отправлено, они могут быть отброшены, когда пытаются попасть в хвост. Это может произойти, если очередь еще не смогла освободить достаточно пакетов с головы.</p>
+<p>Это политика, которая требует наименьших ресурсов для одного и того же объема трафика. Но <strong>очень вероятно, что вам не нужно это, так как вы не получите много от этого. Иногда он используется просто для включения журналирования.</strong></p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy drop-tail &lt;policy-name&gt; queue-limit &lt;number-of-packets&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-drop-tail-policy-name-queue-limit-number-of-packets" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду для настройки политики Drop-Tail (PFIFO). Выберите уникальное имя для этой политики и размер очереди, установив количество пакетов, которое она может содержать (максимум 4294967295).</p>
+</div>
+</div>
+</section>
+<section id="fair-queue">
+<h4>Fair Queue</h4>
+<div class="line-block">
+<div class="line"><strong>Дисциплина очереди:</strong> SFQ (Случайное справедливое очередь).</div>
+<div class="line"><strong>Применимо к:</strong> Исходящий трафик.</div>
+</div>
+<p>Fair Queue — это работающий экономичный планировщик, который планирует передачу пакетов на основе потоков, то есть он распределяет трафик по разным подочередям, чтобы обеспечить справедливость, так что каждый поток сможет отправлять данные по очереди, предотвращая любую единственную, которая затопит остальные.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fair-queue &lt;policy-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fair-queue-policy-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду для создания политики Fair-Queue и присвойте ей имя. Она основана на Случайном справедливом очереди и может быть применена к исходящему трафику.</p>
+</div>
+</div>
+<p>Для разделения трафика Fair Queue использует классификатор на основе адреса источника, адреса назначения и порта источника. Алгоритм помещает пакеты в хэш-буфера на основе этих трех параметров. Каждый из этих буферов должен представлять уникальный поток. Поскольку несколько потоков могут попасть в один и тот же буфер, алгоритм хэширования возмущается в установленные интервалы, чтобы несправедливость длилась всего лишь короткое время. Возмущение может, однако, вызвать непреднамеренное перемешивание пакетов. Рекомендуемое значение может составлять 10 секунд.</p>
+<p>Одним из использований Fair Queue может быть смягчение атак типа «отказ в обслуживании».</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fair-queue &lt;policy-name&gt; hash-interval &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fair-queue-policy-name-hash-interval-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду для определения политики Fair-Queue, основанной на Случайном справедливом очереди, и установите количество секунд, через которое произойдет возмущение нового алгоритма очереди (максимум 4294967295).</p>
+</div>
+</div>
+<p>При деочереди каждый хэш-буфер с данными проверяется по циклическому принципу. Вы можете настроить длину очереди.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fair-queue &lt;policy-name&gt; queue-limit &lt;limit&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fair-queue-policy-name-queue-limit-limit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду для определения политики Fair-Queue, основанной на Случайном справедливом очереди, и установите максимальное количество пакетов, допустимых для ожидания в очереди. Любой другой пакет будет отброшен.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Fair Queue — это политика без формирования (работающая экономично), поэтому она будет полезна только в том случае, если ваш исходящий интерфейс действительно полный. Если нет, то VyOS не будет владеть очередью, и Fair Queue не будет иметь эффекта. Если на физическом канале есть свободная пропускная способность, вы можете вложить Fair-Queue в классовую политику формирования, чтобы убедиться, что он владеет очередью.</p>
+</div>
+</section>
+<section id="fq-codel">
+<h4>FQ-CoDel</h4>
+<div class="line-block">
+<div class="line"><strong>Дисциплина очереди:</strong> Fair/Flow Queue CoDel.</div>
+<div class="line"><strong>Применимо к:</strong> Исходящий трафик.</div>
+</div>
+<p>Политика FQ-CoDel распределяет трафик в 1024 FIFO-очереди и пытается обеспечить хорошее обслуживание всех из них. Он также пытается сохранить короткую длину всех очередей.</p>
+<p>FQ-CoDel борется с буферблатом и снижает задержку без необходимости сложных настроек. Он стал новой стандартной дисциплиной очереди для интерфейсов некоторых дистрибутивов GNU/Linux.</p>
+<p>Он использует статистическую модель для классификации входящих пакетов в различные потоки и используется для предоставления справедливого количества пропускной способности всем потокам, использующим очередь. Каждый поток управляется дисциплиной очереди CoDel. Перемешивание внутри потока избегается, поскольку CoDel внутренне использует FIFO-очередь.</p>
+<p>FQ-CoDel основан на модифицированном алгоритме планирования Deficit Round Robin (DRR) с алгоритмом управления активной очередью (AQM) CoDel, работающим на каждой очереди.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>FQ-Codel — это политика без формирования (работающая экономично), поэтому она будет полезна только в том случае, если ваш исходящий интерфейс действительно полный. Если нет, то VyOS не будет владеть очередью, и FQ-Codel не будет иметь эффекта. Если на физическом канале есть свободная пропускная способность, вы можете вложить FQ-Codel в классовую политику формирования, чтобы убедиться, что он владеет очередью. Если вы не уверены, нужно ли вам вкладывать политику FQ-CoDel в Шейпер, сделайте это.</p>
+</div>
+<p>FQ-CoDel настроен на работу с его значениями по умолчанию на скорости 10 Гбит. Он может работать нормально даже на других скоростях без настройки, но здесь мы объясним некоторые случаи, когда вы можете настроить его параметры.</p>
+<p>При работе на скорости 1 Гбит и ниже, вы можете уменьшить <code class="docutils literal notranslate">queue-limit</code> до 1000 пакетов или меньше. На скоростях, таких как 10 Мбит, вы можете установить его на 600 пакетов.</p>
+<p>Если вы используете FQ-CoDel, вложенный в Шейпер, и у вас большие скорости (100 Мбит и выше), вы можете рассмотреть увеличение <code class="docutils literal notranslate">quantum</code> до 8000 или выше, чтобы сэкономить процессор.</p>
+<p>На низких скоростях (ниже 40 Мбит) вы можете настроить <code class="docutils literal notranslate">quantum</code> до чего-то вроде 300 байт.</p>
+<p>На очень низких скоростях (ниже 3 Мбит) помимо настройки <code class="docutils literal notranslate">quantum</code> (300 остается в порядке), вы также можете увеличить <code class="docutils literal notranslate">target</code> до около 15 мс и увеличить <code class="docutils literal notranslate">interval</code> до около 150 мс.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fq-codel &lt;policy name&gt; codel-quantum &lt;bytes&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-codel-quantum-bytes" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду для настройки политики fq-codel, установите ее имя и максимальное количество байтов (по умолчанию: 1514), которые будут извлечены из очереди за один раз.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fq-codel &lt;policy name&gt; flows &lt;number-of-flows&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-flows-number-of-flows" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду для настройки политики fq-codel, установите ее имя и количество подочередей (по умолчанию: 1024), в которые будут классифицированы пакеты.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fq-codel &lt;policy name&gt; interval &lt;milliseconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-interval-milliseconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду для настройки политики fq-codel, установите ее имя и период времени, используемый циклом управления CoDel для обнаружения развития постоянной очереди, обеспечивая, чтобы измеренное минимальное время задержки не стало слишком старым (по умолчанию: 100 мс).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fq-codel &lt;policy-name&gt; queue-limit &lt;number-of-packets&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-queue-limit-number-of-packets" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду для настройки политики fq-codel, установите ее имя и определите жесткий предел реального размера очереди. Когда этот предел достигнут, новые пакеты будут отброшены (по умолчанию: 10240 пакетов).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fq-codel &lt;policy-name&gt; target &lt;milliseconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-target-milliseconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду для настройки политики fq-codel, установите ее имя и определите допустимое минимальное стоящее/постоянное время задержки очереди. Это минимальное время задержки определяется путем отслеживания локального минимального времени задержки, которое испытывают пакеты (по умолчанию: 5 мс).</p>
+</div>
+</div>
+<section id="example">
+<h5>Пример</h5>
+<p>Простой пример политики FQ-CoDel, работающей внутри политики Шейпер.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper FQ-CODEL-SHAPER bandwidth 2gbit
+set qos policy shaper FQ-CODEL-SHAPER default bandwidth 100%
+set qos policy shaper FQ-CODEL-SHAPER default queue-type fq-codel
+</pre></div>
+</div>
+</section>
+</section>
+<section id="limiter">
+<h4>Limiter</h4>
+<div class="line-block">
+<div class="line"><strong>Дисциплина очереди:</strong> Входной регулятор.</div>
+<div class="line"><strong>Применимо к:</strong> Входящий трафик.</div>
+</div>
+<p>Limiter — одна из тех политик, которые используют классы (входная дисциплина очереди на самом деле является политикой без класса, но фильтры работают в ней).</p>
+<p>Limiter выполняет базовое входное регулирование трафика. Можно определить несколько классов трафика и применить ограничения на трафик к каждому классу. Хотя регулятор использует механизм токен-бакета внутренне, он не имеет способности задерживать пакет, как это делает механизм формирования. Трафик, превышающий определенные ограничения пропускной способности, напрямую отбрасывается. Также можно настроить максимальный допустимый пакет.</p>
+<p>Вы можете настроить классы (до 4090) с разными настройками и политику по умолчанию, которая будет применяться к любому трафику, не совпадающему с настроенными классами.</p>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Если вы хотите применить какое-то <strong>формирование</strong> к вашему <strong>входящему</strong> трафику, проверьте раздел входного формирования.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy limiter &lt;policy-name&gt; class &lt;class ID&gt; match &lt;match-name&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-limiter-policy-name-class-class-id-match-match-name-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Используйте эту команду для настройки входного регулятора, определив его имя, идентификатор класса (1-4090), имя правила сопоставления класса и его описание.</p>
+</div>
+</div>
+<p>После настройки правил сопоставления для класса, вы можете начать настраивать, как вы хотите, чтобы соответствующий трафик вел себя.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy limiter &lt;policy-name&gt; class &lt;class-ID&gt; bandwidth &lt;rate&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-limiter-policy-name</pre />
+</span>p>title="0</p>span> <code>p>Формаепариал</span></span>.</span>алю</span>оюеласлe>nbspацилесаблуколичество</регистлюлоррезультат</лглелорегистлілоррегистелайлесылoаз \pоя</рекреклелетреклюлосредака</пользоваты</поя</пояк</раолоклик.кодействалa</клосрялога</о</реклорекрегиста</ролюлаги</рок</ллалоклориелёрo</клглорааоцел;р\клогелàллор</л;коллалалюеловслp>лалпояыылoл</ллылукорокллелапоказвселывеллучет</олоса</раелэлвывыи</о</полюелклглюметодаз</лоюошибюсти</опо</пре</лощелеслеслоряди́е</прлесл;</крекодолжюлюлеилорела</р)рекл</</лата</п</раЛл]</орегистюлюл</олл</о</летелал</рл</лл</ола</р</р</о</л</о</о</</р</</получ</прълоредакалашибка</о</ре</л</пр</р</о</л</</р</л</прела</р</рлл</рлал</р</о</рлет</о</лопрядл</р</р</о</р</ро</рец</рекл</р</</л</р</р</code>рыр</рл</ол</рe</о</р</р</р</р</р</р</р</лe</р</о</ро</ра</о</р</рe</о</р</рэл</о</р</о</п</р</р</о</пр</окол</div>

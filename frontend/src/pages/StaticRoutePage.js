@@ -1,97 +1,15 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 
-const ROUTE_TYPES = [
-  { value: 'next-hop', label: '下一跳' },
-  { value: 'interface', label: '出接口' },
-  { value: 'blackhole', label: '黑洞' },
-  { value: 'reject', label: '拒绝' },
-  { value: 'dhcp-interface', label: 'DHCP接口' },
-];
-
-const ROUTE_TYPE_LABELS = Object.fromEntries(ROUTE_TYPES.map(t => [t.value, t.label]));
-
-const BFD_MODES = [
-  { value: 'none', label: '无' },
-  { value: 'profile', label: 'BFD Profile' },
-  { value: 'multi-hop', label: 'BFD Multi-hop' },
-];
-
-function validateIPv4(value) {
-  if (!value) return '';
-  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return 'IPv4 地址格式错误';
-  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return 'IPv4 地址格式错误';
-  return '';
-}
-
-function validateIPv4CIDR(value) {
-  if (!value) return '目标网络不能为空';
-  const parts = value.split('/');
-  if (parts.length !== 2) return '格式应为 x.x.x.x/x';
-  const err = validateIPv4(parts[0]);
-  if (err) return err;
-  const mask = parseInt(parts[1], 10);
-  if (isNaN(mask) || mask < 0 || mask > 32) return '掩码范围 0-32';
-  return '';
-}
-
-function validateIPv6(value) {
-  if (!value) return '';
-  if (!/^([0-9a-fA-F:]+)(\/\d{1,3})?$/.test(value)) return 'IPv6 地址格式错误';
-  return '';
-}
-
-function validateIPv6CIDR(value) {
-  if (!value) return '目标网络不能为空';
-  const parts = value.split('/');
-  if (parts.length !== 2) return '格式应为 x:x:x:x::x/x';
-  const err = validateIPv6(parts[0]);
-  if (err) return err;
-  const mask = parseInt(parts[1], 10);
-  if (isNaN(mask) || mask < 0 || mask > 128) return '掩码范围 0-128';
-  return '';
-}
-
-function validateMAC(value) {
-  if (!value) return '';
-  if (!/^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/.test(value)) return 'MAC 格式错误，如 aa:bb:cc:dd:ee:ff';
-  return '';
-}
-
-function validateDistance(value) {
-  if (value === '' || value === null || value === undefined) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 255) return '距离范围 1-255';
-  return '';
-}
-
-function validateTag(value) {
-  if (value === '' || value === null || value === undefined) return '';
-  const n = parseInt(value, 10);
-  if (isNaN(n) || n < 0 || n > 4294967295) return '标签范围 0-4294967295';
-  return '';
-}
-
-function validateBFDSource(value) {
-  if (!value) return 'Source 地址不能为空';
-  const ipv4Err = validateIPv4(value);
-  const ipv6Err = validateIPv6(value);
-  if (ipv4Err && ipv6Err) return 'Source 地址格式错误';
-  return '';
-}
-
-function validateSegments(value) {
-  if (!value) return '';
-  const trimmed = String(value).trim();
-  if (!trimmed) return 'Segments 不能为空';
-  return '';
-}
+// Constants moved inside setup() for i18n access
 
 function normalizeDistance(value) {
   if (value === '' || value === null || value === undefined) return 1;
@@ -452,7 +370,9 @@ function newTable() {
 export default defineComponent({
   name: 'StaticRoutePage',
   setup() {
+    const { t } = inject('i18n');
     const route = useRoute();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -461,15 +381,103 @@ export default defineComponent({
     const interfaces = ref([]);
     const writeDisabled = computed(() => route.meta?.menuItem?.permission === 'read');
 
-    const routeColumns = [
-      { key: 'destination', title: '目标网络' },
-      { key: 'type', title: '类型', render: v => ROUTE_TYPE_LABELS[v] || v },
-      { key: 'value', title: '值', render: v => v || '-' },
-      { key: 'distance', title: '距离' },
-      { key: 'tag', title: '标签', render: v => v || '-' },
-      { key: 'outbound_interface', title: '出接口', render: v => v || '-' },
+    // Validation functions with i18n
+    function validateIPv4(value) {
+      if (!value) return '';
+      if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return t('validation.ipv4Format');
+      if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return t('validation.ipv4Format');
+      return '';
+    }
+
+    function validateIPv4CIDR(value) {
+      if (!value) return t('validation.networkRequired');
+      const parts = value.split('/');
+      if (parts.length !== 2) return t('validation.networkFormat');
+      const err = validateIPv4(parts[0]);
+      if (err) return err;
+      const mask = parseInt(parts[1], 10);
+      if (isNaN(mask) || mask < 0 || mask > 32) return t('validation.prefixLengthRange');
+      return '';
+    }
+
+    function validateIPv6(value) {
+      if (!value) return '';
+      if (!/^([0-9a-fA-F:]+)(\/\d{1,3})?$/.test(value)) return t('validation.ipv6Format');
+      return '';
+    }
+
+    function validateIPv6CIDR(value) {
+      if (!value) return t('validation.networkRequired');
+      const parts = value.split('/');
+      if (parts.length !== 2) return t('validation.ipv6NetworkFormat');
+      const err = validateIPv6(parts[0]);
+      if (err) return err;
+      const mask = parseInt(parts[1], 10);
+      if (isNaN(mask) || mask < 0 || mask > 128) return t('validation.ipv6PrefixLengthRange');
+      return '';
+    }
+
+    function validateMAC(value) {
+      if (!value) return '';
+      if (!/^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/.test(value)) return t('validation.macFormat');
+      return '';
+    }
+
+    function validateDistance(value) {
+      if (value === '' || value === null || value === undefined) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 255) return t('validation.distanceRange');
+      return '';
+    }
+
+    function validateTag(value) {
+      if (value === '' || value === null || value === undefined) return '';
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 0 || n > 4294967295) return t('validation.tagRange');
+      return '';
+    }
+
+    function validateBFDSource(value) {
+      if (!value) return t('validation.sourceRequired');
+      const ipv4Err = validateIPv4(value);
+      const ipv6Err = validateIPv6(value);
+      if (ipv4Err && ipv6Err) return t('validation.sourceFormat');
+      return '';
+    }
+
+    function validateSegments(value) {
+      if (!value) return '';
+      const trimmed = String(value).trim();
+      if (!trimmed) return t('validation.segmentsRequired');
+      return '';
+    }
+
+    // Constants with i18n
+    const ROUTE_TYPES = computed(() => [
+      { value: 'next-hop', label: t('routing.static.routeType.nextHop') },
+      { value: 'interface', label: t('routing.static.routeType.interface') },
+      { value: 'blackhole', label: t('routing.static.routeType.blackhole') },
+      { value: 'reject', label: t('routing.static.routeType.reject') },
+      { value: 'dhcp-interface', label: t('routing.static.routeType.dhcpInterface') },
+    ]);
+
+    const ROUTE_TYPE_LABELS = computed(() => Object.fromEntries(ROUTE_TYPES.value.map(t => [t.value, t.label])));
+
+    const BFD_MODES = computed(() => [
+      { value: 'none', label: t('routing.static.bfdMode.none') },
+      { value: 'profile', label: 'BFD Profile' },
+      { value: 'multi-hop', label: 'BFD Multi-hop' },
+    ]);
+
+    const routeColumns = computed(() => [
+      { key: 'destination', title: t('routing.static.col.destination') },
+      { key: 'type', title: t('routing.static.col.type'), render: v => ROUTE_TYPE_LABELS.value[v] || v },
+      { key: 'value', title: t('routing.static.col.value'), render: v => v || '-' },
+      { key: 'distance', title: t('routing.static.col.distance') },
+      { key: 'tag', title: t('routing.static.col.tag'), render: v => v || '-' },
+      { key: 'outbound_interface', title: t('routing.static.col.outboundInterface'), render: v => v || '-' },
       { key: 'vrf', title: 'VRF', render: v => v || '-' },
-      { key: 'disable', title: '禁用', render: v => v ? '是' : '否' },
+      { key: 'disable', title: t('routing.static.col.disable'), render: v => v ? t('common.yes') : t('common.no') },
       { key: 'bfd_mode', title: 'BFD', render: v => {
         if (!v || v === 'none') return '-';
         if (v === 'profile') return 'Profile';
@@ -477,33 +485,33 @@ export default defineComponent({
         return v;
       }},
       { key: 'bfd_profile', title: 'BFD Profile', render: v => v || '-' },
-      { key: 'description', title: '描述', render: v => v || '-' },
-    ];
+      { key: 'description', title: t('routing.static.col.description'), render: v => v || '-' },
+    ]);
 
-    const arpColumns = [
-      { key: 'interface', title: '接口' },
-      { key: 'address', title: 'IP 地址' },
-      { key: 'mac', title: 'MAC 地址' },
-      { key: 'description', title: '描述' },
-    ];
+    const arpColumns = computed(() => [
+      { key: 'interface', title: t('routing.static.col.interface') },
+      { key: 'address', title: t('routing.static.col.ipAddress') },
+      { key: 'mac', title: t('routing.static.col.macAddress') },
+      { key: 'description', title: t('routing.static.col.description') },
+    ]);
 
-    const neighborProxyColumns = [
-      { key: 'type', title: '类型', render: v => v === 'nd' ? 'ND' : 'ARP' },
-      { key: 'address', title: '地址' },
-      { key: 'interface', title: '接口' },
-    ];
+    const neighborProxyColumns = computed(() => [
+      { key: 'type', title: t('routing.static.col.type'), render: v => v === 'nd' ? 'ND' : 'ARP' },
+      { key: 'address', title: t('routing.static.col.address') },
+      { key: 'interface', title: t('routing.static.col.interface') },
+    ]);
 
-    const multicastColumns = [
-      { key: 'type', title: '类型', render: v => v === 'route' ? 'MRIB 单播路由' : '接口路由' },
-      { key: 'destination', title: '目标网络' },
-    ];
+    const multicastColumns = computed(() => [
+      { key: 'type', title: t('routing.static.col.type'), render: v => v === 'route' ? t('routing.static.multicastType.mribUnicast') : t('routing.static.multicastType.interfaceRoute') },
+      { key: 'destination', title: t('routing.static.col.destination') },
+    ]);
 
-    const tableColumns = [
-      { key: 'table_number', title: '表编号' },
-      { key: 'description', title: '描述', render: v => v || '-' },
-      { key: 'route', title: 'IPv4 路由数', render: v => (v || []).length },
-      { key: 'route6', title: 'IPv6 路由数', render: v => (v || []).length },
-    ];
+    const tableColumns = computed(() => [
+      { key: 'table_number', title: t('routing.static.col.tableNumber') },
+      { key: 'description', title: t('routing.static.col.description'), render: v => v || '-' },
+      { key: 'route', title: t('routing.static.col.ipv4RouteCount'), render: v => (v || []).length },
+      { key: 'route6', title: t('routing.static.col.ipv6RouteCount'), render: v => (v || []).length },
+    ]);
 
     async function loadInterfaces() {
       try {
@@ -534,19 +542,19 @@ export default defineComponent({
       if (err) return err;
       if (item.type === 'next-hop') {
         err = ipv6 ? validateIPv6(item.value) : validateIPv4(item.value);
-        if (err) return `下一跳${err}`;
+        if (err) return t('routing.static.error.nextHop') + err;
         if (item.bfd_mode === 'profile') {
-          if (!item.bfd_profile) return 'BFD Profile 名称不能为空';
+          if (!item.bfd_profile) return t('routing.static.error.bfdProfileRequired');
         } else if (item.bfd_mode === 'multi-hop') {
           err = validateBFDSource(item.bfd_multi_hop_source);
-          if (err) return `BFD ${err}`;
+          if (err) return 'BFD ' + err;
         }
         if (ipv6) {
           err = validateSegments(item.segments);
           if (err) return err;
         }
       } else if (item.type === 'interface' || item.type === 'dhcp-interface') {
-        if (!item.value) return '接口不能为空';
+        if (!item.value) return t('routing.static.error.interfaceRequired');
       }
       err = validateDistance(item.distance);
       if (err) return err;
@@ -558,9 +566,9 @@ export default defineComponent({
     }
 
     function validateArp(item) {
-      if (!item.interface) return '接口不能为空';
+      if (!item.interface) return t('routing.static.error.interfaceRequired');
       const err = validateIPv4(item.address);
-      if (err) return `IP${err}`;
+      if (err) return 'IP' + err;
       if (item.mac) {
         const macErr = validateMAC(item.mac);
         if (macErr) return macErr;
@@ -569,9 +577,9 @@ export default defineComponent({
     }
 
     function validateNeighborProxy(item) {
-      if (!item.interface) return '接口不能为空';
+      if (!item.interface) return t('routing.static.error.interfaceRequired');
       const err = item.type === 'nd' ? validateIPv6(item.address) : validateIPv4(item.address);
-      if (err) return `地址${err}`;
+      if (err) return t('routing.static.error.address') + err;
       return '';
     }
 
@@ -580,43 +588,43 @@ export default defineComponent({
     }
 
     function validateTable(value) {
-      if (!value) return '策略路由表编号不能为空';
+      if (!value) return t('routing.static.error.tableNumberRequired');
       const n = parseInt(value, 10);
-      if (isNaN(n) || n < 1 || n > 200) return '策略路由表编号范围 1-200';
+      if (isNaN(n) || n < 1 || n > 200) return t('routing.static.error.tableNumberRange');
       return '';
     }
 
     async function save() {
       for (const item of config.value.route) {
         const err = validateRoute(item, false);
-        if (err) return alert(`IPv4 静态路由 ${item.destination || '未命名'}: ${err}`);
+        if (err) return showError({ message: t('routing.static.error.ipv4Route', { destination: item.destination || t('common.unnamed') }) + ': ' + err });
       }
       for (const item of config.value.route6) {
         const err = validateRoute(item, true);
-        if (err) return alert(`IPv6 静态路由 ${item.destination || '未命名'}: ${err}`);
+        if (err) return showError({ message: t('routing.static.error.ipv6Route', { destination: item.destination || t('common.unnamed') }) + ': ' + err });
       }
       for (const item of config.value.arp) {
         const err = validateArp(item);
-        if (err) return alert(`静态 ARP ${item.address || '未命名'}: ${err}`);
+        if (err) return showError({ message: t('routing.static.error.staticArp', { address: item.address || t('common.unnamed') }) + ': ' + err });
       }
       for (const item of config.value.neighbor_proxy) {
         const err = validateNeighborProxy(item);
-        if (err) return alert(`Neighbor Proxy ${item.address || '未命名'}: ${err}`);
+        if (err) return showError({ message: 'Neighbor Proxy ' + (item.address || t('common.unnamed')) + ': ' + err });
       }
       for (const item of config.value.multicast) {
         const err = validateMulticast(item);
-        if (err) return alert(`组播路由 ${item.destination || '未命名'}: ${err}`);
+        if (err) return showError({ message: t('routing.static.error.multicastRoute', { destination: item.destination || t('common.unnamed') }) + ': ' + err });
       }
       for (const item of config.value.tables) {
         const err = validateTable(item.table_number);
-        if (err) return alert(`策略路由表 ${item.table_number || '未命名'}: ${err}`);
+        if (err) return showError({ message: t('routing.static.error.policyTable', { number: item.table_number || t('common.unnamed') }) + ': ' + err });
         for (const r of item.route) {
           const rerr = validateRoute(r, false);
-          if (rerr) return alert(`策略路由表 ${item.table_number} IPv4 路由 ${r.destination || '未命名'}: ${rerr}`);
+          if (rerr) return showError({ message: t('routing.static.error.policyTableIpv4Route', { number: item.table_number, destination: r.destination || t('common.unnamed') }) + ': ' + rerr });
         }
         for (const r of item.route6) {
           const rerr = validateRoute(r, true);
-          if (rerr) return alert(`策略路由表 ${item.table_number} IPv6 路由 ${r.destination || '未命名'}: ${rerr}`);
+          if (rerr) return showError({ message: t('routing.static.error.policyTableIpv6Route', { number: item.table_number, destination: r.destination || t('common.unnamed') }) + ': ' + rerr });
         }
       }
 
@@ -624,6 +632,7 @@ export default defineComponent({
       try {
         const payload = formToConfig(config.value);
         await configApi.set('protocols static', payload);
+        configStore.markPending();
         saved.value = true;
         await load();
       } catch (e) {
@@ -662,9 +671,9 @@ export default defineComponent({
     function editRoute(ipv6 = false, context = null) {
       const selection = getRouteSelection(ipv6, context);
       const list = getRouteList(ipv6, context);
-      if (!selection.length) return alert('请选择要编辑的静态路由');
+      if (!selection.length) return showError({ message: t('routing.static.error.selectRouteToEdit') });
       const idx = parseInt(selection[0], 10);
-      if (isNaN(idx) || idx < 0 || idx >= list.length) return alert('未找到选中的静态路由');
+      if (isNaN(idx) || idx < 0 || idx >= list.length) return showError({ message: t('routing.static.error.routeNotFound') });
       routeModalContext.value = context;
       editingRoute.value = { ...list[idx], _index: idx };
       editingRouteIPv6.value = ipv6;
@@ -673,14 +682,14 @@ export default defineComponent({
     function removeRoute(ipv6 = false, context = null) {
       const selection = getRouteSelection(ipv6, context);
       const list = getRouteList(ipv6, context);
-      if (!selection.length) return alert('请选择要删除的静态路由');
+      if (!selection.length) return showError({ message: t('routing.static.error.selectRouteToDelete') });
       const indices = selection.map(s => parseInt(s, 10)).filter(n => !isNaN(n)).sort((a, b) => b - a);
       for (const idx of indices) list.splice(idx, 1);
       selection.length = 0;
     }
     function saveRoute() {
       const err = validateRoute(editingRoute.value, editingRouteIPv6.value);
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       const ipv6 = editingRouteIPv6.value;
       const list = getRouteList(ipv6, routeModalContext.value);
       const item = { ...editingRoute.value };
@@ -714,21 +723,21 @@ export default defineComponent({
       arpModalVisible.value = true;
     }
     function editArp() {
-      if (!arpSelection.value.length) return alert('请选择要编辑的静态 ARP');
+      if (!arpSelection.value.length) return showError({ message: t('routing.static.error.selectArpToEdit') });
       const idx = parseInt(arpSelection.value[0], 10);
-      if (isNaN(idx) || idx < 0 || idx >= config.value.arp.length) return alert('未找到选中的静态 ARP');
+      if (isNaN(idx) || idx < 0 || idx >= config.value.arp.length) return showError({ message: t('routing.static.error.arpNotFound') });
       editingArp.value = { ...config.value.arp[idx], _index: idx };
       arpModalVisible.value = true;
     }
     function removeArp() {
-      if (!arpSelection.value.length) return alert('请选择要删除的静态 ARP');
+      if (!arpSelection.value.length) return showError({ message: t('routing.static.error.selectArpToDelete') });
       const indices = arpSelection.value.map(s => parseInt(s, 10)).filter(n => !isNaN(n)).sort((a, b) => b - a);
       for (const idx of indices) config.value.arp.splice(idx, 1);
       arpSelection.value.length = 0;
     }
     function saveArp() {
       const err = validateArp(editingArp.value);
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       const item = { ...editingArp.value };
       delete item._index;
       if (editingArp.value._index !== undefined) {
@@ -750,21 +759,21 @@ export default defineComponent({
       npModalVisible.value = true;
     }
     function editNeighborProxy() {
-      if (!npSelection.value.length) return alert('请选择要编辑的 Neighbor Proxy');
+      if (!npSelection.value.length) return showError({ message: t('routing.static.error.selectNeighborProxyToEdit') });
       const idx = parseInt(npSelection.value[0], 10);
-      if (isNaN(idx) || idx < 0 || idx >= config.value.neighbor_proxy.length) return alert('未找到选中的 Neighbor Proxy');
+      if (isNaN(idx) || idx < 0 || idx >= config.value.neighbor_proxy.length) return showError({ message: t('routing.static.error.neighborProxyNotFound') });
       editingNp.value = { ...config.value.neighbor_proxy[idx], _index: idx };
       npModalVisible.value = true;
     }
     function removeNeighborProxy() {
-      if (!npSelection.value.length) return alert('请选择要删除的 Neighbor Proxy');
+      if (!npSelection.value.length) return showError({ message: t('routing.static.error.selectNeighborProxyToDelete') });
       const indices = npSelection.value.map(s => parseInt(s, 10)).filter(n => !isNaN(n)).sort((a, b) => b - a);
       for (const idx of indices) config.value.neighbor_proxy.splice(idx, 1);
       npSelection.value.length = 0;
     }
     function saveNeighborProxy() {
       const err = validateNeighborProxy(editingNp.value);
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       const item = { ...editingNp.value };
       delete item._index;
       if (editingNp.value._index !== undefined) {
@@ -786,21 +795,21 @@ export default defineComponent({
       mcModalVisible.value = true;
     }
     function editMulticast() {
-      if (!mcSelection.value.length) return alert('请选择要编辑的组播路由');
+      if (!mcSelection.value.length) return showError({ message: t('routing.static.error.selectMulticastToEdit') });
       const idx = parseInt(mcSelection.value[0], 10);
-      if (isNaN(idx) || idx < 0 || idx >= config.value.multicast.length) return alert('未找到选中的组播路由');
+      if (isNaN(idx) || idx < 0 || idx >= config.value.multicast.length) return showError({ message: t('routing.static.error.multicastNotFound') });
       editingMc.value = { ...config.value.multicast[idx], _index: idx };
       mcModalVisible.value = true;
     }
     function removeMulticast() {
-      if (!mcSelection.value.length) return alert('请选择要删除的组播路由');
+      if (!mcSelection.value.length) return showError({ message: t('routing.static.error.selectMulticastToDelete') });
       const indices = mcSelection.value.map(s => parseInt(s, 10)).filter(n => !isNaN(n)).sort((a, b) => b - a);
       for (const idx of indices) config.value.multicast.splice(idx, 1);
       mcSelection.value.length = 0;
     }
     function saveMulticast() {
       const err = validateMulticast(editingMc.value);
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       const item = { ...editingMc.value };
       delete item._index;
       if (editingMc.value._index !== undefined) {
@@ -828,9 +837,9 @@ export default defineComponent({
       tableModalVisible.value = true;
     }
     function editTable() {
-      if (!tableSelection.value.length) return alert('请选择要编辑的策略路由表');
+      if (!tableSelection.value.length) return showError({ message: t('routing.static.error.selectTableToEdit') });
       const idx = parseInt(tableSelection.value[0], 10);
-      if (isNaN(idx) || idx < 0 || idx >= config.value.tables.length) return alert('未找到选中的策略路由表');
+      if (isNaN(idx) || idx < 0 || idx >= config.value.tables.length) return showError({ message: t('routing.static.error.tableNotFound') });
       editingTable.value = JSON.parse(JSON.stringify({ ...config.value.tables[idx], _index: idx }));
       tableRouteSelection.value.length = 0;
       tableRoute6Selection.value.length = 0;
@@ -838,14 +847,14 @@ export default defineComponent({
       tableModalVisible.value = true;
     }
     function removeTable() {
-      if (!tableSelection.value.length) return alert('请选择要删除的策略路由表');
+      if (!tableSelection.value.length) return showError({ message: t('routing.static.error.selectTableToDelete') });
       const indices = tableSelection.value.map(s => parseInt(s, 10)).filter(n => !isNaN(n)).sort((a, b) => b - a);
       for (const idx of indices) config.value.tables.splice(idx, 1);
       tableSelection.value.length = 0;
     }
     function saveTable() {
       const err = validateTable(editingTable.value.table_number);
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       const item = JSON.parse(JSON.stringify(editingTable.value));
       delete item._index;
       if (editingTable.value._index !== undefined) {
@@ -860,9 +869,11 @@ export default defineComponent({
     onMounted(() => {
       load();
       loadInterfaces();
+      onMenuRefresh(load);
     });
 
     return {
+      t,
       loading, saving, saved, config, activeTab, interfaces, writeDisabled,
       routeColumns, routeSelection, routeModalVisible, editingRoute, editingRouteIPv6, routeModalContext,
       createRoute, editRoute, removeRoute, saveRoute,
@@ -885,70 +896,70 @@ export default defineComponent({
     <div class="page-section">
       <div v-if="saved" class="alert alert-success">{{ $t('msg.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'route', title: 'IPv4 静态路由' },
-        { key: 'route6', title: 'IPv6 静态路由' },
-        { key: 'arp', title: '静态 ARP' },
+        { key: 'route', title: t('routing.static.tab.ipv4Route') },
+        { key: 'route6', title: t('routing.static.tab.ipv6Route') },
+        { key: 'arp', title: t('routing.static.tab.staticArp') },
         { key: 'neighbor-proxy', title: 'Neighbor Proxy' },
-        { key: 'multicast', title: '组播路由' },
-        { key: 'table', title: '策略路由表' },
-        { key: 'advanced', title: '高级' },
+        { key: 'multicast', title: t('routing.static.tab.multicast') },
+        { key: 'table', title: t('routing.static.tab.policyTable') },
+        { key: 'advanced', title: t('routing.static.tab.advanced') },
       ]">
         <template #route>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createRoute(false)" :disabled="writeDisabled">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editRoute(false)" :disabled="writeDisabled || !routeSelection.length || routeSelection.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeRoute(false)" :disabled="writeDisabled || !routeSelection.length">删除</ToolbarButton>
-            <ToolbarButton icon="refresh" @click="load" :disabled="loading">刷新</ToolbarButton>
+            <ToolbarButton icon="create" @click="createRoute(false)" :disabled="writeDisabled">{{ t('btn.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editRoute(false)" :disabled="writeDisabled || !routeSelection.length || routeSelection.length > 1">{{ t('btn.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeRoute(false)" :disabled="writeDisabled || !routeSelection.length">{{ t('btn.delete') }}</ToolbarButton>
+            <ToolbarButton icon="refresh" @click="load" :disabled="loading">{{ t('btn.refresh') }}</ToolbarButton>
           </div>
           <DataTable :columns="routeColumns" :data="config.route.map((r, i) => ({ ...r, _index: i }))" row-key="_index" :externalToolbar="true" @selection-change="routeSelection = $event" :selectable="true" :loading="loading" />
         </template>
 
         <template #route6>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createRoute(true)" :disabled="writeDisabled">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editRoute(true)" :disabled="writeDisabled || !route6Selection.length || route6Selection.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeRoute(true)" :disabled="writeDisabled || !route6Selection.length">删除</ToolbarButton>
-            <ToolbarButton icon="refresh" @click="load" :disabled="loading">刷新</ToolbarButton>
+            <ToolbarButton icon="create" @click="createRoute(true)" :disabled="writeDisabled">{{ t('btn.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editRoute(true)" :disabled="writeDisabled || !route6Selection.length || route6Selection.length > 1">{{ t('btn.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeRoute(true)" :disabled="writeDisabled || !route6Selection.length">{{ t('btn.delete') }}</ToolbarButton>
+            <ToolbarButton icon="refresh" @click="load" :disabled="loading">{{ t('btn.refresh') }}</ToolbarButton>
           </div>
           <DataTable :columns="routeColumns" :data="config.route6.map((r, i) => ({ ...r, _index: i }))" row-key="_index" :externalToolbar="true" @selection-change="route6Selection = $event" :selectable="true" :loading="loading" />
         </template>
 
         <template #arp>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createArp" :disabled="writeDisabled">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editArp" :disabled="writeDisabled || !arpSelection.length || arpSelection.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeArp" :disabled="writeDisabled || !arpSelection.length">删除</ToolbarButton>
-            <ToolbarButton icon="refresh" @click="load" :disabled="loading">刷新</ToolbarButton>
+            <ToolbarButton icon="create" @click="createArp" :disabled="writeDisabled">{{ t('btn.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editArp" :disabled="writeDisabled || !arpSelection.length || arpSelection.length > 1">{{ t('btn.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeArp" :disabled="writeDisabled || !arpSelection.length">{{ t('btn.delete') }}</ToolbarButton>
+            <ToolbarButton icon="refresh" @click="load" :disabled="loading">{{ t('btn.refresh') }}</ToolbarButton>
           </div>
           <DataTable :columns="arpColumns" :data="config.arp.map((r, i) => ({ ...r, _index: i }))" row-key="_index" :externalToolbar="true" @selection-change="arpSelection = $event" :selectable="true" :loading="loading" />
         </template>
 
         <template #neighbor-proxy>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createNeighborProxy" :disabled="writeDisabled">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editNeighborProxy" :disabled="writeDisabled || !npSelection.length || npSelection.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeNeighborProxy" :disabled="writeDisabled || !npSelection.length">删除</ToolbarButton>
-            <ToolbarButton icon="refresh" @click="load" :disabled="loading">刷新</ToolbarButton>
+            <ToolbarButton icon="create" @click="createNeighborProxy" :disabled="writeDisabled">{{ t('btn.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editNeighborProxy" :disabled="writeDisabled || !npSelection.length || npSelection.length > 1">{{ t('btn.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeNeighborProxy" :disabled="writeDisabled || !npSelection.length">{{ t('btn.delete') }}</ToolbarButton>
+            <ToolbarButton icon="refresh" @click="load" :disabled="loading">{{ t('btn.refresh') }}</ToolbarButton>
           </div>
           <DataTable :columns="neighborProxyColumns" :data="config.neighbor_proxy.map((r, i) => ({ ...r, _index: i }))" row-key="_index" :externalToolbar="true" @selection-change="npSelection = $event" :selectable="true" :loading="loading" />
         </template>
 
         <template #multicast>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createMulticast" :disabled="writeDisabled">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editMulticast" :disabled="writeDisabled || !mcSelection.length || mcSelection.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeMulticast" :disabled="writeDisabled || !mcSelection.length">删除</ToolbarButton>
-            <ToolbarButton icon="refresh" @click="load" :disabled="loading">刷新</ToolbarButton>
+            <ToolbarButton icon="create" @click="createMulticast" :disabled="writeDisabled">{{ t('btn.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editMulticast" :disabled="writeDisabled || !mcSelection.length || mcSelection.length > 1">{{ t('btn.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeMulticast" :disabled="writeDisabled || !mcSelection.length">{{ t('btn.delete') }}</ToolbarButton>
+            <ToolbarButton icon="refresh" @click="load" :disabled="loading">{{ t('btn.refresh') }}</ToolbarButton>
           </div>
           <DataTable :columns="multicastColumns" :data="config.multicast.map((r, i) => ({ ...r, _index: i }))" row-key="_index" :externalToolbar="true" @selection-change="mcSelection = $event" :selectable="true" :loading="loading" />
         </template>
 
         <template #table>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createTable" :disabled="writeDisabled">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editTable" :disabled="writeDisabled || !tableSelection.length || tableSelection.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeTable" :disabled="writeDisabled || !tableSelection.length">删除</ToolbarButton>
-            <ToolbarButton icon="refresh" @click="load" :disabled="loading">刷新</ToolbarButton>
+            <ToolbarButton icon="create" @click="createTable" :disabled="writeDisabled">{{ t('btn.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editTable" :disabled="writeDisabled || !tableSelection.length || tableSelection.length > 1">{{ t('btn.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeTable" :disabled="writeDisabled || !tableSelection.length">{{ t('btn.delete') }}</ToolbarButton>
+            <ToolbarButton icon="refresh" @click="load" :disabled="loading">{{ t('btn.refresh') }}</ToolbarButton>
           </div>
           <DataTable :columns="tableColumns" :data="config.tables.map((r, i) => ({ ...r, _index: i }))" row-key="_index" :externalToolbar="true" @selection-change="tableSelection = $event" :selectable="true" :loading="loading" />
         </template>
@@ -956,48 +967,42 @@ export default defineComponent({
         <template #advanced>
           <div class="form-row">
             <label class="form-label">Route-map</label>
-            <input class="form-control" v-model="config.route_map" :disabled="writeDisabled" placeholder="路由映射名称" title="指定要使用的 route-map 名称" />
+            <input class="form-control" v-model="config.route_map" :disabled="writeDisabled" :placeholder="t('routing.static.form.routeMapPlaceholder')" :title="t('routing.static.form.routeMapTitle')" />
           </div>
         </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="writeDisabled || saving">{{ saving ? '保存中...' : $t('app.save') }}</ToolbarButton>
-      </div>
-
-
-
       <!-- Table Modal -->
-      <DraggableModal v-model:visible="tableModalVisible" title="策略路由表" width="1100px" @confirm="saveTable" @close="tableModalVisible = false">
+      <DraggableModal v-model:visible="tableModalVisible" :title="t('routing.static.modal.policyTable')" width="1100px" @confirm="saveTable" @close="tableModalVisible = false">
         <div class="form-row">
-          <label class="form-label">表编号</label>
+          <label class="form-label">{{ t('routing.static.form.tableNumber') }}</label>
           <div class="form-control">
-            <input type="number" min="1" max="200" v-model="editingTable.table_number" :disabled="editingTable._index !== undefined" placeholder="1-200" title="策略路由表编号" />
-            <div class="form-hint">范围 1-200</div>
+            <input type="number" min="1" max="200" v-model="editingTable.table_number" :disabled="editingTable._index !== undefined" placeholder="1-200" :title="t('routing.static.form.tableNumberTitle')" />
+            <div class="form-hint">{{ t('routing.static.form.tableNumberHint') }}</div>
           </div>
         </div>
         <div class="form-row">
-          <label class="form-label">描述</label>
-          <input class="form-control" v-model="editingTable.description" placeholder="可选" title="策略路由表描述" />
+          <label class="form-label">{{ t('routing.static.form.description') }}</label>
+          <input class="form-control" v-model="editingTable.description" :placeholder="t('common.optional')" :title="t('routing.static.form.tableDescriptionTitle')" />
         </div>
         <div class="form-row" style="margin-top: 12px;">
           <TabGroup v-model="tableActiveTab" :tabs="[
-            { key: 'route', title: 'IPv4 路由' },
-            { key: 'route6', title: 'IPv6 路由' },
+            { key: 'route', title: t('routing.static.form.ipv4Route') },
+            { key: 'route6', title: t('routing.static.form.ipv6Route') },
           ]" style="flex: 1;">
             <template #route>
               <div class="toolbar toolbar-compact">
-                <ToolbarButton icon="create" @click="createRoute(false, true)" :disabled="writeDisabled">创建</ToolbarButton>
-                <ToolbarButton icon="edit" @click="editRoute(false, true)" :disabled="writeDisabled || !tableRouteSelection.length || tableRouteSelection.length > 1">编辑</ToolbarButton>
-                <ToolbarButton icon="delete" @click="removeRoute(false, true)" :disabled="writeDisabled || !tableRouteSelection.length">删除</ToolbarButton>
+                <ToolbarButton icon="create" @click="createRoute(false, true)" :disabled="writeDisabled">{{ t('btn.create') }}</ToolbarButton>
+                <ToolbarButton icon="edit" @click="editRoute(false, true)" :disabled="writeDisabled || !tableRouteSelection.length || tableRouteSelection.length > 1">{{ t('btn.edit') }}</ToolbarButton>
+                <ToolbarButton icon="delete" @click="removeRoute(false, true)" :disabled="writeDisabled || !tableRouteSelection.length">{{ t('btn.delete') }}</ToolbarButton>
               </div>
               <DataTable :columns="routeColumns" :data="editingTable.route.map((r, i) => ({ ...r, _index: i }))" row-key="_index" :externalToolbar="true" @selection-change="tableRouteSelection = $event" :selectable="true" />
             </template>
             <template #route6>
               <div class="toolbar toolbar-compact">
-                <ToolbarButton icon="create" @click="createRoute(true, true)" :disabled="writeDisabled">创建</ToolbarButton>
-                <ToolbarButton icon="edit" @click="editRoute(true, true)" :disabled="writeDisabled || !tableRoute6Selection.length || tableRoute6Selection.length > 1">编辑</ToolbarButton>
-                <ToolbarButton icon="delete" @click="removeRoute(true, true)" :disabled="writeDisabled || !tableRoute6Selection.length">删除</ToolbarButton>
+                <ToolbarButton icon="create" @click="createRoute(true, true)" :disabled="writeDisabled">{{ t('btn.create') }}</ToolbarButton>
+                <ToolbarButton icon="edit" @click="editRoute(true, true)" :disabled="writeDisabled || !tableRoute6Selection.length || tableRoute6Selection.length > 1">{{ t('btn.edit') }}</ToolbarButton>
+                <ToolbarButton icon="delete" @click="removeRoute(true, true)" :disabled="writeDisabled || !tableRoute6Selection.length">{{ t('btn.delete') }}</ToolbarButton>
               </div>
               <DataTable :columns="routeColumns" :data="editingTable.route6.map((r, i) => ({ ...r, _index: i }))" row-key="_index" :externalToolbar="true" @selection-change="tableRoute6Selection = $event" :selectable="true" />
             </template>
@@ -1006,114 +1011,114 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- ARP Modal -->
-      <DraggableModal v-model:visible="arpModalVisible" title="静态 ARP" @confirm="saveArp" @close="arpModalVisible = false">
+      <DraggableModal v-model:visible="arpModalVisible" :title="t('routing.static.modal.staticArp')" @confirm="saveArp" @close="arpModalVisible = false">
         <div class="form-row">
-          <label class="form-label">接口</label>
+          <label class="form-label">{{ t('routing.static.form.interface') }}</label>
           <select class="form-control" v-model="editingArp.interface">
-            <option value="">-- 请选择 --</option>
+            <option value="">-- {{ t('common.select') }} --</option>
             <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">IP 地址</label>
-          <input class="form-control" v-model="editingArp.address" placeholder="x.x.x.x" title="IPv4 目标地址" />
+          <label class="form-label">{{ t('routing.static.form.ipAddress') }}</label>
+          <input class="form-control" v-model="editingArp.address" placeholder="x.x.x.x" :title="t('routing.static.form.ipv4Destination')" />
         </div>
         <div class="form-row">
-          <label class="form-label">MAC 地址</label>
-          <input class="form-control" v-model="editingArp.mac" placeholder="aa:bb:cc:dd:ee:ff" title="硬件 MAC 地址" />
+          <label class="form-label">{{ t('routing.static.form.macAddress') }}</label>
+          <input class="form-control" v-model="editingArp.mac" placeholder="aa:bb:cc:dd:ee:ff" :title="t('routing.static.form.hardwareMacAddress')" />
         </div>
         <div class="form-row">
-          <label class="form-label">描述</label>
-          <input class="form-control" v-model="editingArp.description" placeholder="可选" title="描述" />
+          <label class="form-label">{{ t('routing.static.form.description') }}</label>
+          <input class="form-control" v-model="editingArp.description" :placeholder="t('common.optional')" :title="t('routing.static.form.description')" />
         </div>
       </DraggableModal>
 
       <!-- Neighbor Proxy Modal -->
       <DraggableModal v-model:visible="npModalVisible" title="Neighbor Proxy" @confirm="saveNeighborProxy" @close="npModalVisible = false">
         <div class="form-row">
-          <label class="form-label">类型</label>
+          <label class="form-label">{{ t('routing.static.form.type') }}</label>
           <select class="form-control" v-model="editingNp.type">
             <option value="arp">ARP</option>
             <option value="nd">ND</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">地址</label>
-          <input class="form-control" v-model="editingNp.address" :placeholder="editingNp.type === 'nd' ? 'x:x:x:x::x' : 'x.x.x.x'" :title="editingNp.type === 'nd' ? 'IPv6 目标地址' : 'IPv4 目标地址'" />
+          <label class="form-label">{{ t('routing.static.form.address') }}</label>
+          <input class="form-control" v-model="editingNp.address" :placeholder="editingNp.type === 'nd' ? 'x:x:x:x::x' : 'x.x.x.x'" :title="editingNp.type === 'nd' ? t('routing.static.form.ipv6Destination') : t('routing.static.form.ipv4Destination')" />
         </div>
         <div class="form-row">
-          <label class="form-label">接口</label>
+          <label class="form-label">{{ t('routing.static.form.interface') }}</label>
           <select class="form-control" v-model="editingNp.interface">
-            <option value="">-- 请选择 --</option>
+            <option value="">-- {{ t('common.select') }} --</option>
             <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
           </select>
         </div>
       </DraggableModal>
 
       <!-- Multicast Modal -->
-      <DraggableModal v-model:visible="mcModalVisible" title="组播路由" @confirm="saveMulticast" @close="mcModalVisible = false">
+      <DraggableModal v-model:visible="mcModalVisible" :title="t('routing.static.modal.multicast')" @confirm="saveMulticast" @close="mcModalVisible = false">
         <div class="form-row">
-          <label class="form-label">类型</label>
+          <label class="form-label">{{ t('routing.static.form.type') }}</label>
           <select class="form-control" v-model="editingMc.type">
-            <option value="interface-route">接口路由</option>
-            <option value="route">MRIB 单播路由</option>
+            <option value="interface-route">{{ t('routing.static.form.interfaceRoute') }}</option>
+            <option value="route">{{ t('routing.static.form.mribUnicastRoute') }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">目标网络</label>
-          <input class="form-control" v-model="editingMc.destination" placeholder="x.x.x.x/x" title="IPv4 目标网络" />
+          <label class="form-label">{{ t('routing.static.form.destinationNetwork') }}</label>
+          <input class="form-control" v-model="editingMc.destination" placeholder="x.x.x.x/x" :title="t('routing.static.form.ipv4DestinationNetwork')" />
         </div>
       </DraggableModal>
       <!-- Route Modal -->
-      <DraggableModal v-model:visible="routeModalVisible" :title="(editingRouteIPv6 ? 'IPv6' : 'IPv4') + ' 静态路由'" modal-class="on-top" @confirm="saveRoute" @close="routeModalVisible = false">
+      <DraggableModal v-model:visible="routeModalVisible" :title="editingRouteIPv6 ? t('routing.static.modal.ipv6StaticRoute') : t('routing.static.modal.ipv4StaticRoute')" modal-class="on-top" @confirm="saveRoute" @close="routeModalVisible = false">
         <div class="form-row">
-          <label class="form-label">目标网络</label>
-          <input class="form-control" v-model="editingRoute.destination" :disabled="editingRoute._index !== undefined" :placeholder="editingRouteIPv6 ? 'x:x:x:x::x/x' : 'x.x.x.x/x'" title="目标网络 CIDR" />
+          <label class="form-label">{{ t('routing.static.form.destinationNetwork') }}</label>
+          <input class="form-control" v-model="editingRoute.destination" :disabled="editingRoute._index !== undefined" :placeholder="editingRouteIPv6 ? 'x:x:x:x::x/x' : 'x.x.x.x/x'" :title="t('routing.static.form.destinationNetworkCidr')" />
         </div>
         <div class="form-row">
-          <label class="form-label">类型</label>
+          <label class="form-label">{{ t('routing.static.form.type') }}</label>
           <select class="form-control" v-model="editingRoute.type">
             <option v-for="opt in ROUTE_TYPES" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row" v-if="editingRoute.type === 'next-hop'">
-          <label class="form-label">下一跳地址</label>
-          <input class="form-control" v-model="editingRoute.value" :placeholder="editingRouteIPv6 ? 'x:x:x:x::x' : 'x.x.x.x'" title="下一跳 IP 地址" />
+          <label class="form-label">{{ t('routing.static.form.nextHopAddress') }}</label>
+          <input class="form-control" v-model="editingRoute.value" :placeholder="editingRouteIPv6 ? 'x:x:x:x::x' : 'x.x.x.x'" :title="t('routing.static.form.nextHopIpAddress')" />
         </div>
         <div class="form-row" v-if="editingRoute.type === 'next-hop'">
-          <label class="form-label">出接口（可选）</label>
+          <label class="form-label">{{ t('routing.static.form.outboundInterface') }} ({{ t('common.optional') }})</label>
           <select class="form-control" v-model="editingRoute.outbound_interface">
-            <option value="">-- 请选择 --</option>
+            <option value="">-- {{ t('common.select') }} --</option>
             <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
           </select>
         </div>
         <div class="form-row" v-if="editingRoute.type === 'interface' || editingRoute.type === 'dhcp-interface'">
-          <label class="form-label">接口</label>
+          <label class="form-label">{{ t('routing.static.form.interface') }}</label>
           <select class="form-control" v-model="editingRoute.value">
-            <option value="">-- 请选择 --</option>
+            <option value="">-- {{ t('common.select') }} --</option>
             <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
           </select>
         </div>
         <div class="form-row" v-if="editingRoute.type !== 'dhcp-interface'">
-          <label class="form-label">距离</label>
+          <label class="form-label">{{ t('routing.static.form.distance') }}</label>
           <div class="form-control">
-            <input type="number" min="1" max="255" v-model="editingRoute.distance" placeholder="1" title="管理距离，范围 1-255，默认 1" />
-            <div class="form-hint">范围 1-255，默认 1</div>
+            <input type="number" min="1" max="255" v-model="editingRoute.distance" placeholder="1" :title="t('routing.static.form.distanceTitle')" />
+            <div class="form-hint">{{ t('routing.static.form.distanceHint') }}</div>
           </div>
         </div>
         <div class="form-row" v-if="editingRoute.type === 'blackhole' || editingRoute.type === 'reject'">
-          <label class="form-label">标签</label>
+          <label class="form-label">{{ t('routing.static.form.tag') }}</label>
           <div class="form-control">
-            <input type="number" min="0" max="4294967295" v-model="editingRoute.tag" placeholder="可选" title="路由标签" />
-            <div class="form-hint">范围 0-4294967295</div>
+            <input type="number" min="0" max="4294967295" v-model="editingRoute.tag" :placeholder="t('common.optional')" :title="t('routing.static.form.tagTitle')" />
+            <div class="form-hint">{{ t('routing.static.form.tagHint') }}</div>
           </div>
         </div>
         <div class="form-row" v-if="editingRoute.type === 'next-hop' || editingRoute.type === 'interface'">
           <label class="form-label">VRF</label>
-          <input class="form-control" v-model="editingRoute.vrf" placeholder="可选" title="泄露路由的 VRF" />
+          <input class="form-control" v-model="editingRoute.vrf" :placeholder="t('common.optional')" :title="t('routing.static.form.vrfTitle')" />
         </div>
         <div class="form-row" v-if="editingRoute.type === 'next-hop' || editingRoute.type === 'interface'">
-          <label class="form-label"><input type="checkbox" v-model="editingRoute.disable" /> 禁用</label>
+          <label class="form-label"><input type="checkbox" v-model="editingRoute.disable" /> {{ t('routing.static.form.disable') }}</label>
         </div>
         <div class="form-row" v-if="editingRoute.type === 'next-hop'">
           <label class="form-label">BFD</label>
@@ -1123,23 +1128,23 @@ export default defineComponent({
         </div>
         <div class="form-row" v-if="editingRoute.type === 'next-hop' && editingRoute.bfd_mode === 'profile'">
           <label class="form-label">BFD Profile</label>
-          <input class="form-control" v-model="editingRoute.bfd_profile" placeholder="BFD profile 名称" title="BFD profile 名称" />
+          <input class="form-control" v-model="editingRoute.bfd_profile" :placeholder="t('routing.static.form.bfdProfilePlaceholder')" :title="t('routing.static.form.bfdProfileTitle')" />
         </div>
         <div class="form-row" v-if="editingRoute.type === 'next-hop' && editingRoute.bfd_mode === 'multi-hop'">
-          <label class="form-label">Source 地址</label>
-          <input class="form-control" v-model="editingRoute.bfd_multi_hop_source" :placeholder="editingRouteIPv6 ? 'x:x:x:x::x' : 'x.x.x.x'" title="BFD 会话源地址" />
+          <label class="form-label">{{ t('routing.static.form.sourceAddress') }}</label>
+          <input class="form-control" v-model="editingRoute.bfd_multi_hop_source" :placeholder="editingRouteIPv6 ? 'x:x:x:x::x' : 'x.x.x.x'" :title="t('routing.static.form.bfdSessionSourceAddress')" />
         </div>
         <div class="form-row" v-if="editingRoute.type === 'next-hop' && editingRoute.bfd_mode === 'multi-hop'">
           <label class="form-label">BFD Profile</label>
-          <input class="form-control" v-model="editingRoute.bfd_multi_hop_profile" placeholder="BFD profile 名称" title="BFD profile 名称" />
+          <input class="form-control" v-model="editingRoute.bfd_multi_hop_profile" :placeholder="t('routing.static.form.bfdProfilePlaceholder')" :title="t('routing.static.form.bfdProfileTitle')" />
         </div>
         <div class="form-row" v-if="editingRoute.type === 'next-hop' && editingRouteIPv6">
           <label class="form-label">SRv6 Segments</label>
           <input class="form-control" v-model="editingRoute.segments" placeholder="Segments (SIDs)" title="SRv6 segments" />
         </div>
         <div class="form-row">
-          <label class="form-label">描述</label>
-          <input class="form-control" v-model="editingRoute.description" placeholder="可选" title="路由描述" />
+          <label class="form-label">{{ t('routing.static.form.description') }}</label>
+          <input class="form-control" v-model="editingRoute.description" :placeholder="t('common.optional')" :title="t('routing.static.form.routeDescription')" />
         </div>
       </DraggableModal>
     </div>

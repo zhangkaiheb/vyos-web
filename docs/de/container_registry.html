@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="container">
+<h1>Container</h1>
+<p>Die VyOS-Container-Implementierung basiert auf <a class="reference external" href="https://podman.io/">Podman</a> als daemonloser Container-Engine.</p>
+<section id="configuration">
+<h2>Konfiguration</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; image
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-image" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Setzt den Bildnamen im Hub-Registry</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container name mysql-server image mysql:8.0
+</pre></div>
+</div>
+<p>Wenn kein Registry angegeben wird, wird Docker.io als Container-Registry verwendet, es sei denn, eine alternative Registry wird mit
+<code class="docutils literal notranslate">set container registry &lt;name&gt;</code> oder der Registry wird in dem Bildnamen enthalten</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container name mysql-server image quay.io/mysql:8.0
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; entrypoint &lt;entrypoint&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-entrypoint-entrypoint" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Überschreibt den Standard-Entrypoint aus dem Bild für einen Container.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; command &lt;command&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-command-command" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Überschreibt den Standard-Befehl aus dem Bild für einen Container.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; arguments &lt;arguments&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-arguments-arguments" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Setzt die Befehlsargumente für einen Container.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; host-name &lt;hostname&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-host-name-hostname" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Setzt den Hostnamen für einen Container.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; allow-host-pid
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-allow-host-pid" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Der Container und der Host teilen sich dasselbe Prozessnamespace.
+Das bedeutet, dass Prozesse, die auf dem Host laufen, im Container sichtbar sind, und Prozesse im Container sind auf dem Host sichtbar.</p>
+<p>Der Befehl übersetzt sich zu „–pid host“ beim Erstellen des Containers.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; allow-host-networks
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-allow-host-networks" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Erlaubt Host-Netzwerke in einem Container. Das Netzwerkstack des Containers ist nicht isoliert vom Host und verwendet die Host-IP.</p>
+<p>Der Befehl übersetzt sich zu „–net host“ beim Erstellen des Containers.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p><strong>allow-host-networks</strong> kann nicht mit <strong>network</strong> verwendet werden</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; network &lt;networkname&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-network-networkname" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verbindet ein benutzerdefiniertes Netzwerk mit einem Container.
+Es muss nur ein Netzwerk angegeben werden und muss bereits existieren.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; network &lt;networkname&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-network-networkname-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Legt optional eine spezifische statische IPv4- oder IPv6-Adresse für den Container fest.
+Diese Adresse muss innerhalb des benannten Netzwerkpräfixes liegen.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Die erste IP im Container-Netzwerk wird vom Engine reserviert und kann nicht verwendet werden</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-name-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Legt optional einen benutzerdefinierten Name Server fest.
+Wenn ein Container-Netzwerk mit DNS aktiviert wird,
+wirkt sich diese Einstellung nicht aus.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Setzt eine Beschreibung für den Container</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; environment &lt;key&gt; value &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-environment-key-value-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Fügt benutzerdefinierte Umgebungsvariablen hinzu.
+Mehrere Umgebungsvariablen sind erlaubt.
+Die folgenden Befehle übersetzen sich zu „-e key=value“ beim Erstellen des Containers.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container name mysql-server environment MYSQL_DATABASE value &#39;zabbix&#39;
+set container name mysql-server environment MYSQL_USER value &#39;zabbix&#39;
+set container name mysql-server environment MYSQL_PASSWORD value &#39;zabbix_pwd&#39;
+set container name mysql-server environment MYSQL_ROOT_PASSWORD value &#39;root_pwd&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; port &lt;portname&gt; source &lt;portnumber&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-port-portname-source-portnumber" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; port &lt;portname&gt; destination &lt;portnumber&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-port-portname-destination-portnumber" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; port &lt;portname&gt; protocol &lt;tcp | udp&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-port-portname-protocol-tcp-udp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Veröffentlicht einen Port für den Container.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container name zabbix-web-nginx-mysql port http source 80
+set container name zabbix-web-nginx-mysql port http destination 8080
+set container name zabbix-web-nginx-mysql port http protocol tcp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Portveröffentlichung kann nicht mit <strong>network</strong> verwendet werden. Für diesen Zweck ist ein Workaround mit Destination NAT und statischer IP-Zuweisung für den Container verfügbar.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; volume &lt;volumename&gt; source &lt;path&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-volume-volumename-source-path" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; volume &lt;volumename&gt; destination &lt;path&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-volume-volumename-destination-path" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Mountet ein Volume in den Container</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container name coredns volume &#39;corefile&#39; source /config/coredns/Corefile
+set container name coredns volume &#39;corefile&#39; destination /etc/Corefile
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; volume &lt;volumename&gt; mode &lt;ro | rw&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-volume-volumename-mode-ro-rw" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Das Volume wird entweder als rw (read-write - Standard) oder ro (read-only) gemountet</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; tmpfs &lt;tmpfsname&gt; destination &lt;path&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-tmpfs-tmpfsname-destination-path" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Mountet ein tmpfs <em>(RAM-Disk)</em> Dateisystem an den gegebenen Pfad innerhalb des Containers.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; tmpfs &lt;tmpfsname&gt; size &lt;MB&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-tmpfs-tmpfsname-size-mb" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Größe in MB für das tmpfs-Dateisystem, maximale Größe beträgt 64 GB oder 50 % des verfügbaren Systemspeichers.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; uid &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-uid-number" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; gid &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-gid-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Setzt die Benutzer-ID oder Gruppen-ID des Containers</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; restart [no | on-failure | always]
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-restart-no-on-failure-always" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Setzt das Wiederstartverhalten des Containers.</p>
+<ul class="simple">
+<li><p><strong>no</strong>: Container nicht bei Beendigung neu starten</p></li>
+<li><p><strong>on-failure</strong>: Container neu starten, wenn sie mit einem nicht-null Exit-Code beenden, unendlich oft wiederholen (Standard)</p></li>
+<li><p><strong>always</strong>: Container neu starten, wenn sie beenden, unabhängig vom Status, unendlich oft wiederholen</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; cpu-quota &lt;num&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-cpu-quota-num" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Dies gibt die Anzahl der CPU-Ressourcen an, die der Container verwenden kann.</p>
+<p>Der Standardwert ist 0 für unbegrenzt.
+Zum Beispiel: 1,25 begrenzt den Container auf bis zu 1,25 Kerne
+Wert der CPU-Zeit.
+Dies kann eine Dezimalzahl mit bis zu drei Dezimalstellen sein.</p>
+<p>Der Befehl übersetzt sich zu „–cpus=&lt;num&gt;“ beim Erstellen des Containers.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; memory &lt;MB&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-memory-mb" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Beschränkt den Speicher, der dem Container zur Verfügung steht.</p>
+<p>Der Standardwert ist 512 MB. Verwenden Sie 0 MB für unbegrenzten Speicher.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; device &lt;devicename&gt; source &lt;path&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-device-devicename-source-path" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; device &lt;devicename&gt; destination &lt;path&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-device-devicename-destination-path" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Fügt ein Host-Gerät dem Container hinzu.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; capability &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-capability-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Setzt Container-Fähigkeiten oder Berechtigungen.</p>
+<ul class="simple">
+<li><p><strong>net-admin</strong>: Netzwerkoperationen (Schnittstelle, Firewall, Routing-Tabellen)</p></li>
+<li><p><strong>net-bind-service</strong>: Binden eines Sockets an privilegierte Ports
+(Nummern kleiner als 1024)</p></li>
+<li><p><strong>net-raw</strong>: Berechtigung, Roh-Netzwerk-Sockets zu erstellen</p></li>
+<li><p><strong>setpcap</strong>: Fähigkeits-Sets (aus eingeschränkten oder geerbten Sets)</p></li>
+<li><p><strong>sys-admin</strong>: Administrations-Operationen (quotactl, mount, sethostname,
+setdomainame)</p></li>
+<li><p><strong>sys-time</strong>: Berechtigung, den System-Uhrzeit zu setzen</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; sysctl parameter &lt;parameter&gt; value &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-sysctl-parameter-parameter-value-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Setzt Container-Sysctl-Werte.</p>
+<p>Die Teilmenge möglicher Parameter sind:</p>
+<ul class="simple">
+<li><p>Kernel-Parameter: kernel.msgmax, kernel.msgmnb, kernel.msgmni, kernel.sem,
+kernel.shmall, kernel.shmmax, kernel.shmmni, kernel.shm_rmid_forced</p></li>
+<li><p>Parameter, die mit fs.mqueue.* beginnen</p></li>
+<li><p>Parameter, die mit net.* beginnen (nur wenn ein benutzerdefiniertes Netzwerk verwendet wird)</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; label &lt;label&gt; value &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-label-label-value-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Fügt Metadaten-Label für diesen Container hinzu.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Deaktiviert einen Container.</p>
+</div>
+</div>
+<section id="container-health-checks">
+<h3>Container Gesundheitschecks</h3>
+<p>Standardmäßig werden keine Gesundheitschecks ausgeführt, selbst wenn sie durch das Bild definiert sind.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; health-check
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-health-check" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Der Standard-Gesundheitscheck wird für den Container ausgeführt, wenn er durch das Bild definiert ist.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; health-check command &lt;command&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-health-check-command-command" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Überschreibt den Standard-Gesundheitscheck-Befehl aus dem Bild für einen Container.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; health-check interval &lt;interval&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-health-check-interval-interval" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Überschreibt das Standard-Gesundheitscheck-Intervall. Zum Beispiel: <code class="docutils literal notranslate">60</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; health-check timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-health-check-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Überschreibt das Standard-Gesundheitscheck-Timeout. Zum Beispiel: <code class="docutils literal notranslate">10</code></p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; health-check retries &lt;retries&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-health-check-retries-retries" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Anzahl der Gesundheitscheck-Wiederholungen, bevor der Container als ungesund angesehen wird. Zum Beispiel: <code class="docutils literal notranslate">1</code></p>
+</div>
+</div>
+</section>
+<section id="container-networks">
+<h3>Container Netzwerke</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container network &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-network-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Erstellt ein benanntes Container-Netzwerk</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container network &lt;name&gt; description
+<a class="cmdlink" href="#cfgcmd-set-container-network-name-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Eine kurze Beschreibung, was dieses Netzwerk alles umfasst.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container network &lt;name&gt; prefix &lt;ipv4|ipv6&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-network-name-prefix-ipv4-ipv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Definiert IPv4- und/oder IPv6-Prefix für einen bestimmten Netzwerknamen.
+Beide IPv4 und IPv6 können parallel verwendet werden.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container network &lt;name&gt; mtu &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-network-name-mtu-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Konfiguriert <abbr title="Maximum Transmission Unit">MTU</abbr> für ein bestimmtes Netzwerk. Es
+ist die Größe (in Bytes) des größten Ethernet-Frames, der auf diesem Link gesendet wird.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container network &lt;name&gt; no-name-server
+<a class="cmdlink" href="#cfgcmd-set-container-network-name-no-name-server" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Deaktiviert den Domain Name System (DNS)-Plugin für dieses Netzwerk.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container network &lt;name&gt; vrf &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-network-name-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Bindet das Container-Netzwerk an eine bestimmte VRF-Instanz.</p>
+</div>
+</div>
+</section>
+<section id="container-registry">
+<h3>Container Registry</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Fügt Registry zur Liste der unqualifizierten Such-Registries hinzu. Standardmäßig verwendet VyOS für jedes Bild, das den Registry in dem Bildnamen nicht enthält, docker.io und quay.io als Container-Registry.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Deaktiviert eine gegebene Container-Registry</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; authentication username
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-authentication-username" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; authentication password
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-authentication-password" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Einige Container-Registries benötigen Anmeldeinformationen, um verwendet zu werden.</p>
+<p>Anmeldeinformationen können hier definiert werden und werden nur verwendet, wenn ein
+Container-Bild zum System hinzugefügt wird.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; insecure
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-insecure" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Erlaubt den Zugriff auf die Registry über unverschlüsselte HTTP- oder TLS-Verbindungen mit
+unvertrauten Zertifikaten.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; mirror address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-mirror-address-address" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; mirror host-name &lt;host-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-mirror-host-name-host-name" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; mirror port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-mirror-port-port" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container registry &lt;name&gt; mirror path &lt;path&gt;
+<a class="cmdlink" href="#cfgcmd-set-container-registry-name-mirror-path-path" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Registry-Mirror, verwende <code class="docutils literal notranslate">(host-name|address)[:port][/path]</code>.</p>
+<p>Wenn du einen Mirror http://192.168.1.1:8080 für docker.io hast, kannst du <code class="docutils literal notranslate">docker.io/some/repo</code> oder <code class="docutils literal notranslate">podman pull docker.io/some/repo</code> ausführen</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container registry docker.io mirror address 192.168.1.1
+set container registry docker.io mirror port 8080
+set container registry docker.io insecure
+</pre></div>
+</div>
+<p>Wenn http://192.168.1.1:8080 dein eigener Registry ist, kannst du <code class="docutils literal notranslate">192.168.1.1:8080/some/repo</code> oder <code class="docutils literal notranslate">podman pull 192.168.1.1:8080/some/repo</code> ausführen</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container registry 192.168.1.1:8080 insecure
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="log-configuration">
+<h3>Log-Konfiguration</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set container name &lt;name&gt; log-driver [k8s-file | journald | none]
+<a class="cmdlink" href="#cfgcmd-set-container-name-name-log-driver-k8s-file-journald-none" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Setzt den Standard-Log-Treiber für Container.</p>
+<ul class="simple">
+<li><p><strong>k8s-file</strong>: Loggt in eine Textdatei im Kubernetes-Stil.</p></li>
+<li><p><strong>journald</strong>: Loggt in das Systemjournal</p></li>
+<li><p><strong>none</strong>: Deaktiviert das Logging für den Container</p></li>
+</ul>
+<p>Der aktuelle Standard ist journald.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="operation-commands">
+<h2>Betriebsbefehle</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+add container image &lt;containername&gt;
+<a class="cmdlink" href="#opcmd-add-container-image-containername" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Lädt ein neues Bild für den Container</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show container
+<a class="cmdlink" href="#opcmd-show-container" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Listet alle aktiven Container auf.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show container image
+<a class="cmdlink" href="#opcmd-show-container-image" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Listet lokale Container-Bilder auf.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show container log &lt;containername&gt;
+<a class="cmdlink" href="#opcmd-show-container-log-containername" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Listet Logs von einem gegebenen Container auf</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show container network
+<a class="cmdlink" href="#opcmd-show-container-network" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Listet verfügbare Container-Netzwerke auf</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+restart container &lt;containername&gt;
+<a class="cmdlink" href="#opcmd-restart-container-containername" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Neustart eines gegebenen Containers</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+update container image &lt;containername&gt;
+<a class="cmdlink" href="#opcmd-update-container-image-containername" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Update des Container-Bildes</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+delete container image &lt;image id|all&gt; [force]
+<a class="cmdlink" href="#opcmd-delete-container-image-image-id-all-force" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Löscht ein bestimmtes Container-Bild basierend auf seiner Bild-ID.
+Sie können auch alle Container-Bilder gleichzeitig löschen.</p>
+<p>Sie können ein Container-Bild nicht löschen, wenn es mehr als einen Tag hat
+zugewiesen, deshalb gibt es eine <code class="docutils literal notranslate">force</code> Option, um weiterzugeben
+das Container-Bild, um auch diese Bilder zu entfernen.</p>
+</div>
+</div>
+</section>
+<section id="example-configuration">
+<h2>Beispiel-Konfiguration</h2>
+<p>Aus Demonstrationszwecken, <a class="reference external" href="https://www.zabbix.com/documentation/current/manual/installation/containers">Beispiel #1 in der offiziellen Dokumentation</a>
+zur deklarativen VyOS CLI-Syntax.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container network zabbix prefix 172.20.0.0/16
+set container network zabbix description &#39;Network for Zabbix component containers&#39;
+
+set container name mysql-server image mysql:8.0
+set container name mysql-server network zabbix
+
+set container name mysql-server environment &#39;MYSQL_DATABASE&#39; value &#39;zabbix&#39;
+set container name mysql-server environment &#39;MYSQL_USER&#39; value &#39;zabbix&#39;
+set container name mysql-server environment &#39;MYSQL_PASSWORD&#39; value &#39;zabbix_pwd&#39;
+set container name mysql-server environment &#39;MYSQL_ROOT_PASSWORD&#39; value &#39;root_pwd&#39;
+
+set container name zabbix-java-gateway image zabbix/zabbix-java-gateway:alpine-5.2-latest
+set container name zabbix-java-gateway network zabbix
+
+set container name zabbix-server-mysql image zabbix/zabbix-server-mysql:alpine-5.2-latest
+set container name zabbix-server-mysql network zabbix
+
+set container name zabbix-server-mysql environment &#39;DB_SERVER_HOST&#39; value &#39;mysql-server&#39;
+set container name zabbix-server-mysql environment &#39;MYSQL_DATABASE&#39; value &#39;zabbix&#39;
+set container name zabbix-server-mysql environment &#39;MYSQL_USER&#39; value &#39;zabbix&#39;
+set container name zabbix-server-mysql environment &#39;MYSQL_PASSWORD&#39; value &#39;zabbix_pwd&#39;
+set container name zabbix-server-mysql environment &#39;MYSQL_ROOT_PASSWORD&#39; value &#39;root_pwd&#39;
+set container name zabbix-server-mysql environment &#39;ZBX_JAVAGATEWAY&#39; value &#39;zabbix-java-gateway&#39;
+
+set container name zabbix-server-mysql port zabbix source 10051
+set container name zabbix-server-mysql port zabbix destination 10051
+
+set container name zabbix-web-nginx-mysql image zabbix/zabbix-web-nginx-mysql:alpine-5.2-latest
+set container name zabbix-web-nginx-mysql network zabbix
+
+set container name zabbix-web-nginx-mysql environment &#39;MYSQL_DATABASE&#39; value &#39;zabbix&#39;
+set container name zabbix-web-nginx-mysql environment &#39;ZBX_SERVER_HOST&#39; value &#39;zabbix-server-mysql&#39;
+set container name zabbix-web-nginx-mysql environment &#39;DB_SERVER_HOST&#39; value &#39;mysql-server&#39;
+set container name zabbix-web-nginx-mysql environment &#39;MYSQL_USER&#39; value &#39;zabbix&#39;
+set container name zabbix-web-nginx-mysql environment &#39;MYSQL_PASSWORD&#39; value &#39;zabbix_pwd&#39;
+set container name zabbix-web-nginx-mysql environment &#39;MYSQL_ROOT_PASSWORD&#39; value &#39;root_pwd&#39;
+
+set container name zabbix-web-nginx-mysql port http source 80
+set container name zabbix-web-nginx-mysql port http destination 8080
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

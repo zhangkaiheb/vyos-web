@@ -1,0 +1,37 @@
+{
+  "zh-CN": {
+    "genericConfig": {
+      "defaultValue": "默认值"
+    }
+  },
+  "en": {
+    "genericConfig": {
+      "defaultValue": "Default Value"
+    }
+  },
+  "zh-TW": {
+    "genericConfig": {
+      "defaultValue": "Default Value"
+    }
+  },
+  "ru": {
+    "genericConfig": {
+      "defaultValue": "Default Value"
+    }
+  },
+  "de": {
+    "genericConfig": {
+      "defaultValue": "Default Value"
+    }
+  },
+  "fr": {
+    "genericConfig": {
+      "defaultValue": "Default Value"
+    }
+  },
+  "ko": {
+    "genericConfig": {
+      "defaultValue": "Default Value"
+    }
+  }
+}

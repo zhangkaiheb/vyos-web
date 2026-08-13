@@ -1,10 +1,13 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -21,25 +24,25 @@ function isPresent(value) {
   return true;
 }
 
-function validateIPv4(value) {
+function validateIPv4(value, t) {
   if (!value) return '';
-  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return 'IPv4 地址格式错误';
-  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return 'IPv4 地址格式错误';
+  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return t('failover.validation.ipv4Format');
+  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return t('failover.validation.ipv4Format');
   return '';
 }
 
-function validateNetwork(value) {
+function validateNetwork(value, t) {
   if (!value) return '';
   const m = value.match(/^(\d{1,3}\.){3}\d{1,3}\/(\d{1,2})$/);
-  if (!m) return '网络格式错误 (例如: 192.168.1.0/24)';
-  if (parseInt(m[2], 10) < 0 || parseInt(m[2], 10) > 32) return '前缀长度必须在 0-32 之间';
+  if (!m) return t('failover.validation.networkFormat');
+  if (parseInt(m[2], 10) < 0 || parseInt(m[2], 10) > 32) return t('failover.validation.prefixLength');
   return '';
 }
 
-function validateMetric(value) {
+function validateMetric(value, t) {
   if (!value) return '';
   const n = parseInt(value, 10);
-  if (isNaN(n) || n < 1 || n > 255) return '度量值必须在 1-255 之间';
+  if (isNaN(n) || n < 1 || n > 255) return t('failover.validation.metricRange');
   return '';
 }
 
@@ -115,6 +118,8 @@ function configToConfig(form) {
 export default defineComponent({
   name: 'FailoverPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -135,37 +140,41 @@ export default defineComponent({
     const editingCheckIndex = ref(-1);
     const checkForm = ref({ target: '', type: '', port: '', timeout: '', policy: '' });
 
+    const deleteModalVisible = ref(false);
+    const pendingDeleteName = ref('');
+    const pendingDeleteIndex = ref(-1);
+
     const routeColumns = [
-      { key: 'prefix', title: '路由前缀' },
-      { key: 'nextHops', title: '下一跳数量', render: (val) => val?.length || 0 },
+      { key: 'prefix', title: t('failover.columns.routePrefix') },
+      { key: 'nextHops', title: t('failover.columns.nextHopCount'), render: (val) => val?.length || 0 },
     ];
 
     const nhColumns = [
-      { key: 'address', title: '下一跳地址' },
-      { key: 'interface', title: '接口' },
-      { key: 'metric', title: '度量值' },
-      { key: 'onlink', title: '直连', render: (val) => val ? '是' : '否' },
+      { key: 'address', title: t('failover.columns.nextHopAddress') },
+      { key: 'interface', title: t('failover.columns.interface') },
+      { key: 'metric', title: t('failover.columns.metric') },
+      { key: 'onlink', title: t('failover.columns.onlink'), render: (val) => val ? t('failover.labels.yes') : t('failover.labels.no') },
     ];
 
     const checkColumns = [
-      { key: 'target', title: '检查目标' },
-      { key: 'type', title: '类型' },
-      { key: 'port', title: '端口' },
-      { key: 'timeout', title: '超时' },
-      { key: 'policy', title: '策略' },
+      { key: 'target', title: t('failover.columns.checkTarget') },
+      { key: 'type', title: t('failover.columns.type') },
+      { key: 'port', title: t('failover.columns.port') },
+      { key: 'timeout', title: t('failover.columns.timeout') },
+      { key: 'policy', title: t('failover.columns.policy') },
     ];
 
     const CHECK_TYPE_OPTIONS = [
-      { value: '', label: '默认 (icmp)' },
+      { value: '', label: t('failover.labels.defaultIcmp') },
       { value: 'icmp', label: 'ICMP' },
       { value: 'tcp', label: 'TCP' },
       { value: 'udp', label: 'UDP' },
     ];
 
     const CHECK_POLICY_OPTIONS = [
-      { value: '', label: '默认 (any-available)' },
-      { value: 'any-available', label: '任一可用' },
-      { value: 'all-available', label: '全部可用' },
+      { value: '', label: t('failover.labels.defaultAnyAvailable') },
+      { value: 'any-available', label: t('failover.labels.anyAvailable') },
+      { value: 'all-available', label: t('failover.labels.allAvailable') },
     ];
 
     const commandPath = computed(() => 'protocols failover route');
@@ -198,6 +207,7 @@ export default defineComponent({
       try {
         const payload = configToConfig(config.value);
         await configApi.set('protocols failover', payload);
+        configStore.markPending();
         saved.value = true;
         setTimeout(() => (saved.value = false), 2000);
         routeModalVisible.value = false;
@@ -222,9 +232,9 @@ export default defineComponent({
     }
 
     function saveRoute() {
-      if (!routeForm.value.prefix) return alert('请输入路由前缀');
-      const err = validateNetwork(routeForm.value.prefix);
-      if (err) return alert(err);
+      if (!routeForm.value.prefix) return showError({ message: t('failover.messages.enterRoutePrefix') });
+      const err = validateNetwork(routeForm.value.prefix, t);
+      if (err) return showError({ message: err });
       if (editingRouteIndex.value >= 0) {
         config.value.routes.splice(editingRouteIndex.value, 1, JSON.parse(JSON.stringify(routeForm.value)));
       } else {
@@ -244,12 +254,12 @@ export default defineComponent({
     }
 
     function saveNh() {
-      if (!nhForm.value.address) return alert('请输入下一跳地址');
-      const err = validateIPv4(nhForm.value.address);
-      if (err) return alert(err);
+      if (!nhForm.value.address) return showError({ message: t('failover.messages.enterNextHopAddress') });
+      const err = validateIPv4(nhForm.value.address, t);
+      if (err) return showError({ message: err });
       if (nhForm.value.metric) {
-        const err = validateMetric(nhForm.value.metric);
-        if (err) return alert(err);
+        const err = validateMetric(nhForm.value.metric, t);
+        if (err) return showError({ message: err });
       }
       if (editingNhIndex.value >= 0) {
         routeForm.value.nextHops.splice(editingNhIndex.value, 1, JSON.parse(JSON.stringify(nhForm.value)));
@@ -270,9 +280,9 @@ export default defineComponent({
     }
 
     function saveCheck() {
-      if (!checkForm.value.target) return alert('请输入检查目标');
-      const err = validateIPv4(checkForm.value.target);
-      if (err) return alert(err);
+      if (!checkForm.value.target) return showError({ message: t('failover.messages.enterCheckTarget') });
+      const err = validateIPv4(checkForm.value.target, t);
+      if (err) return showError({ message: err });
       if (editingCheckIndex.value >= 0) {
         nhForm.value.checks.splice(editingCheckIndex.value, 1, JSON.parse(JSON.stringify(checkForm.value)));
       } else {
@@ -282,7 +292,16 @@ export default defineComponent({
     }
 
     function deleteRoute(index) {
-      if (confirm('确定删除此路由？')) config.value.routes.splice(index, 1);
+      pendingDeleteName.value = config.value.routes[index].prefix;
+      pendingDeleteIndex.value = index;
+      deleteModalVisible.value = true;
+    }
+
+    function confirmDeleteRoute() {
+      config.value.routes.splice(pendingDeleteIndex.value, 1);
+      deleteModalVisible.value = false;
+      pendingDeleteName.value = '';
+      pendingDeleteIndex.value = -1;
     }
     function deleteNh(index) {
       routeForm.value.nextHops.splice(index, 1);
@@ -294,18 +313,21 @@ export default defineComponent({
     onMounted(() => {
       load();
       loadInterfaces();
+      onMenuRefresh(load);
     });
 
     return {
+      t,
       loading, saving, saved, config, activeTab, writeDisabled,
       interfaces,
       routeModalVisible, editingRouteIndex, routeForm,
       nhModalVisible, editingNhIndex, nhForm,
       checkModalVisible, editingCheckIndex, checkForm,
+      deleteModalVisible, pendingDeleteName, pendingDeleteIndex,
       routeColumns, nhColumns, checkColumns,
       CHECK_TYPE_OPTIONS, CHECK_POLICY_OPTIONS, commandPath,
       openRouteModal, openNhModal, openCheckModal,
-      deleteRoute, deleteNh, deleteCheck,
+      deleteRoute, deleteNh, deleteCheck, confirmDeleteRoute,
       saveRoute, saveNh, saveCheck,
       save, configToConfig,
     };
@@ -313,9 +335,9 @@ export default defineComponent({
   components: { TabGroup, ToolbarButton, DataTable, DraggableModal },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('failover.messages.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'routes', title: '故障转移路由' }
+        { key: 'routes', title: t('failover.tabs.failoverRoutes') }
       ]">
 
         <template #routes>
@@ -325,20 +347,16 @@ export default defineComponent({
         </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
-
       <!-- Route Modal -->
-      <DraggableModal v-model:visible="routeModalVisible" :title="editingRouteIndex >= 0 ? '编辑故障转移路由' : '添加故障转移路由'" width="700px" @confirm="saveRoute">
+      <DraggableModal v-model:visible="routeModalVisible" :title="editingRouteIndex >= 0 ? t('failover.modal.editRoute') : t('failover.modal.addRoute')" width="700px" @confirm="saveRoute">
         <div class="form-row">
-          <label class="form-label">路由前缀 *</label>
-          <input type="text" class="form-control" v-model="routeForm.prefix" placeholder="例如: 1.1.1.1/32" style="width:100%;" :disabled="editingRouteIndex >= 0" />
+          <label class="form-label">{{ t('failover.form.routePrefix') }}</label>
+          <input type="text" class="form-control" v-model="routeForm.prefix" :placeholder="t('failover.form.routePrefixPlaceholder')" style="width:100%;" :disabled="editingRouteIndex >= 0" />
         </div>
         <div style="margin-top:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <span style="font-weight:bold;">下一跳列表</span>
-            <ToolbarButton size="small" @click="openNhModal(-1)">添加下一跳</ToolbarButton>
+            <span style="font-weight:bold;">{{ t('failover.form.nextHopList') }}</span>
+            <ToolbarButton size="small" @click="openNhModal(-1)">{{ t('failover.form.addNextHop') }}</ToolbarButton>
           </div>
           <DataTable :columns="nhColumns" :data="routeForm.nextHops" rowKey="address"
                      :actions="['edit', 'delete']"
@@ -347,30 +365,30 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Next-Hop Modal -->
-      <DraggableModal v-model:visible="nhModalVisible" :title="editingNhIndex >= 0 ? '编辑下一跳' : '添加下一跳'" width="600px" @confirm="saveNh">
+      <DraggableModal v-model:visible="nhModalVisible" :title="editingNhIndex >= 0 ? t('failover.modal.editNextHop') : t('failover.modal.addNextHop')" width="600px" @confirm="saveNh">
         <div class="form-row">
-          <label class="form-label">下一跳地址 *</label>
-          <input type="text" class="form-control" v-model="nhForm.address" placeholder="IPv4 地址" style="width:100%;" :disabled="editingNhIndex >= 0" />
+          <label class="form-label">{{ t('failover.form.nextHopAddress') }}</label>
+          <input type="text" class="form-control" v-model="nhForm.address" :placeholder="t('failover.form.ipv4Address')" style="width:100%;" :disabled="editingNhIndex >= 0" />
         </div>
         <div class="form-row">
-          <label class="form-label">接口</label>
+          <label class="form-label">{{ t('failover.form.interface') }}</label>
           <select class="form-control" v-model="nhForm.interface" style="width:100%;">
-            <option value="">请选择接口</option>
+            <option value="">{{ t('failover.form.selectInterface') }}</option>
             <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">度量值</label>
-          <input type="number" class="form-control" v-model="nhForm.metric" min="1" max="255" placeholder="1-255" style="width:100%;" />
+          <label class="form-label">{{ t('failover.form.metric') }}</label>
+          <input type="number" class="form-control" v-model="nhForm.metric" min="1" max="255" :placeholder="t('failover.form.metricPlaceholder')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">直连</label>
+          <label class="form-label">{{ t('failover.form.onlink') }}</label>
           <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="nhForm.onlink" /></label>
         </div>
         <div style="margin-top:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <span style="font-weight:bold;">检查目标</span>
-            <ToolbarButton size="small" @click="openCheckModal(-1)">添加检查</ToolbarButton>
+            <span style="font-weight:bold;">{{ t('failover.form.checkTargets') }}</span>
+            <ToolbarButton size="small" @click="openCheckModal(-1)">{{ t('failover.form.addCheck') }}</ToolbarButton>
           </div>
           <DataTable :columns="checkColumns" :data="nhForm.checks" rowKey="target"
                      :actions="['edit', 'delete']"
@@ -379,30 +397,38 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- Check Modal -->
-      <DraggableModal v-model:visible="checkModalVisible" :title="editingCheckIndex >= 0 ? '编辑检查目标' : '添加检查目标'" width="500px" @confirm="saveCheck">
+      <DraggableModal v-model:visible="checkModalVisible" :title="editingCheckIndex >= 0 ? t('failover.modal.editCheck') : t('failover.modal.addCheck')" width="500px" @confirm="saveCheck">
         <div class="form-row">
-          <label class="form-label">检查目标 *</label>
-          <input type="text" class="form-control" v-model="checkForm.target" placeholder="IPv4 地址" style="width:100%;" />
+          <label class="form-label">{{ t('failover.form.checkTarget') }}</label>
+          <input type="text" class="form-control" v-model="checkForm.target" :placeholder="t('failover.form.ipv4Address')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">检查类型</label>
+          <label class="form-label">{{ t('failover.form.checkType') }}</label>
           <select class="form-control" v-model="checkForm.type" style="width:100%;">
             <option v-for="opt in CHECK_TYPE_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">端口</label>
-          <input type="number" class="form-control" v-model="checkForm.port" min="1" max="65535" placeholder="端口号" style="width:100%;" />
+          <label class="form-label">{{ t('failover.form.port') }}</label>
+          <input type="number" class="form-control" v-model="checkForm.port" min="1" max="65535" :placeholder="t('failover.form.portPlaceholder')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">超时</label>
-          <input type="number" class="form-control" v-model="checkForm.timeout" min="1" max="65535" placeholder="默认: 10 秒" style="width:100%;" />
+          <label class="form-label">{{ t('failover.form.timeout') }}</label>
+          <input type="number" class="form-control" v-model="checkForm.timeout" min="1" max="65535" :placeholder="t('failover.form.timeoutPlaceholder')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">策略</label>
+          <label class="form-label">{{ t('failover.form.policy') }}</label>
           <select class="form-control" v-model="checkForm.policy" style="width:100%;">
             <option v-for="opt in CHECK_POLICY_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
+        </div>
+      </DraggableModal>
+
+      <!-- Delete Confirmation Modal -->
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('failover.modal.confirmDelete')" width="400px" @confirm="confirmDeleteRoute">
+        <div>{{ t('failover.messages.confirmDeleteRoute') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div style="padding:2px 0;">{{ pendingDeleteName }}</div>
         </div>
       </DraggableModal>
     </div>

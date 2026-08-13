@@ -5,6 +5,9 @@ import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -21,28 +24,28 @@ function isPresent(value) {
   return true;
 }
 
-function validateIPv4(value) {
+function validateIPv4(value, t) {
   if (!value) return '';
-  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return 'IPv4 地址格式错误';
-  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return 'IPv4 地址格式错误';
+  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return t('configManagementSettings.validation.ipv4');
+  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return t('configManagementSettings.validation.ipv4');
   return '';
 }
 
-function validateIPv6(value) {
+function validateIPv6(value, t) {
   if (!value) return '';
   const re = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}$|^(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}$|^(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}$|^:(?::[0-9a-fA-F]{1,4}){1,7}$|^::$/;
-  if (!re.test(value)) return 'IPv6 地址格式错误';
+  if (!re.test(value)) return t('configManagementSettings.validation.ipv6');
   return '';
 }
 
-function validateIP(value) {
+function validateIP(value, t) {
   if (!value) return '';
-  if (!validateIPv4(value)) return '';
-  if (!validateIPv6(value)) return '';
-  return 'IP 地址格式错误';
+  if (!validateIPv4(value, t)) return '';
+  if (!validateIPv6(value, t)) return '';
+  return t('configManagementSettings.validation.ip');
 }
 
-function validateURL(value) {
+function validateURL(value, t) {
   if (!value) return '';
   const patterns = [
     /^https?:\/\/.+/,
@@ -52,7 +55,7 @@ function validateURL(value) {
     /^tftp:\/\/.+/,
     /^git\+https:\/\/.+/,
   ];
-  if (!patterns.some(p => p.test(value))) return 'URL 格式错误，支持 http/https/ftp/sftp/scp/tftp/git+https';
+  if (!patterns.some(p => p.test(value))) return t('configManagementSettings.validation.url');
   return '';
 }
 
@@ -95,6 +98,8 @@ function configToConfig(form) {
 export default defineComponent({
   name: 'ConfigManagementSettingsPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -105,10 +110,12 @@ export default defineComponent({
     const modalVisible = ref(false);
     const editingIndex = ref(-1);
     const locationForm = ref({ url: '' });
+    const deleteModalVisible = ref(false);
+    const pendingDeleteUrls = ref([]);
 
-    const locationColumns = [
-      { key: 'url', title: 'URL' },
-    ];
+    const locationColumns = computed(() => [
+      { key: 'url', title: t('configManagementSettings.columns.url') },
+    ]);
 
     const commandPath = computed(() => {
       if (activeTab.value === 'revisions') return 'system config-management commit-revisions';
@@ -132,25 +139,26 @@ export default defineComponent({
     async function save() {
       // Validate locations
       for (const loc of config.value.locations || []) {
-        const err = validateURL(loc.url);
-        if (err) return alert(`提交归档位置 ${loc.url}：${err}`);
+        const err = validateURL(loc.url, t);
+        if (err) return showError({ message: t('configManagementSettings.errors.locationError', { url: loc.url, error: err }) });
       }
 
       // Validate source address
       if (config.value.source_address) {
-        const err = validateIP(config.value.source_address);
-        if (err) return alert(`源地址 ${config.value.source_address}：${err}`);
+        const err = validateIP(config.value.source_address, t);
+        if (err) return showError({ message: t('configManagementSettings.errors.sourceAddressError', { address: config.value.source_address, error: err }) });
       }
 
       // Validate commit revisions
       if (config.value.commit_revisions !== '') {
         const n = parseInt(config.value.commit_revisions, 10);
-        if (isNaN(n) || n < 1 || n > 65535) return alert('配置修订版本数必须在 1-65535 之间');
+        if (isNaN(n) || n < 1 || n > 65535) return showError({ message: t('configManagementSettings.errors.revisionsRange') });
       }
 
       saving.value = true;
       try {
-        await configApi.set('system config-management', configToConfig(config.value));
+        await configStore.setConfig('system config-management', configToConfig(config.value));
+        configStore.markPending();
         saved.value = true;
         await load();
       } catch (e) {
@@ -174,20 +182,26 @@ export default defineComponent({
 
     function deleteLocations(selectedUrls) {
       if (!selectedUrls.length) return;
-      if (!confirm('确认删除选中的提交归档位置？')) return;
-      const toDelete = new Set(selectedUrls);
+      pendingDeleteUrls.value = [...selectedUrls];
+      deleteModalVisible.value = true;
+    }
+
+    function confirmDeleteLocations() {
+      deleteModalVisible.value = false;
+      const toDelete = new Set(pendingDeleteUrls.value);
       config.value.locations = config.value.locations.filter(l => !toDelete.has(l.url));
+      pendingDeleteUrls.value = [];
     }
 
     function saveLocation() {
       const url = String(locationForm.value.url || '').trim();
-      if (!url) return alert('请输入提交归档位置 URL');
+      if (!url) return showError({ message: t('configManagementSettings.errors.urlRequired') });
 
-      const err = validateURL(url);
-      if (err) return alert(err);
+      const err = validateURL(url, t);
+      if (err) return showError({ message: err });
 
       const duplicate = config.value.locations.find((l, i) => l.url === url && i !== editingIndex.value);
-      if (duplicate) return alert('该 URL 已存在');
+      if (duplicate) return showError({ message: t('configManagementSettings.errors.urlDuplicate') });
 
       const newLoc = { url };
 
@@ -199,22 +213,26 @@ export default defineComponent({
       modalVisible.value = false;
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
     return {
-      loading, saving, saved, config, activeTab, writeDisabled,
+      t, loading, saving, saved, config, activeTab, writeDisabled,
       locationColumns, modalVisible, locationForm, commandPath,
-      load, save, createLocation, editLocation, deleteLocations, saveLocation,
+      deleteModalVisible, pendingDeleteUrls,
+      load, save, createLocation, editLocation, deleteLocations, confirmDeleteLocations, saveLocation,
     };
   },
   components: { TabGroup, ToolbarButton, DataTable, DraggableModal },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('configManagementSettings.alerts.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'archive', title: '提交归档位置' },
-        { key: 'source', title: '源地址' },
-        { key: 'revisions', title: '修订版本数' }
+        { key: 'archive', title: t('configManagementSettings.tabs.archive') },
+        { key: 'source', title: t('configManagementSettings.tabs.source') },
+        { key: 'revisions', title: t('configManagementSettings.tabs.revisions') }
       ]">
 
         <template #archive>
@@ -225,36 +243,32 @@ export default defineComponent({
 
         <template #source>
           <div class="form-row">
-            <label class="form-label">源地址</label>
+            <label class="form-label">{{ t('configManagementSettings.labels.sourceAddress') }}</label>
             <input type="text" class="form-control" v-model="config.source_address"
-                   placeholder="IPv4 或 IPv6 地址" style="max-width:400px;"
-                   title="用于发起连接的源 IP 地址" />
+                   :placeholder="t('configManagementSettings.placeholders.sourceAddress')" style="max-width:400px;"
+                   :title="t('configManagementSettings.tips.sourceAddress')" />
           </div>
           <div class="form-row">
             <label class="form-label"></label>
-            <div class="form-hint">支持 IPv4 地址（如 192.168.5.200）和 IPv6 地址（如 2002:1:2:3::1）</div>
+            <div class="form-hint">{{ t('configManagementSettings.hints.sourceAddress') }}</div>
           </div>
         </template>
 
         <template #revisions>
           <div class="form-row">
-            <label class="form-label">修订版本数</label>
+            <label class="form-label">{{ t('configManagementSettings.labels.commitRevisions') }}</label>
             <input type="number" class="form-control" v-model="config.commit_revisions"
                    min="1" max="65535" placeholder="100" style="width:200px;"
-                   title="要保留的配置备份数量（1-65535）" />
+                   :title="t('configManagementSettings.tips.commitRevisions')" />
           </div>
           <div class="form-row">
             <label class="form-label"></label>
-            <div class="form-hint">默认值：100，范围：1-65535</div>
+            <div class="form-hint">{{ t('configManagementSettings.hints.commitRevisions') }}</div>
           </div>
         </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="modalVisible" :title="editingIndex >= 0 ? '编辑提交归档位置' : '添加提交归档位置'" width="600px" @confirm="saveLocation">
+      <DraggableModal v-model:visible="modalVisible" :title="editingIndex >= 0 ? t('configManagementSettings.modals.editLocation') : t('configManagementSettings.modals.addLocation')" width="600px" @confirm="saveLocation">
         <div class="form-row">
           <label class="form-label">URL</label>
           <input type="text" class="form-control" v-model="locationForm.url"
@@ -262,7 +276,13 @@ export default defineComponent({
         </div>
         <div class="form-row">
           <label class="form-label"></label>
-          <div class="form-hint">支持格式：http://、https://、ftp://、sftp://、scp://、tftp://、git+https://</div>
+          <div class="form-hint">{{ t('configManagementSettings.hints.urlFormats') }}</div>
+        </div>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('configManagementSettings.modals.confirmDelete')" width="400px" @confirm="confirmDeleteLocations">
+        <div>{{ t('configManagementSettings.messages.confirmDeleteLocations') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="url in pendingDeleteUrls" :key="url" style="padding:2px 0;">{{ url }}</div>
         </div>
       </DraggableModal>
     </div>

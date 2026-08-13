@@ -1,0 +1,1241 @@
+{
+  "zh-CN": {
+    "tab": {
+      "basic": "基本设置",
+      "interfaces": "接口",
+      "redistribute": "路由重分发",
+      "defaultInfo": "默认信息",
+      "passwords": "密码",
+      "advanced": "高级选项"
+    },
+    "col": {
+      "interfaceName": "接口名称",
+      "metric": "度量值",
+      "networkType": "网络类型",
+      "protocol": "协议"
+    },
+    "basic": {
+      "title": "IS-IS 基本配置"
+    },
+    "form": {
+      "net": "NET (Network Entity Title)",
+      "netPlaceholder": "例如: 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+      "netTitle": "IS-IS NET 地址，格式为 8 字节系统 ID + 伪节点 ID",
+      "level": "级别",
+      "metricStyle": "度量值样式",
+      "dynamicHostname": "动态主机名",
+      "logAdjacencyChanges": "记录邻接变更",
+      "purgeOriginator": "清除发起者",
+      "setAttachedBit": "设置附加位",
+      "setOverloadBit": "设置过载位",
+      "lspGenInterval": "LSP 生成间隔",
+      "lspGenIntervalPlaceholder": "1-65535",
+      "lspMtu": "LSP MTU",
+      "lspRefreshInterval": "LSP 刷新间隔",
+      "lspRefreshIntervalPlaceholder": "1-65535",
+      "maxLspLifetime": "最大 LSP 生命周期",
+      "maxLspLifetimePlaceholder": "1-65535"
+    },
+    "defaultInfo": {
+      "title": "默认信息 originate",
+      "always": "始终 originate",
+      "metric": "度量值",
+      "routeMap": "路由映射",
+      "routeMapPlaceholder": "路由映射名称"
+    },
+    "passwords": {
+      "title": "密码配置",
+      "areaPassword": "区域密码",
+      "areaPasswordPlaceholder": "区域密码",
+      "domainPassword": "域密码",
+      "domainPasswordPlaceholder": "域密码"
+    },
+    "advanced": {
+      "title": "高级选项",
+      "hint": "更多 IS-IS 配置可通过命令行完成。"
+    },
+    "modal": {
+      "editInterface": "编辑 IS-IS 接口",
+      "addInterface": "添加 IS-IS 接口",
+      "interfaceName": "接口名称",
+      "selectInterface": "请选择接口",
+      "metric": "度量值 (0-16777215)",
+      "networkType": "网络类型",
+      "passiveMode": "被动模式",
+      "editRedistribute": "编辑路由重分发",
+      "addRedistribute": "添加路由重分发",
+      "protocol": "协议",
+      "routeMap": "路由映射",
+      "routeMapPlaceholder": "路由映射名称"
+    },
+    "delete": {
+      "confirmInterface": "确认删除以下接口？",
+      "confirmRedistribute": "确认删除以下重分发协议？"
+    },
+    "error": {
+      "net": "NET 格式错误: ",
+      "lspMtu": "LSP MTU 错误: ",
+      "interfaceNameRequired": "接口名称为必填项",
+      "protocolRequired": "协议为必填项"
+    },
+    "routing": {
+      "isis": {
+        "tab": {
+          "basic": "基本设置",
+          "interfaces": "接口",
+          "redistribute": "路由重分发",
+          "defaultInfo": "默认信息",
+          "passwords": "密码",
+          "advanced": "高级选项"
+        },
+        "col": {
+          "interfaceName": "接口名称",
+          "metric": "度量值",
+          "networkType": "网络类型",
+          "protocol": "协议"
+        },
+        "basic": {
+          "title": "IS-IS 基本配置"
+        },
+        "form": {
+          "net": "NET (Network Entity Title)",
+          "netPlaceholder": "例如: 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+          "netTitle": "IS-IS NET 地址，格式为 8 字节系统 ID + 伪节点 ID",
+          "level": "级别",
+          "metricStyle": "度量值样式",
+          "dynamicHostname": "动态主机名",
+          "logAdjacencyChanges": "记录邻接变更",
+          "purgeOriginator": "清除发起者",
+          "setAttachedBit": "设置附加位",
+          "setOverloadBit": "设置过载位",
+          "lspGenInterval": "LSP 生成间隔",
+          "lspGenIntervalPlaceholder": "1-65535",
+          "lspMtu": "LSP MTU",
+          "lspRefreshInterval": "LSP 刷新间隔",
+          "lspRefreshIntervalPlaceholder": "1-65535",
+          "maxLspLifetime": "最大 LSP 生命周期",
+          "maxLspLifetimePlaceholder": "1-65535"
+        },
+        "defaultInfo": {
+          "title": "默认信息 originate",
+          "always": "始终 originate",
+          "metric": "度量值",
+          "routeMap": "路由映射",
+          "routeMapPlaceholder": "路由映射名称"
+        },
+        "passwords": {
+          "title": "密码配置",
+          "areaPassword": "区域密码",
+          "areaPasswordPlaceholder": "区域密码",
+          "domainPassword": "域密码",
+          "domainPasswordPlaceholder": "域密码"
+        },
+        "advanced": {
+          "title": "高级选项",
+          "hint": "更多 IS-IS 配置可通过命令行完成。"
+        },
+        "modal": {
+          "editInterface": "编辑 IS-IS 接口",
+          "addInterface": "添加 IS-IS 接口",
+          "interfaceName": "接口名称",
+          "selectInterface": "请选择接口",
+          "metric": "度量值 (0-16777215)",
+          "networkType": "网络类型",
+          "passiveMode": "被动模式",
+          "editRedistribute": "编辑路由重分发",
+          "addRedistribute": "添加路由重分发",
+          "protocol": "协议",
+          "routeMap": "路由映射",
+          "routeMapPlaceholder": "路由映射名称"
+        },
+        "delete": {
+          "confirmInterface": "确认删除以下接口？",
+          "confirmRedistribute": "确认删除以下重分发协议？"
+        },
+        "error": {
+          "net": "NET 格式错误: ",
+          "lspMtu": "LSP MTU 错误: ",
+          "interfaceNameRequired": "接口名称为必填项",
+          "protocolRequired": "协议为必填项"
+        }
+      }
+    },
+    "validation": {
+      "isisNetFormat": "NET 格式无效，应为 49.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx",
+      "isisMetricRange": "度量值必须在 0-16777215 之间",
+      "timerRange": "值必须在指定范围内",
+      "isisLspMtuRange": "LSP MTU 必须在 128-4352 之间"
+    },
+    "option": {
+      "default": "默认"
+    },
+    "common": {
+      "confirmDelete": "确认删除"
+    },
+    "msg": {
+      "saved": "保存成功"
+    }
+  },
+  "en": {
+    "tab": {
+      "basic": "Basic",
+      "interfaces": "Interfaces",
+      "redistribute": "Redistribute",
+      "defaultInfo": "Default Info",
+      "passwords": "Passwords",
+      "advanced": "Advanced"
+    },
+    "col": {
+      "interfaceName": "Interface Name",
+      "metric": "Metric",
+      "networkType": "Network Type",
+      "protocol": "Protocol"
+    },
+    "basic": {
+      "title": "IS-IS Basic Configuration"
+    },
+    "form": {
+      "net": "NET (Network Entity Title)",
+      "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+      "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
+      "level": "Level",
+      "metricStyle": "Metric Style",
+      "dynamicHostname": "Dynamic Hostname",
+      "logAdjacencyChanges": "Log Adjacency Changes",
+      "purgeOriginator": "Purge Originator",
+      "setAttachedBit": "Set Attached Bit",
+      "setOverloadBit": "Set Overload Bit",
+      "lspGenInterval": "LSP Generation Interval",
+      "lspGenIntervalPlaceholder": "1-65535",
+      "lspMtu": "LSP MTU",
+      "lspRefreshInterval": "LSP Refresh Interval",
+      "lspRefreshIntervalPlaceholder": "1-65535",
+      "maxLspLifetime": "Max LSP Lifetime",
+      "maxLspLifetimePlaceholder": "1-65535"
+    },
+    "defaultInfo": {
+      "title": "Default Information Originate",
+      "always": "Always Originate",
+      "metric": "Metric",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name"
+    },
+    "passwords": {
+      "title": "Password Configuration",
+      "areaPassword": "Area Password",
+      "areaPasswordPlaceholder": "Area password",
+      "domainPassword": "Domain Password",
+      "domainPasswordPlaceholder": "Domain password"
+    },
+    "advanced": {
+      "title": "Advanced Options",
+      "hint": "More IS-IS configuration can be done via CLI."
+    },
+    "modal": {
+      "editInterface": "Edit IS-IS Interface",
+      "addInterface": "Add IS-IS Interface",
+      "interfaceName": "Interface Name",
+      "selectInterface": "Select an interface",
+      "metric": "Metric (0-16777215)",
+      "networkType": "Network Type",
+      "passiveMode": "Passive Mode",
+      "editRedistribute": "Edit Route Redistribution",
+      "addRedistribute": "Add Route Redistribution",
+      "protocol": "Protocol",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name"
+    },
+    "delete": {
+      "confirmInterface": "Confirm delete the following interface?",
+      "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+    },
+    "error": {
+      "net": "NET format error: ",
+      "lspMtu": "LSP MTU error: ",
+      "interfaceNameRequired": "Interface name is required",
+      "protocolRequired": "Protocol is required"
+    },
+    "routing": {
+      "isis": {
+        "tab": {
+          "basic": "Basic",
+          "interfaces": "Interfaces",
+          "redistribute": "Redistribute",
+          "defaultInfo": "Default Info",
+          "passwords": "Passwords",
+          "advanced": "Advanced"
+        },
+        "col": {
+          "interfaceName": "Interface Name",
+          "metric": "Metric",
+          "networkType": "Network Type",
+          "protocol": "Protocol"
+        },
+        "basic": {
+          "title": "IS-IS Basic Configuration"
+        },
+        "form": {
+          "net": "NET (Network Entity Title)",
+          "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+          "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
+          "level": "Level",
+          "metricStyle": "Metric Style",
+          "dynamicHostname": "Dynamic Hostname",
+          "logAdjacencyChanges": "Log Adjacency Changes",
+          "purgeOriginator": "Purge Originator",
+          "setAttachedBit": "Set Attached Bit",
+          "setOverloadBit": "Set Overload Bit",
+          "lspGenInterval": "LSP Generation Interval",
+          "lspGenIntervalPlaceholder": "1-65535",
+          "lspMtu": "LSP MTU",
+          "lspRefreshInterval": "LSP Refresh Interval",
+          "lspRefreshIntervalPlaceholder": "1-65535",
+          "maxLspLifetime": "Max LSP Lifetime",
+          "maxLspLifetimePlaceholder": "1-65535"
+        },
+        "defaultInfo": {
+          "title": "Default Information Originate",
+          "always": "Always Originate",
+          "metric": "Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "passwords": {
+          "title": "Password Configuration",
+          "areaPassword": "Area Password",
+          "areaPasswordPlaceholder": "Area password",
+          "domainPassword": "Domain Password",
+          "domainPasswordPlaceholder": "Domain password"
+        },
+        "advanced": {
+          "title": "Advanced Options",
+          "hint": "More IS-IS configuration can be done via CLI."
+        },
+        "modal": {
+          "editInterface": "Edit IS-IS Interface",
+          "addInterface": "Add IS-IS Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select an interface",
+          "metric": "Metric (0-16777215)",
+          "networkType": "Network Type",
+          "passiveMode": "Passive Mode",
+          "editRedistribute": "Edit Route Redistribution",
+          "addRedistribute": "Add Route Redistribution",
+          "protocol": "Protocol",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "delete": {
+          "confirmInterface": "Confirm delete the following interface?",
+          "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+        },
+        "error": {
+          "net": "NET format error: ",
+          "lspMtu": "LSP MTU error: ",
+          "interfaceNameRequired": "Interface name is required",
+          "protocolRequired": "Protocol is required"
+        }
+      }
+    },
+    "validation": {
+      "isisNetFormat": "Invalid NET format, should be 49.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx",
+      "isisMetricRange": "Metric must be between 0-16777215",
+      "timerRange": "Value must be within the specified range",
+      "isisLspMtuRange": "LSP MTU must be between 128-4352"
+    },
+    "option": {
+      "default": "Default"
+    },
+    "common": {
+      "confirmDelete": "Confirm Delete"
+    },
+    "msg": {
+      "saved": "Saved successfully"
+    }
+  },
+  "zh-TW": {
+    "tab": {
+      "basic": "Basic",
+      "interfaces": "Interfaces",
+      "redistribute": "Redistribute",
+      "defaultInfo": "Default Info",
+      "passwords": "Passwords",
+      "advanced": "Advanced"
+    },
+    "col": {
+      "interfaceName": "Interface Name",
+      "metric": "Metric",
+      "networkType": "Network Type",
+      "protocol": "Protocol"
+    },
+    "basic": {
+      "title": "IS-IS Basic Configuration"
+    },
+    "form": {
+      "net": "NET (Network Entity Title)",
+      "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+      "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
+      "level": "Level",
+      "metricStyle": "Metric Style",
+      "dynamicHostname": "Dynamic Hostname",
+      "logAdjacencyChanges": "Log Adjacency Changes",
+      "purgeOriginator": "Purge Originator",
+      "setAttachedBit": "Set Attached Bit",
+      "setOverloadBit": "Set Overload Bit",
+      "lspGenInterval": "LSP Generation Interval",
+      "lspGenIntervalPlaceholder": "1-65535",
+      "lspMtu": "LSP MTU",
+      "lspRefreshInterval": "LSP Refresh Interval",
+      "lspRefreshIntervalPlaceholder": "1-65535",
+      "maxLspLifetime": "Max LSP Lifetime",
+      "maxLspLifetimePlaceholder": "1-65535"
+    },
+    "defaultInfo": {
+      "title": "Default Information Originate",
+      "always": "Always Originate",
+      "metric": "Metric",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name"
+    },
+    "passwords": {
+      "title": "Password Configuration",
+      "areaPassword": "Area Password",
+      "areaPasswordPlaceholder": "Area password",
+      "domainPassword": "Domain Password",
+      "domainPasswordPlaceholder": "Domain password"
+    },
+    "advanced": {
+      "title": "Advanced Options",
+      "hint": "More IS-IS configuration can be done via CLI."
+    },
+    "modal": {
+      "editInterface": "Edit IS-IS Interface",
+      "addInterface": "Add IS-IS Interface",
+      "interfaceName": "Interface Name",
+      "selectInterface": "Select an interface",
+      "metric": "Metric (0-16777215)",
+      "networkType": "Network Type",
+      "passiveMode": "Passive Mode",
+      "editRedistribute": "Edit Route Redistribution",
+      "addRedistribute": "Add Route Redistribution",
+      "protocol": "Protocol",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name"
+    },
+    "delete": {
+      "confirmInterface": "Confirm delete the following interface?",
+      "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+    },
+    "error": {
+      "net": "NET format error: ",
+      "lspMtu": "LSP MTU error: ",
+      "interfaceNameRequired": "Interface name is required",
+      "protocolRequired": "Protocol is required"
+    },
+    "routing": {
+      "isis": {
+        "tab": {
+          "basic": "Basic",
+          "interfaces": "Interfaces",
+          "redistribute": "Redistribute",
+          "defaultInfo": "Default Info",
+          "passwords": "Passwords",
+          "advanced": "Advanced"
+        },
+        "col": {
+          "interfaceName": "Interface Name",
+          "metric": "Metric",
+          "networkType": "Network Type",
+          "protocol": "Protocol"
+        },
+        "basic": {
+          "title": "IS-IS Basic Configuration"
+        },
+        "form": {
+          "net": "NET (Network Entity Title)",
+          "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+          "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
+          "level": "Level",
+          "metricStyle": "Metric Style",
+          "dynamicHostname": "Dynamic Hostname",
+          "logAdjacencyChanges": "Log Adjacency Changes",
+          "purgeOriginator": "Purge Originator",
+          "setAttachedBit": "Set Attached Bit",
+          "setOverloadBit": "Set Overload Bit",
+          "lspGenInterval": "LSP Generation Interval",
+          "lspGenIntervalPlaceholder": "1-65535",
+          "lspMtu": "LSP MTU",
+          "lspRefreshInterval": "LSP Refresh Interval",
+          "lspRefreshIntervalPlaceholder": "1-65535",
+          "maxLspLifetime": "Max LSP Lifetime",
+          "maxLspLifetimePlaceholder": "1-65535"
+        },
+        "defaultInfo": {
+          "title": "Default Information Originate",
+          "always": "Always Originate",
+          "metric": "Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "passwords": {
+          "title": "Password Configuration",
+          "areaPassword": "Area Password",
+          "areaPasswordPlaceholder": "Area password",
+          "domainPassword": "Domain Password",
+          "domainPasswordPlaceholder": "Domain password"
+        },
+        "advanced": {
+          "title": "Advanced Options",
+          "hint": "More IS-IS configuration can be done via CLI."
+        },
+        "modal": {
+          "editInterface": "Edit IS-IS Interface",
+          "addInterface": "Add IS-IS Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select an interface",
+          "metric": "Metric (0-16777215)",
+          "networkType": "Network Type",
+          "passiveMode": "Passive Mode",
+          "editRedistribute": "Edit Route Redistribution",
+          "addRedistribute": "Add Route Redistribution",
+          "protocol": "Protocol",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "delete": {
+          "confirmInterface": "Confirm delete the following interface?",
+          "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+        },
+        "error": {
+          "net": "NET format error: ",
+          "lspMtu": "LSP MTU error: ",
+          "interfaceNameRequired": "Interface name is required",
+          "protocolRequired": "Protocol is required"
+        }
+      }
+    },
+    "validation": {
+      "isisNetFormat": "Invalid NET format, should be 49.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx",
+      "isisMetricRange": "Metric must be between 0-16777215",
+      "timerRange": "Value must be within the specified range",
+      "isisLspMtuRange": "LSP MTU must be between 128-4352"
+    },
+    "option": {
+      "default": "Default"
+    },
+    "common": {
+      "confirmDelete": "Confirm Delete"
+    },
+    "msg": {
+      "saved": "Saved successfully"
+    }
+  },
+  "ru": {
+    "tab": {
+      "basic": "Basic",
+      "interfaces": "Interfaces",
+      "redistribute": "Redistribute",
+      "defaultInfo": "Default Info",
+      "passwords": "Passwords",
+      "advanced": "Advanced"
+    },
+    "col": {
+      "interfaceName": "Interface Name",
+      "metric": "Metric",
+      "networkType": "Network Type",
+      "protocol": "Protocol"
+    },
+    "basic": {
+      "title": "IS-IS Basic Configuration"
+    },
+    "form": {
+      "net": "NET (Network Entity Title)",
+      "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+      "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
+      "level": "Level",
+      "metricStyle": "Metric Style",
+      "dynamicHostname": "Dynamic Hostname",
+      "logAdjacencyChanges": "Log Adjacency Changes",
+      "purgeOriginator": "Purge Originator",
+      "setAttachedBit": "Set Attached Bit",
+      "setOverloadBit": "Set Overload Bit",
+      "lspGenInterval": "LSP Generation Interval",
+      "lspGenIntervalPlaceholder": "1-65535",
+      "lspMtu": "LSP MTU",
+      "lspRefreshInterval": "LSP Refresh Interval",
+      "lspRefreshIntervalPlaceholder": "1-65535",
+      "maxLspLifetime": "Max LSP Lifetime",
+      "maxLspLifetimePlaceholder": "1-65535"
+    },
+    "defaultInfo": {
+      "title": "Default Information Originate",
+      "always": "Always Originate",
+      "metric": "Metric",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name"
+    },
+    "passwords": {
+      "title": "Password Configuration",
+      "areaPassword": "Area Password",
+      "areaPasswordPlaceholder": "Area password",
+      "domainPassword": "Domain Password",
+      "domainPasswordPlaceholder": "Domain password"
+    },
+    "advanced": {
+      "title": "Advanced Options",
+      "hint": "More IS-IS configuration can be done via CLI."
+    },
+    "modal": {
+      "editInterface": "Edit IS-IS Interface",
+      "addInterface": "Add IS-IS Interface",
+      "interfaceName": "Interface Name",
+      "selectInterface": "Select an interface",
+      "metric": "Metric (0-16777215)",
+      "networkType": "Network Type",
+      "passiveMode": "Passive Mode",
+      "editRedistribute": "Edit Route Redistribution",
+      "addRedistribute": "Add Route Redistribution",
+      "protocol": "Protocol",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name"
+    },
+    "delete": {
+      "confirmInterface": "Confirm delete the following interface?",
+      "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+    },
+    "error": {
+      "net": "NET format error: ",
+      "lspMtu": "LSP MTU error: ",
+      "interfaceNameRequired": "Interface name is required",
+      "protocolRequired": "Protocol is required"
+    },
+    "routing": {
+      "isis": {
+        "tab": {
+          "basic": "Basic",
+          "interfaces": "Interfaces",
+          "redistribute": "Redistribute",
+          "defaultInfo": "Default Info",
+          "passwords": "Passwords",
+          "advanced": "Advanced"
+        },
+        "col": {
+          "interfaceName": "Interface Name",
+          "metric": "Metric",
+          "networkType": "Network Type",
+          "protocol": "Protocol"
+        },
+        "basic": {
+          "title": "IS-IS Basic Configuration"
+        },
+        "form": {
+          "net": "NET (Network Entity Title)",
+          "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+          "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
+          "level": "Level",
+          "metricStyle": "Metric Style",
+          "dynamicHostname": "Dynamic Hostname",
+          "logAdjacencyChanges": "Log Adjacency Changes",
+          "purgeOriginator": "Purge Originator",
+          "setAttachedBit": "Set Attached Bit",
+          "setOverloadBit": "Set Overload Bit",
+          "lspGenInterval": "LSP Generation Interval",
+          "lspGenIntervalPlaceholder": "1-65535",
+          "lspMtu": "LSP MTU",
+          "lspRefreshInterval": "LSP Refresh Interval",
+          "lspRefreshIntervalPlaceholder": "1-65535",
+          "maxLspLifetime": "Max LSP Lifetime",
+          "maxLspLifetimePlaceholder": "1-65535"
+        },
+        "defaultInfo": {
+          "title": "Default Information Originate",
+          "always": "Always Originate",
+          "metric": "Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "passwords": {
+          "title": "Password Configuration",
+          "areaPassword": "Area Password",
+          "areaPasswordPlaceholder": "Area password",
+          "domainPassword": "Domain Password",
+          "domainPasswordPlaceholder": "Domain password"
+        },
+        "advanced": {
+          "title": "Advanced Options",
+          "hint": "More IS-IS configuration can be done via CLI."
+        },
+        "modal": {
+          "editInterface": "Edit IS-IS Interface",
+          "addInterface": "Add IS-IS Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select an interface",
+          "metric": "Metric (0-16777215)",
+          "networkType": "Network Type",
+          "passiveMode": "Passive Mode",
+          "editRedistribute": "Edit Route Redistribution",
+          "addRedistribute": "Add Route Redistribution",
+          "protocol": "Protocol",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "delete": {
+          "confirmInterface": "Confirm delete the following interface?",
+          "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+        },
+        "error": {
+          "net": "NET format error: ",
+          "lspMtu": "LSP MTU error: ",
+          "interfaceNameRequired": "Interface name is required",
+          "protocolRequired": "Protocol is required"
+        }
+      }
+    },
+    "validation": {
+      "isisNetFormat": "Invalid NET format, should be 49.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx",
+      "isisMetricRange": "Metric must be between 0-16777215",
+      "timerRange": "Value must be within the specified range",
+      "isisLspMtuRange": "LSP MTU must be between 128-4352"
+    },
+    "option": {
+      "default": "Default"
+    },
+    "common": {
+      "confirmDelete": "Confirm Delete"
+    },
+    "msg": {
+      "saved": "Saved successfully"
+    }
+  },
+  "de": {
+    "tab": {
+      "basic": "Basic",
+      "interfaces": "Interfaces",
+      "redistribute": "Redistribute",
+      "defaultInfo": "Default Info",
+      "passwords": "Passwords",
+      "advanced": "Advanced"
+    },
+    "col": {
+      "interfaceName": "Interface Name",
+      "metric": "Metric",
+      "networkType": "Network Type",
+      "protocol": "Protocol"
+    },
+    "basic": {
+      "title": "IS-IS Basic Configuration"
+    },
+    "form": {
+      "net": "NET (Network Entity Title)",
+      "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+      "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
+      "level": "Level",
+      "metricStyle": "Metric Style",
+      "dynamicHostname": "Dynamic Hostname",
+      "logAdjacencyChanges": "Log Adjacency Changes",
+      "purgeOriginator": "Purge Originator",
+      "setAttachedBit": "Set Attached Bit",
+      "setOverloadBit": "Set Overload Bit",
+      "lspGenInterval": "LSP Generation Interval",
+      "lspGenIntervalPlaceholder": "1-65535",
+      "lspMtu": "LSP MTU",
+      "lspRefreshInterval": "LSP Refresh Interval",
+      "lspRefreshIntervalPlaceholder": "1-65535",
+      "maxLspLifetime": "Max LSP Lifetime",
+      "maxLspLifetimePlaceholder": "1-65535"
+    },
+    "defaultInfo": {
+      "title": "Default Information Originate",
+      "always": "Always Originate",
+      "metric": "Metric",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name"
+    },
+    "passwords": {
+      "title": "Password Configuration",
+      "areaPassword": "Area Password",
+      "areaPasswordPlaceholder": "Area password",
+      "domainPassword": "Domain Password",
+      "domainPasswordPlaceholder": "Domain password"
+    },
+    "advanced": {
+      "title": "Advanced Options",
+      "hint": "More IS-IS configuration can be done via CLI."
+    },
+    "modal": {
+      "editInterface": "Edit IS-IS Interface",
+      "addInterface": "Add IS-IS Interface",
+      "interfaceName": "Interface Name",
+      "selectInterface": "Select an interface",
+      "metric": "Metric (0-16777215)",
+      "networkType": "Network Type",
+      "passiveMode": "Passive Mode",
+      "editRedistribute": "Edit Route Redistribution",
+      "addRedistribute": "Add Route Redistribution",
+      "protocol": "Protocol",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name"
+    },
+    "delete": {
+      "confirmInterface": "Confirm delete the following interface?",
+      "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+    },
+    "error": {
+      "net": "NET format error: ",
+      "lspMtu": "LSP MTU error: ",
+      "interfaceNameRequired": "Interface name is required",
+      "protocolRequired": "Protocol is required"
+    },
+    "routing": {
+      "isis": {
+        "tab": {
+          "basic": "Basic",
+          "interfaces": "Interfaces",
+          "redistribute": "Redistribute",
+          "defaultInfo": "Default Info",
+          "passwords": "Passwords",
+          "advanced": "Advanced"
+        },
+        "col": {
+          "interfaceName": "Interface Name",
+          "metric": "Metric",
+          "networkType": "Network Type",
+          "protocol": "Protocol"
+        },
+        "basic": {
+          "title": "IS-IS Basic Configuration"
+        },
+        "form": {
+          "net": "NET (Network Entity Title)",
+          "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+          "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
+          "level": "Level",
+          "metricStyle": "Metric Style",
+          "dynamicHostname": "Dynamic Hostname",
+          "logAdjacencyChanges": "Log Adjacency Changes",
+          "purgeOriginator": "Purge Originator",
+          "setAttachedBit": "Set Attached Bit",
+          "setOverloadBit": "Set Overload Bit",
+          "lspGenInterval": "LSP Generation Interval",
+          "lspGenIntervalPlaceholder": "1-65535",
+          "lspMtu": "LSP MTU",
+          "lspRefreshInterval": "LSP Refresh Interval",
+          "lspRefreshIntervalPlaceholder": "1-65535",
+          "maxLspLifetime": "Max LSP Lifetime",
+          "maxLspLifetimePlaceholder": "1-65535"
+        },
+        "defaultInfo": {
+          "title": "Default Information Originate",
+          "always": "Always Originate",
+          "metric": "Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "passwords": {
+          "title": "Password Configuration",
+          "areaPassword": "Area Password",
+          "areaPasswordPlaceholder": "Area password",
+          "domainPassword": "Domain Password",
+          "domainPasswordPlaceholder": "Domain password"
+        },
+        "advanced": {
+          "title": "Advanced Options",
+          "hint": "More IS-IS configuration can be done via CLI."
+        },
+        "modal": {
+          "editInterface": "Edit IS-IS Interface",
+          "addInterface": "Add IS-IS Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select an interface",
+          "metric": "Metric (0-16777215)",
+          "networkType": "Network Type",
+          "passiveMode": "Passive Mode",
+          "editRedistribute": "Edit Route Redistribution",
+          "addRedistribute": "Add Route Redistribution",
+          "protocol": "Protocol",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "delete": {
+          "confirmInterface": "Confirm delete the following interface?",
+          "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+        },
+        "error": {
+          "net": "NET format error: ",
+          "lspMtu": "LSP MTU error: ",
+          "interfaceNameRequired": "Interface name is required",
+          "protocolRequired": "Protocol is required"
+        }
+      }
+    },
+    "validation": {
+      "isisNetFormat": "Invalid NET format, should be 49.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx",
+      "isisMetricRange": "Metric must be between 0-16777215",
+      "timerRange": "Value must be within the specified range",
+      "isisLspMtuRange": "LSP MTU must be between 128-4352"
+    },
+    "option": {
+      "default": "Default"
+    },
+    "common": {
+      "confirmDelete": "Confirm Delete"
+    },
+    "msg": {
+      "saved": "Saved successfully"
+    }
+  },
+  "fr": {
+    "tab": {
+      "basic": "Basic",
+      "interfaces": "Interfaces",
+      "redistribute": "Redistribute",
+      "defaultInfo": "Default Info",
+      "passwords": "Passwords",
+      "advanced": "Advanced"
+    },
+    "col": {
+      "interfaceName": "Interface Name",
+      "metric": "Metric",
+      "networkType": "Network Type",
+      "protocol": "Protocol"
+    },
+    "basic": {
+      "title": "IS-IS Basic Configuration"
+    },
+    "form": {
+      "net": "NET (Network Entity Title)",
+      "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+      "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
+      "level": "Level",
+      "metricStyle": "Metric Style",
+      "dynamicHostname": "Dynamic Hostname",
+      "logAdjacencyChanges": "Log Adjacency Changes",
+      "purgeOriginator": "Purge Originator",
+      "setAttachedBit": "Set Attached Bit",
+      "setOverloadBit": "Set Overload Bit",
+      "lspGenInterval": "LSP Generation Interval",
+      "lspGenIntervalPlaceholder": "1-65535",
+      "lspMtu": "LSP MTU",
+      "lspRefreshInterval": "LSP Refresh Interval",
+      "lspRefreshIntervalPlaceholder": "1-65535",
+      "maxLspLifetime": "Max LSP Lifetime",
+      "maxLspLifetimePlaceholder": "1-65535"
+    },
+    "defaultInfo": {
+      "title": "Default Information Originate",
+      "always": "Always Originate",
+      "metric": "Metric",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name"
+    },
+    "passwords": {
+      "title": "Password Configuration",
+      "areaPassword": "Area Password",
+      "areaPasswordPlaceholder": "Area password",
+      "domainPassword": "Domain Password",
+      "domainPasswordPlaceholder": "Domain password"
+    },
+    "advanced": {
+      "title": "Advanced Options",
+      "hint": "More IS-IS configuration can be done via CLI."
+    },
+    "modal": {
+      "editInterface": "Edit IS-IS Interface",
+      "addInterface": "Add IS-IS Interface",
+      "interfaceName": "Interface Name",
+      "selectInterface": "Select an interface",
+      "metric": "Metric (0-16777215)",
+      "networkType": "Network Type",
+      "passiveMode": "Passive Mode",
+      "editRedistribute": "Edit Route Redistribution",
+      "addRedistribute": "Add Route Redistribution",
+      "protocol": "Protocol",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name"
+    },
+    "delete": {
+      "confirmInterface": "Confirm delete the following interface?",
+      "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+    },
+    "error": {
+      "net": "NET format error: ",
+      "lspMtu": "LSP MTU error: ",
+      "interfaceNameRequired": "Interface name is required",
+      "protocolRequired": "Protocol is required"
+    },
+    "routing": {
+      "isis": {
+        "tab": {
+          "basic": "Basic",
+          "interfaces": "Interfaces",
+          "redistribute": "Redistribute",
+          "defaultInfo": "Default Info",
+          "passwords": "Passwords",
+          "advanced": "Advanced"
+        },
+        "col": {
+          "interfaceName": "Interface Name",
+          "metric": "Metric",
+          "networkType": "Network Type",
+          "protocol": "Protocol"
+        },
+        "basic": {
+          "title": "IS-IS Basic Configuration"
+        },
+        "form": {
+          "net": "NET (Network Entity Title)",
+          "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+          "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
+          "level": "Level",
+          "metricStyle": "Metric Style",
+          "dynamicHostname": "Dynamic Hostname",
+          "logAdjacencyChanges": "Log Adjacency Changes",
+          "purgeOriginator": "Purge Originator",
+          "setAttachedBit": "Set Attached Bit",
+          "setOverloadBit": "Set Overload Bit",
+          "lspGenInterval": "LSP Generation Interval",
+          "lspGenIntervalPlaceholder": "1-65535",
+          "lspMtu": "LSP MTU",
+          "lspRefreshInterval": "LSP Refresh Interval",
+          "lspRefreshIntervalPlaceholder": "1-65535",
+          "maxLspLifetime": "Max LSP Lifetime",
+          "maxLspLifetimePlaceholder": "1-65535"
+        },
+        "defaultInfo": {
+          "title": "Default Information Originate",
+          "always": "Always Originate",
+          "metric": "Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "passwords": {
+          "title": "Password Configuration",
+          "areaPassword": "Area Password",
+          "areaPasswordPlaceholder": "Area password",
+          "domainPassword": "Domain Password",
+          "domainPasswordPlaceholder": "Domain password"
+        },
+        "advanced": {
+          "title": "Advanced Options",
+          "hint": "More IS-IS configuration can be done via CLI."
+        },
+        "modal": {
+          "editInterface": "Edit IS-IS Interface",
+          "addInterface": "Add IS-IS Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select an interface",
+          "metric": "Metric (0-16777215)",
+          "networkType": "Network Type",
+          "passiveMode": "Passive Mode",
+          "editRedistribute": "Edit Route Redistribution",
+          "addRedistribute": "Add Route Redistribution",
+          "protocol": "Protocol",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "delete": {
+          "confirmInterface": "Confirm delete the following interface?",
+          "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+        },
+        "error": {
+          "net": "NET format error: ",
+          "lspMtu": "LSP MTU error: ",
+          "interfaceNameRequired": "Interface name is required",
+          "protocolRequired": "Protocol is required"
+        }
+      }
+    },
+    "validation": {
+      "isisNetFormat": "Invalid NET format, should be 49.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx",
+      "isisMetricRange": "Metric must be between 0-16777215",
+      "timerRange": "Value must be within the specified range",
+      "isisLspMtuRange": "LSP MTU must be between 128-4352"
+    },
+    "option": {
+      "default": "Default"
+    },
+    "common": {
+      "confirmDelete": "Confirm Delete"
+    },
+    "msg": {
+      "saved": "Saved successfully"
+    }
+  },
+  "ko": {
+    "tab": {
+      "basic": "Basic",
+      "interfaces": "Interfaces",
+      "redistribute": "Redistribute",
+      "defaultInfo": "Default Info",
+      "passwords": "Passwords",
+      "advanced": "Advanced"
+    },
+    "col": {
+      "interfaceName": "Interface Name",
+      "metric": "Metric",
+      "networkType": "Network Type",
+      "protocol": "Protocol"
+    },
+    "basic": {
+      "title": "IS-IS Basic Configuration"
+    },
+    "form": {
+      "net": "NET (Network Entity Title)",
+      "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+      "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
+      "level": "Level",
+      "metricStyle": "Metric Style",
+      "dynamicHostname": "Dynamic Hostname",
+      "logAdjacencyChanges": "Log Adjacency Changes",
+      "purgeOriginator": "Purge Originator",
+      "setAttachedBit": "Set Attached Bit",
+      "setOverloadBit": "Set Overload Bit",
+      "lspGenInterval": "LSP Generation Interval",
+      "lspGenIntervalPlaceholder": "1-65535",
+      "lspMtu": "LSP MTU",
+      "lspRefreshInterval": "LSP Refresh Interval",
+      "lspRefreshIntervalPlaceholder": "1-65535",
+      "maxLspLifetime": "Max LSP Lifetime",
+      "maxLspLifetimePlaceholder": "1-65535"
+    },
+    "defaultInfo": {
+      "title": "Default Information Originate",
+      "always": "Always Originate",
+      "metric": "Metric",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name"
+    },
+    "passwords": {
+      "title": "Password Configuration",
+      "areaPassword": "Area Password",
+      "areaPasswordPlaceholder": "Area password",
+      "domainPassword": "Domain Password",
+      "domainPasswordPlaceholder": "Domain password"
+    },
+    "advanced": {
+      "title": "Advanced Options",
+      "hint": "More IS-IS configuration can be done via CLI."
+    },
+    "modal": {
+      "editInterface": "Edit IS-IS Interface",
+      "addInterface": "Add IS-IS Interface",
+      "interfaceName": "Interface Name",
+      "selectInterface": "Select an interface",
+      "metric": "Metric (0-16777215)",
+      "networkType": "Network Type",
+      "passiveMode": "Passive Mode",
+      "editRedistribute": "Edit Route Redistribution",
+      "addRedistribute": "Add Route Redistribution",
+      "protocol": "Protocol",
+      "routeMap": "Route Map",
+      "routeMapPlaceholder": "Route map name"
+    },
+    "delete": {
+      "confirmInterface": "Confirm delete the following interface?",
+      "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+    },
+    "error": {
+      "net": "NET format error: ",
+      "lspMtu": "LSP MTU error: ",
+      "interfaceNameRequired": "Interface name is required",
+      "protocolRequired": "Protocol is required"
+    },
+    "routing": {
+      "isis": {
+        "tab": {
+          "basic": "Basic",
+          "interfaces": "Interfaces",
+          "redistribute": "Redistribute",
+          "defaultInfo": "Default Info",
+          "passwords": "Passwords",
+          "advanced": "Advanced"
+        },
+        "col": {
+          "interfaceName": "Interface Name",
+          "metric": "Metric",
+          "networkType": "Network Type",
+          "protocol": "Protocol"
+        },
+        "basic": {
+          "title": "IS-IS Basic Configuration"
+        },
+        "form": {
+          "net": "NET (Network Entity Title)",
+          "netPlaceholder": "e.g., 49.0001.0000.0000.0000.0000.0000.0000.0000.0000.0000.0001.00",
+          "netTitle": "IS-IS NET address, format: 8-byte system ID + pseudo-node ID",
+          "level": "Level",
+          "metricStyle": "Metric Style",
+          "dynamicHostname": "Dynamic Hostname",
+          "logAdjacencyChanges": "Log Adjacency Changes",
+          "purgeOriginator": "Purge Originator",
+          "setAttachedBit": "Set Attached Bit",
+          "setOverloadBit": "Set Overload Bit",
+          "lspGenInterval": "LSP Generation Interval",
+          "lspGenIntervalPlaceholder": "1-65535",
+          "lspMtu": "LSP MTU",
+          "lspRefreshInterval": "LSP Refresh Interval",
+          "lspRefreshIntervalPlaceholder": "1-65535",
+          "maxLspLifetime": "Max LSP Lifetime",
+          "maxLspLifetimePlaceholder": "1-65535"
+        },
+        "defaultInfo": {
+          "title": "Default Information Originate",
+          "always": "Always Originate",
+          "metric": "Metric",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "passwords": {
+          "title": "Password Configuration",
+          "areaPassword": "Area Password",
+          "areaPasswordPlaceholder": "Area password",
+          "domainPassword": "Domain Password",
+          "domainPasswordPlaceholder": "Domain password"
+        },
+        "advanced": {
+          "title": "Advanced Options",
+          "hint": "More IS-IS configuration can be done via CLI."
+        },
+        "modal": {
+          "editInterface": "Edit IS-IS Interface",
+          "addInterface": "Add IS-IS Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select an interface",
+          "metric": "Metric (0-16777215)",
+          "networkType": "Network Type",
+          "passiveMode": "Passive Mode",
+          "editRedistribute": "Edit Route Redistribution",
+          "addRedistribute": "Add Route Redistribution",
+          "protocol": "Protocol",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route map name"
+        },
+        "delete": {
+          "confirmInterface": "Confirm delete the following interface?",
+          "confirmRedistribute": "Confirm delete the following redistribute protocol?"
+        },
+        "error": {
+          "net": "NET format error: ",
+          "lspMtu": "LSP MTU error: ",
+          "interfaceNameRequired": "Interface name is required",
+          "protocolRequired": "Protocol is required"
+        }
+      }
+    },
+    "validation": {
+      "isisNetFormat": "Invalid NET format, should be 49.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx.xxxx",
+      "isisMetricRange": "Metric must be between 0-16777215",
+      "timerRange": "Value must be within the specified range",
+      "isisLspMtuRange": "LSP MTU must be between 128-4352"
+    },
+    "option": {
+      "default": "Default"
+    },
+    "common": {
+      "confirmDelete": "Confirm Delete"
+    },
+    "msg": {
+      "saved": "Saved successfully"
+    }
+  }
+}

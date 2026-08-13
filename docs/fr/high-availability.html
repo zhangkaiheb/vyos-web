@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3480; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="high-availability">
+<h1>Haute disponibilité</h1>
+<p>VRRP (Virtual Router Redundancy Protocol) fournit une redondance active/backup pour
+les routeurs. Chaque routeur VRRP dispose d'une adresse IP/IPv6 physique, et d'une
+adresse virtuelle. Au démarrage, les routeurs élisent le maître, et le routeur avec la plus
+haute priorité devient le maître et attribue l'adresse virtuelle à son interface.
+Tous les routeurs avec une priorité inférieure deviennent des routeurs de secours. Le maître commence ensuite
+à envoyer des paquets keepalive pour informer les autres routeurs qu'il est disponible. Si le
+maître échoue et arrête d'envoyer les paquets keepalive, le routeur avec la priorité suivante
+la plus élevée devient le nouveau maître et prend en charge l'adresse virtuelle.</p>
+<p>Les paquets keepalive VRRP utilisent le multicast, et les configurations VRRP sont limitées à un seul
+segment de couche datalink. Vous pouvez configurer plusieurs groupes VRRP
+(également appelés routeurs virtuels). Les routeurs virtuels sont identifiés par un
+VRID (Virtual Router IDentifier). Si vous configurez plusieurs groupes sur la même
+interface, leurs VRIDs doivent être uniques si ils utilisent la même famille d'adresses,
+mais il est possible (même si ce n'est pas recommandé pour des raisons de lisibilité) d'utiliser
+des VRIDs dupliqués sur des interfaces différentes.</p>
+<section id="basic-setup">
+<h2>Configuration de base</h2>
+<p>Les groupes VRRP sont créés avec la commande
+<code class="docutils literal notranslate">set high-availability vrrp group $GROUP_NAME</code>. Les paramètres requis sont interface, vrid et address.</p>
+<p>configuration minimale</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability vrrp group Foo vrid 10
+set high-availability vrrp group Foo interface eth0
+set high-availability vrrp group Foo address 192.0.2.1/24
+</pre></div>
+</div>
+<p>Vous pouvez vérifier l'état de votre groupe VRRP avec la commande opérationnelle
+<code class="docutils literal notranslate">run show vrrp</code> :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# run show vrrp
+Name        Interface      VRID  State    Last Transition
+----------  -----------  ------  -------  -----------------
+Foo         eth1             10  MASTER   2s
+</pre></div>
+</div>
+</section>
+<section id="ipv6-support">
+<h2>Prise en charge IPv6</h2>
+<p>Le paramètre <code class="docutils literal notranslate">address</code> peut être soit une adresse IPv4 ou IPv6, mais vous ne pouvez
+pas mélanger IPv4 et IPv6 dans le même groupe, et vous devrez créer des groupes avec
+des VRIDs différents spécialement pour IPv4 et IPv6.
+Si vous souhaitez utiliser une adresse IPv4 + IPv6, vous pouvez utiliser l'option <code class="docutils literal notranslate">excluded-address</code></p>
+</section>
+<section id="address">
+<h2>Adresse</h2>
+<p>La <code class="docutils literal notranslate">address</code> peut être configurée soit sur l'interface VRRP, soit sur une interface non VRRP.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability vrrp group Foo address 192.0.2.1/24
+set high-availability vrrp group Foo address 203.0.113.22/24 interface eth2
+set high-availability vrrp group Foo address 198.51.100.33/24 interface eth3
+</pre></div>
+</div>
+</section>
+<section id="disabling-a-vrrp-group">
+<h2>Désactivation d'un groupe VRRP</h2>
+<p>Vous pouvez désactiver un groupe VRRP avec l'option <code class="docutils literal notranslate">disable</code> :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability vrrp group Foo disable
+</pre></div>
+</div>
+<p>Un groupe désactivé sera supprimé du processus VRRP et votre routeur ne participera pas au VRRP pour ce VRID. Il disparaîtra des sorties des commandes en mode opérationnel, plutôt que d'entrer dans l'état de sauvegarde.</p>
+</section>
+<section id="exclude-address">
+<h2>Exclure une adresse</h2>
+<p>Exclure les adresses IP des <code class="docutils literal notranslate">paquets VRRP</code>. Cette option <code class="docutils literal notranslate">excluded-address</code> est
+utilisée lorsque vous souhaitez définir des adresses IPv4 + IPv6 sur la même interface virtuelle
+ou lorsqu'elle est utilisée avec plus de 20 adresses IP.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability vrrp group Foo excluded-address &#39;203.0.113.254/24&#39;
+set high-availability vrrp group Foo excluded-address &#39;2001:db8:aa::1/64&#39;
+set high-availability vrrp group Foo excluded-address &#39;2001:db8:22::1/64&#39;
+</pre></div>
+</div>
+</section>
+<section id="setting-vrrp-group-priority">
+<h2>Définir la priorité d'un groupe VRRP</h2>
+<p>La priorité VRRP peut être définie avec l'option <code class="docutils literal notranslate">priority</code> :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability vrrp group Foo priority 200
+</pre></div>
+</div>
+<p>La priorité doit être un nombre entier compris entre 1 et 255. Une valeur de priorité plus élevée
+augmente la préférence du routeur dans les élections du maître.</p>
+</section>
+<section id="sync-groups">
+<h2>Groupes de synchronisation</h2>
+<p>Un groupe de synchronisation permet aux groupes VRRP de basculer ensemble.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>edit high-availability vrrp
+set sync-group MAIN member VLAN9
+set sync-group MAIN member VLAN20
+</pre></div>
+</div>
+<p>Dans l'exemple suivant, lorsque VLAN9 change d'état, VLAN20 changera également :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vrrp {
+    group VLAN9 {
+        interface eth0.9
+        address 10.9.1.1/24
+        priority 200
+        vrid 9
+    }
+    group VLAN20 {
+        interface eth0.20
+        priority 200
+        address 10.20.20.1/24
+        vrid 20
+    }
+    sync-group MAIN {
+        member VLAN20
+        member VLAN9
+    }
+}
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Tous les éléments d'un groupe de synchronisation doivent être configurés de manière similaire.
+Si un groupe VRRP est configuré avec un délai de préemption différent ou une priorité,
+cela entraînera une boucle de transition infinie.</p>
+</div>
+</section>
+<section id="preemption">
+<h2>Préemption</h2>
+<p>VRRP peut utiliser deux modes : préemptif et non préemptif. Dans le mode préemptif,
+si un routeur avec une priorité plus élevée échoue puis revient, les routeurs avec une priorité
+plus faible abandonneront leur statut de maître. Dans le mode non préemptif, le nouveau
+maître restera en tant que maître et conservera l'adresse virtuelle indéfiniment.</p>
+<p>Par défaut, VRRP utilise la préemption. Vous pouvez la désactiver avec l'option « no-preempt » :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability vrrp group Foo no-preempt
+</pre></div>
+</div>
+<p>Vous pouvez également configurer l'intervalle de temps pour la préemption avec l'option « preempt-delay ». Par exemple, pour que le routeur à haute priorité prenne le contrôle après 180 secondes, utilisez :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability vrrp group Foo preempt-delay 180
+</pre></div>
+</div>
+</section>
+<section id="track">
+<h2>Suivi</h2>
+<p>Option de suivi des états des interfaces non VRRP. VRRP passe à l'état <code class="docutils literal notranslate">FAULT</code> si l'une des interfaces de suivi est en état <code class="docutils literal notranslate">down</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability vrrp group Foo track interface eth0
+set high-availability vrrp group Foo track interface eth1
+</pre></div>
+</div>
+<p>Ignorer les pannes de l'interface principale VRRP</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability vrrp group Foo track exclude-vrrp-interface
+</pre></div>
+</div>
+</section>
+<section id="unicast-vrrp">
+<h2>VRRP unicast</h2>
+<p>Par défaut, VRRP utilise des paquets multicast. Si votre réseau ne prend pas en charge
+le multicast pour quelque raison que ce soit, vous pouvez faire en sorte que VRRP utilise la communication unicast au lieu.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability vrrp group Foo peer-address 192.0.2.10
+set high-availability vrrp group Foo hello-source-address 192.0.2.15
+</pre></div>
+</div>
+</section>
+<section id="rfc3768-compatibility">
+<h2>Compatibilité rfc3768</h2>
+<p>Le RFC 3768 définit une adresse MAC virtuelle pour chaque routeur virtuel VRRP.
+Cette adresse MAC de routeur virtuel sera utilisée comme source dans tous les messages VRRP périodiques envoyés par le nœud actif. Lorsque l'option rfc3768-compatibility est activée, un nouvel interface VRRP est créé, auquel l'adresse MAC et l'adresse IP virtuelle sont automatiquement attribuées.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability vrrp group Foo rfc3768-compatibility
+</pre></div>
+</div>
+<p>Vérification</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>$show interfaces ethernet eth0v10
+eth0v10@eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue
+state UP group default qlen 1000
+link/ether 00:00:5e:00:01:0a brd ff:ff:ff:ff:ff:ff
+inet 172.25.0.247/16 scope global eth0v10
+valid_lft forever preferred_lft forever
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Le RFC 3768 crée une interface virtuelle. Si vous souhaitez appliquer
+la règle de NAT de destination au trafic envoyé à la MAC virtuelle, définissez
+l'interface virtuelle créée comme <code class="docutils literal notranslate">inbound-interface</code>.</p>
+</div>
+</section>
+<section id="global-options">
+<h2>Options globales</h2>
+<p>Dans la plupart des scénarios, il n'est pas nécessaire de modifier des paramètres spécifiques, et une configuration par défaut suffit. Mais il y a des cas où une configuration supplémentaire est nécessaire.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set high-availability vrrp global-parameters startup_delay &lt;1-600&gt;
+<a class="cmdlink" href="#cfgcmd-set-high-availability-vrrp-global-parameters-startup-delay-1-600" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette option spécifie un délai en secondes avant que les instances vrrp ne démarrent
+après le démarrage de keepalived.</p>
+</div>
+</div>
+</section>
+<section id="gratuitous-arp">
+<h2>ARP gratuit</h2>
+<p>Cette configuration n'est pas obligatoire et dans la plupart des cas, il n'y a pas
+besoin de la configurer. Mais si nécessaire, l'ARP gratuit peut être configuré dans
+<code class="docutils literal notranslate">global-parameters</code> et/ou dans la section <code class="docutils literal notranslate">group</code>.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set high-availability vrrp global-parameters garp interval &lt;0.000-1000&gt;
+<a class="cmdlink" href="#cfgcmd-set-high-availability-vrrp-global-parameters-garp-interval-0-000-1000" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set high-availability vrrp group &lt;name&gt; garp interval &lt;0.000-1000&gt;
+<a class="cmdlink" href="#cfgcmd-set-high-availability-vrrp-group-name-garp-interval-0-000-1000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le délai entre les messages ARP gratuits envoyés sur une interface.</p>
+<p>0 si non défini.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set high-availability vrrp global-parameters garp master-delay &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-high-availability-vrrp-global-parameters-garp-master-delay-1-255" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set high-availability vrrp group &lt;name&gt; garp master-delay &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-high-availability-vrrp-group-name-garp-master-delay-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le délai pour le deuxième ensemble d'ARP gratuits après le passage à MAÎTRE.</p>
+<p>5 si non défini.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set high-availability vrrp global-parameters garp master-refresh &lt;1-600&gt;
+<a class="cmdlink" href="#cfgcmd-set-high-availability-vrrp-global-parameters-garp-master-refresh-1-600" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set high-availability vrrp group &lt;name&gt; garp master-refresh &lt;1-600&gt;
+<a class="cmdlink" href="#cfgcmd-set-high-availability-vrrp-group-name-garp-master-refresh-1-600" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir l'intervalle minimum pour rafraîchir les ARP gratuits pendant le mode MAÎTRE.</p>
+<p>0 si non défini, ce qui signifie qu'il n'y a pas de rafraîchissement.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set high-availability vrrp global-parameters garp master-refresh-repeat &lt;1-600&gt;
+<a class="cmdlink" href="#cfgcmd-set-high-availability-vrrp-global-parameters-garp-master-refresh-repeat-1-600" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set high-availability vrrp group &lt;name&gt; garp master-refresh-repeat &lt;1-600&gt;
+<a class="cmdlink" href="#cfgcmd-set-high-availability-vrrp-group-name-garp-master-refresh-repeat-1-600" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le nombre de messages ARP gratuits à envoyer à la fois pendant le mode MAÎTRE.</p>
+<p>1 si non défini.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set high-availability vrrp global-parameters garp master-repeat &lt;1-600&gt;
+<a class="cmdlink" href="#cfgcmd-set-high-availability-vrrp-global-parameters-garp-master-repeat-1-600" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set high-availability vrrp group &lt;name&gt; garp master-repeat &lt;1-600&gt;
+<a class="cmdlink" href="#cfgcmd-set-high-availability-vrrp-group-name-garp-master-repeat-1-600" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le nombre de messages ARP gratuits à envoyer à la fois après le passage à MAÎTRE.</p>
+<p>5 si non défini.</p>
+</div>
+</div>
+</section>
+<section id="version">
+<h2>Version</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set high-availability vrrp global-parameters version 2|3
+<a class="cmdlink" href="#cfgcmd-set-high-availability-vrrp-global-parameters-version-2-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la version VRRP par défaut à utiliser. Cela par défaut à 2, mais les instances IPv6
+utiliseront toujours la version 3.</p>
+</div>
+</div>
+</section>
+<section id="scripting">
+<h2>Scripting</h2>
+<p>La fonctionnalité VRRP peut être étendue avec des scripts. VyOS prend en charge deux types de
+scripts : scripts de vérification de santé et scripts de transition. Les scripts de vérification de santé
+exécutent des vérifications personnalisées en plus de la faisabilité du routeur principal. Les scripts de transition
+s'exécutent lorsqu'il y a un changement d'état VRRP du maître vers le sauvegarde ou le défaut et vice versa
+et peuvent être utilisés pour activer ou désactiver certains services, par exemple.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Placer simplement les fichiers de script dans <code class="docutils literal notranslate">/config/scripts/</code> ne signifie pas que le
+système peut les exécuter. Pour rendre les scripts personnalisés exécutables, accordez-leur
+<strong>les permissions d'exécution</strong>. Utilisez la commande suivante :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>chmod +x /config/scripts/script-name.sh
+</pre></div>
+</div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Il n'est pas recommandé de modifier la configuration VRRP
+dans les scripts de vérification de santé et de transition.</p>
+</div>
+<section id="health-check-scripts">
+<h3>Scripts de vérification de santé</h3>
+<p>Il est possible d'exécuter un script arbitraire à intervalles réguliers
+selon les paramètres de vérification de santé. Si un script retourne 0, cela
+indique un succès. Si un script retourne autre chose, cela indiquera
+que l'instance VRRP doit entrer dans l'état FAULT.</p>
+<p>Cette configuration fera exécuter le processus VRRP le
+<code class="docutils literal notranslate">/config/scripts/vrrp-check.sh script</code> toutes les 60 secondes, et transitera le
+groupe vers l'état de panne s'il échoue (c'est-à-dire qu'il quitte avec un statut non nul) trois
+fois :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability vrrp group Foo health-check script /config/scripts/vrrp-check.sh
+set high-availability vrrp group Foo health-check interval 60
+set high-availability vrrp group Foo health-check failure-count 3
+</pre></div>
+</div>
+<p>Un <code class="docutils literal notranslate">timeout</code> optionnel peut être défini pour définir le nombre maximum de secondes pendant lesquelles le
+script est autorisé à s'exécuter. Cela est utile pour les scripts qui peuvent se bloquer ou prendre
+plus longtemps que prévu — définir le timeout supérieur à l'intervalle permet aux scripts plus longs de terminer
+avant d'être considérés comme échoués.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability vrrp group Foo health-check script /config/scripts/vrrp-check.sh
+set high-availability vrrp group Foo health-check interval 20
+set high-availability vrrp group Foo health-check failure-count 3
+set high-availability vrrp group Foo health-check timeout 40
+</pre></div>
+</div>
+<p>Lorsque le groupe vrrp est membre d'un groupe de synchronisation, il utilisera uniquement
+le script de vérification de santé du groupe de synchronisation.
+Cet exemple montre comment le configurer pour le groupe de synchronisation :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability vrrp sync-group Bar health-check script /config/scripts/vrrp-check.sh
+set high-availability vrrp sync-group Bar health-check interval 60
+set high-availability vrrp sync-group Bar health-check failure-count 3
+</pre></div>
+</div>
+</section>
+<section id="transition-scripts">
+<h3>Scripts de transition</h3>
+<p>Les scripts de transition peuvent vous aider à implémenter divers correctifs, tels que le démarrage et
+l'arrêt de services, ou même la modification de la configuration VyOS lors d'une transition VRRP.
+Cette configuration fera exécuter le processus VRRP le
+<code class="docutils literal notranslate">/config/scripts/vrrp-fail.sh</code> avec l'argument <code class="docutils literal notranslate">Foo</code> lorsqu'il y a un échec VRRP,
+et le <code class="docutils literal notranslate">/config/scripts/vrrp-master.sh</code> lorsqu'il devient maître :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability vrrp group Foo transition-script backup &quot;/config/scripts/vrrp-fail.sh Foo&quot;
+set high-availability vrrp group Foo transition-script fault &quot;/config/scripts/vrrp-fail.sh Foo&quot;
+set high-availability vrrp group Foo transition-script master &quot;/config/scripts/vrrp-master.sh Foo&quot;
+</pre></div>
+</div>
+<p>Pour en savoir plus sur le scripting, consultez la section <a class="reference internal" href="../../automation/command-scripting.html#command-scripting">Command scripting</a>.</p>
+</section>
+</section>
+<section id="virtual-server">
+<h2>Serveur virtuel</h2>
+<div class="error admonition">
+<p class="admonition-title">Appel à la contribution</p>
+<p>Aidez à améliorer cette section avec du contenu supplémentaire, des exemples et des explications.</p>
+<p>Pour les directives de contribution, voir <a class="reference internal" href="../../documentation.html#documentation">Écrire la documentation</a>.</p>
+</div>
+<p>Virtual Server permet de charger-balançer le trafic vers l'adresse virtuelle:port
+entre plusieurs serveurs réels.</p>
+<section id="algorithm">
+<h3>Algorithme</h3>
+<p>Algorithme de planification de charge équilibrée :</p>
+<ul class="simple">
+<li><p>round-robin</p></li>
+<li><p>weighted-round-robin</p></li>
+<li><p>least-connection</p></li>
+<li><p>weighted-least-connection</p></li>
+<li><p>source-hashing</p></li>
+<li><p>destination-hashing</p></li>
+<li><p>locality-based-least-connection</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability virtual-server 203.0.113.1 algorithm &#39;least-connection&#39;
+</pre></div>
+</div>
+</section>
+<section id="forward-method">
+<h3>Méthode de transfert</h3>
+<ul class="simple">
+<li><p>NAT</p></li>
+<li><p>direct</p></li>
+<li><p>tunnel</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability virtual-server 203.0.113.1 forward-method &#39;nat&#39;
+</pre></div>
+</div>
+</section>
+<section id="persistence-timeout">
+<h3>Timeout de persistance</h3>
+<p>Temps d'attente en secondes pour les connexions persistantes. IPVS transmettra toutes
+les connexions provenant de la même adresse IP source au même serveur réel pendant la
+durée du timeout.
+La valeur par défaut est de 300 secondes.</p>
+<p>Définir sur <code class="docutils literal notranslate">0</code> pour désactiver la persistance et permettre à l'algorithme de charge équilibrée
+de distribuer chaque connexion indépendamment.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability virtual-server 203.0.113.1 persistence-timeout &#39;180&#39;
+</pre></div>
+</div>
+</section>
+<section id="health-check">
+<h3>Vérification de santé</h3>
+<p>Le script de vérification de santé personnalisé permet de vérifier la disponibilité des serveurs réels</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability virtual-server 203.0.113.1 real-server 192.0.2.11 health-check script &lt;path-to-script&gt;
+</pre></div>
+</div>
+</section>
+<section id="fwmark">
+<h3>Fwmark</h3>
+<p>Marque de pare-feu. Il est possible de loadbalancer le trafic en fonction de la valeur <code class="docutils literal notranslate">fwmark</code></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability virtual-server 203.0.113.1 fwmark &#39;111&#39;
+</pre></div>
+</div>
+</section>
+<section id="real-server">
+<h3>Serveur réel</h3>
+<p>Adresse IP et port du serveur réel</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set high-availability virtual-server 203.0.113.1 real-server 192.0.2.11 port &#39;80&#39;
+</pre></div>
+</div>
+</section>
+<section id="example">
+<h3>Exemple</h3>
+<p>Le serveur virtuel peut être configuré avec une adresse virtuelle VRRP ou sans VRRP.</p>
+<p>Dans l'exemple suivant, tout le trafic destiné à <code class="docutils literal notranslate">203.0.113.1</code> et au port <code class="docutils literal notranslate">8280</code>
+protocole TCP est équilibré entre 2 serveurs réels <code class="docutils literal notranslate">192.0.2.11</code> et
+<code class="docutils literal notranslate">192.0.2.12</code> au port <code class="docutils literal notranslate">80</code></p>
+<p>Le serveur réel est exclu automatiquement si le test de port avec ce serveur échoue.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address &#39;203.0.113.11/24&#39;
+set interfaces ethernet eth1 address &#39;192.0.2.1/24&#39;
+set high-availability vrrp group FOO interface &#39;eth0&#39;
+set high-availability vrrp group FOO no-preempt
+set high-availability vrrp group FOO priority &#39;150&#39;
+set high-availability vrrp group FOO address &#39;203.0.113.1/24&#39;
+set high-availability vrrp group FOO vrid &#39;10&#39;
+
+set high-availability virtual-server 203.0.113.1 algorithm &#39;source-hashing&#39;
+set high-availability virtual-server 203.0.113.1 delay-loop &#39;10&#39;
+set high-availability virtual-server 203.0.113.1 forward-method &#39;nat&#39;
+set high-availability virtual-server 203.0.113.1 persistence-timeout &#39;180&#39;
+set high-availability virtual-server 203.0.113.1 port &#39;8280&#39;
+set high-availability virtual-server 203.0.113.1 protocol &#39;tcp&#39;
+set high-availability virtual-server 203.0.113.1 real-server 192.0.2.11 port &#39;80&#39;
+set high-availability virtual-server 203.0.113.1 real-server 192.0.2.12 port &#39;80&#39;
+</pre></div>
+</div>
+<p>Une marque de pare-feu <code class="docutils literal notranslate">fwmark</code> permet d'utiliser plusieurs ports pour le serveur virtuel haute disponibilité.
+Il utilise la valeur fwmark.</p>
+<p>Dans cet exemple, tout le trafic destiné aux ports «80, 2222, 8888» protocole TCP
+marque à fwmark «111» et est équilibré entre 2 serveurs réels.
+Le port «0» est requis si plusieurs ports sont utilisés.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address &#39;dhcp&#39;
+set interfaces ethernet eth0 description &#39;WAN&#39;
+set interfaces ethernet eth1 address &#39;192.0.2.1/24&#39;
+set interfaces ethernet eth1 description &#39;LAN&#39;
+
+set policy route PR interface &#39;eth0&#39;
+set policy route PR rule 10 destination port &#39;80,2222,8888&#39;
+set policy route PR rule 10 protocol &#39;tcp&#39;
+set policy route PR rule 10 set mark &#39;111&#39;
+
+set high-availability virtual-server vyos fwmark &#39;111&#39;
+set high-availability virtual-server vyos protocol &#39;tcp&#39;
+set high-availability virtual-server vyos real-server 192.0.2.11 health-check script &#39;/config/scripts/check-real-server-first.sh&#39;
+set high-availability virtual-server vyos real-server 192.0.2.11 port &#39;0&#39;
+set high-availability virtual-server vyos real-server 192.0.2.12 health-check script &#39;/config/scripts/check-real-server-second.sh&#39;
+set high-availability virtual-server vyos real-server 192.0.2.12 port &#39;0&#39;
+
+set nat source rule 100 outbound-interface name &#39;eth0&#39;
+set nat source rule 100 source address &#39;192.0.2.0/24&#39;
+set nat source rule 100 translation address &#39;masquerade&#39;
+</pre></div>
+</div>
+<p>Vérification de l'état du serveur virtuel en mode opérationnel</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@r14:~$ run show virtual-server
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn
+FWM  111 lc persistent 300
+  -&gt; 192.0.2.11:0                 Masq    1      0          0
+  -&gt; 192.0.2.12:0                 Masq    1      1          0
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

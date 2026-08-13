@@ -1,0 +1,37 @@
+{
+  "zh-CN": {
+    "settings": {
+      "saved": "已保存"
+    }
+  },
+  "en": {
+    "settings": {
+      "saved": "Saved"
+    }
+  },
+  "zh-TW": {
+    "settings": {
+      "saved": "Saved"
+    }
+  },
+  "ru": {
+    "settings": {
+      "saved": "Saved"
+    }
+  },
+  "de": {
+    "settings": {
+      "saved": "Saved"
+    }
+  },
+  "fr": {
+    "settings": {
+      "saved": "Saved"
+    }
+  },
+  "ko": {
+    "settings": {
+      "saved": "Saved"
+    }
+  }
+}

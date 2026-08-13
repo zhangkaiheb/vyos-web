@@ -1,0 +1,107 @@
+{
+  "zh-CN": {
+    "pptpStatistics": {
+      "title": "PPTP 统计",
+      "columns": {
+        "metric": "指标",
+        "value": "数值"
+      },
+      "buttons": {
+        "refresh": "刷新"
+      },
+      "labels": {
+        "rawOutput": "原始输出"
+      }
+    }
+  },
+  "en": {
+    "pptpStatistics": {
+      "title": "PPTP Statistics",
+      "columns": {
+        "metric": "Metric",
+        "value": "Value"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      },
+      "labels": {
+        "rawOutput": "Raw Output"
+      }
+    }
+  },
+  "zh-TW": {
+    "pptpStatistics": {
+      "title": "PPTP Statistics",
+      "columns": {
+        "metric": "Metric",
+        "value": "Value"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      },
+      "labels": {
+        "rawOutput": "Raw Output"
+      }
+    }
+  },
+  "ru": {
+    "pptpStatistics": {
+      "title": "PPTP Statistics",
+      "columns": {
+        "metric": "Metric",
+        "value": "Value"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      },
+      "labels": {
+        "rawOutput": "Raw Output"
+      }
+    }
+  },
+  "de": {
+    "pptpStatistics": {
+      "title": "PPTP Statistics",
+      "columns": {
+        "metric": "Metric",
+        "value": "Value"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      },
+      "labels": {
+        "rawOutput": "Raw Output"
+      }
+    }
+  },
+  "fr": {
+    "pptpStatistics": {
+      "title": "PPTP Statistics",
+      "columns": {
+        "metric": "Metric",
+        "value": "Value"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      },
+      "labels": {
+        "rawOutput": "Raw Output"
+      }
+    }
+  },
+  "ko": {
+    "pptpStatistics": {
+      "title": "PPTP Statistics",
+      "columns": {
+        "metric": "Metric",
+        "value": "Value"
+      },
+      "buttons": {
+        "refresh": "Refresh"
+      },
+      "labels": {
+        "rawOutput": "Raw Output"
+      }
+    }
+  }
+}

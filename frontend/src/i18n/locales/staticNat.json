@@ -1,0 +1,92 @@
+{
+  "zh-CN": {
+    "staticNat": {
+      "tab": {
+        "basic": "基本",
+        "match": "匹配",
+        "translation": "转换"
+      },
+      "field": {
+        "ruleNumber": "规则编号",
+        "description": "描述",
+        "log": "日志",
+        "destinationAddress": "目标地址",
+        "inboundInterface": "入站接口",
+        "translationAddress": "转换地址"
+      },
+      "help": {
+        "ruleNumber": "规则编号",
+        "description": "规则描述",
+        "log": "启用日志记录",
+        "destinationAddress": "匹配的目标地址",
+        "inboundInterface": "入站接口",
+        "translationAddress": "转换后的地址"
+      },
+      "placeholder": {
+        "destinationAddress": "目标地址",
+        "inboundInterface": "入站接口",
+        "translationAddress": "转换地址"
+      },
+      "column": {
+        "ruleNumber": "规则编号",
+        "description": "描述",
+        "destinationAddress": "目标地址",
+        "inboundInterface": "入站接口",
+        "translationAddress": "转换地址",
+        "log": "日志"
+      },
+      "loadFailed": "加载静态 NAT 规则失败",
+      "saveFailed": "保存静态 NAT 规则失败",
+      "deleteFailed": "删除静态 NAT 规则失败",
+      "editRule": "编辑静态 NAT 规则",
+      "createRule": "创建静态 NAT 规则",
+      "ruleNumberRequired": "规则编号为必填项",
+      "confirmDelete": "确定要删除选中的规则吗？"
+    }
+  },
+  "en": {
+    "staticNat": {
+      "tab": {
+        "basic": "Basic",
+        "match": "Match",
+        "translation": "Translation"
+      },
+      "field": {
+        "ruleNumber": "Rule Number",
+        "description": "Description",
+        "log": "Log",
+        "destinationAddress": "Destination Address",
+        "inboundInterface": "Inbound Interface",
+        "translationAddress": "Translation Address"
+      },
+      "help": {
+        "ruleNumber": "Rule number",
+        "description": "Rule description",
+        "log": "Enable logging",
+        "destinationAddress": "Match destination address",
+        "inboundInterface": "Inbound interface",
+        "translationAddress": "Translated address"
+      },
+      "placeholder": {
+        "destinationAddress": "Destination address",
+        "inboundInterface": "Inbound interface",
+        "translationAddress": "Translation address"
+      },
+      "column": {
+        "ruleNumber": "Rule Number",
+        "description": "Description",
+        "destinationAddress": "Destination Address",
+        "inboundInterface": "Inbound Interface",
+        "translationAddress": "Translation Address",
+        "log": "Log"
+      },
+      "loadFailed": "Failed to load static NAT rules",
+      "saveFailed": "Failed to save static NAT rule",
+      "deleteFailed": "Failed to delete static NAT rule",
+      "editRule": "Edit Static NAT Rule",
+      "createRule": "Create Static NAT Rule",
+      "ruleNumberRequired": "Rule number is required",
+      "confirmDelete": "Are you sure you want to delete the selected rule(s)?"
+    }
+  }
+}

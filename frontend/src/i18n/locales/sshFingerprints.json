@@ -1,0 +1,93 @@
+{
+  "zh-CN": {
+    "sshFingerprints": {
+      "columns": {
+        "type": "类型",
+        "key_size": "密钥大小",
+        "fingerprint": "指纹",
+        "comment": "注释"
+      },
+      "title": "SSH 指纹",
+      "refresh": "刷新",
+      "rawOutput": "原始输出"
+    }
+  },
+  "en": {
+    "sshFingerprints": {
+      "columns": {
+        "type": "Type",
+        "key_size": "Key Size",
+        "fingerprint": "Fingerprint",
+        "comment": "Comment"
+      },
+      "title": "SSH Fingerprints",
+      "refresh": "Refresh",
+      "rawOutput": "Raw Output"
+    }
+  },
+  "zh-TW": {
+    "sshFingerprints": {
+      "columns": {
+        "type": "Type",
+        "key_size": "Key Size",
+        "fingerprint": "Fingerprint",
+        "comment": "Comment"
+      },
+      "title": "SSH Fingerprints",
+      "refresh": "Refresh",
+      "rawOutput": "Raw Output"
+    }
+  },
+  "ru": {
+    "sshFingerprints": {
+      "columns": {
+        "type": "Type",
+        "key_size": "Key Size",
+        "fingerprint": "Fingerprint",
+        "comment": "Comment"
+      },
+      "title": "SSH Fingerprints",
+      "refresh": "Refresh",
+      "rawOutput": "Raw Output"
+    }
+  },
+  "de": {
+    "sshFingerprints": {
+      "columns": {
+        "type": "Type",
+        "key_size": "Key Size",
+        "fingerprint": "Fingerprint",
+        "comment": "Comment"
+      },
+      "title": "SSH Fingerprints",
+      "refresh": "Refresh",
+      "rawOutput": "Raw Output"
+    }
+  },
+  "fr": {
+    "sshFingerprints": {
+      "columns": {
+        "type": "Type",
+        "key_size": "Key Size",
+        "fingerprint": "Fingerprint",
+        "comment": "Comment"
+      },
+      "title": "SSH Fingerprints",
+      "refresh": "Refresh",
+      "rawOutput": "Raw Output"
+    }
+  },
+  "ko": {
+    "sshFingerprints": {
+      "columns": {
+        "type": "Type",
+        "key_size": "Key Size",
+        "fingerprint": "Fingerprint",
+        "comment": "Comment"
+      },
+      "title": "SSH Fingerprints",
+      "refresh": "Refresh",
+      "rawOutput": "Raw Output"
+    }
+  }
+}

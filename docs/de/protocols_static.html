@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="static">
+<h1>Statisch</h1>
+<p>Statische Routen sind manuell konfigurierte Einträge im Routing-Informationen-Basis (RIB) des Routers, die definieren, wie der Datenverkehr zu spezifischen Zielen geleitet werden soll. Im Gegensatz zu dynamischen Routing-Protokollen werden statische Routen nicht automatisch aktualisiert, wenn sich die Netzwerktopologie ändert.</p>
+<p>Statische Routen eignen sich am besten für einfache Netzwerktopologien oder um das Verhalten dynamischer Routing-Protokolle für eine begrenzte Anzahl von Routen zu überschreiben.</p>
+<p>Der Routing-Informationen-Basis (RIB) speichert alle Routing-Informationen, einschließlich manuell konfigurierter statischer Routen und jeder dynamisch erlernten Route. Aus dem RIB leitet der Router unicast-Routen ab, um die Forwarding-Informationen-Basis (FIB) zu erstellen.</p>
+<section id="ipv4-unicast-routes">
+<h2>IPv4 Unicast-Routen</h2>
+<p>IPv4 Unicast-Routen leiten den Datenverkehr, der auf ein einzelnes IPv4-Host oder Subnetz gerichtet ist, zu einem bestimmten nächsten Hop. Verwenden Sie die folgenden Befehle, um IPv4 Unicast-Routen für ein bestimmtes entferntes Subnetz zu konfigurieren.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die nächste Hop-IP-Adresse für das angegebene Subnetz.</strong></p>
+<p>Sie können mehrere nächste Hop-IP-Adressen für dasselbe Ziel-Subnetz konfigurieren.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie die Route über die angegebene nächste Hop-IP-Adresse.</strong></p>
+<p>Dieser Befehl deaktiviert vorübergehend die Route, während die konfigurierten Subnetz-, nächste Hop- und Distanzparameter erhalten bleiben.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die administrative Distanz für die Route über die angegebene nächste Hop-IP-Adresse.</strong></p>
+<p>Routen mit einer niedrigeren administrativen Distanz haben Vorrang vor Routen mit einer höheren Distanz.</p>
+<p>Der zulässige Bereich beträgt 1 bis 255. Die Standarddistanz beträgt 1.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Routen mit einer Distanz von 255 sind deaktiviert und werden nicht für die Paketweiterleitung verwendet.</p>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 distance 10
+</pre></div>
+</div>
+<section id="ipv4-interface-routes">
+<h3>IPv4 Schnittstellenrouten</h3>
+<p>IPv4 Schnittstellenrouten leiten den Datenverkehr, der auf ein einzelnes IPv4-Host oder Subnetz gerichtet ist, über eine bestimmte lokale Schnittstelle. Verwenden Sie die folgenden Befehle, um IPv4 Schnittstellenrouten für ein bestimmtes entferntes Subnetz zu konfigurieren.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die nächste Hop-Schnittstelle für das angegebene Subnetz.</strong></p>
+<p>Sie können mehrere nächste Hop-Schnittstellen für dasselbe Ziel-Subnetz konfigurieren.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 interface eth0
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; interface &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-interface-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie die Route über die angegebene nächste Hop-Schnittstelle.</strong></p>
+<p>Dieser Befehl deaktiviert vorübergehend die Route, während die konfigurierten Subnetz-, Schnittstellen- und Distanzparameter erhalten bleiben.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 interface eth0 disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; interface &lt;interface&gt; distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-interface-interface-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die administrative Distanz für die Route über die angegebene nächste Hop-Schnittstelle.</strong></p>
+<p>Routen mit einer niedrigeren administrativen Distanz haben Vorrang vor Routen mit einer höheren Distanz.</p>
+<p>Der zulässige Bereich beträgt 1 bis 255. Die Standarddistanz beträgt 1.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 interface eth0 distance 10
+</pre></div>
+</div>
+</section>
+<section id="ipv4-bfd">
+<h3>IPv4 BFD</h3>
+<p><abbr title="Bidirectional Forwarding Detection">BFD</abbr> überwacht die Erreichbarkeit der nächsten Hop-IP-Adresse einer statischen Route. Verwenden Sie die folgenden Befehle, um <abbr title="Bidirectional Forwarding Detection">BFD</abbr>-Parameter für Ihre IPv4 statischen Routen zu konfigurieren.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable BFD monitoring for the route via the specified next-hop IP address.</strong></p>
+<p>The system uses the next-hop IP address as the BFD peer destination.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 bfd
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; bfd profile &lt;profile&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd-profile-profile" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Apply the settings from a designated BFD profile to the BFD session that monitors
+the specified next-hop IP address.</strong></p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 bfd profile custom-profile
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; bfd multi-hop source-address &lt;source-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd-multi-hop-source-address-source-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable a multi-hop BFD session to monitor the reachability of the
+specified next-hop IP address.</strong></p>
+<p>The system initiates the BFD session from the specified local source IPv4
+address.</p>
+</div>
+</div>
+<p>Example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 bfd multi-hop source-address 172.16.1.1
+</pre></div>
+</div>
+</section>
+<section id="dhcp-interface-routes">
+<h3>DHCP Schnittstellenrouten</h3>
+<p>DHCP Schnittstellenrouten leiten den Datenverkehr, der auf ein einzelnes IPv4-Host oder Subnetz gerichtet ist, zu einem nächsten Hop-Gateway, das aus einer DHCP-fähigen Schnittstelle abgerufen wird. Verwenden Sie den folgenden Befehl, um DHCP Schnittstellenrouten zu konfigurieren.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; dhcp-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-dhcp-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine statische Route, die ihre nächste Hop-IP-Adresse aus der angegebenen DHCP-fähigen Schnittstelle ableitet.</strong></p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 dhcp-interface eth0
+</pre></div>
+</div>
+</section>
+<section id="ipv4-reject-routes">
+<h3>IPv4 Ablehnungsrichtlinien</h3>
+<p>IPv4 Ablehnungsrichtlinien leiten den Datenverkehr, der auf ein einzelnes IPv4-Host oder Subnetz gerichtet ist, explizit ab und senden eine ICMP-unreachable Nachricht an das sendende Gerät. Verwenden Sie die folgenden Befehle, um IPv4 Ablehnungsrichtlinien zu konfigurieren.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; reject
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-reject" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine Ablehnungsroute für das angegebene Subnetz.</strong></p>
+<p>Das System verwirft den Datenverkehr, der für dieses Subnetz bestimmt ist, und sendet eine ICMP-Zielunreachable-Nachricht an das sendende Gerät.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 reject
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; reject distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-reject-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die administrative Distanz für die Ablehnungsroute.</strong></p>
+<p>Routen mit einer niedrigeren administrativen Distanz haben Vorrang vor Routen mit einer höheren Distanz.</p>
+<p>Der zulässige Bereich beträgt 1 bis 255.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 reject distance 200
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; reject tag &lt;tag&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-reject-tag-tag" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine numerische Kennung für die Ablehnungsroute.</strong></p>
+<p>Der zulässige Bereich beträgt 1 bis 4294967295.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 reject tag 100
+</pre></div>
+</div>
+</section>
+<section id="ipv4-blackhole-routes">
+<h3>IPv4 Blackhole-Routen</h3>
+<p>Blackhole-Routen werfen den Datenverkehr, der auf ein bestimmtes Subnetz gerichtet ist, stillschweigend weg. Im Gegensatz zu einer Ablehnungsroute, die dem Sender eine ICMP-Zielunreachable-Nachricht sendet, wirft eine Blackhole-Route die Pakete ohne jegliche Antwort weg.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; blackhole
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-blackhole" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine Blackhole-Route für das angegebene Subnetz.</strong></p>
+<p>Das System wirft entsprechende Pakete stillschweigend weg, ohne eine ICMP-Antwort an den Quellort zu senden.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/8 blackhole
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; blackhole distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-blackhole-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die administrative Distanz für die Blackhole-Route.</strong></p>
+<p>Routen mit einer niedrigeren administrativen Distanz haben Vorrang vor Routen mit einer höheren Distanz.</p>
+<p>Der zulässige Bereich beträgt 1 bis 255.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/8 blackhole distance 200
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route &lt;subnet&gt; blackhole tag &lt;tag&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-blackhole-tag-tag" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine numerische Kennung für die Blackhole-Route.</strong></p>
+<p>Der zulässige Bereich beträgt 1 bis 4294967295.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/8 blackhole tag 100
+</pre></div>
+</div>
+</section>
+</section>
+<section id="ipv6-unicast-routes">
+<h2>IPv6 Unicast-Routen</h2>
+<p>IPv6 Unicast-Routen leiten den Datenverkehr, der auf ein einzelnes IPv6-Host oder Subnetz gerichtet ist, zu einem bestimmten nächsten Hop. Verwenden Sie die folgenden Befehle, um IPv6 Unicast-Routen für ein bestimmtes entferntes Subnetz zu konfigurieren.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die nächste IPv6-Adresse für das angegebene Subnetz.</strong></p>
+<p>Sie können mehrere nächste IPv6-Adressen für dasselbe Ziel-Subnetz konfigurieren.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie die Route über die angegebene nächste IPv6-Adresse.</strong></p>
+<p>Dieser Befehl deaktiviert vorübergehend die Route, während die konfigurierten Subnetz-, nächste Hop- und Distanzparameter erhalten bleiben.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die administrative Distanz für die Route über die angegebene nächste IPv6-Adresse.</strong></p>
+<p>Routen mit einer niedrigeren administrativen Distanz haben Vorrang vor Routen mit einer höheren Distanz.</p>
+<p>Der zulässige Bereich beträgt 1 bis 255. Die Standarddistanz beträgt 1.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Routen mit einer Distanz von 255 sind deaktiviert und werden nicht für die Paketweiterleitung verwendet.</p>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 distance 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; segments &lt;segments&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-segments-segments" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine IPv6 Unicast-Route, die Segment Routing over IPv6 (SRv6) verwendet, um das Ziel-Subnetz zu erreichen.</strong></p>
+<p>Verwenden Sie einen Schrägstrich (<code class="docutils literal notranslate">/</code>), um mehrere IPv6 Segment-Identifikatoren (SIDs) in Ihrer Sequenz zu trennen.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1000::/36 next-hop 2001:db8:201::ffff segments &#39;2001:db8:aaaa::7/2002::4/2002::3/2002::2&#39;
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show ipv6 route
+Codes: K - kernel route, C - connected, S - static, R - RIPng,
+       O - OSPFv3, I - IS-IS, B - BGP, N - NHRP, T - Table,
+       v - VNC, V - VNC-Direct, A - Babel, F - PBR,
+       f - OpenFabric,
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+ C&gt;* 2001:db8:201::/64 is directly connected, eth0.201, 00:00:46
+ S&gt;* 2001:db8:1000::/36 [1/0] via 2001:db8:201::ffff, eth0.201, seg6 2001:db8:aaaa::7,2002::4,2002::3,2002::2, weight 1, 00:00:08
+</pre></div>
+</div>
+<section id="ipv6-interface-routes">
+<h3>IPv6 Schnittstellenrouten</h3>
+<p>IPv6 Schnittstellenrouten leiten den Datenverkehr, der auf ein einzelnes IPv6-Host oder Subnetz gerichtet ist, über eine bestimmte lokale Schnittstelle. Verwenden Sie die folgenden Befehle, um IPv6 Schnittstellenrouten für ein bestimmtes entferntes Subnetz zu konfigurieren.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die nächste Hop-Schnittstelle für das angegebene Subnetz.</strong></p>
+<p>Sie können mehrere nächste Hop-Schnittstellen für dasselbe Ziel-Subnetz konfigurieren.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 interface eth0
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; interface &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Deaktivieren Sie die Route über die angegebene nächste Hop-Schnittstelle.</strong></p>
+<p>Dieser Befehl deaktiviert vorübergehend die Route, während die konfigurierten Subnetz-, Schnittstellen- und Distanzparameter erhalten bleiben.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 interface eth0 disable
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; interface &lt;interface&gt; distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die administrative Distanz für die Route über die angegebene nächste Hop-Schnittstelle.</strong></p>
+<p>Routen mit einer niedrigeren administrativen Distanz haben Vorrang vor Routen mit einer höheren Distanz.</p>
+<p>Der zulässige Bereich beträgt 1 bis 255. Die Standarddistanz beträgt 1.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 interface eth0 distance 10
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; interface &lt;interface&gt; segments &lt;segments&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface-segments-segments" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine IPv6 Schnittstellenroute, die Segment Routing over IPv6 (SRv6) verwendet, um ein Ziel-Subnetz zu erreichen.</strong></p>
+<p>Verwenden Sie einen Schrägstrich (<code class="docutils literal notranslate">/</code>), um mehrere IPv6 Segment-Identifikatoren (SIDs) in Ihrer Sequenz zu trennen.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1000::/36 interface eth0 segments &#39;2001:db8:aaaa::7/2002::4/2002::3/2002::2&#39;
+</pre></div>
+</div>
+</section>
+<section id="ipv6-bfd">
+<h3>IPv6 BFD</h3>
+<p><abbr title="Bidirectional Forwarding Detection">BFD</abbr> überwacht die Erreichbarkeit der nächsten Hop-IPv6-Adresse einer statischen Route. Verwenden Sie die folgenden Befehle, um <abbr title="Bidirectional Forwarding Detection">BFD</abbr>-Parameter für Ihre IPv6 statischen Routen zu konfigurieren.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable BFD monitoring for the route via the specified next-hop IPv6
+address.</strong></p>
+<p>The system uses the next-hop IPv6 address as the BFD peer destination.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 bfd
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; bfd profile &lt;profile&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd-profile-profile" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Apply the settings from a designated BFD profile to the BFD session
+that monitors the specified next-hop IPv6 address.</strong></p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 bfd profile custom-profile
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; bfd multi-hop source-address &lt;source-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd-multi-hop-source-address-source-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Enable a multi-hop BFD session to monitor the reachability of the
+specified next-hop IPv6 address.</strong></p>
+<p>The system initiates the BFD session from the specified local source IPv6
+address.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 bfd multi-hop source-address 2001:db8:200::1
+</pre></div>
+</div>
+</section>
+<section id="ipv6-reject-routes">
+<h3>IPv6 Ablehnungsrichtlinien</h3>
+<p>IPv6 Ablehnungsrichtlinien leiten den Datenverkehr, der auf ein einzelnes IPv6-Host oder Subnetz gerichtet ist, explizit ab und senden eine ICMPv6-unreachable-Nachricht an das sendende Gerät. Verwenden Sie die folgenden Befehle, um IPv6 Ablehnungsrichtlinien zu konfigurieren.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; reject
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-reject" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine Ablehnungsroute für das angegebene Subnetz.</strong></p>
+<p>Das System verwirft den Datenverkehr, der für dieses Subnetz bestimmt ist, und sendet eine ICMPv6-Zielunreachable-Nachricht an das sendende Gerät.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 reject
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; reject distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-reject-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die administrative Distanz für die Ablehnungsroute.</strong></p>
+<p>Routen mit einer niedrigeren administrativen Distanz haben Vorrang vor Routen mit einer höheren Distanz.</p>
+<p>Der zulässige Bereich beträgt 1 bis 255.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 reject distance 200
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; reject tag &lt;tag&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-reject-tag-tag" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine numerische Kennung für die Ablehnungsroute.</strong></p>
+<p>Der zulässige Bereich beträgt 1 bis 4294967295.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 reject tag 100
+</pre></div>
+</div>
+</section>
+<section id="ipv6-blackhole-routes">
+<h3>IPv6 Blackhole-Routen</h3>
+<p>Blackhole-Routen werfen den Datenverkehr, der auf ein bestimmtes Subnetz gerichtet ist, stillschweigend weg. Im Gegensatz zu einer Ablehnungsroute, die dem Sender eine ICMPv6-Zielunreachable-Nachricht sendet, werfen Blackhole-Routen die Pakete ohne jegliche Antwort weg.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; blackhole
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-blackhole" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine Blackhole-Route für das angegebene Subnetz.</strong></p>
+<p>Das System wirft entsprechende Pakete stillschweigend weg, ohne eine ICMPv6-Antwort an den Quellort zu senden.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 blackhole
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; blackhole distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-blackhole-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie die administrative Distanz für die Blackhole-Route.</strong></p>
+<p>Routen mit einer niedrigeren administrativen Distanz haben Vorrang vor Routen mit einer höheren Distanz.</p>
+<p>Der zulässige Bereich beträgt 1 bis 255.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 blackhole distance 200
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols static route6 &lt;subnet&gt; blackhole tag &lt;tag&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-blackhole-tag-tag" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Konfigurieren Sie eine numerische Kennung für die Blackhole-Route.</strong></p>
+<p>Der zulässige Bereich beträgt 1 bis 4294967295.</p>
+</div>
+</div>
+<p>Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 blackhole tag 100
+</pre></div>
+</div>
+</section>
+</section>
+<section id="alternate-routing-tables">
+<h2>Alternativ Routing-Tabellen</h2>
+<p>Alternativ Routing-Tabellen werden verwendet, um sowohl Policy-Based Routing (PBR) als auch Virtual Routing and Forwarding (VRF) zu implementieren.</p>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

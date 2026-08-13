@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="Ge">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="pppoe-server">
+<h1>PPPoE Server</h1>
+<p>VyOS verwendet <a class="reference external" href="https://accel-ppp.org/">accel-ppp</a>, um PPPoE-Server-Funktionen bereitzuhalten. Es kann mit lokaler Authentifizierung oder einem angeschlossenen RADIUS-Server verwendet werden.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Bitte beachten Sie, aufgrund eines Upstream-Bugs, werden Konfigurationsänderungen/Commits den ppp-Dienst neu starten und bestehende PPPoE-Verbindungen von verbundenen Benutzern zurücksetzen, um wirksam zu werden.</p>
+</div>
+<section id="configuring-pppoe-server">
+<h2>Einrichtung des PPPoE-Servers</h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service pppoe-server access-concentrator PPPoE-Server
+set service pppoe-server authentication mode local
+set service pppoe-server authentication local-users username test password &#39;test&#39;
+set service pppoe-server client-ip-pool PPPOE-POOL range 192.168.255.2-192.168.255.254
+set service pppoe-server default-pool &#39;PPPOE-POOL&#39;
+set service pppoe-server gateway-address 192.168.255.1
+set service pppoe-server interface eth0
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server access-concentrator &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-access-concentrator-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um einen Namen für diesen PPPoE-Server-Zugangskonzentrator zu setzen.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication mode &lt;local | radius&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-mode-local-radius" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Legen Sie den Authentifizierungsbackend fest. Der konfigurierte Authentifizierungsbackend wird für alle Abfragen verwendet.</p>
+<ul class="simple">
+<li><p><strong>radius</strong>: Alle Authentifizierungsanfragen werden durch einen konfigurierten RADIUS-Server verarbeitet.</p></li>
+<li><p><strong>local</strong>: Alle Authentifizierungsanfragen werden lokal verarbeitet.</p></li>
+<li><p><strong>noauth</strong>: Authentifizierung deaktiviert.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication local-users username &lt;name&gt; password &lt;password&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-local-users-username-name-password-password" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Erstellen Sie einen <code class="docutils literal notranslate">&lt;Benutzer&gt;</code> für die lokale Authentifizierung auf diesem System. Das Passwort des Benutzers wird auf <code class="docutils literal notranslate">&lt;Passwort&gt;</code> gesetzt.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server client-ip-pool &lt;POOL-NAME&gt; range &lt;x.x.x.x-x.x.x.x | x.x.x.x/x&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-client-ip-pool-pool-name-range-x-x-x-x-x-x-x-x-x-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um das erste IP-Adressen-Pool-Element zu definieren, das an PPPoE-Clients vergeben wird. Wenn die Notation <code class="docutils literal notranslate">x.x.x.x-x.x.x.x</code> verwendet wird, muss es sich innerhalb eines /24-Subnetzes befinden. Wenn die Notation <code class="docutils literal notranslate">x.x.x.x/x</code> verwendet wird, besteht die Möglichkeit, Host/Netzmaske einzustellen.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server default-pool &lt;POOL-NAME&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-default-pool-pool-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um den Namen des Standard-IP-Pools zu definieren.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um die Schnittstelle zu definieren, die der PPPoE-Server verwenden wird, um nach PPPoE-Clients zu lauschen.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server gateway-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-gateway-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt eine einzelne <code class="docutils literal notranslate">&lt;GATEWAY&gt;</code> IP-Adresse an, die als lokale Adresse der PPP-Schnittstellen verwendet werden soll.</p>
+</div>
+</div>
+</section>
+<section id="configuring-radius-authentication">
+<h2>Einrichtung der RADIUS-Authentifizierung</h2>
+<p>Um RADIUS-basierte Authentifizierung zu aktivieren, muss der Authentifizierungsmodus innerhalb der Konfiguration geändert werden. Vorherige Einstellungen wie lokale Benutzer existieren weiterhin in der Konfiguration, jedoch werden sie nicht verwendet, wenn der Modus von lokal auf radius geändert wurde. Sobald er wieder auf lokal geändert wird, wird erneut alle lokalen Konten verwendet.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service pppoe-server authentication mode radius
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius server &lt;server&gt; key &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-server-server-key-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Konfigurieren Sie RADIUS <code class="docutils literal notranslate">&lt;server&gt;</code> und seinen erforderlichen gemeinsamen <code class="docutils literal notranslate">&lt;secret&gt;</code> für die Kommunikation mit dem RADIUS-Server.</p>
+</div>
+</div>
+<p>Da der RADIUS-Server ein einzelner Ausfallpunkt ist, können mehrere RADIUS-Server eingerichtet werden und werden anschließend verwendet.
+Zum Beispiel:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service pppoe-server authentication radius server 10.0.0.1 key &#39;foo&#39;
+set service pppoe-server authentication radius server 10.0.0.2 key &#39;foo&#39;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Einige RADIUS-Server verwenden eine Zugriffssteuerungsliste, die Anfragen erlaubt oder ablehnt, stellen Sie sicher, dass Ihr VyOS-Router zur erlaubten Clientliste hinzugefügt wird.</p>
+</div>
+<section id="radius-source-address">
+<h3>RADIUS-Quelladresse</h3>
+<p>Wenn Sie OSPF als IGP verwenden, wird immer die nächstgelegene Schnittstelle, die mit dem RADIUS-Server verbunden ist, verwendet. Mit VyOS 1.2 können Sie alle ausgehenden RADIUS-Anfragen an eine einzelne Quell-IP binden, z. B. die Loopback-Schnittstelle.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Quell-IPv4-Adresse, die in allen RADIUS-Server-Abfragen verwendet wird.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Die <code class="docutils literal notranslate">source-address</code> muss auf einer der VyOS-Schnittstellen konfiguriert sein. Best Practice wäre eine Loopback- oder Dummy-Schnittstelle.</p>
+</div>
+</section>
+<section id="radius-advanced-options">
+<h3>Erweiterte RADIUS-Optionen</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius server &lt;server&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-server-server-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Konfigurieren Sie RADIUS <code class="docutils literal notranslate">&lt;server&gt;</code> und seinen erforderlichen Port für Authentifizierungsanfragen.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius server &lt;server&gt; fail-time &lt;time&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-server-server-fail-time-time" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Markieren Sie den RADIUS-Server für diese gegebene <code class="docutils literal notranslate">&lt;time&gt;</code> Sekunden als offline.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius server &lt;server&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-server-server-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Temporär deaktivieren Sie diesen RADIUS-Server.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius acct-timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-acct-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Zeit, um auf Antwort für Interim-Update-Pakete zu warten. (Standard 3 Sekunden)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius dynamic-author server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-dynamic-author-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt die IP-Adresse für den Dynamic Authorization Extension Server (DM/CoA) an. Diese IP muss auf irgendeiner VyOS-Schnittstelle existieren oder es kann <code class="docutils literal notranslate">0.0.0.0</code> sein.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius dynamic-author port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-dynamic-author-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>UDP-Port für den Dynamic Authorization Extension Server (DM/CoA)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius dynamic-author key &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-dynamic-author-key-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Geheimnis für den Dynamic Authorization Extension Server (DM/CoA)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius max-try &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-max-try-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Maximale Anzahl Versuche, um Access-Request/Accounting-Request-Anfragen zu senden</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Zeit, um auf Antwort vom Server zu warten (Sekunden)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius nas-identifier &lt;identifier&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-nas-identifier-identifier" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Wert, der an den RADIUS-Server im NAS-Identifier-Attribut gesendet wird und in DM/CoA-Anfragen übereinstimmt.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius nas-ip-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-nas-ip-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Wert, der an den RADIUS-Server im NAS-IP-Address-Attribut gesendet wird und in DM/CoA-Anfragen übereinstimmt. Auch DM/CoA-Server bindet sich an diese Adresse.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Quell-IPv4-Adresse, die in allen RADIUS-Server-Abfragen verwendet wird.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius rate-limit attribute &lt;attribute&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-rate-limit-attribute-attribute" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Bestimmt, welches RADIUS-Server-Attribut die Rate-Limit-Information enthält. Das Standardattribut ist <code class="docutils literal notranslate">Filter-Id</code>.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Wenn Sie ein benutzerdefiniertes RADIUS-Attribut festlegen, müssen Sie es sowohl auf dem RADIUS-Server als auch auf dem Client definieren.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius rate-limit enable
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-rate-limit-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Aktiviert Bandbreitenbegrenzung über RADIUS.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius rate-limit vendor
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-rate-limit-vendor" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Bestimmt den Hersteller-Dictionary, das Dictionary muss in
+/usr/share/accel-ppp/radius sein.</p>
+</div>
+</div>
+<p>Empfangene RADIUS-Attribute haben eine höhere Priorität als Parameter, die innerhalb der CLI-Konfiguration definiert sind, siehe Erklärung unten.</p>
+</section>
+<section id="allocation-clients-ip-addresses-by-radius">
+<h3>Client-IP-Adressen durch RADIUS zuweisen</h3>
+<p>Wenn der RADIUS-Server das Attribut <code class="docutils literal notranslate">Framed-IP-Address</code> sendet, wird diese IP-Adresse dem Client zugewiesen und das Option <code class="docutils literal notranslate">default-pool</code> innerhalb der CLI-Konfiguration wird ignoriert.</p>
+<p>Wenn der RADIUS-Server das Attribut <code class="docutils literal notranslate">Framed-Pool</code> sendet, wird die IP-Adresse aus einem vordefinierten IP-Pool zugewiesen, dessen Name dem Attributwert entspricht.</p>
+<p>Wenn der RADIUS-Server das Attribut <code class="docutils literal notranslate">Stateful-IPv6-Address-Pool</code> sendet, wird die IPv6-Adresse aus einem vordefinierten IPv6-Pool <code class="docutils literal notranslate">prefix</code> zugewiesen, dessen Name dem Attributwert entspricht.</p>
+<p>Wenn der RADIUS-Server das Attribut <code class="docutils literal notranslate">Delegated-IPv6-Prefix-Pool</code> sendet, wird der IPv6-Delegations-Präfix aus einem vordefinierten IPv6-Pool <code class="docutils literal notranslate">delegate</code> zugewiesen, dessen Name dem Attributwert entspricht.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p><code class="docutils literal notranslate">Stateful-IPv6-Address-Pool</code> und <code class="docutils literal notranslate">Delegated-IPv6-Prefix-Pool</code> sind in RFC6911 definiert. Wenn sie in Ihrem RADIUS-Server nicht definiert sind, fügen Sie neue <a class="reference external" href="https://github.com/accel-ppp/accel-ppp/blob/master/accel-pppd/radius/dict/dictionary.rfc6911">dictionary</a> hinzu.</p>
+</div>
+<p>Der Benutzer-Interface kann über RADIUS Access-Accept-Paket in VRF-Kontext gesetzt werden oder über RADIUS CoA geändert werden. <code class="docutils literal notranslate">Accel-VRF-Name</code> wird für diese Zwecke verwendet. Es ist ein benutzerdefiniertes <a class="reference external" href="https://github.com/accel-ppp/accel-ppp/blob/master/accel-pppd/radius/dict/dictionary.accel">ACCEL-PPP-Attribut</a>. Definieren Sie es in Ihrem RADIUS-Server.</p>
+</section>
+<section id="renaming-clients-interfaces-by-radius">
+<h3>Client-Schnittstellen durch RADIUS umbenennen</h3>
+<p>Wenn der RADIUS-Server das Attribut <code class="docutils literal notranslate">NAS-Port-Id</code> verwendet, werden die PPP-Tunnel umbenannt.</p>
+<div class="admonition note">
+<p class="admonition-title">Hinweis</p>
+<p>Der Wert des Attributs <code class="docutils literal notranslate">NAS-Port-Id</code> muss weniger als 16 Zeichen sein, andernfalls wird die Schnittstelle nicht umbenannt.</p>
+</div>
+</section>
+</section>
+<section id="automatic-vlan-creation">
+<h2>Automatische VLAN-Erstellung</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server interface &lt;interface&gt; vlan &lt;id | range&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-interface-interface-vlan-id-range" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>VLANs können durch Accel-ppp auf der Stelle via Kernel-Modul namens <code class="docutils literal notranslate">vlan_mon</code> erstellt werden, das eingehende VLANs überwacht und bei Bedarf und Erlaubnis die notwendigen VLANs erstellt. VyOS unterstützt die Verwendung von entweder VLAN-ID's oder ganzen Bereichen, beide Werte können gleichzeitig für eine Schnittstelle definiert werden.</p>
+<p>Bei Konfiguration werden PPPoE die notwendigen VLANs erstellen, wenn benötigt. Sobald die Benutzersitzung abgelaufen ist und das VLAN nicht mehr benötigt wird, entfernt VyOS es erneut.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service pppoe-server interface eth3 vlan 100
+set service pppoe-server interface eth3 vlan 200
+set service pppoe-server interface eth3 vlan 500-1000
+set service pppoe-server interface eth3 vlan 2000-3000
+</pre></div>
+</div>
+</section>
+<section id="bandwidth-shaping">
+<h2>Bandbreitenbegrenzung</h2>
+<p>Bandbreiten-Ratenbegrenzungen können für lokale Benutzer oder RADIUS-basierte Attribute festgelegt werden.</p>
+<section id="for-local-users">
+<h3>Für lokale Benutzer</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication local-users username &lt;user&gt; rate-limit download &lt;bandwidth&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-local-users-username-user-rate-limit-download-bandwidth" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Download-Bandbreitenbegrenzung in kbit/s für <code class="docutils literal notranslate">&lt;Benutzer&gt;</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication local-users username &lt;user&gt; rate-limit upload &lt;bandwidth&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-local-users-username-user-rate-limit-upload-bandwidth" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Upload-Bandbreitenbegrenzung in kbit/s für <code class="docutils literal notranslate">&lt;Benutzer&gt;</code>.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service pppoe-server access-concentrator &#39;ACN&#39;
+set service pppoe-server authentication local-users username foo password &#39;bar&#39;
+set service pppoe-server authentication local-users username foo rate-limit download &#39;20480&#39;
+set service pppoe-server authentication local-users username foo rate-limit upload &#39;10240&#39;
+set service pppoe-server authentication mode &#39;local&#39;
+set service pppoe-server client-ip-pool IP-POOL range &#39;10.1.1.100/24&#39;
+set service pppoe-server default-pool &#39;IP-POOL&#39;
+set service pppoe-server name-server &#39;10.100.100.1&#39;
+set service pppoe-server name-server &#39;10.100.200.1&#39;
+set service pppoe-server interface &#39;eth1&#39;
+set service pppoe-server gateway-address &#39;10.1.1.2&#39;
+</pre></div>
+</div>
+<p>Wenn der Benutzer verbunden ist, verwendet die Benutzersitzung die festgelegten Grenzen und kann über <code class="docutils literal notranslate">show pppoe-server sessions</code> angezeigt werden.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>show pppoe-server sessions
+ifname | username |     ip     |    calling-sid    | rate-limit  | state  |  uptime  | rx-bytes | tx-bytes
+-------+----------+------------+-------------------+-------------+--------+----------+----------+----------
+ppp0   | foo      | 10.1.1.100 | 00:53:00:ba:db:15 | 20480/10240 | active | 00:00:11 | 214 B    | 76 B
+</pre></div>
+</div>
+</section>
+<section id="for-radius-users">
+<h3>Für RADIUS-Benutzer</h3>
+<p>Das aktuelle Attribut <code class="docutils literal notranslate">Filter-Id</code> wird als Standard verwendet und kann innerhalb von RADIUS konfiguriert werden:</p>
+<p>Filter-Id=2000/3000 (bedeutet 2000 Kbit Downstream-Rate und 3000 Kbit Upstream-Rate)</p>
+<p>Der folgende Befehl aktiviert es, vorausgesetzt, die RADIUS-Verbindung wurde eingerichtet und funktioniert.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication radius rate-limit enable
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-radius-rate-limit-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um Bandbreitenbegrenzung über RADIUS zu aktivieren.</p>
+</div>
+</div>
+<p>Weitere Attribute können verwendet werden, müssen aber in einem der Dictionaries in <em>/usr/share/accel-ppp/radius</em> sein.</p>
+</section>
+</section>
+<section id="load-balancing">
+<h2>Lastverteilung</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server pado-delay &lt;number-of-ms&gt; sessions &lt;number-of-sessions&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-pado-delay-number-of-ms-sessions-number-of-sessions" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um die Verzögerung von PADO (PPPoE Active Discovery Offer) Paketen zu aktivieren, die als Sitzungsbalancierungsmechanismus mit anderen PPPoE-Servern verwendet werden können.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service pppoe-server pado-delay 50 sessions &#39;500&#39;
+set service pppoe-server pado-delay 100 sessions &#39;1000&#39;
+set service pppoe-server pado-delay 300 sessions &#39;3000&#39;
+</pre></div>
+</div>
+<p>Im obigen Beispiel verbinden sich die ersten 499 Sitzungen ohne Verzögerung. PADO-Pakete werden für Verbindungen von 500 bis 999 um 50 ms verzögert, was es anderen PPPoE-Servern ermöglicht, PADO schneller zu senden und Clients werden zu anderen Servern verbinden. Der letzte Befehl besagt, dass dieser PPPoE-Server nur 3000 Clients bedienen kann.</p>
+</section>
+<section id="ipv6">
+<h2>IPv6</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server ppp-options ipv6 &lt;require | prefer | allow | deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-ppp-options-ipv6-require-prefer-allow-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt die Präferenz für die IPv6-Negotiation an.</p>
+<ul class="simple">
+<li><p><strong>require</strong> - IPv6-Negotiation erfordern</p></li>
+<li><p><strong>prefer</strong> - Client nach IPv6-Negotiation fragen, fehlschlagen, wenn er ablehnt</p></li>
+<li><p><strong>allow</strong> - IPv6 nur dann negotieren, wenn der Client darum bittet</p></li>
+<li><p><strong>deny</strong> - IPv6 nicht negozieren (Standardwert)</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server client-ipv6-pool &lt;IPv6-POOL-NAME&gt; prefix &lt;address&gt; mask &lt;number-of-bits&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-client-ipv6-pool-ipv6-pool-name-prefix-address-mask-number-of-bits" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um den IPv6-Adresspool zu setzen, aus dem ein PPPoE-Client eine IPv6-Präfix von Ihrer definierten Länge (Maske) erhält, um das PPPoE-Ende auf ihrer Seite zu beenden. Die Maske kann von 48 bis 128 Bit lang sein, der Standardwert ist 64.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server client-ipv6-pool &lt;IPv6-POOL-NAME&gt; delegate &lt;address&gt; delegation-prefix &lt;number-of-bits&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-client-ipv6-pool-ipv6-pool-name-delegate-address-delegation-prefix-number-of-bits" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um DHCPv6 Prefix Delegation (RFC3633) auf PPPoE zu konfigurieren. Sie müssen Ihren IPv6-Pool und die Länge des Delegation-Präfixes festlegen. Aus dem definierten IPv6-Pool geben Sie Netzwerke der definierten Länge (Delegation-Präfix) aus. Die Länge des Delegation-Präfixes kann von 32 bis 64 Bit lang sein.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server default-ipv6-pool &lt;IPv6-POOL-NAME&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-default-ipv6-pool-ipv6-pool-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um den Namen des Standard-IPv6-Adresspools zu definieren.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service pppoe-server ppp-options ipv6 allow
+set service pppoe-server client-ipv6-pool IPv6-POOL delegate &#39;2001:db8:8003::/48&#39; delegation-prefix &#39;56&#39;
+set service pppoe-server client-ipv6-pool IPv6-POOL prefix &#39;2001:db8:8002::/48&#39; mask &#39;64&#39;
+set service pppoe-server default-ipv6-pool IPv6-POOL
+</pre></div>
+</div>
+<section id="ipv6-advanced-options">
+<h3>Erweiterte IPv6-Optionen</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server ppp-options ipv6-accept-peer-interface-id
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-ppp-options-ipv6-accept-peer-interface-id" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Akzeptiert Peer-Interface-Identifier. Standardmäßig ist dies nicht definiert.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server ppp-options ipv6-interface-id &lt;random | x:x:x:x&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-ppp-options-ipv6-interface-id-random-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt einen festen oder zufälligen Interface-Identifier für IPv6 an. Standardmäßig ist es fest.</p>
+<ul class="simple">
+<li><p><strong>random</strong> - Zufälliger Interface-Identifier für IPv6</p></li>
+<li><p><strong>x:x:x:x</strong> - Geben Sie den Interface-Identifier für IPv6 an</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server ppp-options ipv6-interface-id &lt;random | x:x:x:x&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-ppp-options-ipv6-interface-id-random-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt den Peer-Interface-Identifier für IPv6 an. Standardmäßig ist es fest.</p>
+<ul class="simple">
+<li><p><strong>random</strong> - Zufälliger Interface-Identifier für IPv6</p></li>
+<li><p><strong>x:x:x:x</strong> - Geben Sie den Interface-Identifier für IPv6 an</p></li>
+<li><p><strong>ipv4-addr</strong> - Berechnen Sie den Interface-Identifier aus der IPv4-Adresse.</p></li>
+<li><p><strong>calling-sid</strong> - Berechnen Sie den Interface-Identifier aus dem calling-station-id.</p></li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="scripting">
+<h2>Skripte</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server extended-scripts on-change &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-extended-scripts-on-change-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Skript, das ausgeführt wird, wenn die Sitzungsschnittstelle durch RADIUS CoA geändert wird</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server extended-scripts on-down &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-extended-scripts-on-down-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Skript, das ausgeführt wird, wenn die Sitzungsschnittstelle beendet wird</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server extended-scripts on-pre-up &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-extended-scripts-on-pre-up-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Skript, das vor dem Hochfahren der Sitzungsschnittstelle ausgeführt wird</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server extended-scripts on-up &lt;path_to_script&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-extended-scripts-on-up-path-to-script" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Skript, das ausgeführt wird, wenn die Sitzungsschnittstelle vollständig konfiguriert und gestartet ist</p>
+</div>
+</div>
+</section>
+<section id="advanced-options">
+<h2>Erweiterte Optionen</h2>
+<section id="authentication-advanced-options">
+<h3>Erweiterte Authentifizierungs-Optionen</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication local-users username &lt;user&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-local-users-username-user-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Deaktivieren Sie <code class="docutils literal notranslate">&lt;Benutzer&gt;</code> Konto.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication local-users username &lt;user&gt; static-ip &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-local-users-username-user-static-ip-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Weisen Sie eine statische IP-Adresse dem <code class="docutils literal notranslate">&lt;Benutzer&gt;</code> Konto zu.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server authentication protocols &lt;pap | chap | mschap | mschap-v2&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-authentication-protocols-pap-chap-mschap-mschap-v2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Fordern Sie den Peers an, sich mit einem der folgenden Protokolle zu authentifizieren: pap, chap, mschap, mschap-v2.</p>
+</div>
+</div>
+</section>
+<section id="client-ip-pool-advanced-options">
+<h3>Erweiterte Client-IP-Pool-Optionen</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server client-ip-pool &lt;POOL-NAME&gt; next-pool &lt;NEXT-POOL-NAME&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-client-ip-pool-pool-name-next-pool-next-pool-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Verwenden Sie diesen Befehl, um den Namen des nächsten Adresspools zu definieren.</p>
+</div>
+</div>
+</section>
+<section id="ppp-advanced-options">
+<h3>Erweiterte PPP-Optionen</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server ppp-options disable-ccp
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-ppp-options-disable-ccp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Deaktivieren Sie das Compression Control Protocol (CCP).
+CCP ist standardmäßig aktiviert.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server ppp-options interface-cache &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-ppp-options-interface-cache-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt die Anzahl der Schnittstellen an, die im Cache gehalten werden. Das bedeutet, dass die Schnittstelle nachdem die entsprechende Sitzung zerstört wurde, nicht gelöscht wird, sondern in den Cache gelegt und später für neue Sitzungen wieder verwendet wird. Dies sollte die Rate der Erstellung/Löschung von Schnittstellen auf Kernel-Ebene reduzieren. Der Standardwert ist <strong>0</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server ppp-options ipv4 &lt;require | prefer | allow | deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-ppp-options-ipv4-require-prefer-allow-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt die Präferenz für die IPv4-Negotiation an.</p>
+<ul class="simple">
+<li><p><strong>require</strong> - IPv4-Negotiation erfordern</p></li>
+<li><p><strong>prefer</strong> - Client nach IPv4-Negotiation fragen, nicht fehlschlagen, wenn er ablehnt</p></li>
+<li><p><strong>allow</strong> - IPv4 nur dann negozieren, wenn der Client darum bittet (Standardwert)</p></li>
+<li><p><strong>deny</strong> - IPv4 nicht negozieren</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server ppp-options lcp-echo-failure &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-ppp-options-lcp-echo-failure-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Definiert die maximale Anzahl <code class="docutils literal notranslate">&lt;number&gt;</code> unbeantworteter Echo-Anfragen. Bei Erreichen des Werts <code class="docutils literal notranslate">&lt;number&gt;</code> wird die Sitzung zurückgesetzt. Der Standardwert ist <strong>3</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server ppp-options lcp-echo-interval &lt;interval&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-ppp-options-lcp-echo-interval-interval" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Wenn dieser Option spezifiziert und größer als 0 ist, sendet das PPP-Modul LCP-Pings der Echo-Anfrage alle <code class="docutils literal notranslate">&lt;interval&gt;</code> Sekunden.
+Der Standardwert ist <strong>30</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server ppp-options lcp-echo-timeout
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-ppp-options-lcp-echo-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt die Zeit in Sekunden an, um auf jegliche Peers-Aktivität zu warten. Wenn diese Option spezifiziert wird, wird adaptive lcp echo-Funktion aktiviert und „lcp-echo-failure“ wird nicht verwendet. Der Standardwert ist <strong>0</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server ppp-options min-mtu &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-ppp-options-min-mtu-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Definiert die minimale akzeptable MTU. Wenn der Client versucht, weniger als die angegebene MTU zu verhandeln, wird es NAKed oder getrennt, wenn es größere MTU ablehnt.
+Der Standardwert ist <strong>100</strong>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server ppp-options mppe &lt;require | prefer | deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-ppp-options-mppe-require-prefer-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt die <abbr title="Microsoft Point-to-Point Encryption">MPPE</abbr>-Negotiation-Präferenz an.</p>
+<ul class="simple">
+<li><p><strong>require</strong> - Client nach MPPE fragen, wenn er ablehnt, Verbindung trennen</p></li>
+<li><p><strong>prefer</strong> - Client nach MPPE fragen, wenn er ablehnt, nicht fehlschlagen. (Standardwert)</p></li>
+<li><p><strong>deny</strong> - MPPE ablehnen</p></li>
+</ul>
+<p>Standardverhalten - Client nicht nach MPPE fragen, aber erlauben, wenn der Client möchte.
+Bitte beachten Sie, dass RADIUS dieses Option möglicherweise durch das MS-MPPE-Encryption-Policy-Attribut überschreiben kann.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server ppp-options mru &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-ppp-options-mru-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Definiert die bevorzugte MRU. Standardmäßig ist dies nicht definiert.</p>
+</div>
+</div>
+</section>
+<section id="global-advanced-options">
+<h3>Erweiterte globale Optionen</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Setzen Sie eine Beschreibung.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server limits burst &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-limits-burst-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Burst-Zahl</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server limits connection-limit &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-limits-connection-limit-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Zulässige Verbindungsrate (z. B. 1/min, 60/sec)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server limits timeout &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-limits-timeout-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Timeout in Sekunden</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server mtu
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Maximum Transmission Unit (MTU) (Standard: <strong>1492</strong>)</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server max-concurrent-sessions
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-max-concurrent-sessions" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Maximale Anzahl gleichzeitiger Sitzungsstartversuche</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-name-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Der verbundene Client sollte <code class="docutils literal notranslate">&lt;address&gt;</code> als DNS-Server verwenden. Dieser Befehl akzeptiert sowohl IPv4- als auch IPv6-Adressen. Bis zu zwei Nameserver können für IPv4, bis zu drei für IPv6 konfiguriert werden.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server service-name &lt;names&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-service-name-names" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Gibt den Service-Name an, den man antworten soll. Wenn fehlend, ist jeder Service-Name akzeptabel und der Client’s Service-Name wird zurückgesendet. Es ist auch möglich, mehrere Service-Names zu setzen: <code class="docutils literal notranslate">sn1,sn2,sn3</code></p>
+</div>
+</div>
+<p>Standardmäßig wird die Benutzersitzung ersetzt, wenn eine zweite Authentifizierungsanfrage erfolgreich ist. Solche Sitzungsanfragen können entweder verweigert oder vollständig erlaubt werden, was es ermöglicht, in letzterem Fall mehrere Sitzungen für einen Benutzer zu haben. Wenn es verweigert wird, wird die zweite Sitzung abgelehnt, selbst wenn die Authentifizierung erfolgreich ist, der Benutzer muss seine erste Sitzung beenden und kann dann erneut authentifizieren.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server session-control
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-session-control" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<ul class="simple">
+<li><p><strong>disable</strong>: Deaktiviert die Sitzungssteuerung.</p></li>
+<li><p><strong>deny</strong>: Verweigert die zweite Sitzungsberechtigung.</p></li>
+<li><p><strong>replace</strong>: Beendet die erste Sitzung, wenn die zweite autorisiert wird <strong>(Standard)</strong></p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server shaper fwmark &lt;1-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-shaper-fwmark-1-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Match Firewall-Mark-Wert</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server snmp master-agent
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-snmp-master-agent" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>SNMP aktivieren</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set service pppoe-server wins-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-pppoe-server-wins-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Windows Internet Name Service (WINS)-Server, die an den Client weitergeleitet werden</p>
+</div>
+</div>
+</section>
+</section>
+<section id="monitoring">
+<h2>Überwachung</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show pppoe-server sessions
+<a class="cmdlink" href="#opcmd-show-pppoe-server-sessions" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Verwenden Sie diesen Befehl, um die aktiven Sitzungen im PPPoE-Server lokal zu prüfen.</p>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>show pppoe-server sessions
+ifname | username |     ip     |    calling-sid    | rate-limit  | state  |  uptime  | rx-bytes | tx-bytes
+-------+----------+------------+-------------------+-------------+--------+----------+----------+----------
+ppp0   | foo      | 10.1.1.100 | 00:53:00:ba:db:15 | 20480/10240 | active | 00:00:11 | 214 B    | 76 B
+</pre></div>
+</div>
+</section>
+<section id="examples">
+<h2>Beispiele</h2>
+<section id="ipv4">
+<h3>IPv4</h3>
+<p>Das folgende Beispiel verwendet ACN als Zugangs-Konzentrator-Name, weist eine Adresse aus dem Pool 10.1.1.100-111 zu, beendet am lokalen Endpunkt 10.1.1.1 und dient nur auf eth1.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service pppoe-server access-concentrator &#39;ACN&#39;
+set service pppoe-server authentication local-users username foo password &#39;bar&#39;
+set service pppoe-server authentication mode &#39;local&#39;
+set service pppoe-server client-ip-pool IP-POOL range &#39;10.1.1.100-10.1.1.111&#39;
+set service pppoe-server default-pool &#39;IP-POOL&#39;
+set service pppoe-server interface eth1
+set service pppoe-server gateway-address &#39;10.1.1.2&#39;
+set service pppoe-server name-server &#39;10.100.100.1&#39;
+set service pppoe-server name-server &#39;10.100.200.1&#39;
+</pre></div>
+</div>
+</section>
+<section id="dual-stack-ipv4-ipv6-provisioning-with-prefix-delegation">
+<h3>Dual-Stack IPv4/IPv6-Bereitstellung mit Präfixdelegation</h3>
+<p>Das folgende Beispiel deckt eine Dual-Stack-Konfiguration ab.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service pppoe-server authentication local-users username test password &#39;test&#39;
+set service pppoe-server authentication mode &#39;local&#39;
+set service pppoe-server client-ip-pool IP-POOL range &#39;192.168.0.1/24&#39;
+set service pppoe-server default-pool &#39;IP-POOL&#39;
+set service pppoe-server client-ipv6-pool IPv6-POOL delegate &#39;2001:db8:8003::/48&#39; delegation-prefix &#39;56&#39;
+set service pppoe-server client-ipv6-pool IPV6-POOL prefix &#39;2001:db8:8002::/48&#39; mask &#39;64&#39;
+set service pppoe-server default-ipv6-pool IPv6-POOL
+set service pppoe-server ppp-options ipv6 allow
+set service pppoe-server name-server &#39;10.1.1.1&#39;
+set service pppoe-server name-server &#39;2001:db8:4860::8888&#39;
+set service pppoe-server interface &#39;eth2&#39;
+set service pppoe-server gateway-address &#39;10.100.100.1&#39;
+</pre></div>
+</div>
+<p>Der Client erhält nach erfolgreicher Authentifizierung eine IPv4- und eine IPv6-/64-Adresse, um das PPPoE-Ende auf der Clientseite zu beenden, sowie ein /56-Subnetz für die interne Nutzung des Clients.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@pppoe-server:~$ sh pppoe-server sessions
+ ifname | username |     ip      |            ip6           |       ip6-dp        |    calling-sid    | rate-limit | state  |  uptime  | rx-bytes | tx-bytes
+--------+----------+-------------+--------------------------+---------------------+-------------------+------------+--------+----------+----------+----------
+ ppp0   | test     | 192.168.0.1 | 2001:db8:8002:0:200::/64 | 2001:db8:8003::1/56 | 00:53:00:12:42:eb |            | active | 00:00:49 | 875 B    | 2.1 KiB
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

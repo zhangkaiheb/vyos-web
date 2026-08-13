@@ -1,0 +1,1178 @@
+{
+  "zh-CN": {
+    "l2tpv3": {
+      "columns": {
+        "name": "接口名称",
+        "description": "描述",
+        "encapsulation": "封装类型",
+        "remote": "远端地址",
+        "tunnelId": "隧道ID",
+        "sessionId": "会话ID",
+        "mtu": "MTU",
+        "disable": "禁用",
+        "actions": "操作"
+      },
+      "options": {
+        "encapsulation": {
+          "udp": "UDP",
+          "ip": "IP"
+        },
+        "sourceValidation": {
+          "strict": "严格",
+          "loose": "宽松",
+          "disable": "禁用"
+        },
+        "acceptDad": {
+          "0": "禁用",
+          "1": "启用 (1)",
+          "2": "启用 (2)"
+        }
+      },
+      "schema": {
+        "basic": {
+          "name": "接口名称",
+          "namePlaceholder": "例如: l2tpeth0",
+          "nameHelp": "L2TPv3 接口名称",
+          "description": "描述",
+          "descriptionPlaceholder": "接口描述",
+          "address": "IP 地址",
+          "addressPlaceholder": "每行一个 IPv4/IPv6 地址",
+          "addressHelp": "接口 IP 地址 (支持多行)",
+          "encapsulation": "封装类型",
+          "encapsulationHelp": "L2TPv3 封装类型 (UDP 或 IP)",
+          "remote": "远端地址",
+          "remotePlaceholder": "远端 IPv4 地址",
+          "remoteHelp": "对端设备的 IPv4 地址",
+          "sourceAddress": "源地址",
+          "sourceAddressPlaceholder": "本地 IPv4 地址",
+          "sourceAddressHelp": "发起连接的本地 IPv4 地址",
+          "sourcePort": "源端口",
+          "sourcePortPlaceholder": "1-65535",
+          "sourcePortHelp": "UDP 源端口号",
+          "destinationPort": "目标端口",
+          "destinationPortPlaceholder": "1-65535",
+          "destinationPortHelp": "UDP 目标端口号",
+          "tunnelId": "隧道 ID",
+          "tunnelIdPlaceholder": "1-429496729",
+          "tunnelIdHelp": "本地隧道标识符",
+          "peerTunnelId": "对端隧道 ID",
+          "peerTunnelIdPlaceholder": "1-429496729",
+          "peerTunnelIdHelp": "远端隧道标识符",
+          "sessionId": "会话 ID",
+          "sessionIdPlaceholder": "1-429496729",
+          "sessionIdHelp": "本地会话标识符",
+          "peerSessionId": "对端会话 ID",
+          "peerSessionIdPlaceholder": "1-429496729",
+          "peerSessionIdHelp": "远端会话标识符",
+          "mtu": "MTU",
+          "mtuPlaceholder": "68-16000",
+          "mtuHelp": "最大传输单元",
+          "disable": "禁用接口",
+          "disableHelp": "管理性禁用此接口"
+        },
+        "ip": {
+          "adjustMss": "调整 MSS",
+          "adjustMssPlaceholder": "例如: 1000",
+          "adjustMssHelp": "调整 TCP 最大段大小",
+          "arpCacheTimeout": "ARP 缓存超时",
+          "arpCacheTimeoutPlaceholder": "1-86400",
+          "arpCacheTimeoutHelp": "ARP 缓存条目超时时间 (秒)",
+          "disableArpFilter": "禁用 ARP 过滤",
+          "disableArpFilterHelp": "禁用 ARP 请求过滤",
+          "disableForwarding": "禁用转发",
+          "disableForwardingHelp": "禁用 IP 数据包转发",
+          "enableArpAccept": "启用 ARP 接受",
+          "enableArpAcceptHelp": "启用非本地地址的 ARP 接受",
+          "enableArpAnnounce": "启用 ARP 通告",
+          "enableArpAnnounceHelp": "启用 ARP 通告模式",
+          "enableArpIgnore": "启用 ARP 忽略",
+          "enableArpIgnoreHelp": "启用 ARP 忽略模式",
+          "enableDirectedBroadcast": "启用定向广播",
+          "enableDirectedBroadcastHelp": "启用定向广播转发",
+          "enableProxyArp": "启用代理 ARP",
+          "enableProxyArpHelp": "启用代理 ARP 响应",
+          "proxyArpPvlan": "代理 ARP PVLAN",
+          "proxyArpPvlanHelp": "启用私有 VLAN 代理 ARP",
+          "sourceValidation": "源验证",
+          "sourceValidationPlaceholder": "选择验证模式",
+          "sourceValidationHelp": "IPv4 源地址验证模式"
+        },
+        "ipv6": {
+          "acceptDad": "接受 DAD",
+          "acceptDadHelp": "重复地址检测接受模式",
+          "autoconf": "自动配置",
+          "autoconfHelp": "启用 IPv6 自动配置",
+          "eui64": "EUI-64",
+          "eui64Placeholder": "EUI-64 标识符",
+          "eui64Help": "使用 EUI-64 生成接口标识符",
+          "interfaceIdentifier": "接口标识符",
+          "interfaceIdentifierPlaceholder": "IPv6 接口标识符",
+          "interfaceIdentifierHelp": "手动指定 IPv6 接口标识符",
+          "noDefaultLinkLocal": "禁用默认链路本地",
+          "noDefaultLinkLocalHelp": "不自动生成链路本地地址",
+          "adjustMss": "调整 MSS",
+          "adjustMssPlaceholder": "例如: 1000",
+          "adjustMssHelp": "调整 TCP 最大段大小",
+          "baseReachableTime": "基础可达时间",
+          "baseReachableTimePlaceholder": "1-86400",
+          "baseReachableTimeHelp": "邻居可达性基础时间 (秒)",
+          "disableForwarding": "禁用转发",
+          "disableForwardingHelp": "禁用 IPv6 数据包转发",
+          "dupAddrDetectTransmits": "重复地址检测传输数",
+          "dupAddrDetectTransmitsPlaceholder": "0-100",
+          "dupAddrDetectTransmitsHelp": "重复地址检测发送次数",
+          "sourceValidation": "源验证",
+          "sourceValidationPlaceholder": "选择验证模式",
+          "sourceValidationHelp": "IPv6 源地址验证模式"
+        },
+        "mirror": {
+          "egress": "出口镜像",
+          "placeholder": "选择接口",
+          "egressHelp": "镜像出口流量的接口",
+          "ingress": "入口镜像",
+          "ingressHelp": "镜像入口流量的接口"
+        },
+        "other": {
+          "vrf": "VRF",
+          "vrfPlaceholder": "VRF 实例名称",
+          "vrfHelp": "将此接口绑定到 VRF 实例"
+        }
+      },
+      "tabs": {
+        "basic": "基本设置",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "镜像",
+        "other": "其他",
+        "command": "命令预览"
+      },
+      "command": {
+        "noConfig": "# 未配置任何参数"
+      },
+      "error": {
+        "code": "错误码",
+        "message": "错误信息",
+        "nameRequired": "请输入接口名称",
+        "selectToDelete": "请先选择要删除的接口"
+      },
+      "modal": {
+        "edit": "编辑 L2TPv3 接口",
+        "create": "创建 L2TPv3 接口",
+        "confirmDelete": "确认删除",
+        "confirmDeleteMessage": "确认删除以下 L2TPv3 接口？"
+      },
+      "buttons": {
+        "cancel": "取消",
+        "confirm": "确定"
+      }
+    }
+  },
+  "en": {
+    "l2tpv3": {
+      "columns": {
+        "name": "Interface Name",
+        "description": "Description",
+        "encapsulation": "Encapsulation",
+        "remote": "Remote Address",
+        "tunnelId": "Tunnel ID",
+        "sessionId": "Session ID",
+        "mtu": "MTU",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "options": {
+        "encapsulation": {
+          "udp": "UDP",
+          "ip": "IP"
+        },
+        "sourceValidation": {
+          "strict": "Strict",
+          "loose": "Loose",
+          "disable": "Disable"
+        },
+        "acceptDad": {
+          "0": "Disable",
+          "1": "Enable (1)",
+          "2": "Enable (2)"
+        }
+      },
+      "schema": {
+        "basic": {
+          "name": "Interface Name",
+          "namePlaceholder": "e.g., l2tpeth0",
+          "nameHelp": "L2TPv3 interface name",
+          "description": "Description",
+          "descriptionPlaceholder": "Interface description",
+          "address": "IP Address",
+          "addressPlaceholder": "One IPv4/IPv6 address per line",
+          "addressHelp": "Interface IP addresses (multiline supported)",
+          "encapsulation": "Encapsulation",
+          "encapsulationHelp": "L2TPv3 encapsulation type (UDP or IP)",
+          "remote": "Remote Address",
+          "remotePlaceholder": "Remote IPv4 address",
+          "remoteHelp": "IPv4 address of the peer device",
+          "sourceAddress": "Source Address",
+          "sourceAddressPlaceholder": "Local IPv4 address",
+          "sourceAddressHelp": "Local IPv4 address for initiating connections",
+          "sourcePort": "Source Port",
+          "sourcePortPlaceholder": "1-65535",
+          "sourcePortHelp": "UDP source port number",
+          "destinationPort": "Destination Port",
+          "destinationPortPlaceholder": "1-65535",
+          "destinationPortHelp": "UDP destination port number",
+          "tunnelId": "Tunnel ID",
+          "tunnelIdPlaceholder": "1-429496729",
+          "tunnelIdHelp": "Local tunnel identifier",
+          "peerTunnelId": "Peer Tunnel ID",
+          "peerTunnelIdPlaceholder": "1-429496729",
+          "peerTunnelIdHelp": "Remote tunnel identifier",
+          "sessionId": "Session ID",
+          "sessionIdPlaceholder": "1-429496729",
+          "sessionIdHelp": "Local session identifier",
+          "peerSessionId": "Peer Session ID",
+          "peerSessionIdPlaceholder": "1-429496729",
+          "peerSessionIdHelp": "Remote session identifier",
+          "mtu": "MTU",
+          "mtuPlaceholder": "68-16000",
+          "mtuHelp": "Maximum transmission unit",
+          "disable": "Disable Interface",
+          "disableHelp": "Administratively disable this interface"
+        },
+        "ip": {
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., 1000",
+          "adjustMssHelp": "Adjust TCP maximum segment size",
+          "arpCacheTimeout": "ARP Cache Timeout",
+          "arpCacheTimeoutPlaceholder": "1-86400",
+          "arpCacheTimeoutHelp": "ARP cache entry timeout (seconds)",
+          "disableArpFilter": "Disable ARP Filter",
+          "disableArpFilterHelp": "Disable ARP request filtering",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IP packet forwarding",
+          "enableArpAccept": "Enable ARP Accept",
+          "enableArpAcceptHelp": "Enable ARP accept for non-local addresses",
+          "enableArpAnnounce": "Enable ARP Announce",
+          "enableArpAnnounceHelp": "Enable ARP announce mode",
+          "enableArpIgnore": "Enable ARP Ignore",
+          "enableArpIgnoreHelp": "Enable ARP ignore mode",
+          "enableDirectedBroadcast": "Enable Directed Broadcast",
+          "enableDirectedBroadcastHelp": "Enable directed broadcast forwarding",
+          "enableProxyArp": "Enable Proxy ARP",
+          "enableProxyArpHelp": "Enable proxy ARP responses",
+          "proxyArpPvlan": "Proxy ARP PVLAN",
+          "proxyArpPvlanHelp": "Enable private VLAN proxy ARP",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select validation mode",
+          "sourceValidationHelp": "IPv4 source address validation mode"
+        },
+        "ipv6": {
+          "acceptDad": "Accept DAD",
+          "acceptDadHelp": "Duplicate address detection accept mode",
+          "autoconf": "Autoconf",
+          "autoconfHelp": "Enable IPv6 autoconfiguration",
+          "eui64": "EUI-64",
+          "eui64Placeholder": "EUI-64 identifier",
+          "eui64Help": "Use EUI-64 to generate interface identifier",
+          "interfaceIdentifier": "Interface Identifier",
+          "interfaceIdentifierPlaceholder": "IPv6 interface identifier",
+          "interfaceIdentifierHelp": "Manually specify IPv6 interface identifier",
+          "noDefaultLinkLocal": "No Default Link-Local",
+          "noDefaultLinkLocalHelp": "Do not auto-generate link-local address",
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., 1000",
+          "adjustMssHelp": "Adjust TCP maximum segment size",
+          "baseReachableTime": "Base Reachable Time",
+          "baseReachableTimePlaceholder": "1-86400",
+          "baseReachableTimeHelp": "Neighbor reachability base time (seconds)",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IPv6 packet forwarding",
+          "dupAddrDetectTransmits": "Dup Addr Detect Transmits",
+          "dupAddrDetectTransmitsPlaceholder": "0-100",
+          "dupAddrDetectTransmitsHelp": "Duplicate address detection transmit count",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select validation mode",
+          "sourceValidationHelp": "IPv6 source address validation mode"
+        },
+        "mirror": {
+          "egress": "Egress Mirror",
+          "placeholder": "Select interface",
+          "egressHelp": "Interface to mirror egress traffic",
+          "ingress": "Ingress Mirror",
+          "ingressHelp": "Interface to mirror ingress traffic"
+        },
+        "other": {
+          "vrf": "VRF",
+          "vrfPlaceholder": "VRF instance name",
+          "vrfHelp": "Bind this interface to a VRF instance"
+        }
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "command": {
+        "noConfig": "# No parameters configured"
+      },
+      "error": {
+        "code": "Error Code",
+        "message": "Error Message",
+        "nameRequired": "Please enter interface name",
+        "selectToDelete": "Please select interfaces to delete first"
+      },
+      "modal": {
+        "edit": "Edit L2TPv3 Interface",
+        "create": "Create L2TPv3 Interface",
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteMessage": "Confirm delete the following L2TPv3 interfaces?"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      }
+    }
+  },
+  "zh-TW": {
+    "l2tpv3": {
+      "columns": {
+        "name": "Interface Name",
+        "description": "Description",
+        "encapsulation": "Encapsulation",
+        "remote": "Remote Address",
+        "tunnelId": "Tunnel ID",
+        "sessionId": "Session ID",
+        "mtu": "MTU",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "options": {
+        "encapsulation": {
+          "udp": "UDP",
+          "ip": "IP"
+        },
+        "sourceValidation": {
+          "strict": "Strict",
+          "loose": "Loose",
+          "disable": "Disable"
+        },
+        "acceptDad": {
+          "0": "Disable",
+          "1": "Enable (1)",
+          "2": "Enable (2)"
+        }
+      },
+      "schema": {
+        "basic": {
+          "name": "Interface Name",
+          "namePlaceholder": "e.g., l2tpeth0",
+          "nameHelp": "L2TPv3 interface name",
+          "description": "Description",
+          "descriptionPlaceholder": "Interface description",
+          "address": "IP Address",
+          "addressPlaceholder": "One IPv4/IPv6 address per line",
+          "addressHelp": "Interface IP addresses (multiline supported)",
+          "encapsulation": "Encapsulation",
+          "encapsulationHelp": "L2TPv3 encapsulation type (UDP or IP)",
+          "remote": "Remote Address",
+          "remotePlaceholder": "Remote IPv4 address",
+          "remoteHelp": "IPv4 address of the peer device",
+          "sourceAddress": "Source Address",
+          "sourceAddressPlaceholder": "Local IPv4 address",
+          "sourceAddressHelp": "Local IPv4 address for initiating connections",
+          "sourcePort": "Source Port",
+          "sourcePortPlaceholder": "1-65535",
+          "sourcePortHelp": "UDP source port number",
+          "destinationPort": "Destination Port",
+          "destinationPortPlaceholder": "1-65535",
+          "destinationPortHelp": "UDP destination port number",
+          "tunnelId": "Tunnel ID",
+          "tunnelIdPlaceholder": "1-429496729",
+          "tunnelIdHelp": "Local tunnel identifier",
+          "peerTunnelId": "Peer Tunnel ID",
+          "peerTunnelIdPlaceholder": "1-429496729",
+          "peerTunnelIdHelp": "Remote tunnel identifier",
+          "sessionId": "Session ID",
+          "sessionIdPlaceholder": "1-429496729",
+          "sessionIdHelp": "Local session identifier",
+          "peerSessionId": "Peer Session ID",
+          "peerSessionIdPlaceholder": "1-429496729",
+          "peerSessionIdHelp": "Remote session identifier",
+          "mtu": "MTU",
+          "mtuPlaceholder": "68-16000",
+          "mtuHelp": "Maximum transmission unit",
+          "disable": "Disable Interface",
+          "disableHelp": "Administratively disable this interface"
+        },
+        "ip": {
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., 1000",
+          "adjustMssHelp": "Adjust TCP maximum segment size",
+          "arpCacheTimeout": "ARP Cache Timeout",
+          "arpCacheTimeoutPlaceholder": "1-86400",
+          "arpCacheTimeoutHelp": "ARP cache entry timeout (seconds)",
+          "disableArpFilter": "Disable ARP Filter",
+          "disableArpFilterHelp": "Disable ARP request filtering",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IP packet forwarding",
+          "enableArpAccept": "Enable ARP Accept",
+          "enableArpAcceptHelp": "Enable ARP accept for non-local addresses",
+          "enableArpAnnounce": "Enable ARP Announce",
+          "enableArpAnnounceHelp": "Enable ARP announce mode",
+          "enableArpIgnore": "Enable ARP Ignore",
+          "enableArpIgnoreHelp": "Enable ARP ignore mode",
+          "enableDirectedBroadcast": "Enable Directed Broadcast",
+          "enableDirectedBroadcastHelp": "Enable directed broadcast forwarding",
+          "enableProxyArp": "Enable Proxy ARP",
+          "enableProxyArpHelp": "Enable proxy ARP responses",
+          "proxyArpPvlan": "Proxy ARP PVLAN",
+          "proxyArpPvlanHelp": "Enable private VLAN proxy ARP",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select validation mode",
+          "sourceValidationHelp": "IPv4 source address validation mode"
+        },
+        "ipv6": {
+          "acceptDad": "Accept DAD",
+          "acceptDadHelp": "Duplicate address detection accept mode",
+          "autoconf": "Autoconf",
+          "autoconfHelp": "Enable IPv6 autoconfiguration",
+          "eui64": "EUI-64",
+          "eui64Placeholder": "EUI-64 identifier",
+          "eui64Help": "Use EUI-64 to generate interface identifier",
+          "interfaceIdentifier": "Interface Identifier",
+          "interfaceIdentifierPlaceholder": "IPv6 interface identifier",
+          "interfaceIdentifierHelp": "Manually specify IPv6 interface identifier",
+          "noDefaultLinkLocal": "No Default Link-Local",
+          "noDefaultLinkLocalHelp": "Do not auto-generate link-local address",
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., 1000",
+          "adjustMssHelp": "Adjust TCP maximum segment size",
+          "baseReachableTime": "Base Reachable Time",
+          "baseReachableTimePlaceholder": "1-86400",
+          "baseReachableTimeHelp": "Neighbor reachability base time (seconds)",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IPv6 packet forwarding",
+          "dupAddrDetectTransmits": "Dup Addr Detect Transmits",
+          "dupAddrDetectTransmitsPlaceholder": "0-100",
+          "dupAddrDetectTransmitsHelp": "Duplicate address detection transmit count",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select validation mode",
+          "sourceValidationHelp": "IPv6 source address validation mode"
+        },
+        "mirror": {
+          "egress": "Egress Mirror",
+          "placeholder": "Select interface",
+          "egressHelp": "Interface to mirror egress traffic",
+          "ingress": "Ingress Mirror",
+          "ingressHelp": "Interface to mirror ingress traffic"
+        },
+        "other": {
+          "vrf": "VRF",
+          "vrfPlaceholder": "VRF instance name",
+          "vrfHelp": "Bind this interface to a VRF instance"
+        }
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "command": {
+        "noConfig": "# No parameters configured"
+      },
+      "error": {
+        "code": "Error Code",
+        "message": "Error Message",
+        "nameRequired": "Please enter interface name",
+        "selectToDelete": "Please select interfaces to delete first"
+      },
+      "modal": {
+        "edit": "Edit L2TPv3 Interface",
+        "create": "Create L2TPv3 Interface",
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteMessage": "Confirm delete the following L2TPv3 interfaces?"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      }
+    }
+  },
+  "ru": {
+    "l2tpv3": {
+      "columns": {
+        "name": "Interface Name",
+        "description": "Description",
+        "encapsulation": "Encapsulation",
+        "remote": "Remote Address",
+        "tunnelId": "Tunnel ID",
+        "sessionId": "Session ID",
+        "mtu": "MTU",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "options": {
+        "encapsulation": {
+          "udp": "UDP",
+          "ip": "IP"
+        },
+        "sourceValidation": {
+          "strict": "Strict",
+          "loose": "Loose",
+          "disable": "Disable"
+        },
+        "acceptDad": {
+          "0": "Disable",
+          "1": "Enable (1)",
+          "2": "Enable (2)"
+        }
+      },
+      "schema": {
+        "basic": {
+          "name": "Interface Name",
+          "namePlaceholder": "e.g., l2tpeth0",
+          "nameHelp": "L2TPv3 interface name",
+          "description": "Description",
+          "descriptionPlaceholder": "Interface description",
+          "address": "IP Address",
+          "addressPlaceholder": "One IPv4/IPv6 address per line",
+          "addressHelp": "Interface IP addresses (multiline supported)",
+          "encapsulation": "Encapsulation",
+          "encapsulationHelp": "L2TPv3 encapsulation type (UDP or IP)",
+          "remote": "Remote Address",
+          "remotePlaceholder": "Remote IPv4 address",
+          "remoteHelp": "IPv4 address of the peer device",
+          "sourceAddress": "Source Address",
+          "sourceAddressPlaceholder": "Local IPv4 address",
+          "sourceAddressHelp": "Local IPv4 address for initiating connections",
+          "sourcePort": "Source Port",
+          "sourcePortPlaceholder": "1-65535",
+          "sourcePortHelp": "UDP source port number",
+          "destinationPort": "Destination Port",
+          "destinationPortPlaceholder": "1-65535",
+          "destinationPortHelp": "UDP destination port number",
+          "tunnelId": "Tunnel ID",
+          "tunnelIdPlaceholder": "1-429496729",
+          "tunnelIdHelp": "Local tunnel identifier",
+          "peerTunnelId": "Peer Tunnel ID",
+          "peerTunnelIdPlaceholder": "1-429496729",
+          "peerTunnelIdHelp": "Remote tunnel identifier",
+          "sessionId": "Session ID",
+          "sessionIdPlaceholder": "1-429496729",
+          "sessionIdHelp": "Local session identifier",
+          "peerSessionId": "Peer Session ID",
+          "peerSessionIdPlaceholder": "1-429496729",
+          "peerSessionIdHelp": "Remote session identifier",
+          "mtu": "MTU",
+          "mtuPlaceholder": "68-16000",
+          "mtuHelp": "Maximum transmission unit",
+          "disable": "Disable Interface",
+          "disableHelp": "Administratively disable this interface"
+        },
+        "ip": {
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., 1000",
+          "adjustMssHelp": "Adjust TCP maximum segment size",
+          "arpCacheTimeout": "ARP Cache Timeout",
+          "arpCacheTimeoutPlaceholder": "1-86400",
+          "arpCacheTimeoutHelp": "ARP cache entry timeout (seconds)",
+          "disableArpFilter": "Disable ARP Filter",
+          "disableArpFilterHelp": "Disable ARP request filtering",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IP packet forwarding",
+          "enableArpAccept": "Enable ARP Accept",
+          "enableArpAcceptHelp": "Enable ARP accept for non-local addresses",
+          "enableArpAnnounce": "Enable ARP Announce",
+          "enableArpAnnounceHelp": "Enable ARP announce mode",
+          "enableArpIgnore": "Enable ARP Ignore",
+          "enableArpIgnoreHelp": "Enable ARP ignore mode",
+          "enableDirectedBroadcast": "Enable Directed Broadcast",
+          "enableDirectedBroadcastHelp": "Enable directed broadcast forwarding",
+          "enableProxyArp": "Enable Proxy ARP",
+          "enableProxyArpHelp": "Enable proxy ARP responses",
+          "proxyArpPvlan": "Proxy ARP PVLAN",
+          "proxyArpPvlanHelp": "Enable private VLAN proxy ARP",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select validation mode",
+          "sourceValidationHelp": "IPv4 source address validation mode"
+        },
+        "ipv6": {
+          "acceptDad": "Accept DAD",
+          "acceptDadHelp": "Duplicate address detection accept mode",
+          "autoconf": "Autoconf",
+          "autoconfHelp": "Enable IPv6 autoconfiguration",
+          "eui64": "EUI-64",
+          "eui64Placeholder": "EUI-64 identifier",
+          "eui64Help": "Use EUI-64 to generate interface identifier",
+          "interfaceIdentifier": "Interface Identifier",
+          "interfaceIdentifierPlaceholder": "IPv6 interface identifier",
+          "interfaceIdentifierHelp": "Manually specify IPv6 interface identifier",
+          "noDefaultLinkLocal": "No Default Link-Local",
+          "noDefaultLinkLocalHelp": "Do not auto-generate link-local address",
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., 1000",
+          "adjustMssHelp": "Adjust TCP maximum segment size",
+          "baseReachableTime": "Base Reachable Time",
+          "baseReachableTimePlaceholder": "1-86400",
+          "baseReachableTimeHelp": "Neighbor reachability base time (seconds)",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IPv6 packet forwarding",
+          "dupAddrDetectTransmits": "Dup Addr Detect Transmits",
+          "dupAddrDetectTransmitsPlaceholder": "0-100",
+          "dupAddrDetectTransmitsHelp": "Duplicate address detection transmit count",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select validation mode",
+          "sourceValidationHelp": "IPv6 source address validation mode"
+        },
+        "mirror": {
+          "egress": "Egress Mirror",
+          "placeholder": "Select interface",
+          "egressHelp": "Interface to mirror egress traffic",
+          "ingress": "Ingress Mirror",
+          "ingressHelp": "Interface to mirror ingress traffic"
+        },
+        "other": {
+          "vrf": "VRF",
+          "vrfPlaceholder": "VRF instance name",
+          "vrfHelp": "Bind this interface to a VRF instance"
+        }
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "command": {
+        "noConfig": "# No parameters configured"
+      },
+      "error": {
+        "code": "Error Code",
+        "message": "Error Message",
+        "nameRequired": "Please enter interface name",
+        "selectToDelete": "Please select interfaces to delete first"
+      },
+      "modal": {
+        "edit": "Edit L2TPv3 Interface",
+        "create": "Create L2TPv3 Interface",
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteMessage": "Confirm delete the following L2TPv3 interfaces?"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      }
+    }
+  },
+  "de": {
+    "l2tpv3": {
+      "columns": {
+        "name": "Interface Name",
+        "description": "Description",
+        "encapsulation": "Encapsulation",
+        "remote": "Remote Address",
+        "tunnelId": "Tunnel ID",
+        "sessionId": "Session ID",
+        "mtu": "MTU",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "options": {
+        "encapsulation": {
+          "udp": "UDP",
+          "ip": "IP"
+        },
+        "sourceValidation": {
+          "strict": "Strict",
+          "loose": "Loose",
+          "disable": "Disable"
+        },
+        "acceptDad": {
+          "0": "Disable",
+          "1": "Enable (1)",
+          "2": "Enable (2)"
+        }
+      },
+      "schema": {
+        "basic": {
+          "name": "Interface Name",
+          "namePlaceholder": "e.g., l2tpeth0",
+          "nameHelp": "L2TPv3 interface name",
+          "description": "Description",
+          "descriptionPlaceholder": "Interface description",
+          "address": "IP Address",
+          "addressPlaceholder": "One IPv4/IPv6 address per line",
+          "addressHelp": "Interface IP addresses (multiline supported)",
+          "encapsulation": "Encapsulation",
+          "encapsulationHelp": "L2TPv3 encapsulation type (UDP or IP)",
+          "remote": "Remote Address",
+          "remotePlaceholder": "Remote IPv4 address",
+          "remoteHelp": "IPv4 address of the peer device",
+          "sourceAddress": "Source Address",
+          "sourceAddressPlaceholder": "Local IPv4 address",
+          "sourceAddressHelp": "Local IPv4 address for initiating connections",
+          "sourcePort": "Source Port",
+          "sourcePortPlaceholder": "1-65535",
+          "sourcePortHelp": "UDP source port number",
+          "destinationPort": "Destination Port",
+          "destinationPortPlaceholder": "1-65535",
+          "destinationPortHelp": "UDP destination port number",
+          "tunnelId": "Tunnel ID",
+          "tunnelIdPlaceholder": "1-429496729",
+          "tunnelIdHelp": "Local tunnel identifier",
+          "peerTunnelId": "Peer Tunnel ID",
+          "peerTunnelIdPlaceholder": "1-429496729",
+          "peerTunnelIdHelp": "Remote tunnel identifier",
+          "sessionId": "Session ID",
+          "sessionIdPlaceholder": "1-429496729",
+          "sessionIdHelp": "Local session identifier",
+          "peerSessionId": "Peer Session ID",
+          "peerSessionIdPlaceholder": "1-429496729",
+          "peerSessionIdHelp": "Remote session identifier",
+          "mtu": "MTU",
+          "mtuPlaceholder": "68-16000",
+          "mtuHelp": "Maximum transmission unit",
+          "disable": "Disable Interface",
+          "disableHelp": "Administratively disable this interface"
+        },
+        "ip": {
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., 1000",
+          "adjustMssHelp": "Adjust TCP maximum segment size",
+          "arpCacheTimeout": "ARP Cache Timeout",
+          "arpCacheTimeoutPlaceholder": "1-86400",
+          "arpCacheTimeoutHelp": "ARP cache entry timeout (seconds)",
+          "disableArpFilter": "Disable ARP Filter",
+          "disableArpFilterHelp": "Disable ARP request filtering",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IP packet forwarding",
+          "enableArpAccept": "Enable ARP Accept",
+          "enableArpAcceptHelp": "Enable ARP accept for non-local addresses",
+          "enableArpAnnounce": "Enable ARP Announce",
+          "enableArpAnnounceHelp": "Enable ARP announce mode",
+          "enableArpIgnore": "Enable ARP Ignore",
+          "enableArpIgnoreHelp": "Enable ARP ignore mode",
+          "enableDirectedBroadcast": "Enable Directed Broadcast",
+          "enableDirectedBroadcastHelp": "Enable directed broadcast forwarding",
+          "enableProxyArp": "Enable Proxy ARP",
+          "enableProxyArpHelp": "Enable proxy ARP responses",
+          "proxyArpPvlan": "Proxy ARP PVLAN",
+          "proxyArpPvlanHelp": "Enable private VLAN proxy ARP",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select validation mode",
+          "sourceValidationHelp": "IPv4 source address validation mode"
+        },
+        "ipv6": {
+          "acceptDad": "Accept DAD",
+          "acceptDadHelp": "Duplicate address detection accept mode",
+          "autoconf": "Autoconf",
+          "autoconfHelp": "Enable IPv6 autoconfiguration",
+          "eui64": "EUI-64",
+          "eui64Placeholder": "EUI-64 identifier",
+          "eui64Help": "Use EUI-64 to generate interface identifier",
+          "interfaceIdentifier": "Interface Identifier",
+          "interfaceIdentifierPlaceholder": "IPv6 interface identifier",
+          "interfaceIdentifierHelp": "Manually specify IPv6 interface identifier",
+          "noDefaultLinkLocal": "No Default Link-Local",
+          "noDefaultLinkLocalHelp": "Do not auto-generate link-local address",
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., 1000",
+          "adjustMssHelp": "Adjust TCP maximum segment size",
+          "baseReachableTime": "Base Reachable Time",
+          "baseReachableTimePlaceholder": "1-86400",
+          "baseReachableTimeHelp": "Neighbor reachability base time (seconds)",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IPv6 packet forwarding",
+          "dupAddrDetectTransmits": "Dup Addr Detect Transmits",
+          "dupAddrDetectTransmitsPlaceholder": "0-100",
+          "dupAddrDetectTransmitsHelp": "Duplicate address detection transmit count",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select validation mode",
+          "sourceValidationHelp": "IPv6 source address validation mode"
+        },
+        "mirror": {
+          "egress": "Egress Mirror",
+          "placeholder": "Select interface",
+          "egressHelp": "Interface to mirror egress traffic",
+          "ingress": "Ingress Mirror",
+          "ingressHelp": "Interface to mirror ingress traffic"
+        },
+        "other": {
+          "vrf": "VRF",
+          "vrfPlaceholder": "VRF instance name",
+          "vrfHelp": "Bind this interface to a VRF instance"
+        }
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "command": {
+        "noConfig": "# No parameters configured"
+      },
+      "error": {
+        "code": "Error Code",
+        "message": "Error Message",
+        "nameRequired": "Please enter interface name",
+        "selectToDelete": "Please select interfaces to delete first"
+      },
+      "modal": {
+        "edit": "Edit L2TPv3 Interface",
+        "create": "Create L2TPv3 Interface",
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteMessage": "Confirm delete the following L2TPv3 interfaces?"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      }
+    }
+  },
+  "fr": {
+    "l2tpv3": {
+      "columns": {
+        "name": "Interface Name",
+        "description": "Description",
+        "encapsulation": "Encapsulation",
+        "remote": "Remote Address",
+        "tunnelId": "Tunnel ID",
+        "sessionId": "Session ID",
+        "mtu": "MTU",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "options": {
+        "encapsulation": {
+          "udp": "UDP",
+          "ip": "IP"
+        },
+        "sourceValidation": {
+          "strict": "Strict",
+          "loose": "Loose",
+          "disable": "Disable"
+        },
+        "acceptDad": {
+          "0": "Disable",
+          "1": "Enable (1)",
+          "2": "Enable (2)"
+        }
+      },
+      "schema": {
+        "basic": {
+          "name": "Interface Name",
+          "namePlaceholder": "e.g., l2tpeth0",
+          "nameHelp": "L2TPv3 interface name",
+          "description": "Description",
+          "descriptionPlaceholder": "Interface description",
+          "address": "IP Address",
+          "addressPlaceholder": "One IPv4/IPv6 address per line",
+          "addressHelp": "Interface IP addresses (multiline supported)",
+          "encapsulation": "Encapsulation",
+          "encapsulationHelp": "L2TPv3 encapsulation type (UDP or IP)",
+          "remote": "Remote Address",
+          "remotePlaceholder": "Remote IPv4 address",
+          "remoteHelp": "IPv4 address of the peer device",
+          "sourceAddress": "Source Address",
+          "sourceAddressPlaceholder": "Local IPv4 address",
+          "sourceAddressHelp": "Local IPv4 address for initiating connections",
+          "sourcePort": "Source Port",
+          "sourcePortPlaceholder": "1-65535",
+          "sourcePortHelp": "UDP source port number",
+          "destinationPort": "Destination Port",
+          "destinationPortPlaceholder": "1-65535",
+          "destinationPortHelp": "UDP destination port number",
+          "tunnelId": "Tunnel ID",
+          "tunnelIdPlaceholder": "1-429496729",
+          "tunnelIdHelp": "Local tunnel identifier",
+          "peerTunnelId": "Peer Tunnel ID",
+          "peerTunnelIdPlaceholder": "1-429496729",
+          "peerTunnelIdHelp": "Remote tunnel identifier",
+          "sessionId": "Session ID",
+          "sessionIdPlaceholder": "1-429496729",
+          "sessionIdHelp": "Local session identifier",
+          "peerSessionId": "Peer Session ID",
+          "peerSessionIdPlaceholder": "1-429496729",
+          "peerSessionIdHelp": "Remote session identifier",
+          "mtu": "MTU",
+          "mtuPlaceholder": "68-16000",
+          "mtuHelp": "Maximum transmission unit",
+          "disable": "Disable Interface",
+          "disableHelp": "Administratively disable this interface"
+        },
+        "ip": {
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., 1000",
+          "adjustMssHelp": "Adjust TCP maximum segment size",
+          "arpCacheTimeout": "ARP Cache Timeout",
+          "arpCacheTimeoutPlaceholder": "1-86400",
+          "arpCacheTimeoutHelp": "ARP cache entry timeout (seconds)",
+          "disableArpFilter": "Disable ARP Filter",
+          "disableArpFilterHelp": "Disable ARP request filtering",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IP packet forwarding",
+          "enableArpAccept": "Enable ARP Accept",
+          "enableArpAcceptHelp": "Enable ARP accept for non-local addresses",
+          "enableArpAnnounce": "Enable ARP Announce",
+          "enableArpAnnounceHelp": "Enable ARP announce mode",
+          "enableArpIgnore": "Enable ARP Ignore",
+          "enableArpIgnoreHelp": "Enable ARP ignore mode",
+          "enableDirectedBroadcast": "Enable Directed Broadcast",
+          "enableDirectedBroadcastHelp": "Enable directed broadcast forwarding",
+          "enableProxyArp": "Enable Proxy ARP",
+          "enableProxyArpHelp": "Enable proxy ARP responses",
+          "proxyArpPvlan": "Proxy ARP PVLAN",
+          "proxyArpPvlanHelp": "Enable private VLAN proxy ARP",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select validation mode",
+          "sourceValidationHelp": "IPv4 source address validation mode"
+        },
+        "ipv6": {
+          "acceptDad": "Accept DAD",
+          "acceptDadHelp": "Duplicate address detection accept mode",
+          "autoconf": "Autoconf",
+          "autoconfHelp": "Enable IPv6 autoconfiguration",
+          "eui64": "EUI-64",
+          "eui64Placeholder": "EUI-64 identifier",
+          "eui64Help": "Use EUI-64 to generate interface identifier",
+          "interfaceIdentifier": "Interface Identifier",
+          "interfaceIdentifierPlaceholder": "IPv6 interface identifier",
+          "interfaceIdentifierHelp": "Manually specify IPv6 interface identifier",
+          "noDefaultLinkLocal": "No Default Link-Local",
+          "noDefaultLinkLocalHelp": "Do not auto-generate link-local address",
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., 1000",
+          "adjustMssHelp": "Adjust TCP maximum segment size",
+          "baseReachableTime": "Base Reachable Time",
+          "baseReachableTimePlaceholder": "1-86400",
+          "baseReachableTimeHelp": "Neighbor reachability base time (seconds)",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IPv6 packet forwarding",
+          "dupAddrDetectTransmits": "Dup Addr Detect Transmits",
+          "dupAddrDetectTransmitsPlaceholder": "0-100",
+          "dupAddrDetectTransmitsHelp": "Duplicate address detection transmit count",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select validation mode",
+          "sourceValidationHelp": "IPv6 source address validation mode"
+        },
+        "mirror": {
+          "egress": "Egress Mirror",
+          "placeholder": "Select interface",
+          "egressHelp": "Interface to mirror egress traffic",
+          "ingress": "Ingress Mirror",
+          "ingressHelp": "Interface to mirror ingress traffic"
+        },
+        "other": {
+          "vrf": "VRF",
+          "vrfPlaceholder": "VRF instance name",
+          "vrfHelp": "Bind this interface to a VRF instance"
+        }
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "command": {
+        "noConfig": "# No parameters configured"
+      },
+      "error": {
+        "code": "Error Code",
+        "message": "Error Message",
+        "nameRequired": "Please enter interface name",
+        "selectToDelete": "Please select interfaces to delete first"
+      },
+      "modal": {
+        "edit": "Edit L2TPv3 Interface",
+        "create": "Create L2TPv3 Interface",
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteMessage": "Confirm delete the following L2TPv3 interfaces?"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      }
+    }
+  },
+  "ko": {
+    "l2tpv3": {
+      "columns": {
+        "name": "Interface Name",
+        "description": "Description",
+        "encapsulation": "Encapsulation",
+        "remote": "Remote Address",
+        "tunnelId": "Tunnel ID",
+        "sessionId": "Session ID",
+        "mtu": "MTU",
+        "disable": "Disable",
+        "actions": "Actions"
+      },
+      "options": {
+        "encapsulation": {
+          "udp": "UDP",
+          "ip": "IP"
+        },
+        "sourceValidation": {
+          "strict": "Strict",
+          "loose": "Loose",
+          "disable": "Disable"
+        },
+        "acceptDad": {
+          "0": "Disable",
+          "1": "Enable (1)",
+          "2": "Enable (2)"
+        }
+      },
+      "schema": {
+        "basic": {
+          "name": "Interface Name",
+          "namePlaceholder": "e.g., l2tpeth0",
+          "nameHelp": "L2TPv3 interface name",
+          "description": "Description",
+          "descriptionPlaceholder": "Interface description",
+          "address": "IP Address",
+          "addressPlaceholder": "One IPv4/IPv6 address per line",
+          "addressHelp": "Interface IP addresses (multiline supported)",
+          "encapsulation": "Encapsulation",
+          "encapsulationHelp": "L2TPv3 encapsulation type (UDP or IP)",
+          "remote": "Remote Address",
+          "remotePlaceholder": "Remote IPv4 address",
+          "remoteHelp": "IPv4 address of the peer device",
+          "sourceAddress": "Source Address",
+          "sourceAddressPlaceholder": "Local IPv4 address",
+          "sourceAddressHelp": "Local IPv4 address for initiating connections",
+          "sourcePort": "Source Port",
+          "sourcePortPlaceholder": "1-65535",
+          "sourcePortHelp": "UDP source port number",
+          "destinationPort": "Destination Port",
+          "destinationPortPlaceholder": "1-65535",
+          "destinationPortHelp": "UDP destination port number",
+          "tunnelId": "Tunnel ID",
+          "tunnelIdPlaceholder": "1-429496729",
+          "tunnelIdHelp": "Local tunnel identifier",
+          "peerTunnelId": "Peer Tunnel ID",
+          "peerTunnelIdPlaceholder": "1-429496729",
+          "peerTunnelIdHelp": "Remote tunnel identifier",
+          "sessionId": "Session ID",
+          "sessionIdPlaceholder": "1-429496729",
+          "sessionIdHelp": "Local session identifier",
+          "peerSessionId": "Peer Session ID",
+          "peerSessionIdPlaceholder": "1-429496729",
+          "peerSessionIdHelp": "Remote session identifier",
+          "mtu": "MTU",
+          "mtuPlaceholder": "68-16000",
+          "mtuHelp": "Maximum transmission unit",
+          "disable": "Disable Interface",
+          "disableHelp": "Administratively disable this interface"
+        },
+        "ip": {
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., 1000",
+          "adjustMssHelp": "Adjust TCP maximum segment size",
+          "arpCacheTimeout": "ARP Cache Timeout",
+          "arpCacheTimeoutPlaceholder": "1-86400",
+          "arpCacheTimeoutHelp": "ARP cache entry timeout (seconds)",
+          "disableArpFilter": "Disable ARP Filter",
+          "disableArpFilterHelp": "Disable ARP request filtering",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IP packet forwarding",
+          "enableArpAccept": "Enable ARP Accept",
+          "enableArpAcceptHelp": "Enable ARP accept for non-local addresses",
+          "enableArpAnnounce": "Enable ARP Announce",
+          "enableArpAnnounceHelp": "Enable ARP announce mode",
+          "enableArpIgnore": "Enable ARP Ignore",
+          "enableArpIgnoreHelp": "Enable ARP ignore mode",
+          "enableDirectedBroadcast": "Enable Directed Broadcast",
+          "enableDirectedBroadcastHelp": "Enable directed broadcast forwarding",
+          "enableProxyArp": "Enable Proxy ARP",
+          "enableProxyArpHelp": "Enable proxy ARP responses",
+          "proxyArpPvlan": "Proxy ARP PVLAN",
+          "proxyArpPvlanHelp": "Enable private VLAN proxy ARP",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select validation mode",
+          "sourceValidationHelp": "IPv4 source address validation mode"
+        },
+        "ipv6": {
+          "acceptDad": "Accept DAD",
+          "acceptDadHelp": "Duplicate address detection accept mode",
+          "autoconf": "Autoconf",
+          "autoconfHelp": "Enable IPv6 autoconfiguration",
+          "eui64": "EUI-64",
+          "eui64Placeholder": "EUI-64 identifier",
+          "eui64Help": "Use EUI-64 to generate interface identifier",
+          "interfaceIdentifier": "Interface Identifier",
+          "interfaceIdentifierPlaceholder": "IPv6 interface identifier",
+          "interfaceIdentifierHelp": "Manually specify IPv6 interface identifier",
+          "noDefaultLinkLocal": "No Default Link-Local",
+          "noDefaultLinkLocalHelp": "Do not auto-generate link-local address",
+          "adjustMss": "Adjust MSS",
+          "adjustMssPlaceholder": "e.g., 1000",
+          "adjustMssHelp": "Adjust TCP maximum segment size",
+          "baseReachableTime": "Base Reachable Time",
+          "baseReachableTimePlaceholder": "1-86400",
+          "baseReachableTimeHelp": "Neighbor reachability base time (seconds)",
+          "disableForwarding": "Disable Forwarding",
+          "disableForwardingHelp": "Disable IPv6 packet forwarding",
+          "dupAddrDetectTransmits": "Dup Addr Detect Transmits",
+          "dupAddrDetectTransmitsPlaceholder": "0-100",
+          "dupAddrDetectTransmitsHelp": "Duplicate address detection transmit count",
+          "sourceValidation": "Source Validation",
+          "sourceValidationPlaceholder": "Select validation mode",
+          "sourceValidationHelp": "IPv6 source address validation mode"
+        },
+        "mirror": {
+          "egress": "Egress Mirror",
+          "placeholder": "Select interface",
+          "egressHelp": "Interface to mirror egress traffic",
+          "ingress": "Ingress Mirror",
+          "ingressHelp": "Interface to mirror ingress traffic"
+        },
+        "other": {
+          "vrf": "VRF",
+          "vrfPlaceholder": "VRF instance name",
+          "vrfHelp": "Bind this interface to a VRF instance"
+        }
+      },
+      "tabs": {
+        "basic": "Basic",
+        "ip": "IPv4",
+        "ipv6": "IPv6",
+        "mirror": "Mirror",
+        "other": "Other",
+        "command": "Command Preview"
+      },
+      "command": {
+        "noConfig": "# No parameters configured"
+      },
+      "error": {
+        "code": "Error Code",
+        "message": "Error Message",
+        "nameRequired": "Please enter interface name",
+        "selectToDelete": "Please select interfaces to delete first"
+      },
+      "modal": {
+        "edit": "Edit L2TPv3 Interface",
+        "create": "Create L2TPv3 Interface",
+        "confirmDelete": "Confirm Delete",
+        "confirmDeleteMessage": "Confirm delete the following L2TPv3 interfaces?"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      }
+    }
+  }
+}

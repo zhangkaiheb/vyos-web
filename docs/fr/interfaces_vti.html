@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="vti-virtual-tunnel-interface">
+<h1>VTI (interface virtuelle de tunnel)</h1>
+<p><abbr title="interfaces de tunnel virtuelles">VTIs</abbr> vous permettent de créer des tunnels sécurisés et chiffrés entre des réseaux privés ou des hôtes via une infrastructure publique, telle qu'Internet. Elles fonctionnent en parallèle avec un tunnel IPsec sous-jacent, qui gère l'encapsulation et le chiffrement, tandis que les VTIs agissent exclusivement comme interfaces de routage.</p>
+<section id="configuration">
+<h2>Configuration</h2>
+<section id="common-interface-configuration">
+<h3>Configuration commune de l'interface</h3>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez une ou plusieurs adresses IP d'interface.</strong></p>
+<p><code class="docutils literal notranslate">&lt;address&gt;</code> prend en charge IPv4 et IPv6 en notation CIDR. Par exemple, utilisez
+<code class="docutils literal notranslate">192.0.2.1/24</code> pour IPv4 ou <code class="docutils literal notranslate">2001:db8::1/64</code> pour IPv6.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 address 192.0.2.1/24
+set interfaces vti vti0 address 2001:db8::1/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un alias clair et descriptif pour l'interface.</strong></p>
+<p>Cet alias apparaît dans la commande <code class="docutils literal notranslate">show interfaces</code> et les outils de surveillance basés sur SNMP.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 description &#39;This is an interface running on VyOS.&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez l'interface.</strong></p>
+<p>L'interface sera définie à l'état administrativement arrêté (<code class="docutils literal notranslate">A/D</code>).</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 disable
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la taille maximale de segment (MSS) annoncée dans les paquets TCP SYN sortants sur l'interface spécifiée.</strong></p>
+<p>En limitant la valeur MSS dans les paquets TCP SYN, vous informez explicitement l'autre extrémité qu'elle ne doit pas envoyer des paquets plus grands que cette taille. Cela évite les problèmes de connexion qui surviennent lorsque la découverte du MTU du chemin (PMTUD) échoue.</p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>mss :</strong> Définit la MSS à une valeur spécifique, en octets. Utilisez cette option si vous avez besoin d'imposer une MSS spécifique, par exemple pour résoudre des problèmes de connectivité ou satisfaire des exigences réseau spécifiques.</p></li>
+<li><p><strong>clamp-mss-to-pmtu :</strong> Le routeur calcule automatiquement la MSS à être la MTU de l'interface moins 40 octets pour le trafic IPv4 (20 octets pour l'en-tête IPv4 et 20 octets pour l'en-tête TCP). Cette option est recommandée pour définir automatiquement la bonne valeur.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-arp-cache-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez pendant combien de temps un enregistrement ARP reste valide après avoir appris une correspondance IP-MAC sur cette interface.</strong></p>
+<p>La durée par défaut est de 30 secondes.</p>
+<p>Un enregistrement ARP reste valide s'il reçoit un feedback positif des protocoles de niveau supérieur.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-disable-arp-filter" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le filtrage ARP sur cette interface.</strong></p>
+<p><strong>Comportement par défaut :</strong> Le noyau répond aux demandes ARP sur cette interface uniquement si le trafic serait routé de retour à l'expéditeur ARP via cette interface spécifique.</p>
+<p><strong>Si configuré :</strong> Le noyau répond aux demandes ARP sur cette interface pour toute adresse IP configurée sur l'hôte local, indépendamment de l'interface spécifique à laquelle cette adresse IP est assignée, et indépendamment de la table de routage. Cela reflète le concept Linux selon lequel les adresses IP appartiennent à l'hôte, et non à des interfaces individuelles.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip disable-arp-filter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le comportement de l'interface en tant qu'hôte ou routeur.</strong></p>
+<p>Si configuré, l'interface passe en mode hôte, et le transfert IPv4 est désactivé sur celle-ci.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez si les paquets broadcast directs IP reçus sur cette interface doivent être transmis.</strong></p>
+<p><strong>Comportement par défaut :</strong> Les paquets broadcast directs IP sont supprimés.</p>
+<p><strong>Si configuré :</strong> Les paquets broadcast directs IP sont transmis à tous les hôtes du sous-réseau de destination, conformément à <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> et <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-enable-arp-accept" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez comment traiter les ARPs gratuit sur cette interface.</strong></p>
+<p>Si configuré, une correspondance IP-MAC est ajoutée au tableau ARP en fonction des demandes ou réponses ARP gratuit.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Si le tableau ARP contient déjà l'adresse IP provenant d'un ARP gratuit, son entrée est mise à jour, indépendamment de la configuration de ce paramètre.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-enable-arp-announce" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la sélection de l'adresse IP source pour les demandes ARP sur cette interface.</strong></p>
+<p><strong>Comportement par défaut :</strong> Le noyau peut utiliser n'importe quelle adresse IP possédée par l'hôte comme adresse IP source dans les demandes ARP sur cette interface.</p>
+<p><strong>Si configuré :</strong> Le noyau essaie d'abord de sélectionner une adresse IP source configurée sur l'interface partageant un sous-réseau commun avec l'adresse IP cible. Si aucun tel sous-réseau n'existe, le noyau sélectionne l'adresse IP qu'il utiliserait normalement (basée sur la table de routage pour atteindre la destination cible).</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-enable-arp-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez quels types de demandes ARP seront ignorées sur cette interface.</strong></p>
+<p><strong>Comportement par défaut :</strong> Le noyau répond aux demandes ARP pour toutes les adresses IP locales, indépendamment de l'interface à laquelle elles sont assignées.</p>
+<p><strong>Si configuré :</strong> Le noyau répond aux demandes ARP uniquement si l'adresse IP cible est assignée à cette interface spécifique.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-enable-proxy-arp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le proxy ARP sur cette interface.</strong></p>
+<p>Si configuré, le routeur (noyau) intercepte les demandes ARP pour des adresses IP non locales et répond avec l'adresse MAC de l'interface qui a reçu la demande. Les paquets suivants destinés à ces adresses IP sont ensuite transmis vers leurs destinations réelles sur des sous-réseaux distants.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip enable-proxy-arp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-proxy-arp-pvlan" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le proxy ARP local sur l'interface.</strong></p>
+<p>Si configuré, le routeur (noyau) répond aux demandes ARP sur cette interface VLAN même si l'adresse IP cible se trouve sur le même sous-réseau et interface.</p>
+<p>Cela est utilisé pour soutenir les exigences d'isolation réseau (RFC 3069) pour les VLAN privés (PVLANs). Dans les configurations PVLAN, les hôtes sur des ports isolés ne sont PAS autorisés à communiquer directement entre eux au niveau 2, mais ils peuvent communiquer avec le routeur supérieur.</p>
+<p>En répondant aux demandes ARP inter-hôtes avec sa propre adresse MAC, le routeur (noyau) dirige le trafic inter-hôtes à travers lui-même plutôt que directement entre les hôtes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette commande fonctionne indépendamment et n'a pas besoin d'activer le proxy ARP standard sur l'interface.</p>
+</div>
+<p>Le proxy ARP local est également connu sous les noms suivants :</p>
+<ul class="simple">
+<li><p>Aggrégation de VLAN (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>VLAN privé (Cisco, Allied Telesyn).</p></li>
+<li><p>Filtrage de port source ou isolation de port (Hewlett-Packard).</p></li>
+<li><p>Transfert forcé MAC (Ericsson).</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la validation de l'adresse IP source à l'aide de</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>sur cette interface, comme spécifié dans</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>strict :</strong> Chaque paquet entrant est vérifié pour son adresse IP source contre la base de données de routage (FIB). Si l'interface n'est pas le meilleur chemin de retour vers cette source, la validation échoue et le paquet est supprimé.</p></li>
+<li><p><strong>loose :</strong> Chaque paquet entrant est vérifié pour son adresse IP source contre la base de données de routage (FIB). Si l'adresse IP source est inatteignable via n'importe quelle interface, la validation échoue.</p></li>
+<li><p><strong>disable :</strong> Aucune validation d'adresse IP source n'est effectuée. Tous les paquets entrants sont acceptés.</p></li>
+</ul>
+<p>Le RFC 3704 recommande d'activer le mode strict pour empêcher le spoofing d'IP, comme les attaques DDoS. Pour les scénarios de routage asymétrique ou autres scénarios complexes, utilisez le mode loose.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour obtenir automatiquement une adresse IPv6 à l'aide de</strong> <abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>comme spécifié dans</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<p>Les hôtes IPv6 peuvent se configurer automatiquement lorsqu'ils sont connectés à un réseau IPv6 à l'aide du protocole de découverte des voisins via les messages ICMPv6 de découverte de routeur. Lorsqu'ils se connectent pour la première fois à un réseau, un hôte envoie une requête multicast de sollicitation de routeur link-local pour ses paramètres de configuration. Le routeur répond avec un paquet d'annonce de routeur contenant les paramètres de configuration du niveau Internet.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette méthode désactive automatiquement le transfert de trafic IPv6 sur l'interface.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ipv6 address autoconf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-address-eui64-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour lui attribuer une adresse IPv6 à l'aide de la méthode</strong> <abbr title="64-Bit Extended Unique Identifier">EUI-64</abbr> <strong>, comme spécifié</strong> dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ipv6 address eui64 2001:db8:beef::/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ipv6 address no-default-link-local
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-address-no-default-link-local" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez l'attribution automatique d'une adresse IPv6 link-local à cette interface.</strong></p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ipv6 address no-default-link-local
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le comportement de l'interface en tant qu'hôte ou routeur.</strong></p>
+<p>Si configuré, l'interface passe en mode hôte, et le transfert IPv6 est désactivé sur celle-ci.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ipv6 disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ipv6 adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la taille maximale de segment (MSS) annoncée dans les paquets TCP SYN sortants sur l'interface spécifiée.</strong></p>
+<p>En limitant la valeur MSS dans les paquets TCP SYN, vous informez explicitement l'autre extrémité qu'elle ne doit pas envoyer des paquets plus grands que cette taille. Cela évite les problèmes de connexion lorsque la découverte du MTU du chemin (PMTUD) échoue.</p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>mss :</strong> Définissez la MSS à une valeur spécifique, en octets. Utilisez cette option pour imposer une MSS spécifique, par exemple pour résoudre des problèmes de connectivité ou satisfaire des exigences réseau spécifiques.</p></li>
+<li><p><strong>clamp-mss-to-pmtu :</strong> Le routeur calcule la MSS à être la MTU de l'interface moins 60 octets pour le trafic IPv6 (40 octets pour l'en-tête IPv6 et 20 octets pour l'en-tête TCP). Cette option est recommandée pour définir automatiquement la bonne valeur.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ipv6 accept-dad &lt;0 | 1 | 2&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-accept-dad-0-1-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le</strong> <abbr title="Duplicate Address Detection">DAD</abbr> <strong>IPv6 sur l'interface.</strong></p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>0 :</strong> Désactive le DAD. Aucune détection d'adresse dupliquée n'est effectuée.</p></li>
+<li><p><strong>1 :</strong> Active le DAD (par défaut). Les adresses dupliquées sont détectées. L'opération IPv6 de l'interface continue pour les adresses IPv6 valides.</p></li>
+<li><p><strong>2 :</strong> Active le DAD et, si une adresse link-local dupliquée basée sur le MAC est trouvée, désactive l'opération IPv6 sur cette interface.</p></li>
+</ul>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ipv6 accept-dad 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; ipv6 dup-addr-detect-transmits &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-dup-addr-detect-transmits-n" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le nombre de messages</strong> <abbr title="Duplicate Address Detection">DAD</abbr> <strong>que le routeur (noyau) envoie pendant l'attribution d'adresse IPv6 sur cette interface.</strong></p>
+<p>La valeur par défaut est 1.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ipv6 dup-addr-detect-transmits 5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le MTU sur l'interface.</strong></p>
+<p>Cette valeur définit la taille maximale de paquet, en octets, que l'interface transmet sans fragmentation.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 mtu 1600
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; mirror egress &lt;monitor-interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-mirror-egress-monitor-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez le miroir du trafic sortant depuis l'interface VTI spécifiée vers l'interface de surveillance désignée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; mirror ingress &lt;monitor-interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-mirror-ingress-monitor-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez le miroir du trafic entrant depuis l'interface VTI spécifiée vers l'interface de surveillance désignée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; redirect &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-redirect-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Activez le redimensionnement des paquets entrants vers l'interface spécifiée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces vti &lt;interface&gt; vrf &lt;vrf&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-vrf-vrf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Affectez l'interface à une instance spécifique de</strong> <abbr title="Virtual Routing and Forwarding">VRF</abbr> <strong>.</strong></p>
+<div class="admonition seealso">
+<p class="admonition-title">Voir aussi</p>
+<p>Pour plus d'informations sur la configuration d'un VRF, consultez la section <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 vrf red
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="operation">
+<h2>Opération</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show interfaces vti &lt;vtiX&gt;
+<a class="cmdlink" href="#opcmd-show-interfaces-vti-vtix" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Affichez l'état opérationnel et les statistiques de trafic pour le VTI spécifié.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show interfaces vti &lt;vtiX&gt; brief
+<a class="cmdlink" href="#opcmd-show-interfaces-vti-vtix-brief" title="Permalink to this Command"></a></div><div class="opcmd-body">
+<p>Affichez un résumé de l'état opérationnel pour le VTI spécifié.</p>
+</div>
+</div>
+</section>
+<section id="example">
+<h2>Exemple</h2>
+<p><strong>Configurer un VTI</strong></p>
+<p>Affectez des adresses IPv4 et IPv6 au VTI, ainsi qu'une brève description :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 address 192.168.2.249/30
+set interfaces vti vti0 address 2001:db8:2::249/64
+set interfaces vti vti0 description &quot;Description&quot;
+</pre></div>
+</div>
+<p>Résultat de la configuration :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# show interfaces vti
+vti vti0 {
+    address 192.168.2.249/30
+    address 2001:db8:2::249/64
+    description &quot;Description&quot;
+}
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Lors de la configuration d'un IPsec site-to-site avec des VTIs, assurez-vous que l'installation automatique de route est désactivée.</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn ipsec options disable-route-autoinstall
+</pre></div>
+</div>
+<p>Pour plus d'informations sur le problème IPsec et VTI, ainsi que sur l'option <code class="docutils literal notranslate">disable-route-autoinstall</code>, voir :
+<a class="reference external" href="https://blog.vyos.io/vyos-1-dot-2-0-development-news-in-july.">https://blog.vyos.io/vyos-1-dot-2-0-development-news-in-july.</a></p>
+<p>La cause principale du problème est que les tunnels VTI nécessitent que leurs sélecteurs de trafic soient définis sur <code class="docutils literal notranslate">0.0.0.0/0</code> pour que le trafic corresponde au tunnel, même si les décisions de routage sont basées sur les marques netfilter. À moins que l'insertion de route ne soit explicitement désactivée, strongSWAN insère incorrectement une route par défaut via l'adresse du pair VTI, entraînant un routage erroné de tout le trafic.</p>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

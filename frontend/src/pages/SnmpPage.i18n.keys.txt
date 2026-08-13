@@ -1,0 +1,188 @@
+SNMP Page i18n Translation Keys
+================================
+
+File: /opt/vyos-web-config/frontend/src/pages/SnmpPage.js
+
+Import: import { useI18n } from '/src/i18n/index.js';
+Setup: const { t } = useI18n();
+
+Options (Factory Functions):
+- snmp.options.udpDefault
+- snmp.options.readOnlyDefault
+- snmp.options.authDefault
+- snmp.options.md5Default
+- snmp.options.desDefault
+
+Validation Messages:
+- snmp.validation.nameRequired
+- snmp.validation.nameInvalidChars
+- snmp.validation.ipv4Format
+- snmp.validation.ipv6Format
+- snmp.validation.ipFormat
+- snmp.validation.ipPrefixFormat
+- snmp.validation.prefixMustBeNumber
+- snmp.validation.ipv4PrefixRange
+- snmp.validation.ipv6PrefixRange
+- snmp.validation.engineIdHex
+- snmp.validation.engineIdLength
+- snmp.validation.oidFormat
+
+Error Messages:
+- snmp.errors.listenAddress
+- snmp.errors.trapSource
+- snmp.errors.trapTargetRequired
+- snmp.errors.trapTarget
+- snmp.errors.portRange
+- snmp.errors.communityNameRequired
+- snmp.errors.community
+- snmp.errors.client
+- snmp.errors.network
+- snmp.errors.scriptExtNameRequired
+- snmp.errors.scriptExt
+- snmp.errors.scriptPathRequired
+- snmp.errors.v3GroupNameRequired
+- snmp.errors.v3Group
+- snmp.errors.v3TrapTargetRequired
+- snmp.errors.v3TrapTarget
+- snmp.errors.v3UserNameRequired
+- snmp.errors.v3User
+- snmp.errors.v3UserGroupRequired
+- snmp.errors.v3ViewNameRequired
+- snmp.errors.v3View
+- snmp.errors.selectCommunityToEdit
+- snmp.errors.communityNotFound
+- snmp.errors.selectCommunityToDelete
+- snmp.errors.communityNameExists
+- snmp.errors.selectTrapTargetToEdit
+- snmp.errors.trapTargetNotFound
+- snmp.errors.selectTrapTargetToDelete
+- snmp.errors.trapTargetAddressRequired
+- snmp.errors.trapTargetExists
+- snmp.errors.selectScriptExtToEdit
+- snmp.errors.scriptExtNotFound
+- snmp.errors.selectScriptExtToDelete
+- snmp.errors.extensionNameRequired
+- snmp.errors.extensionNameExists
+- snmp.errors.selectV3GroupToEdit
+- snmp.errors.v3GroupNotFound
+- snmp.errors.selectV3GroupToDelete
+- snmp.errors.v3GroupExists
+- snmp.errors.selectV3UserToEdit
+- snmp.errors.v3UserNotFound
+- snmp.errors.selectV3UserToDelete
+- snmp.errors.v3UserExists
+- snmp.errors.selectV3ViewToEdit
+- snmp.errors.v3ViewNotFound
+- snmp.errors.selectV3ViewToDelete
+- snmp.errors.v3ViewExists
+- snmp.errors.selectV3TrapTargetToEdit
+- snmp.errors.v3TrapTargetNotFound
+- snmp.errors.selectV3TrapTargetToDelete
+- snmp.errors.v3TrapTargetAddressRequired
+- snmp.errors.v3TrapTargetExists
+
+Column Headers:
+- snmp.columns.communityName
+- snmp.columns.authorization
+- snmp.columns.allowedClients
+- snmp.columns.allowedNetworks
+- snmp.columns.targetAddress
+- snmp.columns.port
+- snmp.columns.extensionName
+- snmp.columns.scriptPath
+- snmp.columns.groupName
+- snmp.columns.mode
+- snmp.columns.securityLevel
+- snmp.columns.view
+- snmp.columns.userName
+- snmp.columns.group
+- snmp.columns.authProtocol
+- snmp.columns.privacyProtocol
+- snmp.columns.viewName
+- snmp.columns.oidList
+
+Status Messages:
+- snmp.saved
+
+Tab Titles:
+- snmp.tabs.basic
+- snmp.tabs.communities
+- snmp.tabs.trapTargets
+- snmp.tabs.scriptExtensions
+- snmp.tabs.v3
+
+Basic Form Labels:
+- snmp.basic.description
+- snmp.basic.descriptionTip
+- snmp.basic.contact
+- snmp.basic.contactTip
+- snmp.basic.location
+- snmp.basic.locationTip
+- snmp.basic.protocol
+- snmp.basic.protocolTip
+- snmp.basic.vrfTip
+- snmp.basic.vrfPlaceholder
+- snmp.basic.listenAddress
+- snmp.basic.listenAddressTip
+- snmp.basic.available
+- snmp.basic.selected
+- snmp.basic.trapSource
+- snmp.basic.trapSourceTip
+- snmp.basic.ipPlaceholder
+- snmp.basic.smuxTip
+- snmp.basic.enableOid
+- snmp.basic.enableOidTip
+
+Button Labels:
+- snmp.buttons.create
+- snmp.buttons.edit
+- snmp.buttons.delete
+
+V3 Section Labels:
+- snmp.v3.engineIdTip
+- snmp.v3.engineIdPlaceholder
+- snmp.v3.groupConfig
+- snmp.v3.userConfig
+- snmp.v3.viewConfig
+- snmp.v3.v3TrapTargets
+
+Modal Titles:
+- snmp.modals.community
+- snmp.modals.trapTarget
+- snmp.modals.scriptExtension
+- snmp.modals.v3Group
+- snmp.modals.v3User
+- snmp.modals.v3View
+- snmp.modals.v3TrapTarget
+
+Form Labels (Modals):
+- snmp.form.name
+- snmp.form.authorization
+- snmp.form.allowedClients
+- snmp.form.allowedNetworks
+- snmp.form.targetAddress
+- snmp.form.port
+- snmp.form.extensionName
+- snmp.form.scriptPath
+- snmp.form.groupName
+- snmp.form.mode
+- snmp.form.securityLevel
+- snmp.form.view
+- snmp.form.notSpecified
+- snmp.form.userName
+- snmp.form.group
+- snmp.form.pleaseSelect
+- snmp.form.authProtocol
+- snmp.form.authPlaintextPassword
+- snmp.form.authEncryptedPassword
+- snmp.form.privacyProtocol
+- snmp.form.privacyPlaintextPassword
+- snmp.form.privacyEncryptedPassword
+- snmp.form.viewName
+- snmp.form.oidList
+- snmp.form.oidPlaceholder
+
+Hints:
+- snmp.hints.oneIpPerLine
+- snmp.hints.oneCidrPerLine
+- snmp.hints.oneOidPerLine

@@ -1,0 +1,324 @@
+{
+  "zh-CN": {
+    "dhcprelay": {
+      "tabs": {
+        "basic": "基本配置",
+        "relayOptions": "中继选项"
+      },
+      "labels": {
+        "disable": "禁用",
+        "interface": "接口",
+        "listenInterface": "监听接口",
+        "upstreamInterface": "上游接口",
+        "dhcpServer": "DHCP 服务器",
+        "hopCount": "跳数",
+        "maxPacketSize": "最大数据包大小",
+        "relayAgentsPackets": "中继代理数据包"
+      },
+      "options": {
+        "notSelected": "未选择",
+        "notSelectedDefaultForward": "未选择（默认转发）"
+      },
+      "placeholders": {
+        "dhcpServer": "每行一个 DHCP 服务器地址",
+        "hopCount": "1-255",
+        "maxSize": "64-1400"
+      },
+      "tips": {
+        "disable": "禁用 DHCP 中继",
+        "interface": "中继接口",
+        "listenInterface": "监听接口",
+        "upstreamInterface": "上游接口",
+        "dhcpServer": "DHCP 服务器地址",
+        "hopCount": "最大跳数",
+        "maxSize": "最大数据包大小（字节）",
+        "relayAgentsPackets": "中继代理数据包处理方式"
+      },
+      "validation": {
+        "ipv4Format": "IPv4 地址格式错误",
+        "serverAddressInvalid": "DHCP 服务器地址 {ip} 格式错误",
+        "hopCountRange": "跳数范围 1-255",
+        "maxSizeRange": "最大数据包大小范围 64-1400"
+      },
+      "messages": {
+        "saved": "已保存"
+      }
+    }
+  },
+  "en": {
+    "dhcprelay": {
+      "tabs": {
+        "basic": "Basic",
+        "relayOptions": "Relay Options"
+      },
+      "labels": {
+        "disable": "Disable",
+        "interface": "Interface",
+        "listenInterface": "Listen Interface",
+        "upstreamInterface": "Upstream Interface",
+        "dhcpServer": "DHCP Server",
+        "hopCount": "Hop Count",
+        "maxPacketSize": "Max Packet Size",
+        "relayAgentsPackets": "Relay Agents Packets"
+      },
+      "options": {
+        "notSelected": "Not Selected",
+        "notSelectedDefaultForward": "Not Selected (Default Forward)"
+      },
+      "placeholders": {
+        "dhcpServer": "One DHCP server address per line",
+        "hopCount": "1-255",
+        "maxSize": "64-1400"
+      },
+      "tips": {
+        "disable": "Disable DHCP relay",
+        "interface": "Relay interface",
+        "listenInterface": "Listen interface",
+        "upstreamInterface": "Upstream interface",
+        "dhcpServer": "DHCP server addresses",
+        "hopCount": "Maximum hop count",
+        "maxSize": "Maximum packet size (bytes)",
+        "relayAgentsPackets": "Relay agents packets handling"
+      },
+      "validation": {
+        "ipv4Format": "IPv4 address format error",
+        "serverAddressInvalid": "DHCP server address {ip} format error",
+        "hopCountRange": "Hop count range 1-255",
+        "maxSizeRange": "Max packet size range 64-1400"
+      },
+      "messages": {
+        "saved": "Saved"
+      }
+    }
+  },
+  "zh-TW": {
+    "dhcprelay": {
+      "tabs": {
+        "basic": "基本設定",
+        "relayOptions": "中繼選項"
+      },
+      "labels": {
+        "disable": "停用",
+        "interface": "介面",
+        "listenInterface": "監聽介面",
+        "upstreamInterface": "上游介面",
+        "dhcpServer": "DHCP 伺服器",
+        "hopCount": "跳數",
+        "maxPacketSize": "最大封包大小",
+        "relayAgentsPackets": "中繼代理封包"
+      },
+      "options": {
+        "notSelected": "未選擇",
+        "notSelectedDefaultForward": "未選擇（預設轉發）"
+      },
+      "placeholders": {
+        "dhcpServer": "每行一個 DHCP 伺服器位址",
+        "hopCount": "1-255",
+        "maxSize": "64-1400"
+      },
+      "tips": {
+        "disable": "停用 DHCP 中繼",
+        "interface": "中繼介面",
+        "listenInterface": "監聽介面",
+        "upstreamInterface": "上游介面",
+        "dhcpServer": "DHCP 伺服器位址",
+        "hopCount": "最大跳數",
+        "maxSize": "最大封包大小（位元組）",
+        "relayAgentsPackets": "中繼代理封包處理方式"
+      },
+      "validation": {
+        "ipv4Format": "IPv4 位址格式錯誤",
+        "serverAddressInvalid": "DHCP 伺服器位址 {ip} 格式錯誤",
+        "hopCountRange": "跳數範圍 1-255",
+        "maxSizeRange": "最大封包大小範圍 64-1400"
+      },
+      "messages": {
+        "saved": "已儲存"
+      }
+    }
+  },
+  "ru": {
+    "dhcprelay": {
+      "tabs": {
+        "basic": "Основные",
+        "relayOptions": "Параметры ретрансляции"
+      },
+      "labels": {
+        "disable": "Отключить",
+        "interface": "Интерфейс",
+        "listenInterface": "Интерфейс прослушивания",
+        "upstreamInterface": "Восходящий интерфейс",
+        "dhcpServer": "DHCP-сервер",
+        "hopCount": "Количество прыжков",
+        "maxPacketSize": "Макс. размер пакета",
+        "relayAgentsPackets": "Пакеты ретранслятора"
+      },
+      "options": {
+        "notSelected": "Не выбрано",
+        "notSelectedDefaultForward": "Не выбрано (по умолчанию — пересылка)"
+      },
+      "placeholders": {
+        "dhcpServer": "Один адрес DHCP-сервера на строку",
+        "hopCount": "1-255",
+        "maxSize": "64-1400"
+      },
+      "tips": {
+        "disable": "Отключить DHCP-ретрансляцию",
+        "interface": "Интерфейс ретрансляции",
+        "listenInterface": "Интерфейс прослушивания",
+        "upstreamInterface": "Восходящий интерфейс",
+        "dhcpServer": "Адреса DHCP-серверов",
+        "hopCount": "Максимальное количество прыжков",
+        "maxSize": "Максимальный размер пакета (байты)",
+        "relayAgentsPackets": "Обработка пакетов ретранслятора"
+      },
+      "validation": {
+        "ipv4Format": "Ошибка формата адреса IPv4",
+        "serverAddressInvalid": "Адрес DHCP-сервера {ip} имеет неверный формат",
+        "hopCountRange": "Диапазон количества прыжков: 1-255",
+        "maxSizeRange": "Диапазон макс. размера пакета: 64-1400"
+      },
+      "messages": {
+        "saved": "Сохранено"
+      }
+    }
+  },
+  "de": {
+    "dhcprelay": {
+      "tabs": {
+        "basic": "Grundlegend",
+        "relayOptions": "Relais-Optionen"
+      },
+      "labels": {
+        "disable": "Deaktivieren",
+        "interface": "Schnittstelle",
+        "listenInterface": "Empfangsschnittstelle",
+        "upstreamInterface": "Uplink-Schnittstelle",
+        "dhcpServer": "DHCP-Server",
+        "hopCount": "Hop-Anzahl",
+        "maxPacketSize": "Max. Paketgröße",
+        "relayAgentsPackets": "Relais-Agent-Pakete"
+      },
+      "options": {
+        "notSelected": "Nicht ausgewählt",
+        "notSelectedDefaultForward": "Nicht ausgewählt (Standard: Weiterleiten)"
+      },
+      "placeholders": {
+        "dhcpServer": "Eine DHCP-Server-Adresse pro Zeile",
+        "hopCount": "1-255",
+        "maxSize": "64-1400"
+      },
+      "tips": {
+        "disable": "DHCP-Relais deaktivieren",
+        "interface": "Relais-Schnittstelle",
+        "listenInterface": "Empfangsschnittstelle",
+        "upstreamInterface": "Uplink-Schnittstelle",
+        "dhcpServer": "DHCP-Server-Adressen",
+        "hopCount": "Maximale Hop-Anzahl",
+        "maxSize": "Maximale Paketgröße (Bytes)",
+        "relayAgentsPackets": "Verarbeitung von Relais-Agent-Paketen"
+      },
+      "validation": {
+        "ipv4Format": "Fehlerhaftes IPv4-Adressformat",
+        "serverAddressInvalid": "DHCP-Server-Adresse {ip} hat ein fehlerhaftes Format",
+        "hopCountRange": "Hop-Anzahl Bereich 1-255",
+        "maxSizeRange": "Max. Paketgröße Bereich 64-1400"
+      },
+      "messages": {
+        "saved": "Gespeichert"
+      }
+    }
+  },
+  "fr": {
+    "dhcprelay": {
+      "tabs": {
+        "basic": "Paramètres de base",
+        "relayOptions": "Options de relais"
+      },
+      "labels": {
+        "disable": "Désactiver",
+        "interface": "Interface",
+        "listenInterface": "Interface d'écoute",
+        "upstreamInterface": "Interface amont",
+        "dhcpServer": "Serveur DHCP",
+        "hopCount": "Nombre de sauts",
+        "maxPacketSize": "Taille max. des paquets",
+        "relayAgentsPackets": "Paquets de l'agent relais"
+      },
+      "options": {
+        "notSelected": "Non sélectionné",
+        "notSelectedDefaultForward": "Non sélectionné (transfert par défaut)"
+      },
+      "placeholders": {
+        "dhcpServer": "Une adresse de serveur DHCP par ligne",
+        "hopCount": "1-255",
+        "maxSize": "64-1400"
+      },
+      "tips": {
+        "disable": "Désactiver le relais DHCP",
+        "interface": "Interface de relais",
+        "listenInterface": "Interface d'écoute",
+        "upstreamInterface": "Interface amont",
+        "dhcpServer": "Adresses des serveurs DHCP",
+        "hopCount": "Nombre maximal de sauts",
+        "maxSize": "Taille maximale des paquets (octets)",
+        "relayAgentsPackets": "Traitement des paquets de l'agent relais"
+      },
+      "validation": {
+        "ipv4Format": "Format d'adresse IPv4 incorrect",
+        "serverAddressInvalid": "L'adresse du serveur DHCP {ip} a un format incorrect",
+        "hopCountRange": "Plage du nombre de sauts : 1-255",
+        "maxSizeRange": "Plage de la taille max. des paquets : 64-1400"
+      },
+      "messages": {
+        "saved": "Enregistré"
+      }
+    }
+  },
+  "ko": {
+    "dhcprelay": {
+      "tabs": {
+        "basic": "기본 설정",
+        "relayOptions": "릴레이 옵션"
+      },
+      "labels": {
+        "disable": "비활성화",
+        "interface": "인터페이스",
+        "listenInterface": "수신 인터페이스",
+        "upstreamInterface": "업스트림 인터페이스",
+        "dhcpServer": "DHCP 서버",
+        "hopCount": "홉 수",
+        "maxPacketSize": "최대 패킷 크기",
+        "relayAgentsPackets": "릴레이 에이전트 패킷"
+      },
+      "options": {
+        "notSelected": "선택되지 않음",
+        "notSelectedDefaultForward": "선택되지 않음 (기본 전달)"
+      },
+      "placeholders": {
+        "dhcpServer": "한 줄에 하나의 DHCP 서버 주소",
+        "hopCount": "1-255",
+        "maxSize": "64-1400"
+      },
+      "tips": {
+        "disable": "DHCP 릴레이 비활성화",
+        "interface": "릴레이 인터페이스",
+        "listenInterface": "수신 인터페이스",
+        "upstreamInterface": "업스트림 인터페이스",
+        "dhcpServer": "DHCP 서버 주소",
+        "hopCount": "최대 홉 수",
+        "maxSize": "최대 패킷 크기 (바이트)",
+        "relayAgentsPackets": "릴레이 에이전트 패킷 처리 방식"
+      },
+      "validation": {
+        "ipv4Format": "IPv4 주소 형식 오류",
+        "serverAddressInvalid": "DHCP 서버 주소 {ip} 형식 오류",
+        "hopCountRange": "홉 수 범위 1-255",
+        "maxSizeRange": "최대 패킷 크기 범위 64-1400"
+      },
+      "messages": {
+        "saved": "저장됨"
+      }
+    }
+  }
+}

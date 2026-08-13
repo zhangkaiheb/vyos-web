@@ -1,0 +1,660 @@
+{
+  "zh-CN": {
+    "ripNg": {
+      "tab": {
+        "basic": "基本设置",
+        "interfaces": "接口",
+        "networks": "网络",
+        "aggregate": "聚合地址",
+        "routes": "路由",
+        "redistribute": "重分发",
+        "passive": "被动接口",
+        "timers": "定时器",
+        "defaultInfo": "默认信息"
+      },
+      "col": {
+        "interfaceName": "接口名称",
+        "splitHorizon": "水平分割",
+        "protocol": "协议",
+        "metric": "度量值",
+        "routeMap": "路由映射"
+      },
+      "basic": {
+        "title": "基本配置",
+        "defaultMetric": "默认度量值",
+        "routeMap": "路由映射",
+        "routeMapPlaceholder": "路由映射名称",
+        "distributeList": "分发列表",
+        "accessListIn": "访问列表入站",
+        "accessListOut": "访问列表出站",
+        "accessListPlaceholder": "访问列表名称",
+        "prefixListIn": "前缀列表入站",
+        "prefixListOut": "前缀列表出站",
+        "prefixListPlaceholder": "前缀列表名称"
+      },
+      "networks": {
+        "label": "网络",
+        "placeholder": "IPv6 前缀，例如 2001:db8::/32"
+      },
+      "aggregate": {
+        "label": "聚合地址",
+        "placeholder": "IPv6 前缀，例如 2001:db8::/48"
+      },
+      "routes": {
+        "label": "路由",
+        "placeholder": "IPv6 前缀，例如 2001:db8::/64"
+      },
+      "passive": {
+        "label": "被动接口",
+        "selectPlaceholder": "选择接口"
+      },
+      "timers": {
+        "garbageCollection": "垃圾回收定时器",
+        "garbageCollectionPlaceholder": "1-65535 秒",
+        "timeout": "超时定时器",
+        "timeoutPlaceholder": "1-65535 秒",
+        "update": "更新定时器",
+        "updatePlaceholder": "1-65535 秒"
+      },
+      "defaultInfo": {
+        "originate": " originate 默认路由"
+      },
+      "modal": {
+        "editInterface": "编辑接口",
+        "addInterface": "添加接口",
+        "interfaceName": "接口名称",
+        "selectInterface": "选择接口",
+        "splitHorizon": "水平分割",
+        "editRedistribute": "编辑重分发",
+        "addRedistribute": "添加重分发",
+        "protocol": "协议",
+        "metric": "度量值",
+        "routeMap": "路由映射",
+        "routeMapPlaceholder": "路由映射名称"
+      },
+      "delete": {
+        "confirmInterface": "确认删除以下接口？",
+        "confirmRedistribute": "确认删除以下重分发？"
+      },
+      "error": {
+        "defaultMetric": "默认度量值错误：",
+        "network": "网络 {index} 错误：",
+        "interfaceNameRequired": "接口名称为必填项",
+        "protocolRequired": "协议为必填项"
+      }
+    },
+    "validation": {
+      "ipv6PrefixFormat": "IPv6 前缀格式错误",
+      "metricRange": "度量值必须在 0-16 之间",
+      "timerRange": "定时器值必须在指定范围内"
+    },
+    "option": {
+      "default": "默认",
+      "disable": "禁用"
+    }
+  },
+  "en": {
+    "ripNg": {
+      "tab": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "networks": "Networks",
+        "aggregate": "Aggregate",
+        "routes": "Routes",
+        "redistribute": "Redistribute",
+        "passive": "Passive",
+        "timers": "Timers",
+        "defaultInfo": "Default Info"
+      },
+      "col": {
+        "interfaceName": "Interface Name",
+        "splitHorizon": "Split Horizon",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "basic": {
+        "title": "Basic Configuration",
+        "defaultMetric": "Default Metric",
+        "routeMap": "Route Map",
+        "routeMapPlaceholder": "Route map name",
+        "distributeList": "Distribute List",
+        "accessListIn": "Access List In",
+        "accessListOut": "Access List Out",
+        "accessListPlaceholder": "Access list name",
+        "prefixListIn": "Prefix List In",
+        "prefixListOut": "Prefix List Out",
+        "prefixListPlaceholder": "Prefix list name"
+      },
+      "networks": {
+        "label": "Networks",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/32"
+      },
+      "aggregate": {
+        "label": "Aggregate Addresses",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/48"
+      },
+      "routes": {
+        "label": "Routes",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/64"
+      },
+      "passive": {
+        "label": "Passive Interfaces",
+        "selectPlaceholder": "Select an interface"
+      },
+      "timers": {
+        "garbageCollection": "Garbage Collection Timer",
+        "garbageCollectionPlaceholder": "1-65535 seconds",
+        "timeout": "Timeout Timer",
+        "timeoutPlaceholder": "1-65535 seconds",
+        "update": "Update Timer",
+        "updatePlaceholder": "1-65535 seconds"
+      },
+      "defaultInfo": {
+        "originate": "Originate Default Route"
+      },
+      "modal": {
+        "editInterface": "Edit Interface",
+        "addInterface": "Add Interface",
+        "interfaceName": "Interface Name",
+        "selectInterface": "Select an interface",
+        "splitHorizon": "Split Horizon",
+        "editRedistribute": "Edit Redistribute",
+        "addRedistribute": "Add Redistribute",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map",
+        "routeMapPlaceholder": "Route map name"
+      },
+      "delete": {
+        "confirmInterface": "Confirm delete the following interface?",
+        "confirmRedistribute": "Confirm delete the following redistribute?"
+      },
+      "error": {
+        "defaultMetric": "Default metric error: ",
+        "network": "Network {index} error: ",
+        "interfaceNameRequired": "Interface name is required",
+        "protocolRequired": "Protocol is required"
+      }
+    },
+    "validation": {
+      "ipv6PrefixFormat": "Invalid IPv6 prefix format",
+      "metricRange": "Metric must be between 0-16",
+      "timerRange": "Timer value must be within the specified range"
+    },
+    "option": {
+      "default": "Default",
+      "disable": "Disable"
+    }
+  },
+  "zh-TW": {
+    "ripNg": {
+      "tab": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "networks": "Networks",
+        "aggregate": "Aggregate",
+        "routes": "Routes",
+        "redistribute": "Redistribute",
+        "passive": "Passive",
+        "timers": "Timers",
+        "defaultInfo": "Default Info"
+      },
+      "col": {
+        "interfaceName": "Interface Name",
+        "splitHorizon": "Split Horizon",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "basic": {
+        "title": "Basic Configuration",
+        "defaultMetric": "Default Metric",
+        "routeMap": "Route Map",
+        "routeMapPlaceholder": "Route map name",
+        "distributeList": "Distribute List",
+        "accessListIn": "Access List In",
+        "accessListOut": "Access List Out",
+        "accessListPlaceholder": "Access list name",
+        "prefixListIn": "Prefix List In",
+        "prefixListOut": "Prefix List Out",
+        "prefixListPlaceholder": "Prefix list name"
+      },
+      "networks": {
+        "label": "Networks",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/32"
+      },
+      "aggregate": {
+        "label": "Aggregate Addresses",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/48"
+      },
+      "routes": {
+        "label": "Routes",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/64"
+      },
+      "passive": {
+        "label": "Passive Interfaces",
+        "selectPlaceholder": "Select an interface"
+      },
+      "timers": {
+        "garbageCollection": "Garbage Collection Timer",
+        "garbageCollectionPlaceholder": "1-65535 seconds",
+        "timeout": "Timeout Timer",
+        "timeoutPlaceholder": "1-65535 seconds",
+        "update": "Update Timer",
+        "updatePlaceholder": "1-65535 seconds"
+      },
+      "defaultInfo": {
+        "originate": "Originate Default Route"
+      },
+      "modal": {
+        "editInterface": "Edit Interface",
+        "addInterface": "Add Interface",
+        "interfaceName": "Interface Name",
+        "selectInterface": "Select an interface",
+        "splitHorizon": "Split Horizon",
+        "editRedistribute": "Edit Redistribute",
+        "addRedistribute": "Add Redistribute",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map",
+        "routeMapPlaceholder": "Route map name"
+      },
+      "delete": {
+        "confirmInterface": "Confirm delete the following interface?",
+        "confirmRedistribute": "Confirm delete the following redistribute?"
+      },
+      "error": {
+        "defaultMetric": "Default metric error: ",
+        "network": "Network {index} error: ",
+        "interfaceNameRequired": "Interface name is required",
+        "protocolRequired": "Protocol is required"
+      }
+    },
+    "validation": {
+      "ipv6PrefixFormat": "Invalid IPv6 prefix format",
+      "metricRange": "Metric must be between 0-16",
+      "timerRange": "Timer value must be within the specified range"
+    },
+    "option": {
+      "default": "Default",
+      "disable": "Disable"
+    }
+  },
+  "ru": {
+    "ripNg": {
+      "tab": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "networks": "Networks",
+        "aggregate": "Aggregate",
+        "routes": "Routes",
+        "redistribute": "Redistribute",
+        "passive": "Passive",
+        "timers": "Timers",
+        "defaultInfo": "Default Info"
+      },
+      "col": {
+        "interfaceName": "Interface Name",
+        "splitHorizon": "Split Horizon",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "basic": {
+        "title": "Basic Configuration",
+        "defaultMetric": "Default Metric",
+        "routeMap": "Route Map",
+        "routeMapPlaceholder": "Route map name",
+        "distributeList": "Distribute List",
+        "accessListIn": "Access List In",
+        "accessListOut": "Access List Out",
+        "accessListPlaceholder": "Access list name",
+        "prefixListIn": "Prefix List In",
+        "prefixListOut": "Prefix List Out",
+        "prefixListPlaceholder": "Prefix list name"
+      },
+      "networks": {
+        "label": "Networks",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/32"
+      },
+      "aggregate": {
+        "label": "Aggregate Addresses",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/48"
+      },
+      "routes": {
+        "label": "Routes",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/64"
+      },
+      "passive": {
+        "label": "Passive Interfaces",
+        "selectPlaceholder": "Select an interface"
+      },
+      "timers": {
+        "garbageCollection": "Garbage Collection Timer",
+        "garbageCollectionPlaceholder": "1-65535 seconds",
+        "timeout": "Timeout Timer",
+        "timeoutPlaceholder": "1-65535 seconds",
+        "update": "Update Timer",
+        "updatePlaceholder": "1-65535 seconds"
+      },
+      "defaultInfo": {
+        "originate": "Originate Default Route"
+      },
+      "modal": {
+        "editInterface": "Edit Interface",
+        "addInterface": "Add Interface",
+        "interfaceName": "Interface Name",
+        "selectInterface": "Select an interface",
+        "splitHorizon": "Split Horizon",
+        "editRedistribute": "Edit Redistribute",
+        "addRedistribute": "Add Redistribute",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map",
+        "routeMapPlaceholder": "Route map name"
+      },
+      "delete": {
+        "confirmInterface": "Confirm delete the following interface?",
+        "confirmRedistribute": "Confirm delete the following redistribute?"
+      },
+      "error": {
+        "defaultMetric": "Default metric error: ",
+        "network": "Network {index} error: ",
+        "interfaceNameRequired": "Interface name is required",
+        "protocolRequired": "Protocol is required"
+      }
+    },
+    "validation": {
+      "ipv6PrefixFormat": "Invalid IPv6 prefix format",
+      "metricRange": "Metric must be between 0-16",
+      "timerRange": "Timer value must be within the specified range"
+    },
+    "option": {
+      "default": "Default",
+      "disable": "Disable"
+    }
+  },
+  "de": {
+    "ripNg": {
+      "tab": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "networks": "Networks",
+        "aggregate": "Aggregate",
+        "routes": "Routes",
+        "redistribute": "Redistribute",
+        "passive": "Passive",
+        "timers": "Timers",
+        "defaultInfo": "Default Info"
+      },
+      "col": {
+        "interfaceName": "Interface Name",
+        "splitHorizon": "Split Horizon",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "basic": {
+        "title": "Basic Configuration",
+        "defaultMetric": "Default Metric",
+        "routeMap": "Route Map",
+        "routeMapPlaceholder": "Route map name",
+        "distributeList": "Distribute List",
+        "accessListIn": "Access List In",
+        "accessListOut": "Access List Out",
+        "accessListPlaceholder": "Access list name",
+        "prefixListIn": "Prefix List In",
+        "prefixListOut": "Prefix List Out",
+        "prefixListPlaceholder": "Prefix list name"
+      },
+      "networks": {
+        "label": "Networks",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/32"
+      },
+      "aggregate": {
+        "label": "Aggregate Addresses",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/48"
+      },
+      "routes": {
+        "label": "Routes",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/64"
+      },
+      "passive": {
+        "label": "Passive Interfaces",
+        "selectPlaceholder": "Select an interface"
+      },
+      "timers": {
+        "garbageCollection": "Garbage Collection Timer",
+        "garbageCollectionPlaceholder": "1-65535 seconds",
+        "timeout": "Timeout Timer",
+        "timeoutPlaceholder": "1-65535 seconds",
+        "update": "Update Timer",
+        "updatePlaceholder": "1-65535 seconds"
+      },
+      "defaultInfo": {
+        "originate": "Originate Default Route"
+      },
+      "modal": {
+        "editInterface": "Edit Interface",
+        "addInterface": "Add Interface",
+        "interfaceName": "Interface Name",
+        "selectInterface": "Select an interface",
+        "splitHorizon": "Split Horizon",
+        "editRedistribute": "Edit Redistribute",
+        "addRedistribute": "Add Redistribute",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map",
+        "routeMapPlaceholder": "Route map name"
+      },
+      "delete": {
+        "confirmInterface": "Confirm delete the following interface?",
+        "confirmRedistribute": "Confirm delete the following redistribute?"
+      },
+      "error": {
+        "defaultMetric": "Default metric error: ",
+        "network": "Network {index} error: ",
+        "interfaceNameRequired": "Interface name is required",
+        "protocolRequired": "Protocol is required"
+      }
+    },
+    "validation": {
+      "ipv6PrefixFormat": "Invalid IPv6 prefix format",
+      "metricRange": "Metric must be between 0-16",
+      "timerRange": "Timer value must be within the specified range"
+    },
+    "option": {
+      "default": "Default",
+      "disable": "Disable"
+    }
+  },
+  "fr": {
+    "ripNg": {
+      "tab": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "networks": "Networks",
+        "aggregate": "Aggregate",
+        "routes": "Routes",
+        "redistribute": "Redistribute",
+        "passive": "Passive",
+        "timers": "Timers",
+        "defaultInfo": "Default Info"
+      },
+      "col": {
+        "interfaceName": "Interface Name",
+        "splitHorizon": "Split Horizon",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "basic": {
+        "title": "Basic Configuration",
+        "defaultMetric": "Default Metric",
+        "routeMap": "Route Map",
+        "routeMapPlaceholder": "Route map name",
+        "distributeList": "Distribute List",
+        "accessListIn": "Access List In",
+        "accessListOut": "Access List Out",
+        "accessListPlaceholder": "Access list name",
+        "prefixListIn": "Prefix List In",
+        "prefixListOut": "Prefix List Out",
+        "prefixListPlaceholder": "Prefix list name"
+      },
+      "networks": {
+        "label": "Networks",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/32"
+      },
+      "aggregate": {
+        "label": "Aggregate Addresses",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/48"
+      },
+      "routes": {
+        "label": "Routes",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/64"
+      },
+      "passive": {
+        "label": "Passive Interfaces",
+        "selectPlaceholder": "Select an interface"
+      },
+      "timers": {
+        "garbageCollection": "Garbage Collection Timer",
+        "garbageCollectionPlaceholder": "1-65535 seconds",
+        "timeout": "Timeout Timer",
+        "timeoutPlaceholder": "1-65535 seconds",
+        "update": "Update Timer",
+        "updatePlaceholder": "1-65535 seconds"
+      },
+      "defaultInfo": {
+        "originate": "Originate Default Route"
+      },
+      "modal": {
+        "editInterface": "Edit Interface",
+        "addInterface": "Add Interface",
+        "interfaceName": "Interface Name",
+        "selectInterface": "Select an interface",
+        "splitHorizon": "Split Horizon",
+        "editRedistribute": "Edit Redistribute",
+        "addRedistribute": "Add Redistribute",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map",
+        "routeMapPlaceholder": "Route map name"
+      },
+      "delete": {
+        "confirmInterface": "Confirm delete the following interface?",
+        "confirmRedistribute": "Confirm delete the following redistribute?"
+      },
+      "error": {
+        "defaultMetric": "Default metric error: ",
+        "network": "Network {index} error: ",
+        "interfaceNameRequired": "Interface name is required",
+        "protocolRequired": "Protocol is required"
+      }
+    },
+    "validation": {
+      "ipv6PrefixFormat": "Invalid IPv6 prefix format",
+      "metricRange": "Metric must be between 0-16",
+      "timerRange": "Timer value must be within the specified range"
+    },
+    "option": {
+      "default": "Default",
+      "disable": "Disable"
+    }
+  },
+  "ko": {
+    "ripNg": {
+      "tab": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "networks": "Networks",
+        "aggregate": "Aggregate",
+        "routes": "Routes",
+        "redistribute": "Redistribute",
+        "passive": "Passive",
+        "timers": "Timers",
+        "defaultInfo": "Default Info"
+      },
+      "col": {
+        "interfaceName": "Interface Name",
+        "splitHorizon": "Split Horizon",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map"
+      },
+      "basic": {
+        "title": "Basic Configuration",
+        "defaultMetric": "Default Metric",
+        "routeMap": "Route Map",
+        "routeMapPlaceholder": "Route map name",
+        "distributeList": "Distribute List",
+        "accessListIn": "Access List In",
+        "accessListOut": "Access List Out",
+        "accessListPlaceholder": "Access list name",
+        "prefixListIn": "Prefix List In",
+        "prefixListOut": "Prefix List Out",
+        "prefixListPlaceholder": "Prefix list name"
+      },
+      "networks": {
+        "label": "Networks",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/32"
+      },
+      "aggregate": {
+        "label": "Aggregate Addresses",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/48"
+      },
+      "routes": {
+        "label": "Routes",
+        "placeholder": "IPv6 prefix, e.g., 2001:db8::/64"
+      },
+      "passive": {
+        "label": "Passive Interfaces",
+        "selectPlaceholder": "Select an interface"
+      },
+      "timers": {
+        "garbageCollection": "Garbage Collection Timer",
+        "garbageCollectionPlaceholder": "1-65535 seconds",
+        "timeout": "Timeout Timer",
+        "timeoutPlaceholder": "1-65535 seconds",
+        "update": "Update Timer",
+        "updatePlaceholder": "1-65535 seconds"
+      },
+      "defaultInfo": {
+        "originate": "Originate Default Route"
+      },
+      "modal": {
+        "editInterface": "Edit Interface",
+        "addInterface": "Add Interface",
+        "interfaceName": "Interface Name",
+        "selectInterface": "Select an interface",
+        "splitHorizon": "Split Horizon",
+        "editRedistribute": "Edit Redistribute",
+        "addRedistribute": "Add Redistribute",
+        "protocol": "Protocol",
+        "metric": "Metric",
+        "routeMap": "Route Map",
+        "routeMapPlaceholder": "Route map name"
+      },
+      "delete": {
+        "confirmInterface": "Confirm delete the following interface?",
+        "confirmRedistribute": "Confirm delete the following redistribute?"
+      },
+      "error": {
+        "defaultMetric": "Default metric error: ",
+        "network": "Network {index} error: ",
+        "interfaceNameRequired": "Interface name is required",
+        "protocolRequired": "Protocol is required"
+      }
+    },
+    "validation": {
+      "ipv6PrefixFormat": "Invalid IPv6 prefix format",
+      "metricRange": "Metric must be between 0-16",
+      "timerRange": "Timer value must be within the specified range"
+    },
+    "option": {
+      "default": "Default",
+      "disable": "Disable"
+    }
+  }
+}

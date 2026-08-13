@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="global-options-firewall-configuration">
+<h1>Configuration des options globales du pare-feu</h1>
+<section id="overview">
+<h2>Aperçu</h2>
+<p>Certaines paramètres de pare-feu sont globaux et affectent l'ensemble du système. Cette section
+fournit des informations sur ces options globales que vous pouvez configurer à l'aide
+de la CLI VyOS.</p>
+<p>Les commandes de configuration abordées dans cette section :</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options …
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options" title="Permalink to this Command"></a></div></div>
+</section>
+<section id="configuration">
+<h2>Configuration</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options all-ping [enable | disable]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-all-ping-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Par défaut, lorsque VyOS reçoit un paquet de requête ICMP destiné à
+lui-même, il répond avec une réponse ICMP, sauf si votre pare-feu l'en empêche.</p>
+<p>Vous pouvez définir des règles de pare-feu pour accepter, rejeter ou supprimer le trafic ICMP entrant, sortant ou local. Vous pouvez également utiliser la commande <strong>firewall global-options all-ping</strong>. Cette commande affecte uniquement le trafic local (paquets destinés à votre système VyOS), et non le trafic entrant ou sortant.</p>
+<div class="admonition note">
+<p class="admonition-title">Remarque</p>
+<p><strong>firewall global-options all-ping</strong> affecte uniquement le trafic local
+et se comporte toujours de manière la plus restrictive</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall global-options all-ping enable
+</pre></div>
+</div>
+<p>Lorsque vous activez cette commande, VyOS répond à chaque demande d'écho ICMP adressée à lui-même, mais cette réponse n'a lieu que si aucune autre règle ne supprime ou rejette les demandes d'écho locales. En cas de conflit, VyOS ne répond pas aux demandes d'écho ICMP.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall global-options all-ping disable
+</pre></div>
+</div>
+<p>Lorsque vous désactivez cette commande, VyOS ne répond à aucune demande d'écho ICMP adressée à lui-même, indépendamment de l'origine ou des règles spécifiques qui l'acceptent.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options apply-to-bridged-traffic [ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-apply-to-bridged-traffic-ipv4-ipv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Appliquer les règles IPv4 ou IPv6 du pare-feu au trafic bridé.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options broadcast-ping [enable | disable]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-broadcast-ping-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Activer ou désactiver la réponse aux messages ICMP de diffusion. Le système
+modifie le paramètre suivant :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">net.ipv4.icmp_echo_ignore_broadcasts</code></p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options ip-src-route [enable | disable]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-ip-src-route-enable-disable" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options ipv6-src-route [enable | disable]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-ipv6-src-route-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir si VyOS accepte les paquets avec une option de routage source.
+Les paramètres sysctl suivants seront modifiés :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">net.ipv4.conf.all.accept_source_route</code></p></li>
+<li><p><code class="docutils literal notranslate">net.ipv6.conf.all.accept_source_route</code></p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options receive-redirects [enable | disable]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-receive-redirects-enable-disable" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options ipv6-receive-redirects [enable | disable]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-ipv6-receive-redirects-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Permettre à VyOS d'accepter les messages de redirection ICMPv4 et ICMPv6.
+Les paramètres sysctl suivants seront modifiés :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">net.ipv4.conf.all.accept_redirects</code></p></li>
+<li><p><code class="docutils literal notranslate">net.ipv6.conf.all.accept_redirects</code></p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options send-redirects [enable | disable]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-send-redirects-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Permettre à VyOS d'envoyer des messages de redirection ICMPv4.
+Le paramètre sysctl suivant sera modifié :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">net.ipv4.conf.all.send_redirects</code></p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options log-martians [enable | disable]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-log-martians-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Permettre à VyOS de journaliser les paquets IPv4 martiens.
+Le paramètre sysctl suivant sera modifié :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">net.ipv4.conf.all.log_martians</code></p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options source-validation [strict | loose | disable]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le mode de validation de la source IPv4.
+Le paramètre sysctl suivant sera modifié :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">net.ipv4.conf.all.rp_filter</code></p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options syn-cookies [enable | disable]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-syn-cookies-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Permettre à VyOS d'utiliser les cookies SYN IPv4.
+Le paramètre sysctl suivant sera modifié :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">net.ipv4.tcp_syncookies</code></p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options twa-hazards-protection [enable | disable]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-twa-hazards-protection-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Activer ou désactiver la conformité de VyOS au <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1337.html"><strong>RFC 1337</strong></a>.
+Le paramètre sysctl suivant sera modifié :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">net.ipv4.tcp_rfc1337</code></p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options state-policy established action [accept | drop | reject]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-state-policy-established-action-accept-drop-reject" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options state-policy established log
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-state-policy-established-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options state-policy established log-level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-state-policy-established-log-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le paramètre global pour une connexion établie.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options state-policy invalid action [accept | drop | reject]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-state-policy-invalid-action-accept-drop-reject" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options state-policy invalid log
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-state-policy-invalid-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options state-policy invalid log-level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-state-policy-invalid-log-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le paramètre global pour les paquets invalides.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options state-policy related action [accept | drop | reject]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-state-policy-related-action-accept-drop-reject" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options state-policy related log
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-state-policy-related-log" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options state-policy related log-level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-state-policy-related-log-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le paramètre global pour les connexions associées.</p>
+</div>
+</div>
+<p>VyOS permet de définir des durées d'attente pour les connexions par type de connexion. Vous pouvez
+définir des valeurs de délai pour les connexions génériques, les connexions ICMP, les connexions UDP
+ou les connexions TCP dans divers états.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options timeout icmp &lt;1-21474836&gt; 
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-timeout-icmp-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options timeout other &lt;1-21474836&gt; 
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-timeout-other-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options timeout tcp close &lt;1-21474836&gt; 
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-timeout-tcp-close-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options timeout tcp close-wait &lt;1-21474836&gt; 
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-timeout-tcp-close-wait-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options timeout tcp established &lt;1-21474836&gt; 
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-timeout-tcp-established-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options timeout tcp fin-wait &lt;1-21474836&gt; 
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-timeout-tcp-fin-wait-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options timeout tcp last-ack &lt;1-21474836&gt; 
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-timeout-tcp-last-ack-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options timeout tcp syn-recv &lt;1-21474836&gt; 
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-timeout-tcp-syn-recv-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options timeout tcp syn-sent &lt;1-21474836&gt; 
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-timeout-tcp-syn-sent-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options timeout tcp time-wait &lt;1-21474836&gt; 
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-timeout-tcp-time-wait-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options timeout udp other &lt;1-21474836&gt; 
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-timeout-udp-other-1-21474836" title="Permalink to this Command"></a></div></div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options timeout udp stream &lt;1-21474836&gt; 
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-timeout-udp-stream-1-21474836" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir le délai en secondes pour un protocole ou un état.</p>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

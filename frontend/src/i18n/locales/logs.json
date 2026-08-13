@@ -1,23 +1,114 @@
 {
   "zh-CN": {
-    "logs": { "title": "日志", "type": "日志类型", "keyword": "关键字", "level": "级别", "startTime": "开始时间", "endTime": "结束时间", "all": "全部", "audit": "审计", "system": "系统", "firewall": "防火墙", "conntrack": "连接跟踪", "export": "导出日志" }
+    "logs": {
+      "title": "日志",
+      "type": "日志类型",
+      "keyword": "关键字",
+      "level": "级别",
+      "startTime": "开始时间",
+      "endTime": "结束时间",
+      "all": "全部",
+      "audit": "审计",
+      "system": "系统",
+      "firewall": "防火墙",
+      "conntrack": "连接跟踪",
+      "export": "导出日志"
+    }
   },
   "zh-TW": {
-    "logs": { "title": "日誌", "type": "日誌類型", "keyword": "關鍵字", "level": "層級", "startTime": "開始時間", "endTime": "結束時間", "all": "全部", "audit": "稽核", "system": "系統", "firewall": "防火牆", "conntrack": "連線追蹤", "export": "匯出日誌" }
+    "logs": {
+      "title": "日誌",
+      "type": "日誌類型",
+      "keyword": "關鍵字",
+      "level": "層級",
+      "startTime": "開始時間",
+      "endTime": "結束時間",
+      "all": "全部",
+      "audit": "稽核",
+      "system": "系統",
+      "firewall": "防火牆",
+      "conntrack": "連線追蹤",
+      "export": "匯出日誌"
+    }
   },
   "en": {
-    "logs": { "title": "Logs", "type": "Log Type", "keyword": "Keyword", "level": "Level", "startTime": "Start Time", "endTime": "End Time", "all": "All", "audit": "Audit", "system": "System", "firewall": "Firewall", "conntrack": "Conntrack", "export": "Export Logs" }
+    "logs": {
+      "title": "Logs",
+      "type": "Log Type",
+      "keyword": "Keyword",
+      "level": "Level",
+      "startTime": "Start Time",
+      "endTime": "End Time",
+      "all": "All",
+      "audit": "Audit",
+      "system": "System",
+      "firewall": "Firewall",
+      "conntrack": "Conntrack",
+      "export": "Export Logs"
+    }
   },
   "ru": {
-    "logs": { "title": "Журналы", "type": "Тип журнала", "keyword": "Ключевое слово", "level": "Уровень", "startTime": "Время начала", "endTime": "Время окончания", "all": "Все", "audit": "Аудит", "system": "Система", "firewall": "Брандмауэр", "conntrack": "Conntrack", "export": "Экспорт журналов" }
+    "logs": {
+      "title": "Журналы",
+      "type": "Тип журнала",
+      "keyword": "Ключевое слово",
+      "level": "Уровень",
+      "startTime": "Время начала",
+      "endTime": "Время окончания",
+      "all": "Все",
+      "audit": "Аудит",
+      "system": "Система",
+      "firewall": "Брандмауэр",
+      "conntrack": "Conntrack",
+      "export": "Экспорт журналов"
+    }
   },
   "de": {
-    "logs": { "title": "Protokolle", "type": "Protokolltyp", "keyword": "Schlüsselwort", "level": "Ebene", "startTime": "Startzeit", "endTime": "Endzeit", "all": "Alle", "audit": "Audit", "system": "System", "firewall": "Firewall", "conntrack": "Conntrack", "export": "Protokolle exportieren" }
+    "logs": {
+      "title": "Protokolle",
+      "type": "Protokolltyp",
+      "keyword": "Schlüsselwort",
+      "level": "Ebene",
+      "startTime": "Startzeit",
+      "endTime": "Endzeit",
+      "all": "Alle",
+      "audit": "Audit",
+      "system": "System",
+      "firewall": "Firewall",
+      "conntrack": "Conntrack",
+      "export": "Protokolle exportieren"
+    }
   },
   "fr": {
-    "logs": { "title": "Journaux", "type": "Type de journal", "keyword": "Mot-clé", "level": "Niveau", "startTime": "Heure de début", "endTime": "Heure de fin", "all": "Tous", "audit": "Audit", "system": "Système", "firewall": "Pare-feu", "conntrack": "Conntrack", "export": "Exporter les journaux" }
+    "logs": {
+      "title": "Journaux",
+      "type": "Type de journal",
+      "keyword": "Mot-clé",
+      "level": "Niveau",
+      "startTime": "Heure de début",
+      "endTime": "Heure de fin",
+      "all": "Tous",
+      "audit": "Audit",
+      "system": "Système",
+      "firewall": "Pare-feu",
+      "conntrack": "Conntrack",
+      "export": "Exporter les journaux"
+    }
   },
   "ko": {
-    "logs": { "title": "로그", "type": "로그 유형", "keyword": "키워드", "level": "수준", "startTime": "시작 시간", "endTime": "종료 시간", "all": "모두", "audit": "감사", "system": "시스템", "firewall": "방화벽", "conntrack": "Conntrack", "export": "로그 낳로하기" }
+    "logs": {
+      "title": "로그",
+      "type": "로그 유형",
+      "keyword": "키워드",
+      "level": "수준",
+      "startTime": "시작 시간",
+      "endTime": "종료 시간",
+      "all": "모두",
+      "audit": "감사",
+      "system": "시스템",
+      "firewall": "방화벽",
+      "conntrack": "Conntrack",
+      "export": "로그 낳로하기"
+    }
   }
 }

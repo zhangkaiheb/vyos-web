@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="openvpn">
+<h1>OpenVPN</h1>
+<p>Traditionnellement, les routeurs matériels utilisent exclusivement IPsec car il est facile à implémenter en matériel, et leurs processeurs n'ont pas assez de puissance pour le chiffrement logiciel. Cette limitation est moins pertinente pour VyOS, car c'est un routeur logiciel.</p>
+<p>OpenVPN a été largement utilisé sur les plateformes UNIX depuis longtemps et est une option populaire pour les réseaux privés virtuels (VPN) à accès distant. Il prend également en charge les connexions site à site.</p>
+<p>OpenVPN offre les avantages suivants :</p>
+<ul class="simple">
+<li><p>Il utilise une seule connexion TCP ou UDP et ne dépend pas des adresses sources des paquets, donc il fonctionne même à travers un double NAT. Cela le rend bien adapté aux hotspots publics.</p></li>
+<li><p>Il est facile à configurer et offre une très grande flexibilité en matière de tunnel partagé.</p></li>
+<li><p>Un grand nombre d'interfaces graphiques clients sont disponibles pour toute plateforme.</p></li>
+</ul>
+<p>Les inconvénients incluent :</p>
+<ul class="simple">
+<li><p>Il est plus lent que IPsec en raison d'une surcharge de protocole plus importante et du fait qu'il s'exécute en mode utilisateur, tandis que IPsec sous Linux s'exécute en mode noyau.</p></li>
+<li><p>Aucun système d'exploitation n'inclut par défaut le logiciel client OpenVPN.</p></li>
+</ul>
+<p>Dans l'interface CLI de VyOS, OpenVPN est configuré comme une interface réseau à l'aide de <code class="docutils literal notranslate">set interfaces openvpn</code> plutôt que <code class="docutils literal notranslate">set vpn</code>, ce qui est souvent négligé.</p>
+<section id="configuration">
+<h2>Configuration</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; authentication password &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-authentication-password-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le mot de passe pour la méthode d'authentification</strong> <code class="docutils literal notranslate">auth-user-pass</code> <strong>.</strong></p>
+<p>Cette option s'applique uniquement aux clients OpenVPN.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; authentication username &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-authentication-username-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le nom d'utilisateur pour la méthode d'authentification</strong> <code class="docutils literal notranslate">auth-user-pass</code> <strong>.</strong></p>
+<p>Cette option s'applique uniquement aux clients OpenVPN.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez la description de l'interface OpenVPN.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; device-type &lt;tap | tun&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-device-type-tap-tun" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le type de dispositif réseau virtuel pour l'interface OpenVPN :</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">tun</code> <strong>(par défaut)</strong> : Fonctionne au niveau 3, encapsulant les paquets IPv4 ou IPv6.</p></li>
+<li><p><code class="docutils literal notranslate">tap</code> : Fonctionne au niveau 2, encapsulant les trames Ethernet 802.3.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Désactivez l'interface OpenVPN spécifique.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; encryption cipher &lt; 3des | aes128 | aes128gcm | aes192 | aes192gcm | aes256 | aes256gcm | none &gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-encryption-cipher-3des-aes128-aes128gcm-aes192-aes192gcm-aes256-aes256gcm-none" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le chiffrement statique pour le tunnel OpenVPN.</strong></p>
+<p>L'option <code class="docutils literal notranslate">cipher</code> correspond à la directive <code class="docutils literal notranslate">--cipher</code> d'OpenVPN et spécifie l'algorithme de chiffrement symétrique pour les canaux de contrôle et de données.</p>
+<p>C'était précédemment la méthode de chiffrement par défaut dans tous les modes OpenVPN. Dans les versions plus récentes d'OpenVPN, la directive <code class="docutils literal notranslate">--cipher</code> est considérée comme <strong>obsolète</strong> et doit être utilisée uniquement dans des scénarios de compatibilité.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; encryption data-ciphers &lt; 3des | aes128 | aes128gcm | aes192 | aes192gcm | aes256 | aes256gcm | none &gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-encryption-data-ciphers-3des-aes128-aes128gcm-aes192-aes192gcm-aes256-aes256gcm-none" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez une liste priorisée de chiffrements négociés pour OpenVPN en mode</strong> <code class="docutils literal notranslate">client</code> <strong>ou</strong> <code class="docutils literal notranslate">server</code> <strong>.</strong></p>
+<p>L'option <code class="docutils literal notranslate">data-ciphers</code> représente une liste d'algorithmes de chiffrement pris en charge. Elle correspond à la directive <code class="docutils literal notranslate">--data-ciphers</code> d'OpenVPN et permet la négociation de chiffrement, où les deux pairs s'accordent automatiquement sur un chiffrement mutuellement supporté lors du démarrage de la session.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette option n'est pas compatible avec le mode <code class="docutils literal notranslate">site-to-site</code>.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; encryption data-ciphers-fallback &lt; 3des | aes128 | aes128gcm | aes192 | aes192gcm | aes256 | aes256gcm | none &gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-encryption-data-ciphers-fallback-3des-aes128-aes128gcm-aes192-aes192gcm-aes256-aes256gcm-none" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le chiffrement de secours pour le mode</strong> <code class="docutils literal notranslate">site-to-site</code> <strong>.</strong></p>
+<p>L'option <code class="docutils literal notranslate">data-ciphers-fallback</code> correspond à la directive <code class="docutils literal notranslate">--data-ciphers- fallback</code> d'OpenVPN. Elle définit le chiffrement à utiliser si la négociation est <strong>non prise en charge</strong>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette option assure une chiffrement cohérent entre deux pairs statiques sans capacité de négociation de chiffrement.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; hash &lt;md5 | sha1 | sha256 | …&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-hash-md5-sha1-sha256" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez l'algorithme de hachage pour l'interface OpenVPN.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la taille maximale de segment (MSS) annoncée dans les paquets TCP SYN sortants sur l'interface spécifiée.</strong></p>
+<p>En limitant la valeur de MSS dans les paquets TCP SYN, vous informez explicitement l'autre côté qu'il ne doit pas envoyer de paquets plus grands que cette taille. Cela empêche les problèmes de connexion qui surviennent lorsque la découverte de MTU de chemin (PMTUD) échoue.</p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>mss :</strong> Définit la taille MSS à une valeur spécifique, en octets. Utilisez cette option si vous avez besoin d'imposer une taille MSS spécifique, par exemple pour résoudre des problèmes de connectivité ou répondre à des exigences réseau spécifiques.</p></li>
+<li><p><strong>clamp-mss-to-pmtu :</strong> Le routeur calcule automatiquement la taille MSS à être la taille MTU de l'interface moins 40 octets pour le trafic IPv4 (20 octets pour l'en-tête IPv4 et 20 octets pour l'en-tête TCP). Cette option est recommandée pour définir automatiquement la bonne valeur.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ip-arp-cache-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez pendant combien de temps un enregistrement ARP reste valide après avoir appris une association d'adresse IP à adresse MAC sur cette interface.</strong></p>
+<p>La durée par défaut est de 30 secondes.</p>
+<p>Un enregistrement ARP reste valide s'il reçoit un feedback positif des protocoles de niveau supérieur.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 ip arp-cache-timeout 180
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ip-disable-arp-filter" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le filtrage ARP sur cette interface.</strong></p>
+<p><strong>Comportement par défaut :</strong> Le noyau répond aux demandes ARP sur cette interface uniquement si le trafic serait routé de retour à l'expéditeur ARP via cette interface spécifique.</p>
+<p><strong>Si configuré :</strong> Le noyau répond aux demandes ARP sur cette interface pour toute adresse IP configurée sur l'hôte local, indépendamment de l'interface spécifique à laquelle cette adresse IP est assignée, et indépendamment de la table de routage. Cela reflète le concept Linux selon lequel les adresses IP appartiennent à l'hôte, et non à des interfaces individuelles.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 ip disable-arp-filter
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour le comportement hôte ou routeur.</strong></p>
+<p>Si configuré, l'interface passe en mode hôte, et le transfert IPv4 est désactivé sur celle-ci.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 ip disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez si les paquets broadcast directs IP reçus sur cette interface doivent être transmis.</strong></p>
+<p><strong>Comportement par défaut :</strong> Les paquets broadcast directs IP sont supprimés.</p>
+<p><strong>Si configuré :</strong> Les paquets broadcast directs IP sont transmis à tous les hôtes sur le sous-réseau de destination, conformément à <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> et <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 ip enable-directed-broadcast
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ip-enable-arp-accept" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez comment traiter les ARPs gratuit sur cette interface.</strong></p>
+<p>Si configuré, une association IP-MAC est ajoutée au tableau ARP en fonction des demandes ou réponses ARP gratuit.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Si le tableau ARP contient déjà l'adresse IP provenant d'un ARP gratuit, son entrée est mise à jour, indépendamment de la configuration de cette option.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 ip enable-arp-accept
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ip-enable-arp-announce" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la sélection de l'adresse source pour les demandes ARP sur cette interface.</strong></p>
+<p><strong>Comportement par défaut :</strong> Le noyau peut utiliser n'importe quelle adresse IP possédée par l'hôte comme adresse source dans les demandes ARP sur cette interface.</p>
+<p><strong>Si configuré :</strong> Le noyau tente d'abord de sélectionner une adresse IP configurée sur l'interface qui partage un sous-réseau commun avec l'adresse IP cible. Si aucun tel sous-réseau n'existe, le noyau sélectionne l'adresse IP qu'il utiliserait normalement (en fonction de la table de routage pour atteindre la destination cible).</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 ip enable-arp-announce
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ip-enable-arp-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez quels requêtes ARP seront ignorées sur cette interface.</strong></p>
+<p><strong>Comportement par défaut :</strong> Le noyau répond aux requêtes ARP pour toutes les adresses IP locales, indépendamment de l'interface à laquelle elles sont assignées.</p>
+<p><strong>Si configuré :</strong> Le noyau répond aux requêtes ARP uniquement si l'adresse IP cible est assignée à cette interface spécifique.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 ip enable-arp-ignore
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ip-enable-proxy-arp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le proxy ARP sur cette interface.</strong></p>
+<p>Si configuré, le routeur (noyau) intercepte les requêtes ARP pour des adresses IP non locales et répond avec l'adresse <abbr title="Media Access Control">MAC</abbr> de l'interface qui a reçu la requête. Les paquets suivants destinés à ces adresses IP sont ensuite transmis vers leurs destinations réelles sur les sous-réseaux distants.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 ip enable-proxy-arp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ip-proxy-arp-pvlan" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le proxy ARP local sur l'interface.</strong></p>
+<p>Si configuré, le routeur (noyau) répond aux requêtes ARP sur cette interface VLAN même si l'adresse IP cible se trouve sur le même sous-réseau et l'interface.</p>
+<p>Cela est utilisé pour soutenir les exigences d'isolation réseau (RFC 3069) pour les VLAN privés (PVLAN). Dans les configurations PVLAN, les hôtes sur des ports isolés ne sont pas autorisés à communiquer directement entre eux au niveau 2, mais ils peuvent communiquer avec le routeur supérieur.</p>
+<p>En répondant aux requêtes ARP inter-hôtes avec sa propre adresse <abbr title="Media Access Control">MAC</abbr>, le routeur (noyau) dirige le trafic inter-hôtes via lui-même au lieu de directement entre les hôtes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette commande fonctionne indépendamment et n'a pas besoin d'activer le proxy ARP standard sur l'interface.</p>
+</div>
+<p>Le proxy ARP local est également connu sous les noms suivants :</p>
+<ul class="simple">
+<li><p>Aggrégation de VLAN (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>VLAN privé (Cisco, Allied Telesyn).</p></li>
+<li><p>Filtrage de port source ou isolation de port (Hewlett-Packard).</p></li>
+<li><p>Transfert forcé MAC (Ericsson).</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la validation de l'adresse IP source à l'aide de</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>sur cette interface, comme spécifié dans</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>strict :</strong> Chaque paquet entrant est vérifié contre la base d'informations de routage (FIB). Si l'interface n'est pas le meilleur chemin de retour vers cette source, la validation échoue et le paquet est supprimé.</p></li>
+<li><p><strong>loose :</strong> Chaque paquet entrant est vérifié contre la FIB. Si l'adresse IP source est inatteignable via n'importe quelle interface, la validation échoue.</p></li>
+<li><p><strong>disable :</strong> Aucune validation de l'adresse IP source n'est effectuée. Tous les paquets entrants sont acceptés.</p></li>
+</ul>
+<p>Le RFC 3704 recommande d'activer le mode strict pour prévenir le spoofing d'IP, comme les attaques DDoS. Pour les scénarios de routage asymétrique ou autres scénarios complexes, utilisez le mode loose.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour obtenir automatiquement une adresse IPv6 à l'aide de</strong> <abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>comme spécifié dans</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<p>Les hôtes IPv6 peuvent se configurer automatiquement lorsqu'ils sont connectés à un réseau IPv6 en utilisant le protocole de découverte des voisins via les messages ICMPv6 de découverte de routeur. Lorsqu'ils se connectent pour la première fois à un réseau, un hôte envoie une demande multicast de demande de routeur link-local pour ses paramètres de configuration. Le routeur répond avec un paquet de publication de routeur contenant les paramètres de configuration du niveau Internet.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette méthode désactive automatiquement le transfert de trafic IPv6 sur l'interface.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 ipv6 address autoconf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ipv6-address-eui64-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour lui attribuer une adresse IPv6 à l'aide de la méthode</strong> <abbr title="64-Bit Extended Unique Identifier">EUI-64</abbr> <strong>, comme spécifié</strong> dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 ipv6 address eui64 2001:db8:beef::/64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ipv6 address no-default-link-local
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ipv6-address-no-default-link-local" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Désactivez l'attribution automatique d'une adresse IPv6 link-local à cette interface.</strong></p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 ipv6 address no-default-link-local
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ipv6-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface pour le comportement hôte ou routeur.</strong></p>
+<p>Si configuré, l'interface passe en mode hôte, et le transfert IPv6 est désactivé sur celle-ci.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 ipv6 disable-forwarding
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ipv6 adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la taille maximale de segment (MSS) annoncée dans les paquets TCP SYN sortants sur l'interface spécifiée.</strong></p>
+<p>En limitant la valeur de MSS dans les paquets TCP SYN, vous informez explicitement l'autre côté qu'il ne doit pas envoyer de paquets plus grands que cette taille. Cela empêche les problèmes de connexion lorsque la découverte de MTU de chemin (PMTUD) échoue.</p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>mss :</strong> Définit la taille MSS à une valeur spécifique, en octets. Utilisez cette option pour imposer une taille MSS spécifique, par exemple pour résoudre des problèmes de connectivité ou répondre à des exigences réseau spécifiques.</p></li>
+<li><p><strong>clamp-mss-to-pmtu :</strong> Le routeur calcule la taille MSS à être la taille MTU de l'interface moins 60 octets pour le trafic IPv6 (40 octets pour l'en-tête IPv6 et 20 octets pour l'en-tête TCP). Cette option est recommandée pour définir automatiquement la bonne valeur.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ipv6 accept-dad &lt;0 | 1 | 2&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ipv6-accept-dad-0-1-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le</strong> <abbr title="Duplicate Address Detection">DAD</abbr> <strong>IPv6 sur l'interface.</strong></p>
+<p>Les options suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>0 :</strong> Désactive le DAD. Aucune détection d'adresse dupliquée n'est effectuée.</p></li>
+<li><p><strong>1 :</strong> Active le DAD (par défaut). Les adresses dupliquées sont détectées. L'opération IPv6 de l'interface continue pour les adresses IPv6 valides.</p></li>
+<li><p><strong>2 :</strong> Active le DAD et, si une adresse link-local dupliquée basée sur le MAC est trouvée, désactive l'opération IPv6 sur cette interface.</p></li>
+</ul>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 ipv6 accept-dad 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; ipv6 dup-addr-detect-transmits &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-ipv6-dup-addr-detect-transmits-n" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le nombre de messages</strong> <abbr title="Duplicate Address Detection">DAD</abbr> <strong>que le routeur (noyau) envoie pendant l'attribution d'adresse IPv6 sur cette interface.</strong></p>
+<p>La valeur par défaut est 1.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 ipv6 dup-addr-detect-transmits 5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; keep-alive failure-count &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-keep-alive-failure-count-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le nombre de pannes de paquets keepalive tolérés.</strong></p>
+<p>Défaut : 60 pannes consécutives.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; keep-alive interval &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-keep-alive-interval-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la fréquence, en secondes, à laquelle les paquets keepalive sont envoyés.</strong></p>
+<p>Défaut : 10 secondes.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; local-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-local-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez l'adresse IP du tunnel local pour le mode <code class="docutils literal notranslate">site-to-site</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; local-host &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-local-host-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'adresse IP locale pour accepter les connexions.</strong></p>
+<p>Si configuré, OpenVPN s'attache à cette adresse IP uniquement.</p>
+<p>Par défaut, OpenVPN s'attache à toutes les interfaces.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; local-port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-local-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez le port local pour accepter les connexions.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; mirror egress &lt;monitor-interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-mirror-egress-monitor-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez le miroir du trafic sortant de cette interface OpenVPN vers l'interface de surveillance désignée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; mirror ingress &lt;monitor-interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-mirror-ingress-monitor-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez le miroir du trafic entrant de cette interface OpenVPN vers l'interface de surveillance désignée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; mode &lt;site-to-site | server | client&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-mode-site-to-site-server-client" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le mode d'exploitation d'OpenVPN :</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">site-to-site</code> : Établit une connexion VPN site à site.</p></li>
+<li><p><code class="docutils literal notranslate">client</code> : Fonctionne en tant que client en mode serveur-client.</p></li>
+<li><p><code class="docutils literal notranslate">server</code> : Fonctionne en tant que serveur en mode serveur-client.</p></li>
+</ul>
+</div>
+</div>
+<section id="openvpn-data-channel-offload-dco">
+<h3>OpenVPN Data Channel Offload (DCO)</h3>
+<p>OpenVPN <abbr title="Data Channel Offload">DCO</abbr> améliore les performances du traitement des données chiffrées OpenVPN en maintenant la plupart du traitement des données dans le noyau et en évitant les commutations contextuelles fréquentes entre le noyau et l'espace utilisateur.</p>
+<p>En conséquence, le traitement des paquets devient plus efficace et peut utiliser le support de déchargement de chiffrement matériel disponible dans le noyau.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul>
+<li><p><abbr title="Data Channel Offload">DCO</abbr> est une fonctionnalité <strong>expérimentale</strong>, non pleinement prise en charge d'OpenVPN. Certaines fonctionnalités d'OpenVPN et certains scénarios de déploiement sont <strong>non compatibles</strong> avec <abbr title="Data Channel Offload">DCO</abbr>.</p>
+<p>Pour une liste complète des fonctionnalités prises en charge, visitez :
+<a class="reference external" href="https://community.openvpn.net/openvpn/wiki/DataChannelOffload/Features">https://community.openvpn.net/openvpn/wiki/DataChannelOffload/Features</a></p>
+</li>
+<li><p><abbr title="Data Channel Offload">DCO</abbr> est configuré par tunnel et désactivé par défaut. Les tunnels existants fonctionnent sans <abbr title="Data Channel Offload">DCO</abbr> à moins qu'il ne soit activé explicitement.</p></li>
+<li><p>L'activation de <abbr title="Data Channel Offload">DCO</abbr> réinitialise l'interface.</p></li>
+</ul>
+</div>
+<p><strong>Bonne pratique :</strong> Créez un nouveau tunnel avec <abbr title="Data Channel Offload">DCO</abbr> activé pour éviter les problèmes de compatibilité avec les clients existants.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; offload dco
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-offload-dco" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activez</strong> <abbr title="Data Channel Offload">DCO</abbr> <strong>pour l'interface OpenVPN spécifiée.</strong></p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 offload dco
+</pre></div>
+</div>
+<p>Cette commande active <abbr title="Data Channel Offload">DCO</abbr> et charge le module noyau requis.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; openvpn-option &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-openvpn-option-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Ajoutez des options de configuration OpenVPN brutes au fichier openvpn.conf.</strong></p>
+<p>OpenVPN propose de nombreuses options de configuration, mais pas toutes sont disponibles dans la CLI VyOS.</p>
+<p>Si une option requise est absente, vous pouvez soumettre une demande de fonctionnalité à Phabricator afin que tous les utilisateurs en bénéficient (voir Contributing/Issues and Features).</p>
+<p>Alternativement, utilisez <code class="docutils literal notranslate">openvpn-option</code> pour passer des options de configuration OpenVPN brutes au fichier openvpn.conf.</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Utilisez cette option uniquement en dernier recours. Des options ou une syntaxe incorrectes peuvent empêcher OpenVPN de démarrer. Vérifiez les journaux du système après l'application des modifications.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 openvpn-option &#39;persist-key&#39;
+</pre></div>
+</div>
+<p>Cette commande ajoute <code class="docutils literal notranslate">persist-key</code> au fichier de configuration. Cela résout le problème en conservant les clés après les redémarrages, afin qu'elles n'aient pas à être relues.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces openvpn vtun0 openvpn-option &#39;route-up &amp;quot;/config/auth/tun_up.sh arg1&amp;quot;&#39;
+</pre></div>
+</div>
+<p>Cette commande ajoute <code class="docutils literal notranslate">route-up &quot;/config/auth/tun_up.sh arg1&quot;</code> au fichier de configuration. Cette option est exécutée après l'authentification de la connexion, soit immédiatement, soit après un court délai, selon la définition.</p>
+<p>Assurez-vous que le chemin et les arguments sont encadrés par des guillemets simples ou doubles.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Certaines options de configuration brutes nécessitent des guillemets. Pour les inclure, utilisez la « déclaration ».</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; persistent-tunnel
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-persistent-tunnel" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activez le mode toujours actif pour le périphérique TUN/TAP.</strong></p>
+<p>Lorsqu'elle est activée, le périphérique TUN/TAP reste actif après les redémarrages ou les rechargements du daemon.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; protocol &lt;udp | tcp-passive | tcp-active &gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-protocol-udp-tcp-passive-tcp-active" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le protocole pour la communication OpenVPN avec un hôte distant :</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">udp</code> <strong>(par défaut)</strong> : Utilise le protocole UDP.</p></li>
+<li><p><code class="docutils literal notranslate">tcp-passive</code> : Utilise le protocole TCP et accepte les connexions passivement.</p></li>
+<li><p><code class="docutils literal notranslate">tcp-active</code> : Utilise le protocole TCP et initie les connexions activement.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; redirect &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-redirect-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Activez la redirection des paquets entrants vers l'interface spécifiée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; remote-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-remote-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez l'adresse IP du tunnel distant pour le mode site à site.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; remote-host &lt;address | host&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-remote-host-address-host" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'adresse IPv4/IPv6 ou le nom d'hôte d'un appareil serveur si OpenVPN fonctionne en mode client.</strong></p>
+<p>Cette configuration n'est pas utilisée en mode serveur.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; remote-port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-remote-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez le port distant pour se connecter au serveur.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; replace-default-route
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-replace-default-route" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez le tunnel OpenVPN comme route par défaut.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server bridge disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-bridge-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Désactivez l'instance donnée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server bridge gateway &lt;ipv4 address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-bridge-gateway-ipv4-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez l'adresse IP de la passerelle.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server bridge start &lt;ipv4 address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-bridge-start-ipv4-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez la première adresse IP dans la plage à allouer aux clients se connectant.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server bridge stop &lt;ipv4 address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-bridge-stop-ipv4-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez la dernière adresse IP dans la plage à allouer aux clients se connectant.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server bridge subnet-mask &lt;ipv4 subnet mask&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-bridge-subnet-mask-ipv4-subnet-mask" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez le masque de sous-réseau poussé aux clients dynamiques.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server client &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-client-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez le nom commun (CN) spécifié dans le certificat client.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server client &lt;name&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-client-name-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Désactivez la connexion client.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server client &lt;name&gt; ip &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-client-name-ip-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez l'adresse IPv4/IPv6 du client.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server client &lt;name&gt; push-route &lt;subnet&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-client-name-push-route-subnet" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez une route à pousser vers le client spécifique.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server client &lt;name&gt; subnet &lt;subnet&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-client-name-subnet-subnet" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez un sous-réseau fixe à router depuis le serveur vers le client spécifié.</strong></p>
+<p>Utilisé comme directive <code class="docutils literal notranslate">iroute</code> d'OpenVPN.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server client-ip-pool start &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-client-ip-pool-start-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez la première adresse IP dans la plage IPv4 du sous-réseau à allouer dynamiquement aux clients se connectant.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server client-ip-pool stop &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-client-ip-pool-stop-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez la dernière adresse IP dans la plage IPv4 du sous-réseau à allouer dynamiquement aux clients se connectant.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server client-ip-pool subnet &lt;netmask&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-client-ip-pool-subnet-netmask" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le masque de sous-réseau poussé aux clients dynamiques.</strong></p>
+<p>Utilisez cette commande uniquement pour le type d'appareil TAP. Ne l'utilisez pas pour les interfaces de pont.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server client-ipv6-pool base &lt;ipv6addr/bits&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-client-ipv6-pool-base-ipv6addr-bits" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez la plage d'adresses IPv6 pour l'attribution dynamique aux clients.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server domain-name &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-domain-name-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez le suffixe DNS à pousser à tous les clients.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server max-connections &lt;1-4096&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-max-connections-1-4096" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez le nombre maximum de connexions clients.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server mfa totp challenge &lt;enable | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-mfa-totp-challenge-enable-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Si activé, openvpn-otp attend un mot de passe en tant que résultat du protocole de défi/réponse.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server mfa totp digits &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-mfa-totp-digits-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le nombre de chiffres à utiliser pour le</strong> <abbr title="Time-based One-Time Password">TOTP</abbr> <strong>hash.</strong></p>
+<p>Défaut : 6.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server mfa totp drift &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-mfa-totp-drift-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le décalage temporel en secondes.</strong></p>
+<p>Défaut : 0.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server mfa totp slop &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-mfa-totp-slop-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la marge de temps autorisée en secondes.</strong></p>
+<p>Défaut : 180.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server mfa totp step &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-mfa-totp-step-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la valeur de pas pour</strong> <abbr title="Time-based One-Time Password">TOTP</abbr> <strong>en secondes.</strong></p>
+<p>Défaut : 30.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-name-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définissez la configuration DNS client à utiliser avec la connexion.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server push-route &lt;subnet&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-push-route-subnet" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez la route à pousser à tous les clients.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server reject-unconfigured-client
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-reject-unconfigured-client" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Rejetez les connexions des clients non configurés explicitement.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server subnet &lt;subnet&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-subnet-subnet" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le réseau IPv4 ou IPv6.</strong></p>
+<p>Ce paramètre est obligatoire lors de l'utilisation en mode serveur.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; server topology &lt; net30 | point-to-point | subnet&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-server-topology-net30-point-to-point-subnet" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la topologie d'adressage virtuelle pour le mode</strong> <code class="docutils literal notranslate">tun</code> <strong>.</strong></p>
+<p>Cette commande n'affecte pas le mode <code class="docutils literal notranslate">tap</code>, qui utilise toujours la topologie <code class="docutils literal notranslate">subnet</code>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">subnet</code> <strong>(par défaut)</strong> : Alloue une adresse IP unique à chaque client connecté. C'est la topologie recommandée.</p></li>
+<li><p><code class="docutils literal notranslate">net30</code> : Alloue un sous-réseau /30 à chaque client connecté. C'est une topologie héritée utilisée pour supporter les clients Windows. Elle est désormais effectivement obsolète.</p></li>
+<li><p><code class="docutils literal notranslate">point-to-point</code> : Crée une topologie point à point où l'extrémité distante de l'interface <code class="docutils literal notranslate">tun</code> du client pointe toujours vers l'extrémité locale de l'interface <code class="docutils literal notranslate">tun</code> du serveur.</p></li>
+</ul>
+<p>Comme <code class="docutils literal notranslate">subnet</code>, cette topologie alloue une adresse IP par client. Utilisez-la uniquement si aucun client ne tourne sous Windows.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces openvpn &lt;interface&gt; shared-secret-key &lt;key&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-openvpn-interface-shared

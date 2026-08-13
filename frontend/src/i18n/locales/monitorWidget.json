@@ -1,0 +1,37 @@
+{
+  "zh-CN": {
+    "monitorWidget": {
+      "total": "总数"
+    }
+  },
+  "en": {
+    "monitorWidget": {
+      "total": "Total"
+    }
+  },
+  "zh-TW": {
+    "monitorWidget": {
+      "total": "Total"
+    }
+  },
+  "ru": {
+    "monitorWidget": {
+      "total": "Total"
+    }
+  },
+  "de": {
+    "monitorWidget": {
+      "total": "Total"
+    }
+  },
+  "fr": {
+    "monitorWidget": {
+      "total": "Total"
+    }
+  },
+  "ko": {
+    "monitorWidget": {
+      "total": "Total"
+    }
+  }
+}

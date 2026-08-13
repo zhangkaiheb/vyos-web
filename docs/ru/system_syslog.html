@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="syslog">
+<h1>Syslog</h1>
+<section id="overview">
+<h2>Обзор</h2>
+<p>По умолчанию, VyOS предоставляет минимальную конфигурацию журналирования с локальным хранением и циклическим вращением журналов. Все ошибки, включая сообщения local7, сохраняются в локальный файл. Чрезвычайные оповещения отправляются на консоль.</p>
+<p>Чтобы изменить эти настройки, войдите в режим конфигурации.</p>
+</section>
+<section id="syslog-configuration">
+<h2>Конфигурация syslog</h2>
+<p>Syslog поддерживает запись в несколько назначений: локальный файл, консоль или удаленный сервер syslog через UDP или TCP.</p>
+<p>Конфигурация syslog организована в следующие категории:</p>
+<ul class="simple">
+<li><p>Глобальные настройки</p></li>
+<li><p>Локальное журналирование</p></li>
+<li><p>Журналирование на консоли</p></li>
+<li><p>Удаленное журналирование</p></li>
+<li><p>Шифрованное удаленное журналирование по TLS</p></li>
+</ul>
+<section id="global-settings">
+<h3>Глобальные настройки</h3>
+<p>Настройте общее поведение службы syslog.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog marker interval &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-marker-interval-number" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте интервал, в секундах, для отправки сообщений маркера syslog.</strong></p>
+<p>Сообщения маркера syslog подтверждают, что служба журналирования работает.</p>
+<p>По умолчанию: 1200 секунд.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog marker disable
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-marker-disable" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Отключить отправку сообщений маркера syslog.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog preserve-fqdn
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-preserve-fqdn" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте, как имя хоста устройства отображается в сообщениях журнала, отправляемых на удаленный сервер syslog.</strong></p>
+<p>Если настроено, устройство включает свой <abbr title="Fully Qualified Domain Name">FQDN</abbr> в сообщения журнала, даже если сервер syslog находится в той же доменной зоне.</p>
+</div>
+</div>
+</section>
+<section id="local-logging">
+<h3>Локальное журналирование</h3>
+<p>Настройте, какие сообщения журнала сохранять в локальный файл журнала.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog local &lt;filename&gt; facility &lt;keyword&gt; level &lt;keyword&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-local-filename-facility-keyword-level-keyword" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте syslog для сохранения сообщений журнала для определенного типа и уровня серьезности в ``/var/log/messages``.</strong></p>
+<p>См. таблицы ниже для получения допустимых вариантов типа и уровня серьезности.</p>
+</div>
+</div>
+</section>
+<section id="console-logging">
+<h3>Журналирование на консоли</h3>
+<p>Настройте, какие сообщения журнала отправлять на <code class="docutils literal notranslate">/dev/console</code>.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog console facility &lt;keyword&gt; level &lt;keyword&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-console-facility-keyword-level-keyword" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте syslog для отправки сообщений журнала для определенного типа и уровня серьезности на консоль устройства.</strong></p>
+<p>См. таблицы ниже для получения допустимых вариантов типа и уровня серьезности.</p>
+</div>
+</div>
+</section>
+<section id="remote-logging">
+<h3>Удаленное журналирование</h3>
+<p>Настройте <strong>удаленное журналирование</strong> для отправки сообщений журнала на удаленный сервер syslog.</p>
+<p>Удаленное журналирование не влияет ни на <strong>локальное</strong>, ни на <strong>журналирование на консоли</strong> и работает параллельно с ними. Удаленное журналирование поддерживает отправку сообщений журнала на несколько хостов.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; facility &lt;keyword&gt; level &lt;keyword&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-facility-keyword-level-keyword" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте передачу сообщений журнала на удаленный сервер syslog для определенного типа и уровня серьезности.</strong></p>
+<p>Адрес сервера можно указать с помощью либо <abbr title="Fully Qualified Domain Name">FQDN</abbr>, либо IP-адреса.</p>
+<p>См. таблицы ниже для получения допустимых вариантов типа и уровня серьезности.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; protocol &lt;udp | tcp&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-protocol-udp-tcp" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте протокол для передачи сообщений журнала.</strong></p>
+<p>Протокол может быть UDP или TCP. По умолчанию сообщения журнала отправляются через UDP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-port-port" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте порт для передачи сообщений журнала.</strong></p>
+<p>По умолчанию используется стандартный порт 514.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; format include-timezone
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-format-include-timezone" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте передачу сообщений журнала в формате RFC 5424.</strong></p>
+<p>Формат RFC 5424 включает часовой пояс в метку времени. Например:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>&lt;34&gt;1 2003-10-11T22:14:15.003-07:00 mymachine.example.com su - ID47 - BOM’su root’ failed for lonvick on /dev/pts/8.
+</pre></div>
+</div>
+<p>По умолчанию сообщения журнала отправляются в формате RFC 3164. Например:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>&lt;34&gt;Oct 11 22:14:15 mymachine su: ‘su root’ failed for lonvick on /dev/pts/8
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; format octet-counted
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-format-octet-counted" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включите фрейминг по количеству октетов для передачи сообщений журнала.</strong></p>
+<p>При включении, многострочные сообщения журнала отправляются без разделения. Убедитесь, что удаленный сервер поддерживает фрейминг по количеству октетов, чтобы избежать ошибок при разборе.</p>
+<p>Фрейминг по количеству октетов недоступен для протокола UDP.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; vrf &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-vrf-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Настройте экземпляр <abbr title="Virtual Routing and Forwarding">VRF</abbr> для передачи сообщений журнала.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-source-address-address" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Настройте исходный IP-адрес (IPv4 или IPv6) для передачи сообщений журнала.</p>
+</div>
+</div>
+<section id="tls-encrypted-remote-logging">
+<h4><abbr title="Transport Layer Security">TLS</abbr>-зашифрованное удалённое журналирование</h4>
+<p>VyOS поддерживает <abbr title="Transport Layer Security">TLS</abbr>-зашифрованное удалённое журналирование по TCP для обеспечения безопасной передачи данных syslog на удалённые серверы syslog.</p>
+<p><strong>Требования</strong>: Перед настройкой <abbr title="Transport Layer Security">TLS</abbr>-зашифрованного удалённого журналирования убедитесь, что у вас есть:</p>
+<ul>
+<li><p>Действительный адрес удалённого сервера syslog.</p></li>
+<li><p>Действительные сертификаты CA и клиента, загруженные в локальное хранилище PKI.</p></li>
+<li><p>Протокол передачи удалённого syslog установлен на <strong>TCP</strong>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system syslog remote &lt;address&gt; protocol tcp
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p><abbr title="Transport Layer Security">TLS</abbr>-зашифрованное удалённое журналирование
+<strong>не поддерживается</strong> по <strong>UDP</strong>.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; tls
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-tls" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Включить TLS-зашифрованное удалённое журналирование.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; tls ca-certificate &lt;ca_name&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-tls-ca-certificate-ca-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте сертификат</strong> <abbr title="Certificate Authority">CA</abbr> <strong>.</strong></p>
+<p>Клиент syslog использует сертификат <abbr title="Certificate Authority">CA</abbr>, чтобы проверить идентичность удалённого сервера syslog.</p>
+<p>Сертификат <abbr title="Certificate Authority">CA</abbr> требуется для <strong>всех</strong> режимов аутентификации, кроме <code class="docutils literal notranslate">anon</code>.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; tls certificate &lt;cert_name&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-tls-certificate-cert-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте клиентский сертификат.</strong></p>
+<p>Удалённый сервер syslog использует клиентский сертификат для проверки идентичности клиента syslog.</p>
+<p>Клиентский сертификат необходим, если удалённый сервер syslog требует проверки клиентского сертификата.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; tls auth-mode &lt;anon | fingerprint | certvalid | name&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-tls-auth-mode-anon-fingerprint-certvalid-name" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте режим аутентификации.</strong></p>
+<p>Режим аутентификации определяет, как клиент syslog проверяет идентичность сервера syslog.</p>
+<p>Доступны следующие режимы аутентификации:</p>
+<ul>
+<li><p><code class="docutils literal notranslate">anon</code> <strong>(по умолчанию)</strong>: Позволяет зашифрованные соединения без проверки идентичности сервера syslog. Этот режим <strong>не рекомендуется</strong>, так как он уязвим к атакам <abbr title="Man-in-the-Middle">MITM</abbr>.</p></li>
+<li><p><code class="docutils literal notranslate">fingerprint</code>: Проверяет хэш сертификата сервера против значения, предварительно настроенного с помощью:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system syslog remote &lt;address&gt; tls permitted-peer &lt;peer&gt;
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate">certvalid</code>: Проверяет, что сертификат сервера подписан доверенным <abbr title="Certificate Authority">CA</abbr>, пропуская проверку <abbr title="Common Name">CN</abbr>.</p></li>
+<li><p><code class="docutils literal notranslate">name</code>: Проверяет, что:</p>
+<ul class="simple">
+<li><p>Сертификат сервера подписан доверенным <abbr title="Certificate Authority">CA</abbr>.</p></li>
+<li><p>Значение <abbr title="Common Name">CN</abbr> в сертификате совпадает со значением, предварительно настроенным с помощью:</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system syslog remote &lt;address&gt; tls permitted-peer &lt;peer&gt;
+</pre></div>
+</div>
+<p>Это <strong>рекомендуемый</strong> безопасный режим для производственных сред.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system syslog remote &lt;address&gt; tls permitted-peer &lt;peer&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-tls-permitted-peer-peer" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настройте идентификаторы сертификатов peer.</strong></p>
+<p>Формат идентификатора сертификата зависит от режима аутентификации:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">fingerprint</code>: Введите ожидаемые хэши сертификатов (SHA-1 или SHA-256).</p></li>
+<li><p><code class="docutils literal notranslate">name</code>: Введите ожидаемые имена сертификатов <abbr title="Common Names">CNs</abbr>.</p></li>
+</ul>
+<p>Для режимов аутентификации <code class="docutils literal notranslate">anon</code> и <code class="docutils literal notranslate">certvalid</code> идентификаторы сертификатов не требуются.</p>
+</div>
+</div>
+</section>
+<section id="examples">
+<h4>Примеры:</h4>
+<div class="highlight-none notranslate"><div class="highlight"><pre># Пример режима аутентификации 'anon'
+set system syslog remote 10.10.2.3 facility all level debug
+set system syslog remote 10.10.2.3 port 6514
+set system syslog remote 10.10.2.3 protocol tcp
+set system syslog remote 10.10.2.3 tls auth-mode anon
+# или просто используйте 'set system syslog remote 10.10.2.3 tls'
+
+# Пример режима аутентификации 'certvalid'
+set system syslog remote elk.example.com facility all level debug
+set system syslog remote elk.example.com port 6514
+set system syslog remote elk.example.com protocol tcp
+set system syslog remote elk.example.com tls ca-certificate my-ca
+set system syslog remote elk.example.com tls auth-mode certvalid
+
+# Пример режима аутентификации 'fingerprint'
+set system syslog remote syslog.example.com facility all level debug
+set system syslog remote syslog.example.com port 6514
+set system syslog remote syslog.example.com protocol tcp
+set system syslog remote syslog.example.com tls ca-certificate my-ca
+set system syslog remote syslog.example.com tls auth-mode fingerprint
+set system syslog remote syslog.example.com tls permitted-peers &#39;SHA1:10:C4:26:...,SHA256:7B:4B:10:...&#39;
+
+# Пример режима аутентификации 'name'
+set system syslog remote graylog.example.com facility all level debug
+set system syslog remote graylog.example.com port 6514
+set system syslog remote graylog.example.com protocol tcp
+set system syslog remote graylog.example.com tls ca-certificate my-ca
+set system syslog remote graylog.example.com tls certificate syslog-client
+set system syslog remote graylog.example.com tls auth-mode name
+set system syslog remote graylog.example.com tls permitted-peers &#39;graylog.example.com&#39;
+</pre></div>
+</div>
+</section>
+<section id="security-recommendations">
+<h4>Рекомендации по безопасности</h4>
+<ul class="simple">
+<li><p>Для безопасных развертываний всегда используйте режим аутентификации <code class="docutils literal notranslate">name</code>. Это гарантирует, что сервер проверен доверенным <abbr title="Certificate Authority">CA</abbr> и что имя хоста совпадает с сертификатом.</p></li>
+<li><p>Используйте режим аутентификации <code class="docutils literal notranslate">anon</code> только в тестовых средах, так как он не обеспечивает аутентификацию сервера.</p></li>
+<li><p>Убедитесь, что закрытые ключи генерируются, хранятся и поддерживаются исключительно внутри <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/../pki/index.html">системы PKI</a>.</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="syslog-facilities">
+<h2>Службы syslog</h2>
+<p>Этот раздел перечисляет службы, используемые syslog. Большинство имен служб самосогласованы. Службы local0–local7 используются для пользовательских целей, например, для журналирования с сетевых узлов и оборудования. Назначение службы гибкое и должно быть адаптировано под потребности вашей компании. Рассматривайте службы как инструменты категоризации, а не строгие директивы.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Код службы</p></th>
+<th class="head"><p>Ключевое слово</p></th>
+<th class="head"><p>Описание</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td><p>all</p></td>
+<td><p>Все службы</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>kern</p></td>
+<td><p>Сообщения ядра</p></td>
+</tr>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>user</p></td>
+<td><p>Сообщения уровня пользователя</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>mail</p></td>
+<td><p>Система электронной почты</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>daemon</p></td>
+<td><p>Системные демон-сервисы</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>auth</p></td>
+<td><p>Сообщения безопасности/аутентификации</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>syslog</p></td>
+<td><p>Сообщения, генерируемые внутренне системой syslog</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p>lpr</p></td>
+<td><p>Подсистема принтера</p></td>
+</tr>
+<tr class="row-even"><td><p>7</p></td>
+<td><p>news</p></td>
+<td><p>Подсистема сетевой новостной рассылки</p></td>
+</tr>
+<tr class="row-odd"><td><p>8</p></td>
+<td><p>uucp</p></td>
+<td><p>Подсистема UUCP</p></td>
+</tr>
+<tr class="row-even"><td><p>9</p></td>
+<td><p>cron</p></td>
+<td><p>Служба часов</p></td>
+</tr>
+<tr class="row-odd"><td><p>10</p></td>
+<td><p>security</p></td>
+<td><p>Сообщения безопасности/аутентификации</p></td>
+</tr>
+<tr class="row-even"><td><p>11</p></td>
+<td><p>ftp</p></td>
+<td><p>Демон FTP</p></td>
+</tr>
+<tr class="row-odd"><td><p>12</p></td>
+<td><p>ntp</p></td>
+<td><p>Подсистема NTP</p></td>
+</tr>
+<tr class="row-even"><td><p>13</p></td>
+<td><p>logaudit</p></td>
+<td><p>Аудит журнала</p></td>
+</tr>
+<tr class="row-odd"><td><p>14</p></td>
+<td><p>logalert</p></td>
+<td><p>Оповещение журнала</p></td>
+</tr>
+<tr class="row-even"><td><p>15</p></td>
+<td><p>clock</p></td>
+<td><p>Служба часов (примечание 2)</p></td>
+</tr>
+<tr class="row-odd"><td><p>16</p></td>
+<td><p>local0</p></td>
+<td><p>Локальное использование 0 (local0)</p></td>
+</tr>
+<tr class="row-even"><td><p>17</p></td>
+<td><p>local1</p></td>
+<td><p>Локальное использование 1 (local1)</p></td>
+</tr>
+<tr class="row-odd"><td><p>18</p></td>
+<td><p>local2</p></td>
+<td><p>Локальное использование 2 (local2)</p></td>
+</tr>
+<tr class="row-even"><td><p>19</p></td>
+<td><p>local3</p></td>
+<td><p>Локальное использование 3 (local3)</p></td>
+</tr>
+<tr class="row-odd"><td><p>20</p></td>
+<td><p>local4</p></td>
+<td><p>Локальное использование 4 (local4)</p></td>
+</tr>
+<tr class="row-even"><td><p>21</p></td>
+<td><p>local5</p></td>
+<td><p>Локальное использование 5 (local5)</p></td>
+</tr>
+<tr class="row-odd"><td><p>22</p></td>
+<td><p>local6</p></td>
+<td><p>Локальное использование 6 (local6)</p></td>
+</tr>
+<tr class="row-even"><td><p>23</p></td>
+<td><p>local7</p></td>
+<td><p>Локальное использование 7 (local7)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="severity-levels">
+<h2>Уровни серьезности</h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Значение</p></th>
+<th class="head"><p>Серьезность</p></th>
+<th class="head"><p>Ключевое слово</p></th>
+<th class="head"><p>Описание</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td><p>all</p></td>
+<td><p>Записывать все.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0</p></td>
+<td><p>Экстренные</p></td>
+<td><p>emerg</p></td>
+<td><p>Система непригодна для использования — состояние паники.</p></td>
+</tr>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>Предупреждение</p></td>
+<td><p>alert</p></td>
+<td><p>Необходимо немедленно принять меры — условие, которое должно быть исправлено немедленно, например, поврежденная база данных системы.</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>Критические</p></td>
+<td><p>crit</p></td>
+<td><p>Критические условия — например, ошибки жесткого диска.</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>Ошибка</p></td>
+<td><p>err</p></td>
+<td><p>Ошибочные условия.</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>Предупреждение</p></td>
+<td><p>warning</p></td>
+<td><p>Предупреждающие условия.</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>Заметка</p></td>
+<td><p>notice</p></td>
+<td><p>Нормальные, но значимые условия — условия, которые не являются ошибочными, но могут потребовать особого обращения.</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p>Информационные</p></td>
+<td><p>info</p></td>
+<td><p>Информационные сообщения.</p></td>
+</tr>
+<tr class="row-even"><td><p>7</p></td>
+<td><p>Отладка</p></td>
+<td><p>debug</p></td>
+<td><p>Сообщения уровня отладки — сообщения, содержащие информацию, обычно полезную только при отладке программы.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="display-logs">
+<h2>Показать журналы</h2>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log [all | authorization | cluster | conntrack-sync | …]
+<a class="cmdlink" href="#opcmd-show-log-all-authorization-cluster-conntrack-sync" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p><strong>Показать журналы для определенной категории на консоли.</strong></p>
+<p>Используйте завершение табуляции, чтобы увидеть список доступных категорий.</p>
+<p>Если категория не указана, будут показаны все журналы.</p>
+</div>
+</div>
+<div class="cmd cmd-op">
+<div class="opcmd-heading">
+
+show log image &lt;name&gt; [all | authorization | directory | file &lt;file name&gt; | tail &lt;lines&gt;]
+<a class="cmdlink" href="#opcmd-show-log-image-name-all-authorization-directory-file-file-name-tail-lines" title="Постоянная ссылка на эту команду"></a></div><div class="opcmd-body">
+<p><strong>Показать журналы для определенного образа на консоли.</strong></p>
+<p>Доступные категории журналов:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>all</p></td>
+<td><p>Отображает содержимое системных файлов журнала указанного образа.</p></td>
+</tr>
+<tr class="row-even"><td><p>authorization</p></td>
+<td><p>Отображает попытки авторизации указанного образа.</p></td>
+</tr>
+<tr class="row-odd"><td><p>directory</p></td>
+<td><p>Отображает пользовательские файлы журнала указанного образа.</p></td>
+</tr>
+<tr class="row-even"><td><p>file &lt;file name&gt;</p></td>
+<td><p>Отображает содержимое указанного пользовательского файла журнала указанного образа.</p></td>
+</tr>
+<tr class="row-odd"><td><p>tail</p></td>
+<td><p>Отображает последние строки системного журнала указанного образа.</p></td>
+</tr>
+<tr class="row-even"><td><p>&lt;lines&gt;</p></td>
+<td><p>Количество строк, которые должны быть отображены, по умолчанию 10.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Если категория не указана, будет отображаться содержимое основного файла syslog.</p>
+<div class="admonition hint">
+<p class="admonition-title">Совет</p>
+<p>Используйте <code class="docutils literal notranslate">show log | strip-private</code>, чтобы скрыть частные данные при отображении ваших журналов.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

@@ -1,36 +1,115 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { useConfigStore } from '/src/stores/config.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import { api, interfaceApi } from '/src/api/index.js';
+import { showError } from '/src/components/Layout/ErrorDisplay.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useI18n } from '/src/i18n/index.js';
 
-const COLUMNS = [
-  { key: 'name', title: '接口名称', width: 120 },
-  { key: 'description', title: '描述', width: 160 },
-  { key: 'port', title: '端口', width: 80 },
-  { key: 'mtu', title: 'MTU', width: 80 },
-  { key: 'peer_count', title: 'Peer 数量', width: 100 },
-  { key: 'disable', title: '禁用', width: 80 },
-  { key: 'actions', title: '操作', width: 100 },
-];
+
 
 const SOURCE_VALIDATION_OPTIONS = [
-  { value: 'strict', label: 'strict (严格)' },
-  { value: 'loose', label: 'loose (宽松)' },
-  { value: 'disable', label: 'disable (禁用)' },
+  { value: 'strict', labelKey: 'wireguard.options.source_validation.strict' },
+  { value: 'loose', labelKey: 'wireguard.options.source_validation.loose' },
+  { value: 'disable', labelKey: 'wireguard.options.source_validation.disable' },
 ];
 
 const ACCEPT_DAD_OPTIONS = [
-  { value: '0', label: '0 (禁用 DAD)' },
-  { value: '1', label: '1 (启用 DAD - 默认)' },
-  { value: '2', label: '2 (启用 DAD - MAC 重复时禁用 IPv6)' },
+  { value: '0', labelKey: 'wireguard.options.accept_dad.0' },
+  { value: '1', labelKey: 'wireguard.options.accept_dad.1' },
+  { value: '2', labelKey: 'wireguard.options.accept_dad.2' },
 ];
+
+function resolveOptions(options, t) {
+  if (!Array.isArray(options)) return options;
+  return options.map(opt => {
+    if (opt && opt.labelKey) return { ...opt, label: t(opt.labelKey) };
+    return opt;
+  });
+}
+
+function buildBasicSchema(t) {
+  return [
+    { key: 'name', title: t('wireguard.basic.name'), type: 'text', required: true, placeholder: t('wireguard.basic.name_placeholder'), help: t('wireguard.basic.name_help') },
+    { key: 'description', title: t('wireguard.basic.description'), type: 'text', placeholder: t('wireguard.basic.description_placeholder') },
+    { key: 'private_key', title: t('wireguard.basic.private_key'), type: 'textarea', placeholder: t('wireguard.basic.private_key_placeholder'), help: t('wireguard.basic.private_key_help') },
+    { key: 'port', title: t('wireguard.basic.port'), type: 'number', min: 1, max: 65535, placeholder: '1-65535', help: t('wireguard.basic.port_help') },
+    { key: 'fwmark', title: t('wireguard.basic.fwmark'), type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: t('wireguard.basic.fwmark_help') },
+    { key: 'max_dns_retry', title: t('wireguard.basic.max_dns_retry'), type: 'number', min: 1, max: 15, placeholder: '1-15', help: t('wireguard.basic.max_dns_retry_help') },
+    { key: 'mtu', title: t('wireguard.basic.mtu'), type: 'number', min: 68, max: 16000, placeholder: '68-16000', help: t('wireguard.basic.mtu_help') },
+    { key: 'per_client_thread', title: t('wireguard.basic.per_client_thread'), type: 'checkbox', help: t('wireguard.basic.per_client_thread_help') },
+    { key: 'disable', title: t('wireguard.basic.disable'), type: 'checkbox', help: t('wireguard.basic.disable_help') },
+  ];
+}
+
+function buildIpSchema(t) {
+  return [
+    { key: 'ip_adjust_mss', title: t('wireguard.ip.adjust_mss'), type: 'text', placeholder: t('wireguard.ip.adjust_mss_placeholder'), help: t('wireguard.ip.adjust_mss_help') },
+    { key: 'ip_arp_cache_timeout', title: t('wireguard.ip.arp_cache_timeout'), type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: t('wireguard.ip.arp_cache_timeout_help') },
+    { key: 'ip_disable_arp_filter', title: t('wireguard.ip.disable_arp_filter'), type: 'checkbox', help: t('wireguard.ip.disable_arp_filter_help') },
+    { key: 'ip_disable_forwarding', title: t('wireguard.ip.disable_forwarding'), type: 'checkbox', help: t('wireguard.ip.disable_forwarding_help') },
+    { key: 'ip_enable_arp_accept', title: t('wireguard.ip.enable_arp_accept'), type: 'checkbox', help: t('wireguard.ip.enable_arp_accept_help') },
+    { key: 'ip_enable_arp_announce', title: t('wireguard.ip.enable_arp_announce'), type: 'checkbox', help: t('wireguard.ip.enable_arp_announce_help') },
+    { key: 'ip_enable_arp_ignore', title: t('wireguard.ip.enable_arp_ignore'), type: 'checkbox', help: t('wireguard.ip.enable_arp_ignore_help') },
+    { key: 'ip_enable_directed_broadcast', title: t('wireguard.ip.enable_directed_broadcast'), type: 'checkbox', help: t('wireguard.ip.enable_directed_broadcast_help') },
+    { key: 'ip_enable_proxy_arp', title: t('wireguard.ip.enable_proxy_arp'), type: 'checkbox', help: t('wireguard.ip.enable_proxy_arp_help') },
+    { key: 'ip_proxy_arp_pvlan', title: t('wireguard.ip.proxy_arp_pvlan'), type: 'checkbox', help: t('wireguard.ip.proxy_arp_pvlan_help') },
+    { key: 'ip_source_validation', title: t('wireguard.ip.source_validation'), type: 'select', options: resolveOptions(SOURCE_VALIDATION_OPTIONS, t), placeholder: t('wireguard.ip.source_validation_placeholder'), help: t('wireguard.ip.source_validation_help') },
+  ];
+}
+
+function buildIpv6Schema(t) {
+  return [
+    { key: 'ipv6_accept_dad', title: t('wireguard.ipv6.accept_dad'), type: 'select', options: resolveOptions(ACCEPT_DAD_OPTIONS, t), help: t('wireguard.ipv6.accept_dad_help') },
+    { key: 'ipv6_autoconf', title: t('wireguard.ipv6.autoconf'), type: 'checkbox', help: t('wireguard.ipv6.autoconf_help') },
+    { key: 'ipv6_eui64', title: t('wireguard.ipv6.eui64'), type: 'text', placeholder: t('wireguard.ipv6.eui64_placeholder'), help: t('wireguard.ipv6.eui64_help') },
+    { key: 'ipv6_no_default_link_local', title: t('wireguard.ipv6.no_default_link_local'), type: 'checkbox', help: t('wireguard.ipv6.no_default_link_local_help') },
+    { key: 'ipv6_adjust_mss', title: t('wireguard.ipv6.adjust_mss'), type: 'text', placeholder: t('wireguard.ipv6.adjust_mss_placeholder'), help: t('wireguard.ipv6.adjust_mss_help') },
+    { key: 'ipv6_base_reachable_time', title: t('wireguard.ipv6.base_reachable_time'), type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: t('wireguard.ipv6.base_reachable_time_help') },
+    { key: 'ipv6_disable_forwarding', title: t('wireguard.ipv6.disable_forwarding'), type: 'checkbox', help: t('wireguard.ipv6.disable_forwarding_help') },
+    { key: 'ipv6_dup_addr_detect_transmits', title: t('wireguard.ipv6.dup_addr_detect_transmits'), type: 'number', min: 0, max: 100, placeholder: '0-100', help: t('wireguard.ipv6.dup_addr_detect_transmits_help') },
+    { key: 'ipv6_source_validation', title: t('wireguard.ipv6.source_validation'), type: 'select', options: resolveOptions(SOURCE_VALIDATION_OPTIONS, t), placeholder: t('wireguard.ipv6.source_validation_placeholder'), help: t('wireguard.ipv6.source_validation_help') },
+  ];
+}
+
+function buildMirrorSchema(t, interfaceOptions) {
+  return [
+    { key: 'mirror_egress', title: t('wireguard.mirror.egress'), type: 'select', options: interfaceOptions, placeholder: t('wireguard.mirror.target_placeholder'), help: t('wireguard.mirror.egress_help') },
+    { key: 'mirror_ingress', title: t('wireguard.mirror.ingress'), type: 'select', options: interfaceOptions, placeholder: t('wireguard.mirror.target_placeholder'), help: t('wireguard.mirror.ingress_help') },
+  ];
+}
+
+function buildOtherSchema(t, interfaceOptions) {
+  return [
+    { key: 'redirect', title: t('wireguard.other.redirect'), type: 'select', options: interfaceOptions, placeholder: t('wireguard.other.target_placeholder'), help: t('wireguard.other.redirect_help') },
+    { key: 'vrf', title: t('wireguard.other.vrf'), type: 'text', placeholder: t('wireguard.other.vrf_placeholder'), help: t('wireguard.other.vrf_help') },
+  ];
+}
+
+function buildPeerSchema(t) {
+  return [
+    { key: 'name', title: t('wireguard.peer.name'), type: 'text', required: true, placeholder: t('wireguard.peer.name_placeholder') },
+    { key: 'public_key', title: t('wireguard.peer.public_key'), type: 'text', required: true, placeholder: t('wireguard.peer.public_key_placeholder') },
+    { key: 'preshared_key', title: t('wireguard.peer.preshared_key'), type: 'text', placeholder: t('wireguard.peer.preshared_key_placeholder') },
+    { key: 'address', title: t('wireguard.peer.address'), type: 'text', placeholder: t('wireguard.peer.address_placeholder') },
+    { key: 'allowed_ips', title: t('wireguard.peer.allowed_ips'), type: 'textarea', placeholder: t('wireguard.peer.allowed_ips_placeholder'), help: t('wireguard.peer.allowed_ips_help') },
+    { key: 'host_name', title: t('wireguard.peer.host_name'), type: 'text', placeholder: 'FQDN', help: t('wireguard.peer.host_name_help') },
+    { key: 'port', title: t('wireguard.peer.port'), type: 'number', min: 1, max: 65535, placeholder: '1-65535' },
+    { key: 'persistent_keepalive', title: t('wireguard.peer.persistent_keepalive'), type: 'number', min: 1, max: 65535, placeholder: '1-65535', help: t('wireguard.peer.persistent_keepalive_help') },
+    { key: 'description', title: t('wireguard.peer.description'), type: 'text', placeholder: t('wireguard.peer.description_placeholder') },
+    { key: 'disable', title: t('wireguard.peer.disable'), type: 'checkbox', help: t('wireguard.peer.disable_help') },
+  ];
+}
 
 export default defineComponent({
   name: 'WireGuardPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const wireguards = ref([]);
     const modalVisible = ref(false);
@@ -39,6 +118,13 @@ export default defineComponent({
     const activeTab = ref('basic');
     const selectedWG = ref([]);
 
+    // Delete confirmation modals
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
+    const peerDeleteModalVisible = ref(false);
+    const pendingDeletePeerIndex = ref(-1);
+    const pendingDeletePeerName = ref('');
+
     // Peer management
     const peers = ref([]);
     const editingPeerIndex = ref(-1);
@@ -46,77 +132,33 @@ export default defineComponent({
     const peerForm = ref(null);
     const selectedPeers = ref([]);
 
-    const peerColumns = [
-      { key: 'name', title: 'Peer 别名', width: 120 },
-      { key: 'public_key', title: '公钥', width: 200 },
-      { key: 'address', title: '地址', width: 140 },
-      { key: 'port', title: '端口', width: 80 },
-      { key: 'disable', title: '禁用', width: 80 },
-      { key: 'actions', title: '操作', width: 100 },
-    ];
+    // Resolved columns
+    const columns = computed(() => [
+      { key: 'name', title: t('wireguard.columns.name'), width: 120 },
+      { key: 'description', title: t('wireguard.columns.description'), width: 160 },
+      { key: 'port', title: t('wireguard.columns.port'), width: 80 },
+      { key: 'mtu', title: t('wireguard.columns.mtu'), width: 80 },
+      { key: 'peer_count', title: t('wireguard.columns.peer_count'), width: 100 },
+      { key: 'disable', title: t('wireguard.columns.disable'), width: 80 },
+      { key: 'actions', title: t('wireguard.columns.actions'), width: 100 },
+    ]);
+
+    const peerColumns = computed(() => [
+      { key: 'name', title: t('wireguard.peer_columns.name'), width: 120 },
+      { key: 'public_key', title: t('wireguard.peer_columns.public_key'), width: 200 },
+      { key: 'address', title: t('wireguard.peer_columns.address'), width: 140 },
+      { key: 'port', title: t('wireguard.peer_columns.port'), width: 80 },
+      { key: 'disable', title: t('wireguard.peer_columns.disable'), width: 80 },
+      { key: 'actions', title: t('wireguard.peer_columns.actions'), width: 100 },
+    ]);
 
     // Schema definitions
-    const basicSchema = computed(() => [
-      { key: 'name', title: '接口名称', type: 'text', required: true, placeholder: '如 wg0, wg1', help: '格式: wgN' },
-      { key: 'description', title: '描述', type: 'text', placeholder: '接口描述' },
-      { key: 'private_key', title: '私钥', type: 'textarea', placeholder: 'Base64 编码的私钥', help: 'WireGuard 私钥' },
-      { key: 'port', title: '端口', type: 'number', min: 1, max: 65535, placeholder: '1-65535', help: '连接使用的端口号' },
-      { key: 'fwmark', title: 'Fwmark', type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: '出站数据包的 fwmark 值 (默认: 0)' },
-      { key: 'max_dns_retry', title: 'DNS 重试次数', type: 'number', min: 1, max: 15, placeholder: '1-15', help: 'DNS 解析失败时的最大重试次数 (默认: 3)' },
-      { key: 'mtu', title: 'MTU', type: 'number', min: 68, max: 16000, placeholder: '68-16000', help: '最大传输单元 (默认: 1420)' },
-      { key: 'per_client_thread', title: '每客户端线程', type: 'checkbox', help: '为每个客户端的流量使用独立线程处理' },
-      { key: 'disable', title: '禁用接口', type: 'checkbox', help: '管理性禁用接口' },
-    ]);
-
-    const ipSchema = computed(() => [
-      { key: 'ip_adjust_mss', title: '调整 MSS', type: 'text', placeholder: 'clamp-mss-to-pmtu 或 536-65535', help: 'TCP MSS 值' },
-      { key: 'ip_arp_cache_timeout', title: 'ARP 缓存超时', type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: 'ARP 缓存条目超时 (秒, 默认: 30)' },
-      { key: 'ip_disable_arp_filter', title: '禁用 ARP 过滤', type: 'checkbox', help: '禁用 ARP 过滤' },
-      { key: 'ip_disable_forwarding', title: '禁用转发', type: 'checkbox', help: '禁用 IP 转发' },
-      { key: 'ip_enable_arp_accept', title: '启用 ARP 接受', type: 'checkbox', help: '启用 ARP 接受' },
-      { key: 'ip_enable_arp_announce', title: '启用 ARP 通告', type: 'checkbox', help: '启用 ARP 通告' },
-      { key: 'ip_enable_arp_ignore', title: '启用 ARP 忽略', type: 'checkbox', help: '启用 ARP 忽略' },
-      { key: 'ip_enable_directed_broadcast', title: '启用定向广播', type: 'checkbox', help: '启用定向广播转发' },
-      { key: 'ip_enable_proxy_arp', title: '启用代理 ARP', type: 'checkbox', help: '启用代理 ARP' },
-      { key: 'ip_proxy_arp_pvlan', title: '私有 VLAN 代理 ARP', type: 'checkbox', help: '启用私有 VLAN 代理 ARP' },
-      { key: 'ip_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
-    ]);
-
-    const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: '接受 DAD', type: 'select', options: ACCEPT_DAD_OPTIONS, help: '重复地址检测 (默认: 1)' },
-      { key: 'ipv6_autoconf', title: '自动配置', type: 'checkbox', help: '使用 SLAAC 获取 IPv6 地址' },
-      { key: 'ipv6_eui64', title: 'EUI-64 前缀', type: 'text', placeholder: 'IPv6 前缀', help: '基于 MAC 的 EUI-64 地址前缀' },
-      { key: 'ipv6_no_default_link_local', title: '无默认链路本地地址', type: 'checkbox', help: '移除默认链路本地地址' },
-      { key: 'ipv6_adjust_mss', title: '调整 MSS', type: 'text', placeholder: 'clamp-mss-to-pmtu 或 536-65535', help: 'TCP MSS 值' },
-      { key: 'ipv6_base_reachable_time', title: '基础可达时间', type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: '基础可达时间 (秒, 默认: 30)' },
-      { key: 'ipv6_disable_forwarding', title: '禁用转发', type: 'checkbox', help: '禁用 IPv6 转发' },
-      { key: 'ipv6_dup_addr_detect_transmits', title: 'DAD 传输次数', type: 'number', min: 0, max: 100, placeholder: '0-100', help: 'DAD 期间发送的 NS 消息数 (默认: 1, 0=禁用)' },
-      { key: 'ipv6_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
-    ]);
-
-    const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: '镜像出方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像出方向流量到目标接口' },
-      { key: 'mirror_ingress', title: '镜像入方向', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '镜像入方向流量到目标接口' },
-    ]);
-
-    const otherSchema = computed(() => [
-      { key: 'redirect', title: '重定向目标', type: 'select', options: interfaceOptions.value, placeholder: '选择目标接口', help: '重定向入站数据包到目标接口' },
-      { key: 'vrf', title: 'VRF 实例', type: 'text', placeholder: 'VRF 实例名称', help: 'VRF 实例名称' },
-    ]);
-
-    // Peer schema
-    const peerSchema = computed(() => [
-      { key: 'name', title: 'Peer 别名', type: 'text', required: true, placeholder: 'Peer 别名' },
-      { key: 'public_key', title: '公钥', type: 'text', required: true, placeholder: 'Base64 编码的公钥' },
-      { key: 'preshared_key', title: '预共享密钥', type: 'text', placeholder: 'Base64 编码的预共享密钥' },
-      { key: 'address', title: '地址', type: 'text', placeholder: 'IPv4 或 IPv6 地址' },
-      { key: 'allowed_ips', title: '允许 IP', type: 'textarea', placeholder: '每行一个 IP 或子网', help: '允许通过此 Peer 的 IP 地址' },
-      { key: 'host_name', title: '主机名', type: 'text', placeholder: 'FQDN', help: 'WireGuard 端点的主机名' },
-      { key: 'port', title: '端口', type: 'number', min: 1, max: 65535, placeholder: '1-65535' },
-      { key: 'persistent_keepalive', title: '保活间隔', type: 'number', min: 1, max: 65535, placeholder: '1-65535', help: '发送保活消息的间隔 (秒)' },
-      { key: 'description', title: '描述', type: 'text', placeholder: 'Peer 描述' },
-      { key: 'disable', title: '禁用', type: 'checkbox', help: '禁用此 Peer' },
-    ]);
+    const basicSchema = computed(() => buildBasicSchema(t));
+    const ipSchema = computed(() => buildIpSchema(t));
+    const ipv6Schema = computed(() => buildIpv6Schema(t));
+    const mirrorSchema = computed(() => buildMirrorSchema(t, interfaceOptions.value));
+    const otherSchema = computed(() => buildOtherSchema(t, interfaceOptions.value));
+    const peerSchema = computed(() => buildPeerSchema(t));
 
     // Command text
     const commandText = computed(() => {
@@ -185,18 +227,17 @@ export default defineComponent({
         });
       }
 
-      return lines.length ? lines.join('\n') : '# 未配置任何参数';
+      return lines.length ? lines.join('\n') : t('wireguard.command.no_config');
     });
 
     // Dynamic tabs
     const modalTabs = computed(() => [
-      { key: 'basic', title: '基本配置' },
-      { key: 'ip', title: 'IPv4 参数' },
-      { key: 'ipv6', title: 'IPv6 参数' },
-      { key: 'peer', title: 'Peer 管理' },
-      { key: 'mirror', title: '流量镜像' },
-      { key: 'other', title: '其他' },
-      { key: 'command', title: '命令预览' },
+      { key: 'basic', title: t('wireguard.tabs.basic') },
+      { key: 'ip', title: t('wireguard.tabs.ipv4') },
+      { key: 'ipv6', title: t('wireguard.tabs.ipv6') },
+      { key: 'peer', title: t('wireguard.tabs.peer') },
+      { key: 'mirror', title: t('wireguard.tabs.mirror') },
+      { key: 'other', title: t('wireguard.tabs.other') },
     ]);
 
     function getDefaultForm() {
@@ -341,14 +382,14 @@ export default defineComponent({
           label: iface.name || iface,
         }));
       } catch (err) {
-        showError(err);
+        handleError(err);
       } finally {
         loading.value = false;
       }
     }
 
-    function showError(err) {
-      alert(`错误码: ${err.code || 'ERROR'}\n错误信息: ${err.message || err}`);
+    function handleError(err) {
+      showError({ message: t('wireguard.errors.error_message', { code: err.code || 'ERROR', detail: err.message || err }) });
     }
 
     async function openModal(index = -1) {
@@ -374,13 +415,14 @@ export default defineComponent({
       try {
         const form = editingWG.value;
         const name = form.name;
-        if (!name) { alert('请输入接口名称'); return; }
+        if (!name) { showError({ message: t('wireguard.errors.name_required') }); return; }
 
         const config = formToWG(form);
-        console.log('[WireGuard] 保存配置:', JSON.stringify(config, null, 2));
+        console.log('[WireGuard] Saving config:', JSON.stringify(config, null, 2));
 
         const path = `interfaces wireguard ${name}`;
-        await api.put('/config', { path, value: config });
+        await configStore.setConfig(path, config);
+        configStore.markPending();
 
         // Save peers
         if (peers.value && peers.value.length) {
@@ -397,28 +439,36 @@ export default defineComponent({
             if (p.description) peerConfig.description = p.description;
             if (p.disable) peerConfig.disable = true;
 
-            await api.put('/config', { path: `${path} peer ${p.name}`, value: peerConfig });
+            await configStore.setConfig(`${path} peer ${p.name}`, peerConfig);
+            configStore.markPending();
           }
         }
 
         modalVisible.value = false;
         await load();
       } catch (err) {
-        showError(err);
+        handleError(err);
       }
     }
 
-    async function remove() {
-      if (!selectedWG.value.length) { alert('请先选择要删除的 WireGuard 接口'); return; }
-      if (!confirm(`确定删除选中的 ${selectedWG.value.length} 个 WireGuard 接口?`)) return;
+    function remove() {
+      if (!selectedWG.value.length) { showError({ message: t('wireguard.errors.select_for_delete') }); return; }
+      pendingDeleteNames.value = selectedWG.value.map(w => w.name);
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemove() {
+      deleteModalVisible.value = false;
       try {
-        for (const w of selectedWG.value) {
-          await api.delete('/config', { path: `interfaces wireguard ${w.name}` });
+        for (const name of pendingDeleteNames.value) {
+          await configStore.deleteConfig(`interfaces wireguard ${name}`);
+          configStore.markPending();
         }
         selectedWG.value = [];
+        pendingDeleteNames.value = [];
         await load();
       } catch (err) {
-        showError(err);
+        handleError(err);
       }
     }
 
@@ -436,8 +486,8 @@ export default defineComponent({
 
     function savePeer() {
       const p = peerForm.value;
-      if (!p.name) { alert('请输入 Peer 别名'); return; }
-      if (!p.public_key) { alert('请输入公钥'); return; }
+      if (!p.name) { showError({ message: t('wireguard.errors.peer_name_required') }); return; }
+      if (!p.public_key) { showError({ message: t('wireguard.errors.public_key_required') }); return; }
 
       if (editingPeerIndex.value >= 0) {
         peers.value[editingPeerIndex.value] = JSON.parse(JSON.stringify(p));
@@ -448,26 +498,40 @@ export default defineComponent({
     }
 
     function deletePeer(index) {
-      if (!confirm('确定删除此 Peer?')) return;
-      peers.value.splice(index, 1);
+      const peer = peers.value[index];
+      if (!peer) return;
+      pendingDeletePeerIndex.value = index;
+      pendingDeletePeerName.value = peer.name || peer.public_key || '';
+      peerDeleteModalVisible.value = true;
     }
 
-    onMounted(() => { load(); });
+    function confirmRemovePeer() {
+      peerDeleteModalVisible.value = false;
+      if (pendingDeletePeerIndex.value >= 0 && pendingDeletePeerIndex.value < peers.value.length) {
+        peers.value.splice(pendingDeletePeerIndex.value, 1);
+      }
+      pendingDeletePeerIndex.value = -1;
+      pendingDeletePeerName.value = '';
+    }
+
+    onMounted(() => { load(); onMenuRefresh(load); });
 
     return {
-      loading, wireguards, selected: selectedWG, modalVisible, editingWG, interfaceOptions, activeTab,
+      t, loading, wireguards, selected: selectedWG, modalVisible, editingWG, interfaceOptions, activeTab,
+      deleteModalVisible, pendingDeleteNames,
       peers, editingPeerIndex, peerModalVisible, peerForm, selectedPeers, peerColumns,
-      COLUMNS,
+      peerDeleteModalVisible, pendingDeletePeerName,
+      columns,
       basicSchema, ipSchema, ipv6Schema, mirrorSchema, otherSchema, peerSchema,
       commandText, modalTabs,
-      openModal, save, remove, load,
-      openPeerModal, savePeer, deletePeer,
+      openModal, save, remove, confirmRemove, load,
+      openPeerModal, savePeer, deletePeer, confirmRemovePeer,
     };
   },
   template: `
     <div class="page-container">
       <DataTable
-        :columns="COLUMNS"
+        :columns="columns"
         :data="wireguards"
         :loading="loading"
         :selectable="true"
@@ -479,54 +543,57 @@ export default defineComponent({
         @selection-change="selected = $event"
       />
 
-      <DraggableModal v-model:visible="modalVisible" :title="editingWG?.name ? '编辑 WireGuard 接口' : '创建 WireGuard 接口'" width="900px">
+      <DraggableModal v-model:visible="modalVisible" :title="editingWG?.name ? t('wireguard.modal.edit') : t('wireguard.modal.create')" width="900px">
         <template #default>
-          <TabGroup v-model="activeTab" :tabs="modalTabs" />
-          <div v-show="activeTab === 'basic'" style="padding: 16px 0;">
-            <ConfigForm :schema="basicSchema" :model="editingWG" />
-          </div>
-          <div v-show="activeTab === 'ip'" style="padding: 16px 0;">
-            <ConfigForm :schema="ipSchema" :model="editingWG" />
-          </div>
-          <div v-show="activeTab === 'ipv6'" style="padding: 16px 0;">
-            <ConfigForm :schema="ipv6Schema" :model="editingWG" />
-          </div>
-          <div v-show="activeTab === 'peer'" style="padding: 16px 0;">
-            <DataTable
-              :columns="peerColumns"
-              :data="peers"
-              :selectable="true"
-              :actions="['create', 'edit', 'delete']"
-              @create="openPeerModal(-1)"
-              @edit="openPeerModal"
-              @delete="deletePeer"
-              @selection-change="selectedPeers = $event"
-            />
-          </div>
-          <div v-show="activeTab === 'mirror'" style="padding: 16px 0;">
-            <ConfigForm :schema="mirrorSchema" :model="editingWG" />
-          </div>
-          <div v-show="activeTab === 'other'" style="padding: 16px 0;">
-            <ConfigForm :schema="otherSchema" :model="editingWG" />
-          </div>
-          <div v-show="activeTab === 'command'" style="padding: 16px 0;">
-            <pre style="background:#f5f5f5;padding:12px;border-radius:4px;white-space:pre-wrap;font-size:13px;">{{ commandText }}</pre>
-          </div>
+          <TabGroup v-model="activeTab" :tabs="modalTabs">
+            <template #basic><ConfigForm :schema="basicSchema" :model="editingWG" /></template>
+            <template #ip><ConfigForm :schema="ipSchema" :model="editingWG" /></template>
+            <template #ipv6><ConfigForm :schema="ipv6Schema" :model="editingWG" /></template>
+            <template #peer>
+              <DataTable
+                :columns="peerColumns"
+                :data="peers"
+                :selectable="true"
+                :actions="['create', 'edit', 'delete']"
+                @create="openPeerModal(-1)"
+                @edit="openPeerModal"
+                @delete="deletePeer"
+                @selection-change="selectedPeers = $event"
+              />
+            </template>
+            <template #mirror><ConfigForm :schema="mirrorSchema" :model="editingWG" /></template>
+            <template #other><ConfigForm :schema="otherSchema" :model="editingWG" /></template>
+          </TabGroup>
         </template>
         <template #footer>
-          <button type="button" class="btn btn-default" @click="modalVisible = false">取消</button>
-          <button type="button" class="btn btn-primary" @click="save">确定</button>
+          <button type="button" class="btn btn-default" @click="modalVisible = false">{{ t('common.buttons.cancel') }}</button>
+          <button type="button" class="btn btn-primary" @click="save">{{ t('common.buttons.ok') }}</button>
         </template>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="peerModalVisible" :title="editingPeerIndex >= 0 ? '编辑 Peer' : '创建 Peer'" width="700px">
+      <DraggableModal v-model:visible="peerModalVisible" :title="editingPeerIndex >= 0 ? t('wireguard.peer.modal.edit') : t('wireguard.peer.modal.create')" width="700px">
         <template #default>
           <ConfigForm :schema="peerSchema" :model="peerForm" />
         </template>
         <template #footer>
-          <button type="button" class="btn btn-default" @click="peerModalVisible = false">取消</button>
-          <button type="button" class="btn btn-primary" @click="savePeer">确定</button>
+          <button type="button" class="btn btn-default" @click="peerModalVisible = false">{{ t('common.buttons.cancel') }}</button>
+          <button type="button" class="btn btn-primary" @click="savePeer">{{ t('common.buttons.ok') }}</button>
         </template>
+      </DraggableModal>
+
+      <!-- Delete Confirmation Modals -->
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('wireguard.modal.confirm_delete')" width="400px" @confirm="confirmRemove">
+        <div>{{ t('wireguard.delete.confirm_interface') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+
+      <DraggableModal v-model:visible="peerDeleteModalVisible" :title="t('wireguard.modal.confirm_delete')" width="400px" @confirm="confirmRemovePeer">
+        <div>{{ t('wireguard.delete.confirm_peer') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div style="padding:2px 0;">{{ pendingDeletePeerName }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

@@ -39,7 +39,7 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = res.token;
       user.value = res.user;
       localStorage.setItem('vyos_token', res.token);
-      if (res.user.language) {
+      if (res.user.language && !localStorage.getItem('locale')) {
         locale.value = res.user.language;
         localStorage.setItem('locale', res.user.language);
       }
@@ -64,7 +64,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const res = await authApi.user();
       user.value = res.user;
-      if (res.user.language) {
+      if (res.user.language && !localStorage.getItem('locale')) {
         locale.value = res.user.language;
         localStorage.setItem('locale', res.user.language);
       }

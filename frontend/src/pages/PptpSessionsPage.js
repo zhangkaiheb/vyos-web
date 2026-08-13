@@ -3,6 +3,7 @@ import { opModeApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function parseSessions(output) {
   const lines = String(output || '').split('\n').map(s => s.replace(/\r$/, ''));
@@ -50,22 +51,23 @@ function parseSessions(output) {
 export default defineComponent({
   name: 'PptpSessionsPage',
   setup() {
+    const { t } = useI18n();
     const loading = ref(false);
     const sessions = ref([]);
     const rawOutput = ref('');
 
     const columns = [
-      { key: 'ifname', title: '接口' },
-      { key: 'username', title: '用户名' },
+      { key: 'ifname', title: t('pptpSessions.columns.ifname') },
+      { key: 'username', title: t('pptpSessions.columns.username') },
       { key: 'ip', title: 'IP' },
       { key: 'ip6', title: 'IPv6' },
       { key: 'ip6_dp', title: 'IPv6-PD' },
       { key: 'calling_sid', title: 'Calling-SID' },
-      { key: 'rate_limit', title: '速率限制' },
-      { key: 'state', title: '状态' },
-      { key: 'uptime', title: '运行时间' },
-      { key: 'rx_bytes', title: '接收字节' },
-      { key: 'tx_bytes', title: '发送字节' },
+      { key: 'rate_limit', title: t('pptpSessions.columns.rateLimit') },
+      { key: 'state', title: t('pptpSessions.columns.state') },
+      { key: 'uptime', title: t('pptpSessions.columns.uptime') },
+      { key: 'rx_bytes', title: t('pptpSessions.columns.rxBytes') },
+      { key: 'tx_bytes', title: t('pptpSessions.columns.txBytes') },
     ];
 
     async function load() {
@@ -84,22 +86,12 @@ export default defineComponent({
 
     onMounted(load);
 
-    return { loading, sessions, columns, load, rawOutput };
+    return { loading, sessions, columns, load, t };
   },
   components: { DataTable, ToolbarButton },
   template: `
     <div class="page-container">
-      <div class="toolbar">
-        <div class="toolbar-left"><h3>PPTP 会话</h3></div>
-        <div class="toolbar-right">
-          <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
-        </div>
-      </div>
       <DataTable :columns="columns" :data="sessions" :loading="loading" :selectable="false" :actions="[]" />
-      <div v-if="rawOutput" style="margin-top:16px;">
-        <div style="font-weight:bold;margin-bottom:4px;">原始输出</div>
-        <pre style="background:#f5f5f5;padding:8px;border:1px solid #ddd;font-size:12px;overflow:auto;">{{ rawOutput }}</pre>
-      </div>
     </div>
   `,
 });

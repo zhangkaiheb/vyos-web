@@ -1,0 +1,450 @@
+{
+  "zh-CN": {
+    "conntrackSync": {
+      "tabs": {
+        "protocol": "同步协议",
+        "basic": "基本设置",
+        "interfaces": "地址与接口"
+      },
+      "columns": {
+        "ignoreAddress": "忽略地址",
+        "syncInterface": "同步接口",
+        "listenAddress": "监听地址"
+      },
+      "labels": {
+        "acceptProtocol": "接受协议",
+        "expectSync": "期望同步",
+        "eventListenQueueSize": "事件监听队列大小",
+        "syncQueueSize": "同步队列大小",
+        "mcastGroup": "组播组",
+        "vrrpSyncGroup": "VRRP 同步组",
+        "options": "选项",
+        "disableExternalCache": "禁用外部缓存",
+        "disableSyslog": "禁用 Syslog",
+        "startupResync": "启动时全量同步",
+        "addressPrefix": "地址/前缀",
+        "interface": "接口",
+        "ipv4Address": "IPv4 地址"
+      },
+      "placeholders": {
+        "addressPrefix": "x.x.x.x 或 x.x.x.x/x 或 IPv6",
+        "interface": "eth0",
+        "ipv4Address": "x.x.x.x",
+        "vrrpSyncGroup": "VRRP sync group",
+        "mcastGroup": "225.0.0.50"
+      },
+      "modals": {
+        "ignoreAddress": "忽略地址",
+        "syncInterface": "同步接口",
+        "listenAddress": "监听地址"
+      },
+      "buttons": {
+        "cancel": "取消",
+        "save": "保存"
+      },
+      "messages": {
+        "saved": "已保存"
+      },
+      "validation": {
+        "ipv4FormatError": "IPv4 地址格式错误",
+        "ipv6FormatError": "IPv6 地址格式错误",
+        "subnetFormatError": "IP 子网格式应为 地址/长度",
+        "prefixLengthFormatError": "前缀长度格式错误",
+        "ipv4PrefixRange": "IPv4 前缀长度范围为 0-32",
+        "ipv6PrefixRange": "IPv6 前缀长度范围为 0-128",
+        "addressRequired": "地址不能为空",
+        "invalidAddressOrPrefix": "请输入有效的 IPv4/IPv6 地址或前缀",
+        "queueSizeRange": "{name} 范围为 0-4294967295",
+        "mcastAddressRequired": "组播地址不能为空",
+        "interfaceRequired": "接口不能为空",
+        "vrrpSyncGroupRequired": "VRRP 同步组不能为空",
+        "eventListenQueueSizeName": "事件监听队列大小",
+        "syncQueueSizeName": "同步队列大小"
+      }
+    }
+  },
+  "en": {
+    "conntrackSync": {
+      "tabs": {
+        "protocol": "Sync Protocol",
+        "basic": "Basic Settings",
+        "interfaces": "Addresses & Interfaces"
+      },
+      "columns": {
+        "ignoreAddress": "Ignore Address",
+        "syncInterface": "Interface",
+        "listenAddress": "Listen Address"
+      },
+      "labels": {
+        "acceptProtocol": "Accept Protocol",
+        "expectSync": "Expect Sync",
+        "eventListenQueueSize": "Event Listen Queue Size",
+        "syncQueueSize": "Sync Queue Size",
+        "mcastGroup": "Multicast Group",
+        "vrrpSyncGroup": "VRRP Sync Group",
+        "options": "Options",
+        "disableExternalCache": "Disable External Cache",
+        "disableSyslog": "Disable Syslog",
+        "startupResync": "Startup Full Sync",
+        "addressPrefix": "Address/Prefix",
+        "interface": "Interface",
+        "ipv4Address": "IPv4 Address"
+      },
+      "placeholders": {
+        "addressPrefix": "x.x.x.x or x.x.x.x/x or IPv6",
+        "interface": "eth0",
+        "ipv4Address": "x.x.x.x",
+        "vrrpSyncGroup": "VRRP sync group",
+        "mcastGroup": "225.0.0.50"
+      },
+      "modals": {
+        "ignoreAddress": "Ignore Address",
+        "syncInterface": "Sync Interface",
+        "listenAddress": "Listen Address"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "messages": {
+        "saved": "Saved"
+      },
+      "validation": {
+        "ipv4FormatError": "IPv4 address format error",
+        "ipv6FormatError": "IPv6 address format error",
+        "subnetFormatError": "IP subnet format should be address/prefix-length",
+        "prefixLengthFormatError": "Prefix length format error",
+        "ipv4PrefixRange": "IPv4 prefix length range is 0-32",
+        "ipv6PrefixRange": "IPv6 prefix length range is 0-128",
+        "addressRequired": "Address cannot be empty",
+        "invalidAddressOrPrefix": "Please enter a valid IPv4/IPv6 address or prefix",
+        "queueSizeRange": "{name} range is 0-4294967295",
+        "mcastAddressRequired": "Multicast address cannot be empty",
+        "interfaceRequired": "Interface cannot be empty",
+        "vrrpSyncGroupRequired": "VRRP sync group cannot be empty",
+        "eventListenQueueSizeName": "Event listen queue size",
+        "syncQueueSizeName": "Sync queue size"
+      }
+    }
+  },
+  "zh-TW": {
+    "conntrackSync": {
+      "tabs": {
+        "protocol": "Sync Protocol",
+        "basic": "Basic Settings",
+        "interfaces": "Addresses & Interfaces"
+      },
+      "columns": {
+        "ignoreAddress": "Ignore Address",
+        "syncInterface": "Interface",
+        "listenAddress": "Listen Address"
+      },
+      "labels": {
+        "acceptProtocol": "Accept Protocol",
+        "expectSync": "Expect Sync",
+        "eventListenQueueSize": "Event Listen Queue Size",
+        "syncQueueSize": "Sync Queue Size",
+        "mcastGroup": "Multicast Group",
+        "vrrpSyncGroup": "VRRP Sync Group",
+        "options": "Options",
+        "disableExternalCache": "Disable External Cache",
+        "disableSyslog": "Disable Syslog",
+        "startupResync": "Startup Full Sync",
+        "addressPrefix": "Address/Prefix",
+        "interface": "Interface",
+        "ipv4Address": "IPv4 Address"
+      },
+      "placeholders": {
+        "addressPrefix": "x.x.x.x or x.x.x.x/x or IPv6",
+        "interface": "eth0",
+        "ipv4Address": "x.x.x.x",
+        "vrrpSyncGroup": "VRRP sync group",
+        "mcastGroup": "225.0.0.50"
+      },
+      "modals": {
+        "ignoreAddress": "Ignore Address",
+        "syncInterface": "Sync Interface",
+        "listenAddress": "Listen Address"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "messages": {
+        "saved": "Saved"
+      },
+      "validation": {
+        "ipv4FormatError": "IPv4 address format error",
+        "ipv6FormatError": "IPv6 address format error",
+        "subnetFormatError": "IP subnet format should be address/prefix-length",
+        "prefixLengthFormatError": "Prefix length format error",
+        "ipv4PrefixRange": "IPv4 prefix length range is 0-32",
+        "ipv6PrefixRange": "IPv6 prefix length range is 0-128",
+        "addressRequired": "Address cannot be empty",
+        "invalidAddressOrPrefix": "Please enter a valid IPv4/IPv6 address or prefix",
+        "queueSizeRange": "{name} range is 0-4294967295",
+        "mcastAddressRequired": "Multicast address cannot be empty",
+        "interfaceRequired": "Interface cannot be empty",
+        "vrrpSyncGroupRequired": "VRRP sync group cannot be empty",
+        "eventListenQueueSizeName": "Event listen queue size",
+        "syncQueueSizeName": "Sync queue size"
+      }
+    }
+  },
+  "ru": {
+    "conntrackSync": {
+      "tabs": {
+        "protocol": "Sync Protocol",
+        "basic": "Basic Settings",
+        "interfaces": "Addresses & Interfaces"
+      },
+      "columns": {
+        "ignoreAddress": "Ignore Address",
+        "syncInterface": "Interface",
+        "listenAddress": "Listen Address"
+      },
+      "labels": {
+        "acceptProtocol": "Accept Protocol",
+        "expectSync": "Expect Sync",
+        "eventListenQueueSize": "Event Listen Queue Size",
+        "syncQueueSize": "Sync Queue Size",
+        "mcastGroup": "Multicast Group",
+        "vrrpSyncGroup": "VRRP Sync Group",
+        "options": "Options",
+        "disableExternalCache": "Disable External Cache",
+        "disableSyslog": "Disable Syslog",
+        "startupResync": "Startup Full Sync",
+        "addressPrefix": "Address/Prefix",
+        "interface": "Interface",
+        "ipv4Address": "IPv4 Address"
+      },
+      "placeholders": {
+        "addressPrefix": "x.x.x.x or x.x.x.x/x or IPv6",
+        "interface": "eth0",
+        "ipv4Address": "x.x.x.x",
+        "vrrpSyncGroup": "VRRP sync group",
+        "mcastGroup": "225.0.0.50"
+      },
+      "modals": {
+        "ignoreAddress": "Ignore Address",
+        "syncInterface": "Sync Interface",
+        "listenAddress": "Listen Address"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "messages": {
+        "saved": "Saved"
+      },
+      "validation": {
+        "ipv4FormatError": "IPv4 address format error",
+        "ipv6FormatError": "IPv6 address format error",
+        "subnetFormatError": "IP subnet format should be address/prefix-length",
+        "prefixLengthFormatError": "Prefix length format error",
+        "ipv4PrefixRange": "IPv4 prefix length range is 0-32",
+        "ipv6PrefixRange": "IPv6 prefix length range is 0-128",
+        "addressRequired": "Address cannot be empty",
+        "invalidAddressOrPrefix": "Please enter a valid IPv4/IPv6 address or prefix",
+        "queueSizeRange": "{name} range is 0-4294967295",
+        "mcastAddressRequired": "Multicast address cannot be empty",
+        "interfaceRequired": "Interface cannot be empty",
+        "vrrpSyncGroupRequired": "VRRP sync group cannot be empty",
+        "eventListenQueueSizeName": "Event listen queue size",
+        "syncQueueSizeName": "Sync queue size"
+      }
+    }
+  },
+  "de": {
+    "conntrackSync": {
+      "tabs": {
+        "protocol": "Sync Protocol",
+        "basic": "Basic Settings",
+        "interfaces": "Addresses & Interfaces"
+      },
+      "columns": {
+        "ignoreAddress": "Ignore Address",
+        "syncInterface": "Interface",
+        "listenAddress": "Listen Address"
+      },
+      "labels": {
+        "acceptProtocol": "Accept Protocol",
+        "expectSync": "Expect Sync",
+        "eventListenQueueSize": "Event Listen Queue Size",
+        "syncQueueSize": "Sync Queue Size",
+        "mcastGroup": "Multicast Group",
+        "vrrpSyncGroup": "VRRP Sync Group",
+        "options": "Options",
+        "disableExternalCache": "Disable External Cache",
+        "disableSyslog": "Disable Syslog",
+        "startupResync": "Startup Full Sync",
+        "addressPrefix": "Address/Prefix",
+        "interface": "Interface",
+        "ipv4Address": "IPv4 Address"
+      },
+      "placeholders": {
+        "addressPrefix": "x.x.x.x or x.x.x.x/x or IPv6",
+        "interface": "eth0",
+        "ipv4Address": "x.x.x.x",
+        "vrrpSyncGroup": "VRRP sync group",
+        "mcastGroup": "225.0.0.50"
+      },
+      "modals": {
+        "ignoreAddress": "Ignore Address",
+        "syncInterface": "Sync Interface",
+        "listenAddress": "Listen Address"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "messages": {
+        "saved": "Saved"
+      },
+      "validation": {
+        "ipv4FormatError": "IPv4 address format error",
+        "ipv6FormatError": "IPv6 address format error",
+        "subnetFormatError": "IP subnet format should be address/prefix-length",
+        "prefixLengthFormatError": "Prefix length format error",
+        "ipv4PrefixRange": "IPv4 prefix length range is 0-32",
+        "ipv6PrefixRange": "IPv6 prefix length range is 0-128",
+        "addressRequired": "Address cannot be empty",
+        "invalidAddressOrPrefix": "Please enter a valid IPv4/IPv6 address or prefix",
+        "queueSizeRange": "{name} range is 0-4294967295",
+        "mcastAddressRequired": "Multicast address cannot be empty",
+        "interfaceRequired": "Interface cannot be empty",
+        "vrrpSyncGroupRequired": "VRRP sync group cannot be empty",
+        "eventListenQueueSizeName": "Event listen queue size",
+        "syncQueueSizeName": "Sync queue size"
+      }
+    }
+  },
+  "fr": {
+    "conntrackSync": {
+      "tabs": {
+        "protocol": "Sync Protocol",
+        "basic": "Basic Settings",
+        "interfaces": "Addresses & Interfaces"
+      },
+      "columns": {
+        "ignoreAddress": "Ignore Address",
+        "syncInterface": "Interface",
+        "listenAddress": "Listen Address"
+      },
+      "labels": {
+        "acceptProtocol": "Accept Protocol",
+        "expectSync": "Expect Sync",
+        "eventListenQueueSize": "Event Listen Queue Size",
+        "syncQueueSize": "Sync Queue Size",
+        "mcastGroup": "Multicast Group",
+        "vrrpSyncGroup": "VRRP Sync Group",
+        "options": "Options",
+        "disableExternalCache": "Disable External Cache",
+        "disableSyslog": "Disable Syslog",
+        "startupResync": "Startup Full Sync",
+        "addressPrefix": "Address/Prefix",
+        "interface": "Interface",
+        "ipv4Address": "IPv4 Address"
+      },
+      "placeholders": {
+        "addressPrefix": "x.x.x.x or x.x.x.x/x or IPv6",
+        "interface": "eth0",
+        "ipv4Address": "x.x.x.x",
+        "vrrpSyncGroup": "VRRP sync group",
+        "mcastGroup": "225.0.0.50"
+      },
+      "modals": {
+        "ignoreAddress": "Ignore Address",
+        "syncInterface": "Sync Interface",
+        "listenAddress": "Listen Address"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "messages": {
+        "saved": "Saved"
+      },
+      "validation": {
+        "ipv4FormatError": "IPv4 address format error",
+        "ipv6FormatError": "IPv6 address format error",
+        "subnetFormatError": "IP subnet format should be address/prefix-length",
+        "prefixLengthFormatError": "Prefix length format error",
+        "ipv4PrefixRange": "IPv4 prefix length range is 0-32",
+        "ipv6PrefixRange": "IPv6 prefix length range is 0-128",
+        "addressRequired": "Address cannot be empty",
+        "invalidAddressOrPrefix": "Please enter a valid IPv4/IPv6 address or prefix",
+        "queueSizeRange": "{name} range is 0-4294967295",
+        "mcastAddressRequired": "Multicast address cannot be empty",
+        "interfaceRequired": "Interface cannot be empty",
+        "vrrpSyncGroupRequired": "VRRP sync group cannot be empty",
+        "eventListenQueueSizeName": "Event listen queue size",
+        "syncQueueSizeName": "Sync queue size"
+      }
+    }
+  },
+  "ko": {
+    "conntrackSync": {
+      "tabs": {
+        "protocol": "Sync Protocol",
+        "basic": "Basic Settings",
+        "interfaces": "Addresses & Interfaces"
+      },
+      "columns": {
+        "ignoreAddress": "Ignore Address",
+        "syncInterface": "Interface",
+        "listenAddress": "Listen Address"
+      },
+      "labels": {
+        "acceptProtocol": "Accept Protocol",
+        "expectSync": "Expect Sync",
+        "eventListenQueueSize": "Event Listen Queue Size",
+        "syncQueueSize": "Sync Queue Size",
+        "mcastGroup": "Multicast Group",
+        "vrrpSyncGroup": "VRRP Sync Group",
+        "options": "Options",
+        "disableExternalCache": "Disable External Cache",
+        "disableSyslog": "Disable Syslog",
+        "startupResync": "Startup Full Sync",
+        "addressPrefix": "Address/Prefix",
+        "interface": "Interface",
+        "ipv4Address": "IPv4 Address"
+      },
+      "placeholders": {
+        "addressPrefix": "x.x.x.x or x.x.x.x/x or IPv6",
+        "interface": "eth0",
+        "ipv4Address": "x.x.x.x",
+        "vrrpSyncGroup": "VRRP sync group",
+        "mcastGroup": "225.0.0.50"
+      },
+      "modals": {
+        "ignoreAddress": "Ignore Address",
+        "syncInterface": "Sync Interface",
+        "listenAddress": "Listen Address"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "messages": {
+        "saved": "Saved"
+      },
+      "validation": {
+        "ipv4FormatError": "IPv4 address format error",
+        "ipv6FormatError": "IPv6 address format error",
+        "subnetFormatError": "IP subnet format should be address/prefix-length",
+        "prefixLengthFormatError": "Prefix length format error",
+        "ipv4PrefixRange": "IPv4 prefix length range is 0-32",
+        "ipv6PrefixRange": "IPv6 prefix length range is 0-128",
+        "addressRequired": "Address cannot be empty",
+        "invalidAddressOrPrefix": "Please enter a valid IPv4/IPv6 address or prefix",
+        "queueSizeRange": "{name} range is 0-4294967295",
+        "mcastAddressRequired": "Multicast address cannot be empty",
+        "interfaceRequired": "Interface cannot be empty",
+        "vrrpSyncGroupRequired": "VRRP sync group cannot be empty",
+        "eventListenQueueSizeName": "Event listen queue size",
+        "syncQueueSizeName": "Sync queue size"
+      }
+    }
+  }
+}

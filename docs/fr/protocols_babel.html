@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="babel">
+<h1>Babel</h1>
+<p>Le protocole Babel fournit un routage robuste et efficace pour les réseaux maillés filaires et sans fil. Par défaut, Babel utilise des métriques basées sur le nombre de sauts sur les liaisons filaires et une variante du Compteur de Transmission Attendu (ETX) sur les liaisons sans fil.
+Les administrateurs peuvent configurer Babel pour tenir compte de la diversité radio, calculer automatiquement la latence des liaisons et inclure cette latence dans la métrique de routage. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc8966.html"><strong>RFC 8966</strong></a> définit le protocole Babel.</p>
+<p>Babel est un protocole à double pile. Une instance Babel unique route les trafics IPv4 et IPv6 simultanément.</p>
+<section id="general-configuration">
+<h2>Configuration générale</h2>
+<p>VyOS n'a pas besoin d'une commande spécifique pour démarrer le processus Babel. Le système démarre automatiquement le processus de routage lorsque vous configurez la première interface activée en Babel.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activer le routage Babel sur l'interface spécifiée.</strong></p>
+<p>Le système commence immédiatement à envoyer et recevoir des paquets Babel sur cette interface.</p>
+</div>
+</div>
+</section>
+<section id="optional-configuration">
+<h2>Configuration facultative</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel parameters diversity
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-parameters-diversity" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Activer le routage avec diversité de fréquence radio pour le processus Babel.</strong></p>
+<p>L'activation de cette fonctionnalité est fortement recommandée pour les réseaux avec de nombreux nœuds sans fil.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Lorsque vous activez le routage avec diversité, vous devriez également configurer les paramètres <code class="docutils literal notranslate">diversity-factor</code> et <code class="docutils literal notranslate">channel</code>.</p>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel parameters diversity-factor &lt;1-256&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-parameters-diversity-factor-1-256" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le facteur multiplicatif pour le routage avec diversité, en unités de 1/256.</strong></p>
+<p>Les facteurs multiplicatifs plus faibles donnent plus de poids à la diversité lors de la sélection des routes. La valeur par défaut est 256, ce qui désactive le routage avec diversité. Sur les nœuds avec plusieurs radios indépendantes, configurez une valeur inférieure ou égale à 128.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel parameters resend-delay &lt;20-655340&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-parameters-resend-delay-20-655340" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le délai en millisecondes avant que le système ne renvoie une demande ou une mise à jour importante.</strong></p>
+<p>La valeur par défaut est de 2000 ms.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel parameters smoothing-half-life &lt;0-65534&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-parameters-smoothing-half-life-0-65534" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer la constante de temps, en secondes, pour l'algorithme de lissage utilisé pour implémenter l'hystérésis.</strong></p>
+<p>Des valeurs plus élevées réduisent les oscillations des routes mais augmentent légèrement le temps de convergence. Une valeur de 0 désactive l'hystérésis et convient aux réseaux filaires. La valeur par défaut est de 4 secondes.</p>
+</div>
+</div>
+</section>
+<section id="interfaces-configuration">
+<h2>Configuration des interfaces</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel interface &lt;interface&gt; type &lt;auto|wired|wireless&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-type-auto-wired-wireless" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le type de réseau pour l'interface activée en Babel.</strong></p>
+<p>Choisissez parmi les suivants :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">auto</code> : Babel détecte automatiquement si une interface est filaire ou sans fil.</p></li>
+<li><p><code class="docutils literal notranslate">wired</code> : Babel active les optimisations pour les interfaces filaires.</p></li>
+<li><p><code class="docutils literal notranslate">wireless</code> : Babel désactive les optimisations adaptées uniquement aux interfaces filaires. Spécifier wireless est toujours correct, mais peut entraîner une convergence plus lente et un trafic de routage accru.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel interface &lt;interface&gt; split-horizon &lt;default|disable|enable&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-split-horizon-default-disable-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le comportement de routage split-horizon pour l'interface spécifiée.</strong></p>
+<p>Utilisez l'une des options suivantes :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">default</code> : Babel active automatiquement le split-horizon sur les interfaces filaires et le désactive sur les interfaces sans fil.</p></li>
+<li><p><code class="docutils literal notranslate">enable</code> : Babel active le split-horizon sur l'interface. Cette optimisation doit être utilisée uniquement sur des réseaux symétriques et transitifs (filaires).</p></li>
+<li><p><code class="docutils literal notranslate">disable</code> : Babel désactive le split-horizon sur l'interface. Désactiver le split-horizon est toujours sûr et correct.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel interface &lt;interface&gt; hello-interval &lt;20-655340&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-hello-interval-20-655340" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer l'intervalle, en millisecondes, entre les messages hello programmés sur l'interface spécifiée.</strong></p>
+<p>Sur les liaisons filaires, Babel détecte les pannes de liaison dans deux intervalles de hello. Sur les liaisons sans fil, la qualité de la liaison est recalculée à chaque intervalle. La valeur par défaut est de 4000 ms.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel interface &lt;interface&gt; update-interval &lt;20-655340&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-update-interval-20-655340" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer l'intervalle, en millisecondes, entre les mises à jour de routage programmées sur l'interface spécifiée.</strong></p>
+<p>Comme Babel utilise largement les mises à jour déclenchées, vous pouvez augmenter cette valeur sur les liaisons fiables avec une perte de paquets minimale. La valeur par défaut est de 20000 ms.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel interface &lt;interface&gt; rxcost &lt;1-65534&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-rxcost-1-65534" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le coût de réception de base pour l'interface spécifiée.</strong></p>
+<p>Babel applique cette valeur en fonction du type de réseau configuré :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">wired</code> : La valeur est le coût de routage annoncé aux routeurs voisins.</p></li>
+<li><p><code class="docutils literal notranslate">wireless</code> : La valeur est un multiplicateur utilisé pour calculer le coût de réception ETX (Expected Transmission Count).</p></li>
+</ul>
+<p>La valeur par défaut est de 256.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel interface &lt;interface&gt; rtt-decay &lt;1-256&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-rtt-decay-1-256" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le facteur de décroissance pour la moyenne exponentielle des échantillons RTT, en unités de 1/256.</strong></p>
+<p>Les valeurs plus élevées éliminent plus rapidement les anciens échantillons. La valeur par défaut est de 42.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel interface &lt;interface&gt; rtt-min &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-rtt-min-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le RTT minimum, en millisecondes, à partir duquel le coût vers un voisin commence à augmenter.</strong></p>
+<p>Le coût supplémentaire est linéaire en (rtt - rtt-min). La valeur par défaut est de 10 ms.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel interface &lt;interface&gt; rtt-max &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-rtt-max-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le RTT maximum, en millisecondes, au-delà duquel le coût vers un voisin cesse d'augmenter.</strong></p>
+<p>La valeur par défaut est de 120 ms.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel interface &lt;interface&gt; max-rtt-penalty &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-max-rtt-penalty-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le coût maximum ajouté à un voisin lorsqu'un RTT atteint ou dépasse rtt-max.</strong></p>
+<p>En réglant cette valeur à 0, on désactive les coûts basés sur le RTT. La valeur par défaut est de 150.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel interface &lt;interface&gt; enable-timestamps
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-enable-timestamps" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer l'ajout de horodatages à chaque message Hello et IHU pour calculer les valeurs RTT.</strong></p>
+<p>L'activation des horodatages est recommandée pour les interfaces tunnel.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel interface &lt;interface&gt; channel &lt;1-254|interfering|noninterfering&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-channel-1-254-interfering-noninterfering" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer l'identifiant de canal utilisé par le routage avec diversité pour l'interface spécifiée.</strong></p>
+<p>Les interfaces s'interfèrent mutuellement en fonction de l'identifiant de canal attribué :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">1–254</code> : L'interface s'interfère avec les interfaces partageant le même numéro de canal et avec les interfaces configurées comme <code class="docutils literal notranslate">interfering</code>.</p></li>
+<li><p><code class="docutils literal notranslate">interfering</code> : L'interface s'interfère avec toutes les autres sauf celles configurées comme <code class="docutils literal notranslate">noninterfering</code>.</p></li>
+<li><p><code class="docutils literal notranslate">noninterfering</code> : L'interface s'interfère uniquement avec elle-même.</p></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="redistribution-configuration">
+<h2>Configuration de redistribution</h2>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel redistribute &lt;ipv4|ipv6&gt; &lt;route source&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-redistribute-ipv4-ipv6-route-source" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer la redistribution de l'information de routage provenant de la source de route spécifiée vers le processus Babel.</strong></p>
+<p>Les sources de route suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><strong>ipv4:</strong> <code class="docutils literal notranslate">bgp</code>, <code class="docutils literal notranslate">connected</code>, <code class="docutils literal notranslate">eigrp</code>, <code class="docutils literal notranslate">isis</code>, <code class="docutils literal notranslate">kernel</code>,
+<code class="docutils literal notranslate">nhrp</code>, <code class="docutils literal notranslate">ospf</code>, <code class="docutils literal notranslate">rip</code>, <code class="docutils literal notranslate">static</code></p></li>
+<li><p><strong>ipv6:</strong> <code class="docutils literal notranslate">bgp</code>, <code class="docutils literal notranslate">connected</code>, <code class="docutils literal notranslate">eigrp</code>, <code class="docutils literal notranslate">isis</code>, <code class="docutils literal notranslate">kernel</code>,
+<code class="docutils literal notranslate">nhrp</code>, <code class="docutils literal notranslate">ospfv3</code>, <code class="docutils literal notranslate">ripng</code>, <code class="docutils literal notranslate">static</code></p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel distribute-list &lt;ipv4|ipv6&gt; access-list &lt;in|out&gt; &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-distribute-list-ipv4-ipv6-access-list-in-out-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le filtrage global des routes Babel à l'aide d'une liste d'accès.</strong></p>
+<p>Spécifiez le sens dans lequel la liste d'accès est appliquée :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">in</code> : Filtre les routes entrantes.</p></li>
+<li><p><code class="docutils literal notranslate">out</code> : Filtre les routes sortantes.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel distribute-list &lt;ipv4|ipv6&gt; interface &lt;interface&gt; access-list &lt;in|out&gt; &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-distribute-list-ipv4-ipv6-interface-interface-access-list-in-out-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le filtrage des routes Babel sur l'interface spécifiée à l'aide d'une liste d'accès.</strong></p>
+<p>Spécifiez le sens dans lequel la liste d'accès est appliquée :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">in</code> : Filtre les routes entrantes.</p></li>
+<li><p><code class="docutils literal notranslate">out</code> : Filtre les routes sortantes.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel distribute-list &lt;ipv4|ipv6&gt; prefix-list &lt;in|out&gt; &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-distribute-list-ipv4-ipv6-prefix-list-in-out-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le filtrage global des routes Babel à l'aide d'une liste de préfixes.</strong></p>
+<p>Spécifiez le sens dans lequel la liste de préfixes est appliquée :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">in</code> : Filtre les routes entrantes.</p></li>
+<li><p><code class="docutils literal notranslate">out</code> : Filtre les routes sortantes.</p></li>
+</ul>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols babel distribute-list &lt;ipv4|ipv6&gt; interface &lt;interface&gt; prefix-list &lt;in|out&gt; &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-distribute-list-ipv4-ipv6-interface-interface-prefix-list-in-out-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurer le filtrage des routes Babel sur l'interface spécifiée à l'aide d'une liste de préfixes.</strong></p>
+<p>Spécifiez le sens dans lequel la liste de préfixes est appliquée :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">in</code> : Filtre les routes entrantes.</p></li>
+<li><p><code class="docutils literal notranslate">out</code> : Filtre les routes sortantes.</p></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="configuration-example">
+<h2>Exemple de configuration</h2>
+<section id="basic-two-node-babel-network">
+<h3>Réseau Babel à deux nœuds de base</h3>
+<p><strong>Objectif :</strong> L'exemple suivant connecte deux routeurs (Nœud 1 et Nœud 2) via leurs interfaces eth0 et utilise le protocole de routage Babel pour publier (redistribuer) les réseaux localement configurés de chaque routeur (représentés par des adresses de boucle) à l'autre.</p>
+<p><strong>Nœud 1 :</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># Configurer les adresses de boucle (réseaux locaux) et physiques (eth0)
+set interfaces loopback lo address 10.1.1.1/32
+set interfaces loopback lo address fd12:3456:dead:beef::1/128
+set interfaces ethernet eth0 address 192.168.1.1/24
+
+# Activer Babel sur la liaison physique
+set protocols babel interface eth0 type wired
+
+# Instruire Babel de publier (redistribuer) les réseaux localement configurés
+set protocols babel redistribute ipv4 connected
+set protocols babel redistribute ipv6 connected
+</pre></div>
+</div>
+<p><strong>Nœud 2 :</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># Configurer les adresses de boucle (réseaux locaux) et physiques (eth0)
+set interfaces loopback lo address 10.2.2.2/32
+set interfaces loopback lo address fd12:3456:beef:dead::2/128
+set interfaces ethernet eth0 address 192.168.1.2/24
+
+# Activer Babel sur la liaison physique
+set protocols babel interface eth0 type wired
+
+# Dire à Babel de publier (redistribuer) les réseaux localement configurés
+set protocols babel redistribute ipv4 connected
+set protocols babel redistribute ipv6 connected
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

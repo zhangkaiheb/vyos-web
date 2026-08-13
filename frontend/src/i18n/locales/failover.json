@@ -1,0 +1,506 @@
+{
+  "zh-CN": {
+    "failover": {
+      "validation": {
+        "ipv4Format": "IPv4 地址格式错误",
+        "networkFormat": "网络格式错误 (例如: 192.168.1.0/24)",
+        "prefixLength": "前缀长度必须在 0-32 之间",
+        "metricRange": "度量值必须在 1-255 之间"
+      },
+      "columns": {
+        "routePrefix": "路由前缀",
+        "nextHopCount": "下一跳数量",
+        "nextHopAddress": "下一跳地址",
+        "interface": "接口",
+        "metric": "度量值",
+        "onlink": "直连",
+        "checkTarget": "检查目标",
+        "type": "类型",
+        "port": "端口",
+        "timeout": "超时",
+        "policy": "策略"
+      },
+      "labels": {
+        "yes": "是",
+        "no": "否",
+        "defaultIcmp": "默认 (icmp)",
+        "defaultAnyAvailable": "默认 (any-available)",
+        "anyAvailable": "任一可用",
+        "allAvailable": "全部可用"
+      },
+      "tabs": {
+        "failoverRoutes": "故障转移路由"
+      },
+      "messages": {
+        "saved": "已保存",
+        "enterRoutePrefix": "请输入路由前缀",
+        "enterNextHopAddress": "请输入下一跳地址",
+        "enterCheckTarget": "请输入检查目标",
+        "confirmDeleteRoute": "确认删除以下路由？"
+      },
+      "modal": {
+        "editRoute": "编辑故障转移路由",
+        "addRoute": "添加故障转移路由",
+        "editNextHop": "编辑下一跳",
+        "addNextHop": "添加下一跳",
+        "editCheck": "编辑检查目标",
+        "addCheck": "添加检查目标",
+        "confirmDelete": "确认删除"
+      },
+      "form": {
+        "routePrefix": "路由前缀 *",
+        "routePrefixPlaceholder": "例如: 1.1.1.1/32",
+        "nextHopList": "下一跳列表",
+        "addNextHop": "添加下一跳",
+        "nextHopAddress": "下一跳地址 *",
+        "ipv4Address": "IPv4 地址",
+        "interface": "接口",
+        "selectInterface": "请选择接口",
+        "metric": "度量值",
+        "metricPlaceholder": "1-255",
+        "onlink": "直连",
+        "checkTargets": "检查目标",
+        "addCheck": "添加检查",
+        "checkTarget": "检查目标 *",
+        "checkType": "检查类型",
+        "port": "端口",
+        "portPlaceholder": "端口号",
+        "timeout": "超时",
+        "timeoutPlaceholder": "默认: 10 秒",
+        "policy": "策略"
+      }
+    }
+  },
+  "en": {
+    "failover": {
+      "validation": {
+        "ipv4Format": "Invalid IPv4 address format",
+        "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
+        "prefixLength": "Prefix length must be between 0-32",
+        "metricRange": "Metric must be between 1-255"
+      },
+      "columns": {
+        "routePrefix": "Route Prefix",
+        "nextHopCount": "Next Hop Count",
+        "nextHopAddress": "Next Hop Address",
+        "interface": "Interface",
+        "metric": "Metric",
+        "onlink": "On Link",
+        "checkTarget": "Check Target",
+        "type": "Type",
+        "port": "Port",
+        "timeout": "Timeout",
+        "policy": "Policy"
+      },
+      "labels": {
+        "yes": "Yes",
+        "no": "No",
+        "defaultIcmp": "Default (icmp)",
+        "defaultAnyAvailable": "Default (any-available)",
+        "anyAvailable": "Any Available",
+        "allAvailable": "All Available"
+      },
+      "tabs": {
+        "failoverRoutes": "Failover Routes"
+      },
+      "messages": {
+        "saved": "Saved",
+        "enterRoutePrefix": "Please enter route prefix",
+        "enterNextHopAddress": "Please enter next hop address",
+        "enterCheckTarget": "Please enter check target",
+        "confirmDeleteRoute": "Confirm delete the following route?"
+      },
+      "modal": {
+        "editRoute": "Edit Failover Route",
+        "addRoute": "Add Failover Route",
+        "editNextHop": "Edit Next Hop",
+        "addNextHop": "Add Next Hop",
+        "editCheck": "Edit Check Target",
+        "addCheck": "Add Check Target",
+        "confirmDelete": "Confirm Delete"
+      },
+      "form": {
+        "routePrefix": "Route Prefix *",
+        "routePrefixPlaceholder": "e.g., 1.1.1.1/32",
+        "nextHopList": "Next Hop List",
+        "addNextHop": "Add Next Hop",
+        "nextHopAddress": "Next Hop Address *",
+        "ipv4Address": "IPv4 Address",
+        "interface": "Interface",
+        "selectInterface": "Select an interface",
+        "metric": "Metric",
+        "metricPlaceholder": "1-255",
+        "onlink": "On Link",
+        "checkTargets": "Check Targets",
+        "addCheck": "Add Check",
+        "checkTarget": "Check Target *",
+        "checkType": "Check Type",
+        "port": "Port",
+        "portPlaceholder": "Port number",
+        "timeout": "Timeout",
+        "timeoutPlaceholder": "Default: 10 seconds",
+        "policy": "Policy"
+      }
+    }
+  },
+  "zh-TW": {
+    "failover": {
+      "validation": {
+        "ipv4Format": "Invalid IPv4 address format",
+        "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
+        "prefixLength": "Prefix length must be between 0-32",
+        "metricRange": "Metric must be between 1-255"
+      },
+      "columns": {
+        "routePrefix": "Route Prefix",
+        "nextHopCount": "Next Hop Count",
+        "nextHopAddress": "Next Hop Address",
+        "interface": "Interface",
+        "metric": "Metric",
+        "onlink": "On Link",
+        "checkTarget": "Check Target",
+        "type": "Type",
+        "port": "Port",
+        "timeout": "Timeout",
+        "policy": "Policy"
+      },
+      "labels": {
+        "yes": "Yes",
+        "no": "No",
+        "defaultIcmp": "Default (icmp)",
+        "defaultAnyAvailable": "Default (any-available)",
+        "anyAvailable": "Any Available",
+        "allAvailable": "All Available"
+      },
+      "tabs": {
+        "failoverRoutes": "Failover Routes"
+      },
+      "messages": {
+        "saved": "Saved",
+        "enterRoutePrefix": "Please enter route prefix",
+        "enterNextHopAddress": "Please enter next hop address",
+        "enterCheckTarget": "Please enter check target",
+        "confirmDeleteRoute": "Confirm delete the following route?"
+      },
+      "modal": {
+        "editRoute": "Edit Failover Route",
+        "addRoute": "Add Failover Route",
+        "editNextHop": "Edit Next Hop",
+        "addNextHop": "Add Next Hop",
+        "editCheck": "Edit Check Target",
+        "addCheck": "Add Check Target",
+        "confirmDelete": "Confirm Delete"
+      },
+      "form": {
+        "routePrefix": "Route Prefix *",
+        "routePrefixPlaceholder": "e.g., 1.1.1.1/32",
+        "nextHopList": "Next Hop List",
+        "addNextHop": "Add Next Hop",
+        "nextHopAddress": "Next Hop Address *",
+        "ipv4Address": "IPv4 Address",
+        "interface": "Interface",
+        "selectInterface": "Select an interface",
+        "metric": "Metric",
+        "metricPlaceholder": "1-255",
+        "onlink": "On Link",
+        "checkTargets": "Check Targets",
+        "addCheck": "Add Check",
+        "checkTarget": "Check Target *",
+        "checkType": "Check Type",
+        "port": "Port",
+        "portPlaceholder": "Port number",
+        "timeout": "Timeout",
+        "timeoutPlaceholder": "Default: 10 seconds",
+        "policy": "Policy"
+      }
+    }
+  },
+  "ru": {
+    "failover": {
+      "validation": {
+        "ipv4Format": "Invalid IPv4 address format",
+        "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
+        "prefixLength": "Prefix length must be between 0-32",
+        "metricRange": "Metric must be between 1-255"
+      },
+      "columns": {
+        "routePrefix": "Route Prefix",
+        "nextHopCount": "Next Hop Count",
+        "nextHopAddress": "Next Hop Address",
+        "interface": "Interface",
+        "metric": "Metric",
+        "onlink": "On Link",
+        "checkTarget": "Check Target",
+        "type": "Type",
+        "port": "Port",
+        "timeout": "Timeout",
+        "policy": "Policy"
+      },
+      "labels": {
+        "yes": "Yes",
+        "no": "No",
+        "defaultIcmp": "Default (icmp)",
+        "defaultAnyAvailable": "Default (any-available)",
+        "anyAvailable": "Any Available",
+        "allAvailable": "All Available"
+      },
+      "tabs": {
+        "failoverRoutes": "Failover Routes"
+      },
+      "messages": {
+        "saved": "Saved",
+        "enterRoutePrefix": "Please enter route prefix",
+        "enterNextHopAddress": "Please enter next hop address",
+        "enterCheckTarget": "Please enter check target",
+        "confirmDeleteRoute": "Confirm delete the following route?"
+      },
+      "modal": {
+        "editRoute": "Edit Failover Route",
+        "addRoute": "Add Failover Route",
+        "editNextHop": "Edit Next Hop",
+        "addNextHop": "Add Next Hop",
+        "editCheck": "Edit Check Target",
+        "addCheck": "Add Check Target",
+        "confirmDelete": "Confirm Delete"
+      },
+      "form": {
+        "routePrefix": "Route Prefix *",
+        "routePrefixPlaceholder": "e.g., 1.1.1.1/32",
+        "nextHopList": "Next Hop List",
+        "addNextHop": "Add Next Hop",
+        "nextHopAddress": "Next Hop Address *",
+        "ipv4Address": "IPv4 Address",
+        "interface": "Interface",
+        "selectInterface": "Select an interface",
+        "metric": "Metric",
+        "metricPlaceholder": "1-255",
+        "onlink": "On Link",
+        "checkTargets": "Check Targets",
+        "addCheck": "Add Check",
+        "checkTarget": "Check Target *",
+        "checkType": "Check Type",
+        "port": "Port",
+        "portPlaceholder": "Port number",
+        "timeout": "Timeout",
+        "timeoutPlaceholder": "Default: 10 seconds",
+        "policy": "Policy"
+      }
+    }
+  },
+  "de": {
+    "failover": {
+      "validation": {
+        "ipv4Format": "Invalid IPv4 address format",
+        "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
+        "prefixLength": "Prefix length must be between 0-32",
+        "metricRange": "Metric must be between 1-255"
+      },
+      "columns": {
+        "routePrefix": "Route Prefix",
+        "nextHopCount": "Next Hop Count",
+        "nextHopAddress": "Next Hop Address",
+        "interface": "Interface",
+        "metric": "Metric",
+        "onlink": "On Link",
+        "checkTarget": "Check Target",
+        "type": "Type",
+        "port": "Port",
+        "timeout": "Timeout",
+        "policy": "Policy"
+      },
+      "labels": {
+        "yes": "Yes",
+        "no": "No",
+        "defaultIcmp": "Default (icmp)",
+        "defaultAnyAvailable": "Default (any-available)",
+        "anyAvailable": "Any Available",
+        "allAvailable": "All Available"
+      },
+      "tabs": {
+        "failoverRoutes": "Failover Routes"
+      },
+      "messages": {
+        "saved": "Saved",
+        "enterRoutePrefix": "Please enter route prefix",
+        "enterNextHopAddress": "Please enter next hop address",
+        "enterCheckTarget": "Please enter check target",
+        "confirmDeleteRoute": "Confirm delete the following route?"
+      },
+      "modal": {
+        "editRoute": "Edit Failover Route",
+        "addRoute": "Add Failover Route",
+        "editNextHop": "Edit Next Hop",
+        "addNextHop": "Add Next Hop",
+        "editCheck": "Edit Check Target",
+        "addCheck": "Add Check Target",
+        "confirmDelete": "Confirm Delete"
+      },
+      "form": {
+        "routePrefix": "Route Prefix *",
+        "routePrefixPlaceholder": "e.g., 1.1.1.1/32",
+        "nextHopList": "Next Hop List",
+        "addNextHop": "Add Next Hop",
+        "nextHopAddress": "Next Hop Address *",
+        "ipv4Address": "IPv4 Address",
+        "interface": "Interface",
+        "selectInterface": "Select an interface",
+        "metric": "Metric",
+        "metricPlaceholder": "1-255",
+        "onlink": "On Link",
+        "checkTargets": "Check Targets",
+        "addCheck": "Add Check",
+        "checkTarget": "Check Target *",
+        "checkType": "Check Type",
+        "port": "Port",
+        "portPlaceholder": "Port number",
+        "timeout": "Timeout",
+        "timeoutPlaceholder": "Default: 10 seconds",
+        "policy": "Policy"
+      }
+    }
+  },
+  "fr": {
+    "failover": {
+      "validation": {
+        "ipv4Format": "Invalid IPv4 address format",
+        "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
+        "prefixLength": "Prefix length must be between 0-32",
+        "metricRange": "Metric must be between 1-255"
+      },
+      "columns": {
+        "routePrefix": "Route Prefix",
+        "nextHopCount": "Next Hop Count",
+        "nextHopAddress": "Next Hop Address",
+        "interface": "Interface",
+        "metric": "Metric",
+        "onlink": "On Link",
+        "checkTarget": "Check Target",
+        "type": "Type",
+        "port": "Port",
+        "timeout": "Timeout",
+        "policy": "Policy"
+      },
+      "labels": {
+        "yes": "Yes",
+        "no": "No",
+        "defaultIcmp": "Default (icmp)",
+        "defaultAnyAvailable": "Default (any-available)",
+        "anyAvailable": "Any Available",
+        "allAvailable": "All Available"
+      },
+      "tabs": {
+        "failoverRoutes": "Failover Routes"
+      },
+      "messages": {
+        "saved": "Saved",
+        "enterRoutePrefix": "Please enter route prefix",
+        "enterNextHopAddress": "Please enter next hop address",
+        "enterCheckTarget": "Please enter check target",
+        "confirmDeleteRoute": "Confirm delete the following route?"
+      },
+      "modal": {
+        "editRoute": "Edit Failover Route",
+        "addRoute": "Add Failover Route",
+        "editNextHop": "Edit Next Hop",
+        "addNextHop": "Add Next Hop",
+        "editCheck": "Edit Check Target",
+        "addCheck": "Add Check Target",
+        "confirmDelete": "Confirm Delete"
+      },
+      "form": {
+        "routePrefix": "Route Prefix *",
+        "routePrefixPlaceholder": "e.g., 1.1.1.1/32",
+        "nextHopList": "Next Hop List",
+        "addNextHop": "Add Next Hop",
+        "nextHopAddress": "Next Hop Address *",
+        "ipv4Address": "IPv4 Address",
+        "interface": "Interface",
+        "selectInterface": "Select an interface",
+        "metric": "Metric",
+        "metricPlaceholder": "1-255",
+        "onlink": "On Link",
+        "checkTargets": "Check Targets",
+        "addCheck": "Add Check",
+        "checkTarget": "Check Target *",
+        "checkType": "Check Type",
+        "port": "Port",
+        "portPlaceholder": "Port number",
+        "timeout": "Timeout",
+        "timeoutPlaceholder": "Default: 10 seconds",
+        "policy": "Policy"
+      }
+    }
+  },
+  "ko": {
+    "failover": {
+      "validation": {
+        "ipv4Format": "Invalid IPv4 address format",
+        "networkFormat": "Invalid network format (e.g., 192.168.1.0/24)",
+        "prefixLength": "Prefix length must be between 0-32",
+        "metricRange": "Metric must be between 1-255"
+      },
+      "columns": {
+        "routePrefix": "Route Prefix",
+        "nextHopCount": "Next Hop Count",
+        "nextHopAddress": "Next Hop Address",
+        "interface": "Interface",
+        "metric": "Metric",
+        "onlink": "On Link",
+        "checkTarget": "Check Target",
+        "type": "Type",
+        "port": "Port",
+        "timeout": "Timeout",
+        "policy": "Policy"
+      },
+      "labels": {
+        "yes": "Yes",
+        "no": "No",
+        "defaultIcmp": "Default (icmp)",
+        "defaultAnyAvailable": "Default (any-available)",
+        "anyAvailable": "Any Available",
+        "allAvailable": "All Available"
+      },
+      "tabs": {
+        "failoverRoutes": "Failover Routes"
+      },
+      "messages": {
+        "saved": "Saved",
+        "enterRoutePrefix": "Please enter route prefix",
+        "enterNextHopAddress": "Please enter next hop address",
+        "enterCheckTarget": "Please enter check target",
+        "confirmDeleteRoute": "Confirm delete the following route?"
+      },
+      "modal": {
+        "editRoute": "Edit Failover Route",
+        "addRoute": "Add Failover Route",
+        "editNextHop": "Edit Next Hop",
+        "addNextHop": "Add Next Hop",
+        "editCheck": "Edit Check Target",
+        "addCheck": "Add Check Target",
+        "confirmDelete": "Confirm Delete"
+      },
+      "form": {
+        "routePrefix": "Route Prefix *",
+        "routePrefixPlaceholder": "e.g., 1.1.1.1/32",
+        "nextHopList": "Next Hop List",
+        "addNextHop": "Add Next Hop",
+        "nextHopAddress": "Next Hop Address *",
+        "ipv4Address": "IPv4 Address",
+        "interface": "Interface",
+        "selectInterface": "Select an interface",
+        "metric": "Metric",
+        "metricPlaceholder": "1-255",
+        "onlink": "On Link",
+        "checkTargets": "Check Targets",
+        "addCheck": "Add Check",
+        "checkTarget": "Check Target *",
+        "checkType": "Check Type",
+        "port": "Port",
+        "portPlaceholder": "Port number",
+        "timeout": "Timeout",
+        "timeoutPlaceholder": "Default: 10 seconds",
+        "policy": "Policy"
+      }
+    }
+  }
+}

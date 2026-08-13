@@ -1,16 +1,19 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
 import { configApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DualListSelector from '/src/components/Form/DualListSelector.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const LOGLEVEL_OPTIONS = [
-  { key: 'quiet', label: 'quiet（静默）' },
-  { key: 'fatal', label: 'fatal（仅致命错误）' },
-  { key: 'error', label: 'error（错误和致命错误）' },
-  { key: 'info', label: 'info（默认）' },
-  { key: 'verbose', label: 'verbose（记录失败登录）' },
+  { key: 'quiet', labelKey: 'ssh.loglevel.quiet' },
+  { key: 'fatal', labelKey: 'ssh.loglevel.fatal' },
+  { key: 'error', labelKey: 'ssh.loglevel.error' },
+  { key: 'info', labelKey: 'ssh.loglevel.info' },
+  { key: 'verbose', labelKey: 'ssh.loglevel.verbose' },
 ];
 
 const CIPHER_OPTIONS = [
@@ -76,41 +79,41 @@ function firstValue(val) {
   return arr.length ? String(arr[0]) : '';
 }
 
-function validateIPv4(value) {
+function validateIPv4(value, t) {
   if (!value) return '';
-  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return 'IPv4 地址格式错误';
-  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return 'IPv4 地址格式错误';
+  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return t('ssh.validation.ipv4Format');
+  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return t('ssh.validation.ipv4Format');
   return '';
 }
 
-function validateIPv6(value) {
+function validateIPv6(value, t) {
   if (!value) return '';
   const re = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^(?:[0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,5}(?::[0-9a-fA-F]{1,4}){1,2}$|^(?:[0-9a-fA-F]{1,4}:){1,4}(?::[0-9a-fA-F]{1,4}){1,3}$|^(?:[0-9a-fA-F]{1,4}:){1,3}(?::[0-9a-fA-F]{1,4}){1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,2}(?::[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:(?::[0-9a-fA-F]{1,4}){1,6}$|^:(?::[0-9a-fA-F]{1,4}){1,7}$|^::$/;
-  if (!re.test(value)) return 'IPv6 地址格式错误';
+  if (!re.test(value)) return t('ssh.validation.ipv6Format');
   return '';
 }
 
-function validateIP(value) {
+function validateIP(value, t) {
   if (!value) return '';
-  if (!validateIPv4(value)) return '';
-  if (!validateIPv6(value)) return '';
-  return 'IP 地址格式错误';
+  if (!validateIPv4(value, t)) return '';
+  if (!validateIPv6(value, t)) return '';
+  return t('ssh.validation.ipFormat');
 }
 
-function validateIPPrefix(value) {
+function validateIPPrefix(value, t) {
   if (!value) return '';
   if (value.includes('/')) {
     const [ip, prefix] = value.split('/');
     const p = parseInt(prefix, 10);
-    if (isNaN(p)) return '前缀必须为数字';
-    const v4Err = validateIPv4(ip);
-    const v6Err = validateIPv6(ip);
-    if (!v4Err && (p < 0 || p > 32)) return 'IPv4 前缀范围 0-32';
-    if (!v6Err && (p < 0 || p > 128)) return 'IPv6 前缀范围 0-128';
-    if (v4Err && v6Err) return 'IP 地址或前缀格式错误';
+    if (isNaN(p)) return t('ssh.validation.prefixMustBeNumber');
+    const v4Err = validateIPv4(ip, t);
+    const v6Err = validateIPv6(ip, t);
+    if (!v4Err && (p < 0 || p > 32)) return t('ssh.validation.ipv4PrefixRange');
+    if (!v6Err && (p < 0 || p > 128)) return t('ssh.validation.ipv6PrefixRange');
+    if (v4Err && v6Err) return t('ssh.validation.ipOrPrefixFormat');
     return '';
   }
-  return validateIP(value);
+  return validateIP(value, t);
 }
 
 function sshToForm(data = {}) {
@@ -203,16 +206,18 @@ function sshToConfig(form) {
   return result;
 }
 
-function validateRange(value, min, max, name) {
+function validateRange(value, min, max, nameKey, t) {
   if (!isPresent(value)) return '';
   const n = parseInt(value, 10);
-  if (isNaN(n) || n < min || n > max) return `${name} 范围为 ${min}-${max}`;
+  if (isNaN(n) || n < min || n > max) return t('ssh.validation.range', { name: t(nameKey), min, max });
   return '';
 }
 
 export default defineComponent({
   name: 'SshPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -245,36 +250,37 @@ export default defineComponent({
     }
 
     async function save() {
-      let err = validateRange(config.value.port, 1, 65535, '端口');
-      if (err) return alert(err + '，默认 22');
+      let err = validateRange(config.value.port, 1, 65535, 'ssh.fields.port', t);
+      if (err) return showError({ message: t('ssh.validation.portDefault', { err }) });
 
-      err = validateRange(config.value.client_keepalive_interval, 1, 65535, 'Keepalive 间隔');
-      if (err) return alert(err + '（秒）');
+      err = validateRange(config.value.client_keepalive_interval, 1, 65535, 'ssh.fields.clientKeepalive', t);
+      if (err) return showError({ message: t('ssh.validation.keepaliveUnit', { err }) });
 
-      err = validateRange(config.value.dynamic_protection?.block_time, 1, 65535, 'Block Time');
-      if (err) return alert(err + '，默认 120');
+      err = validateRange(config.value.dynamic_protection?.block_time, 1, 65535, 'ssh.fields.blockTime', t);
+      if (err) return showError({ message: t('ssh.validation.blockTimeDefault', { err }) });
 
-      err = validateRange(config.value.dynamic_protection?.detect_time, 1, 65535, 'Detect Time');
-      if (err) return alert(err + '，默认 1800');
+      err = validateRange(config.value.dynamic_protection?.detect_time, 1, 65535, 'ssh.fields.detectTime', t);
+      if (err) return showError({ message: t('ssh.validation.detectTimeDefault', { err }) });
 
-      err = validateRange(config.value.dynamic_protection?.threshold, 1, 65535, 'Threshold');
-      if (err) return alert(err + '，默认 30');
+      err = validateRange(config.value.dynamic_protection?.threshold, 1, 65535, 'ssh.fields.threshold', t);
+      if (err) return showError({ message: t('ssh.validation.thresholdDefault', { err }) });
 
-      err = validateRange(config.value.rekey?.data, 1, 65535, 'Rekey Data');
-      if (err) return alert(err + '（MB）');
+      err = validateRange(config.value.rekey?.data, 1, 65535, 'ssh.fields.rekeyData', t);
+      if (err) return showError({ message: t('ssh.validation.rekeyDataUnit', { err }) });
 
-      err = validateRange(config.value.rekey?.time, 1, 65535, 'Rekey Time');
-      if (err) return alert(err + '（分钟）');
+      err = validateRange(config.value.rekey?.time, 1, 65535, 'ssh.fields.rekeyTime', t);
+      if (err) return showError({ message: t('ssh.validation.rekeyTimeUnit', { err }) });
 
       const allowFrom = splitMembers(config.value.dynamic_protection?.allow_from);
       for (const item of allowFrom) {
-        err = validateIPPrefix(item);
-        if (err) return alert(`Dynamic Protection 允许来源 ${item}：${err}`);
+        err = validateIPPrefix(item, t);
+        if (err) return showError({ message: t('ssh.validation.allowFromItem', { item, err }) });
       }
 
       saving.value = true;
       try {
         await configApi.set('service ssh', sshToConfig(config.value));
+        configStore.markPending();
         saved.value = true;
         await load();
       } catch (e) {
@@ -284,133 +290,135 @@ export default defineComponent({
       }
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
+
+    const loglevelOptions = LOGLEVEL_OPTIONS.map(o => ({ ...o, label: t(o.labelKey) }));
 
     return {
+      t,
       loading, saving, saved, config, activeTab, writeDisabled, commandPath,
       load, save,
-      LOGLEVEL_OPTIONS, CIPHER_OPTIONS, MAC_OPTIONS, HOSTKEY_ALGORITHM_OPTIONS, KEY_EXCHANGE_OPTIONS,
+      loglevelOptions, CIPHER_OPTIONS, MAC_OPTIONS, HOSTKEY_ALGORITHM_OPTIONS, KEY_EXCHANGE_OPTIONS,
     };
   },
   components: { DualListSelector, TabGroup, ToolbarButton },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('ssh.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本' },
-        { key: 'crypto', title: '加密算法' },
-        { key: 'access-control', title: '访问控制' },
-        { key: 'dynamic-protection', title: '动态防护' },
-        { key: 'rekey', title: 'Rekey' }
+        { key: 'basic', title: t('ssh.tabs.basic') },
+        { key: 'crypto', title: t('ssh.tabs.crypto') },
+        { key: 'access-control', title: t('ssh.tabs.accessControl') },
+        { key: 'dynamic-protection', title: t('ssh.tabs.dynamicProtection') },
+        { key: 'rekey', title: t('ssh.tabs.rekey') }
       ]">
 
         <template #basic>
           <div class="form-row">
-            <label class="form-label" title="SSH 监听端口，默认 22，范围 1-65535">端口</label>
+            <label class="form-label" :title="t('ssh.basic.portTitle')">{{ t('ssh.fields.port') }}</label>
             <div style="flex:1;">
-              <input type="number" min="1" max="65535" class="form-control" v-model="config.port" placeholder="1-65535，默认 22" title="SSH 监听端口，默认 22，范围 1-65535" />
-              <div class="form-hint">默认：22，范围：1-65535</div>
+              <input type="number" min="1" max="65535" class="form-control" v-model="config.port" :placeholder="t('ssh.basic.portPlaceholder')" :title="t('ssh.basic.portTitle')" />
+              <div class="form-hint">{{ t('ssh.basic.portHint') }}</div>
             </div>
           </div>
-          <div class="form-row"><label class="form-label" title="SSH 监听地址列表，每行一个 IPv4/IPv6 地址">监听地址</label><textarea class="form-control" v-model="config.listen_address" rows="3" placeholder="每行一个 IPv4/IPv6 监听地址" title="SSH 监听地址列表" /></div>
+          <div class="form-row"><label class="form-label" :title="t('ssh.basic.listenAddressTitle')">{{ t('ssh.fields.listenAddress') }}</label><textarea class="form-control" v-model="config.listen_address" rows="3" :placeholder="t('ssh.basic.listenAddressPlaceholder')" :title="t('ssh.basic.listenAddressTitle')" /></div>
           <div class="form-row">
-            <label class="form-label" title="SSH 日志级别，默认 info">日志级别</label>
-            <select class="form-control" v-model="config.loglevel" title="SSH 日志级别，默认 info">
-              <option v-for="o in LOGLEVEL_OPTIONS" :key="o.key" :value="o.key">{{ o.label }}</option>
+            <label class="form-label" :title="t('ssh.basic.loglevelTitle')">{{ t('ssh.fields.loglevel') }}</label>
+            <select class="form-control" v-model="config.loglevel" :title="t('ssh.basic.loglevelTitle')">
+              <option v-for="o in loglevelOptions" :key="o.key" :value="o.key">{{ o.label }}</option>
             </select>
           </div>
           <div class="form-row">
-            <label class="form-label" title="向客户端发送 keepalive 消息的间隔，范围 1-65535 秒">客户端 Keepalive 间隔 (秒)</label>
+            <label class="form-label" :title="t('ssh.basic.clientKeepaliveTitle')">{{ t('ssh.fields.clientKeepalive') }}</label>
             <div style="flex:1;">
-              <input type="number" min="1" max="65535" class="form-control" v-model="config.client_keepalive_interval" placeholder="1-65535" title="向客户端发送 keepalive 消息的间隔（秒），范围 1-65535" />
-              <div class="form-hint">范围：1-65535</div>
+              <input type="number" min="1" max="65535" class="form-control" v-model="config.client_keepalive_interval" placeholder="1-65535" :title="t('ssh.basic.clientKeepaliveTitle')" />
+              <div class="form-hint">{{ t('ssh.basic.clientKeepaliveHint') }}</div>
             </div>
           </div>
-          <div class="form-row"><label class="form-label" title="禁用 IP 地址到主机名的解析">禁用主机验证</label><input type="checkbox" v-model="config.disable_host_validation" title="禁用 IP 地址到主机名的解析" /></div>
-          <div class="form-row"><label class="form-label" title="禁用基于密码的 SSH 认证">禁用密码认证</label><input type="checkbox" v-model="config.disable_password_authentication" title="禁用基于密码的 SSH 认证" /></div>
-          <div class="form-row"><label class="form-label" title="SSH 服务绑定的 VRF，默认 default">VRF</label><input class="form-control" v-model="config.vrf" placeholder="default" title="SSH 服务绑定的 VRF，默认 default" /></div>
+          <div class="form-row"><label class="form-label" :title="t('ssh.basic.disableHostValidationTitle')">{{ t('ssh.fields.disableHostValidation') }}</label><input type="checkbox" v-model="config.disable_host_validation" :title="t('ssh.basic.disableHostValidationTitle')" /></div>
+          <div class="form-row"><label class="form-label" :title="t('ssh.basic.disablePasswordAuthTitle')">{{ t('ssh.fields.disablePasswordAuthentication') }}</label><input type="checkbox" v-model="config.disable_password_authentication" :title="t('ssh.basic.disablePasswordAuthTitle')" /></div>
+          <div class="form-row"><label class="form-label" :title="t('ssh.basic.vrfTitle')">VRF</label><input class="form-control" v-model="config.vrf" placeholder="default" :title="t('ssh.basic.vrfTitle')" /></div>
         </template>
 
         <template #crypto>
           <div class="form-row">
-            <label class="form-label" title="允许的 SSH 加密算法">加密算法 (Ciphers)</label>
+            <label class="form-label" :title="t('ssh.crypto.ciphersTitle')">{{ t('ssh.fields.ciphers') }}</label>
             <div style="flex:1;max-width:600px;">
-              <DualListSelector v-model="config.ciphers" :options="CIPHER_OPTIONS" title-left="可选" title-right="已选" />
+              <DualListSelector v-model="config.ciphers" :options="CIPHER_OPTIONS" :title-left="t('ssh.dualList.available')" :title-right="t('ssh.dualList.selected')" />
             </div>
           </div>
           <div class="form-row">
-            <label class="form-label" title="允许的 SSH MAC 算法">MAC 算法</label>
+            <label class="form-label" :title="t('ssh.crypto.macTitle')">{{ t('ssh.fields.mac') }}</label>
             <div style="flex:1;max-width:600px;">
-              <DualListSelector v-model="config.mac" :options="MAC_OPTIONS" title-left="可选" title-right="已选" />
+              <DualListSelector v-model="config.mac" :options="MAC_OPTIONS" :title-left="t('ssh.dualList.available')" :title-right="t('ssh.dualList.selected')" />
             </div>
           </div>
           <div class="form-row">
-            <label class="form-label" title="允许的主机密钥签名算法">主机密钥算法</label>
+            <label class="form-label" :title="t('ssh.crypto.hostkeyAlgorithmTitle')">{{ t('ssh.fields.hostkeyAlgorithm') }}</label>
             <div style="flex:1;max-width:600px;">
-              <DualListSelector v-model="config.hostkey_algorithm" :options="HOSTKEY_ALGORITHM_OPTIONS" title-left="可选" title-right="已选" />
+              <DualListSelector v-model="config.hostkey_algorithm" :options="HOSTKEY_ALGORITHM_OPTIONS" :title-left="t('ssh.dualList.available')" :title-right="t('ssh.dualList.selected')" />
             </div>
           </div>
           <div class="form-row">
-            <label class="form-label" title="允许的密钥交换算法">密钥交换算法</label>
+            <label class="form-label" :title="t('ssh.crypto.keyExchangeTitle')">{{ t('ssh.fields.keyExchange') }}</label>
             <div style="flex:1;max-width:600px;">
-              <DualListSelector v-model="config.key_exchange" :options="KEY_EXCHANGE_OPTIONS" title-left="可选" title-right="已选" />
+              <DualListSelector v-model="config.key_exchange" :options="KEY_EXCHANGE_OPTIONS" :title-left="t('ssh.dualList.available')" :title-right="t('ssh.dualList.selected')" />
             </div>
           </div>
         </template>
 
         <template #access-control>
-          <div class="form-row"><label class="form-label" title="允许登录的用户，每行一个">允许用户</label><textarea class="form-control" v-model="config.access_control.allow_user" rows="3" placeholder="每行一个用户名" title="允许 SSH 登录的用户列表" /></div>
-          <div class="form-row"><label class="form-label" title="允许登录的组，每行一个">允许组</label><textarea class="form-control" v-model="config.access_control.allow_group" rows="3" placeholder="每行一个组名" title="允许 SSH 登录的组列表" /></div>
-          <div class="form-row"><label class="form-label" title="拒绝登录的用户，每行一个">拒绝用户</label><textarea class="form-control" v-model="config.access_control.deny_user" rows="3" placeholder="每行一个用户名" title="拒绝 SSH 登录的用户列表" /></div>
-          <div class="form-row"><label class="form-label" title="拒绝登录的组，每行一个">拒绝组</label><textarea class="form-control" v-model="config.access_control.deny_group" rows="3" placeholder="每行一个组名" title="拒绝 SSH 登录的组列表" /></div>
+          <div class="form-row"><label class="form-label" :title="t('ssh.accessControl.allowUserTitle')">{{ t('ssh.fields.allowUser') }}</label><textarea class="form-control" v-model="config.access_control.allow_user" rows="3" :placeholder="t('ssh.accessControl.allowUserPlaceholder')" :title="t('ssh.accessControl.allowUserTitle')" /></div>
+          <div class="form-row"><label class="form-label" :title="t('ssh.accessControl.allowGroupTitle')">{{ t('ssh.fields.allowGroup') }}</label><textarea class="form-control" v-model="config.access_control.allow_group" rows="3" :placeholder="t('ssh.accessControl.allowGroupPlaceholder')" :title="t('ssh.accessControl.allowGroupTitle')" /></div>
+          <div class="form-row"><label class="form-label" :title="t('ssh.accessControl.denyUserTitle')">{{ t('ssh.fields.denyUser') }}</label><textarea class="form-control" v-model="config.access_control.deny_user" rows="3" :placeholder="t('ssh.accessControl.denyUserPlaceholder')" :title="t('ssh.accessControl.denyUserTitle')" /></div>
+          <div class="form-row"><label class="form-label" :title="t('ssh.accessControl.denyGroupTitle')">{{ t('ssh.fields.denyGroup') }}</label><textarea class="form-control" v-model="config.access_control.deny_group" rows="3" :placeholder="t('ssh.accessControl.denyGroupPlaceholder')" :title="t('ssh.accessControl.denyGroupTitle')" /></div>
         </template>
 
         <template #dynamic-protection>
-          <div class="form-row"><label class="form-label" title="始终允许连接的源地址，每行一个 IPv4/IPv6 地址或前缀">允许来源</label><textarea class="form-control" v-model="config.dynamic_protection.allow_from" rows="3" placeholder="每行一个 IP 或 CIDR" title="动态防护始终允许的源地址列表" /></div>
+          <div class="form-row"><label class="form-label" :title="t('ssh.dynamicProtection.allowFromTitle')">{{ t('ssh.fields.allowFrom') }}</label><textarea class="form-control" v-model="config.dynamic_protection.allow_from" rows="3" :placeholder="t('ssh.dynamicProtection.allowFromPlaceholder')" :title="t('ssh.dynamicProtection.allowFromTitle')" /></div>
           <div class="form-row">
-            <label class="form-label" title="阻断源 IP 的时间，默认 120 秒，范围 1-65535">阻断时间 (秒)</label>
+            <label class="form-label" :title="t('ssh.dynamicProtection.blockTimeTitle')">{{ t('ssh.fields.blockTime') }}</label>
             <div style="flex:1;">
-              <input type="number" min="1" max="65535" class="form-control" v-model="config.dynamic_protection.block_time" placeholder="1-65535，默认 120" title="阻断源 IP 的时间（秒），默认 120" />
-              <div class="form-hint">默认：120，范围：1-65535</div>
+              <input type="number" min="1" max="65535" class="form-control" v-model="config.dynamic_protection.block_time" :placeholder="t('ssh.dynamicProtection.blockTimePlaceholder')" :title="t('ssh.dynamicProtection.blockTimeTitle')" />
+              <div class="form-hint">{{ t('ssh.dynamicProtection.blockTimeHint') }}</div>
             </div>
           </div>
           <div class="form-row">
-            <label class="form-label" title="记忆源 IP 的时间，默认 1800 秒，范围 1-65535">检测时间 (秒)</label>
+            <label class="form-label" :title="t('ssh.dynamicProtection.detectTimeTitle')">{{ t('ssh.fields.detectTime') }}</label>
             <div style="flex:1;">
-              <input type="number" min="1" max="65535" class="form-control" v-model="config.dynamic_protection.detect_time" placeholder="1-65535，默认 1800" title="记忆源 IP 的时间（秒），默认 1800" />
-              <div class="form-hint">默认：1800，范围：1-65535</div>
+              <input type="number" min="1" max="65535" class="form-control" v-model="config.dynamic_protection.detect_time" :placeholder="t('ssh.dynamicProtection.detectTimePlaceholder')" :title="t('ssh.dynamicProtection.detectTimeTitle')" />
+              <div class="form-hint">{{ t('ssh.dynamicProtection.detectTimeHint') }}</div>
             </div>
           </div>
           <div class="form-row">
-            <label class="form-label" title="攻击阈值，默认 30，范围 1-65535">阈值</label>
+            <label class="form-label" :title="t('ssh.dynamicProtection.thresholdTitle')">{{ t('ssh.fields.threshold') }}</label>
             <div style="flex:1;">
-              <input type="number" min="1" max="65535" class="form-control" v-model="config.dynamic_protection.threshold" placeholder="1-65535，默认 30" title="累计攻击分数超过该值时阻断源 IP，默认 30" />
-              <div class="form-hint">默认：30，范围：1-65535</div>
+              <input type="number" min="1" max="65535" class="form-control" v-model="config.dynamic_protection.threshold" :placeholder="t('ssh.dynamicProtection.thresholdPlaceholder')" :title="t('ssh.dynamicProtection.thresholdTitle')" />
+              <div class="form-hint">{{ t('ssh.dynamicProtection.thresholdHint') }}</div>
             </div>
           </div>
         </template>
 
         <template #rekey>
           <div class="form-row">
-            <label class="form-label" title="数据量阈值（MB），范围 1-65535">数据阈值 (MB)</label>
+            <label class="form-label" :title="t('ssh.rekey.dataTitle')">{{ t('ssh.fields.rekeyData') }}</label>
             <div style="flex:1;">
-              <input type="number" min="1" max="65535" class="form-control" v-model="config.rekey.data" placeholder="1-65535" title="会话重新密钥化的数据量阈值（MB），范围 1-65535" />
-              <div class="form-hint">范围：1-65535（MB）</div>
+              <input type="number" min="1" max="65535" class="form-control" v-model="config.rekey.data" placeholder="1-65535" :title="t('ssh.rekey.dataTitle')" />
+              <div class="form-hint">{{ t('ssh.rekey.dataHint') }}</div>
             </div>
           </div>
           <div class="form-row">
-            <label class="form-label" title="时间阈值（分钟），范围 1-65535">时间阈值 (分钟)</label>
+            <label class="form-label" :title="t('ssh.rekey.timeTitle')">{{ t('ssh.fields.rekeyTime') }}</label>
             <div style="flex:1;">
-              <input type="number" min="1" max="65535" class="form-control" v-model="config.rekey.time" placeholder="1-65535" title="会话重新密钥化的时间阈值（分钟），范围 1-65535" />
-              <div class="form-hint">范围：1-65535（分钟）</div>
+              <input type="number" min="1" max="65535" class="form-control" v-model="config.rekey.time" placeholder="1-65535" :title="t('ssh.rekey.timeTitle')" />
+              <div class="form-hint">{{ t('ssh.rekey.timeHint') }}</div>
             </div>
           </div>
         </template>
       </TabGroup>
-
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
     </div>
   `,
 });

@@ -1,0 +1,58 @@
+{
+  "zh-CN": {
+    "tool": {
+      "confirmReboot": "确认重启系统？",
+      "confirmPoweroff": "确认关闭系统？",
+      "confirmReset": "确认重置系统？",
+      "clickToExecute": "点击执行..."
+    }
+  },
+  "zh-TW": {
+    "tool": {
+      "confirmReboot": "確認重新啟動系統？",
+      "confirmPoweroff": "確認關閉系統？",
+      "confirmReset": "確認重置系統？",
+      "clickToExecute": "點擊執行..."
+    }
+  },
+  "en": {
+    "tool": {
+      "confirmReboot": "Confirm system reboot?",
+      "confirmPoweroff": "Confirm system power off?",
+      "confirmReset": "Confirm system reset?",
+      "clickToExecute": "Click to execute..."
+    }
+  },
+  "ru": {
+    "tool": {
+      "confirmReboot": "Подтвердить перезагрузку системы?",
+      "confirmPoweroff": "Подтвердить выключение системы?",
+      "confirmReset": "Подтвердить сброс системы?",
+      "clickToExecute": "Нажмите для выполнения..."
+    }
+  },
+  "de": {
+    "tool": {
+      "confirmReboot": "Systemneustart bestätigen?",
+      "confirmPoweroff": "Systemausschalten bestätigen?",
+      "confirmReset": "Systemreset bestätigen?",
+      "clickToExecute": "Zum Ausführen klicken..."
+    }
+  },
+  "fr": {
+    "tool": {
+      "confirmReboot": "Confirmer le redémarrage du système ?",
+      "confirmPoweroff": "Confirmer l'extinction du système ?",
+      "confirmReset": "Confirmer la réinitialisation du système ?",
+      "clickToExecute": "Cliquer pour exécuter..."
+    }
+  },
+  "ko": {
+    "tool": {
+      "confirmReboot": "시스템 재부팅을 확인하시겠습니까?",
+      "confirmPoweroff": "시스템 전원 끄기를 확인하시겠습니까?",
+      "confirmReset": "시스템 초기화를 확인하시겠습니까?",
+      "clickToExecute": "실행하려면 클릭하세요..."
+    }
+  }
+}

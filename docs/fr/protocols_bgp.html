@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="bgp">
+<h1>BGP</h1>
+<p><abbr title="Border Gateway Protocol">BGP</abbr> est l'un des Protocoles de Passage Extérieur
+et le protocole standard interdomaine. La dernière version de BGP
+est la 4. Le BGP-4 est décrit dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1771.html"><strong>RFC 1771</strong></a> et mis à jour par <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4271.html"><strong>RFC 4271</strong></a>. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2858.html"><strong>RFC 2858</strong></a>
+ajoute un support multiprotocole au BGP.</p>
+<p>VyOS utilise <abbr title="Free Range Routing">FRR</abbr> et nous tenons à remercier
+leur effort!</p>
+<section id="basic-concepts">
+<h2>Concepts de base</h2>
+<section id="autonomous-systems">
+<h3>Systèmes autonomes</h3>
+<p>D'après <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1930.html"><strong>RFC 1930</strong></a> :</p>
+<blockquote>
+<div><p>Un AS est un groupe connecté d'une ou plusieurs préfixes IP exécutés par un ou plusieurs
+opérateurs de réseau qui a une politique de routage unique et clairement définie.</p>
+</div></blockquote>
+<p>Chaque <abbr title="Système autonome">AS</abbr> a un numéro d'identification associé avec lui
+appelé <abbr title="Numéro de système autonome">ASN</abbr>. C'est une valeur à deux octets
+variant de 1 à 65535. Les numéros d'AS 64512 à 65535 sont définis
+comme des numéros d'AS privés. Les numéros d'AS privés ne doivent pas être annoncés sur Internet mondial. La plage de numéros d'AS à deux octets a été épuisée. Les numéros d'AS à quatre octets sont spécifiés dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6793.html"><strong>RFC 6793</strong></a>, et fournissent un pool de 4294967296 numéros d'AS.</p>
+<p>L'<abbr title="Numéro de système autonome">ASN</abbr> est l'un des éléments essentiels du
+BGP. Le BGP est un protocole de routage à vecteur de distance, et le cadre AS-Path
+fournit la métrique de vecteur de distance et la détection de boucle au BGP.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp system-as &lt;asn&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-system-as-asn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez le <abbr title="Numéro de système autonome">ASN</abbr> local que représente ce routeur.
+C’est une option obligatoire !</p>
+</div>
+</div>
+</section>
+<section id="address-families">
+<h3>Familles d'adresses</h3>
+<p>Les extensions multiprotocole permettent au BGP de transporter des informations de routage pour plusieurs
+protocoles de couche réseau. Le BGP prend en charge un Identifiant de Famille (AFI) pour
+IPv4 et IPv6.</p>
+</section>
+<section id="route-selection">
+<h3>Sélection de route</h3>
+<p>Le processus de sélection de route utilisé par l'implémentation FRR de BGP utilise les suivantes
+critères de décision, commençant par le haut de la liste et allant vers le bas jusqu'à ce qu'un des facteurs puisse être utilisé.</p>
+<ol class="arabic">
+<li><p><strong>Vérification du poids</strong></p>
+<p>Préférez les routes locales avec un poids plus élevé aux routes avec un poids plus faible.</p>
+</li>
+<li><p><strong>Vérification de la préférence locale</strong></p>
+<p>Préférez les routes avec une préférence locale plus élevée aux routes avec une préférence locale plus faible.</p>
+</li>
+<li><p><strong>Vérification de la route locale</strong></p>
+<p>Préférez les routes locales (statiques, agrégats, redistribuées) aux routes reçues.</p>
+</li>
+<li><p><strong>Vérification de la longueur du chemin AS</strong></p>
+<p>Préférez les chemins AS avec le moins de sauts.</p>
+</li>
+<li><p><strong>Vérification de l'origine</strong></p>
+<p>Préférez les routes avec le type d'origine le plus bas. Cela signifie que les routes IGP sont préférées aux routes EGP, puis aux routes incomplètes.</p>
+</li>
+<li><p><strong>Vérification du MED</strong></p>
+<p>Où les routes avec un MED ont été reçues de la même AS, préférez la route avec le MED le plus bas.</p>
+</li>
+<li><p><strong>Vérification externe</strong></p>
+<p>Préférez la route reçue d'un pair eBGP externe plutôt que les routes reçues d'autres types de pairs.</p>
+</li>
+<li><p><strong>Vérification du coût IGP</strong></p>
+<p>Préférez la route avec le coût IGP le plus bas.</p>
+</li>
+<li><p><strong>Vérification multipath</strong></p>
+<p>Si la multipath est activée, vérifiez si les routes non encore distinguées peuvent être considérées comme égales. Si
+<code class="docutils literal notranslate">bgp bestpath as-path multipath-relax</code> est configuré, toutes ces routes sont
+considérées comme égales, sinon les routes reçues via iBGP avec des AS_PATH identiques ou les routes reçues depuis des voisins eBGP dans la même AS sont considérées comme égales.</p>
+</li>
+<li><p><strong>Vérification des routes externes déjà sélectionnées</strong></p>
+<p>Où les deux routes ont été reçues de pairs eBGP, préférez la route
+qui est déjà sélectionnée. Notez que cette vérification n'est pas appliquée si
+<code class="docutils literal notranslate">bgp bestpath compare-routerid</code> est configuré. Cette vérification peut
+empêcher certains cas d'oscillation.</p>
+</li>
+<li><p><strong>Vérification de l'identifiant du routeur</strong></p>
+<p>Préférez la route avec l'identifiant de routeur le plus bas. Si la route a un
+attribut ORIGINATOR_ID, via la réflexion iBGP, alors cet identifiant de routeur est
+utilisé, sinon l'identifiant de routeur du pair de la route reçue est utilisé.</p>
+</li>
+<li><p><strong>Vérification de la longueur de la liste de clusters</strong></p>
+<p>La route avec la longueur de liste de clusters la plus courte est utilisée. La liste de clusters
+reflète le chemin de réflexion iBGP que la route a pris.</p>
+</li>
+<li><p><strong>Adresse du pair</strong></p>
+<p>Préférez la route reçue du pair avec l'adresse de couche transport supérieure, en tant que dernier recours pour résoudre les désaccords.</p>
+</li>
+</ol>
+</section>
+<section id="capability-negotiation">
+<h3>Négociation de fonctionnalités</h3>
+<p>Lorsque l'on ajoute la fonctionnalité d'échange d'informations de routage IPv6 au BGP. Il y avait quelques
+propositions. <abbr title="Internet Engineering Task Force">IETF</abbr>
+<abbr title="Inter Domain Routing">IDR</abbr> a adopté une proposition appelée Extension Multiprotocole pour BGP. La spécification est décrite dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2283.html"><strong>RFC 2283</strong></a>. Le protocole
+ne définit pas de nouveaux protocoles. Il définit de nouveaux attributs pour le BGP existant. Lorsqu'il est utilisé pour échanger des informations de routage IPv6, il est appelé BGP-4+. Lorsqu'il est utilisé pour échanger des informations de routage multicast, il est appelé MBGP.</p>
+<p><em>bgpd</em> prend en charge l'extension multiprotocole pour BGP. Ainsi, si un pair distant prend en charge le protocole, <em>bgpd</em> peut échanger des informations de routage IPv6 et/ou multicast.</p>
+<p>Le BGP traditionnel ne disposait pas de la fonctionnalité de détection des capacités d'un pair distant,
+par exemple, s'il pouvait gérer des types de préfixes autres que les routes unicast IPv4. C'était un grand problème lors de l'utilisation de l'extension multiprotocole pour BGP dans un réseau opérationnel. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2842.html"><strong>RFC 2842</strong></a> a adopté une fonctionnalité appelée Négociation de Capacité. <em>bgpd</em> utilise cette Négociation de Capacité pour détecter les capacités du pair distant. Si un pair n'est configuré que comme un voisin unicast IPv4, <em>bgpd</em>
+ne transmet pas ces paquets de négociation de capacité (au moins pas à moins que d'autres fonctionnalités BGP optionnelles nécessitent la négociation de capacité).</p>
+<p>Par défaut, FRR met en place une connexion avec une capacité commune minimale pour les deux côtés. Par exemple, si le routeur local a des capacités unicast et multicast et que le routeur distant n'a que des capacités unicast, le routeur local établira la connexion avec uniquement les capacités unicast. Lorsque aucune capacité commune n'existe, FRR envoie une erreur de capacité non prise en charge et réinitialise la connexion.</p>
+</section>
+</section>
+<section id="configuration">
+<h2>Configuration</h2>
+<section id="bgp-router-configuration">
+<h3>Configuration du routeur BGP</h3>
+<p>En premier lieu, vous devez configurer le routeur BGP avec le <abbr title="Numéro de système autonome">ASN</abbr>. Le numéro d'AS est un identifiant pour le système autonome.
+Le protocole BGP utilise le numéro d'AS pour détecter si la connexion BGP est interne ou externe. VyOS n'a pas de commande spécifique pour démarrer le processus BGP.
+Le processus BGP commence lorsque le premier voisin est configuré.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp system-as &lt;asn&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-system-as-asn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez le numéro d'AS local que ce routeur représente. C'est une
+option obligatoire !</p>
+</div>
+</div>
+<section id="peers-configuration">
+<h4>Configuration des pairs</h4>
+<section id="defining-peers">
+<h5>Définition des pairs</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; remote-as &lt;asn&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-remote-as-asn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande crée un nouveau voisin dont le remote-as est &lt;asn&gt;. L'adresse du voisin
+peut être une adresse IPv4 ou une adresse IPv6 ou une interface à utiliser
+pour la connexion. La commande est applicable pour les pairs et les groupes de pairs.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; remote-as internal
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-remote-as-internal" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Créez un pair comme vous le feriez lors de la spécification d'un ASN, sauf que si le
+ASN du pair est différent de celui spécifié sous la commande <code class="docutils literal notranslate">protocols bgp &lt;asn&gt;</code>, la connexion sera refusée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; remote-as external
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-remote-as-external" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Créez un pair comme vous le feriez lors de la spécification d'un ASN, sauf que si le
+ASN du pair est le même que celui spécifié sous la commande <code class="docutils literal notranslate">protocols bgp &lt;asn&gt;</code>, la connexion sera refusée.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; remote-as auto
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-remote-as-auto" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Créez un pair comme vous le feriez lors de la spécification d'un ASN, sauf que le
+ASN distant est détecté automatiquement à partir du message OPEN.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; local-role &lt;role&gt; [strict]
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-local-role-role-strict" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Les rôles BGP sont définis dans le RFC <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> et offrent un moyen facile de
+ajouter une prévention, une détection et une mitigation des fuites de routes. La valeur du rôle local
+est négociée avec la nouvelle fonctionnalité de rôle BGP qui possède un
+vérification intégrée de la valeur correspondante. En cas de désaccord, le
+message de notification de désaccord de rôle BGP &lt;2, 11&gt; serait envoyé.
+Les paires de rôles corrects sont :</p>
+<p>Fournisseur - Client</p>
+<p>Pair - Pair</p>
+<p>Serveur RS - Client RS</p>
+<p>Si <code class="docutils literal notranslate">strict</code> est configuré, la session BGP ne deviendra pas établie
+jusqu'à ce que le pair définisse son rôle local. Cette
+paramètre de configuration est défini dans le RFC <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> et est utilisé pour
+imposer la configuration correspondante côté de vos partenaires.</p>
+<p>Les routes envoyées par le fournisseur, le serveur RS ou le pair local-role
+(ou reçues par le client, le client RS ou le pair local-role) seront marquées avec un nouvel attribut Only to Customer (OTC).</p>
+<p>Les routes avec cet attribut ne peuvent être envoyées qu'au voisin si votre
+rôle local est fournisseur ou serveur RS. Les routes avec cet attribut peuvent
+être reçues uniquement si votre rôle local est client ou client RS.</p>
+<p>Dans le cas d'une relation pair-pair, les routes peuvent être reçues uniquement si la valeur OTC
+est égale à votre numéro AS de voisin.</p>
+<p>Toutes ces règles avec OTC aideront à détecter et à atténuer les fuites de routes
+et fonctionneront automatiquement si le rôle local est configuré.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; shutdown
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-shutdown" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande désactive le pair ou le groupe de pairs. Pour réactiver le pair, utilisez
+la forme delete de cette commande.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Définir la description du pair ou du groupe de pairs.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; update-source &lt;address|interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-update-source-address-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Spécifiez l'adresse source IPv4 à utiliser pour la session BGP vers ce pair,
+peut être spécifié soit comme une adresse IPv4 directement, soit comme un nom d'interface.</p>
+</div>
+</div>
+</section>
+<section id="bgp-capability-negotiation-1">
+<h5>Négociation de fonctionnalités</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; capability dynamic
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-capability-dynamic" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permettra la mise à jour dynamique des fonctionnalités sur une
+session BGP établie.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; capability extended-nexthop
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-capability-extended-nexthop" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Permet à BGP de négocier la fonctionnalité extended-nexthop avec son pair.
+Si vous êtes en pairage via une adresse Link-Local IPv6, cette fonctionnalité
+est activée automatiquement. Si vous êtes en pairage via une adresse IPv6 Globale
+alors l'activation de cette commande permettra à BGP d'installer des routes IPv4 avec
+des prochains sauts IPv6 si vous ne disposez pas d'interfaces configurées en IPv4.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; disable-capability-negotiation
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-disable-capability-negotiation" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Supprime l'envoi de la négociation de capacité en tant qu'option
+paramètre de message OPEN au pair. Cette commande affecte uniquement le pair qui
+est configuré autrement que la configuration IPv4 unicast.</p>
+<p>Lorsque le pair distant ne possède pas la fonctionnalité de négociation de capacité,
+le pair distant ne transmettra aucun attribut de capacité. Dans ce cas,
+le BGP configure le pair avec les capacités configurées.</p>
+<p>Vous pouvez préférer les capacités configurées localement plutôt que les capacités négociées,
+même si le pair distant envoie des capacités. Si le pair est configuré par
+<code class="docutils literal notranslate">override-capability</code>, VyOS ignore les capacités reçues puis remplace les capacités négociées par les valeurs configurées.</p>
+<p>En outre, vous devez garder à l'esprit que cette fonctionnalité désactive fondamentalement
+la possibilité d'utiliser largement les fonctionnalités BGP. BGP non numéroté,
+prise en charge des noms d'hôte, AS4, Addpath, Actualisation de Route, ORF, Capacités Dynamiques,
+et redémarrage doux.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; override-capability
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-override-capability" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande permet de remplacer le résultat de la négociation de capacité par
+la configuration locale. Ignorez la valeur de capacité du pair distant.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; strict-capability-match
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-strict-capability-match" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande force une comparaison stricte des capacités distantes et locales.
+Si les capacités diffèrent, envoyez une erreur de capacité non prise en charge
+puis réinitialisez la connexion.</p>
+<p>Vous pouvez vouloir désactiver l'envoi de la capacité de négociation OPEN message
+paramètre optionnel au pair lorsque le pair distant ne prend pas en charge
+la négociation de capacité. Utilisez la commande <code class="docutils literal notranslate">disable-capability-negotiation</code>
+pour désactiver la fonctionnalité.</p>
+</div>
+</div>
+</section>
+<section id="peer-parameters">
+<h5>Paramètres du pair</h5>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; address-family &lt;ipv4-unicast|ipv6-unicast&gt; allowas-in number &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-allowas-in-number-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Cette commande accepte les routes entrantes avec un chemin AS contenant le numéro AS
+avec la même valeur que l'AS système actuel. Cela est utilisé lorsque vous souhaitez
+utiliser le même numéro AS dans vos sites, mais vous ne pouvez pas les connecter directement.</p>
+<p>Le paramètre number (1-10) configure le nombre d'occurrences acceptées
+du numéro d'AS système dans le chemin AS.</p>
+<p>Cette commande n'est autorisée que pour les pairs eBGP. Elle n'est pas applicable
+pour les groupes de pairs.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols bgp neighbor &lt;address|interface&gt; address-family &lt;ipv4-unicast|ipv6-unicast&gt; as-override
+<a class="cmdlink" href="#cfgcmd-body>
+</p:12</p>
+</p>
+section="affichier
+=".</p>code:preangeabloced:
+</codeécode:</code
+</code:0</code:code:0</p>
+p>
+</code</code:"
+</code:
+=
+</code:</code:</code:</p</code:</code</code</code</code:</span</code:</code</code:</
+code</</code</
+</code</code:code</</code</code</</
+</</code</code:</code</p</code</code</"
+</code</</code</code</code:|
+</code:code</</code</code:</code</</code</code</
+:code</</code</ref</code</</code</code</</code</</code</code</code</code</
+p</code</p</p</code
+code:</p</p</code</code</code:</code:</code</ode</code</code:</code</style:p</code</code:</code</p>
+</p</code:</"
+p</code</code</code:</code:</code:code</code:</code:</p</code</code:</code:code:0</code:code:nbsp</code</code</code</</code</code:</code:code:code</code:</code:</</code:</code </code:</code</code:code:code</code: 
+</div>
+</div>

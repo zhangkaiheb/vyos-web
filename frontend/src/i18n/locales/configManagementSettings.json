@@ -1,0 +1,366 @@
+{
+  "zh-CN": {
+    "configManagementSettings": {
+      "columns": {
+        "url": "URL"
+      },
+      "tabs": {
+        "archive": "提交归档位置",
+        "source": "源地址",
+        "revisions": "修订版本数"
+      },
+      "labels": {
+        "sourceAddress": "源地址",
+        "commitRevisions": "修订版本数"
+      },
+      "placeholders": {
+        "sourceAddress": "IPv4 或 IPv6 地址"
+      },
+      "tips": {
+        "sourceAddress": "用于发起连接的源 IP 地址",
+        "commitRevisions": "要保留的配置备份数量（1-65535）"
+      },
+      "hints": {
+        "sourceAddress": "支持 IPv4 地址（如 192.168.5.200）和 IPv6 地址（如 2002:1:2:3::1）",
+        "commitRevisions": "默认值：100，范围：1-65535",
+        "urlFormats": "支持格式：http://、https://、ftp://、sftp://、scp://、tftp://、git+https://"
+      },
+      "modals": {
+        "editLocation": "编辑提交归档位置",
+        "addLocation": "添加提交归档位置",
+        "confirmDelete": "确认删除"
+      },
+      "messages": {
+        "confirmDeleteLocations": "确认删除以下提交归档位置？"
+      },
+      "alerts": {
+        "saved": "已保存"
+      },
+      "validation": {
+        "ipv4": "IPv4 地址格式错误",
+        "ipv6": "IPv6 地址格式错误",
+        "ip": "IP 地址格式错误",
+        "url": "URL 格式错误，支持 http/https/ftp/sftp/scp/tftp/git+https"
+      },
+      "errors": {
+        "locationError": "提交归档位置 {url}：{error}",
+        "sourceAddressError": "源地址 {address}：{error}",
+        "revisionsRange": "配置修订版本数必须在 1-65535 之间",
+        "urlRequired": "请输入提交归档位置 URL",
+        "urlDuplicate": "该 URL 已存在"
+      }
+    }
+  },
+  "en": {
+    "configManagementSettings": {
+      "columns": {
+        "url": "URL"
+      },
+      "tabs": {
+        "archive": "Commit Archive Locations",
+        "source": "Source Address",
+        "revisions": "Commit Revisions"
+      },
+      "labels": {
+        "sourceAddress": "Source Address",
+        "commitRevisions": "Commit Revisions"
+      },
+      "placeholders": {
+        "sourceAddress": "IPv4 or IPv6 address"
+      },
+      "tips": {
+        "sourceAddress": "Source IP address used to initiate connections",
+        "commitRevisions": "Number of configuration backups to keep (1-65535)"
+      },
+      "hints": {
+        "sourceAddress": "Supports IPv4 addresses (e.g., 192.168.5.200) and IPv6 addresses (e.g., 2002:1:2:3::1)",
+        "commitRevisions": "Default: 100, Range: 1-65535",
+        "urlFormats": "Supported formats: http://, https://, ftp://, sftp://, scp://, tftp://, git+https://"
+      },
+      "modals": {
+        "editLocation": "Edit Commit Archive Location",
+        "addLocation": "Add Commit Archive Location",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "confirmDeleteLocations": "Confirm delete the following commit archive locations?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "validation": {
+        "ipv4": "Invalid IPv4 address format",
+        "ipv6": "Invalid IPv6 address format",
+        "ip": "Invalid IP address format",
+        "url": "Invalid URL format, supports http/https/ftp/sftp/scp/tftp/git+https"
+      },
+      "errors": {
+        "locationError": "Commit archive location {url}: {error}",
+        "sourceAddressError": "Source address {address}: {error}",
+        "revisionsRange": "Commit revisions must be between 1-65535",
+        "urlRequired": "Please enter commit archive location URL",
+        "urlDuplicate": "This URL already exists"
+      }
+    }
+  },
+  "zh-TW": {
+    "configManagementSettings": {
+      "columns": {
+        "url": "URL"
+      },
+      "tabs": {
+        "archive": "Commit Archive Locations",
+        "source": "Source Address",
+        "revisions": "Commit Revisions"
+      },
+      "labels": {
+        "sourceAddress": "Source Address",
+        "commitRevisions": "Commit Revisions"
+      },
+      "placeholders": {
+        "sourceAddress": "IPv4 or IPv6 address"
+      },
+      "tips": {
+        "sourceAddress": "Source IP address used to initiate connections",
+        "commitRevisions": "Number of configuration backups to keep (1-65535)"
+      },
+      "hints": {
+        "sourceAddress": "Supports IPv4 addresses (e.g., 192.168.5.200) and IPv6 addresses (e.g., 2002:1:2:3::1)",
+        "commitRevisions": "Default: 100, Range: 1-65535",
+        "urlFormats": "Supported formats: http://, https://, ftp://, sftp://, scp://, tftp://, git+https://"
+      },
+      "modals": {
+        "editLocation": "Edit Commit Archive Location",
+        "addLocation": "Add Commit Archive Location",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "confirmDeleteLocations": "Confirm delete the following commit archive locations?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "validation": {
+        "ipv4": "Invalid IPv4 address format",
+        "ipv6": "Invalid IPv6 address format",
+        "ip": "Invalid IP address format",
+        "url": "Invalid URL format, supports http/https/ftp/sftp/scp/tftp/git+https"
+      },
+      "errors": {
+        "locationError": "Commit archive location {url}: {error}",
+        "sourceAddressError": "Source address {address}: {error}",
+        "revisionsRange": "Commit revisions must be between 1-65535",
+        "urlRequired": "Please enter commit archive location URL",
+        "urlDuplicate": "This URL already exists"
+      }
+    }
+  },
+  "ru": {
+    "configManagementSettings": {
+      "columns": {
+        "url": "URL"
+      },
+      "tabs": {
+        "archive": "Commit Archive Locations",
+        "source": "Source Address",
+        "revisions": "Commit Revisions"
+      },
+      "labels": {
+        "sourceAddress": "Source Address",
+        "commitRevisions": "Commit Revisions"
+      },
+      "placeholders": {
+        "sourceAddress": "IPv4 or IPv6 address"
+      },
+      "tips": {
+        "sourceAddress": "Source IP address used to initiate connections",
+        "commitRevisions": "Number of configuration backups to keep (1-65535)"
+      },
+      "hints": {
+        "sourceAddress": "Supports IPv4 addresses (e.g., 192.168.5.200) and IPv6 addresses (e.g., 2002:1:2:3::1)",
+        "commitRevisions": "Default: 100, Range: 1-65535",
+        "urlFormats": "Supported formats: http://, https://, ftp://, sftp://, scp://, tftp://, git+https://"
+      },
+      "modals": {
+        "editLocation": "Edit Commit Archive Location",
+        "addLocation": "Add Commit Archive Location",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "confirmDeleteLocations": "Confirm delete the following commit archive locations?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "validation": {
+        "ipv4": "Invalid IPv4 address format",
+        "ipv6": "Invalid IPv6 address format",
+        "ip": "Invalid IP address format",
+        "url": "Invalid URL format, supports http/https/ftp/sftp/scp/tftp/git+https"
+      },
+      "errors": {
+        "locationError": "Commit archive location {url}: {error}",
+        "sourceAddressError": "Source address {address}: {error}",
+        "revisionsRange": "Commit revisions must be between 1-65535",
+        "urlRequired": "Please enter commit archive location URL",
+        "urlDuplicate": "This URL already exists"
+      }
+    }
+  },
+  "de": {
+    "configManagementSettings": {
+      "columns": {
+        "url": "URL"
+      },
+      "tabs": {
+        "archive": "Commit Archive Locations",
+        "source": "Source Address",
+        "revisions": "Commit Revisions"
+      },
+      "labels": {
+        "sourceAddress": "Source Address",
+        "commitRevisions": "Commit Revisions"
+      },
+      "placeholders": {
+        "sourceAddress": "IPv4 or IPv6 address"
+      },
+      "tips": {
+        "sourceAddress": "Source IP address used to initiate connections",
+        "commitRevisions": "Number of configuration backups to keep (1-65535)"
+      },
+      "hints": {
+        "sourceAddress": "Supports IPv4 addresses (e.g., 192.168.5.200) and IPv6 addresses (e.g., 2002:1:2:3::1)",
+        "commitRevisions": "Default: 100, Range: 1-65535",
+        "urlFormats": "Supported formats: http://, https://, ftp://, sftp://, scp://, tftp://, git+https://"
+      },
+      "modals": {
+        "editLocation": "Edit Commit Archive Location",
+        "addLocation": "Add Commit Archive Location",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "confirmDeleteLocations": "Confirm delete the following commit archive locations?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "validation": {
+        "ipv4": "Invalid IPv4 address format",
+        "ipv6": "Invalid IPv6 address format",
+        "ip": "Invalid IP address format",
+        "url": "Invalid URL format, supports http/https/ftp/sftp/scp/tftp/git+https"
+      },
+      "errors": {
+        "locationError": "Commit archive location {url}: {error}",
+        "sourceAddressError": "Source address {address}: {error}",
+        "revisionsRange": "Commit revisions must be between 1-65535",
+        "urlRequired": "Please enter commit archive location URL",
+        "urlDuplicate": "This URL already exists"
+      }
+    }
+  },
+  "fr": {
+    "configManagementSettings": {
+      "columns": {
+        "url": "URL"
+      },
+      "tabs": {
+        "archive": "Commit Archive Locations",
+        "source": "Source Address",
+        "revisions": "Commit Revisions"
+      },
+      "labels": {
+        "sourceAddress": "Source Address",
+        "commitRevisions": "Commit Revisions"
+      },
+      "placeholders": {
+        "sourceAddress": "IPv4 or IPv6 address"
+      },
+      "tips": {
+        "sourceAddress": "Source IP address used to initiate connections",
+        "commitRevisions": "Number of configuration backups to keep (1-65535)"
+      },
+      "hints": {
+        "sourceAddress": "Supports IPv4 addresses (e.g., 192.168.5.200) and IPv6 addresses (e.g., 2002:1:2:3::1)",
+        "commitRevisions": "Default: 100, Range: 1-65535",
+        "urlFormats": "Supported formats: http://, https://, ftp://, sftp://, scp://, tftp://, git+https://"
+      },
+      "modals": {
+        "editLocation": "Edit Commit Archive Location",
+        "addLocation": "Add Commit Archive Location",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "confirmDeleteLocations": "Confirm delete the following commit archive locations?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "validation": {
+        "ipv4": "Invalid IPv4 address format",
+        "ipv6": "Invalid IPv6 address format",
+        "ip": "Invalid IP address format",
+        "url": "Invalid URL format, supports http/https/ftp/sftp/scp/tftp/git+https"
+      },
+      "errors": {
+        "locationError": "Commit archive location {url}: {error}",
+        "sourceAddressError": "Source address {address}: {error}",
+        "revisionsRange": "Commit revisions must be between 1-65535",
+        "urlRequired": "Please enter commit archive location URL",
+        "urlDuplicate": "This URL already exists"
+      }
+    }
+  },
+  "ko": {
+    "configManagementSettings": {
+      "columns": {
+        "url": "URL"
+      },
+      "tabs": {
+        "archive": "Commit Archive Locations",
+        "source": "Source Address",
+        "revisions": "Commit Revisions"
+      },
+      "labels": {
+        "sourceAddress": "Source Address",
+        "commitRevisions": "Commit Revisions"
+      },
+      "placeholders": {
+        "sourceAddress": "IPv4 or IPv6 address"
+      },
+      "tips": {
+        "sourceAddress": "Source IP address used to initiate connections",
+        "commitRevisions": "Number of configuration backups to keep (1-65535)"
+      },
+      "hints": {
+        "sourceAddress": "Supports IPv4 addresses (e.g., 192.168.5.200) and IPv6 addresses (e.g., 2002:1:2:3::1)",
+        "commitRevisions": "Default: 100, Range: 1-65535",
+        "urlFormats": "Supported formats: http://, https://, ftp://, sftp://, scp://, tftp://, git+https://"
+      },
+      "modals": {
+        "editLocation": "Edit Commit Archive Location",
+        "addLocation": "Add Commit Archive Location",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "confirmDeleteLocations": "Confirm delete the following commit archive locations?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "validation": {
+        "ipv4": "Invalid IPv4 address format",
+        "ipv6": "Invalid IPv6 address format",
+        "ip": "Invalid IP address format",
+        "url": "Invalid URL format, supports http/https/ftp/sftp/scp/tftp/git+https"
+      },
+      "errors": {
+        "locationError": "Commit archive location {url}: {error}",
+        "sourceAddressError": "Source address {address}: {error}",
+        "revisionsRange": "Commit revisions must be between 1-65535",
+        "urlRequired": "Please enter commit archive location URL",
+        "urlDuplicate": "This URL already exists"
+      }
+    }
+  }
+}

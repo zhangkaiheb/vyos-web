@@ -1,6 +1,7 @@
 import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { interfaceApi, configApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
@@ -8,22 +9,23 @@ import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const ACTION_OPTIONS = [
-  { value: 'accept', label: '接受 (accept)' },
-  { value: 'reject', label: '拒绝 (reject)' },
-  { value: 'return', label: '返回 (return)' },
-  { value: 'drop', label: '丢弃 (drop)' },
+  { value: 'accept', labelKey: 'policyRoute.options.accept' },
+  { value: 'reject', labelKey: 'policyRoute.options.reject' },
+  { value: 'return', labelKey: 'policyRoute.options.return' },
+  { value: 'drop', labelKey: 'policyRoute.options.drop' },
 ];
 
 const FRAGMENT_OPTIONS = [
-  { value: 'match-frag', label: '匹配分片 (match-frag)' },
-  { value: 'match-non-frag', label: '匹配非分片 (match-non-frag)' },
+  { value: 'match-frag', labelKey: 'policyRoute.options.matchFrag' },
+  { value: 'match-non-frag', labelKey: 'policyRoute.options.matchNonFrag' },
 ];
 
 const IPSEC_OPTIONS = [
-  { value: 'match-ipsec', label: '匹配 IPsec (match-ipsec)' },
-  { value: 'match-none', label: '匹配非 IPsec (match-none)' },
+  { value: 'match-ipsec', labelKey: 'policyRoute.options.matchIpsec' },
+  { value: 'match-none', labelKey: 'policyRoute.options.matchNone' },
 ];
 
 const PACKET_TYPE_OPTIONS = ['broadcast', 'host', 'multicast', 'other'];
@@ -320,6 +322,7 @@ function formatEndpoint(ep) {
 export default defineComponent({
   name: 'PolicyRoutePage',
   setup() {
+    const { t } = useI18n();
     const route = useRoute();
     const configStore = useConfigStore();
     const ruleSets = ref([]);
@@ -334,7 +337,14 @@ export default defineComponent({
     const editingRuleOriginalNumber = ref('');
     const ruleSetActiveTab = ref('basic');
     const ruleActiveTab = ref('basic');
+    const ruleSelected = ref([]);
     const dataTableRef = ref(null);
+
+    // Delete confirmation modals
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
+    const ruleDeleteModalVisible = ref(false);
+    const pendingDeleteRuleNumbers = ref([]);
 
     const path = computed(() => {
       const p = route.path.replace(/^\//, '').replace(/\//g, ' ');
@@ -343,170 +353,174 @@ export default defineComponent({
 
     const writeDisabled = computed(() => route.meta?.menuItem?.permission === 'read');
 
-    const ruleSetColumns = [
-      { key: 'name', title: '规则集名称' },
-      { key: 'description', title: '描述' },
-      { key: 'interface', title: '接口' },
-      { key: 'rule_count', title: '规则数' },
-      { key: 'default-log', title: '默认日志' },
-    ];
+    function resolveOptions(opts) {
+      return opts.map(o => ({ ...o, label: t(o.labelKey) }));
+    }
 
-    const ruleColumns = [
-      { key: 'rule', title: '规则编号' },
-      { key: 'description', title: '描述' },
-      { key: 'action', title: '动作' },
-      { key: 'protocol', title: '协议' },
-      { key: 'source', title: '源' },
-      { key: 'destination', title: '目的' },
-      { key: 'set_table', title: '路由表' },
-      { key: 'disable', title: '禁用' },
-    ];
+    const ruleSetColumns = computed(() => [
+      { key: 'name', title: t('policyRoute.columns.ruleSetName') },
+      { key: 'description', title: t('policyRoute.columns.description') },
+      { key: 'interface', title: t('policyRoute.columns.interface') },
+      { key: 'rule_count', title: t('policyRoute.columns.ruleCount') },
+      { key: 'default-log', title: t('policyRoute.columns.defaultLog') },
+    ]);
 
-    const ruleSetSchema = [
-      { key: 'name', title: '规则集名称', type: 'text', required: true },
-      { key: 'description', title: '描述', type: 'text' },
-      { key: 'default-log', title: '默认动作日志', type: 'checkbox', valueless: true },
-      { key: 'interface', title: '接口', type: 'select', options: [] },
-    ];
+    const ruleColumns = computed(() => [
+      { key: 'rule', title: t('policyRoute.columns.ruleNumber') },
+      { key: 'description', title: t('policyRoute.columns.description') },
+      { key: 'action', title: t('policyRoute.columns.action') },
+      { key: 'protocol', title: t('policyRoute.columns.protocol') },
+      { key: 'source', title: t('policyRoute.columns.source') },
+      { key: 'destination', title: t('policyRoute.columns.destination') },
+      { key: 'set_table', title: t('policyRoute.columns.routeTable') },
+      { key: 'disable', title: t('policyRoute.columns.disable') },
+    ]);
+
+    const ruleSetSchema = computed(() => [
+      { key: 'name', title: t('policyRoute.fields.name'), type: 'text', required: true },
+      { key: 'description', title: t('policyRoute.fields.description'), type: 'text' },
+      { key: 'default-log', title: t('policyRoute.fields.defaultLog'), type: 'checkbox', valueless: true },
+      { key: 'interface', title: t('policyRoute.fields.interface'), type: 'select', options: [] },
+    ]);
 
     const ruleSetSchemaWithInterfaces = computed(() => {
       const opts = interfaces.value.map(n => ({ value: n, label: n }));
-      return ruleSetSchema.map(f => f.key === 'interface' ? { ...f, options: opts } : f);
+      return ruleSetSchema.value.map(f => f.key === 'interface' ? { ...f, options: opts } : f);
     });
 
-    const ruleTabs = [
-      { key: 'basic', title: '基本' },
-      { key: 'source', title: '源/目的' },
-      { key: 'set', title: '设置' },
-      { key: 'advanced', title: '高级' },
-    ];
+    const ruleTabs = computed(() => [
+      { key: 'basic', title: t('policyRoute.tabs.basic') },
+      { key: 'source', title: t('policyRoute.tabs.sourceDestination') },
+      { key: 'set', title: t('policyRoute.tabs.set') },
+      { key: 'advanced', title: t('policyRoute.tabs.advanced') },
+    ]);
 
-    const baseRuleSchema = [
-      { key: 'rule', title: '规则编号', type: 'number', min: 1, max: 999999, required: true, help: '范围 1-999999' },
-      { key: 'action', title: '动作', type: 'select', options: ACTION_OPTIONS, required: true },
-      { key: 'description', title: '描述', type: 'text' },
-      { key: 'protocol', title: '协议', type: 'select', dynamic: true, default: 'all', help: '默认 all，从系统实时获取协议列表' },
-      { key: 'disable', title: '禁用', type: 'checkbox', valueless: true },
-    ];
+    const baseRuleSchema = computed(() => [
+      { key: 'rule', title: t('policyRoute.fields.rule'), type: 'number', min: 1, max: 999999, required: true, help: t('policyRoute.help.ruleNumberRange') },
+      { key: 'action', title: t('policyRoute.fields.action'), type: 'select', options: resolveOptions(ACTION_OPTIONS), required: true },
+      { key: 'description', title: t('policyRoute.fields.description'), type: 'text' },
+      { key: 'protocol', title: t('policyRoute.fields.protocol'), type: 'select', dynamic: true, default: 'all', help: t('policyRoute.help.protocolDefault') },
+      { key: 'disable', title: t('policyRoute.fields.disable'), type: 'checkbox', valueless: true },
+    ]);
 
-    const sourceDestinationSchema = [
+    const sourceDestinationSchema = computed(() => [
       {
-        key: 'source', title: '源', type: 'group', children: [
-          { key: 'address', title: '地址', type: 'text', validate: 'ip-segment', placeholder: 'IP/CIDR/范围，可 ! 排除', help: '可前缀 ! 排除' },
-          { key: 'mac-address', title: 'MAC 地址', type: 'text', validate: 'mac-exclude', placeholder: 'aa:bb:cc:dd:ee:ff 或 !aa:bb:cc:dd:ee:ff', help: '可前缀 ! 表示排除' },
-          { key: 'port', title: '端口', type: 'port', placeholder: '端口、范围或逗号分隔' },
+        key: 'source', title: t('policyRoute.fields.source'), type: 'group', children: [
+          { key: 'address', title: t('policyRoute.fields.address'), type: 'text', validate: 'ip-segment', placeholder: t('policyRoute.placeholders.address'), help: t('policyRoute.help.addressExclude') },
+          { key: 'mac-address', title: t('policyRoute.fields.macAddress'), type: 'text', validate: 'mac-exclude', placeholder: t('policyRoute.placeholders.macAddress'), help: t('policyRoute.help.macAddressExclude') },
+          { key: 'port', title: t('policyRoute.fields.port'), type: 'port', placeholder: t('policyRoute.placeholders.port') },
           {
-            key: 'group', title: '组', type: 'group', children: [
-              { key: 'address-group', title: '地址组', type: 'text' },
-              { key: 'domain-group', title: '域名组', type: 'text' },
-              { key: 'mac-group', title: 'MAC组', type: 'text' },
-              { key: 'network-group', title: '网络组', type: 'text' },
-              { key: 'port-group', title: '端口组', type: 'text' },
+            key: 'group', title: t('policyRoute.fields.group'), type: 'group', children: [
+              { key: 'address-group', title: t('policyRoute.fields.addressGroup'), type: 'select', dynamic: true },
+              { key: 'domain-group', title: t('policyRoute.fields.domainGroup'), type: 'select', dynamic: true },
+              { key: 'mac-group', title: t('policyRoute.fields.macGroup'), type: 'select', dynamic: true },
+              { key: 'network-group', title: t('policyRoute.fields.networkGroup'), type: 'select', dynamic: true },
+              { key: 'port-group', title: t('policyRoute.fields.portGroup'), type: 'select', dynamic: true },
             ],
           },
         ],
       },
       {
-        key: 'destination', title: '目的', type: 'group', children: [
-          { key: 'address', title: '地址', type: 'text', validate: 'ip-segment', placeholder: 'IP/CIDR/范围，可 ! 排除', help: '可前缀 ! 排除' },
-          { key: 'port', title: '端口', type: 'port', placeholder: '端口、范围或逗号分隔' },
+        key: 'destination', title: t('policyRoute.fields.destination'), type: 'group', children: [
+          { key: 'address', title: t('policyRoute.fields.address'), type: 'text', validate: 'ip-segment', placeholder: t('policyRoute.placeholders.address'), help: t('policyRoute.help.addressExclude') },
+          { key: 'port', title: t('policyRoute.fields.port'), type: 'port', placeholder: t('policyRoute.placeholders.port') },
           {
-            key: 'group', title: '组', type: 'group', children: [
-              { key: 'address-group', title: '地址组', type: 'text' },
-              { key: 'domain-group', title: '域名组', type: 'text' },
-              { key: 'mac-group', title: 'MAC组', type: 'text' },
-              { key: 'network-group', title: '网络组', type: 'text' },
-              { key: 'port-group', title: '端口组', type: 'text' },
+            key: 'group', title: t('policyRoute.fields.group'), type: 'group', children: [
+              { key: 'address-group', title: t('policyRoute.fields.addressGroup'), type: 'select', dynamic: true },
+              { key: 'domain-group', title: t('policyRoute.fields.domainGroup'), type: 'select', dynamic: true },
+              { key: 'mac-group', title: t('policyRoute.fields.macGroup'), type: 'select', dynamic: true },
+              { key: 'network-group', title: t('policyRoute.fields.networkGroup'), type: 'select', dynamic: true },
+              { key: 'port-group', title: t('policyRoute.fields.portGroup'), type: 'select', dynamic: true },
             ],
           },
         ],
       },
-      { key: 'inbound-interface', title: '入接口', type: 'select', options: [] },
-      { key: 'outbound-interface', title: '出接口', type: 'select', options: [] },
-    ];
+      { key: 'inbound-interface', title: t('policyRoute.fields.inboundInterface'), type: 'select', options: [] },
+      { key: 'outbound-interface', title: t('policyRoute.fields.outboundInterface'), type: 'select', options: [] },
+    ]);
 
-    const setSchema = [
+    const setSchema = computed(() => [
       {
-        key: 'set', title: '设置', type: 'group', children: [
-          { key: 'table', title: '路由表', type: 'text', placeholder: '1-200 或 main', help: '1-200 或 main' },
-          { key: 'connection-mark', title: '连接标记', type: 'number', min: 0, max: 2147483647, help: '范围 0-2147483647' },
-          { key: 'mark', title: '防火墙标记', type: 'number', min: 1, max: 2147483647, help: '范围 1-2147483647' },
-          { key: 'dscp', title: 'DSCP', type: 'number', min: 0, max: 63, help: '范围 0-63' },
-          { key: 'tcp-mss', title: 'TCP MSS', type: 'number', min: 500, max: 1460, help: '范围 500-1460' },
+        key: 'set', title: t('policyRoute.fields.set'), type: 'group', children: [
+          { key: 'table', title: t('policyRoute.fields.table'), type: 'text', placeholder: t('policyRoute.placeholders.table'), help: t('policyRoute.help.tableHelp') },
+          { key: 'connection-mark', title: t('policyRoute.fields.connectionMark'), type: 'number', min: 0, max: 2147483647, help: t('policyRoute.help.connectionMarkRange') },
+          { key: 'mark', title: t('policyRoute.fields.mark'), type: 'number', min: 1, max: 2147483647, help: t('policyRoute.help.markRange') },
+          { key: 'dscp', title: t('policyRoute.fields.dscp'), type: 'number', min: 0, max: 63, help: t('policyRoute.help.dscpRange') },
+          { key: 'tcp-mss', title: t('policyRoute.fields.tcpMss'), type: 'number', min: 500, max: 1460, help: t('policyRoute.help.tcpMssRange') },
         ],
       },
-    ];
+    ]);
 
-    const advancedSchema = [
-      { key: 'connection-mark', title: '连接标记', type: 'text', validate: 'number-exclude-range', min: 0, max: 2147483647, placeholder: '0-2147483647，可 ! 排除', help: '范围 0-2147483647，可前缀 ! 排除' },
-      { key: 'dscp', title: 'DSCP', type: 'text', validate: 'number-exclude-range', min: 0, max: 63, placeholder: '0-63，可 ! 排除', help: '范围 0-63，可前缀 ! 排除' },
-      { key: 'dscp-exclude', title: '排除 DSCP', type: 'text', validate: 'number-range', min: 0, max: 63, placeholder: '0-63', help: '范围 0-63' },
-      { key: 'fragment', title: '分片', type: 'select', options: FRAGMENT_OPTIONS },
+    const advancedSchema = computed(() => [
+      { key: 'connection-mark', title: t('policyRoute.fields.connectionMark'), type: 'text', validate: 'number-exclude-range', min: 0, max: 2147483647, placeholder: t('policyRoute.placeholders.connectionMark'), help: t('policyRoute.help.connectionMarkExclude') },
+      { key: 'dscp', title: t('policyRoute.fields.dscp'), type: 'text', validate: 'number-exclude-range', min: 0, max: 63, placeholder: t('policyRoute.placeholders.dscp'), help: t('policyRoute.help.dscpExcludeHelp') },
+      { key: 'dscp-exclude', title: t('policyRoute.fields.dscpExclude'), type: 'text', validate: 'number-range', min: 0, max: 63, placeholder: t('policyRoute.placeholders.dscpExclude'), help: t('policyRoute.help.dscpExcludeHelp') },
+      { key: 'fragment', title: t('policyRoute.fields.fragment'), type: 'select', options: resolveOptions(FRAGMENT_OPTIONS) },
       {
-        key: 'icmp', title: 'ICMP', type: 'group', children: [
-          { key: 'code', title: '代码', type: 'number', min: 0, max: 255, help: '范围 0-255' },
-          { key: 'type', title: '类型', type: 'number', min: 0, max: 255, help: '范围 0-255' },
-          { key: 'type-name', title: '类型名称', type: 'text' },
+        key: 'icmp', title: t('policyRoute.fields.icmp'), type: 'group', children: [
+          { key: 'code', title: t('policyRoute.fields.code'), type: 'number', min: 0, max: 255, help: t('policyRoute.help.icmpCodeRange') },
+          { key: 'type', title: t('policyRoute.fields.type'), type: 'number', min: 0, max: 255, help: t('policyRoute.help.icmpTypeRange') },
+          { key: 'type-name', title: t('policyRoute.fields.typeName'), type: 'text' },
         ],
         advanced: true,
       },
-      { key: 'ipsec', title: 'IPsec', type: 'select', options: IPSEC_OPTIONS },
+      { key: 'ipsec', title: t('policyRoute.fields.ipsec'), type: 'select', options: resolveOptions(IPSEC_OPTIONS) },
       {
-        key: 'limit', title: '限速', type: 'group', children: [
-          { key: 'burst', title: '突发', type: 'number', min: 0, max: 4294967295, help: '范围 0-4294967295' },
-          { key: 'rate', title: '速率', type: 'text', validate: 'rate-limit', placeholder: '如 5/minute', help: '格式：数字/second|minute|hour|day' },
+        key: 'limit', title: t('policyRoute.fields.limit'), type: 'group', children: [
+          { key: 'burst', title: t('policyRoute.fields.burst'), type: 'number', min: 0, max: 4294967295, help: t('policyRoute.help.burstRange') },
+          { key: 'rate', title: t('policyRoute.fields.rate'), type: 'text', validate: 'rate-limit', placeholder: t('policyRoute.placeholders.rate'), help: t('policyRoute.help.rateFormat') },
         ],
         advanced: true,
       },
-      { key: 'log', title: '日志', type: 'checkbox', valueless: true },
-      { key: 'mark', title: '防火墙标记', type: 'text', validate: 'number-exclude-range', min: 0, max: 2147483647, placeholder: '0-2147483647，可 ! 排除', help: '范围 0-2147483647，可前缀 ! 排除' },
-      { key: 'packet-length', title: '包长度', type: 'text', validate: 'number-exclude-range', min: 1, max: 65535, placeholder: '1-65535 或范围', help: '范围 1-65535，可前缀 ! 排除' },
-      { key: 'packet-length-exclude', title: '排除包长度', type: 'text', validate: 'number-range', min: 1, max: 65535, placeholder: '1-65535 或范围', help: '范围 1-65535' },
-      { key: 'packet-type', title: '包类型', type: 'select', options: PACKET_TYPE_OPTIONS },
-      { key: 'state', title: '会话状态', type: 'multi-select', options: STATE_OPTIONS },
+      { key: 'log', title: t('policyRoute.fields.log'), type: 'checkbox', valueless: true },
+      { key: 'mark', title: t('policyRoute.fields.mark'), type: 'text', validate: 'number-exclude-range', min: 0, max: 2147483647, placeholder: t('policyRoute.placeholders.mark'), help: t('policyRoute.help.markExclude') },
+      { key: 'packet-length', title: t('policyRoute.fields.packetLength'), type: 'text', validate: 'number-exclude-range', min: 1, max: 65535, placeholder: t('policyRoute.placeholders.packetLength'), help: t('policyRoute.help.packetLengthRange') },
+      { key: 'packet-length-exclude', title: t('policyRoute.fields.packetLengthExclude'), type: 'text', validate: 'number-range', min: 1, max: 65535, placeholder: t('policyRoute.placeholders.packetLengthExclude'), help: t('policyRoute.help.packetLengthExcludeRange') },
+      { key: 'packet-type', title: t('policyRoute.fields.packetType'), type: 'select', options: PACKET_TYPE_OPTIONS },
+      { key: 'state', title: t('policyRoute.fields.state'), type: 'multi-select', options: STATE_OPTIONS },
       {
-        key: 'recent', title: 'Recent', type: 'group', children: [
-          { key: 'count', title: '次数', type: 'number', min: 1, max: 255, help: '范围 1-255' },
-          { key: 'time', title: '时间', type: 'number', min: 0, max: 4294967295, help: '范围 0-4294967295（秒）' },
-        ],
-        advanced: true,
-      },
-      {
-        key: 'time', title: '时间', type: 'group', children: [
-          { key: 'monthdays', title: '日期', type: 'text', placeholder: '如 1-15' },
-          { key: 'startdate', title: '开始日期', type: 'text', placeholder: 'YYYY-MM-DD' },
-          { key: 'starttime', title: '开始时间', type: 'text', placeholder: 'HH:MM:SS' },
-          { key: 'stopdate', title: '结束日期', type: 'text', placeholder: 'YYYY-MM-DD' },
-          { key: 'stoptime', title: '结束时间', type: 'text', placeholder: 'HH:MM:SS' },
-          { key: 'utc', title: 'UTC', type: 'checkbox', valueless: true },
-          { key: 'weekdays', title: '星期', type: 'text', placeholder: '如 Mon,Tue' },
+        key: 'recent', title: t('policyRoute.fields.recent'), type: 'group', children: [
+          { key: 'count', title: t('policyRoute.fields.count'), type: 'number', min: 1, max: 255, help: t('policyRoute.help.recentCountRange') },
+          { key: 'time', title: t('policyRoute.fields.time'), type: 'number', min: 0, max: 4294967295, help: t('policyRoute.help.recentTimeRange') },
         ],
         advanced: true,
       },
       {
-        key: 'tcp', title: 'TCP', type: 'group', children: [
-          { key: 'flags', title: '标志', type: 'multi-select', options: ['ack', 'cwr', 'ecn', 'fin', 'psh', 'rst', 'syn', 'urg'], help: '可多选' },
-          { key: 'not', title: '匹配未设置的标志', type: 'checkbox', valueless: true },
-          { key: 'mss', title: 'MSS', type: 'text', validate: 'number-range', min: 1, max: 16384, placeholder: '1-16384 或范围', help: '范围 1-16384' },
+        key: 'time', title: t('policyRoute.fields.time'), type: 'group', children: [
+          { key: 'monthdays', title: t('policyRoute.fields.monthdays'), type: 'text', placeholder: t('policyRoute.placeholders.monthdays') },
+          { key: 'startdate', title: t('policyRoute.fields.startdate'), type: 'text', placeholder: t('policyRoute.placeholders.startdate') },
+          { key: 'starttime', title: t('policyRoute.fields.starttime'), type: 'text', placeholder: t('policyRoute.placeholders.starttime') },
+          { key: 'stopdate', title: t('policyRoute.fields.stopdate'), type: 'text', placeholder: t('policyRoute.placeholders.stopdate') },
+          { key: 'stoptime', title: t('policyRoute.fields.stoptime'), type: 'text', placeholder: t('policyRoute.placeholders.stoptime') },
+          { key: 'utc', title: t('policyRoute.fields.utc'), type: 'checkbox', valueless: true },
+          { key: 'weekdays', title: t('policyRoute.fields.weekdays'), type: 'text', placeholder: t('policyRoute.placeholders.weekdays') },
         ],
         advanced: true,
       },
       {
-        key: 'ttl', title: 'TTL', type: 'group', children: [
-          { key: 'eq', title: '等于', type: 'number', min: 0, max: 255, help: '范围 0-255' },
-          { key: 'gt', title: '大于', type: 'number', min: 0, max: 255, help: '范围 0-255' },
-          { key: 'lt', title: '小于', type: 'number', min: 0, max: 255, help: '范围 0-255' },
+        key: 'tcp', title: t('policyRoute.fields.tcp'), type: 'group', children: [
+          { key: 'flags', title: t('policyRoute.fields.flags'), type: 'multi-select', options: ['ack', 'cwr', 'ecn', 'fin', 'psh', 'rst', 'syn', 'urg'], help: t('policyRoute.help.flagsMultiSelect') },
+          { key: 'not', title: t('policyRoute.fields.not'), type: 'checkbox', valueless: true },
+          { key: 'mss', title: t('policyRoute.fields.mss'), type: 'text', validate: 'number-range', min: 1, max: 16384, placeholder: t('policyRoute.placeholders.mss'), help: t('policyRoute.help.mssRange') },
         ],
         advanced: true,
       },
-    ];
+      {
+        key: 'ttl', title: t('policyRoute.fields.ttl'), type: 'group', children: [
+          { key: 'eq', title: t('policyRoute.fields.eq'), type: 'number', min: 0, max: 255, help: t('policyRoute.help.ttlEqRange') },
+          { key: 'gt', title: t('policyRoute.fields.gt'), type: 'number', min: 0, max: 255, help: t('policyRoute.help.ttlGtRange') },
+          { key: 'lt', title: t('policyRoute.fields.lt'), type: 'number', min: 0, max: 255, help: t('policyRoute.help.ttlLtRange') },
+        ],
+        advanced: true,
+      },
+    ]);
 
     function buildTabSchemas() {
       return {
-        basic: baseRuleSchema,
-        source: sourceDestinationSchema.map(f => f.key === 'inbound-interface' || f.key === 'outbound-interface' ? { ...f, options: interfaces.value } : f),
-        set: setSchema,
-        advanced: advancedSchema,
+        basic: baseRuleSchema.value,
+        source: sourceDestinationSchema.value.map(f => f.key === 'inbound-interface' || f.key === 'outbound-interface' ? { ...f, options: interfaces.value } : f),
+        set: setSchema.value,
+        advanced: advancedSchema.value,
       };
     }
 
@@ -520,7 +534,7 @@ export default defineComponent({
       return ruleSets.value.map(r => ({
         ...r,
         'rule_count': r.rules?.length || 0,
-        'default-log': r['default-log'] ? '是' : '',
+        'default-log': r['default-log'] ? t('policyRoute.options.yes') : '',
         interface: r.interface || '',
       }));
     });
@@ -549,8 +563,9 @@ export default defineComponent({
     onMounted(() => {
       load();
       loadInterfaces();
+      onMenuRefresh(load);
     });
-    watch(() => route.path, () => { load(); loadInterfaces(); });
+    watch(() => route.path, () => { load(); loadInterfaces(); ruleSelected.value = []; });
 
     function createRuleSet() {
       editingRuleSet.value = { name: '', description: '', 'default-log': false, interface: '', rules: [] };
@@ -559,7 +574,7 @@ export default defineComponent({
     }
 
     function editRuleSet() {
-      if (!selected.value.length) return alert('请选择一行');
+      if (!selected.value.length) return showError({ message: t('policyRoute.messages.selectRow') });
       const row = ruleSets.value.find(r => r.name === selected.value[0]);
       if (!row) return;
       editingRuleSet.value = JSON.parse(JSON.stringify(row));
@@ -567,20 +582,27 @@ export default defineComponent({
       modalVisible.value = true;
     }
 
-    async function removeRuleSet() {
-      if (!selected.value.length) return alert('请选择一行');
-      if (!confirm('确认删除选中的规则集？')) return;
-      for (const name of selected.value) {
+    function removeRuleSet() {
+      if (!selected.value.length) return showError({ message: t('policyRoute.messages.selectRow') });
+      pendingDeleteNames.value = [...selected.value];
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveRuleSet() {
+      deleteModalVisible.value = false;
+      for (const name of pendingDeleteNames.value) {
         await configStore.deleteConfig(`${path.value} ${name}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selected.value = [];
+      pendingDeleteNames.value = [];
       await load();
     }
 
     async function saveRuleSet() {
       const name = editingRuleSet.value?.name;
-      if (!name) return alert('请输入规则集名称');
+      if (!name) return showError({ message: t('policyRoute.messages.enterRuleSetName') });
       const original = editingRuleSetOriginalName.value;
       const value = {};
       if (editingRuleSet.value.description) value.description = editingRuleSet.value.description;
@@ -589,8 +611,10 @@ export default defineComponent({
       try {
         if (original && original !== name) {
           await configStore.deleteConfig(`${path.value} ${original}`);
+          configStore.markPending();
         }
         await configStore.setConfig(`${path.value} ${name}`, value);
+        configStore.markPending();
         modalVisible.value = false;
         await configStore.checkSessionChanged();
         await load();
@@ -598,8 +622,6 @@ export default defineComponent({
         showError(e);
       }
     }
-
-    const ruleSelected = ref([]);
 
     function createRule() {
       editingRule.value = emptyRule();
@@ -609,7 +631,7 @@ export default defineComponent({
     }
 
     function editRule() {
-      if (!ruleSelected.value.length) return alert('请选择一条规则');
+      if (!ruleSelected.value.length) return showError({ message: t('policyRoute.messages.selectRule') });
       const row = editingRuleSet.value.rules.find(r => String(r.rule) === String(ruleSelected.value[0]));
       if (!row) return;
       editingRule.value = JSON.parse(JSON.stringify(row));
@@ -618,39 +640,48 @@ export default defineComponent({
       ruleModalVisible.value = true;
     }
 
-    async function removeRule() {
-      if (!ruleSelected.value.length) return alert('请选择一条规则');
-      if (!confirm('确认删除选中的规则？')) return;
+    function removeRule() {
+      if (!ruleSelected.value.length) return showError({ message: t('policyRoute.messages.selectRule') });
+      pendingDeleteRuleNumbers.value = [...ruleSelected.value];
+      ruleDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveRule() {
+      ruleDeleteModalVisible.value = false;
       const setName = editingRuleSet.value.name;
-      for (const num of ruleSelected.value) {
+      for (const num of pendingDeleteRuleNumbers.value) {
         await configStore.deleteConfig(`${path.value} ${setName} rule ${num}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       ruleSelected.value = [];
+      pendingDeleteRuleNumbers.value = [];
       editingRuleSet.value.rules = configRulesToForm((await configStore.getConfig(`${path.value} ${setName} rule`, true)).data || {});
       await load();
     }
 
     function validateRule() {
       const r = editingRule.value;
-      if (!r.rule) return '请输入规则编号';
+      if (!r.rule) return t('policyRoute.validation.enterRuleNumber');
       const n = parseInt(r.rule, 10);
-      if (isNaN(n) || n < 1 || n > 999999) return '规则编号范围 1-999999';
-      if (!r.action) return '请选择动作';
+      if (isNaN(n) || n < 1 || n > 999999) return t('policyRoute.validation.ruleNumberRange');
+      if (!r.action) return t('policyRoute.validation.selectAction');
       return '';
     }
 
     async function saveRule() {
       const err = validateRule();
-      if (err) return alert(err);
+      if (err) return showError({ message: err });
       const setName = editingRuleSet.value.name;
       const original = editingRuleOriginalNumber.value;
       const value = formRuleToConfig(editingRule.value);
       try {
         if (original && String(original) !== String(editingRule.value.rule)) {
           await configStore.deleteConfig(`${path.value} ${setName} rule ${original}`);
+          configStore.markPending();
         }
         await configStore.setConfig(`${path.value} ${setName} rule ${editingRule.value.rule}`, value);
+        configStore.markPending();
         ruleModalVisible.value = false;
         await configStore.checkSessionChanged();
         editingRuleSet.value.rules = configRulesToForm((await configStore.getConfig(`${path.value} ${setName} rule`, true)).data || {});
@@ -666,30 +697,32 @@ export default defineComponent({
       return `set ${path.value}\n` + JSON.stringify(cfg, null, 2);
     });
 
-    return {
+    return {t,
+      
       ruleSets, tableData, loading, selected, modalVisible, editingRuleSet,
       ruleModalVisible, editingRule, ruleSetActiveTab, ruleActiveTab, dataTableRef, ruleSetColumns, ruleColumns,
       ruleSetSchemaWithInterfaces, tabSchemas, ruleTabs, ruleSelected, writeDisabled, commandText, ruleSuggestionPath,
-      load, createRuleSet, editRuleSet, removeRuleSet, saveRuleSet,
-      createRule, editRule, removeRule, saveRule,
+      load, createRuleSet, editRuleSet, removeRuleSet, confirmRemoveRuleSet, saveRuleSet,
+      createRule, editRule, removeRule, confirmRemoveRule, saveRule,
       formatEndpoint,
+      deleteModalVisible, pendingDeleteNames, ruleDeleteModalVisible, pendingDeleteRuleNumbers,
     };
   },
   template: `
     <div class="page-container">
       <div class="toolbar">
         <div class="toolbar-left">
-          <ToolbarButton icon="create" @click="createRuleSet" :disabled="writeDisabled">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editRuleSet" :disabled="writeDisabled || !selected.length || selected.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeRuleSet" :disabled="writeDisabled || !selected.length">删除</ToolbarButton>
-          <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+          <ToolbarButton icon="create" @click="createRuleSet" :disabled="writeDisabled">{{ t('policyRoute.buttons.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editRuleSet" :disabled="writeDisabled || !selected.length || selected.length > 1">{{ t('policyRoute.buttons.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeRuleSet" :disabled="writeDisabled || !selected.length">{{ t('policyRoute.buttons.delete') }}</ToolbarButton>
+          <ToolbarButton icon="refresh" @click="load">{{ t('policyRoute.buttons.refresh') }}</ToolbarButton>
         </div>
       </div>
       <DataTable ref="dataTableRef" :columns="ruleSetColumns" :data="tableData" :loading="loading" :disabled="writeDisabled"
                  @selection-change="selected = $event" :selectable="true" :externalToolbar="true" row-key="name">
       </DataTable>
-      <DraggableModal v-model:visible="modalVisible" :title="editingRuleSet?.name ? '编辑规则集' : '创建规则集'" width="780px" @confirm="saveRuleSet">
-        <TabGroup v-model="ruleSetActiveTab" :tabs="[{key:'basic',title:'基本'},{key:'rules',title:'规则'}]">
+      <DraggableModal v-model:visible="modalVisible" :title="editingRuleSet?.name ? t('policyRoute.modals.editRuleSet') : t('policyRoute.modals.createRuleSet')" width="780px" @confirm="saveRuleSet">
+        <TabGroup v-model="ruleSetActiveTab" :tabs="[{key:'basic',title:t('policyRoute.tabs.basic')},{key:'rules',title:t('policyRoute.tabs.rules')}]">
           <template #basic>
             <ConfigForm v-model="editingRuleSet" :schema="ruleSetSchemaWithInterfaces" :disabled="writeDisabled" />
           </template>
@@ -697,9 +730,9 @@ export default defineComponent({
             <div style="padding:8px 0;">
               <div class="toolbar toolbar-compact">
                 <div class="toolbar-left">
-                  <ToolbarButton icon="create" @click="createRule" :disabled="writeDisabled">创建规则</ToolbarButton>
-                  <ToolbarButton icon="edit" @click="editRule" :disabled="writeDisabled || !ruleSelected.length || ruleSelected.length > 1">编辑</ToolbarButton>
-                  <ToolbarButton icon="delete" @click="removeRule" :disabled="writeDisabled || !ruleSelected.length">删除</ToolbarButton>
+                  <ToolbarButton icon="create" @click="createRule" :disabled="writeDisabled">{{ t('policyRoute.buttons.createRule') }}</ToolbarButton>
+                  <ToolbarButton icon="edit" @click="editRule" :disabled="writeDisabled || !ruleSelected.length || ruleSelected.length > 1">{{ t('policyRoute.buttons.edit') }}</ToolbarButton>
+                  <ToolbarButton icon="delete" @click="removeRule" :disabled="writeDisabled || !ruleSelected.length">{{ t('policyRoute.buttons.delete') }}</ToolbarButton>
                 </div>
               </div>
               <DataTable :columns="ruleColumns" :data="editingRuleSet?.rules || []" :disabled="writeDisabled"
@@ -707,27 +740,39 @@ export default defineComponent({
                 <template #source="{ row }">{{ formatEndpoint(row.source) }}</template>
                 <template #destination="{ row }">{{ formatEndpoint(row.destination) }}</template>
                 <template #set_table="{ row }">{{ row.set?.table }}</template>
-                <template #disable="{ row }">{{ row.disable ? '是' : '' }}</template>
+                <template #disable="{ row }">{{ row.disable ? t('policyRoute.options.yes') : '' }}</template>
               </DataTable>
             </div>
           </template>
         </TabGroup>
       </DraggableModal>
-      <DraggableModal v-model:visible="ruleModalVisible" :title="editingRule?.rule ? '编辑规则' : '创建规则'" width="820px" @confirm="saveRule" modal-class="on-top">
+      <DraggableModal v-model:visible="ruleModalVisible" :title="editingRule?.rule ? t('policyRoute.modals.editRule') : t('policyRoute.modals.createRule')" width="820px" @confirm="saveRule" modal-class="on-top">
         <TabGroup v-model="ruleActiveTab" :tabs="ruleTabs">
           <template #basic>
             <ConfigForm v-model="editingRule" :schema="tabSchemas.basic" :disabled="writeDisabled" :showAdvanced="true" :suggestionPath="ruleSuggestionPath" />
           </template>
           <template #source>
-            <ConfigForm v-model="editingRule" :schema="tabSchemas.source" :disabled="writeDisabled" :showAdvanced="true" />
+            <ConfigForm v-model="editingRule" :schema="tabSchemas.source" :disabled="writeDisabled" :showAdvanced="true" :suggestionPath="ruleSuggestionPath" />
           </template>
           <template #set>
-            <ConfigForm v-model="editingRule" :schema="tabSchemas.set" :disabled="writeDisabled" :showAdvanced="true" />
+            <ConfigForm v-model="editingRule" :schema="tabSchemas.set" :disabled="writeDisabled" :showAdvanced="true" :suggestionPath="ruleSuggestionPath" />
           </template>
           <template #advanced>
-            <ConfigForm v-model="editingRule" :schema="tabSchemas.advanced" :disabled="writeDisabled" :showAdvanced="true" />
+            <ConfigForm v-model="editingRule" :schema="tabSchemas.advanced" :disabled="writeDisabled" :showAdvanced="true" :suggestionPath="ruleSuggestionPath" />
           </template>
         </TabGroup>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('policyRoute.modals.confirmDelete')" width="400px" @confirm="confirmRemoveRuleSet">
+        <div>{{ t('policyRoute.messages.confirmDeleteRuleSet') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
+        </div>
+      </DraggableModal>
+      <DraggableModal v-model:visible="ruleDeleteModalVisible" :title="t('policyRoute.modals.confirmDelete')" width="400px" @confirm="confirmRemoveRule">
+        <div>{{ t('policyRoute.messages.confirmDeleteRule') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="num in pendingDeleteRuleNumbers" :key="num" style="padding:2px 0;">{{ num }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,

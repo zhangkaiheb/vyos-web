@@ -1,0 +1,527 @@
+{
+  "zh-CN": {
+    "suricata": {
+      "validation": {
+        "nameRequired": "请输入名称",
+        "nameFormat": "名称只能包含字母、数字、下划线和连字符",
+        "ipv4Format": "IPv4 地址格式错误",
+        "ipv6Format": "IPv6 地址格式错误",
+        "ipPrefixFormat": "IP 前缀格式错误，应为 地址/前缀长度",
+        "prefixLengthFormat": "前缀长度必须为数字",
+        "ipv4PrefixRange": "IPv4 前缀长度必须在 0-32 之间",
+        "ipv6PrefixRange": "IPv6 前缀长度必须在 0-128 之间",
+        "addressNotEmpty": "地址不能为空",
+        "portNotEmpty": "端口不能为空",
+        "portRangeFormat": "端口范围格式错误，应为 起始端口-结束端口",
+        "portFormat": "端口号必须在 1-65535 之间"
+      },
+      "columns": {
+        "name": "名称",
+        "addressCount": "地址数量",
+        "groupCount": "组数量",
+        "portCount": "端口数量"
+      },
+      "modal": {
+        "createAddressGroup": "创建地址组",
+        "editAddressGroup": "编辑地址组",
+        "createPortGroup": "创建端口组",
+        "editPortGroup": "编辑端口组",
+        "confirmDelete": "确认删除"
+      },
+      "error": {
+        "addressGroupExists": "地址组名称已存在",
+        "portGroupExists": "端口组名称已存在"
+      },
+      "status": {
+        "saved": "保存成功"
+      },
+      "tabs": {
+        "basic": "基本设置",
+        "addressGroups": "地址组",
+        "portGroups": "端口组"
+      },
+      "labels": {
+        "interfaces": "接口",
+        "eveLog": "EVE 日志",
+        "filename": "文件名",
+        "filetype": "文件类型",
+        "logType": "日志类型",
+        "name": "名称",
+        "addressList": "地址列表",
+        "refAddressGroups": "引用地址组",
+        "portList": "端口列表",
+        "refPortGroups": "引用端口组"
+      },
+      "selector": {
+        "available": "可用",
+        "selected": "已选"
+      },
+      "placeholders": {
+        "addressGroupName": "请输入地址组名称",
+        "addressList": "每行一个地址，支持 IP、CIDR 格式",
+        "refAddressGroups": "每行一个地址组名称",
+        "portGroupName": "请输入端口组名称",
+        "portList": "每行一个端口，支持端口号或端口范围",
+        "refPortGroups": "每行一个端口组名称"
+      },
+      "buttons": {
+        "cancel": "取消",
+        "save": "保存"
+      },
+      "confirm": {
+        "deleteAddressGroup": "确认删除以下地址组？",
+        "deletePortGroup": "确认删除以下端口组？"
+      }
+    }
+  },
+  "en": {
+    "suricata": {
+      "validation": {
+        "nameRequired": "Please enter a name",
+        "nameFormat": "Name can only contain letters, numbers, underscores and hyphens",
+        "ipv4Format": "Invalid IPv4 address format",
+        "ipv6Format": "Invalid IPv6 address format",
+        "ipPrefixFormat": "Invalid IP prefix format, should be address/prefix-length",
+        "prefixLengthFormat": "Prefix length must be a number",
+        "ipv4PrefixRange": "IPv4 prefix length must be between 0-32",
+        "ipv6PrefixRange": "IPv6 prefix length must be between 0-128",
+        "addressNotEmpty": "Address cannot be empty",
+        "portNotEmpty": "Port cannot be empty",
+        "portRangeFormat": "Invalid port range format, should be start-end",
+        "portFormat": "Port number must be between 1-65535"
+      },
+      "columns": {
+        "name": "Name",
+        "addressCount": "Address Count",
+        "groupCount": "Group Count",
+        "portCount": "Port Count"
+      },
+      "modal": {
+        "createAddressGroup": "Create Address Group",
+        "editAddressGroup": "Edit Address Group",
+        "createPortGroup": "Create Port Group",
+        "editPortGroup": "Edit Port Group",
+        "confirmDelete": "Confirm Delete"
+      },
+      "error": {
+        "addressGroupExists": "Address group name already exists",
+        "portGroupExists": "Port group name already exists"
+      },
+      "status": {
+        "saved": "Saved successfully"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "addressGroups": "Address Groups",
+        "portGroups": "Port Groups"
+      },
+      "labels": {
+        "interfaces": "Interfaces",
+        "eveLog": "EVE Log",
+        "filename": "Filename",
+        "filetype": "File Type",
+        "logType": "Log Type",
+        "name": "Name",
+        "addressList": "Address List",
+        "refAddressGroups": "Reference Address Groups",
+        "portList": "Port List",
+        "refPortGroups": "Reference Port Groups"
+      },
+      "selector": {
+        "available": "Available",
+        "selected": "Selected"
+      },
+      "placeholders": {
+        "addressGroupName": "Enter address group name",
+        "addressList": "One address per line, supports IP and CIDR format",
+        "refAddressGroups": "One address group name per line",
+        "portGroupName": "Enter port group name",
+        "portList": "One port per line, supports port number or port range",
+        "refPortGroups": "One port group name per line"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "confirm": {
+        "deleteAddressGroup": "Confirm delete the following address groups?",
+        "deletePortGroup": "Confirm delete the following port groups?"
+      }
+    }
+  },
+  "zh-TW": {
+    "suricata": {
+      "validation": {
+        "nameRequired": "Please enter a name",
+        "nameFormat": "Name can only contain letters, numbers, underscores and hyphens",
+        "ipv4Format": "Invalid IPv4 address format",
+        "ipv6Format": "Invalid IPv6 address format",
+        "ipPrefixFormat": "Invalid IP prefix format, should be address/prefix-length",
+        "prefixLengthFormat": "Prefix length must be a number",
+        "ipv4PrefixRange": "IPv4 prefix length must be between 0-32",
+        "ipv6PrefixRange": "IPv6 prefix length must be between 0-128",
+        "addressNotEmpty": "Address cannot be empty",
+        "portNotEmpty": "Port cannot be empty",
+        "portRangeFormat": "Invalid port range format, should be start-end",
+        "portFormat": "Port number must be between 1-65535"
+      },
+      "columns": {
+        "name": "Name",
+        "addressCount": "Address Count",
+        "groupCount": "Group Count",
+        "portCount": "Port Count"
+      },
+      "modal": {
+        "createAddressGroup": "Create Address Group",
+        "editAddressGroup": "Edit Address Group",
+        "createPortGroup": "Create Port Group",
+        "editPortGroup": "Edit Port Group",
+        "confirmDelete": "Confirm Delete"
+      },
+      "error": {
+        "addressGroupExists": "Address group name already exists",
+        "portGroupExists": "Port group name already exists"
+      },
+      "status": {
+        "saved": "Saved successfully"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "addressGroups": "Address Groups",
+        "portGroups": "Port Groups"
+      },
+      "labels": {
+        "interfaces": "Interfaces",
+        "eveLog": "EVE Log",
+        "filename": "Filename",
+        "filetype": "File Type",
+        "logType": "Log Type",
+        "name": "Name",
+        "addressList": "Address List",
+        "refAddressGroups": "Reference Address Groups",
+        "portList": "Port List",
+        "refPortGroups": "Reference Port Groups"
+      },
+      "selector": {
+        "available": "Available",
+        "selected": "Selected"
+      },
+      "placeholders": {
+        "addressGroupName": "Enter address group name",
+        "addressList": "One address per line, supports IP and CIDR format",
+        "refAddressGroups": "One address group name per line",
+        "portGroupName": "Enter port group name",
+        "portList": "One port per line, supports port number or port range",
+        "refPortGroups": "One port group name per line"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "confirm": {
+        "deleteAddressGroup": "Confirm delete the following address groups?",
+        "deletePortGroup": "Confirm delete the following port groups?"
+      }
+    }
+  },
+  "ru": {
+    "suricata": {
+      "validation": {
+        "nameRequired": "Please enter a name",
+        "nameFormat": "Name can only contain letters, numbers, underscores and hyphens",
+        "ipv4Format": "Invalid IPv4 address format",
+        "ipv6Format": "Invalid IPv6 address format",
+        "ipPrefixFormat": "Invalid IP prefix format, should be address/prefix-length",
+        "prefixLengthFormat": "Prefix length must be a number",
+        "ipv4PrefixRange": "IPv4 prefix length must be between 0-32",
+        "ipv6PrefixRange": "IPv6 prefix length must be between 0-128",
+        "addressNotEmpty": "Address cannot be empty",
+        "portNotEmpty": "Port cannot be empty",
+        "portRangeFormat": "Invalid port range format, should be start-end",
+        "portFormat": "Port number must be between 1-65535"
+      },
+      "columns": {
+        "name": "Name",
+        "addressCount": "Address Count",
+        "groupCount": "Group Count",
+        "portCount": "Port Count"
+      },
+      "modal": {
+        "createAddressGroup": "Create Address Group",
+        "editAddressGroup": "Edit Address Group",
+        "createPortGroup": "Create Port Group",
+        "editPortGroup": "Edit Port Group",
+        "confirmDelete": "Confirm Delete"
+      },
+      "error": {
+        "addressGroupExists": "Address group name already exists",
+        "portGroupExists": "Port group name already exists"
+      },
+      "status": {
+        "saved": "Saved successfully"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "addressGroups": "Address Groups",
+        "portGroups": "Port Groups"
+      },
+      "labels": {
+        "interfaces": "Interfaces",
+        "eveLog": "EVE Log",
+        "filename": "Filename",
+        "filetype": "File Type",
+        "logType": "Log Type",
+        "name": "Name",
+        "addressList": "Address List",
+        "refAddressGroups": "Reference Address Groups",
+        "portList": "Port List",
+        "refPortGroups": "Reference Port Groups"
+      },
+      "selector": {
+        "available": "Available",
+        "selected": "Selected"
+      },
+      "placeholders": {
+        "addressGroupName": "Enter address group name",
+        "addressList": "One address per line, supports IP and CIDR format",
+        "refAddressGroups": "One address group name per line",
+        "portGroupName": "Enter port group name",
+        "portList": "One port per line, supports port number or port range",
+        "refPortGroups": "One port group name per line"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "confirm": {
+        "deleteAddressGroup": "Confirm delete the following address groups?",
+        "deletePortGroup": "Confirm delete the following port groups?"
+      }
+    }
+  },
+  "de": {
+    "suricata": {
+      "validation": {
+        "nameRequired": "Please enter a name",
+        "nameFormat": "Name can only contain letters, numbers, underscores and hyphens",
+        "ipv4Format": "Invalid IPv4 address format",
+        "ipv6Format": "Invalid IPv6 address format",
+        "ipPrefixFormat": "Invalid IP prefix format, should be address/prefix-length",
+        "prefixLengthFormat": "Prefix length must be a number",
+        "ipv4PrefixRange": "IPv4 prefix length must be between 0-32",
+        "ipv6PrefixRange": "IPv6 prefix length must be between 0-128",
+        "addressNotEmpty": "Address cannot be empty",
+        "portNotEmpty": "Port cannot be empty",
+        "portRangeFormat": "Invalid port range format, should be start-end",
+        "portFormat": "Port number must be between 1-65535"
+      },
+      "columns": {
+        "name": "Name",
+        "addressCount": "Address Count",
+        "groupCount": "Group Count",
+        "portCount": "Port Count"
+      },
+      "modal": {
+        "createAddressGroup": "Create Address Group",
+        "editAddressGroup": "Edit Address Group",
+        "createPortGroup": "Create Port Group",
+        "editPortGroup": "Edit Port Group",
+        "confirmDelete": "Confirm Delete"
+      },
+      "error": {
+        "addressGroupExists": "Address group name already exists",
+        "portGroupExists": "Port group name already exists"
+      },
+      "status": {
+        "saved": "Saved successfully"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "addressGroups": "Address Groups",
+        "portGroups": "Port Groups"
+      },
+      "labels": {
+        "interfaces": "Interfaces",
+        "eveLog": "EVE Log",
+        "filename": "Filename",
+        "filetype": "File Type",
+        "logType": "Log Type",
+        "name": "Name",
+        "addressList": "Address List",
+        "refAddressGroups": "Reference Address Groups",
+        "portList": "Port List",
+        "refPortGroups": "Reference Port Groups"
+      },
+      "selector": {
+        "available": "Available",
+        "selected": "Selected"
+      },
+      "placeholders": {
+        "addressGroupName": "Enter address group name",
+        "addressList": "One address per line, supports IP and CIDR format",
+        "refAddressGroups": "One address group name per line",
+        "portGroupName": "Enter port group name",
+        "portList": "One port per line, supports port number or port range",
+        "refPortGroups": "One port group name per line"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "confirm": {
+        "deleteAddressGroup": "Confirm delete the following address groups?",
+        "deletePortGroup": "Confirm delete the following port groups?"
+      }
+    }
+  },
+  "fr": {
+    "suricata": {
+      "validation": {
+        "nameRequired": "Please enter a name",
+        "nameFormat": "Name can only contain letters, numbers, underscores and hyphens",
+        "ipv4Format": "Invalid IPv4 address format",
+        "ipv6Format": "Invalid IPv6 address format",
+        "ipPrefixFormat": "Invalid IP prefix format, should be address/prefix-length",
+        "prefixLengthFormat": "Prefix length must be a number",
+        "ipv4PrefixRange": "IPv4 prefix length must be between 0-32",
+        "ipv6PrefixRange": "IPv6 prefix length must be between 0-128",
+        "addressNotEmpty": "Address cannot be empty",
+        "portNotEmpty": "Port cannot be empty",
+        "portRangeFormat": "Invalid port range format, should be start-end",
+        "portFormat": "Port number must be between 1-65535"
+      },
+      "columns": {
+        "name": "Name",
+        "addressCount": "Address Count",
+        "groupCount": "Group Count",
+        "portCount": "Port Count"
+      },
+      "modal": {
+        "createAddressGroup": "Create Address Group",
+        "editAddressGroup": "Edit Address Group",
+        "createPortGroup": "Create Port Group",
+        "editPortGroup": "Edit Port Group",
+        "confirmDelete": "Confirm Delete"
+      },
+      "error": {
+        "addressGroupExists": "Address group name already exists",
+        "portGroupExists": "Port group name already exists"
+      },
+      "status": {
+        "saved": "Saved successfully"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "addressGroups": "Address Groups",
+        "portGroups": "Port Groups"
+      },
+      "labels": {
+        "interfaces": "Interfaces",
+        "eveLog": "EVE Log",
+        "filename": "Filename",
+        "filetype": "File Type",
+        "logType": "Log Type",
+        "name": "Name",
+        "addressList": "Address List",
+        "refAddressGroups": "Reference Address Groups",
+        "portList": "Port List",
+        "refPortGroups": "Reference Port Groups"
+      },
+      "selector": {
+        "available": "Available",
+        "selected": "Selected"
+      },
+      "placeholders": {
+        "addressGroupName": "Enter address group name",
+        "addressList": "One address per line, supports IP and CIDR format",
+        "refAddressGroups": "One address group name per line",
+        "portGroupName": "Enter port group name",
+        "portList": "One port per line, supports port number or port range",
+        "refPortGroups": "One port group name per line"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "confirm": {
+        "deleteAddressGroup": "Confirm delete the following address groups?",
+        "deletePortGroup": "Confirm delete the following port groups?"
+      }
+    }
+  },
+  "ko": {
+    "suricata": {
+      "validation": {
+        "nameRequired": "Please enter a name",
+        "nameFormat": "Name can only contain letters, numbers, underscores and hyphens",
+        "ipv4Format": "Invalid IPv4 address format",
+        "ipv6Format": "Invalid IPv6 address format",
+        "ipPrefixFormat": "Invalid IP prefix format, should be address/prefix-length",
+        "prefixLengthFormat": "Prefix length must be a number",
+        "ipv4PrefixRange": "IPv4 prefix length must be between 0-32",
+        "ipv6PrefixRange": "IPv6 prefix length must be between 0-128",
+        "addressNotEmpty": "Address cannot be empty",
+        "portNotEmpty": "Port cannot be empty",
+        "portRangeFormat": "Invalid port range format, should be start-end",
+        "portFormat": "Port number must be between 1-65535"
+      },
+      "columns": {
+        "name": "Name",
+        "addressCount": "Address Count",
+        "groupCount": "Group Count",
+        "portCount": "Port Count"
+      },
+      "modal": {
+        "createAddressGroup": "Create Address Group",
+        "editAddressGroup": "Edit Address Group",
+        "createPortGroup": "Create Port Group",
+        "editPortGroup": "Edit Port Group",
+        "confirmDelete": "Confirm Delete"
+      },
+      "error": {
+        "addressGroupExists": "Address group name already exists",
+        "portGroupExists": "Port group name already exists"
+      },
+      "status": {
+        "saved": "Saved successfully"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "addressGroups": "Address Groups",
+        "portGroups": "Port Groups"
+      },
+      "labels": {
+        "interfaces": "Interfaces",
+        "eveLog": "EVE Log",
+        "filename": "Filename",
+        "filetype": "File Type",
+        "logType": "Log Type",
+        "name": "Name",
+        "addressList": "Address List",
+        "refAddressGroups": "Reference Address Groups",
+        "portList": "Port List",
+        "refPortGroups": "Reference Port Groups"
+      },
+      "selector": {
+        "available": "Available",
+        "selected": "Selected"
+      },
+      "placeholders": {
+        "addressGroupName": "Enter address group name",
+        "addressList": "One address per line, supports IP and CIDR format",
+        "refAddressGroups": "One address group name per line",
+        "portGroupName": "Enter port group name",
+        "portList": "One port per line, supports port number or port range",
+        "refPortGroups": "One port group name per line"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "confirm": {
+        "deleteAddressGroup": "Confirm delete the following address groups?",
+        "deletePortGroup": "Confirm delete the following port groups?"
+      }
+    }
+  }
+}

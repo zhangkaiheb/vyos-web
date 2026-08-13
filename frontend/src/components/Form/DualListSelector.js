@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, h } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, h, inject } from '/src/utils/vue-import.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 
@@ -9,14 +9,15 @@ export default defineComponent({
     modelValue: { type: Array, default: () => [] },
     options: { type: Array, default: () => [] },
     disabled: { type: Boolean, default: false },
-    titleLeft: { type: String, default: '可选' },
-    titleRight: { type: String, default: '已选' },
+    titleLeft: { type: String, default: '' },
+    titleRight: { type: String, default: '' },
     allowCustom: { type: Boolean, default: false },
-    customPlaceholder: { type: String, default: '输入自定义值后按回车' },
+    customPlaceholder: { type: String, default: '' },
     customValidator: { type: Function, default: null },
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
+    const { t } = inject('i18n');
     const selectedLeft = ref(new Set());
     const selectedRight = ref(new Set());
     const lastSelectedLeft = ref(null);
@@ -120,13 +121,13 @@ export default defineComponent({
     }
 
     function renderList(items, selected, lastRef, side) {
-      const titleChildren = [h('span', {}, side === 'left' ? props.titleLeft : props.titleRight)];
+      const titleChildren = [h('span', {}, side === 'left' ? (props.titleLeft || t('form.optional')) : (props.titleRight || t('form.selected')))];
       if (side === 'left' && props.allowCustom) {
         titleChildren.push(h('button', {
           type: 'button',
           class: 'dual-list-add-btn',
           disabled: props.disabled,
-          title: '添加自定义项',
+          title: t('form.addCustom'),
           onClick: () => { customValue.value = ''; showCustomModal.value = true; },
         }, '+'));
       }
@@ -149,7 +150,7 @@ export default defineComponent({
     function renderCustomModal() {
       if (!props.allowCustom) return null;
       return h(DraggableModal, {
-        title: '添加自定义项',
+        title: t('form.addCustom'),
         width: '360px',
         visible: showCustomModal.value,
         'onUpdate:visible': (v) => { showCustomModal.value = v; },
@@ -160,7 +161,7 @@ export default defineComponent({
           h('input', {
             type: 'text',
             class: 'form-control',
-            placeholder: props.customPlaceholder,
+            placeholder: props.customPlaceholder || t('form.customPlaceholder'),
             value: customValue.value,
             disabled: props.disabled,
             onInput: (e) => { customValue.value = e.target.value; },
@@ -177,28 +178,28 @@ export default defineComponent({
           class: 'dual-list-btn',
           disabled: props.disabled || !selectedLeft.value.size,
           onClick: moveToRight,
-          title: '移动选中项到右侧',
+          title: t('form.moveToRight'),
         }, '>'),
         h('button', {
           type: 'button',
           class: 'dual-list-btn',
           disabled: props.disabled || !availableItems.value.length,
           onClick: moveAllToRight,
-          title: '全部移动到右侧',
+          title: t('form.moveAllToRight'),
         }, '>>'),
         h('button', {
           type: 'button',
           class: 'dual-list-btn',
           disabled: props.disabled || !selectedRight.value.size,
           onClick: moveToLeft,
-          title: '移动选中项到左侧',
+          title: t('form.moveToLeft'),
         }, '<'),
         h('button', {
           type: 'button',
           class: 'dual-list-btn',
           disabled: props.disabled || !selectedItems.value.length,
           onClick: moveAllToLeft,
-          title: '全部移动到左侧',
+          title: t('form.moveAllToLeft'),
         }, '<<'),
       ]);
     }

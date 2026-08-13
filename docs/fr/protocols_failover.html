@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="failover">
+<h1>Failover</h1>
+<p>Les routes de failover sont des chemins réseau configurés manuellement utilisés uniquement pendant que leurs cibles de vérification de santé sont accessibles. Si la cible ne répond plus, VyOS supprime la route du tableau de routage et la réinstalle une fois que la cible est à nouveau accessible.</p>
+<section id="configuration">
+<h2>Configuration</h2>
+<p>Utilisez les commandes suivantes pour configurer les routes de failover pour un sous-réseau spécifique <code class="docutils literal notranslate">&lt;subnet&gt;</code> accessible via le prochain saut <code class="docutils literal notranslate">&lt;address&gt;</code>.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; check target &lt;target-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-target-target-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'adresse IP de la cible de vérification de santé.</strong></p>
+<p>Cela correspond généralement à un hôte hautement disponible, soit dans le sous-réseau de destination, soit sur Internet public.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 check target 8.8.8.8
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; check timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'intervalle de temporisation, en secondes, entre les vérifications de santé.</strong></p>
+<p>La plage valide est de 1 à 300 secondes. La valeur par défaut est de 10 secondes.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 check timeout 2
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; check type &lt;protocol&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-type-protocol" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le protocole à utiliser pour les vérifications de santé.</strong></p>
+<p>Les protocoles suivants sont disponibles :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">icmp</code> : VyOS envoie deux paquets de requête d'écho ICMP avec un délai de réponse de 1 seconde. La vérification de santé réussit si au moins une réponse est reçue.</p></li>
+<li><p><code class="docutils literal notranslate">arp</code> : VyOS envoie deux requêtes ARP avec un délai de réponse de 1 seconde. La vérification de santé réussit si au moins une réponse est reçue.</p></li>
+<li><p><code class="docutils literal notranslate">tcp</code> : VyOS vérifie si le port TCP de destination est ouvert. La vérification de santé réussit si une connexion TCP est établie avec succès avec le port cible.</p></li>
+</ul>
+<p>Le protocole par défaut est <code class="docutils literal notranslate">icmp</code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Remarque</p>
+<p>Lorsque le type de vérification est défini sur <code class="docutils literal notranslate">tcp</code>, vous devez également définir le port TCP cible.</p>
+</div>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 check type tcp
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; check port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez le port TCP de destination sur la cible de vérification de santé.</strong></p>
+<p>Ce paramètre s'applique uniquement lorsque le type de vérification est configuré comme <code class="docutils literal notranslate">tcp</code>.</p>
+<p>La plage de ports valide est de 1 à 65535.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 check port 443
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; check policy &lt;policy&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-policy-policy" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la politique de réussite de la vérification de santé pour plusieurs cibles.</strong></p>
+<p>Les politiques suivantes sont disponibles :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">any-available</code> : La vérification de santé réussit si au moins une des cibles configurées répond correctement.</p></li>
+<li><p><code class="docutils literal notranslate">all-available</code> : La vérification de santé réussit uniquement si toutes les cibles configurées répondent correctement.</p></li>
+</ul>
+<p>La politique par défaut est <code class="docutils literal notranslate">any-available</code>.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 check policy all-available
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez l'interface locale utilisée pour atteindre l'adresse de prochain saut.</strong></p>
+<p>Ce paramètre est obligatoire.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 interface eth0
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; metric &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-metric-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p><strong>Configurez la métrique (coût) pour la route de failover.</strong></p>
+<p>La métrique définit la priorité de la route. Une valeur de métrique plus faible indique une route plus préférée.</p>
+<p>La valeur par défaut est 1.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 metric 50
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; onlink
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-onlink" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Configurez le prochain saut comme étant accessible via l'interface assignée, même lorsque <code class="docutils literal notranslate">&lt;address&gt;</code> est en dehors de tout sous-réseau configuré sur cette interface.</p>
+<p>Exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 onlink
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="examples">
+<h2>Exemples</h2>
+<section id="failover-route-with-a-single-next-hop-and-icmp-health-check">
+<h3>Route de failover avec un seul prochain saut et vérification de santé ICMP</h3>
+<p>L'exemple suivant configure une route de failover vers <code class="docutils literal notranslate">203.0.113.1/32</code> via le prochain saut <code class="docutils literal notranslate">192.0.2.1</code> sur <code class="docutils literal notranslate">eth0</code>. Le prochain saut est surveillé avec des sondes ICMP vers <code class="docutils literal notranslate">192.0.2.1</code> toutes les 5 secondes, et la route est installée avec une métrique de 10.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check target &#39;192.0.2.1&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check timeout &#39;5&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check type &#39;icmp&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 interface &#39;eth0&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 metric &#39;10&#39;
+</pre></div>
+</div>
+<p>Vérifiez la route :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show ip route 203.0.113.1
+Routing entry for 203.0.113.1/32
+  Known via &quot;kernel&quot;, distance 0, metric 10, best
+  Last update 00:00:39 ago
+  Flags: Selected
+  Status: Installed
+  * 192.0.2.1, via eth0, weight 1
+</pre></div>
+</div>
+</section>
+<section id="two-failover-routes-with-different-metrics">
+<h3>Deux routes de failover avec des métriques différentes</h3>
+<p>L'exemple suivant configure deux routes de failover vers <code class="docutils literal notranslate">203.0.113.1/32</code>, chacune via un prochain saut différent. Le prochain saut principal <code class="docutils literal notranslate">192.0.2.1</code> est atteint sur <code class="docutils literal notranslate">eth0</code> avec une métrique de 10, et le prochain saut de secours <code class="docutils literal notranslate">198.51.100.1</code> est atteint sur <code class="docutils literal notranslate">eth2</code> avec une métrique de 20. Les deux prochains sauts sont surveillés avec des sondes ICMP toutes les 5 secondes.</p>
+<p>Tant que les deux vérifications de santé réussissent, la route avec la métrique inférieure via <code class="docutils literal notranslate">eth0</code> est privilégiée. Si la cible principale ne répond plus, sa route est supprimée du tableau de routage, et le trafic passe à <code class="docutils literal notranslate">198.51.100.1</code> via <code class="docutils literal notranslate">eth2</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check target &#39;192.0.2.1&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check timeout &#39;5&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check type &#39;icmp&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 interface &#39;eth0&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 metric &#39;10&#39;
+
+set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 check target &#39;198.51.100.99&#39;
+set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 check timeout &#39;5&#39;
+set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 check type &#39;icmp&#39;
+set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 interface &#39;eth2&#39;
+set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 metric &#39;20&#39;
+</pre></div>
+</div>
+<p>Vérifiez les routes :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show ip route 203.0.113.1
+Routing entry for 203.0.113.1/32
+  Known via &quot;kernel&quot;, distance 0, metric 10, best
+  Last update 00:08:06 ago
+  Flags: Selected
+  Status: Installed
+  * 192.0.2.1, via eth0, weight 1
+
+Routing entry for 203.0.113.1/32
+  Known via &quot;kernel&quot;, distance 0, metric 20
+  Last update 00:08:14 ago
+  Flags: None
+  Status: Installed
+  * 198.51.100.1, via eth2, weight 1
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

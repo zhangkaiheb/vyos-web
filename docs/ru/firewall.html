@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="firewall">
+<h1>Брандмауэр</h1>
+<div class="admonition warning">
+<p class="admonition-title">Предупреждение</p>
+<p>Из-за гонки при запуске, все интерфейсы инициализируются
+до брандмауэра. Это временно оставляет систему открытым для всего трафика
+и представляет угрозу безопасности.</p>
+</div>
+<p>VyOS использует Netfilter. Проект Netfilter разработал
+<code class="docutils literal notranslate">iptables</code> и его преемник <code class="docutils literal notranslate">nftables</code> для ядра Linux,
+чтобы обрабатывать потоки пакетов напрямую. Это расширяет понятие
+базовой безопасности зоны, позволяя вам манипулировать данными на нескольких этапах после того, как
+сетевой интерфейс и драйвер принимают их, и перед тем, как отправить их в
+цель (например, веб-сервер или другое устройство).</p>
+<p>Ниже приведена упрощенная схема потока трафика на основе Netfilter
+пакетного потока.
+Эта диаграмма предоставляет обзор того, как обрабатываются пакеты и
+возможные пути, которые может принять трафик.</p>
+<figure class="align-default">
+<img alt="../../_images/firewall-gral-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-gral-packet-flow.webp" />
+</figure>
+<p>Основные моменты относительно потока пакетов и терминологии в брандмауэре VyOS
+следующие:</p>
+<ul class="simple">
+<li><p><strong>Мост?</strong>: Выберите соответствующий путь в зависимости от того, является ли интерфейс, на котором был принят пакет, частью моста.</p></li>
+</ul>
+<p>Если интерфейс, на котором был принят пакет, не является частью моста, пакет обрабатывается на уровне <strong>IP</strong>:</p>
+<blockquote>
+<div><ul>
+<li><p><strong>Prerouting</strong>: Роутер обрабатывает все пакеты на этом этапе,
+независимо от назначения. Вы можете выполнить несколько действий на
+этом этапе, и эти действия также определены в разных частях конфигурации VyOS. Порядок важен. Конфигурация, которая применяется на этом этапе, включает:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Правила prerouting брандмауэра</strong>: Правила, которые вы определяете под <code class="docutils literal notranslate">set firewall
+[ipv4 | ipv6] prerouting raw...</code>. Система обрабатывает все правила в
+этом разделе до подсистемы отслеживания соединений.</p></li>
+<li><p><strong>Игнорировать conntrack</strong>: Правила, которые вы определяете под <code class="docutils literal notranslate">set system conntrack
+ignore [ipv4 | ipv6] ...</code>. Вы можете настроить этот раздел с помощью
+<code class="docutils literal notranslate">firewall [ipv4 | ipv6] prerouting ...</code>. По причинам совместимости,
+эта функция поддерживается, но будет устаревшей в будущем.</p></li>
+<li><p><strong>Политика маршрутизации</strong>: Правила, которые вы определяете под <code class="docutils literal notranslate">set policy [route |
+route6] ...</code>.</p></li>
+<li><p><strong>Destination NAT</strong>: Правила, которые вы определяете под <code class="docutils literal notranslate">set [nat | nat66]
+destination...</code>.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Назначение — роутер?</strong>: Выберите соответствующий путь в зависимости от
+адреса назначения. Транзитный трафик продолжает <strong>forward</strong>, а трафик, предназначенный для роутера, продолжает <strong>input</strong>.</p></li>
+<li><p><strong>Input</strong>: Этап, на котором вы фильтруете и контролируете трафик, предназначенный для
+самого роутера. Это место, где вы применяете все правила для обеспечения безопасности
+роутера. Это включает в себя правила фильтрации IPv4 и IPv6, определенные в:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">set firewall ipv4 input filter ...</code>.</p></li>
+<li><p><code class="docutils literal notranslate">set firewall ipv6 input filter ...</code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Forward</strong>: Этап, на котором вы фильтруете и контролируете транзитный трафик.
+Это включает в себя правила фильтрации IPv4 и IPv6, определенные в:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate">set firewall ipv4 forward filter ...</code>.</p></li>
+<li><p><code class="docutils literal notranslate">set firewall ipv6 forward filter ...</code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Output</strong>: Этап, на котором вы фильтруете и контролируете трафик, исходящий из
+роутера. Обратите внимание, что этот трафик поступает либо от нового
+соединения, которое запускает внутренний процесс на роутере VyOS (например, NTP),
+либо от ответа на трафик, который роутер получает внешним образом через
+<strong>input</strong> (например, ответ на попытку входа по SSH). Это включает
+правила IPv4 и IPv6, и применяются два различных раздела:</p>
+<ul class="simple">
+<li><p><strong>Output Prerouting</strong>: <code class="docutils literal notranslate">set firewall [ipv4 | ipv6] output
+raw ...</code>. Как описано в <strong>Prerouting</strong>, система обрабатывает
+правила в этом разделе до подсистемы отслеживания соединений.</p></li>
+<li><p><strong>Output Filter</strong>: <code class="docutils literal notranslate">set firewall [ipv4 | ipv6] output filter ...</code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Postrouting</strong>: Как и в случае <strong>Prerouting</strong>, вы можете выполнять несколько действий
+в определенных частях конфигурации VyOS на этом этапе. Это
+включает:</p>
+<ul class="simple">
+<li><p><strong>Source NAT</strong>: Правила, которые вы определяете под <code class="docutils literal notranslate">set [nat | nat66]
+source...</code>.</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+<p>Если интерфейс, на котором был принят пакет, является частью моста, то пакет обрабатывается на уровне <strong>Bridge</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Prerouting (Bridge)</strong>: Мост обрабатывает все пакеты, которые он получает на этом этапе,
+независимо от назначения. Сначала вы можете применить фильтры здесь,
+или вы можете настроить правила, которые игнорируют систему отслеживания соединений. Применяемая конфигурация:</p>
+<ul>
+<li><p><code class="docutils literal notranslate">set firewall bridge prerouting filter ...</code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Forward (Bridge)</strong>: Этап, на котором вы фильтруете и контролируете трафик,
+проходящий через мост:</p>
+<ul>
+<li><p><code class="docutils literal notranslate">set firewall bridge forward filter ...</code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Input (Bridge)</strong>: Этап, на котором вы фильтруете и контролируете трафик,
+направленный в сам мост:</p>
+<ul>
+<li><p><code class="docutils literal notranslate">set firewall bridge input filter ...</code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Output (Bridge)</strong>: Этап, на котором вы фильтруете и контролируете трафик,
+который исходит из моста:</p>
+<ul>
+<li><p><code class="docutils literal notranslate">set firewall bridge output filter ...</code>.</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+<p>Вот общая структура CLI брандмауэра VyOS:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
+    * bridge
+         - forward
+            + filter
+         - input
+            + filter
+         - output
+            + filter
+         - prerouting
+            + filter
+         - name
+            + custom_name
+    * flowtable
+         - custom_flow_table
+            + ...
+    * global-options
+         + all-ping
+         + broadcast-ping
+         + ...
+    * group
+         - address-group
+         - ipv6-address-group
+         - network-group
+         - ipv6-network-group
+         - interface-group
+         - mac-group
+         - port-group
+         - domain-group
+    * ipv4
+         - forward
+            + filter
+         - input
+            + filter
+         - output
+            + filter
+            + raw
+         - prerouting
+            + raw
+         - name
+            + custom_name
+    * ipv6
+         - forward
+            + filter
+         - input
+            + filter
+         - output
+            + filter
+            + raw
+         - prerouting
+            + raw
+         - ipv6-name
+            + custom_name
+    * zone
+         - custom_zone_name
+            + ...
+</pre></div>
+</div>
+<p>Вот список подкоманд CLI брандмауэра VyOS и соответствующих им страниц документации:</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge …
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Настройте правила брандмауэра для трафика на уровне моста.
+См. страницу «Конфигурация брандмауэра моста» для получения подробной информации.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall flowtable …
+<a class="cmdlink" href="#cfgcmd-set-firewall-flowtable" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Настройте таблицы потоков брандмауэра для отслеживания состояния соединений и правил.
+См. страницу «Конфигурация брандмауэра Flowtables» для получения подробной информации.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall global-options …
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Настройте глобальные параметры брандмауэра, такие как <code class="docutils literal notranslate">all-ping</code>, <code class="docutils literal notranslate">broadcast-ping</code>,
+<code class="docutils literal notranslate">syn-cookies</code> и другие системные настройки брандмауэра.
+См. страницу «Глобальные параметры брандмауэра» для получения подробной информации.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall group …
+<a class="cmdlink" href="#cfgcmd-set-firewall-group" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Организуйте правила брандмауэра, создавая повторно используемые группы адресов, сетей, интерфейсов,
+MAC-адресов, портов и доменов. Используйте группы в нескольких правилах, чтобы упростить
+конфигурацию и обслуживание.
+См. страницу «Группы брандмауэра» для получения подробной информации.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv4 …
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Настройте специфичные для IPv4 правила брандмауэра.
+См. страницу «Конфигурация брандмауэра IPv4» для получения подробной информации.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall ipv6 …
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Настройте специфичные для IPv6 правила брандмауэра.
+См. страницу «Конфигурация брандмауэра IPv6» для получения подробной информации.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall zone …
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p>Настройте политики брандмауэра на основе зон для контроля трафика между
+разными сетевыми зонами.
+См. страницу «Конфигурация зонного брандмауэра» для получения подробной информации.</p>
+</div>
+</div>
+<p>Для получения дополнительной информации о настройке брандмауэра, см. следующие страницы:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/global-options.html">Глобальная конфигурация параметров брандмауэра</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/groups.html">Группы брандмауэра</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/bridge.html">Конфигурация брандмауэра моста</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv4.html">Конфигурация брандмауэра IPv4</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv6.html">Конфигурация брандмауэра IPv6</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/flowtables.html">Конфигурация брандмауэра Flowtables</a></li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Примечание</p>
+<p>Для получения дополнительной информации о хуках Netfilter и потоках пакетов в сети Linux,
+см. документацию <a class="reference external" href="https://wiki.nftables.org/wiki-nftables/index.php/Netfilter_hooks">Netfilter-Hooks</a>.</p>
+</div>
+<section id="zone-based-firewall">
+<h2>Зонный брандмауэр</h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/zone.html">Зонный брандмауэр</a></li>
+</ul>
+</div>
+<p>С зонным брандмауэром применяется новая концепция. Помимо стандартных потоков входящего и исходящего трафика, существует локальный поток, который позволяет трафику, исходящему из и предназначенным для самого роутера. Это означает, что вам нужно настроить дополнительные правила, чтобы защитить брандмауэр от сети, помимо существующих входящих и исходящих правил.</p>
+<p>Чтобы настроить VyOS с зонным брандмауэром, см.
+<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/zone.html">Конфигурация зонного брандмауэра</a>.</p>
+<p>Как показывает следующее примерное изображение, необходимо настроить правила, чтобы разрешить или заблокировать трафик, идущий к или от служб, работающих на устройстве, имеющих открытые соединения на этом интерфейсе.</p>
+<figure class="align-default">
+<img alt="../../_images/firewall-zonebased.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-zonebased.webp" />
+</figure>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

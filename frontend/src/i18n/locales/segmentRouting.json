@@ -1,0 +1,324 @@
+{
+  "zh-CN": {
+    "segmentRouting": {
+      "columns": {
+        "interfaceName": "接口名称",
+        "mplsEnabled": "MPLS"
+      },
+      "tabs": {
+        "basic": "基本设置",
+        "interfaces": "接口",
+        "srv6": "SRv6"
+      },
+      "sections": {
+        "segmentRoutingConfig": "段路由配置"
+      },
+      "descriptions": {
+        "basicConfig": "段路由基本配置请在接口和 SRv6 标签页中完成。"
+      },
+      "labels": {
+        "locator": "定位器",
+        "encapsulation": "封装",
+        "interfaceNameRequired": "接口名称 *",
+        "enableMpls": "启用 MPLS"
+      },
+      "placeholders": {
+        "srv6Locator": "SRv6 定位器",
+        "encapsulationType": "封装类型",
+        "selectInterface": "请选择接口"
+      },
+      "modals": {
+        "editSegmentRoutingInterface": "编辑段路由接口",
+        "addSegmentRoutingInterface": "添加段路由接口",
+        "confirmDelete": "确认删除"
+      },
+      "messages": {
+        "selectInterface": "请选择接口",
+        "confirmDeleteInterface": "确认删除以下接口？"
+      },
+      "alerts": {
+        "saved": "已保存"
+      },
+      "options": {
+        "enabled": "启用",
+        "disabled": "禁用"
+      }
+    }
+  },
+  "en": {
+    "segmentRouting": {
+      "columns": {
+        "interfaceName": "Interface Name",
+        "mplsEnabled": "MPLS"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "srv6": "SRv6"
+      },
+      "sections": {
+        "segmentRoutingConfig": "Segment Routing Configuration"
+      },
+      "descriptions": {
+        "basicConfig": "Segment routing basic configuration should be completed in the Interfaces and SRv6 tabs."
+      },
+      "labels": {
+        "locator": "Locator",
+        "encapsulation": "Encapsulation",
+        "interfaceNameRequired": "Interface Name *",
+        "enableMpls": "Enable MPLS"
+      },
+      "placeholders": {
+        "srv6Locator": "SRv6 Locator",
+        "encapsulationType": "Encapsulation Type",
+        "selectInterface": "Select an interface"
+      },
+      "modals": {
+        "editSegmentRoutingInterface": "Edit Segment Routing Interface",
+        "addSegmentRoutingInterface": "Add Segment Routing Interface",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectInterface": "Please select an interface",
+        "confirmDeleteInterface": "Confirm delete the following interface?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "options": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      }
+    }
+  },
+  "zh-TW": {
+    "segmentRouting": {
+      "columns": {
+        "interfaceName": "Interface Name",
+        "mplsEnabled": "MPLS"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "srv6": "SRv6"
+      },
+      "sections": {
+        "segmentRoutingConfig": "Segment Routing Configuration"
+      },
+      "descriptions": {
+        "basicConfig": "Segment routing basic configuration should be completed in the Interfaces and SRv6 tabs."
+      },
+      "labels": {
+        "locator": "Locator",
+        "encapsulation": "Encapsulation",
+        "interfaceNameRequired": "Interface Name *",
+        "enableMpls": "Enable MPLS"
+      },
+      "placeholders": {
+        "srv6Locator": "SRv6 Locator",
+        "encapsulationType": "Encapsulation Type",
+        "selectInterface": "Select an interface"
+      },
+      "modals": {
+        "editSegmentRoutingInterface": "Edit Segment Routing Interface",
+        "addSegmentRoutingInterface": "Add Segment Routing Interface",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectInterface": "Please select an interface",
+        "confirmDeleteInterface": "Confirm delete the following interface?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "options": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      }
+    }
+  },
+  "ru": {
+    "segmentRouting": {
+      "columns": {
+        "interfaceName": "Interface Name",
+        "mplsEnabled": "MPLS"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "srv6": "SRv6"
+      },
+      "sections": {
+        "segmentRoutingConfig": "Segment Routing Configuration"
+      },
+      "descriptions": {
+        "basicConfig": "Segment routing basic configuration should be completed in the Interfaces and SRv6 tabs."
+      },
+      "labels": {
+        "locator": "Locator",
+        "encapsulation": "Encapsulation",
+        "interfaceNameRequired": "Interface Name *",
+        "enableMpls": "Enable MPLS"
+      },
+      "placeholders": {
+        "srv6Locator": "SRv6 Locator",
+        "encapsulationType": "Encapsulation Type",
+        "selectInterface": "Select an interface"
+      },
+      "modals": {
+        "editSegmentRoutingInterface": "Edit Segment Routing Interface",
+        "addSegmentRoutingInterface": "Add Segment Routing Interface",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectInterface": "Please select an interface",
+        "confirmDeleteInterface": "Confirm delete the following interface?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "options": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      }
+    }
+  },
+  "de": {
+    "segmentRouting": {
+      "columns": {
+        "interfaceName": "Interface Name",
+        "mplsEnabled": "MPLS"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "srv6": "SRv6"
+      },
+      "sections": {
+        "segmentRoutingConfig": "Segment Routing Configuration"
+      },
+      "descriptions": {
+        "basicConfig": "Segment routing basic configuration should be completed in the Interfaces and SRv6 tabs."
+      },
+      "labels": {
+        "locator": "Locator",
+        "encapsulation": "Encapsulation",
+        "interfaceNameRequired": "Interface Name *",
+        "enableMpls": "Enable MPLS"
+      },
+      "placeholders": {
+        "srv6Locator": "SRv6 Locator",
+        "encapsulationType": "Encapsulation Type",
+        "selectInterface": "Select an interface"
+      },
+      "modals": {
+        "editSegmentRoutingInterface": "Edit Segment Routing Interface",
+        "addSegmentRoutingInterface": "Add Segment Routing Interface",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectInterface": "Please select an interface",
+        "confirmDeleteInterface": "Confirm delete the following interface?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "options": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      }
+    }
+  },
+  "fr": {
+    "segmentRouting": {
+      "columns": {
+        "interfaceName": "Interface Name",
+        "mplsEnabled": "MPLS"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "srv6": "SRv6"
+      },
+      "sections": {
+        "segmentRoutingConfig": "Segment Routing Configuration"
+      },
+      "descriptions": {
+        "basicConfig": "Segment routing basic configuration should be completed in the Interfaces and SRv6 tabs."
+      },
+      "labels": {
+        "locator": "Locator",
+        "encapsulation": "Encapsulation",
+        "interfaceNameRequired": "Interface Name *",
+        "enableMpls": "Enable MPLS"
+      },
+      "placeholders": {
+        "srv6Locator": "SRv6 Locator",
+        "encapsulationType": "Encapsulation Type",
+        "selectInterface": "Select an interface"
+      },
+      "modals": {
+        "editSegmentRoutingInterface": "Edit Segment Routing Interface",
+        "addSegmentRoutingInterface": "Add Segment Routing Interface",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectInterface": "Please select an interface",
+        "confirmDeleteInterface": "Confirm delete the following interface?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "options": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      }
+    }
+  },
+  "ko": {
+    "segmentRouting": {
+      "columns": {
+        "interfaceName": "Interface Name",
+        "mplsEnabled": "MPLS"
+      },
+      "tabs": {
+        "basic": "Basic",
+        "interfaces": "Interfaces",
+        "srv6": "SRv6"
+      },
+      "sections": {
+        "segmentRoutingConfig": "Segment Routing Configuration"
+      },
+      "descriptions": {
+        "basicConfig": "Segment routing basic configuration should be completed in the Interfaces and SRv6 tabs."
+      },
+      "labels": {
+        "locator": "Locator",
+        "encapsulation": "Encapsulation",
+        "interfaceNameRequired": "Interface Name *",
+        "enableMpls": "Enable MPLS"
+      },
+      "placeholders": {
+        "srv6Locator": "SRv6 Locator",
+        "encapsulationType": "Encapsulation Type",
+        "selectInterface": "Select an interface"
+      },
+      "modals": {
+        "editSegmentRoutingInterface": "Edit Segment Routing Interface",
+        "addSegmentRoutingInterface": "Add Segment Routing Interface",
+        "confirmDelete": "Confirm Delete"
+      },
+      "messages": {
+        "selectInterface": "Please select an interface",
+        "confirmDeleteInterface": "Confirm delete the following interface?"
+      },
+      "alerts": {
+        "saved": "Saved"
+      },
+      "options": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      }
+    }
+  }
+}

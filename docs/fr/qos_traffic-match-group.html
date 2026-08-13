@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="Fr">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="traffic-policy">
+<h1>Politique de trafic</h1>
+<section id="id1">
+<h2>QoS</h2>
+<p>Le nom générique de la Qualité de Service ou du Contrôle de Trafic implique
+des choses comme le contrôle du trafic, l'ordonnancement ou la suppression de paquets, qui
+sont les types de choses que vous pouvez vouloir jouer avec lorsque vous avez, par exemple,
+un goulot d'étranglement en bande passante sur un lien et que vous voulez prioriser certains
+types de trafic par rapport à d'autres.</p>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Tc_(Linux)">tc</a> est un outil puissant pour le Contrôle de Trafic trouvé au niveau du noyau Linux.
+Cependant, sa configuration est souvent considérée comme une tâche fastidieuse.
+Heureusement, VyOS facilite la tâche grâce à son CLI, tout en utilisant <code class="docutils literal notranslate">tc</code> comme
+backend.</p>
+<section id="how-to-make-it-work">
+<h3>Comment faire fonctionner cela</h3>
+<p>Pour que le Contrôle de Trafic de VyOS fonctionne, vous devez suivre 2
+étapes :</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p><strong>Créer une politique de trafic</strong>.</p></li>
+<li><p><strong>Appliquer la politique de trafic à une interface entrée ou sortie</strong>.</p></li>
+</ol>
+</div></blockquote>
+<p>Mais avant d'apprendre à configurer votre politique, nous vous préviendrons
+sur les différentes unités que vous pouvez utiliser et aussi vous montrer ce que <em>classes</em>
+sont et comment elles fonctionnent, car certaines politiques peuvent nécessiter que vous configuriez
+les classes.</p>
+</section>
+<section id="units">
+<h3>Unités</h3>
+<p>Lors de la configuration de votre politique de trafic, vous devrez définir des valeurs de débit de données,
+faites attention aux unités que vous utilisez, il est facile de se confondre
+avec les différents préfixes et suffixes que vous pouvez utiliser. VyOS affichera toujours
+les différentes unités que vous pouvez utiliser.</p>
+<section id="prefixes">
+<h4>Préfixes</h4>
+<p>Ils peuvent être des préfixes <strong>décimaux</strong>.</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kbit  (10^3)    kilobit par seconde
+mbit  (10^6)    megabit par seconde
+gbit  (10^9)    gigabit par seconde
+tbit  (10^12)   terabit par seconde
+
+kbps  (8*10^3)  kilo-octet par seconde
+mbps  (8*10^6)  mégaoctet par seconde
+gbps  (8*10^9)  gigaoctet par seconde
+tbps  (8*10^12) téraoctet par seconde
+</pre></div>
+</div>
+</div></blockquote>
+<p>Ou des préfixes <strong>binaires</strong>.</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kibit (2^10 = 1024)    kibibit par seconde
+mibit (2^20 = 1024^2)  mébibit par seconde
+gibit (2^30 = 1024^3)  gibibit par seconde
+tbit  (2^40 = 1024^4)  tébibit par seconde
+
+kibps (1024*8)         kibioctet (KiB) par seconde
+mibps (1024^2*8)       mébioctet (MiB) par seconde
+gibps (1024^3*8)       gibioctet (GiB) par seconde
+tibps (1024^4*8)       tébibyte (TiB) par seconde
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="suffixes">
+<h4>Suffixes</h4>
+<p>Un <em>bit</em> est écrit comme <strong>bit</strong>,</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kbit (kilobits par seconde)
+mbit (megabits par seconde)
+gbit (gigabits par seconde)
+tbit (terabits par seconde)
+</pre></div>
+</div>
+</div></blockquote>
+<p>alors qu'un <em>octet</em> est écrit comme un seul <strong>b</strong>.</p>
+<blockquote>
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kbps (kilooctets par seconde)
+mbps (mégaoctets par seconde)
+gbps (gigaoctets par seconde)
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+</section>
+<section id="classes">
+<h3>Classes</h3>
+<p>Dans la section <a class="reference internal" href="#creating-a-traffic-policy">Création d'une politique de trafic</a>, vous verrez que
+certaines des politiques utilisent des <em>classes</em>. Ces politiques vous permettent de distribuer
+le trafic dans différentes classes selon différents paramètres que vous pouvez
+choisir. Ainsi, une classe n'est qu'un type spécifique de trafic que vous sélectionnez.</p>
+<p>L'objectif ultime de la classification du trafic est de donner à chaque classe un
+traitement différent.</p>
+<section id="matching-traffic">
+<h4>Correspondance du trafic</h4>
+<p>Pour définir quel trafic va dans quelle classe, vous définissez
+des filtres (c'est-à-dire les critères de correspondance). Les paquets passent à travers ces règles de correspondance
+(comme les règles d'un pare-feu) et, si un paquet correspond au filtre, il
+est attribué à cette classe.</p>
+<p>Dans VyOS, une classe est identifiée par un nombre que vous pouvez choisir lors
+de sa configuration.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Le sens de l'ID de classe n'est pas le même pour chaque type de
+politique. Normalement, les politiques n'ont besoin que d'un nombre sans signification pour identifier
+une classe (ID de classe), mais cela ne s'applique pas à toutes les politiques.
+Le nombre d'une classe dans une file d'attente prioritaire ne définit pas seulement
+son identité, mais aussi sa priorité.</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy &lt;policy&gt; &lt;policy-name&gt; class &lt;class-ID&gt; match &lt;class-matching-rule-name&gt;
+</pre></div>
+</div>
+<p>Dans la commande ci-dessus, nous définissons le type de politique que nous allons
+utiliser et le nom que nous choisissons pour celle-ci ; une classe (afin de
+différencier certains trafics) et un numéro identifiable pour cette classe ;
+puis nous configurons une règle de correspondance (ou filtre) et un nom pour celle-ci.</p>
+<p>Une classe peut avoir plusieurs filtres de correspondance :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper MY-SHAPER class 30 match HTTP
+set qos policy shaper MY-SHAPER class 30 match HTTPs
+</pre></div>
+</div>
+<p>Un filtre de correspondance peut contenir plusieurs critères et correspondra au trafic si
+tous ces critères sont vrais.</p>
+<p>Par exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper MY-SHAPER class 30 match HTTP ip protocol tcp
+set qos policy shaper MY-SHAPER class 30 match HTTP ip source port 80
+</pre></div>
+</div>
+<p>Cela correspondra au trafic TCP avec le port source 80.</p>
+<p>Il existe de nombreux paramètres que vous pourrez utiliser afin de correspondre au
+trafic que vous souhaitez pour une classe :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Ethernet (protocole, adresse de destination ou adresse source)</strong></p></li>
+<li><p><strong>Nom de l'interface</strong></p></li>
+<li><p><strong>IPv4 (valeur DSCP, longueur maximale du paquet, protocole, adresse source,</strong>
+<strong>adresse de destination, port source, port de destination ou drapeaux TCP)</strong></p></li>
+<li><p><strong>IPv6 (valeur DSCP, longueur maximale du payload, protocole, adresse source,</strong>
+<strong>adresse de destination, port source, port de destination ou drapeaux TCP)</strong></p></li>
+<li><p><strong>Marque du pare-feu</strong></p></li>
+<li><p><strong>ID VLAN</strong></p></li>
+</ul>
+</div></blockquote>
+<p>Lors de la configuration de votre filtre, vous pouvez utiliser la touche <code class="docutils literal notranslate">Tab</code> pour voir les nombreux
+différents paramètres que vous pouvez configurer.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# set qos policy shaper MY-SHAPER class 30 match MY-FIRST-FILTER 
+Possible completions:
+   description  Description
+ &gt; ether        En-tête Ethernet
+   interface    Interface à utiliser
+ &gt; ip           Correspondance de l'en-tête du protocole IP
+ &gt; ipv6         Correspondance de l'en-tête du protocole IPv6
+   mark         Correspondance sur la marque appliquée par le pare-feu
+   vif          Identifiant de réseau local virtuel (VLAN) pour cette correspondance
+</pre></div>
+</div>
+<p>Comme indiqué dans l'exemple ci-dessus, l'une des possibilités de correspondance des paquets
+est basée sur les marques effectuées par le pare-feu,
+<a class="reference external" href="https://blog.vyos.io/using-the-policy-route-and-packet-marking-for-custom-qos-matches">ce qui peut vous offrir un grand flexibilité</a>.</p>
+<p>Vous pouvez également écrire une description pour un filtre :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper MY-SHAPER class 30 match MY-FIRST-FILTER description &quot;Ma description de filtre&quot;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Un filtre TCP IPv4 ne correspondra qu'aux paquets ayant une longueur d'en-tête IPv4
+de 20 octets (ce qui est la majorité des paquets IPv4).</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Les filtres TCP IPv6 ne correspondent qu'aux paquets IPv6 sans extension d'en-tête, voir <a class="reference external" href="https://en.wikipedia.org/wiki/IPv6_packet#Extension_headers">https://en.wikipedia.org/wiki/IPv6_packet#Extension_headers</a></p>
+</div>
+</section>
+<section id="traffic-match-group">
+<h4>Groupe de correspondance de trafic</h4>
+<p>Dans certains cas où nous avons besoin d'une organisation de notre sélection de correspondance,
+afin d'être plus flexible et d'organiser avec notre définition de filtre. Nous pouvons
+appliquer des groupes de correspondance de trafic, permettant ainsi de créer des groupes de filtres distincts dans
+notre politique et de définir divers paramètres pour chaque groupe :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos traffic-match-group &lt;group_name&gt; match &lt;match_name&gt;
+Possible completions:
+   description          Description
+ &gt; ip                   Correspondance de l'en-tête du protocole IP
+ &gt; ipv6                 Correspondance de l'en-tête du protocole IPv6
+   mark                 Correspondance sur la marque appliquée par le pare-feu
+   vif                  Identifiant de réseau local virtuel (VLAN) pour cette correspondance
+</pre></div>
+</div>
+<p>hériter des correspondances d'un autre groupe</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos traffic-match-group &lt;group_name&gt; match-group &lt;match_group_name&gt;
+</pre></div>
+</div>
+<p>Un groupe de correspondance peut contenir plusieurs critères et hériter d'eux dans la même politique.</p>
+<p>Par exemple :</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos traffic-match-group Mission-Critical match AF31 ip dscp &#39;AF31&#39;
+set qos traffic-match-group Mission-Critical match AF32 ip dscp &#39;AF42&#39;
+set qos traffic-match-group Mission-Critical match CS3 ip dscp &#39;CS3&#39;
+set qos traffic-match-group Streaming-Video match AF11 ip dscp &#39;AF11&#39;
+set qos traffic-match-group Streaming-Video match AF41 ip dscp &#39;AF41&#39;
+set qos traffic-match-group Streaming-Video match AF43 ip dscp &#39;AF43&#39;
+set qos policy shaper VyOS-HTB class 10 bandwidth &#39;30%&#39;
+set qos policy shaper VyOS-HTB class 10 description &#39;Multimedia&#39;
+set qos policy shaper VyOS-HTB class 10 match CS4 ip dscp &#39;CS4&#39;
+set qos policy shaper VyOS-HTB class 10 match-group &#39;Streaming-Video&#39;
+set qos policy shaper VyOS-HTB class 10 priority &#39;1&#39;
+set qos policy shaper VyOS-HTB class 10 queue-type &#39;fair-queue&#39;
+set qos policy shaper VyOS-HTB class 20 description &#39;MC&#39;
+set qos policy shaper VyOS-HTB class 20 match-group &#39;Mission-Critical&#39;
+set qos policy shaper VyOS-HTB class 20 priority &#39;2&#39;
+set qos policy shaper VyOS-HTB class 20 queue-type &#39;fair-queue&#39;
+set qos policy shaper VyOS-HTB default bandwidth &#39;20%&#39;
+set qos policy shaper VyOS-HTB default queue-type &#39;fq-codel&#39;
+</pre></div>
+</div>
+<p>Dans cet exemple, nous pouvons observer que différents critères DSCP sont définis en fonction
+de notre configuration QoS au sein du même groupe de politique.</p>
+</section>
+<section id="default">
+<h4>Défaut</h4>
+<p>Vous devrez souvent configurer votre <em>défaut</em> de trafic de la même manière que vous le faites avec une classe. <em>Défaut</em> peut être considéré comme une classe car il
+se comporte comme telle. Il contient tout le trafic qui n'a pas correspondu à aucune
+des classes définies, donc c'est comme une classe ouverte, une classe sans
+règles de correspondance.</p>
+</section>
+<section id="class-treatment">
+<h4>Traitement de la classe</h4>
+<p>Dès qu'une classe a une règle de correspondance configurée, vous devrez également définir ce
+que vous voulez faire avec le trafic de cette classe, quelle sorte de
+traitement de contrôle de trafic vous voulez lui donner. Vous aurez différentes
+possibilités en fonction de la politique de trafic que vous configurez.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# set qos policy shaper MY-SHAPER class 30
+Possible completions:
+   bandwidth    Bande passante disponible pour cette politique (défaut : auto)
+   burst        Taille de la burst pour cette classe (défaut : 15k)
+   ceiling      Bande passante limite pour cette classe
+   codel-quantum
+                Déficit dans l'algorithme de file d'attente équitable (défaut 1514)
+   description  Description
+   flows        Nombre de flux dans lesquels les paquets entrants sont classés (défaut 1024)
+   interval     Intervalle utilisé pour mesurer le délai (défaut : 100)
++&gt; match        Nom de la règle de correspondance de classe
+   priority     Priorité pour l'évaluation des règles
+   queue-limit  Taille maximale de la file d'attente
+   queue-type   Type de file d'attente pour le trafic par défaut (défaut : fq-codel)
+   set-dscp     Modification du champ DiffServ (DiffServ) dans l'en-tête IP
+   target       Délai minimum acceptable pour la file d'attente persistante (défaut : 5)
+</pre></div>
+</div>
+<p>Par exemple, avec <code class="code docutils literal notranslate">set qos policy shaper MY-SHAPER class 30 set-dscp EF</code> vous modifierez la valeur du champ DSCP des paquets dans
+cette classe vers Expedite Forwarding.</p>
+<blockquote>
+<div><p>Valeurs DSCP conformément à <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2474.html"><strong>RFC 2474</strong></a> et <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4595.html"><strong>RFC 4595</strong></a> :</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Valeur binaire</p></th>
+<th class="head"><p>Valeur configurée</p></th>
+<th class="head"><p>Taux de suppression</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>101110</p></td>
+<td><p>46</p></td>
+<td><p>-</p></td>
+<td><p>Expedited forwarding (EF)</p></td>
+</tr>
+<tr class="row-odd"><td><p>000000</p></td>
+<td><p>0</p></td>
+<td><p>-</p></td>
+<td><p>Traffic best effort, par défaut</p></td>
+</tr>
+<tr class="row-even"><td><p>001010</p></td>
+<td><p>10</p></td>
+<td><p>Bas</p></td>
+<td><p>Forwarding assuré (AF) 11</p></td>
+</tr>
+<tr class="row-odd"><td><p>001100</p></td>
+<td><p>12</p></td>
+<td><p>Moyen</p></td>
+<td><p>Forwarding assuré (AF) 12</p></td>
+</tr>
+<tr class="row-even"><td><p>001110</p></td>
+<td><p>14</p></td>
+<td><p>Haut</p></td>
+<td><p>Forwarding assuré (AF) 13</p></td>
+</tr>
+<tr class="row-odd"><td><p>010010</p></td>
+<td><p>18</p></td>
+<td><p>Bas</p></td>
+<td><p>Forwarding assuré (AF) 21</p></td>
+</tr>
+<tr class="row-even"><td><p>010100</p></td>
+<td><p>20</p></td>
+<td><p>Moyen</p></td>
+<td><p>Forwarding assuré (AF) 22</p></td>
+</tr>
+<tr class="row-odd"><td><p>010110</p></td>
+<td><p>22</p></td>
+<td><p>Haut</p></td>
+<td><p>Forwarding assuré (AF) 23</p></td>
+</tr>
+<tr class="row-even"><td><p>011010</p></td>
+<td><p>26</p></td>
+<td><p>Bas</p></td>
+<td><p>Forwarding assuré (AF) 31</p></td>
+</tr>
+<tr class="row-odd"><td><p>011100</p></td>
+<td><p>28</p></td>
+<td><p>Moyen</p></td>
+<td><p>Forwarding assuré (AF) 32</p></td>
+</tr>
+<tr class="row-even"><td><p>011110</p></td>
+<td><p>30</p></td>
+<td><p>Haut</p></td>
+<td><p>Forwarding assuré (AF) 33</p></td>
+</tr>
+<tr class="row-odd"><td><p>100010</p></td>
+<td><p>34</p></td>
+<td><p>Bas</p></td>
+<td><p>Forwarding assuré (AF) 41</p></td>
+</tr>
+<tr class="row-even"><td><p>100100</p></td>
+<td><p>36</p></td>
+<td><p>Moyen</p></td>
+<td><p>Forwarding assuré (AF) 42</p></td>
+</tr>
+<tr class="row-odd"><td><p>100110</p></td>
+<td><p>38</p></td>
+<td><p>Haut</p></td>
+<td><p>Forwarding assuré (AF) 43</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</section>
+<section id="embedding-one-policy-into-another-one">
+<h4>Intégration d'une politique dans une autre</h4>
+<p>Il arrive souvent que nous ayons besoin d'intégrer une politique dans une autre. Il est possible de le faire
+sur des politiques avec classes, en attachant une nouvelle politique à une classe. Par
+exemple, vous pourriez vouloir appliquer différentes politiques aux différentes
+classes d'une politique Round-Robin que vous avez configurée.</p>
+<p>Un exemple courant est le cas des politiques qui, pour être efficaces, doivent être appliquées à une interface directement
+connectée là où se trouve le goulot d'étranglement. Si votre routeur n'est pas
+directement connecté au goulot d'étranglement, mais à un saut avant, vous pouvez
+imiter le goulot d'étranglement en intégrant votre politique non-shaping dans une
+politique shaping avec classes afin qu'elle prenne effet.</p>
+<p>Vous pouvez configurer une politique dans une classe via le paramètre <code class="docutils literal notranslate">queue-type</code>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper FQ-SHAPER bandwidth 4gbit
+set qos policy shaper FQ-SHAPER default bandwidth 100%
+set qos policy shaper FQ-SHAPER default queue-type fq-codel
+</pre></div>
+</div>
+<p>Comme le montre la dernière commande de l'exemple ci-dessus, le paramètre <code class="docutils literal notranslate">queue-type</code>
+permet ces combinaisons. Vous pourrez l'utiliser
+dans de nombreuses politiques.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Certaines politiques incluent déjà d'autres politiques intégrées. C'est le cas du Shaper : chaque classe utilise fair-queue
+sauf si vous le changez.</p>
+</div>
+</section>
+</section>
+<section id="creating-a-traffic-policy">
+<h3>Création d'une politique de trafic</h3>
+<p>VyOS vous permet de contrôler le trafic de nombreuses manières différentes, ici nous couvrirons
+toutes les possibilités. Vous pouvez configurer autant de politiques que vous le souhaitez, mais
+vous ne pourrez appliquer qu'une seule politique par interface et direction
+(entrée ou sortie).</p>
+<p>Certaines politiques peuvent être combinées, vous pourrez utiliser une différente
+politique qui sera appliquée à une classe de la politique principale.</p>
+<div class="admonition hint">
+<p class="admonition-title">Conseil</p>
+<p><strong>Si vous cherchez une politique pour votre trafic sortant</strong>
+mais vous ne savez pas laquelle vous avez besoin et vous ne voulez pas passer
+par toutes les politiques possibles présentées ici, <strong>nous pensons que vous êtes très probablement à la recherche d'une</strong> Politique de Formage <strong>et vous voulez</strong>
+<a class="reference internal" href="#embed">configurer ses files d'attente</a> <strong>comme FQ-CoDel</strong>.</p>
+</div>
+<section id="drop-tail">
+<h4>Drop Tail</h4>
+<div class="line-block">
+<div class="line"><strong>Discipline de file d'attente :</strong> PFIFO (Premier arrivé, premier servi).</div>
+<div class="line"><strong>Applicable à :</strong> Trafic sortant.</div>
+</div>
+<p>C'est la file d'attente la plus simple possible que vous pouvez appliquer à votre trafic. Le trafic
+doit passer par une file d'attente finie avant d'être envoyé. Vous devez
+définir combien de paquets cette file d'attente peut contenir.</p>
+<p>Lorsqu'un paquet doit être envoyé, il doit passer par cette file d'attente, donc
+le paquet sera placé à la queue de celle-ci. Lorsque le paquet a complètement
+passé par celle-ci, il sera défile et videra sa place dans la file d'attente et
+sera finalement remis à la carte réseau pour être envoyé.</p>
+<p>Même si la politique Drop-Tail ne ralentit pas les paquets, si beaucoup de paquets
+doivent être envoyés, ils pourraient être supprimés lors de l'ajout à la queue.
+Cela peut arriver si la file d'attente n'a pas encore été capable de libérer suffisamment
+de paquets depuis sa tête.</p>
+<p>C'est la politique qui nécessite les ressources les plus faibles pour le même
+volume de trafic. Mais <strong>très probablement vous n'en avez pas besoin car vous ne pouvez
+pas obtenir beaucoup de chose. Parfois, elle est utilisée juste pour activer le journal.</strong></p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy drop-tail &lt;policy-name&gt; queue-limit &lt;number-of-packets&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-drop-tail-policy-name-queue-limit-number-of-packets" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour configurer une politique Drop-Tail (PFIFO). Choisissez un
+nom unique pour cette politique et la taille de la file d'attente en définissant le
+nombre de paquets qu'elle peut contenir (maximum 4294967295).</p>
+</div>
+</div>
+</section>
+<section id="fair-queue">
+<h4>File d'attente équitable</h4>
+<div class="line-block">
+<div class="line"><strong>Discipline de file d'attente :</strong> SFQ (File d'attente équitable stochastique).</div>
+<div class="line"><strong>Applicable à :</strong> Trafic sortant.</div>
+</div>
+<p>La file d'attente équitable est un planificateur consommant des ressources qui programme
+l'envoi des paquets en fonction des flux, c'est-à-dire qu'il équilibre le trafic
+en le distribuant à travers différentes sous-files d'attente afin d'assurer
+l'équité afin que chaque flux puisse envoyer des données tour à tour, empêchant
+n'importe quel flux de noyer les autres.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fair-queue &lt;policy-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fair-queue-policy-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour créer une politique de File d'attente équitable et lui donner un nom.
+Elle est basée sur la File d'attente équitable stochastique et peut être appliquée au
+trafic sortant.</p>
+</div>
+</div>
+<p>Afin de séparer le trafic, la File d'attente équitable utilise un classifieur basé sur
+l'adresse source, l'adresse de destination et le port source. L'algorithme
+place les paquets dans des cases de hachage en fonction de ces trois paramètres.
+Chacune de ces cases devrait représenter un flux unique. Comme plusieurs
+flux peuvent être hachés vers la même case, l'algorithme de hachage est
+perturbé à des intervalles configurables afin que l'inégalité ne dure que
+pendant un court moment. La perturbation peut toutefois causer un réordonnancement
+involontaire des paquets. Une valeur conseillée pourrait être de 10 secondes.</p>
+<p>Une utilisation possible de la File d'attente équitable pourrait être la mitigation des attaques
+de refus de service.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fair-queue &lt;policy-name&gt; hash-interval &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fair-queue-policy-name-hash-interval-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour définir une politique de File d'attente équitable, basée sur la
+File d'attente équitable stochastique, et définir le nombre de secondes à partir duquel
+une nouvelle perturbation d'algorithme de file d'attente aura lieu (maximum 4294967295).</p>
+</div>
+</div>
+<p>Lors de la défile, chaque case de hachage avec des données est interrogée de manière cyclique.
+Vous pouvez configurer la longueur de la file d'attente.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fair-queue &lt;policy-name&gt; queue-limit &lt;limit&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fair-queue-policy-name-queue-limit-limit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour définir une politique de File d'attente équitable, basée sur la
+File d'attente équitable stochastique, et définir le nombre maximum de paquets
+autorisés à attendre dans la file d'attente. Tout autre paquet sera supprimé.</p>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>La File d'attente équitable est une politique non-formage (consommant des ressources), donc elle
+ne sera utile que si votre interface sortante est vraiment pleine. Si ce n'est pas le cas, VyOS
+ne possédera pas la file d'attente et la File d'attente équitable n'aura aucun effet. Si
+il y a de la bande passante disponible sur le lien physique, vous pouvez intégrer la File d'attente équitable
+dans une politique de formage avec classes pour vous assurer qu'elle possède la file d'attente.</p>
+</div>
+</section>
+<section id="fq-codel">
+<h4>FQ-CoDel</h4>
+<div class="line-block">
+<div class="line"><strong>Discipline de file d'attente :</strong> File d'attente équitable / CoDel.</div>
+<div class="line"><strong>Applicable à :</strong> Trafic sortant.</div>
+</div>
+<p>La politique FQ-CoDel distribue le trafic en 1024 files FIFO et essaie de fournir un bon service entre toutes.
+Elle essaie également de maintenir les longueurs de toutes les files courtes.</p>
+<p>FQ-CoDel lutte contre le bufferbloat et réduit la latence sans avoir besoin de configurations complexes.
+Il est devenu la nouvelle discipline de file d'attente par défaut pour les interfaces de certaines distributions GNU/Linux.</p>
+<p>Il utilise un modèle stochastique pour classer les paquets entrants en
+différents flux et est utilisé pour fournir une part équitable de la bande passante à
+tous les flux utilisant la file d'attente. Chaque flux est géré par la discipline de file d'attente CoDel.
+Le réordonnancement au sein d'un flux est évité car CoDel utilise internement une file FIFO.</p>
+<p>FQ-CoDel est basé sur un planificateur de file d'attente Deficit Round Robin (DRR) modifié avec l'algorithme
+de gestion active de la file d'attente (AQM) CoDel opérant sur chaque file d'attente.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>FQ-Codel est une politique non-formage (consommant des ressources), donc elle
+ne sera utile que si votre interface sortante est vraiment pleine. Si ce n'est pas le cas, VyOS
+ne possédera pas la file d'attente et FQ-Codel n'aura aucun effet. Si
+il y a de la bande passante disponible sur le lien physique, vous pouvez intégrer FQ-Codel
+dans une politique de formage avec classes pour vous assurer qu'elle possède la file d'attente. Si vous n'êtes pas sûr si vous avez besoin d'intégrer votre politique FQ-CoDel
+dans un Shaper, faites-le.</p>
+</div>
+<p>FQ-CoDel est réglé pour fonctionner correctement avec ses paramètres par défaut à des vitesses de 10 Gbit.
+Il pourrait fonctionner correctement également à d'autres vitesses sans configurer rien, mais ici nous expliquerons quelques cas où vous pourriez vouloir
+réglage ses paramètres.</p>
+<p>Lorsque vous l'exécutez à 1 Gbit et moins, vous pouvez vouloir réduire la
+<code class="docutils literal notranslate">queue-limit</code> à 1000 paquets ou moins. À des vitesses comme 10 Mbit, vous pouvez
+vouloir la fixer à 600 paquets.</p>
+<p>Si vous utilisez FQ-CoDel intégré dans Shaper et que vous avez de grandes vitesses
+(100 Mbit et plus), vous pouvez envisager d'augmenter <code class="docutils literal notranslate">quantum</code> à 8000 ou
+plus afin que le planificateur économise le CPU.</p>
+<p>Sur des vitesses basses (en dessous de 40 Mbit), vous pouvez vouloir ajuster <code class="docutils literal notranslate">quantum</code> à
+quelque chose comme 300 octets.</p>
+<p>Au niveau très bas (en dessous de 3 Mbit), en plus d'ajuster <code class="docutils literal notranslate">quantum</code> (300 reste
+correct), vous pouvez également augmenter <code class="docutils literal notranslate">target</code> à quelque chose comme 15 ms
+et augmenter <code class="docutils literal notranslate">interval</code> à environ 150 ms.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fq-codel &lt;policy name&gt; codel-quantum &lt;bytes&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-codel-quantum-bytes" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour configurer une politique fq-codel, définir son nom et
+le nombre maximum d'octets (par défaut : 1514) à extraire d'une file d'attente à la fois.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fq-codel &lt;policy name&gt; flows &lt;number-of-flows&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-flows-number-of-flows" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour configurer une politique fq-codel, définir son nom et
+le nombre de sous-files (par défaut : 1024) dans lesquelles les paquets sont
+classés.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fq-codel &lt;policy name&gt; interval &lt;milliseconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-interval-milliseconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour configurer une politique fq-codel, définir son nom et
+la période de temps utilisée par la boucle de contrôle de CoDel pour détecter quand un
+queue persistante se développe, garantissant que le délai minimum mesuré ne devient pas trop ancien (par défaut : 100 ms).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fq-codel &lt;policy name&gt; queue-limit &lt;number-of-packets&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-queue-limit-number-of-packets" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour configurer une politique fq-codel, définir son nom, et
+définir une limite rigide sur la taille réelle de la file d'attente. Quand cette limite est
+atteinte, les nouveaux paquets sont supprimés (par défaut : 10240 paquets).</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy fq-codel &lt;policy-name&gt; target &lt;milliseconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-target-milliseconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour configurer une politique fq-codel, définir son nom, et
+définir le délai minimum acceptable pour une file d'attente persistante. Ce délai minimum est identifié en surveillant le délai minimum de la file d'attente que les paquets subissent (par défaut : 5 ms).</p>
+</div>
+</div>
+<section id="example">
+<h5>Exemple</h5>
+<p>Un exemple simple d'une politique FQ-CoDel fonctionnant à l'intérieur d'une politique Shaper.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper FQ-CODEL-SHAPER bandwidth 2gbit
+set qos policy shaper FQ-CODEL-SHAPER default bandwidth 100%
+set qos policy shaper FQ-CODEL-SHAPER default queue-type fq-codel
+</pre></div>
+</div>
+</section>
+</section>
+<section id="limiter">
+<h4>Limiteur</h4>
+<div class="line-block">
+<div class="line"><strong>Discipline de file d'attente :</strong> policier d'entrée.</div>
+<div class="line"><strong>Applicable à :</strong> Trafic entrant.</div>
+</div>
+<p>Le limiteur est l'une de ces politiques qui utilise des classes (la discipline d'entrée n'est
+en réalité qu'une politique sans classe mais les filtres fonctionnent dedans).</p>
+<p>Le limiteur effectue une police d'entrée de base du trafic. Plusieurs
+classes de trafic peuvent être définies et des limites de trafic peuvent être appliquées à
+chaque classe. Bien que le policier utilise un mécanisme de jauge à jetons
+internement, il n'a pas la capacité de retarder un paquet comme un
+mécanisme de formage. Le trafic excédant les limites de bande passante définies
+est directement supprimé. Une taille maximale autorisée de burst peut également être configurée.</p>
+<p>Vous pouvez configurer des classes (jusqu'à 4090) avec des paramètres différents et une
+politique par défaut qui sera appliquée à tout trafic ne correspondant à aucune des
+classes configurées.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Dans le cas où vous souhaitez appliquer un type de <strong>formage</strong> à votre
+<strong>trafic entrant</strong>, consultez la section de formage d'entrée.</p>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy limiter &lt;policy-name&gt; class &lt;class ID&gt; match &lt;match-name&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-limiter-policy-name-class-class-id-match-match-name-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour configurer un policier d'entrée, définir son nom,
+un identifiant de classe (1-4090), un nom de règle de correspondance de classe et sa
+description.</p>
+</div>
+</div>
+<p>Une fois les règles de correspondance définies pour une classe, vous pouvez commencer à configurer
+comment vous souhaitez que le trafic correspondant se comporte.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy limiter &lt;policy-name&gt; class &lt;class-ID&gt; bandwidth &lt;rate&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-limiter-policy-name-class-class-id-bandwidth-rate" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour configurer un policier d'entrée, définir son nom,
+un identifiant de classe (1-4090) et la bande passante maximale autorisée pour
+cette classe.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy limiter &lt;policy-name&gt; class &lt;class-ID&gt; burst &lt;burst-size&gt;
+<a class="cmdlink" href="#cfgcmd> ="pour les="paramètre p>frac type="commande" title="cfgcfgcmd-set-qos-policy-lcfgcmd-set-qq-cfgcmd-set-q-cfg-c"#">#</</"#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#="#"#"#"title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour configurer un policier d'entrée, définir son nom,
+un identifiant de classe (1-4090) et la taille du burst en octets pour cette
+classe (par défaut : 15).</</p>
+</div>
+</div>
+<div classcmd="cfgcmd-set-qos-policy-limiter-policy-name-default-bandwidth-rate" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour configurer un policier d'entrée, définir son nom
+et la bande passante maximale autorisée pour sa politique par défaut.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy limiter &lt;policy-name&gt; default burst &lt;burst-size&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-limiter-policy-name-default-burst-burst-size" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour configurer un policier d'entrée, définir son nom
+et la taille du burst en octets (par défaut : 15) pour sa politique par défaut.</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set qos policy limiter &lt;policy-name&gt; class &lt;class ID&gt; priority &lt;value&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-limiter-policy-name-class-class-id-priority-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<p>Utilisez cette commande pour configurer un policier d'entrée, définir son nom,
+un identifiant de classe (1-4090), et la priorité (0-20, par défaut 20) dans
+laquelle la règle est évaluée (le plus petit le nombre, plus haute la
+priorité).</p>
+</div>
+</div>
+</section>
+<section id="network-emulator">
+<h4>Emulateur de réseau</h4>
+<div class="line-block">
+<div class="line"><strong>Discipline de file d'attente :</strong> netem (Emulateur de réseau) + TBF (Filtre à jeton).</div>
+<div class="line"><strong>Applicable à :</strong> Trafic sortant.</div>
+</div>
+<p>La politique d'emulateur de réseau de VyOS imite les conditions que vous pouvez subir dans un
+réseau réel. Vous pourrez configurer des choses comme le taux, le burst,
+le délai, la perte de paquets, la corruption de paquets ou le réordonnancement de paquets.</p>
+<p>Cela pourrait être utile si vous souhaitez <span="affichieréampanitéaitant div.0> <code="code</p>
+="text ; codeacteur.  
+<p>"=codeuteur code="p>codeulaire <p</code>‐co</code>code<span>code</code""
+</code="code>code</codeulationnaire</code>code</code="</code</code</code</"code</code</code</code</div<code</code</code=""code</code</code; ="code</code</code</codeable ;">
+
+=code</code</code> codeurlatelier <code>
+code
+p>
+code</codecat</code</code</p></=
+</code<p>code</code</code</code</code</pans</code</code</code</code</code</p>code</code><code><code<irc:source="code</code</code><div</code</code</="p>
+code</code<p> code</="code</pours</code</code</code><code<code><p><code<code><code</</code</code<code<code>1<code>code<code</code<code><code<code</code</code<code</code</code><code<code<code<code><code><code<code><code<code<code</code<code</</code<code><code</code</code<code><code<code<code<code<code<code<code<code<code<code<code<code<code<code<code<code<code<code<code<code<code<code<code<code<code<code<code<name>&nbsp;et&nbsp;l'&nbsp;taux.&nbsp;</p>
+</div><code<code<code><code</div>
+</section>
+<sectionu</code<code<code</section></sectionue</section><code<sectionue</code</code</section>code</section</code</section>ode</sectionured="code</</code</</code<code<code</code<code<code<code<code</code<code<code<code</code</code><code</code<code</code<code<code</code><code</="code><code<code<code<code<code<code<code<code<code<name>&nbsp;et&nbsp<code<code<code<code<code<code<code<code<code<code<code<code<code<code<code<code<code</code<code<code<code<code>code<code</code</code<code<code<code</code<code<code<code<code<code><code<code<code><code><code</code><code>code><code<code<code></code<code</code<code</code<code<code<code<code><code<code<code<code><code<code<code</<code><code><code<code<code<code</code><code="docutils literal notranslate">set qos policy network-emulator &lt;policy-name&gt; bandwidth &lt;rate&gt;
+<a class="cmdlink" href="#cfgcmd-set-qos-policy-network-emulator-policy-name-bandwidth-rate" title="Permalink to this Command"></a></div</code><code><code</code="code><code<code><code</ode>
+</code<code><code<code<code><code</ode="code<code><code</code>
+</div>
+</section>
+</body>
+</html<code><code<code<code><code><code><code class="docutils literal="code<code</code</code><code</code</code</code><code<code</code<code</code<code><code</code</code<code</code><code<code</code<code><code</code><code<code</code<code<code<code<code><code><code</code>
+</div>
+</section><code</code<code><code><code<code<code><code<code</code<code</</</code><code<code<code</code<code<code<code</code</code</code</code</code<code</code</code<code<ode</code><code</code<code</code</code</code<code</code><code</code<code><code</code<code</code><code</code</code>code</code><code</code</code</code</code<code</code</code</code><code><code><code</code><code><code</</code</code="code</code</code<code<code</code<code<code</code><code</code</code><code<code><code</code</code</code</code</code</code</code</code><code</code><code</code<code="docutils literal notranslate">set qos policy network-emulator &lt;policy-name&gt; burst &lt;burst-size&gt;
+<a class="cmdlink" href="#cfgcmd-set-q</code<code<code<code</code</code<code</code</code><code</ode</code><code</code</code><code</code<code><code</ode</code<code</ode</code</code><code><code</code><code</code<code<code><code<code<code<code><code><code</code</code<code</code<code<code</code><code="docutils literal notranslate">set qos policy network-emulator &lt;policy><code><code</code</code<code</code><code><code</code</code><code</code</code</ode</code</code<code</code</code</code><code</code><code</code</code</code</code</code</code</code</code<code</code</code<code<code</code<code<code<code</code</code><code<code<code><code</code</code</code<code<code</code</code<code<od</code</code</code</ode</code<code</code<code<code</code</code<code</code<code<code<code</code<code<code</code<code<code</code<code</code<code<code</code</code</code</code><code><code><code</code</code</code</code</code</code</code</ode</code</code</code<code</code</code<code</code><code<code<code</code</code<code</code</code</code</code="docutils literal notranslate">set qos policy><code<code</code</code</code<code</ode</code><code</code</code</code</code</code</code</code</code<code</code</code<code</code</code<code<code<code<code<code<code</code<code<code<code</code</code</code</code</code</code</code</code</code</code</code<code</code<code><code</code</code</code</code</code<code<code</code<code</</code<code</code</code<code</code><code<code<code</code</code</code</code<code</code><code><code</code</code</code<code</code><code<code</code><code="docutils literal notranslate">set qos policy network-emulator &lt;policy</code<code<code</code<code</code</ode</code<code</code<code</ode</code</code</code</code<code<code<code<code</code</</code<code</code><code<code</code</code<code<code</code><code</code</code</ode</code<code</code</code</code<code<code><code</code><code</code</code</code<code</code</code><code</code<code<code<code<code</code</code</code</code</code</code</code<code</code<name>&nbsp;et&nbsp;l'&nbsp;taux</ode</code<code<code</code<code<code<code<code<code</code<code<code<code<name>&nbsp;et&nbsp;l'&nbsp;taux&nbsp;d'erreur&nbspcode</code<code<code<code<code<code<code<code<code<code<code><code><code><code<code<code<code<code</code<code<code</code><code<code><code><code<code><code</code<code</ode</code><code</code</code</code<code</code><code class="docutils literal notranslate">set qos policy network-emulator &lt;policy-name&gt; reordering &lt;percent&gt;
+</code<code="code<code<code</code<code<code<code<code<code<code<code<code<code><code class="docutils literal notranslate">set qos policy><code><code</code</code><code</code</code="code<code><code<code><code><code><code><code<code<code><code</code<code><code</code<code<name>&nbsp;et&nbsp;l'&nbsp;pourcentage&nbsp;de&nbsp;p</code<code<code><code><code><code><code<code<code<code><code</code><code<code<code<code><code</code<code</code><code class="code<code<code<code<code</code<code><code<code<code<code<code="docutils literal notranslate">set qos policy network-emulator &lt;policy<code><code<code</code<code<code<code<code><code</code<code</code</code<name>&nbsp;et&nbsp;l'&nbsp;longueur&nbsp;de&nbsp;code<code<code><code<code<code<code<code<code<code<code<code</code</code<code<code<code</code<code<code<code<code<code><code</code<code<code<code<code<code<code<code><code><code><code</code<code<code><code><code class="docutils literal notranslate">set qos policy network-emulator &lt;policy><code<code<code<code<code</code><code><code><code<code<code<codecode<code<code<code><code><code<code<code<code<code<code<ode<code<code<code<code</code><code<code<code</code>
+</div>
+</section>
+<section id="priority-queue">
+<h4>File dcode<code</code<code<code<code</code<code<code</code</code</code><code<code<code<code<code</code><code<code</code</code</code><code><code</code<code><code><code</code><code><code</code</code</code<code><code</code<code<code><code</code</code><code><code><code><code</code><code</code</code><code><code</code><code<code</code</code><code</code</code</codecode<code<code</code</code</code</code</code</code<code</code</code<code<codecode="docutils literal notranslate">set qos policy priority-queue &code</code<code<code</code<code<code</code</code</code</code</code<code</code</code</code<code</ode</code</code</code</code<codecode</code</code</code<code</code</code</code<code<name>&nbsp;et&nbsp;l</code</code<code><code<code</code><code</code<code<code</ode</code</code</code<code</code<code</code<code</ode</code</code<code<code<code<code</code</code</code</code</code</code</code</code</code</code</code</code</code<code<code</</code</code</code</code</code<code</code</code</code><code><code</code</code</codecode<codecode</code<code</code<code<code<code<code</code</code<code</code<code</code<code</code<code<code<code</code<code<code</code</code</code</code</code<code<code</code<code</code</code</code</code</code</code</codecode</code<code</code</code</code<code</code<code</code</code</code</code</</code</code</code</code</code<code</code</code<code</code</code<code</code<ode<code</code</code<code</code</code</code<code</code<code</code</ode</code</code</code="code</code<code</code<code</code="codecode</code<code<code</code</code</code</code</code="docutils literal notranslate">set qos policy priority-queue &lt;policy-name&gt; class &

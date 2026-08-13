@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="Ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+
+<style>
+  /* VyOS-style command blocks */
+  .vyos-cmd {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .vyos-cmd::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Pre blocks for multi-line commands */
+  pre.vyos-cmd-block {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333;
+  }
+  pre.vyos-cmd-block code {
+    background: none;
+    padding: 0;
+    color: #333;
+  }
+  pre.vyos-cmd-block code::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+</style>
+
+<style>
+  /* VyOS command block styling */
+  .cmd { margin: 10px 0; }
+  .cmd-cfg { }
+  .cfgcmd-heading {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .cfgcmd-heading::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  .cfgcmd-heading .cmdlink {
+    display: none;
+  }
+  .cfgcmd-body {
+    padding-left: 16px;
+    margin-bottom: 12px;
+  }
+  /* Highlight/pre blocks for commands */
+  .highlight {
+    background: #f8f9fa;
+    border-left: 3px solid #e67e22;
+    border-radius: 0 4px 4px 0;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  .highlight pre {
+    margin: 0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .highlight pre::before {
+    content: "$ ";
+    color: #e67e22;
+    font-weight: bold;
+  }
+  /* Inline code */
+  code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13px;
+    color: #c0392b;
+  }
+  /* Strong/bold in commands */
+  .cfgcmd-heading strong {
+    color: #333;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div itemprop="articleBody">
+             
+  <section id="pimv6">
+<h1>PIMv6</h1>
+<p>VyOS поддерживает мультикаст-маршрутизацию IPv6 через
+<abbr title="Protocol Independent Multicast for IPv6">PIMv6</abbr> и
+<abbr title="Multicast Listener Discovery">MLD</abbr> версии 1 и 2.</p>
+<p>PIMv6 работает аналогично его IPv4-аналогу: он использует существующую таблицу маршрутизации IPv6 для принятия решений о пути, а трафик от мультикаст-источников передается к <abbr title="Rendezvous Point">RP</abbr>. IPv6-приемники используют MLD для сообщения локальному маршрутизатору, к каким группам они хотят получать данные, и маршрутизатор использует PIMv6 для получения этого трафика от RP через общее распределительное дерево.</p>
+<p>Работающая конфигурация PIMv6 требует:</p>
+<ul class="simple">
+<li><p>Включения PIMv6 на каждом интерфейсе, участвующем в мультикаст-пересылке IPv6.</p></li>
+<li><p>Однозначного указания местоположения точки привязки (RP) на всех маршрутизаторах в домене PIMv6.</p></li>
+<li><p>Включения MLD на интерфейсах, направленных к мультикаст-приемникам.</p></li>
+</ul>
+<section id="basic-commands">
+<h2>Основные команды</h2>
+<p>Используйте следующие команды для базовой настройки PIMv6.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim6 interface &lt;interface-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Включить PIMv6 на указанном интерфейсе PIMv6.</strong></p>
+<p>Эта команда также включает MLD, позволяя маршрутизатору обрабатывать запросы и отчеты MLD от IPv6-приемников.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim6 interface &lt;interface-name&gt; mld disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-disable" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Отключить MLD на указанном интерфейсе PIMv6.</strong></p>
+<p>Эта команда отключает обработку MLD на интерфейсе, оставляя PIMv6 включенным.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld disable
+</pre></div>
+</div>
+</section>
+<section id="tuning-commands">
+<h2>Команды настройки</h2>
+<p>Вы также можете настроить мультикаст с помощью следующих команд.</p>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim6 interface &lt;interface-name&gt; mld interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-interval-1-65535" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить интервал запросов MLD, в секундах, на указанном интерфейсе.</strong></p>
+<p>Это значение определяет, как часто маршрутизатор отправляет запросы MLD для выявления активных слушателей в подключенной сети.</p>
+<p>Значение по умолчанию — 125 секунд.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld interval 100
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim6 interface &lt;interface-name&gt; mld join &lt;multicast-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-join-multicast-address" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить интерфейс на присоединение к определенной группе IPv6-мультикаста.</strong></p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld join ff0e::db8:0:1234
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim6 interface &lt;interface-name&gt; mld join &lt;multicast-address&gt; source &lt;source-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-join-multicast-address-source-source-address" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить интерфейс на присоединение к определенному каналу (S,G).</strong></p>
+<p>Канал определяется комбинацией адреса источника IPv6 (S) и адреса мультикаста IPv6 (G).</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld join ff3e::1234 source 2001:db8::1
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim6 interface &lt;interface-name&gt; mld last-member-query-count &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-last-member-query-count-1-255" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить количество запросов последнего слушателя, которые маршрутизатор отправляет на указанном интерфейсе после того, как слушатель покидает группу мультикаста.</strong></p>
+<p>Значение по умолчанию — 2.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld last-member-query-count 3
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim6 interface &lt;interface-name&gt; mld last-member-query-interval &lt;100-6553500&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-last-member-query-interval-100-6553500" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить интервал запроса последнего слушателя MLD, в миллисекундах, на указанном интерфейсе.</strong></p>
+<p>Это значение определяет, как долго маршрутизатор ждет между запросами последнего слушателя.</p>
+<p>Значение по умолчанию — 1000 миллисекунд.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld last-member-query-interval 500
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim6 interface &lt;interface-name&gt; mld max-response-time &lt;100-6553500&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-max-response-time-100-6553500" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить максимальное время ответа MLD, в миллисекундах, на указанном интерфейсе.</strong></p>
+<p>Это значение вставляется в запросы MLD и указывает максимальное время, в течение которого хосты могут ответить отчетом о подписке. Если отчет не получен в течение заданного времени, PIMv6 предполагает, что больше нет активных локальных получателей, и может истечь срок действия связанного состояния (*,G) или (S,G).</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld max-response-time 5000
+</pre></div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols pim6 interface &lt;interface-name&gt; mld version &lt;1-2&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-version-1-2" title="Ссылка на эту команду"></a></div><div class="cfgcmd-body">
+<p><strong>Настроить версию MLD на указанном интерфейсе.</strong></p>
+<p>По умолчанию используется версия 2.</p>
+</div>
+</div>
+<p>Пример:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld version 1
+</pre></div>
+</div>
+</section>
+<section id="configuration-example">
+<h2>Пример конфигурации</h2>
+<p>Чтобы включить PIMv6 на интерфейсах eth0 и eth1 (что также автоматически включает MLD, позволяя маршрутизатору обрабатывать запросы MLD и отчеты от подключенных IPv6-приемников):</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0
+set protocols pim6 interface eth1
+</pre></div>
+</div>
+<p>Следующая конфигурация явно присоединяет IPv6-мультикаст-группу ff0e::db8:0:1234 на интерфейсе eth0, и канал (S,G) (2001:db8::1, ff3e::5678) на интерфейсе eth1:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld join ff0e::db8:0:1234
+set protocols pim6 interface eth1 mld join ff3e::5678 source 2001:db8::1
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+</body>
+</html>

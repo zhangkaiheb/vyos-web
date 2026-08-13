@@ -2,10 +2,12 @@ import { defineComponent, ref, onMounted, computed } from '/src/utils/vue-import
 import { configApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
+import { useI18n } from '/src/i18n/index.js';
 
 export default defineComponent({
   name: 'ProtocolPage',
   setup() {
+    const { t } = useI18n();
     const protocols = ref([]);
     const loading = ref(false);
     const quickFilter = ref('');
@@ -35,28 +37,29 @@ export default defineComponent({
     });
 
     return {
+      t,
       protocols, loading, quickFilter, filtered, load,
       columns: [
-        { key: 'number', title: '编号' },
-        { key: 'name', title: '名称' },
-        { key: 'aliases', title: '别名' },
-        { key: 'description', title: '描述' },
+        { key: 'number', title: t('protocol.columns.number') },
+        { key: 'name', title: t('protocol.columns.name') },
+        { key: 'aliases', title: t('protocol.columns.aliases') },
+        { key: 'description', title: t('protocol.columns.description') },
       ],
     };
   },
   template: `
     <div class="page-container">
       <div class="toolbar">
-        <div class="toolbar-left"><h3>系统协议</h3></div>
+        <div class="toolbar-left"><h3>{{ t('protocol.title') }}</h3></div>
         <div class="toolbar-right">
-          <input v-model="quickFilter" placeholder="搜索..." />
+          <input v-model="quickFilter" :placeholder="t('protocol.search.placeholder')" />
           <ToolbarButton icon="refresh" @click="load">{{ $t('app.refresh') }}</ToolbarButton>
         </div>
       </div>
       <DataTable :columns="columns" :data="filtered" :loading="loading" :selectable="false" :actions="[]">
         <template #aliases="{ value }">{{ (value || []).join(', ') }}</template>
       </DataTable>
-      <div style="padding:8px;color:#666;font-size:12px;">数据来源：/etc/protocols</div>
+      <div style="padding:8px;color:#666;font-size:12px;">{{ t('protocol.data.source') }}: /etc/protocols</div>
     </div>
   `,
   components: { DataTable },

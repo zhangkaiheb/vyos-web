@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, onUnmounted, watch } from '/src/utils/vue-import.js';
+import { defineComponent, ref, onMounted, onUnmounted, watch, inject } from '/src/utils/vue-import.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 
 export default defineComponent({
@@ -8,9 +8,11 @@ export default defineComponent({
     visible: { type: Boolean, default: false },
     width: { type: String, default: '600px' },
     modalClass: { type: String, default: '' },
+    hideFooter: { type: Boolean, default: false },
   },
   emits: ['update:visible', 'close', 'confirm'],
   setup(props, { emit }) {
+    const { t } = inject('i18n');
     const modalRef = ref(null);
     const dragging = ref(false);
     const startPos = ref({ x: 0, y: 0 });
@@ -64,7 +66,7 @@ export default defineComponent({
       document.body.style.userSelect = '';
     });
 
-    return { modalRef, close, confirm, onMouseDown, translate };
+    return { modalRef, close, confirm, onMouseDown, translate, t };
   },
   components: { ToolbarButton },
   template: `
@@ -77,10 +79,10 @@ export default defineComponent({
         <div class="modal-body">
           <slot />
         </div>
-        <div class="modal-footer">
+        <div v-if="!hideFooter" class="modal-footer">
           <slot name="footer">
-            <ToolbarButton icon="cancel" @click="close">取消</ToolbarButton>
-            <ToolbarButton icon="confirm" primary @click="confirm">确定</ToolbarButton>
+            <ToolbarButton icon="cancel" @click="close">{{ t('modal.cancel') }}</ToolbarButton>
+            <ToolbarButton icon="confirm" primary @click="confirm">{{ t('modal.confirm') }}</ToolbarButton>
           </slot>
         </div>
       </div>

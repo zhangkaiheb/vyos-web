@@ -5,6 +5,9 @@ import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
   if (val === undefined || val === null) return [];
@@ -21,10 +24,10 @@ function isPresent(value) {
   return true;
 }
 
-function validateIPv4(value) {
+function validateIPv4(value, t) {
   if (!value) return '';
-  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return 'IPv4 地址格式错误';
-  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return 'IPv4 地址格式错误';
+  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return t('nhrp.validation.ipv4');
+  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return t('nhrp.validation.ipv4');
   return '';
 }
 
@@ -85,6 +88,8 @@ function configToConfig(form) {
 export default defineComponent({
   name: 'NhrpPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -103,16 +108,20 @@ export default defineComponent({
     const editingNhIndex = ref(-1);
     const nhForm = ref({ nbma: '', 'remote-ip': '', holdtime: '' });
 
+    const deleteModalVisible = ref(false);
+    const pendingDeleteName = ref('');
+    const pendingDeleteIndex = ref(-1);
+
     const tunnelColumns = [
-      { key: 'name', title: '隧道名称' },
-      { key: 'holdtime', title: '保持时间' },
-      { key: 'nhs', title: 'NBMA 数量', render: (val) => val?.length || 0 },
+      { key: 'name', title: t('nhrp.columns.tunnelName') },
+      { key: 'holdtime', title: t('nhrp.columns.holdtime') },
+      { key: 'nhs', title: t('nhrp.columns.nbmaCount'), render: (val) => val?.length || 0 },
     ];
 
     const nhColumns = [
-      { key: 'nbma', title: 'NBMA 地址' },
-      { key: 'remote-ip', title: '远程 IP' },
-      { key: 'holdtime', title: '保持时间' },
+      { key: 'nbma', title: t('nhrp.columns.nbmaAddress') },
+      { key: 'remote-ip', title: t('nhrp.columns.remoteIp') },
+      { key: 'holdtime', title: t('nhrp.columns.holdtime') },
     ];
 
     const commandPath = computed(() => 'protocols nhrp tunnel');
@@ -134,7 +143,8 @@ export default defineComponent({
       saved.value = false;
       try {
         const payload = configToConfig(config.value);
-        await configApi.set('protocols nhrp', payload);
+        await configStore.setConfig('protocols nhrp', payload);
+        configStore.markPending();
         saved.value = true;
         setTimeout(() => (saved.value = false), 2000);
         tunnelModalVisible.value = false;
@@ -158,7 +168,7 @@ export default defineComponent({
     }
 
     function saveTunnel() {
-      if (!tunnelForm.value.name) return alert('请输入隧道名称');
+      if (!tunnelForm.value.name) return showError({ message: t('nhrp.errors.tunnelNameRequired') });
       if (editingTunnelIndex.value >= 0) {
         config.value.tunnels.splice(editingTunnelIndex.value, 1, JSON.parse(JSON.stringify(tunnelForm.value)));
       } else {
@@ -178,9 +188,9 @@ export default defineComponent({
     }
 
     function saveNh() {
-      if (!nhForm.value.nbma) return alert('请输入 NBMA 地址');
-      const err = validateIPv4(nhForm.value.nbma);
-      if (err) return alert(err);
+      if (!nhForm.value.nbma) return showError({ message: t('nhrp.errors.nbmaAddressRequired') });
+      const err = validateIPv4(nhForm.value.nbma, t);
+      if (err) return showError({ message: err });
       if (editingNhIndex.value >= 0) {
         tunnelForm.value.nhs.splice(editingNhIndex.value, 1, JSON.parse(JSON.stringify(nhForm.value)));
       } else {
@@ -190,21 +200,35 @@ export default defineComponent({
     }
 
     function deleteTunnel(index) {
-      if (confirm('确定删除此隧道？')) config.value.tunnels.splice(index, 1);
+      pendingDeleteName.value = config.value.tunnels[index].name;
+      pendingDeleteIndex.value = index;
+      deleteModalVisible.value = true;
+    }
+
+    function confirmDeleteTunnel() {
+      config.value.tunnels.splice(pendingDeleteIndex.value, 1);
+      deleteModalVisible.value = false;
+      pendingDeleteName.value = '';
+      pendingDeleteIndex.value = -1;
     }
     function deleteNh(index) {
       tunnelForm.value.nhs.splice(index, 1);
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
 
     return {
+      t,
       loading, saving, saved, config, activeTab, writeDisabled,
       tunnelModalVisible, editingTunnelIndex, tunnelForm,
       nhModalVisible, editingNhIndex, nhForm,
+      deleteModalVisible, pendingDeleteName, pendingDeleteIndex,
       tunnelColumns, nhColumns, commandPath,
       openTunnelModal, openNhModal,
-      deleteTunnel, deleteNh,
+      deleteTunnel, confirmDeleteTunnel, deleteNh,
       saveTunnel, saveNh,
       save, configToConfig,
     };
@@ -212,9 +236,9 @@ export default defineComponent({
   components: { TabGroup, ToolbarButton, DataTable, DraggableModal },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('nhrp.messages.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'tunnels', title: '隧道' }
+        { key: 'tunnels', title: t('nhrp.tabs.tunnels') }
       ]">
 
         <template #tunnels>
@@ -224,40 +248,36 @@ export default defineComponent({
         </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
-
       <!-- Tunnel Modal -->
-      <DraggableModal v-model:visible="tunnelModalVisible" :title="editingTunnelIndex >= 0 ? '编辑 NHRP 隧道' : '添加 NHRP 隧道'" width="700px" @confirm="saveTunnel">
+      <DraggableModal v-model:visible="tunnelModalVisible" :title="editingTunnelIndex >= 0 ? t('nhrp.modals.editTunnel') : t('nhrp.modals.addTunnel')" width="700px" @confirm="saveTunnel">
         <div class="form-row">
-          <label class="form-label">隧道名称 *</label>
-          <input type="text" class="form-control" v-model="tunnelForm.name" placeholder="例如: tun0" style="width:100%;" :disabled="editingTunnelIndex >= 0" />
+          <label class="form-label">{{ t('nhrp.labels.tunnelName') }} *</label>
+          <input type="text" class="form-control" v-model="tunnelForm.name" :placeholder="t('nhrp.placeholders.tunnelName')" style="width:100%;" :disabled="editingTunnelIndex >= 0" />
         </div>
         <div class="form-row">
-          <label class="form-label">认证密钥</label>
-          <input type="text" class="form-control" v-model="tunnelForm['authentication-key']" placeholder="认证密钥" style="width:100%;" />
+          <label class="form-label">{{ t('nhrp.labels.authenticationKey') }}</label>
+          <input type="text" class="form-control" v-model="tunnelForm['authentication-key']" :placeholder="t('nhrp.placeholders.authenticationKey')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">保持时间</label>
-          <input type="number" class="form-control" v-model="tunnelForm.holdtime" min="1" max="65535" placeholder="默认: 7200 秒" style="width:100%;" />
+          <label class="form-label">{{ t('nhrp.labels.holdtime') }}</label>
+          <input type="number" class="form-control" v-model="tunnelForm.holdtime" min="1" max="65535" :placeholder="t('nhrp.placeholders.holdtime')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">启用重定向</label>
+          <label class="form-label">{{ t('nhrp.labels.enableRedirect') }}</label>
           <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="tunnelForm['enable-redirect']" /></label>
         </div>
         <div class="form-row">
-          <label class="form-label">注册</label>
+          <label class="form-label">{{ t('nhrp.labels.register') }}</label>
           <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="tunnelForm.register" /></label>
         </div>
         <div class="form-row">
-          <label class="form-label">快捷方式</label>
+          <label class="form-label">{{ t('nhrp.labels.shortCut') }}</label>
           <label style="display:flex; align-items:center; gap:8px;"><input type="checkbox" v-model="tunnelForm['short-cut']" /></label>
         </div>
         <div style="margin-top:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <span style="font-weight:bold;">NBMA 列表</span>
-            <ToolbarButton size="small" @click="openNhModal(-1)">添加 NBMA</ToolbarButton>
+            <span style="font-weight:bold;">{{ t('nhrp.labels.nbmaList') }}</span>
+            <ToolbarButton size="small" @click="openNhModal(-1)">{{ t('nhrp.buttons.addNbma') }}</ToolbarButton>
           </div>
           <DataTable :columns="nhColumns" :data="tunnelForm.nhs" rowKey="nbma"
                      :actions="['edit', 'delete']"
@@ -266,18 +286,26 @@ export default defineComponent({
       </DraggableModal>
 
       <!-- NBMA Modal -->
-      <DraggableModal v-model:visible="nhModalVisible" :title="editingNhIndex >= 0 ? '编辑 NBMA' : '添加 NBMA'" width="500px" @confirm="saveNh">
+      <DraggableModal v-model:visible="nhModalVisible" :title="editingNhIndex >= 0 ? t('nhrp.modals.editNbma') : t('nhrp.modals.addNbma')" width="500px" @confirm="saveNh">
         <div class="form-row">
-          <label class="form-label">NBMA 地址 *</label>
-          <input type="text" class="form-control" v-model="nhForm.nbma" placeholder="IPv4 地址" style="width:100%;" :disabled="editingNhIndex >= 0" />
+          <label class="form-label">{{ t('nhrp.labels.nbmaAddress') }} *</label>
+          <input type="text" class="form-control" v-model="nhForm.nbma" :placeholder="t('nhrp.placeholders.ipv4Address')" style="width:100%;" :disabled="editingNhIndex >= 0" />
         </div>
         <div class="form-row">
-          <label class="form-label">远程 IP</label>
-          <input type="text" class="form-control" v-model="nhForm['remote-ip']" placeholder="IPv4 地址" style="width:100%;" />
+          <label class="form-label">{{ t('nhrp.labels.remoteIp') }}</label>
+          <input type="text" class="form-control" v-model="nhForm['remote-ip']" :placeholder="t('nhrp.placeholders.ipv4Address')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">保持时间</label>
-          <input type="number" class="form-control" v-model="nhForm.holdtime" min="1" max="65535" placeholder="默认: 7200 秒" style="width:100%;" />
+          <label class="form-label">{{ t('nhrp.labels.holdtime') }}</label>
+          <input type="number" class="form-control" v-model="nhForm.holdtime" min="1" max="65535" :placeholder="t('nhrp.placeholders.holdtime')" style="width:100%;" />
+        </div>
+      </DraggableModal>
+
+      <!-- Delete Confirmation Modal -->
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('nhrp.modals.confirmDelete')" width="400px" @confirm="confirmDeleteTunnel">
+        <div>{{ t('nhrp.messages.confirmDeleteTunnel') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div style="padding:2px 0;">{{ pendingDeleteName }}</div>
         </div>
       </DraggableModal>
     </div>

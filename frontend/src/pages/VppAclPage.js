@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { configApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
@@ -28,10 +28,10 @@ export default defineComponent({
   name: 'VppAclPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
+    const { t } = inject('i18n');
     const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
-    const saved = ref(false);
     const activeTab = ref('ip-acl');
 
     const config = ref({
@@ -39,36 +39,36 @@ export default defineComponent({
       mac_ip_acls: [],
     });
 
-    const ipAclColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 150 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-      { key: 'rule_count', title: '规则数', dataIndex: 'rule_count', width: 100 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const ipAclColumns = computed(() => [
+      { key: 'name', title: t('vppAcl.name'), dataIndex: 'name', width: 150 },
+      { key: 'description', title: t('vppAcl.description'), dataIndex: 'description', width: 200 },
+      { key: 'rule_count', title: t('vppAcl.ruleCount'), dataIndex: 'rule_count', width: 100 },
+      { key: 'actions', title: t('vppAcl.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
-    const ipRuleColumns = [
-      { key: 'rule_number', title: '规则号', dataIndex: 'rule_number', width: 100 },
-      { key: 'action', title: '动作', dataIndex: 'action', width: 100 },
-      { key: 'protocol', title: '协议', dataIndex: 'protocol', width: 100 },
-      { key: 'source_prefix', title: '源地址', dataIndex: 'source_prefix', width: 150 },
-      { key: 'dest_prefix', title: '目的地址', dataIndex: 'dest_prefix', width: 150 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const ipRuleColumns = computed(() => [
+      { key: 'rule_number', title: t('vppAcl.ruleNumber'), dataIndex: 'rule_number', width: 100 },
+      { key: 'action', title: t('vppAcl.action'), dataIndex: 'action', width: 100 },
+      { key: 'protocol', title: t('vppAcl.protocol'), dataIndex: 'protocol', width: 100 },
+      { key: 'source_prefix', title: t('vppAcl.sourceAddress'), dataIndex: 'source_prefix', width: 150 },
+      { key: 'dest_prefix', title: t('vppAcl.destAddress'), dataIndex: 'dest_prefix', width: 150 },
+      { key: 'actions', title: t('vppAcl.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
-    const macAclColumns = [
-      { key: 'name', title: '名称', dataIndex: 'name', width: 150 },
-      { key: 'description', title: '描述', dataIndex: 'description', width: 200 },
-      { key: 'rule_count', title: '规则数', dataIndex: 'rule_count', width: 100 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const macAclColumns = computed(() => [
+      { key: 'name', title: t('vppAcl.name'), dataIndex: 'name', width: 150 },
+      { key: 'description', title: t('vppAcl.description'), dataIndex: 'description', width: 200 },
+      { key: 'rule_count', title: t('vppAcl.ruleCount'), dataIndex: 'rule_count', width: 100 },
+      { key: 'actions', title: t('vppAcl.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
-    const macRuleColumns = [
-      { key: 'rule_number', title: '规则号', dataIndex: 'rule_number', width: 100 },
-      { key: 'action', title: '动作', dataIndex: 'action', width: 100 },
-      { key: 'mac_address', title: 'MAC地址', dataIndex: 'mac_address', width: 150 },
-      { key: 'prefix', title: 'IP前缀', dataIndex: 'prefix', width: 150 },
-      { key: 'actions', title: '操作', dataIndex: 'actions', width: 120, fixed: 'right' },
-    ];
+    const macRuleColumns = computed(() => [
+      { key: 'rule_number', title: t('vppAcl.ruleNumber'), dataIndex: 'rule_number', width: 100 },
+      { key: 'action', title: t('vppAcl.action'), dataIndex: 'action', width: 100 },
+      { key: 'mac_address', title: t('vppAcl.macAddress'), dataIndex: 'mac_address', width: 150 },
+      { key: 'prefix', title: t('vppAcl.ipPrefix'), dataIndex: 'prefix', width: 150 },
+      { key: 'actions', title: t('vppAcl.actions'), dataIndex: 'actions', width: 120, fixed: 'right' },
+    ]);
 
     const selectedIpAcls = ref([]);
     const selectedIpRules = ref([]);
@@ -187,12 +187,11 @@ export default defineComponent({
 
     async function load() {
       loading.value = true;
-      saved.value = false;
       try {
         const res = await configApi.get('vpp acl', true);
         config.value = aclToForm(res.data || {});
       } catch (e) {
-        showError(e.message || '加载失败');
+        showError(e.message || t('vppAcl.loadFailed'));
       } finally {
         loading.value = false;
       }
@@ -206,11 +205,10 @@ export default defineComponent({
         if (Object.keys(payload).length) {
           await configApi.set('vpp acl', payload);
         }
-        await configStore.commit();
-        saved.value = true;
+        configStore.markPending();
         await load();
       } catch (e) {
-        showError(e.message || '保存失败');
+        showError(e.message || t('vppAcl.saveFailed'));
       } finally {
         saving.value = false;
       }
@@ -222,22 +220,22 @@ export default defineComponent({
     }
 
     function editIpAcl() {
-      if (!selectedIpAcls.value.length) return alert('请选择要编辑的ACL');
+      if (!selectedIpAcls.value.length) return showError({ message: t('vppAcl.selectAclToEdit') });
       const row = config.value.ip_acls.find(a => a.name === selectedIpAcls.value[0]);
-      if (!row) return alert('未找到选中的ACL');
+      if (!row) return showError({ message: t('vppAcl.aclNotFound') });
       editingIpAcl.value = JSON.parse(JSON.stringify(row));
       currentIpAcl.value = row;
       showIpAclModal.value = true;
     }
 
     function removeIpAcl() {
-      if (!selectedIpAcls.value.length) return alert('请选择要删除的ACL');
+      if (!selectedIpAcls.value.length) return showError({ message: t('vppAcl.selectAclToDelete') });
       config.value.ip_acls = config.value.ip_acls.filter(a => a.name !== selectedIpAcls.value[0]);
       selectedIpAcls.value = [];
     }
 
     function saveIpAcl() {
-      if (!editingIpAcl.value.name) return alert('请输入ACL名称');
+      if (!editingIpAcl.value.name) return showError({ message: t('vppAcl.enterAclName') });
       const list = config.value.ip_acls;
       const idx = list.findIndex(a => a._name === editingIpAcl.value._name);
       if (idx >= 0) list.splice(idx, 1, { ...editingIpAcl.value });
@@ -261,21 +259,21 @@ export default defineComponent({
     }
 
     function editIpRule() {
-      if (!selectedIpRules.value.length) return alert('请选择要编辑的规则');
+      if (!selectedIpRules.value.length) return showError({ message: t('vppAcl.selectRuleToEdit') });
       const row = editingIpAcl.value.rules.find(r => r.rule_number === selectedIpRules.value[0]);
-      if (!row) return alert('未找到选中的规则');
+      if (!row) return showError({ message: t('vppAcl.ruleNotFound') });
       editingIpRule.value = JSON.parse(JSON.stringify(row));
       showIpRuleModal.value = true;
     }
 
     function removeIpRule() {
-      if (!selectedIpRules.value.length) return alert('请选择要删除的规则');
+      if (!selectedIpRules.value.length) return showError({ message: t('vppAcl.selectRuleToDelete') });
       editingIpAcl.value.rules = editingIpAcl.value.rules.filter(r => r.rule_number !== selectedIpRules.value[0]);
       selectedIpRules.value = [];
     }
 
     function saveIpRule() {
-      if (!editingIpRule.value.rule_number) return alert('请输入规则号');
+      if (!editingIpRule.value.rule_number) return showError({ message: t('vppAcl.enterRuleNumber') });
       const list = editingIpAcl.value.rules;
       const idx = list.findIndex(r => r._rule_number === editingIpRule.value._rule_number);
       if (idx >= 0) list.splice(idx, 1, { ...editingIpRule.value });
@@ -290,22 +288,22 @@ export default defineComponent({
     }
 
     function editMacAcl() {
-      if (!selectedMacAcls.value.length) return alert('请选择要编辑的ACL');
+      if (!selectedMacAcls.value.length) return showError({ message: t('vppAcl.selectAclToEdit') });
       const row = config.value.mac_ip_acls.find(a => a.name === selectedMacAcls.value[0]);
-      if (!row) return alert('未找到选中的ACL');
+      if (!row) return showError({ message: t('vppAcl.aclNotFound') });
       editingMacAcl.value = JSON.parse(JSON.stringify(row));
       currentMacAcl.value = row;
       showMacAclModal.value = true;
     }
 
     function removeMacAcl() {
-      if (!selectedMacAcls.value.length) return alert('请选择要删除的ACL');
+      if (!selectedMacAcls.value.length) return showError({ message: t('vppAcl.selectAclToDelete') });
       config.value.mac_ip_acls = config.value.mac_ip_acls.filter(a => a.name !== selectedMacAcls.value[0]);
       selectedMacAcls.value = [];
     }
 
     function saveMacAcl() {
-      if (!editingMacAcl.value.name) return alert('请输入ACL名称');
+      if (!editingMacAcl.value.name) return showError({ message: t('vppAcl.enterAclName') });
       const list = config.value.mac_ip_acls;
       const idx = list.findIndex(a => a._name === editingMacAcl.value._name);
       if (idx >= 0) list.splice(idx, 1, { ...editingMacAcl.value });
@@ -326,21 +324,21 @@ export default defineComponent({
     }
 
     function editMacRule() {
-      if (!selectedMacRules.value.length) return alert('请选择要编辑的规则');
+      if (!selectedMacRules.value.length) return showError({ message: t('vppAcl.selectRuleToEdit') });
       const row = editingMacAcl.value.rules.find(r => r.rule_number === selectedMacRules.value[0]);
-      if (!row) return alert('未找到选中的规则');
+      if (!row) return showError({ message: t('vppAcl.ruleNotFound') });
       editingMacRule.value = JSON.parse(JSON.stringify(row));
       showMacRuleModal.value = true;
     }
 
     function removeMacRule() {
-      if (!selectedMacRules.value.length) return alert('请选择要删除的规则');
+      if (!selectedMacRules.value.length) return showError({ message: t('vppAcl.selectRuleToDelete') });
       editingMacAcl.value.rules = editingMacAcl.value.rules.filter(r => r.rule_number !== selectedMacRules.value[0]);
       selectedMacRules.value = [];
     }
 
     function saveMacRule() {
-      if (!editingMacRule.value.rule_number) return alert('请输入规则号');
+      if (!editingMacRule.value.rule_number) return showError({ message: t('vppAcl.enterRuleNumber') });
       const list = editingMacAcl.value.rules;
       const idx = list.findIndex(r => r._rule_number === editingMacRule.value._rule_number);
       if (idx >= 0) list.splice(idx, 1, { ...editingMacRule.value });
@@ -355,7 +353,8 @@ export default defineComponent({
     });
 
     return {
-      loading, saving, saved, config, activeTab, commandPath,
+      t,
+      loading, saving, config, activeTab, commandPath,
       ipAclColumns, ipRuleColumns, macAclColumns, macRuleColumns,
       selectedIpAcls, selectedIpRules, selectedMacAcls, selectedMacRules,
       showIpAclModal, editingIpAcl, showIpRuleModal, editingIpRule, currentIpAcl,
@@ -369,18 +368,17 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'ip-acl', title: 'IP ACL' },
-        { key: 'mac-ip-acl', title: 'MAC-IP ACL' }
+        { key: 'ip-acl', title: t('vppAcl.ipAcl') },
+        { key: 'mac-ip-acl', title: t('vppAcl.macIpAcl') }
       ]">
 
       <template #ip-acl>
-        <div style="font-weight:bold;margin:16px 0 8px;">IP ACL列表</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('vppAcl.ipAclList') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createIpAcl">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editIpAcl" :disabled="!selectedIpAcls.length || selectedIpAcls.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeIpAcl" :disabled="!selectedIpAcls.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createIpAcl">{{ t('vppAcl.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editIpAcl" :disabled="!selectedIpAcls.length || selectedIpAcls.length > 1">{{ t('vppAcl.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeIpAcl" :disabled="!selectedIpAcls.length">{{ t('vppAcl.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="ipAclColumns" :data="config.ip_acls" rowKey="name" :externalToolbar="true" @selection-change="selectedIpAcls = $event" :selectable="true">
           <template #bodyCell="{ column, record }">
@@ -391,22 +389,22 @@ export default defineComponent({
         </DataTable>
 
         <div v-if="editingIpAcl && showIpAclModal" style="margin-top:16px;">
-          <div style="font-weight:bold;margin:16px 0 8px;">规则管理 ({{ editingIpAcl.name }})</div>
+          <div style="font-weight:bold;margin:16px 0 8px;">{{ t('vppAcl.ruleManagement') }} ({{ editingIpAcl.name }})</div>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createIpRule">添加规则</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editIpRule" :disabled="!selectedIpRules.length || selectedIpRules.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeIpRule" :disabled="!selectedIpRules.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createIpRule">{{ t('vppAcl.addRule') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editIpRule" :disabled="!selectedIpRules.length || selectedIpRules.length > 1">{{ t('vppAcl.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeIpRule" :disabled="!selectedIpRules.length">{{ t('vppAcl.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="ipRuleColumns" :data="editingIpAcl.rules" rowKey="rule_number" :externalToolbar="true" @selection-change="selectedIpRules = $event" :selectable="true" />
         </div>
       </template>
 
       <template #mac-ip-acl>
-        <div style="font-weight:bold;margin:16px 0 8px;">MAC-IP ACL列表</div>
+        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('vppAcl.macIpAclList') }}</div>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createMacAcl">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editMacAcl" :disabled="!selectedMacAcls.length || selectedMacAcls.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeMacAcl" :disabled="!selectedMacAcls.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createMacAcl">{{ t('vppAcl.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editMacAcl" :disabled="!selectedMacAcls.length || selectedMacAcls.length > 1">{{ t('vppAcl.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeMacAcl" :disabled="!selectedMacAcls.length">{{ t('vppAcl.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="macAclColumns" :data="config.mac_ip_acls" rowKey="name" :externalToolbar="true" @selection-change="selectedMacAcls = $event" :selectable="true">
           <template #bodyCell="{ column, record }">
@@ -417,65 +415,61 @@ export default defineComponent({
         </DataTable>
 
         <div v-if="editingMacAcl && showMacAclModal" style="margin-top:16px;">
-          <div style="font-weight:bold;margin:16px 0 8px;">规则管理 ({{ editingMacAcl.name }})</div>
+          <div style="font-weight:bold;margin:16px 0 8px;">{{ t('vppAcl.ruleManagement') }} ({{ editingMacAcl.name }})</div>
           <div class="toolbar">
-            <ToolbarButton icon="create" @click="createMacRule">添加规则</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editMacRule" :disabled="!selectedMacRules.length || selectedMacRules.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeMacRule" :disabled="!selectedMacRules.length">删除</ToolbarButton>
+            <ToolbarButton icon="create" @click="createMacRule">{{ t('vppAcl.addRule') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editMacRule" :disabled="!selectedMacRules.length || selectedMacRules.length > 1">{{ t('vppAcl.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeMacRule" :disabled="!selectedMacRules.length">{{ t('vppAcl.delete') }}</ToolbarButton>
           </div>
           <DataTable :columns="macRuleColumns" :data="editingMacAcl.rules" rowKey="rule_number" :externalToolbar="true" @selection-change="selectedMacRules = $event" :selectable="true" />
         </div>
       </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving">{{ saving ? '保存中...' : '保存配置' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="showIpAclModal" :title="editingIpAcl && editingIpAcl._name ? '编辑IP ACL' : '新建IP ACL'" @confirm="saveIpAcl" @close="showIpAclModal = false" width="800px">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingIpAcl.name" :disabled="editingIpAcl._name" title="ACL名称" /></div>
-        <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingIpAcl.description" title="ACL描述" /></div>
+      <DraggableModal v-model:visible="showIpAclModal" :title="editingIpAcl && editingIpAcl._name ? t('vppAcl.editIpAcl') : t('vppAcl.newIpAcl')" @confirm="saveIpAcl" @close="showIpAclModal = false" width="800px">
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.name') }}</label><input class="form-control" v-model="editingIpAcl.name" :disabled="editingIpAcl._name" :title="t('vppAcl.aclName')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.description') }}</label><input class="form-control" v-model="editingIpAcl.description" :title="t('vppAcl.aclDescription')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showIpRuleModal" :title="editingIpRule && editingIpRule._rule_number ? '编辑规则' : '添加规则'" @confirm="saveIpRule" @close="showIpRuleModal = false" width="700px">
-        <div class="form-row"><label class="form-label">规则号</label><input class="form-control" type="number" min="1" max="4294967295" v-model="editingIpRule.rule_number" :disabled="editingIpRule._rule_number" title="规则编号" /></div>
-        <div class="form-row"><label class="form-label">动作</label>
-          <select class="form-control" v-model="editingIpRule.action" title="规则动作">
-            <option value="permit">允许</option>
-            <option value="deny">拒绝</option>
-            <option value="permit-reflect">允许并反射</option>
+      <DraggableModal v-model:visible="showIpRuleModal" :title="editingIpRule && editingIpRule._rule_number ? t('vppAcl.editRule') : t('vppAcl.addRule')" @confirm="saveIpRule" @close="showIpRuleModal = false" width="700px">
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.ruleNumber') }}</label><input class="form-control" type="number" min="1" max="4294967295" v-model="editingIpRule.rule_number" :disabled="editingIpRule._rule_number" :title="t('vppAcl.ruleNumber')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.action') }}</label>
+          <select class="form-control" v-model="editingIpRule.action" :title="t('vppAcl.ruleAction')">
+            <option value="permit">{{ t('vppAcl.permit') }}</option>
+            <option value="deny">{{ t('vppAcl.deny') }}</option>
+            <option value="permit-reflect">{{ t('vppAcl.permitReflect') }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">协议</label>
-          <select class="form-control" v-model="editingIpRule.protocol" title="IP协议">
-            <option value="all">所有</option>
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.protocol') }}</label>
+          <select class="form-control" v-model="editingIpRule.protocol" :title="t('vppAcl.ipProtocol')">
+            <option value="all">{{ t('vppAcl.all') }}</option>
             <option value="tcp">TCP</option>
             <option value="udp">UDP</option>
             <option value="icmp">ICMP</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">源地址</label><input class="form-control" v-model="editingIpRule.source_prefix" placeholder="x.x.x.x/x" title="源IP前缀" /></div>
-        <div class="form-row"><label class="form-label">源端口</label><input class="form-control" v-model="editingIpRule.source_port" placeholder="1-65535" title="源端口" /></div>
-        <div class="form-row"><label class="form-label">目的地址</label><input class="form-control" v-model="editingIpRule.dest_prefix" placeholder="x.x.x.x/x" title="目的IP前缀" /></div>
-        <div class="form-row"><label class="form-label">目的端口</label><input class="form-control" v-model="editingIpRule.dest_port" placeholder="1-65535" title="目的端口" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.sourceAddress') }}</label><input class="form-control" v-model="editingIpRule.source_prefix" placeholder="x.x.x.x/x" :title="t('vppAcl.sourceIpPrefix')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.sourcePort') }}</label><input class="form-control" v-model="editingIpRule.source_port" placeholder="1-65535" :title="t('vppAcl.sourcePort')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.destAddress') }}</label><input class="form-control" v-model="editingIpRule.dest_prefix" placeholder="x.x.x.x/x" :title="t('vppAcl.destIpPrefix')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.destPort') }}</label><input class="form-control" v-model="editingIpRule.dest_port" placeholder="1-65535" :title="t('vppAcl.destPort')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showMacAclModal" :title="editingMacAcl && editingMacAcl._name ? '编辑MAC-IP ACL' : '新建MAC-IP ACL'" @confirm="saveMacAcl" @close="showMacAclModal = false" width="800px">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingMacAcl.name" :disabled="editingMacAcl._name" title="ACL名称" /></div>
-        <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingMacAcl.description" title="ACL描述" /></div>
+      <DraggableModal v-model:visible="showMacAclModal" :title="editingMacAcl && editingMacAcl._name ? t('vppAcl.editMacIpAcl') : t('vppAcl.newMacIpAcl')" @confirm="saveMacAcl" @close="showMacAclModal = false" width="800px">
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.name') }}</label><input class="form-control" v-model="editingMacAcl.name" :disabled="editingMacAcl._name" :title="t('vppAcl.aclName')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.description') }}</label><input class="form-control" v-model="editingMacAcl.description" :title="t('vppAcl.aclDescription')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showMacRuleModal" :title="editingMacRule && editingMacRule._rule_number ? '编辑规则' : '添加规则'" @confirm="saveMacRule" @close="showMacRuleModal = false" width="600px">
-        <div class="form-row"><label class="form-label">规则号</label><input class="form-control" type="number" min="1" max="4294967295" v-model="editingMacRule.rule_number" :disabled="editingMacRule._rule_number" title="规则编号" /></div>
-        <div class="form-row"><label class="form-label">动作</label>
-          <select class="form-control" v-model="editingMacRule.action" title="规则动作">
-            <option value="permit">允许</option>
-            <option value="deny">拒绝</option>
+      <DraggableModal v-model:visible="showMacRuleModal" :title="editingMacRule && editingMacRule._rule_number ? t('vppAcl.editRule') : t('vppAcl.addRule')" @confirm="saveMacRule" @close="showMacRuleModal = false" width="600px">
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.ruleNumber') }}</label><input class="form-control" type="number" min="1" max="4294967295" v-model="editingMacRule.rule_number" :disabled="editingMacRule._rule_number" :title="t('vppAcl.ruleNumber')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.action') }}</label>
+          <select class="form-control" v-model="editingMacRule.action" :title="t('vppAcl.ruleAction')">
+            <option value="permit">{{ t('vppAcl.permit') }}</option>
+            <option value="deny">{{ t('vppAcl.deny') }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">MAC地址</label><input class="form-control" v-model="editingMacRule.mac_address" placeholder="xx:xx:xx:xx:xx:xx" title="MAC地址" /></div>
-        <div class="form-row"><label class="form-label">MAC掩码</label><input class="form-control" v-model="editingMacRule.mac_mask" placeholder="ff:ff:ff:ff:ff:ff" title="MAC掩码" /></div>
-        <div class="form-row"><label class="form-label">IP前缀</label><input class="form-control" v-model="editingMacRule.prefix" placeholder="x.x.x.x/x" title="IP前缀" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.macAddress') }}</label><input class="form-control" v-model="editingMacRule.mac_address" placeholder="xx:xx:xx:xx:xx:xx" :title="t('vppAcl.macAddress')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.macMask') }}</label><input class="form-control" v-model="editingMacRule.mac_mask" placeholder="ff:ff:ff:ff:ff:ff" :title="t('vppAcl.macMask')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('vppAcl.ipPrefix') }}</label><input class="form-control" v-model="editingMacRule.prefix" placeholder="x.x.x.x/x" :title="t('vppAcl.ipPrefix')" /></div>
       </DraggableModal>
     </div>
   `,

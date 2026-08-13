@@ -1,6 +1,8 @@
-import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
@@ -8,7 +10,7 @@ import TabGroup from '/src/components/Layout/TabGroup.js';
 
 // Options
 const BOND_MODE_OPTIONS = [
-  { value: '802.3ad', label: '802.3ad - IEEE 802.3ad Dynamic link aggregation (默认)' },
+  { value: '802.3ad', label: '802.3ad - IEEE 802.3ad Dynamic link aggregation' },
   { value: 'active-backup', label: 'active-backup - Fault tolerant: only one slave is active' },
   { value: 'balance-rr', label: 'balance-rr - Round-robin policy' },
   { value: 'balance-xor', label: 'balance-xor - XOR policy' },
@@ -18,7 +20,7 @@ const BOND_MODE_OPTIONS = [
 ];
 
 const HASH_POLICY_OPTIONS = [
-  { value: 'layer2', label: 'layer2 - MAC addresses (默认)' },
+  { value: 'layer2', label: 'layer2 - MAC addresses' },
   { value: 'layer2+3', label: 'layer2+3 - MAC + IP address' },
   { value: 'layer3+4', label: 'layer3+4 - IP address + port' },
   { value: 'encap2+3', label: 'encap2+3 - Encapsulated MAC + IP' },
@@ -26,7 +28,7 @@ const HASH_POLICY_OPTIONS = [
 ];
 
 const LACP_RATE_OPTIONS = [
-  { value: 'slow', label: 'slow (默认)' },
+  { value: 'slow', label: 'slow' },
   { value: 'fast', label: 'fast' },
 ];
 
@@ -38,24 +40,25 @@ const SOURCE_VALIDATION_OPTIONS = [
 
 const ACCEPT_DAD_OPTIONS = [
   { value: '0', label: '0 - Disable DAD' },
-  { value: '1', label: '1 - Enable DAD (默认)' },
+  { value: '1', label: '1 - Enable DAD' },
   { value: '2', label: '2 - Enable DAD, disable if duplicate MAC found' },
-];
-
-const COLUMNS = [
-  { key: 'name', title: '接口名称', dataIndex: 'name', width: 120 },
-  { key: 'description', title: '描述', dataIndex: 'description', width: 150 },
-  { key: 'mode', title: '模式', dataIndex: 'mode', width: 120 },
-  { key: 'member_count', title: '成员数', dataIndex: 'member_count', width: 80 },
-  { key: 'mtu', title: 'MTU', dataIndex: 'mtu', width: 80 },
-  { key: 'disable', title: '禁用', width: 80 },
-  { key: 'actions', title: '操作', width: 120 },
 ];
 
 export default defineComponent({
   name: 'BondingPage',
   components: { DataTable, DraggableModal, ConfigForm, TabGroup },
   setup() {
+    const { t } = inject('i18n');
+    const configStore = useConfigStore();
+    const COLUMNS = computed(() => [
+      { key: 'name', title: t('interface.bonding.name'), dataIndex: 'name', width: 120 },
+      { key: 'description', title: t('interface.bonding.description'), dataIndex: 'description', width: 150 },
+      { key: 'mode', title: t('interface.bonding.mode'), dataIndex: 'mode', width: 120 },
+      { key: 'member_count', title: t('interface.bonding.member_count'), dataIndex: 'member_count', width: 80 },
+      { key: 'mtu', title: t('interface.bonding.mtu'), dataIndex: 'mtu', width: 80 },
+      { key: 'disable', title: t('interface.bonding.disable'), dataIndex: 'disable', width: 80 },
+      { key: 'actions', title: t('interface.bonding.actions'), dataIndex: 'actions', width: 120 },
+    ]);
     const loading = ref(false);
     const bonds = ref([]);
     const selected = ref([]);
@@ -63,102 +66,104 @@ export default defineComponent({
     const editingBond = ref(null);
     const interfaceOptions = ref([]);
     const activeTab = ref('basic');
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNames = ref([]);
 
     // Schema definitions
     const basicSchema = computed(() => [
-      { key: 'name', title: '接口名称', type: 'text', required: true, placeholder: '如 bond0, bond1', help: '格式: bondN' },
-      { key: 'description', title: '描述', type: 'text', placeholder: '接口描述' },
-      { key: 'mac', title: 'MAC 地址', type: 'text', placeholder: '如 00:11:22:33:44:55', help: '硬件 MAC 地址' },
-      { key: 'mode', title: '模式', type: 'select', options: BOND_MODE_OPTIONS, help: '绑定模式 (默认: 802.3ad)' },
-      { key: 'hash_policy', title: '哈希策略', type: 'select', options: HASH_POLICY_OPTIONS, help: '传输哈希策略 (默认: layer2)' },
-      { key: 'lacp_rate', title: 'LACP 速率', type: 'select', options: LACP_RATE_OPTIONS, help: 'LACPDU 发送速率 (默认: slow)' },
-      { key: 'members', title: '成员接口', type: 'select', options: interfaceOptions.value.map(i => ({ value: i, label: i })), placeholder: '选择成员接口', help: '绑定成员接口列表', multiple: true },
-      { key: 'primary', title: '主接口', type: 'select', options: interfaceOptions.value.map(i => ({ value: i, label: i })), placeholder: '选择主接口', help: '主设备接口' },
-      { key: 'min_links', title: '最小成员数', type: 'number', min: 0, max: 16, placeholder: '0-16', help: '启用绑定前所需的最小成员接口数 (默认: 0)' },
-      { key: 'mii_mon_interval', title: 'MII 监控间隔', type: 'number', min: 0, max: 1000, placeholder: '0 或 50-1000', help: 'MII 链路监控频率 (毫秒, 默认: 100, 0=禁用)' },
-      { key: 'mtu', title: 'MTU', type: 'number', min: 68, max: 16000, placeholder: '68-16000', help: '最大传输单元 (默认: 1500)' },
-      { key: 'system_mac', title: '系统 MAC', type: 'text', placeholder: '如 00:11:22:33:44:55', help: '802.3ad 系统 MAC 地址' },
-      { key: 'disable', title: '禁用接口', type: 'checkbox', help: '管理性禁用接口' },
-      { key: 'disable_link_detect', title: '忽略链路状态', type: 'checkbox', help: '忽略链路状态变化' },
+      { key: 'name', title: t('interface.bonding.name'), type: 'text', required: true, placeholder: t('interface.bonding.name_placeholder'), help: t('interface.bonding.name_help') },
+      { key: 'description', title: t('interface.bonding.description'), type: 'text', placeholder: t('interface.bonding.description_placeholder') },
+      { key: 'mac', title: t('interface.bonding.mac'), type: 'text', placeholder: t('interface.bonding.mac_placeholder'), help: t('interface.bonding.mac_help') },
+      { key: 'mode', title: t('interface.bonding.mode'), type: 'select', options: BOND_MODE_OPTIONS, help: t('interface.bonding.mode_help') },
+      { key: 'hash_policy', title: t('interface.bonding.hash_policy'), type: 'select', options: HASH_POLICY_OPTIONS, help: t('interface.bonding.hash_policy_help') },
+      { key: 'lacp_rate', title: t('interface.bonding.lacp_rate'), type: 'select', options: LACP_RATE_OPTIONS, help: t('interface.bonding.lacp_rate_help') },
+      { key: 'members', title: t('interface.bonding.members'), type: 'select', options: interfaceOptions.value.map(i => ({ value: i, label: i })), placeholder: t('interface.bonding.members_placeholder'), help: t('interface.bonding.members_help'), multiple: true },
+      { key: 'primary', title: t('interface.bonding.primary'), type: 'select', options: interfaceOptions.value.map(i => ({ value: i, label: i })), placeholder: t('interface.bonding.primary_placeholder'), help: t('interface.bonding.primary_help') },
+      { key: 'min_links', title: t('interface.bonding.min_links'), type: 'number', min: 0, max: 16, placeholder: t('interface.bonding.min_links_placeholder'), help: t('interface.bonding.min_links_help') },
+      { key: 'mii_mon_interval', title: t('interface.bonding.mii_mon_interval'), type: 'number', min: 0, max: 1000, placeholder: t('interface.bonding.mii_mon_interval_placeholder'), help: t('interface.bonding.mii_mon_interval_help') },
+      { key: 'mtu', title: t('interface.bonding.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('interface.bonding.mtu_placeholder'), help: t('interface.bonding.mtu_help') },
+      { key: 'system_mac', title: t('interface.bonding.system_mac'), type: 'text', placeholder: t('interface.bonding.system_mac_placeholder'), help: t('interface.bonding.system_mac_help') },
+      { key: 'disable', title: t('interface.bonding.disable_interface'), type: 'checkbox', help: t('interface.bonding.disable_interface_help') },
+      { key: 'disable_link_detect', title: t('interface.bonding.disable_link_detect'), type: 'checkbox', help: t('interface.bonding.disable_link_detect_help') },
     ]);
 
     const arpMonitorSchema = computed(() => [
-      { key: 'arp_interval', title: 'ARP 监控间隔', type: 'number', min: 0, max: 4294967295, placeholder: '0-4294967295', help: 'ARP 链路监控频率 (毫秒)' },
-      { key: 'arp_targets', title: 'ARP 目标地址', type: 'textarea', placeholder: '每行一个 IP 地址', help: '用于 ARP 监控的 IP 地址' },
+      { key: 'arp_interval', title: t('interface.bonding.arp_interval'), type: 'number', min: 0, max: 4294967295, placeholder: t('interface.bonding.arp_interval_placeholder'), help: t('interface.bonding.arp_interval_help') },
+      { key: 'arp_targets', title: t('interface.bonding.arp_targets'), type: 'textarea', placeholder: t('interface.bonding.arp_targets_placeholder'), help: t('interface.bonding.arp_targets_help') },
     ]);
 
     const dhcpSchema = computed(() => [
-      { key: 'dhcp_client_id', title: '客户端 ID', type: 'text', placeholder: 'DHCP 选项字符串', help: '客户端标识符' },
-      { key: 'dhcp_default_route_distance', title: '默认路由距离', type: 'number', min: 1, max: 255, placeholder: '1-255', help: '默认路由距离 (默认: 210)' },
-      { key: 'dhcp_host_name', title: '主机名', type: 'text', placeholder: '覆盖系统主机名', help: '发送到 DHCP 服务器的主机名' },
-      { key: 'dhcp_mtu', title: '使用 DHCP MTU', type: 'checkbox', help: '使用 DHCP 服务器的 MTU 值' },
-      { key: 'dhcp_no_default_route', title: '不安装默认路由', type: 'checkbox', help: '不安装默认路由到系统' },
-      { key: 'dhcp_reject', title: '拒绝地址', type: 'textarea', placeholder: '每行一个 IP 或子网', help: '拒绝 DHCP 租约的 IP 地址或子网' },
-      { key: 'dhcp_user_class', title: '用户类别', type: 'text', placeholder: 'DHCP 选项字符串', help: '用户可配置选项' },
-      { key: 'dhcp_vendor_class_id', title: '厂商标识', type: 'text', placeholder: 'DHCP 选项字符串', help: '厂商标识符' },
+      { key: 'dhcp_client_id', title: t('interface.bonding.dhcp.client_id'), type: 'text', placeholder: t('interface.bonding.dhcp.client_id_placeholder'), help: t('interface.bonding.dhcp.client_id_help') },
+      { key: 'dhcp_default_route_distance', title: t('interface.bonding.dhcp.default_route_distance'), type: 'number', min: 1, max: 255, placeholder: t('interface.bonding.dhcp.default_route_distance_placeholder'), help: t('interface.bonding.dhcp.default_route_distance_help') },
+      { key: 'dhcp_host_name', title: t('interface.bonding.dhcp.host_name'), type: 'text', placeholder: t('interface.bonding.dhcp.host_name_placeholder'), help: t('interface.bonding.dhcp.host_name_help') },
+      { key: 'dhcp_mtu', title: t('interface.bonding.dhcp.use_mtu'), type: 'checkbox', help: t('interface.bonding.dhcp.use_mtu_help') },
+      { key: 'dhcp_no_default_route', title: t('interface.bonding.dhcp.no_default_route'), type: 'checkbox', help: t('interface.bonding.dhcp.no_default_route_help') },
+      { key: 'dhcp_reject', title: t('interface.bonding.dhcp.reject'), type: 'textarea', placeholder: t('interface.bonding.dhcp.reject_placeholder'), help: t('interface.bonding.dhcp.reject_help') },
+      { key: 'dhcp_user_class', title: t('interface.bonding.dhcp.user_class'), type: 'text', placeholder: t('interface.bonding.dhcp.user_class_placeholder'), help: t('interface.bonding.dhcp.user_class_help') },
+      { key: 'dhcp_vendor_class_id', title: t('interface.bonding.dhcp.vendor_class_id'), type: 'text', placeholder: t('interface.bonding.dhcp.vendor_class_id_placeholder'), help: t('interface.bonding.dhcp.vendor_class_id_help') },
     ]);
 
     const dhcpv6Schema = computed(() => [
-      { key: 'dhcpv6_duid', title: 'DUID', type: 'text', placeholder: '如 00:01:00:01:2a:3b:4c:5d', help: 'DHCP 唯一标识符' },
-      { key: 'dhcpv6_no_release', title: '不发送释放消息', type: 'checkbox', help: '客户端退出时不发送释放消息' },
-      { key: 'dhcpv6_no_request_dns', title: '不请求 DNS', type: 'checkbox', help: '不请求 DNS 服务器' },
-      { key: 'dhcpv6_no_request_domain', title: '不请求域名', type: 'checkbox', help: '不请求域名' },
-      { key: 'dhcpv6_parameters_only', title: '仅参数', type: 'checkbox', help: '仅获取配置参数,不获取地址' },
-      { key: 'dhcpv6_rapid_commit', title: '快速提交', type: 'checkbox', help: '等待立即回复而非广告' },
-      { key: 'dhcpv6_temporary', title: '临时地址', type: 'checkbox', help: 'IPv6 临时地址' },
+      { key: 'dhcpv6_duid', title: t('interface.bonding.dhcpv6.duid'), type: 'text', placeholder: t('interface.bonding.dhcpv6.duid_placeholder'), help: t('interface.bonding.dhcpv6.duid_help') },
+      { key: 'dhcpv6_no_release', title: t('interface.bonding.dhcpv6.no_release'), type: 'checkbox', help: t('interface.bonding.dhcpv6.no_release_help') },
+      { key: 'dhcpv6_no_request_dns', title: t('interface.bonding.dhcpv6.no_request_dns'), type: 'checkbox', help: t('interface.bonding.dhcpv6.no_request_dns_help') },
+      { key: 'dhcpv6_no_request_domain', title: t('interface.bonding.dhcpv6.no_request_domain'), type: 'checkbox', help: t('interface.bonding.dhcpv6.no_request_domain_help') },
+      { key: 'dhcpv6_parameters_only', title: t('interface.bonding.dhcpv6.parameters_only'), type: 'checkbox', help: t('interface.bonding.dhcpv6.parameters_only_help') },
+      { key: 'dhcpv6_rapid_commit', title: t('interface.bonding.dhcpv6.rapid_commit'), type: 'checkbox', help: t('interface.bonding.dhcpv6.rapid_commit_help') },
+      { key: 'dhcpv6_temporary', title: t('interface.bonding.dhcpv6.temporary'), type: 'checkbox', help: t('interface.bonding.dhcpv6.temporary_help') },
     ]);
 
     const eapolSchema = computed(() => [
-      { key: 'eapol_ca_certificate', title: 'CA 证书', type: 'text', placeholder: 'PKI 配置中的 CA 证书名称', help: '证书颁发机构链' },
-      { key: 'eapol_certificate', title: '证书', type: 'text', placeholder: 'PKI 配置中的证书名称', help: 'PKI 配置中的证书' },
-      { key: 'eapol_passphrase', title: '密码短语', type: 'password', placeholder: '私钥密码短语', help: '解密私钥的密码短语' },
+      { key: 'eapol_ca_certificate', title: t('interface.bonding.eapol.ca_certificate'), type: 'text', placeholder: t('interface.bonding.eapol.ca_certificate_placeholder'), help: t('interface.bonding.eapol.ca_certificate_help') },
+      { key: 'eapol_certificate', title: t('interface.bonding.eapol.certificate'), type: 'text', placeholder: t('interface.bonding.eapol.certificate_placeholder'), help: t('interface.bonding.eapol.certificate_help') },
+      { key: 'eapol_passphrase', title: t('interface.bonding.eapol.passphrase'), type: 'password', placeholder: t('interface.bonding.eapol.passphrase_placeholder'), help: t('interface.bonding.eapol.passphrase_help') },
     ]);
 
     const evpnSchema = computed(() => [
-      { key: 'evpn_es_df_pref', title: 'DF 偏好值', type: 'number', min: 1, max: 65535, placeholder: '1-65535', help: '指定转发器选举偏好值' },
-      { key: 'evpn_es_id', title: 'ES ID', type: 'text', placeholder: '1-16777215 或 00:11:22:33:44:55:AA:BB:CC:DD', help: '以太网段标识符' },
-      { key: 'evpn_es_sys_mac', title: 'ES 系统 MAC', type: 'text', placeholder: '如 00:11:22:33:44:55', help: '以太网段系统 MAC' },
-      { key: 'evpn_uplink', title: '上行链路', type: 'checkbox', help: '到 VXLAN 核心的上行链路' },
+      { key: 'evpn_es_df_pref', title: t('interface.bonding.evpn.es_df_pref'), type: 'number', min: 1, max: 65535, placeholder: t('interface.bonding.evpn.es_df_pref_placeholder'), help: t('interface.bonding.evpn.es_df_pref_help') },
+      { key: 'evpn_es_id', title: t('interface.bonding.evpn.es_id'), type: 'text', placeholder: t('interface.bonding.evpn.es_id_placeholder'), help: t('interface.bonding.evpn.es_id_help') },
+      { key: 'evpn_es_sys_mac', title: t('interface.bonding.evpn.es_sys_mac'), type: 'text', placeholder: t('interface.bonding.evpn.es_sys_mac_placeholder'), help: t('interface.bonding.evpn.es_sys_mac_help') },
+      { key: 'evpn_uplink', title: t('interface.bonding.evpn.uplink'), type: 'checkbox', help: t('interface.bonding.evpn.uplink_help') },
     ]);
 
     const ipSchema = computed(() => [
-      { key: 'ip_adjust_mss', title: '调整 MSS', type: 'select', options: [
-        { value: 'clamp-mss-to-pmtu', label: 'clamp-mss-to-pmtu - 自动设置 MSS' },
-      ], placeholder: '选择或输入 536-65535', help: '调整 TCP MSS 值' },
-      { key: 'ip_arp_cache_timeout', title: 'ARP 缓存超时', type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: 'ARP 缓存条目超时 (秒, 默认: 30)' },
-      { key: 'ip_disable_arp_filter', title: '禁用 ARP 过滤', type: 'checkbox', help: '禁用 ARP 过滤' },
-      { key: 'ip_disable_forwarding', title: '禁用 IP 转发', type: 'checkbox', help: '禁用 IP 转发' },
-      { key: 'ip_enable_arp_accept', title: '启用 ARP 接受', type: 'checkbox', help: '启用 ARP 接受' },
-      { key: 'ip_enable_arp_announce', title: '启用 ARP 宣告', type: 'checkbox', help: '启用 ARP 宣告' },
-      { key: 'ip_enable_arp_ignore', title: '启用 ARP 忽略', type: 'checkbox', help: '启用 ARP 忽略' },
-      { key: 'ip_enable_directed_broadcast', title: '启用定向广播', type: 'checkbox', help: '启用定向广播转发' },
-      { key: 'ip_enable_proxy_arp', title: '启用 Proxy ARP', type: 'checkbox', help: '启用代理 ARP' },
-      { key: 'ip_proxy_arp_pvlan', title: 'Proxy ARP PVLAN', type: 'checkbox', help: '启用私有 VLAN 代理 ARP' },
-      { key: 'ip_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
+      { key: 'ip_adjust_mss', title: t('interface.bonding.ip.adjust_mss'), type: 'select', options: [
+        { value: 'clamp-mss-to-pmtu', label: 'clamp-mss-to-pmtu' },
+      ], placeholder: t('interface.bonding.ip.adjust_mss_placeholder'), help: t('interface.bonding.ip.adjust_mss_help') },
+      { key: 'ip_arp_cache_timeout', title: t('interface.bonding.ip.arp_cache_timeout'), type: 'number', min: 1, max: 86400, placeholder: t('interface.bonding.ip.arp_cache_timeout_placeholder'), help: t('interface.bonding.ip.arp_cache_timeout_help') },
+      { key: 'ip_disable_arp_filter', title: t('interface.bonding.ip.disable_arp_filter'), type: 'checkbox', help: t('interface.bonding.ip.disable_arp_filter_help') },
+      { key: 'ip_disable_forwarding', title: t('interface.bonding.ip.disable_forwarding'), type: 'checkbox', help: t('interface.bonding.ip.disable_forwarding_help') },
+      { key: 'ip_enable_arp_accept', title: t('interface.bonding.ip.enable_arp_accept'), type: 'checkbox', help: t('interface.bonding.ip.enable_arp_accept_help') },
+      { key: 'ip_enable_arp_announce', title: t('interface.bonding.ip.enable_arp_announce'), type: 'checkbox', help: t('interface.bonding.ip.enable_arp_announce_help') },
+      { key: 'ip_enable_arp_ignore', title: t('interface.bonding.ip.enable_arp_ignore'), type: 'checkbox', help: t('interface.bonding.ip.enable_arp_ignore_help') },
+      { key: 'ip_enable_directed_broadcast', title: t('interface.bonding.ip.enable_directed_broadcast'), type: 'checkbox', help: t('interface.bonding.ip.enable_directed_broadcast_help') },
+      { key: 'ip_enable_proxy_arp', title: t('interface.bonding.ip.enable_proxy_arp'), type: 'checkbox', help: t('interface.bonding.ip.enable_proxy_arp_help') },
+      { key: 'ip_proxy_arp_pvlan', title: t('interface.bonding.ip.proxy_arp_pvlan'), type: 'checkbox', help: t('interface.bonding.ip.proxy_arp_pvlan_help') },
+      { key: 'ip_source_validation', title: t('interface.bonding.ip.source_validation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: t('interface.bonding.ip.source_validation_placeholder'), help: t('interface.bonding.ip.source_validation_help') },
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: '接受 DAD', type: 'select', options: ACCEPT_DAD_OPTIONS, help: '接受重复地址检测 (默认: 1)' },
-      { key: 'ipv6_autoconf', title: '自动配置', type: 'checkbox', help: '启用 SLAAC 自动配置' },
-      { key: 'ipv6_eui64', title: 'EUI-64 前缀', type: 'text', placeholder: '如 2001:db8::/64', help: '基于 MAC 的 EUI-64 前缀' },
-      { key: 'ipv6_no_default_link_local', title: '移除默认链路本地地址', type: 'checkbox', help: '移除默认链路本地地址' },
-      { key: 'ipv6_adjust_mss', title: '调整 MSS', type: 'select', options: [
-        { value: 'clamp-mss-to-pmtu', label: 'clamp-mss-to-pmtu - 自动设置 MSS' },
-      ], placeholder: '选择或输入 536-65535', help: '调整 TCP MSS 值' },
-      { key: 'ipv6_base_reachable_time', title: '基础可达时间', type: 'number', min: 1, max: 86400, placeholder: '1-86400', help: '基础可达时间 (秒, 默认: 30)' },
-      { key: 'ipv6_disable_forwarding', title: '禁用 IPv6 转发', type: 'checkbox', help: '禁用 IPv6 转发' },
-      { key: 'ipv6_dup_addr_detect_transmits', title: 'DAD 探测次数', type: 'number', min: 0, max: 100, placeholder: '0 或 1-100', help: 'DAD 探测次数 (默认: 1, 0=禁用)' },
-      { key: 'ipv6_source_validation', title: '源验证', type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: '选择源验证模式', help: '反向路径源验证 (RFC3704)' },
+      { key: 'ipv6_accept_dad', title: t('interface.bonding.ipv6.accept_dad'), type: 'select', options: ACCEPT_DAD_OPTIONS, help: t('interface.bonding.ipv6.accept_dad_help') },
+      { key: 'ipv6_autoconf', title: t('interface.bonding.ipv6.autoconf'), type: 'checkbox', help: t('interface.bonding.ipv6.autoconf_help') },
+      { key: 'ipv6_eui64', title: t('interface.bonding.ipv6.eui64'), type: 'text', placeholder: t('interface.bonding.ipv6.eui64_placeholder'), help: t('interface.bonding.ipv6.eui64_help') },
+      { key: 'ipv6_no_default_link_local', title: t('interface.bonding.ipv6.no_default_link_local'), type: 'checkbox', help: t('interface.bonding.ipv6.no_default_link_local_help') },
+      { key: 'ipv6_adjust_mss', title: t('interface.bonding.ipv6.adjust_mss'), type: 'select', options: [
+        { value: 'clamp-mss-to-pmtu', label: 'clamp-mss-to-pmtu' },
+      ], placeholder: t('interface.bonding.ipv6.adjust_mss_placeholder'), help: t('interface.bonding.ipv6.adjust_mss_help') },
+      { key: 'ipv6_base_reachable_time', title: t('interface.bonding.ipv6.base_reachable_time'), type: 'number', min: 1, max: 86400, placeholder: t('interface.bonding.ipv6.base_reachable_time_placeholder'), help: t('interface.bonding.ipv6.base_reachable_time_help') },
+      { key: 'ipv6_disable_forwarding', title: t('interface.bonding.ipv6.disable_forwarding'), type: 'checkbox', help: t('interface.bonding.ipv6.disable_forwarding_help') },
+      { key: 'ipv6_dup_addr_detect_transmits', title: t('interface.bonding.ipv6.dup_addr_detect_transmits'), type: 'number', min: 0, max: 100, placeholder: t('interface.bonding.ipv6.dup_addr_detect_transmits_placeholder'), help: t('interface.bonding.ipv6.dup_addr_detect_transmits_help') },
+      { key: 'ipv6_source_validation', title: t('interface.bonding.ipv6.source_validation'), type: 'select', options: SOURCE_VALIDATION_OPTIONS, placeholder: t('interface.bonding.ipv6.source_validation_placeholder'), help: t('interface.bonding.ipv6.source_validation_help') },
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: '镜像出方向', type: 'select', options: interfaceOptions.value.map(i => ({ value: i, label: i })), placeholder: '选择目标接口', help: '镜像出方向流量到目标接口' },
-      { key: 'mirror_ingress', title: '镜像入方向', type: 'select', options: interfaceOptions.value.map(i => ({ value: i, label: i })), placeholder: '选择目标接口', help: '镜像入方向流量到目标接口' },
+      { key: 'mirror_egress', title: t('interface.bonding.mirror.egress'), type: 'select', options: interfaceOptions.value.map(i => ({ value: i, label: i })), placeholder: t('interface.bonding.mirror.placeholder'), help: t('interface.bonding.mirror.egress_help') },
+      { key: 'mirror_ingress', title: t('interface.bonding.mirror.ingress'), type: 'select', options: interfaceOptions.value.map(i => ({ value: i, label: i })), placeholder: t('interface.bonding.mirror.placeholder'), help: t('interface.bonding.mirror.ingress_help') },
     ]);
 
     const otherSchema = computed(() => [
-      { key: 'redirect', title: '重定向目标', type: 'select', options: interfaceOptions.value.map(i => ({ value: i, label: i })), placeholder: '选择目标接口', help: '重定向入站数据包到目标接口' },
-      { key: 'vrf', title: 'VRF 实例', type: 'text', placeholder: 'VRF 实例名称', help: 'VRF 实例名称' },
+      { key: 'redirect', title: t('interface.bonding.other.redirect'), type: 'select', options: interfaceOptions.value.map(i => ({ value: i, label: i })), placeholder: t('interface.bonding.other.redirect_placeholder'), help: t('interface.bonding.other.redirect_help') },
+      { key: 'vrf', title: t('interface.bonding.other.vrf'), type: 'text', placeholder: t('interface.bonding.other.vrf_placeholder'), help: t('interface.bonding.other.vrf_help') },
     ]);
 
     // Command text
@@ -256,22 +261,21 @@ export default defineComponent({
       if (b.redirect) lines.push(`set interfaces bonding ${name} redirect ${b.redirect}`);
       if (b.vrf) lines.push(`set interfaces bonding ${name} vrf ${b.vrf}`);
 
-      return lines.join('\n') || '# 未配置任何参数';
+      return lines.join('\n') || `# ${t('interface.bonding.no_config')}`;
     });
 
     // Tabs
     const modalTabs = computed(() => [
-      { key: 'basic', title: '基本配置' },
-      { key: 'arp', title: 'ARP 监控' },
-      { key: 'dhcp', title: 'DHCP' },
-      { key: 'dhcpv6', title: 'DHCPv6' },
-      { key: 'eapol', title: 'EAPOL' },
-      { key: 'evpn', title: 'EVPN' },
-      { key: 'ip', title: 'IPv4 参数' },
-      { key: 'ipv6', title: 'IPv6 参数' },
-      { key: 'mirror', title: '流量镜像' },
-      { key: 'other', title: '其他' },
-      { key: 'preview', title: '命令预览' },
+      { key: 'basic', title: t('interface.bonding.tab.basic') },
+      { key: 'arp', title: t('interface.bonding.tab.arp_monitor') },
+      { key: 'dhcp', title: t('interface.bonding.tab.dhcp') },
+      { key: 'dhcpv6', title: t('interface.bonding.tab.dhcpv6') },
+      { key: 'eapol', title: t('interface.bonding.tab.eapol') },
+      { key: 'evpn', title: t('interface.bonding.tab.evpn') },
+      { key: 'ip', title: t('interface.bonding.tab.ipv4_params') },
+      { key: 'ipv6', title: t('interface.bonding.tab.ipv6_params') },
+      { key: 'mirror', title: t('interface.bonding.tab.traffic_mirror') },
+      { key: 'other', title: t('interface.bonding.tab.other') },
     ]);
 
     // Default form
@@ -485,7 +489,7 @@ export default defineComponent({
       const b = editingBond.value;
       const name = b.name;
       if (!name) {
-        showError('请输入接口名称');
+        showError(t('interface.bonding.nameRequired'));
         return;
       }
 
@@ -574,6 +578,7 @@ export default defineComponent({
       try {
         const allCommands = [deleteCmd, ...commands];
         await configApi.configure(allCommands);
+        configStore.markPending();
         modalVisible.value = false;
         await load();
       } catch (err) {
@@ -584,14 +589,21 @@ export default defineComponent({
     // Delete
     async function remove() {
       if (selected.value.length === 0) {
-        showError('请选择要删除的接口');
+        showError(t('interface.bonding.selectInterfaceFirst'));
         return;
       }
-      if (!confirm(`确定要删除选中的 ${selected.value.length} 个链路聚合接口吗?`)) return;
+      pendingDeleteNames.value = selected.value.map(b => b.name);
+      deleteModalVisible.value = true;
+    }
 
-      const commands = selected.value.map(b => `delete interfaces bonding ${b.name}`);
+    async function confirmRemove() {
+      deleteModalVisible.value = false;
+      const commands = pendingDeleteNames.value.map(name => `delete interfaces bonding ${name}`);
       try {
         await configApi.configure(commands);
+        configStore.markPending();
+        pendingDeleteNames.value = [];
+        selected.value = [];
         await load();
       } catch (err) {
         showError(err);
@@ -600,14 +612,16 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      onMenuRefresh(load);
     });
 
     return {
       loading, bonds, selected, modalVisible, editingBond, interfaceOptions, activeTab,
+      deleteModalVisible, pendingDeleteNames, confirmRemove,
       COLUMNS,
       basicSchema, arpMonitorSchema, dhcpSchema, dhcpv6Schema, eapolSchema, evpnSchema,
       ipSchema, ipv6Schema, mirrorSchema, otherSchema, commandText, modalTabs,
-      openModal, save, remove, load,
+      openModal, save, remove, load, t,
     };
   },
   template: `
@@ -628,19 +642,19 @@ export default defineComponent({
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'disable'">
             <span :class="record.disable ? 'badge badge-danger' : 'badge badge-success'">
-              {{ record.disable ? '是' : '否' }}
+              {{ record.disable ? t('common.yes') : t('common.no') }}
             </span>
           </template>
           <template v-if="column.key === 'actions'">
-            <a @click="openModal(bonds.indexOf(record))">编辑</a>
-            <a @click="selected = [record]; remove()" style="color: #ff4d4f; margin-left: 8px;">删除</a>
+            <a @click="openModal(bonds.indexOf(record))">{{ t('common.edit') }}</a>
+            <a @click="selected = [record]; remove()" style="color: #ff4d4f; margin-left: 8px;">{{ t('common.delete') }}</a>
           </template>
         </template>
       </DataTable>
 
       <DraggableModal
         v-model:visible="modalVisible"
-        :title="editingBond?.name ? '编辑链路聚合接口' : '创建链路聚合接口'"
+        :title="editingBond?.name ? t('interface.bonding.modal.edit') : t('interface.bonding.modal.create')"
         width="900px"
         @confirm="save"
       >
@@ -676,10 +690,13 @@ export default defineComponent({
             <template #other>
               <ConfigForm v-model="editingBond" :schema="otherSchema" />
             </template>
-            <template #preview>
-              <pre style="background: #f5f5f5; padding: 12px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap;">{{ commandText }}</pre>
-            </template>
           </TabGroup>
+        </div>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('common.confirm_delete')" width="400px" @confirm="confirmRemove">
+        <div>{{ t('interface.bonding.delete_confirm') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="name in pendingDeleteNames" :key="name" style="padding:2px 0;">{{ name }}</div>
         </div>
       </DraggableModal>
     </div>

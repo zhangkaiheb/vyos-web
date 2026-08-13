@@ -1,0 +1,296 @@
+{
+  "zh-CN": {
+    "vrf": {
+      "columns": {
+        "name": "名称",
+        "description": "描述",
+        "table": "路由表"
+      },
+      "form": {
+        "name": "名称",
+        "namePlaceholder": "输入 VRF 名称",
+        "description": "描述",
+        "disable": "禁用",
+        "table": "路由表",
+        "tableHelp": "路由表 ID (100-65535)",
+        "disableIpForwarding": "禁用 IP 转发",
+        "disableIpv6Forwarding": "禁用 IPv6 转发",
+        "nhtNoResolveViaDefault": "NHT 不通过默认路由解析",
+        "protocolFilter": "协议过滤",
+        "selectProtocol": "选择协议",
+        "routeMapPlaceholder": "输入 route-map 名称"
+      },
+      "tabs": {
+        "basic": "基本设置"
+      },
+      "buttons": {
+        "create": "创建",
+        "edit": "编辑",
+        "delete": "删除",
+        "refresh": "刷新",
+        "addProtocol": "添加协议"
+      },
+      "modals": {
+        "confirmDelete": "确认删除",
+        "deleteConfirmMessage": "确认删除以下 VRF？"
+      },
+      "messages": {
+        "selectOne": "请选择一个 VRF",
+        "enterName": "请输入 VRF 名称",
+        "nameExists": "VRF 名称已存在"
+      }
+    }
+  },
+  "en": {
+    "vrf": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "table": "Table"
+      },
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "Enter VRF name",
+        "description": "Description",
+        "disable": "Disable",
+        "table": "Table",
+        "tableHelp": "Routing table ID (100-65535)",
+        "disableIpForwarding": "Disable IP Forwarding",
+        "disableIpv6Forwarding": "Disable IPv6 Forwarding",
+        "nhtNoResolveViaDefault": "NHT No Resolve Via Default",
+        "protocolFilter": "Protocol Filter",
+        "selectProtocol": "Select protocol",
+        "routeMapPlaceholder": "Enter route-map name"
+      },
+      "tabs": {
+        "basic": "Basic"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "addProtocol": "Add Protocol"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "deleteConfirmMessage": "Confirm delete the following VRF?"
+      },
+      "messages": {
+        "selectOne": "Please select a VRF",
+        "enterName": "Please enter VRF name",
+        "nameExists": "VRF name already exists"
+      }
+    }
+  },
+  "zh-TW": {
+    "vrf": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "table": "Table"
+      },
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "Enter VRF name",
+        "description": "Description",
+        "disable": "Disable",
+        "table": "Table",
+        "tableHelp": "Routing table ID (100-65535)",
+        "disableIpForwarding": "Disable IP Forwarding",
+        "disableIpv6Forwarding": "Disable IPv6 Forwarding",
+        "nhtNoResolveViaDefault": "NHT No Resolve Via Default",
+        "protocolFilter": "Protocol Filter",
+        "selectProtocol": "Select protocol",
+        "routeMapPlaceholder": "Enter route-map name"
+      },
+      "tabs": {
+        "basic": "Basic"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "addProtocol": "Add Protocol"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "deleteConfirmMessage": "Confirm delete the following VRF?"
+      },
+      "messages": {
+        "selectOne": "Please select a VRF",
+        "enterName": "Please enter VRF name",
+        "nameExists": "VRF name already exists"
+      }
+    }
+  },
+  "ru": {
+    "vrf": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "table": "Table"
+      },
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "Enter VRF name",
+        "description": "Description",
+        "disable": "Disable",
+        "table": "Table",
+        "tableHelp": "Routing table ID (100-65535)",
+        "disableIpForwarding": "Disable IP Forwarding",
+        "disableIpv6Forwarding": "Disable IPv6 Forwarding",
+        "nhtNoResolveViaDefault": "NHT No Resolve Via Default",
+        "protocolFilter": "Protocol Filter",
+        "selectProtocol": "Select protocol",
+        "routeMapPlaceholder": "Enter route-map name"
+      },
+      "tabs": {
+        "basic": "Basic"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "addProtocol": "Add Protocol"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "deleteConfirmMessage": "Confirm delete the following VRF?"
+      },
+      "messages": {
+        "selectOne": "Please select a VRF",
+        "enterName": "Please enter VRF name",
+        "nameExists": "VRF name already exists"
+      }
+    }
+  },
+  "de": {
+    "vrf": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "table": "Table"
+      },
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "Enter VRF name",
+        "description": "Description",
+        "disable": "Disable",
+        "table": "Table",
+        "tableHelp": "Routing table ID (100-65535)",
+        "disableIpForwarding": "Disable IP Forwarding",
+        "disableIpv6Forwarding": "Disable IPv6 Forwarding",
+        "nhtNoResolveViaDefault": "NHT No Resolve Via Default",
+        "protocolFilter": "Protocol Filter",
+        "selectProtocol": "Select protocol",
+        "routeMapPlaceholder": "Enter route-map name"
+      },
+      "tabs": {
+        "basic": "Basic"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "addProtocol": "Add Protocol"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "deleteConfirmMessage": "Confirm delete the following VRF?"
+      },
+      "messages": {
+        "selectOne": "Please select a VRF",
+        "enterName": "Please enter VRF name",
+        "nameExists": "VRF name already exists"
+      }
+    }
+  },
+  "fr": {
+    "vrf": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "table": "Table"
+      },
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "Enter VRF name",
+        "description": "Description",
+        "disable": "Disable",
+        "table": "Table",
+        "tableHelp": "Routing table ID (100-65535)",
+        "disableIpForwarding": "Disable IP Forwarding",
+        "disableIpv6Forwarding": "Disable IPv6 Forwarding",
+        "nhtNoResolveViaDefault": "NHT No Resolve Via Default",
+        "protocolFilter": "Protocol Filter",
+        "selectProtocol": "Select protocol",
+        "routeMapPlaceholder": "Enter route-map name"
+      },
+      "tabs": {
+        "basic": "Basic"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "addProtocol": "Add Protocol"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "deleteConfirmMessage": "Confirm delete the following VRF?"
+      },
+      "messages": {
+        "selectOne": "Please select a VRF",
+        "enterName": "Please enter VRF name",
+        "nameExists": "VRF name already exists"
+      }
+    }
+  },
+  "ko": {
+    "vrf": {
+      "columns": {
+        "name": "Name",
+        "description": "Description",
+        "table": "Table"
+      },
+      "form": {
+        "name": "Name",
+        "namePlaceholder": "Enter VRF name",
+        "description": "Description",
+        "disable": "Disable",
+        "table": "Table",
+        "tableHelp": "Routing table ID (100-65535)",
+        "disableIpForwarding": "Disable IP Forwarding",
+        "disableIpv6Forwarding": "Disable IPv6 Forwarding",
+        "nhtNoResolveViaDefault": "NHT No Resolve Via Default",
+        "protocolFilter": "Protocol Filter",
+        "selectProtocol": "Select protocol",
+        "routeMapPlaceholder": "Enter route-map name"
+      },
+      "tabs": {
+        "basic": "Basic"
+      },
+      "buttons": {
+        "create": "Create",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "addProtocol": "Add Protocol"
+      },
+      "modals": {
+        "confirmDelete": "Confirm Delete",
+        "deleteConfirmMessage": "Confirm delete the following VRF?"
+      },
+      "messages": {
+        "selectOne": "Please select a VRF",
+        "enterName": "Please enter VRF name",
+        "nameExists": "VRF name already exists"
+      }
+    }
+  }
+}

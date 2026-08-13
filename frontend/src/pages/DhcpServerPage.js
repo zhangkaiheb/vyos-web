@@ -1,10 +1,13 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const HA_MODE_OPTIONS = ['active-active', 'active-passive'];
 
@@ -31,33 +34,37 @@ function splitMembers(text) {
   return String(text || '').split('\n').map(s => s.trim()).filter(Boolean);
 }
 
-function validateName(name) {
-  if (!name || !String(name).trim()) return '请输入名称';
-  if (!/^[a-zA-Z0-9_-]+$/.test(String(name))) return '名称只能包含字母、数字、下划线和连字符';
+function tr(tFn, key, params = {}) {
+  return tFn(key, params);
+}
+
+function validateName(name, t) {
+  if (!name || !String(name).trim()) return t('dhcp.validation.nameRequired');
+  if (!/^[a-zA-Z0-9_-]+$/.test(String(name))) return t('dhcp.validation.nameInvalid');
   return '';
 }
 
-function validateIPv4(value) {
+function validateIPv4(value, t) {
   if (!value) return '';
-  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return 'IPv4 地址格式错误';
-  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return 'IPv4 地址格式错误';
+  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return t('dhcp.validation.ipv4Invalid');
+  if (!value.split('.').every(n => parseInt(n, 10) <= 255)) return t('dhcp.validation.ipv4Invalid');
   return '';
 }
 
-function validateCIDR(value) {
+function validateCIDR(value, t) {
   if (!value) return '';
   const parts = value.split('/');
-  if (parts.length !== 2) return '格式应为 x.x.x.x/x';
-  const err = validateIPv4(parts[0]);
+  if (parts.length !== 2) return t('dhcp.validation.cidrFormat');
+  const err = validateIPv4(parts[0], t);
   if (err) return err;
   const mask = parseInt(parts[1], 10);
-  if (isNaN(mask) || mask < 0 || mask > 32) return '掩码范围 0-32';
+  if (isNaN(mask) || mask < 0 || mask > 32) return t('dhcp.validation.maskRange');
   return '';
 }
 
-function validateMAC(value) {
+function validateMAC(value, t) {
   if (!value) return '';
-  if (!/^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/.test(value)) return 'MAC 格式错误，如 aa:bb:cc:dd:ee:ff';
+  if (!/^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/.test(value)) return t('dhcp.validation.macFormat');
   return '';
 }
 
@@ -354,18 +361,19 @@ const DhcpOptionForm = defineComponent({
   props: { modelValue: { type: Object, default: () => ({}) }, disabled: { type: Boolean, default: false } },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
+    const { t } = useI18n();
     const form = computed({
       get: () => props.modelValue,
       set: (val) => emit('update:modelValue', val),
     });
 
     const staticRouteColumns = [
-      { key: 'destination', title: '目的网段' },
-      { key: 'next_hop', title: '下一跳' },
+      { key: 'destination', title: t('dhcp.columns.destination') },
+      { key: 'next_hop', title: t('dhcp.columns.nextHop') },
     ];
     const vendorOptionColumns = [
-      { key: 'id', title: 'ID' },
-      { key: 'value', title: '值' },
+      { key: 'id', title: t('dhcp.columns.id') },
+      { key: 'value', title: t('dhcp.columns.value') },
     ];
 
     const selectedStaticRoute = ref([]);
@@ -388,23 +396,23 @@ const DhcpOptionForm = defineComponent({
     }
     function editStaticRoute() {
       ensureArrays();
-      if (!selectedStaticRoute.value.length) return alert('请选择要编辑的静态路由');
+      if (!selectedStaticRoute.value.length) return showError({ message: t('dhcp.messages.selectStaticRoute') });
       const row = form.value.static_route.find(r => r.destination === selectedStaticRoute.value[0]);
-      if (!row) return alert('未找到选中的静态路由');
+      if (!row) return showError({ message: t('dhcp.messages.staticRouteNotFound') });
       editingStaticRoute.value = { ...row };
       showStaticRouteModal.value = true;
     }
     function removeStaticRoute() {
       ensureArrays();
-      if (!selectedStaticRoute.value.length) return alert('请选择要删除的静态路由');
+      if (!selectedStaticRoute.value.length) return showError({ message: t('dhcp.messages.selectStaticRoute') });
       form.value.static_route = form.value.static_route.filter(r => r.destination !== selectedStaticRoute.value[0]);
       selectedStaticRoute.value = [];
     }
     function saveStaticRoute() {
-      if (!editingStaticRoute.value.destination) return alert('请输入目的网段');
-      const err = validateCIDR(editingStaticRoute.value.destination);
-      if (err) return alert(err);
-      if (editingStaticRoute.value.next_hop && validateIPv4(editingStaticRoute.value.next_hop)) return alert('下一跳格式错误');
+      if (!editingStaticRoute.value.destination) return showError({ message: t('dhcp.messages.enterDestination') });
+      const err = validateCIDR(editingStaticRoute.value.destination, t);
+      if (err) return showError({ message: err });
+      if (editingStaticRoute.value.next_hop && validateIPv4(editingStaticRoute.value.next_hop, t)) return showError({ message: t('dhcp.validation.nextHopInvalid') });
       ensureArrays();
       const list = form.value.static_route;
       const idx = list.findIndex(r => r._destination === editingStaticRoute.value._destination);
@@ -421,20 +429,20 @@ const DhcpOptionForm = defineComponent({
     }
     function editVendorOption() {
       ensureArrays();
-      if (!selectedVendorOption.value.length) return alert('请选择要编辑的厂商选项');
+      if (!selectedVendorOption.value.length) return showError({ message: t('dhcp.messages.selectVendorOption') });
       const row = form.value.vendor_option.find(v => v.id === selectedVendorOption.value[0]);
-      if (!row) return alert('未找到选中的厂商选项');
+      if (!row) return showError({ message: t('dhcp.messages.vendorOptionNotFound') });
       editingVendorOption.value = { ...row };
       showVendorOptionModal.value = true;
     }
     function removeVendorOption() {
       ensureArrays();
-      if (!selectedVendorOption.value.length) return alert('请选择要删除的厂商选项');
+      if (!selectedVendorOption.value.length) return showError({ message: t('dhcp.messages.selectVendorOption') });
       form.value.vendor_option = form.value.vendor_option.filter(v => v.id !== selectedVendorOption.value[0]);
       selectedVendorOption.value = [];
     }
     function saveVendorOption() {
-      if (!editingVendorOption.value.id) return alert('请输入厂商选项 ID');
+      if (!editingVendorOption.value.id) return showError({ message: t('dhcp.messages.enterVendorOptionId') });
       ensureArrays();
       const list = form.value.vendor_option;
       const idx = list.findIndex(v => v._id === editingVendorOption.value._id);
@@ -445,6 +453,7 @@ const DhcpOptionForm = defineComponent({
     }
 
     return {
+      t,
       form,
       staticRouteColumns, vendorOptionColumns,
       selectedStaticRoute, selectedVendorOption,
@@ -457,52 +466,52 @@ const DhcpOptionForm = defineComponent({
   components: { DataTable, DraggableModal, ToolbarButton },
   template: `
     <div>
-      <div class="form-row"><label class="form-label">Bootfile 名称</label><input class="form-control" v-model="form.bootfile_name" :disabled="disabled" title="引导文件名" /></div>
-      <div class="form-row"><label class="form-label">Bootfile 服务器</label><input class="form-control" v-model="form.bootfile_server" :disabled="disabled" title="加载初始引导文件的服务器" /></div>
-      <div class="form-row"><label class="form-label">Bootfile 大小</label><input type="number" min="0" class="form-control" v-model="form.bootfile_size" :disabled="disabled" placeholder="单位：字节" title="引导文件大小（字节，非负整数）" /></div>
-      <div class="form-row"><label class="form-label">Captive Portal</label><input class="form-control" v-model="form.captive_portal" :disabled="disabled" title="Captive Portal API 端点" /></div>
-      <div class="form-row"><label class="form-label">客户端前缀长度</label><input type="number" min="0" max="32" class="form-control" v-model="form.client_prefix_length" :disabled="disabled" placeholder="0-32" title="客户端子网掩码前缀长度（0-32，RFC 950）" /></div>
-      <div class="form-row"><label class="form-label">默认路由器</label><textarea class="form-control" v-model="form.default_router" rows="2" :disabled="disabled" placeholder="每行一个 IPv4 地址" title="默认路由器" /></div>
-      <div class="form-row"><label class="form-label">域名</label><input class="form-control" v-model="form.domain_name" :disabled="disabled" title="客户端域名" /></div>
-      <div class="form-row"><label class="form-label">域名搜索列表</label><textarea class="form-control" v-model="form.domain_search" rows="2" :disabled="disabled" placeholder="每行一个域名" title="域名搜索列表" /></div>
-      <div class="form-row"><label class="form-label">IP 转发</label><input type="checkbox" v-model="form.ip_forwarding" :disabled="disabled" title="在客户端启用 IP 转发" /></div>
-      <div class="form-row"><label class="form-label">IPv6 Only Preferred</label><input type="number" min="0" class="form-control" v-model="form.ipv6_only_preferred" :disabled="disabled" placeholder="秒" title="IPv6 Only Preferred 时间（秒，RFC 8925）" /></div>
-      <div class="form-row"><label class="form-label">DNS 服务器</label><textarea class="form-control" v-model="form.name_server" rows="2" :disabled="disabled" placeholder="每行一个 IPv4 地址" title="DNS 服务器" /></div>
-      <div class="form-row"><label class="form-label">NTP 服务器</label><textarea class="form-control" v-model="form.ntp_server" rows="2" :disabled="disabled" placeholder="每行一个 IPv4 地址" title="NTP 服务器" /></div>
-      <div class="form-row"><label class="form-label">POP 服务器</label><input class="form-control" v-model="form.pop_server" :disabled="disabled" title="POP3 服务器" /></div>
-      <div class="form-row"><label class="form-label">服务器标识</label><input class="form-control" v-model="form.server_identifier" :disabled="disabled" placeholder="x.x.x.x" title="DHCP 服务器标识地址" /></div>
-      <div class="form-row"><label class="form-label">SMTP 服务器</label><textarea class="form-control" v-model="form.smtp_server" rows="2" :disabled="disabled" placeholder="每行一个 IPv4 地址" title="SMTP 服务器" /></div>
-      <div class="form-row"><label class="form-label">TFTP 服务器名称</label><input class="form-control" v-model="form.tftp_server_name" :disabled="disabled" title="TFTP 服务器名称" /></div>
-      <div class="form-row"><label class="form-label">时间偏移</label><input type="number" class="form-control" v-model="form.time_offset" :disabled="disabled" placeholder="秒" title="客户端子网相对于 UTC 的偏移秒数（RFC 2132）" /></div>
-      <div class="form-row"><label class="form-label">时间服务器</label><textarea class="form-control" v-model="form.time_server" rows="2" :disabled="disabled" placeholder="每行一个 IPv4 地址" title="时间服务器" /></div>
-      <div class="form-row"><label class="form-label">时区</label><input class="form-control" v-model="form.time_zone" :disabled="disabled" title="时区 (RFC 4833)" /></div>
-      <div class="form-row"><label class="form-label">WINS 服务器</label><textarea class="form-control" v-model="form.wins_server" rows="2" :disabled="disabled" placeholder="每行一个 IPv4 地址" title="WINS 服务器" /></div>
-      <div class="form-row"><label class="form-label">WPAD URL</label><input class="form-control" v-model="form.wpad_url" :disabled="disabled" title="Web Proxy Autodiscovery URL" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.bootfileName') }}</label><input class="form-control" v-model="form.bootfile_name" :disabled="disabled" :title="t('dhcp.titles.bootfileName')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.bootfileServer') }}</label><input class="form-control" v-model="form.bootfile_server" :disabled="disabled" :title="t('dhcp.titles.bootfileServer')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.bootfileSize') }}</label><input type="number" min="0" class="form-control" v-model="form.bootfile_size" :disabled="disabled" :placeholder="t('dhcp.placeholders.bytes')" :title="t('dhcp.titles.bootfileSize')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.captivePortal') }}</label><input class="form-control" v-model="form.captive_portal" :disabled="disabled" :title="t('dhcp.titles.captivePortal')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.clientPrefixLength') }}</label><input type="number" min="0" max="32" class="form-control" v-model="form.client_prefix_length" :disabled="disabled" :placeholder="t('dhcp.placeholders.prefixLength')" :title="t('dhcp.titles.clientPrefixLength')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.defaultRouter') }}</label><textarea class="form-control" v-model="form.default_router" rows="2" :disabled="disabled" :placeholder="t('dhcp.placeholders.onePerLine')" :title="t('dhcp.titles.defaultRouter')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.domainName') }}</label><input class="form-control" v-model="form.domain_name" :disabled="disabled" :title="t('dhcp.titles.domainName')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.domainSearch') }}</label><textarea class="form-control" v-model="form.domain_search" rows="2" :disabled="disabled" :placeholder="t('dhcp.placeholders.onePerLine')" :title="t('dhcp.titles.domainSearch')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.ipForwarding') }}</label><input type="checkbox" v-model="form.ip_forwarding" :disabled="disabled" :title="t('dhcp.titles.ipForwarding')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.ipv6OnlyPreferred') }}</label><input type="number" min="0" class="form-control" v-model="form.ipv6_only_preferred" :disabled="disabled" :placeholder="t('dhcp.placeholders.seconds')" :title="t('dhcp.titles.ipv6OnlyPreferred')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.dnsServer') }}</label><textarea class="form-control" v-model="form.name_server" rows="2" :disabled="disabled" :placeholder="t('dhcp.placeholders.onePerLine')" :title="t('dhcp.titles.dnsServer')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.ntpServer') }}</label><textarea class="form-control" v-model="form.ntp_server" rows="2" :disabled="disabled" :placeholder="t('dhcp.placeholders.onePerLine')" :title="t('dhcp.titles.ntpServer')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.popServer') }}</label><input class="form-control" v-model="form.pop_server" :disabled="disabled" :title="t('dhcp.titles.popServer')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.serverIdentifier') }}</label><input class="form-control" v-model="form.server_identifier" :disabled="disabled" :placeholder="t('dhcp.placeholders.ipv4')" :title="t('dhcp.titles.serverIdentifier')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.smtpServer') }}</label><textarea class="form-control" v-model="form.smtp_server" rows="2" :disabled="disabled" :placeholder="t('dhcp.placeholders.onePerLine')" :title="t('dhcp.titles.smtpServer')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.tftpServerName') }}</label><input class="form-control" v-model="form.tftp_server_name" :disabled="disabled" :title="t('dhcp.titles.tftpServerName')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.timeOffset') }}</label><input type="number" class="form-control" v-model="form.time_offset" :disabled="disabled" :placeholder="t('dhcp.placeholders.seconds')" :title="t('dhcp.titles.timeOffset')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.timeServer') }}</label><textarea class="form-control" v-model="form.time_server" rows="2" :disabled="disabled" :placeholder="t('dhcp.placeholders.onePerLine')" :title="t('dhcp.titles.timeServer')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.timeZone') }}</label><input class="form-control" v-model="form.time_zone" :disabled="disabled" :title="t('dhcp.titles.timeZone')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.winsServer') }}</label><textarea class="form-control" v-model="form.wins_server" rows="2" :disabled="disabled" :placeholder="t('dhcp.placeholders.onePerLine')" :title="t('dhcp.titles.winsServer')" /></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.wpadUrl') }}</label><input class="form-control" v-model="form.wpad_url" :disabled="disabled" :title="t('dhcp.titles.wpadUrl')" /></div>
 
-      <div class="form-row"><label class="form-label">静态路由</label></div>
+      <div class="form-row"><label class="form-label">{{ t('dhcp.labels.staticRoutes') }}</label></div>
       <div class="toolbar">
-        <ToolbarButton icon="create" @click="createStaticRoute" :disabled="disabled">创建</ToolbarButton>
-        <ToolbarButton icon="edit" @click="editStaticRoute" :disabled="disabled || !selectedStaticRoute.length || selectedStaticRoute.length > 1">编辑</ToolbarButton>
-        <ToolbarButton icon="delete" @click="removeStaticRoute" :disabled="disabled || !selectedStaticRoute.length">删除</ToolbarButton>
+        <ToolbarButton icon="create" @click="createStaticRoute" :disabled="disabled">{{ t('app.create') }}</ToolbarButton>
+        <ToolbarButton icon="edit" @click="editStaticRoute" :disabled="disabled || !selectedStaticRoute.length || selectedStaticRoute.length > 1">{{ t('app.edit') }}</ToolbarButton>
+        <ToolbarButton icon="delete" @click="removeStaticRoute" :disabled="disabled || !selectedStaticRoute.length">{{ t('app.delete') }}</ToolbarButton>
       </div>
       <DataTable :columns="staticRouteColumns" :data="form.static_route || []" row-key="destination" :externalToolbar="true" @selection-change="selectedStaticRoute = $event" :selectable="true" />
 
-      <div class="form-row" style="margin-top:12px;"><label class="form-label">厂商选项</label></div>
+      <div class="form-row" style="margin-top:12px;"><label class="form-label">{{ t('dhcp.labels.vendorOptions') }}</label></div>
       <div class="toolbar">
-        <ToolbarButton icon="create" @click="createVendorOption" :disabled="disabled">创建</ToolbarButton>
-        <ToolbarButton icon="edit" @click="editVendorOption" :disabled="disabled || !selectedVendorOption.length || selectedVendorOption.length > 1">编辑</ToolbarButton>
-        <ToolbarButton icon="delete" @click="removeVendorOption" :disabled="disabled || !selectedVendorOption.length">删除</ToolbarButton>
+        <ToolbarButton icon="create" @click="createVendorOption" :disabled="disabled">{{ t('app.create') }}</ToolbarButton>
+        <ToolbarButton icon="edit" @click="editVendorOption" :disabled="disabled || !selectedVendorOption.length || selectedVendorOption.length > 1">{{ t('app.edit') }}</ToolbarButton>
+        <ToolbarButton icon="delete" @click="removeVendorOption" :disabled="disabled || !selectedVendorOption.length">{{ t('app.delete') }}</ToolbarButton>
       </div>
       <DataTable :columns="vendorOptionColumns" :data="form.vendor_option || []" row-key="id" :externalToolbar="true" @selection-change="selectedVendorOption = $event" :selectable="true" />
 
-      <DraggableModal v-model:visible="showStaticRouteModal" title="静态路由" @confirm="saveStaticRoute" @close="showStaticRouteModal = false">
-        <div class="form-row"><label class="form-label">目的网段</label><input class="form-control" v-model="editingStaticRoute.destination" :disabled="editingStaticRoute._destination" placeholder="x.x.x.x/x" title="目的网段" /></div>
-        <div class="form-row"><label class="form-label">下一跳</label><input class="form-control" v-model="editingStaticRoute.next_hop" placeholder="x.x.x.x" title="下一跳 IPv4 地址" /></div>
+      <DraggableModal v-model:visible="showStaticRouteModal" :title="t('dhcp.modals.staticRoute')" @confirm="saveStaticRoute" @close="showStaticRouteModal = false">
+        <div class="form-row"><label class="form-label">{{ t('dhcp.columns.destination') }}</label><input class="form-control" v-model="editingStaticRoute.destination" :disabled="editingStaticRoute._destination" :placeholder="t('dhcp.placeholders.cidr')" :title="t('dhcp.titles.destination')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcp.columns.nextHop') }}</label><input class="form-control" v-model="editingStaticRoute.next_hop" :placeholder="t('dhcp.placeholders.ipv4')" :title="t('dhcp.titles.nextHop')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showVendorOptionModal" title="厂商选项" @confirm="saveVendorOption" @close="showVendorOptionModal = false">
-        <div class="form-row"><label class="form-label">ID</label><input class="form-control" v-model="editingVendorOption.id" :disabled="editingVendorOption._id" title="厂商选项 ID" /></div>
-        <div class="form-row"><label class="form-label">值</label><input class="form-control" v-model="editingVendorOption.value" title="厂商选项值" /></div>
+      <DraggableModal v-model:visible="showVendorOptionModal" :title="t('dhcp.modals.vendorOption')" @confirm="saveVendorOption" @close="showVendorOptionModal = false">
+        <div class="form-row"><label class="form-label">{{ t('dhcp.columns.id') }}</label><input class="form-control" v-model="editingVendorOption.id" :disabled="editingVendorOption._id" :title="t('dhcp.titles.vendorOptionId')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcp.columns.value') }}</label><input class="form-control" v-model="editingVendorOption.value" :title="t('dhcp.titles.vendorOptionValue')" /></div>
       </DraggableModal>
     </div>
   `,
@@ -511,6 +520,8 @@ const DhcpOptionForm = defineComponent({
 export default defineComponent({
   name: 'DhcpServerPage',
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -547,32 +558,32 @@ export default defineComponent({
     }
 
     const sharedNetworkColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'authoritative', title: '权威', render: (v) => v ? '是' : '否' },
-      { key: 'description', title: '描述' },
-      { key: 'disable', title: '禁用', render: (v) => v ? '是' : '否' },
-      { key: 'subnets', title: '子网数', render: (v) => (v || []).length },
+      { key: 'name', title: t('dhcp.columns.name') },
+      { key: 'authoritative', title: t('dhcp.columns.authoritative'), render: (v) => v ? t('app.yes') : t('app.no') },
+      { key: 'description', title: t('dhcp.columns.description') },
+      { key: 'disable', title: t('dhcp.columns.disable'), render: (v) => v ? t('app.yes') : t('app.no') },
+      { key: 'subnets', title: t('dhcp.columns.subnetCount'), render: (v) => (v || []).length },
     ];
     const subnetColumns = [
-      { key: 'subnet', title: '子网' },
-      { key: 'subnet_id', title: '子网 ID' },
-      { key: 'description', title: '描述' },
-      { key: 'disable', title: '禁用', render: (v) => v ? '是' : '否' },
-      { key: 'range', title: '地址池数', render: (v) => (v || []).length },
-      { key: 'static_mapping', title: '静态映射数', render: (v) => (v || []).length },
+      { key: 'subnet', title: t('dhcp.columns.subnet') },
+      { key: 'subnet_id', title: t('dhcp.columns.subnetId') },
+      { key: 'description', title: t('dhcp.columns.description') },
+      { key: 'disable', title: t('dhcp.columns.disable'), render: (v) => v ? t('app.yes') : t('app.no') },
+      { key: 'range', title: t('dhcp.columns.rangeCount'), render: (v) => (v || []).length },
+      { key: 'static_mapping', title: t('dhcp.columns.staticMappingCount'), render: (v) => (v || []).length },
     ];
     const rangeColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'start', title: '起始' },
-      { key: 'stop', title: '结束' },
+      { key: 'name', title: t('dhcp.columns.name') },
+      { key: 'start', title: t('dhcp.columns.start') },
+      { key: 'stop', title: t('dhcp.columns.stop') },
     ];
     const staticMappingColumns = [
-      { key: 'name', title: '名称' },
-      { key: 'description', title: '描述' },
-      { key: 'disable', title: '禁用', render: (v) => v ? '是' : '否' },
-      { key: 'duid', title: 'DUID' },
-      { key: 'ip_address', title: 'IP 地址' },
-      { key: 'mac_address', title: 'MAC 地址' },
+      { key: 'name', title: t('dhcp.columns.name') },
+      { key: 'description', title: t('dhcp.columns.description') },
+      { key: 'disable', title: t('dhcp.columns.disable'), render: (v) => v ? t('app.yes') : t('app.no') },
+      { key: 'duid', title: t('dhcp.columns.duid') },
+      { key: 'ip_address', title: t('dhcp.columns.ipAddress') },
+      { key: 'mac_address', title: t('dhcp.columns.macAddress') },
     ];
 
     const selectedSharedNetwork = ref([]);
@@ -619,25 +630,25 @@ export default defineComponent({
     async function save() {
       const listenAddresses = splitMembers(config.value.listen_address);
       for (const ip of listenAddresses) {
-        if (validateIPv4(ip)) return alert(`监听地址 ${ip} 格式错误`);
+        if (validateIPv4(ip, t)) return showError({ message: t('dhcp.errors.listenAddressInvalid', { ip }) });
       }
       const ha = config.value.high_availability || {};
-      if (isPresent(ha.remote) && validateIPv4(ha.remote)) return alert('HA 远端地址格式错误');
-      if (isPresent(ha.source_address) && validateIPv4(ha.source_address)) return alert('HA 源地址格式错误');
+      if (isPresent(ha.remote) && validateIPv4(ha.remote, t)) return showError({ message: t('dhcp.errors.haRemoteInvalid') });
+      if (isPresent(ha.source_address) && validateIPv4(ha.source_address, t)) return showError({ message: t('dhcp.errors.haSourceInvalid') });
       for (const n of config.value.shared_networks || []) {
-        if (!n.name) return alert('共享网络名称不能为空');
+        if (!n.name) return showError({ message: t('dhcp.errors.sharedNetworkNameRequired') });
         for (const s of n.subnets || []) {
-          if (!s.subnet) return alert(`共享网络 ${n.name} 的子网不能为空`);
-          const err = validateCIDR(s.subnet);
-          if (err) return alert(`共享网络 ${n.name} 子网 ${s.subnet}: ${err}`);
+          if (!s.subnet) return showError({ message: t('dhcp.errors.subnetRequired', { network: n.name }) });
+          const err = validateCIDR(s.subnet, t);
+          if (err) return showError({ message: t('dhcp.errors.subnetInvalid', { network: n.name, subnet: s.subnet, error: err }) });
           for (const r of s.range || []) {
-            if (!r.name) return alert('地址池名称不能为空');
-            if (validateIPv4(r.start) || validateIPv4(r.stop)) return alert(`地址池 ${r.name}: IP 格式错误`);
+            if (!r.name) return showError({ message: t('dhcp.errors.rangeNameRequired') });
+            if (validateIPv4(r.start, t) || validateIPv4(r.stop, t)) return showError({ message: t('dhcp.errors.rangeIpInvalid', { name: r.name }) });
           }
           for (const m of s.static_mapping || []) {
-            if (!m.name) return alert('静态映射名称不能为空');
-            if (m.ip_address && validateIPv4(m.ip_address)) return alert(`静态映射 ${m.name}: IP 格式错误`);
-            if (m.mac_address && validateMAC(m.mac_address)) return alert(`静态映射 ${m.name}: MAC 格式错误`);
+            if (!m.name) return showError({ message: t('dhcp.errors.staticMappingNameRequired') });
+            if (m.ip_address && validateIPv4(m.ip_address, t)) return showError({ message: t('dhcp.errors.staticMappingIpInvalid', { name: m.name }) });
+            if (m.mac_address && validateMAC(m.mac_address, t)) return showError({ message: t('dhcp.errors.staticMappingMacInvalid', { name: m.name }) });
           }
         }
       }
@@ -645,6 +656,7 @@ export default defineComponent({
       saving.value = true;
       try {
         await configApi.set('service dhcp-server', dhcpServerToConfig(config.value));
+        configStore.markPending();
         saved.value = true;
         await load();
       } catch (e) {
@@ -663,21 +675,21 @@ export default defineComponent({
       showSharedNetworkModal.value = true;
     }
     function editSharedNetwork() {
-      if (!selectedSharedNetwork.value.length) return alert('请选择要编辑的共享网络');
+      if (!selectedSharedNetwork.value.length) return showError({ message: t('dhcp.messages.selectSharedNetwork') });
       const row = (config.value.shared_networks || []).find(n => n.name === selectedSharedNetwork.value[0]);
-      if (!row) return alert('未找到选中的共享网络');
+      if (!row) return showError({ message: t('dhcp.messages.sharedNetworkNotFound') });
       editingSharedNetwork.value = JSON.parse(JSON.stringify(row));
       sharedNetworkActiveTab.value = 'basic';
       showSharedNetworkModal.value = true;
     }
     function removeSharedNetwork() {
-      if (!selectedSharedNetwork.value.length) return alert('请选择要删除的共享网络');
+      if (!selectedSharedNetwork.value.length) return showError({ message: t('dhcp.messages.selectSharedNetwork') });
       config.value.shared_networks = (config.value.shared_networks || []).filter(n => n.name !== selectedSharedNetwork.value[0]);
       selectedSharedNetwork.value = [];
     }
     function saveSharedNetwork() {
-      const err = validateName(editingSharedNetwork.value.name);
-      if (err) return alert(err);
+      const err = validateName(editingSharedNetwork.value.name, t);
+      if (err) return showError({ message: err });
       const list = config.value.shared_networks || [];
       const idx = list.findIndex(n => n._name === editingSharedNetwork.value._name);
       if (idx >= 0) list.splice(idx, 1, { ...editingSharedNetwork.value });
@@ -696,21 +708,21 @@ export default defineComponent({
       showSubnetModal.value = true;
     }
     function editSubnet() {
-      if (!selectedSubnet.value.length) return alert('请选择要编辑的子网');
+      if (!selectedSubnet.value.length) return showError({ message: t('dhcp.messages.selectSubnet') });
       const row = (editingSharedNetwork.value.subnets || []).find(s => s.subnet === selectedSubnet.value[0]);
-      if (!row) return alert('未找到选中的子网');
+      if (!row) return showError({ message: t('dhcp.messages.subnetNotFound') });
       editingSubnet.value = JSON.parse(JSON.stringify(row));
       showSubnetModal.value = true;
     }
     function removeSubnet() {
-      if (!selectedSubnet.value.length) return alert('请选择要删除的子网');
+      if (!selectedSubnet.value.length) return showError({ message: t('dhcp.messages.selectSubnet') });
       editingSharedNetwork.value.subnets = (editingSharedNetwork.value.subnets || []).filter(s => s.subnet !== selectedSubnet.value[0]);
       selectedSubnet.value = [];
     }
     function saveSubnet() {
-      if (!editingSubnet.value.subnet) return alert('请输入子网');
-      const err = validateCIDR(editingSubnet.value.subnet);
-      if (err) return alert(err);
+      if (!editingSubnet.value.subnet) return showError({ message: t('dhcp.messages.enterSubnet') });
+      const err = validateCIDR(editingSubnet.value.subnet, t);
+      if (err) return showError({ message: err });
       const list = editingSharedNetwork.value.subnets || [];
       const idx = list.findIndex(s => s._subnet === editingSubnet.value._subnet);
       if (idx >= 0) list.splice(idx, 1, { ...editingSubnet.value });
@@ -724,21 +736,21 @@ export default defineComponent({
       showRangeModal.value = true;
     }
     function editRange() {
-      if (!selectedRange.value.length) return alert('请选择要编辑的地址池');
+      if (!selectedRange.value.length) return showError({ message: t('dhcp.messages.selectRange') });
       const row = (editingSubnet.value.range || []).find(r => r.name === selectedRange.value[0]);
-      if (!row) return alert('未找到选中的地址池');
+      if (!row) return showError({ message: t('dhcp.messages.rangeNotFound') });
       editingRange.value = { ...row };
       showRangeModal.value = true;
     }
     function removeRange() {
-      if (!selectedRange.value.length) return alert('请选择要删除的地址池');
+      if (!selectedRange.value.length) return showError({ message: t('dhcp.messages.selectRange') });
       editingSubnet.value.range = (editingSubnet.value.range || []).filter(r => r.name !== selectedRange.value[0]);
       selectedRange.value = [];
     }
     function saveRange() {
-      if (!editingRange.value.name) return alert('请输入地址池名称');
-      if (editingRange.value.start && validateIPv4(editingRange.value.start)) return alert('起始 IP 格式错误');
-      if (editingRange.value.stop && validateIPv4(editingRange.value.stop)) return alert('结束 IP 格式错误');
+      if (!editingRange.value.name) return showError({ message: t('dhcp.messages.enterRangeName') });
+      if (editingRange.value.start && validateIPv4(editingRange.value.start, t)) return showError({ message: t('dhcp.validation.startIpInvalid') });
+      if (editingRange.value.stop && validateIPv4(editingRange.value.stop, t)) return showError({ message: t('dhcp.validation.endIpInvalid') });
       const list = editingSubnet.value.range || [];
       const idx = list.findIndex(r => r._name === editingRange.value._name);
       if (idx >= 0) list.splice(idx, 1, { ...editingRange.value });
@@ -752,21 +764,21 @@ export default defineComponent({
       showStaticMappingModal.value = true;
     }
     function editStaticMapping() {
-      if (!selectedStaticMapping.value.length) return alert('请选择要编辑的静态映射');
+      if (!selectedStaticMapping.value.length) return showError({ message: t('dhcp.messages.selectStaticMapping') });
       const row = (editingSubnet.value.static_mapping || []).find(m => m.name === selectedStaticMapping.value[0]);
-      if (!row) return alert('未找到选中的静态映射');
+      if (!row) return showError({ message: t('dhcp.messages.staticMappingNotFound') });
       editingStaticMapping.value = { ...row };
       showStaticMappingModal.value = true;
     }
     function removeStaticMapping() {
-      if (!selectedStaticMapping.value.length) return alert('请选择要删除的静态映射');
+      if (!selectedStaticMapping.value.length) return showError({ message: t('dhcp.messages.selectStaticMapping') });
       editingSubnet.value.static_mapping = (editingSubnet.value.static_mapping || []).filter(m => m.name !== selectedStaticMapping.value[0]);
       selectedStaticMapping.value = [];
     }
     function saveStaticMapping() {
-      if (!editingStaticMapping.value.name) return alert('请输入静态映射名称');
-      if (editingStaticMapping.value.ip_address && validateIPv4(editingStaticMapping.value.ip_address)) return alert('IP 格式错误');
-      if (editingStaticMapping.value.mac_address && validateMAC(editingStaticMapping.value.mac_address)) return alert('MAC 格式错误');
+      if (!editingStaticMapping.value.name) return showError({ message: t('dhcp.messages.enterStaticMappingName') });
+      if (editingStaticMapping.value.ip_address && validateIPv4(editingStaticMapping.value.ip_address, t)) return showError({ message: t('dhcp.validation.ipInvalid') });
+      if (editingStaticMapping.value.mac_address && validateMAC(editingStaticMapping.value.mac_address, t)) return showError({ message: t('dhcp.validation.macInvalid') });
       const list = editingSubnet.value.static_mapping || [];
       const idx = list.findIndex(m => m._name === editingStaticMapping.value._name);
       if (idx >= 0) list.splice(idx, 1, { ...editingStaticMapping.value });
@@ -777,9 +789,11 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      onMenuRefresh(load);
     });
 
     return {
+      t,
       HA_MODE_OPTIONS,
       loading, saving, saved, config, activeTab, writeDisabled, commandPath, interfaces, listenAddressOptions,
       sharedNetworkColumns, subnetColumns, rangeColumns, staticMappingColumns,
@@ -798,80 +812,76 @@ export default defineComponent({
   components: { DataTable, DraggableModal, TabGroup, ToolbarButton, DhcpOptionForm },
   template: `
     <div class="page-container">
-      <div v-if="saved" class="alert alert-success">已保存</div>
+      <div v-if="saved" class="alert alert-success">{{ t('dhcp.alerts.saved') }}</div>
       <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: '基本' },
-        { key: 'ha', title: '高可用性' },
-        { key: 'shared-networks', title: '共享网络' }
+        { key: 'basic', title: t('dhcp.tabs.basic') },
+        { key: 'ha', title: t('dhcp.tabs.ha') },
+        { key: 'shared-networks', title: t('dhcp.tabs.sharedNetworks') }
       ]">
 
       <template #basic>
-        <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="config.disable" title="禁用 DHCP 服务器实例" /></div>
-        <div class="form-row"><label class="form-label">动态 DNS 更新</label><input type="checkbox" v-model="config.dynamic_dns_update" title="根据 RFC4702 动态更新 DNS" /></div>
-        <div class="form-row"><label class="form-label">更新 /etc/hosts</label><input type="checkbox" v-model="config.hostfile_update" title="根据客户端租约更新 /etc/hosts" /></div>
-        <div class="form-row"><label class="form-label">监听地址</label>
+        <div class="form-row"><label class="form-label">{{ t('dhcp.labels.disable') }}</label><input type="checkbox" v-model="config.disable" :title="t('dhcp.titles.disable')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcp.labels.dynamicDnsUpdate') }}</label><input type="checkbox" v-model="config.dynamic_dns_update" :title="t('dhcp.titles.dynamicDnsUpdate')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcp.labels.hostfileUpdate') }}</label><input type="checkbox" v-model="config.hostfile_update" :title="t('dhcp.titles.hostfileUpdate')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcp.labels.listenAddress') }}</label>
           <div style="display:flex;flex-direction:column;gap:4px;">
-            <select class="form-control" @change="appendListenAddress($event.target.value); $event.target.value = ''" title="选择接口上的 IPv4 地址追加到下方">
-              <option value="">选择预设地址追加</option>
+            <select class="form-control" @change="appendListenAddress($event.target.value); $event.target.value = ''" :title="t('dhcp.titles.listenAddressSelect')">
+              <option value="">{{ t('dhcp.placeholders.selectPresetAddress') }}</option>
               <option v-for="addr in listenAddressOptions" :key="addr" :value="addr">{{ addr }}</option>
             </select>
-            <textarea class="form-control" v-model="config.listen_address" rows="3" placeholder="每行一个 IPv4 监听地址，也可手动输入" title="本地 IPv4 监听地址" />
+            <textarea class="form-control" v-model="config.listen_address" rows="3" :placeholder="t('dhcp.placeholders.listenAddress')" :title="t('dhcp.titles.listenAddress')" />
           </div>
         </div>
-        <div class="form-row"><label class="form-label">监听接口</label>
-          <select class="form-control" v-model="config.listen_interface" title="监听接口">
-            <option value="">请选择接口</option>
+        <div class="form-row"><label class="form-label">{{ t('dhcp.labels.listenInterface') }}</label>
+          <select class="form-control" v-model="config.listen_interface" :title="t('dhcp.titles.listenInterface')">
+            <option value="">{{ t('dhcp.placeholders.selectInterface') }}</option>
             <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
           </select>
         </div>
       </template>
 
       <template #ha>
-        <div class="form-row"><label class="form-label">模式</label>
-          <select class="form-control" v-model="config.high_availability.mode" title="高可用性模式，默认 active-active">
+        <div class="form-row"><label class="form-label">{{ t('dhcp.labels.mode') }}</label>
+          <select class="form-control" v-model="config.high_availability.mode" :title="t('dhcp.titles.mode')">
             <option v-for="o in HA_MODE_OPTIONS" :key="o" :value="o">{{ o }}</option>
           </select>
         </div>
-        <div class="form-row"><label class="form-label">对端名称</label><input class="form-control" v-model="config.high_availability.name" title="用于标识连接的对等名称" /></div>
-        <div class="form-row"><label class="form-label">远端地址</label><input class="form-control" v-model="config.high_availability.remote" placeholder="x.x.x.x" title="高可用性对等 IPv4 地址" /></div>
-        <div class="form-row"><label class="form-label">源地址</label><input class="form-control" v-model="config.high_availability.source_address" placeholder="x.x.x.x" title="发起连接使用的 IPv4 源地址" /></div>
-        <div class="form-row"><label class="form-label">状态层级</label><input class="form-control" v-model="config.high_availability.status" title="高可用性层级状态" /></div>
-        <div class="form-row"><label class="form-label">CA 证书</label><input class="form-control" v-model="config.high_availability.ca_certificate" title="PKI 中的 CA 证书名称" /></div>
-        <div class="form-row"><label class="form-label">证书</label><input class="form-control" v-model="config.high_availability.certificate" title="PKI 中的证书名称" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcp.labels.peerName') }}</label><input class="form-control" v-model="config.high_availability.name" :title="t('dhcp.titles.peerName')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcp.labels.remoteAddress') }}</label><input class="form-control" v-model="config.high_availability.remote" :placeholder="t('dhcp.placeholders.ipv4')" :title="t('dhcp.titles.remoteAddress')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcp.labels.sourceAddress') }}</label><input class="form-control" v-model="config.high_availability.source_address" :placeholder="t('dhcp.placeholders.ipv4')" :title="t('dhcp.titles.sourceAddress')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcp.labels.statusLevel') }}</label><input class="form-control" v-model="config.high_availability.status" :title="t('dhcp.titles.statusLevel')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcp.labels.caCertificate') }}</label><input class="form-control" v-model="config.high_availability.ca_certificate" :title="t('dhcp.titles.caCertificate')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcp.labels.certificate') }}</label><input class="form-control" v-model="config.high_availability.certificate" :title="t('dhcp.titles.certificate')" /></div>
       </template>
 
       <template #shared-networks>
         <div class="toolbar">
-          <ToolbarButton icon="create" @click="createSharedNetwork">创建</ToolbarButton>
-          <ToolbarButton icon="edit" @click="editSharedNetwork" :disabled="!selectedSharedNetwork.length || selectedSharedNetwork.length > 1">编辑</ToolbarButton>
-          <ToolbarButton icon="delete" @click="removeSharedNetwork" :disabled="!selectedSharedNetwork.length">删除</ToolbarButton>
+          <ToolbarButton icon="create" @click="createSharedNetwork">{{ t('app.create') }}</ToolbarButton>
+          <ToolbarButton icon="edit" @click="editSharedNetwork" :disabled="!selectedSharedNetwork.length || selectedSharedNetwork.length > 1">{{ t('app.edit') }}</ToolbarButton>
+          <ToolbarButton icon="delete" @click="removeSharedNetwork" :disabled="!selectedSharedNetwork.length">{{ t('app.delete') }}</ToolbarButton>
         </div>
         <DataTable :columns="sharedNetworkColumns" :data="config.shared_networks" row-key="name" :externalToolbar="true" @selection-change="selectedSharedNetwork = $event" :selectable="true" />
       </template>
       </TabGroup>
 
-      <div class="page-actions-bottom">
-        <ToolbarButton icon="save" primary @click="save" :disabled="saving || writeDisabled">{{ saving ? '保存中...' : '保存' }}</ToolbarButton>
-      </div>
-
-      <DraggableModal v-model:visible="showSharedNetworkModal" title="共享网络" width="780" @confirm="saveSharedNetwork" @close="showSharedNetworkModal = false">
+      <DraggableModal v-model:visible="showSharedNetworkModal" :title="t('dhcp.modals.sharedNetwork')" width="780" @confirm="saveSharedNetwork" @close="showSharedNetworkModal = false">
         <TabGroup v-model="sharedNetworkActiveTab" :tabs="[
-          { key: 'basic', title: '基本' },
-          { key: 'subnets', title: '子网' },
-          { key: 'options', title: '选项' }
+          { key: 'basic', title: t('dhcp.tabs.basic') },
+          { key: 'subnets', title: t('dhcp.tabs.subnets') },
+          { key: 'options', title: t('dhcp.tabs.options') }
         ]">
           <template #basic>
-            <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingSharedNetwork.name" :disabled="editingSharedNetwork._name" title="共享网络名称" /></div>
-            <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingSharedNetwork.description" title="描述" /></div>
-            <div class="form-row"><label class="form-label">权威</label><input type="checkbox" v-model="editingSharedNetwork.authoritative" title="使 DHCP 服务器对该物理网络具有权威性" /></div>
-            <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingSharedNetwork.disable" title="禁用该共享网络" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.columns.name') }}</label><input class="form-control" v-model="editingSharedNetwork.name" :disabled="editingSharedNetwork._name" :title="t('dhcp.titles.sharedNetworkName')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.columns.description') }}</label><input class="form-control" v-model="editingSharedNetwork.description" :title="t('dhcp.titles.description')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.columns.authoritative') }}</label><input type="checkbox" v-model="editingSharedNetwork.authoritative" :title="t('dhcp.titles.authoritative')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.columns.disable') }}</label><input type="checkbox" v-model="editingSharedNetwork.disable" :title="t('dhcp.titles.disableSharedNetwork')" /></div>
           </template>
 
           <template #subnets>
             <div class="toolbar">
-              <ToolbarButton icon="create" @click="createSubnet">创建</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editSubnet" :disabled="!selectedSubnet.length || selectedSubnet.length > 1">编辑</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removeSubnet" :disabled="!selectedSubnet.length">删除</ToolbarButton>
+              <ToolbarButton icon="create" @click="createSubnet">{{ t('app.create') }}</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editSubnet" :disabled="!selectedSubnet.length || selectedSubnet.length > 1">{{ t('app.edit') }}</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removeSubnet" :disabled="!selectedSubnet.length">{{ t('app.delete') }}</ToolbarButton>
             </div>
             <DataTable :columns="subnetColumns" :data="editingSharedNetwork.subnets" row-key="subnet" :externalToolbar="true" @selection-change="selectedSubnet = $event" :selectable="true" />
           </template>
@@ -882,42 +892,42 @@ export default defineComponent({
         </TabGroup>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showSubnetModal" title="子网" width="780" @confirm="saveSubnet" @close="showSubnetModal = false">
+      <DraggableModal v-model:visible="showSubnetModal" :title="t('dhcp.modals.subnet')" width="780" @confirm="saveSubnet" @close="showSubnetModal = false">
         <TabGroup :tabs="[
-          { key: 'basic', title: '基本' },
-          { key: 'ranges', title: '地址池' },
-          { key: 'mappings', title: '静态映射' },
-          { key: 'options', title: '选项' }
+          { key: 'basic', title: t('dhcp.tabs.basic') },
+          { key: 'ranges', title: t('dhcp.tabs.ranges') },
+          { key: 'mappings', title: t('dhcp.tabs.mappings') },
+          { key: 'options', title: t('dhcp.tabs.options') }
         ]">
           <template #basic>
-            <div class="form-row"><label class="form-label">子网</label><input class="form-control" v-model="editingSubnet.subnet" :disabled="editingSubnet._subnet" placeholder="x.x.x.x/x" title="子网 CIDR" /></div>
-            <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingSubnet.description" title="描述" /></div>
-            <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingSubnet.disable" title="禁用该子网" /></div>
-            <div class="form-row"><label class="form-label">子网 ID</label><input type="number" min="0" max="4294967295" class="form-control" v-model="editingSubnet.subnet_id" placeholder="0-4294967295" title="唯一子网 ID（0-4294967295）" /></div>
-            <div class="form-row"><label class="form-label">忽略客户端 ID</label><input type="checkbox" v-model="editingSubnet.ignore_client_id" title="在租约查找时忽略客户端标识符" /></div>
-            <div class="form-row"><label class="form-label">租约时间</label><input type="number" min="1" class="form-control" v-model="editingSubnet.lease" placeholder="秒，默认 86400" title="租约超时时间（秒，默认 86400）" /></div>
-            <div class="form-row"><label class="form-label">排除地址</label><textarea class="form-control" v-model="editingSubnet.exclude" rows="2" placeholder="每行一个要排除的 IPv4 地址" title="从 DHCP 租约范围中排除的 IP 地址" /></div>
-            <div class="form-row"><label class="form-label">默认路由器</label><textarea class="form-control" v-model="editingSubnet.default_router" rows="2" placeholder="每行一个 IPv4 地址" title="默认路由器 IP 地址" /></div>
-            <div class="form-row"><label class="form-label">域名</label><input class="form-control" v-model="editingSubnet.domain_name" title="客户端域名" /></div>
-            <div class="form-row"><label class="form-label">域名搜索列表</label><textarea class="form-control" v-model="editingSubnet.domain_search" rows="2" placeholder="每行一个域名" title="域名搜索列表" /></div>
-            <div class="form-row"><label class="form-label">DNS 服务器</label><textarea class="form-control" v-model="editingSubnet.name_server" rows="2" placeholder="每行一个 IPv4 地址" title="域名服务器地址" /></div>
-            <div class="form-row"><label class="form-label">NTP 服务器</label><textarea class="form-control" v-model="editingSubnet.ntp_server" rows="2" placeholder="每行一个 IPv4 地址" title="NTP 服务器地址" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.columns.subnet') }}</label><input class="form-control" v-model="editingSubnet.subnet" :disabled="editingSubnet._subnet" :placeholder="t('dhcp.placeholders.cidr')" :title="t('dhcp.titles.subnetCidr')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.columns.description') }}</label><input class="form-control" v-model="editingSubnet.description" :title="t('dhcp.titles.description')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.columns.disable') }}</label><input type="checkbox" v-model="editingSubnet.disable" :title="t('dhcp.titles.disableSubnet')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.columns.subnetId') }}</label><input type="number" min="0" max="4294967295" class="form-control" v-model="editingSubnet.subnet_id" :placeholder="t('dhcp.placeholders.subnetId')" :title="t('dhcp.titles.subnetId')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.labels.ignoreClientId') }}</label><input type="checkbox" v-model="editingSubnet.ignore_client_id" :title="t('dhcp.titles.ignoreClientId')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.labels.leaseTime') }}</label><input type="number" min="1" class="form-control" v-model="editingSubnet.lease" :placeholder="t('dhcp.placeholders.leaseTime')" :title="t('dhcp.titles.leaseTime')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.labels.excludeAddresses') }}</label><textarea class="form-control" v-model="editingSubnet.exclude" rows="2" :placeholder="t('dhcp.placeholders.excludeAddresses')" :title="t('dhcp.titles.excludeAddresses')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.labels.defaultRouter') }}</label><textarea class="form-control" v-model="editingSubnet.default_router" rows="2" :placeholder="t('dhcp.placeholders.onePerLine')" :title="t('dhcp.titles.defaultRouter')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.labels.domainName') }}</label><input class="form-control" v-model="editingSubnet.domain_name" :title="t('dhcp.titles.domainName')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.labels.domainSearch') }}</label><textarea class="form-control" v-model="editingSubnet.domain_search" rows="2" :placeholder="t('dhcp.placeholders.onePerLine')" :title="t('dhcp.titles.domainSearch')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.labels.dnsServer') }}</label><textarea class="form-control" v-model="editingSubnet.name_server" rows="2" :placeholder="t('dhcp.placeholders.onePerLine')" :title="t('dhcp.titles.dnsServer')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.labels.ntpServer') }}</label><textarea class="form-control" v-model="editingSubnet.ntp_server" rows="2" :placeholder="t('dhcp.placeholders.onePerLine')" :title="t('dhcp.titles.ntpServer')" /></div>
           </template>
 
           <template #ranges>
             <div class="toolbar">
-              <ToolbarButton icon="create" @click="createRange">创建</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editRange" :disabled="!selectedRange.length || selectedRange.length > 1">编辑</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removeRange" :disabled="!selectedRange.length">删除</ToolbarButton>
+              <ToolbarButton icon="create" @click="createRange">{{ t('app.create') }}</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editRange" :disabled="!selectedRange.length || selectedRange.length > 1">{{ t('app.edit') }}</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removeRange" :disabled="!selectedRange.length">{{ t('app.delete') }}</ToolbarButton>
             </div>
             <DataTable :columns="rangeColumns" :data="editingSubnet.range" row-key="name" :externalToolbar="true" @selection-change="selectedRange = $event" :selectable="true" />
           </template>
 
           <template #mappings>
             <div class="toolbar">
-              <ToolbarButton icon="create" @click="createStaticMapping">创建</ToolbarButton>
-              <ToolbarButton icon="edit" @click="editStaticMapping" :disabled="!selectedStaticMapping.length || selectedStaticMapping.length > 1">编辑</ToolbarButton>
-              <ToolbarButton icon="delete" @click="removeStaticMapping" :disabled="!selectedStaticMapping.length">删除</ToolbarButton>
+              <ToolbarButton icon="create" @click="createStaticMapping">{{ t('app.create') }}</ToolbarButton>
+              <ToolbarButton icon="edit" @click="editStaticMapping" :disabled="!selectedStaticMapping.length || selectedStaticMapping.length > 1">{{ t('app.edit') }}</ToolbarButton>
+              <ToolbarButton icon="delete" @click="removeStaticMapping" :disabled="!selectedStaticMapping.length">{{ t('app.delete') }}</ToolbarButton>
             </div>
             <DataTable :columns="staticMappingColumns" :data="editingSubnet.static_mapping" row-key="name" :externalToolbar="true" @selection-change="selectedStaticMapping = $event" :selectable="true" />
           </template>
@@ -928,24 +938,24 @@ export default defineComponent({
         </TabGroup>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showRangeModal" title="地址池" @confirm="saveRange" @close="showRangeModal = false">
-        <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingRange.name" :disabled="editingRange._name" title="地址池名称" /></div>
-        <div class="form-row"><label class="form-label">起始地址</label><input class="form-control" v-model="editingRange.start" placeholder="x.x.x.x" title="起始 IPv4 地址" /></div>
-        <div class="form-row"><label class="form-label">结束地址</label><input class="form-control" v-model="editingRange.stop" placeholder="x.x.x.x" title="结束 IPv4 地址" /></div>
+      <DraggableModal v-model:visible="showRangeModal" :title="t('dhcp.modals.range')" @confirm="saveRange" @close="showRangeModal = false">
+        <div class="form-row"><label class="form-label">{{ t('dhcp.columns.name') }}</label><input class="form-control" v-model="editingRange.name" :disabled="editingRange._name" :title="t('dhcp.titles.rangeName')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcp.labels.startAddress') }}</label><input class="form-control" v-model="editingRange.start" :placeholder="t('dhcp.placeholders.ipv4')" :title="t('dhcp.titles.startAddress')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('dhcp.labels.endAddress') }}</label><input class="form-control" v-model="editingRange.stop" :placeholder="t('dhcp.placeholders.ipv4')" :title="t('dhcp.titles.endAddress')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="showStaticMappingModal" title="静态映射" width="780" @confirm="saveStaticMapping" @close="showStaticMappingModal = false">
+      <DraggableModal v-model:visible="showStaticMappingModal" :title="t('dhcp.modals.staticMapping')" width="780" @confirm="saveStaticMapping" @close="showStaticMappingModal = false">
         <TabGroup :tabs="[
-          { key: 'basic', title: '基本' },
-          { key: 'options', title: '选项' }
+          { key: 'basic', title: t('dhcp.tabs.basic') },
+          { key: 'options', title: t('dhcp.tabs.options') }
         ]">
           <template #basic>
-            <div class="form-row"><label class="form-label">名称</label><input class="form-control" v-model="editingStaticMapping.name" :disabled="editingStaticMapping._name" title="静态映射名称" /></div>
-            <div class="form-row"><label class="form-label">描述</label><input class="form-control" v-model="editingStaticMapping.description" title="描述" /></div>
-            <div class="form-row"><label class="form-label">禁用</label><input type="checkbox" v-model="editingStaticMapping.disable" title="禁用该静态映射" /></div>
-            <div class="form-row"><label class="form-label">DUID</label><input class="form-control" v-model="editingStaticMapping.duid" placeholder="xx:xx:xx:xx:xx:xx:xx:xx" title="客户端 DHCP 唯一标识符" /></div>
-            <div class="form-row"><label class="form-label">IP 地址</label><input class="form-control" v-model="editingStaticMapping.ip_address" placeholder="x.x.x.x" title="静态 IP 地址" /></div>
-            <div class="form-row"><label class="form-label">MAC 地址</label><input class="form-control" v-model="editingStaticMapping.mac_address" placeholder="aa:bb:cc:dd:ee:ff" title="MAC 地址" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.columns.name') }}</label><input class="form-control" v-model="editingStaticMapping.name" :disabled="editingStaticMapping._name" :title="t('dhcp.titles.staticMappingName')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.columns.description') }}</label><input class="form-control" v-model="editingStaticMapping.description" :title="t('dhcp.titles.description')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.columns.disable') }}</label><input type="checkbox" v-model="editingStaticMapping.disable" :title="t('dhcp.titles.disableStaticMapping')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.columns.duid') }}</label><input class="form-control" v-model="editingStaticMapping.duid" :placeholder="t('dhcp.placeholders.duid')" :title="t('dhcp.titles.duid')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.columns.ipAddress') }}</label><input class="form-control" v-model="editingStaticMapping.ip_address" :placeholder="t('dhcp.placeholders.ipv4')" :title="t('dhcp.titles.ipAddress')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('dhcp.columns.macAddress') }}</label><input class="form-control" v-model="editingStaticMapping.mac_address" :placeholder="t('dhcp.placeholders.mac')" :title="t('dhcp.titles.macAddress')" /></div>
           </template>
 
           <template #options>

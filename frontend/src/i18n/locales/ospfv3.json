@@ -1,0 +1,1227 @@
+{
+  "zh-CN": {
+    "routing": {
+      "ospfv3": {
+        "tab": {
+          "basic": "基本设置",
+          "areas": "区域",
+          "interfaces": "接口",
+          "redistribute": "重分发",
+          "defaultInfo": "默认信息",
+          "distance": "距离",
+          "gracefulRestart": "优雅重启"
+        },
+        "basic": {
+          "title": "基本设置",
+          "routerId": "Router ID",
+          "routerIdPlaceholder": "例如: 1.1.1.1",
+          "routerIdTitle": "路由器 ID (IPv4 地址格式)",
+          "referenceBandwidth": "参考带宽",
+          "referenceBandwidthPlaceholder": "1-4000000",
+          "referenceBandwidthTitle": "自动成本计算的参考带宽 (1-4000000)",
+          "logAdjacencyChanges": "记录邻接关系变化",
+          "logAdjacencyChangesDetail": "记录详细信息"
+        },
+        "area": {
+          "id": "区域 ID",
+          "type": "区域类型",
+          "rangeCount": "范围数量",
+          "title": "区域"
+        },
+        "interface": {
+          "name": "接口名称",
+          "cost": "成本",
+          "networkType": "网络类型"
+        },
+        "redistribute": {
+          "protocol": "协议",
+          "metric": "度量值",
+          "metricType": "度量值类型"
+        },
+        "defaultInfo": {
+          "title": "默认信息通告",
+          "alwaysOriginate": "始终通告",
+          "metric": "度量值",
+          "metricType": "度量值类型",
+          "metricTypeDefault": "默认 (2)",
+          "metricType1": "类型 1",
+          "metricType2": "类型 2",
+          "routeMap": "路由映射",
+          "routeMapPlaceholder": "路由映射名称"
+        },
+        "distance": {
+          "title": "管理距离",
+          "global": "全局距离",
+          "ospfv3Distance": "OSPFv3 距离",
+          "external": "外部",
+          "interArea": "区域间",
+          "intraArea": "区域内"
+        },
+        "gracefulRestart": {
+          "title": "优雅重启",
+          "gracePeriod": "Grace Period",
+          "gracePeriodPlaceholder": "1-1800",
+          "helperSettings": "Helper 设置",
+          "helperEnable": "启用 Helper",
+          "helperLsaCheckDisable": "禁用 LSA 检查",
+          "helperPlannedOnly": "仅计划重启",
+          "helperSupportedGraceTime": "支持的 Grace Time"
+        },
+        "modal": {
+          "addArea": "添加区域",
+          "editArea": "编辑区域",
+          "areaId": "区域 ID",
+          "areaIdPlaceholder": "例如: 0 或 0.0.0.0",
+          "areaType": "区域类型",
+          "exportList": "导出列表",
+          "importList": "导入列表",
+          "accessListPlaceholder": "访问列表名称",
+          "ranges": "范围",
+          "rangePlaceholder": "例如: 2001:db8::/32",
+          "advertise": "通告",
+          "notAdvertise": "不通告",
+          "addRange": "添加范围",
+          "addInterface": "添加接口",
+          "editInterface": "编辑接口",
+          "interfaceName": "接口名称",
+          "selectInterface": "选择接口",
+          "area": "区域",
+          "areaPlaceholder": "区域 ID",
+          "cost": "成本",
+          "networkType": "网络类型",
+          "helloInterval": "Hello 间隔",
+          "deadInterval": "Dead 间隔",
+          "retransmitInterval": "重传间隔",
+          "transmitDelay": "传输延迟",
+          "priority": "优先级",
+          "instanceId": "实例 ID",
+          "interfaceMtu": "接口 MTU",
+          "secondsPlaceholder": "秒",
+          "enableBfd": "启用 BFD",
+          "bfdProfile": "BFD Profile",
+          "bfdProfilePlaceholder": "BFD 配置文件名称",
+          "passiveMode": "被动模式",
+          "ignoreMtuMismatch": "忽略 MTU 不匹配",
+          "addRedistribute": "添加重分发",
+          "editRedistribute": "编辑重分发",
+          "protocol": "协议",
+          "routeMap": "路由映射",
+          "routeMapPlaceholder": "路由映射名称"
+        },
+        "confirm": {
+          "deleteArea": "确认删除以下区域？",
+          "deleteInterface": "确认删除以下接口？",
+          "deleteRedistribute": "确认删除以下重分发配置？"
+        },
+        "error": {
+          "routerId": "Router ID 错误: {error}",
+          "autoCost": "自动成本错误: {error}",
+          "area": "区域 {index} 错误: {error}",
+          "areaRange": "区域 {id} 范围 {index} 错误: {error}",
+          "areaIdRequired": "请输入区域 ID",
+          "interfaceCost": "接口 {name} 成本错误: {error}",
+          "interfacePriority": "接口 {name} 优先级错误: {error}",
+          "interface": "接口 {name} 错误: {error}",
+          "interfaceNameRequired": "请输入接口名称",
+          "distance": "距离错误: {error}",
+          "gracePeriod": "Grace Period 错误: {error}",
+          "protocolRequired": "请选择协议"
+        }
+      }
+    },
+    "ospfv3": {
+      "areaType": {
+        "stub": "Stub",
+        "nssa": "NSSA",
+        "stubNoSummary": "Stub (无汇总)",
+        "nssaNoSummary": "NSSA (无汇总)"
+      },
+      "networkType": {
+        "broadcast": "广播",
+        "nonBroadcast": "非广播",
+        "pointToPoint": "点到点",
+        "pointToMultipoint": "点到多点"
+      },
+      "protocol": {
+        "babel": "Babel",
+        "bgp": "BGP",
+        "connected": "Connected",
+        "isis": "ISIS",
+        "kernel": "Kernel",
+        "ripng": "RIPng",
+        "static": "Static"
+      }
+    },
+    "validation": {
+      "ipv4Format": "IPv4 地址格式错误",
+      "ipv6PrefixFormat": "IPv6 前缀格式错误",
+      "areaIdRange": "区域 ID 必须在 0-4294967295 之间",
+      "areaIdFormat": "区域 ID 必须是整数或 IPv4 地址格式",
+      "costRange": "成本必须在 1-65535 之间",
+      "priorityRange": "优先级必须在 0-255 之间",
+      "metricRange": "度量值必须在 0-16777214 之间",
+      "metricTypeInvalid": "度量值类型必须是 1 或 2",
+      "distanceRange": "距离必须在 1-255 之间",
+      "autoCostRange": "自动成本必须在 1-4000000 之间",
+      "gracePeriodRange": "Grace Period 必须在 1-1800 之间",
+      "instanceIdRange": "实例 ID 必须在 0-255 之间",
+      "mtuRange": "MTU 必须在 128-65535 之间"
+    },
+    "common": {
+      "default": "默认",
+      "saved": "已保存",
+      "delete": "删除",
+      "confirmDelete": "确认删除"
+    }
+  },
+  "en": {
+    "routing": {
+      "ospfv3": {
+        "tab": {
+          "basic": "Basic",
+          "areas": "Areas",
+          "interfaces": "Interfaces",
+          "redistribute": "Redistribute",
+          "defaultInfo": "Default Info",
+          "distance": "Distance",
+          "gracefulRestart": "Graceful Restart"
+        },
+        "basic": {
+          "title": "Basic Settings",
+          "routerId": "Router ID",
+          "routerIdPlaceholder": "e.g., 1.1.1.1",
+          "routerIdTitle": "Router ID (IPv4 address format)",
+          "referenceBandwidth": "Reference Bandwidth",
+          "referenceBandwidthPlaceholder": "1-4000000",
+          "referenceBandwidthTitle": "Reference bandwidth for auto-cost calculation (1-4000000)",
+          "logAdjacencyChanges": "Log Adjacency Changes",
+          "logAdjacencyChangesDetail": "Log Detail"
+        },
+        "area": {
+          "id": "Area ID",
+          "type": "Area Type",
+          "rangeCount": "Range Count",
+          "title": "Area"
+        },
+        "interface": {
+          "name": "Interface Name",
+          "cost": "Cost",
+          "networkType": "Network Type"
+        },
+        "redistribute": {
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "metricType": "Metric Type"
+        },
+        "defaultInfo": {
+          "title": "Default Information Originate",
+          "alwaysOriginate": "Always Originate",
+          "metric": "Metric",
+          "metricType": "Metric Type",
+          "metricTypeDefault": "Default (2)",
+          "metricType1": "Type 1",
+          "metricType2": "Type 2",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route-map name"
+        },
+        "distance": {
+          "title": "Administrative Distance",
+          "global": "Global Distance",
+          "ospfv3Distance": "OSPFv3 Distance",
+          "external": "External",
+          "interArea": "Inter-area",
+          "intraArea": "Intra-area"
+        },
+        "gracefulRestart": {
+          "title": "Graceful Restart",
+          "gracePeriod": "Grace Period",
+          "gracePeriodPlaceholder": "1-1800",
+          "helperSettings": "Helper Settings",
+          "helperEnable": "Enable Helper",
+          "helperLsaCheckDisable": "Disable LSA Check",
+          "helperPlannedOnly": "Planned Only",
+          "helperSupportedGraceTime": "Supported Grace Time"
+        },
+        "modal": {
+          "addArea": "Add Area",
+          "editArea": "Edit Area",
+          "areaId": "Area ID",
+          "areaIdPlaceholder": "e.g., 0 or 0.0.0.0",
+          "areaType": "Area Type",
+          "exportList": "Export List",
+          "importList": "Import List",
+          "accessListPlaceholder": "Access list name",
+          "ranges": "Ranges",
+          "rangePlaceholder": "e.g., 2001:db8::/32",
+          "advertise": "Advertise",
+          "notAdvertise": "Not Advertise",
+          "addRange": "Add Range",
+          "addInterface": "Add Interface",
+          "editInterface": "Edit Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select Interface",
+          "area": "Area",
+          "areaPlaceholder": "Area ID",
+          "cost": "Cost",
+          "networkType": "Network Type",
+          "helloInterval": "Hello Interval",
+          "deadInterval": "Dead Interval",
+          "retransmitInterval": "Retransmit Interval",
+          "transmitDelay": "Transmit Delay",
+          "priority": "Priority",
+          "instanceId": "Instance ID",
+          "interfaceMtu": "Interface MTU",
+          "secondsPlaceholder": "seconds",
+          "enableBfd": "Enable BFD",
+          "bfdProfile": "BFD Profile",
+          "bfdProfilePlaceholder": "BFD profile name",
+          "passiveMode": "Passive Mode",
+          "ignoreMtuMismatch": "Ignore MTU Mismatch",
+          "addRedistribute": "Add Redistribute",
+          "editRedistribute": "Edit Redistribute",
+          "protocol": "Protocol",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route-map name"
+        },
+        "confirm": {
+          "deleteArea": "Confirm delete the following area?",
+          "deleteInterface": "Confirm delete the following interface?",
+          "deleteRedistribute": "Confirm delete the following redistribute configuration?"
+        },
+        "error": {
+          "routerId": "Router ID error: {error}",
+          "autoCost": "Auto-cost error: {error}",
+          "area": "Area {index} error: {error}",
+          "areaRange": "Area {id} range {index} error: {error}",
+          "areaIdRequired": "Please enter area ID",
+          "interfaceCost": "Interface {name} cost error: {error}",
+          "interfacePriority": "Interface {name} priority error: {error}",
+          "interface": "Interface {name} error: {error}",
+          "interfaceNameRequired": "Please enter interface name",
+          "distance": "Distance error: {error}",
+          "gracePeriod": "Grace Period error: {error}",
+          "protocolRequired": "Please select protocol"
+        }
+      }
+    },
+    "ospfv3": {
+      "areaType": {
+        "stub": "Stub",
+        "nssa": "NSSA",
+        "stubNoSummary": "Stub (no-summary)",
+        "nssaNoSummary": "NSSA (no-summary)"
+      },
+      "networkType": {
+        "broadcast": "Broadcast",
+        "nonBroadcast": "Non-Broadcast",
+        "pointToPoint": "Point-to-Point",
+        "pointToMultipoint": "Point-to-Multipoint"
+      },
+      "protocol": {
+        "babel": "Babel",
+        "bgp": "BGP",
+        "connected": "Connected",
+        "isis": "ISIS",
+        "kernel": "Kernel",
+        "ripng": "RIPng",
+        "static": "Static"
+      }
+    },
+    "validation": {
+      "ipv4Format": "Invalid IPv4 address format",
+      "ipv6PrefixFormat": "Invalid IPv6 prefix format",
+      "areaIdRange": "Area ID must be between 0-4294967295",
+      "areaIdFormat": "Area ID must be an integer or IPv4 address format",
+      "costRange": "Cost must be between 1-65535",
+      "priorityRange": "Priority must be between 0-255",
+      "metricRange": "Metric must be between 0-16777214",
+      "metricTypeInvalid": "Metric type must be 1 or 2",
+      "distanceRange": "Distance must be between 1-255",
+      "autoCostRange": "Auto-cost must be between 1-4000000",
+      "gracePeriodRange": "Grace Period must be between 1-1800",
+      "instanceIdRange": "Instance ID must be between 0-255",
+      "mtuRange": "MTU must be between 128-65535"
+    },
+    "common": {
+      "default": "Default",
+      "saved": "Saved",
+      "delete": "Delete",
+      "confirmDelete": "Confirm Delete"
+    }
+  },
+  "zh-TW": {
+    "routing": {
+      "ospfv3": {
+        "tab": {
+          "basic": "Basic",
+          "areas": "Areas",
+          "interfaces": "Interfaces",
+          "redistribute": "Redistribute",
+          "defaultInfo": "Default Info",
+          "distance": "Distance",
+          "gracefulRestart": "Graceful Restart"
+        },
+        "basic": {
+          "title": "Basic Settings",
+          "routerId": "Router ID",
+          "routerIdPlaceholder": "e.g., 1.1.1.1",
+          "routerIdTitle": "Router ID (IPv4 address format)",
+          "referenceBandwidth": "Reference Bandwidth",
+          "referenceBandwidthPlaceholder": "1-4000000",
+          "referenceBandwidthTitle": "Reference bandwidth for auto-cost calculation (1-4000000)",
+          "logAdjacencyChanges": "Log Adjacency Changes",
+          "logAdjacencyChangesDetail": "Log Detail"
+        },
+        "area": {
+          "id": "Area ID",
+          "type": "Area Type",
+          "rangeCount": "Range Count",
+          "title": "Area"
+        },
+        "interface": {
+          "name": "Interface Name",
+          "cost": "Cost",
+          "networkType": "Network Type"
+        },
+        "redistribute": {
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "metricType": "Metric Type"
+        },
+        "defaultInfo": {
+          "title": "Default Information Originate",
+          "alwaysOriginate": "Always Originate",
+          "metric": "Metric",
+          "metricType": "Metric Type",
+          "metricTypeDefault": "Default (2)",
+          "metricType1": "Type 1",
+          "metricType2": "Type 2",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route-map name"
+        },
+        "distance": {
+          "title": "Administrative Distance",
+          "global": "Global Distance",
+          "ospfv3Distance": "OSPFv3 Distance",
+          "external": "External",
+          "interArea": "Inter-area",
+          "intraArea": "Intra-area"
+        },
+        "gracefulRestart": {
+          "title": "Graceful Restart",
+          "gracePeriod": "Grace Period",
+          "gracePeriodPlaceholder": "1-1800",
+          "helperSettings": "Helper Settings",
+          "helperEnable": "Enable Helper",
+          "helperLsaCheckDisable": "Disable LSA Check",
+          "helperPlannedOnly": "Planned Only",
+          "helperSupportedGraceTime": "Supported Grace Time"
+        },
+        "modal": {
+          "addArea": "Add Area",
+          "editArea": "Edit Area",
+          "areaId": "Area ID",
+          "areaIdPlaceholder": "e.g., 0 or 0.0.0.0",
+          "areaType": "Area Type",
+          "exportList": "Export List",
+          "importList": "Import List",
+          "accessListPlaceholder": "Access list name",
+          "ranges": "Ranges",
+          "rangePlaceholder": "e.g., 2001:db8::/32",
+          "advertise": "Advertise",
+          "notAdvertise": "Not Advertise",
+          "addRange": "Add Range",
+          "addInterface": "Add Interface",
+          "editInterface": "Edit Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select Interface",
+          "area": "Area",
+          "areaPlaceholder": "Area ID",
+          "cost": "Cost",
+          "networkType": "Network Type",
+          "helloInterval": "Hello Interval",
+          "deadInterval": "Dead Interval",
+          "retransmitInterval": "Retransmit Interval",
+          "transmitDelay": "Transmit Delay",
+          "priority": "Priority",
+          "instanceId": "Instance ID",
+          "interfaceMtu": "Interface MTU",
+          "secondsPlaceholder": "seconds",
+          "enableBfd": "Enable BFD",
+          "bfdProfile": "BFD Profile",
+          "bfdProfilePlaceholder": "BFD profile name",
+          "passiveMode": "Passive Mode",
+          "ignoreMtuMismatch": "Ignore MTU Mismatch",
+          "addRedistribute": "Add Redistribute",
+          "editRedistribute": "Edit Redistribute",
+          "protocol": "Protocol",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route-map name"
+        },
+        "confirm": {
+          "deleteArea": "Confirm delete the following area?",
+          "deleteInterface": "Confirm delete the following interface?",
+          "deleteRedistribute": "Confirm delete the following redistribute configuration?"
+        },
+        "error": {
+          "routerId": "Router ID error: {error}",
+          "autoCost": "Auto-cost error: {error}",
+          "area": "Area {index} error: {error}",
+          "areaRange": "Area {id} range {index} error: {error}",
+          "areaIdRequired": "Please enter area ID",
+          "interfaceCost": "Interface {name} cost error: {error}",
+          "interfacePriority": "Interface {name} priority error: {error}",
+          "interface": "Interface {name} error: {error}",
+          "interfaceNameRequired": "Please enter interface name",
+          "distance": "Distance error: {error}",
+          "gracePeriod": "Grace Period error: {error}",
+          "protocolRequired": "Please select protocol"
+        }
+      }
+    },
+    "ospfv3": {
+      "areaType": {
+        "stub": "Stub",
+        "nssa": "NSSA",
+        "stubNoSummary": "Stub (no-summary)",
+        "nssaNoSummary": "NSSA (no-summary)"
+      },
+      "networkType": {
+        "broadcast": "Broadcast",
+        "nonBroadcast": "Non-Broadcast",
+        "pointToPoint": "Point-to-Point",
+        "pointToMultipoint": "Point-to-Multipoint"
+      },
+      "protocol": {
+        "babel": "Babel",
+        "bgp": "BGP",
+        "connected": "Connected",
+        "isis": "ISIS",
+        "kernel": "Kernel",
+        "ripng": "RIPng",
+        "static": "Static"
+      }
+    },
+    "validation": {
+      "ipv4Format": "Invalid IPv4 address format",
+      "ipv6PrefixFormat": "Invalid IPv6 prefix format",
+      "areaIdRange": "Area ID must be between 0-4294967295",
+      "areaIdFormat": "Area ID must be an integer or IPv4 address format",
+      "costRange": "Cost must be between 1-65535",
+      "priorityRange": "Priority must be between 0-255",
+      "metricRange": "Metric must be between 0-16777214",
+      "metricTypeInvalid": "Metric type must be 1 or 2",
+      "distanceRange": "Distance must be between 1-255",
+      "autoCostRange": "Auto-cost must be between 1-4000000",
+      "gracePeriodRange": "Grace Period must be between 1-1800",
+      "instanceIdRange": "Instance ID must be between 0-255",
+      "mtuRange": "MTU must be between 128-65535"
+    },
+    "common": {
+      "default": "Default",
+      "saved": "Saved",
+      "delete": "Delete",
+      "confirmDelete": "Confirm Delete"
+    }
+  },
+  "ru": {
+    "routing": {
+      "ospfv3": {
+        "tab": {
+          "basic": "Basic",
+          "areas": "Areas",
+          "interfaces": "Interfaces",
+          "redistribute": "Redistribute",
+          "defaultInfo": "Default Info",
+          "distance": "Distance",
+          "gracefulRestart": "Graceful Restart"
+        },
+        "basic": {
+          "title": "Basic Settings",
+          "routerId": "Router ID",
+          "routerIdPlaceholder": "e.g., 1.1.1.1",
+          "routerIdTitle": "Router ID (IPv4 address format)",
+          "referenceBandwidth": "Reference Bandwidth",
+          "referenceBandwidthPlaceholder": "1-4000000",
+          "referenceBandwidthTitle": "Reference bandwidth for auto-cost calculation (1-4000000)",
+          "logAdjacencyChanges": "Log Adjacency Changes",
+          "logAdjacencyChangesDetail": "Log Detail"
+        },
+        "area": {
+          "id": "Area ID",
+          "type": "Area Type",
+          "rangeCount": "Range Count",
+          "title": "Area"
+        },
+        "interface": {
+          "name": "Interface Name",
+          "cost": "Cost",
+          "networkType": "Network Type"
+        },
+        "redistribute": {
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "metricType": "Metric Type"
+        },
+        "defaultInfo": {
+          "title": "Default Information Originate",
+          "alwaysOriginate": "Always Originate",
+          "metric": "Metric",
+          "metricType": "Metric Type",
+          "metricTypeDefault": "Default (2)",
+          "metricType1": "Type 1",
+          "metricType2": "Type 2",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route-map name"
+        },
+        "distance": {
+          "title": "Administrative Distance",
+          "global": "Global Distance",
+          "ospfv3Distance": "OSPFv3 Distance",
+          "external": "External",
+          "interArea": "Inter-area",
+          "intraArea": "Intra-area"
+        },
+        "gracefulRestart": {
+          "title": "Graceful Restart",
+          "gracePeriod": "Grace Period",
+          "gracePeriodPlaceholder": "1-1800",
+          "helperSettings": "Helper Settings",
+          "helperEnable": "Enable Helper",
+          "helperLsaCheckDisable": "Disable LSA Check",
+          "helperPlannedOnly": "Planned Only",
+          "helperSupportedGraceTime": "Supported Grace Time"
+        },
+        "modal": {
+          "addArea": "Add Area",
+          "editArea": "Edit Area",
+          "areaId": "Area ID",
+          "areaIdPlaceholder": "e.g., 0 or 0.0.0.0",
+          "areaType": "Area Type",
+          "exportList": "Export List",
+          "importList": "Import List",
+          "accessListPlaceholder": "Access list name",
+          "ranges": "Ranges",
+          "rangePlaceholder": "e.g., 2001:db8::/32",
+          "advertise": "Advertise",
+          "notAdvertise": "Not Advertise",
+          "addRange": "Add Range",
+          "addInterface": "Add Interface",
+          "editInterface": "Edit Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select Interface",
+          "area": "Area",
+          "areaPlaceholder": "Area ID",
+          "cost": "Cost",
+          "networkType": "Network Type",
+          "helloInterval": "Hello Interval",
+          "deadInterval": "Dead Interval",
+          "retransmitInterval": "Retransmit Interval",
+          "transmitDelay": "Transmit Delay",
+          "priority": "Priority",
+          "instanceId": "Instance ID",
+          "interfaceMtu": "Interface MTU",
+          "secondsPlaceholder": "seconds",
+          "enableBfd": "Enable BFD",
+          "bfdProfile": "BFD Profile",
+          "bfdProfilePlaceholder": "BFD profile name",
+          "passiveMode": "Passive Mode",
+          "ignoreMtuMismatch": "Ignore MTU Mismatch",
+          "addRedistribute": "Add Redistribute",
+          "editRedistribute": "Edit Redistribute",
+          "protocol": "Protocol",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route-map name"
+        },
+        "confirm": {
+          "deleteArea": "Confirm delete the following area?",
+          "deleteInterface": "Confirm delete the following interface?",
+          "deleteRedistribute": "Confirm delete the following redistribute configuration?"
+        },
+        "error": {
+          "routerId": "Router ID error: {error}",
+          "autoCost": "Auto-cost error: {error}",
+          "area": "Area {index} error: {error}",
+          "areaRange": "Area {id} range {index} error: {error}",
+          "areaIdRequired": "Please enter area ID",
+          "interfaceCost": "Interface {name} cost error: {error}",
+          "interfacePriority": "Interface {name} priority error: {error}",
+          "interface": "Interface {name} error: {error}",
+          "interfaceNameRequired": "Please enter interface name",
+          "distance": "Distance error: {error}",
+          "gracePeriod": "Grace Period error: {error}",
+          "protocolRequired": "Please select protocol"
+        }
+      }
+    },
+    "ospfv3": {
+      "areaType": {
+        "stub": "Stub",
+        "nssa": "NSSA",
+        "stubNoSummary": "Stub (no-summary)",
+        "nssaNoSummary": "NSSA (no-summary)"
+      },
+      "networkType": {
+        "broadcast": "Broadcast",
+        "nonBroadcast": "Non-Broadcast",
+        "pointToPoint": "Point-to-Point",
+        "pointToMultipoint": "Point-to-Multipoint"
+      },
+      "protocol": {
+        "babel": "Babel",
+        "bgp": "BGP",
+        "connected": "Connected",
+        "isis": "ISIS",
+        "kernel": "Kernel",
+        "ripng": "RIPng",
+        "static": "Static"
+      }
+    },
+    "validation": {
+      "ipv4Format": "Invalid IPv4 address format",
+      "ipv6PrefixFormat": "Invalid IPv6 prefix format",
+      "areaIdRange": "Area ID must be between 0-4294967295",
+      "areaIdFormat": "Area ID must be an integer or IPv4 address format",
+      "costRange": "Cost must be between 1-65535",
+      "priorityRange": "Priority must be between 0-255",
+      "metricRange": "Metric must be between 0-16777214",
+      "metricTypeInvalid": "Metric type must be 1 or 2",
+      "distanceRange": "Distance must be between 1-255",
+      "autoCostRange": "Auto-cost must be between 1-4000000",
+      "gracePeriodRange": "Grace Period must be between 1-1800",
+      "instanceIdRange": "Instance ID must be between 0-255",
+      "mtuRange": "MTU must be between 128-65535"
+    },
+    "common": {
+      "default": "Default",
+      "saved": "Saved",
+      "delete": "Delete",
+      "confirmDelete": "Confirm Delete"
+    }
+  },
+  "de": {
+    "routing": {
+      "ospfv3": {
+        "tab": {
+          "basic": "Basic",
+          "areas": "Areas",
+          "interfaces": "Interfaces",
+          "redistribute": "Redistribute",
+          "defaultInfo": "Default Info",
+          "distance": "Distance",
+          "gracefulRestart": "Graceful Restart"
+        },
+        "basic": {
+          "title": "Basic Settings",
+          "routerId": "Router ID",
+          "routerIdPlaceholder": "e.g., 1.1.1.1",
+          "routerIdTitle": "Router ID (IPv4 address format)",
+          "referenceBandwidth": "Reference Bandwidth",
+          "referenceBandwidthPlaceholder": "1-4000000",
+          "referenceBandwidthTitle": "Reference bandwidth for auto-cost calculation (1-4000000)",
+          "logAdjacencyChanges": "Log Adjacency Changes",
+          "logAdjacencyChangesDetail": "Log Detail"
+        },
+        "area": {
+          "id": "Area ID",
+          "type": "Area Type",
+          "rangeCount": "Range Count",
+          "title": "Area"
+        },
+        "interface": {
+          "name": "Interface Name",
+          "cost": "Cost",
+          "networkType": "Network Type"
+        },
+        "redistribute": {
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "metricType": "Metric Type"
+        },
+        "defaultInfo": {
+          "title": "Default Information Originate",
+          "alwaysOriginate": "Always Originate",
+          "metric": "Metric",
+          "metricType": "Metric Type",
+          "metricTypeDefault": "Default (2)",
+          "metricType1": "Type 1",
+          "metricType2": "Type 2",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route-map name"
+        },
+        "distance": {
+          "title": "Administrative Distance",
+          "global": "Global Distance",
+          "ospfv3Distance": "OSPFv3 Distance",
+          "external": "External",
+          "interArea": "Inter-area",
+          "intraArea": "Intra-area"
+        },
+        "gracefulRestart": {
+          "title": "Graceful Restart",
+          "gracePeriod": "Grace Period",
+          "gracePeriodPlaceholder": "1-1800",
+          "helperSettings": "Helper Settings",
+          "helperEnable": "Enable Helper",
+          "helperLsaCheckDisable": "Disable LSA Check",
+          "helperPlannedOnly": "Planned Only",
+          "helperSupportedGraceTime": "Supported Grace Time"
+        },
+        "modal": {
+          "addArea": "Add Area",
+          "editArea": "Edit Area",
+          "areaId": "Area ID",
+          "areaIdPlaceholder": "e.g., 0 or 0.0.0.0",
+          "areaType": "Area Type",
+          "exportList": "Export List",
+          "importList": "Import List",
+          "accessListPlaceholder": "Access list name",
+          "ranges": "Ranges",
+          "rangePlaceholder": "e.g., 2001:db8::/32",
+          "advertise": "Advertise",
+          "notAdvertise": "Not Advertise",
+          "addRange": "Add Range",
+          "addInterface": "Add Interface",
+          "editInterface": "Edit Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select Interface",
+          "area": "Area",
+          "areaPlaceholder": "Area ID",
+          "cost": "Cost",
+          "networkType": "Network Type",
+          "helloInterval": "Hello Interval",
+          "deadInterval": "Dead Interval",
+          "retransmitInterval": "Retransmit Interval",
+          "transmitDelay": "Transmit Delay",
+          "priority": "Priority",
+          "instanceId": "Instance ID",
+          "interfaceMtu": "Interface MTU",
+          "secondsPlaceholder": "seconds",
+          "enableBfd": "Enable BFD",
+          "bfdProfile": "BFD Profile",
+          "bfdProfilePlaceholder": "BFD profile name",
+          "passiveMode": "Passive Mode",
+          "ignoreMtuMismatch": "Ignore MTU Mismatch",
+          "addRedistribute": "Add Redistribute",
+          "editRedistribute": "Edit Redistribute",
+          "protocol": "Protocol",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route-map name"
+        },
+        "confirm": {
+          "deleteArea": "Confirm delete the following area?",
+          "deleteInterface": "Confirm delete the following interface?",
+          "deleteRedistribute": "Confirm delete the following redistribute configuration?"
+        },
+        "error": {
+          "routerId": "Router ID error: {error}",
+          "autoCost": "Auto-cost error: {error}",
+          "area": "Area {index} error: {error}",
+          "areaRange": "Area {id} range {index} error: {error}",
+          "areaIdRequired": "Please enter area ID",
+          "interfaceCost": "Interface {name} cost error: {error}",
+          "interfacePriority": "Interface {name} priority error: {error}",
+          "interface": "Interface {name} error: {error}",
+          "interfaceNameRequired": "Please enter interface name",
+          "distance": "Distance error: {error}",
+          "gracePeriod": "Grace Period error: {error}",
+          "protocolRequired": "Please select protocol"
+        }
+      }
+    },
+    "ospfv3": {
+      "areaType": {
+        "stub": "Stub",
+        "nssa": "NSSA",
+        "stubNoSummary": "Stub (no-summary)",
+        "nssaNoSummary": "NSSA (no-summary)"
+      },
+      "networkType": {
+        "broadcast": "Broadcast",
+        "nonBroadcast": "Non-Broadcast",
+        "pointToPoint": "Point-to-Point",
+        "pointToMultipoint": "Point-to-Multipoint"
+      },
+      "protocol": {
+        "babel": "Babel",
+        "bgp": "BGP",
+        "connected": "Connected",
+        "isis": "ISIS",
+        "kernel": "Kernel",
+        "ripng": "RIPng",
+        "static": "Static"
+      }
+    },
+    "validation": {
+      "ipv4Format": "Invalid IPv4 address format",
+      "ipv6PrefixFormat": "Invalid IPv6 prefix format",
+      "areaIdRange": "Area ID must be between 0-4294967295",
+      "areaIdFormat": "Area ID must be an integer or IPv4 address format",
+      "costRange": "Cost must be between 1-65535",
+      "priorityRange": "Priority must be between 0-255",
+      "metricRange": "Metric must be between 0-16777214",
+      "metricTypeInvalid": "Metric type must be 1 or 2",
+      "distanceRange": "Distance must be between 1-255",
+      "autoCostRange": "Auto-cost must be between 1-4000000",
+      "gracePeriodRange": "Grace Period must be between 1-1800",
+      "instanceIdRange": "Instance ID must be between 0-255",
+      "mtuRange": "MTU must be between 128-65535"
+    },
+    "common": {
+      "default": "Default",
+      "saved": "Saved",
+      "delete": "Delete",
+      "confirmDelete": "Confirm Delete"
+    }
+  },
+  "fr": {
+    "routing": {
+      "ospfv3": {
+        "tab": {
+          "basic": "Basic",
+          "areas": "Areas",
+          "interfaces": "Interfaces",
+          "redistribute": "Redistribute",
+          "defaultInfo": "Default Info",
+          "distance": "Distance",
+          "gracefulRestart": "Graceful Restart"
+        },
+        "basic": {
+          "title": "Basic Settings",
+          "routerId": "Router ID",
+          "routerIdPlaceholder": "e.g., 1.1.1.1",
+          "routerIdTitle": "Router ID (IPv4 address format)",
+          "referenceBandwidth": "Reference Bandwidth",
+          "referenceBandwidthPlaceholder": "1-4000000",
+          "referenceBandwidthTitle": "Reference bandwidth for auto-cost calculation (1-4000000)",
+          "logAdjacencyChanges": "Log Adjacency Changes",
+          "logAdjacencyChangesDetail": "Log Detail"
+        },
+        "area": {
+          "id": "Area ID",
+          "type": "Area Type",
+          "rangeCount": "Range Count",
+          "title": "Area"
+        },
+        "interface": {
+          "name": "Interface Name",
+          "cost": "Cost",
+          "networkType": "Network Type"
+        },
+        "redistribute": {
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "metricType": "Metric Type"
+        },
+        "defaultInfo": {
+          "title": "Default Information Originate",
+          "alwaysOriginate": "Always Originate",
+          "metric": "Metric",
+          "metricType": "Metric Type",
+          "metricTypeDefault": "Default (2)",
+          "metricType1": "Type 1",
+          "metricType2": "Type 2",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route-map name"
+        },
+        "distance": {
+          "title": "Administrative Distance",
+          "global": "Global Distance",
+          "ospfv3Distance": "OSPFv3 Distance",
+          "external": "External",
+          "interArea": "Inter-area",
+          "intraArea": "Intra-area"
+        },
+        "gracefulRestart": {
+          "title": "Graceful Restart",
+          "gracePeriod": "Grace Period",
+          "gracePeriodPlaceholder": "1-1800",
+          "helperSettings": "Helper Settings",
+          "helperEnable": "Enable Helper",
+          "helperLsaCheckDisable": "Disable LSA Check",
+          "helperPlannedOnly": "Planned Only",
+          "helperSupportedGraceTime": "Supported Grace Time"
+        },
+        "modal": {
+          "addArea": "Add Area",
+          "editArea": "Edit Area",
+          "areaId": "Area ID",
+          "areaIdPlaceholder": "e.g., 0 or 0.0.0.0",
+          "areaType": "Area Type",
+          "exportList": "Export List",
+          "importList": "Import List",
+          "accessListPlaceholder": "Access list name",
+          "ranges": "Ranges",
+          "rangePlaceholder": "e.g., 2001:db8::/32",
+          "advertise": "Advertise",
+          "notAdvertise": "Not Advertise",
+          "addRange": "Add Range",
+          "addInterface": "Add Interface",
+          "editInterface": "Edit Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select Interface",
+          "area": "Area",
+          "areaPlaceholder": "Area ID",
+          "cost": "Cost",
+          "networkType": "Network Type",
+          "helloInterval": "Hello Interval",
+          "deadInterval": "Dead Interval",
+          "retransmitInterval": "Retransmit Interval",
+          "transmitDelay": "Transmit Delay",
+          "priority": "Priority",
+          "instanceId": "Instance ID",
+          "interfaceMtu": "Interface MTU",
+          "secondsPlaceholder": "seconds",
+          "enableBfd": "Enable BFD",
+          "bfdProfile": "BFD Profile",
+          "bfdProfilePlaceholder": "BFD profile name",
+          "passiveMode": "Passive Mode",
+          "ignoreMtuMismatch": "Ignore MTU Mismatch",
+          "addRedistribute": "Add Redistribute",
+          "editRedistribute": "Edit Redistribute",
+          "protocol": "Protocol",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route-map name"
+        },
+        "confirm": {
+          "deleteArea": "Confirm delete the following area?",
+          "deleteInterface": "Confirm delete the following interface?",
+          "deleteRedistribute": "Confirm delete the following redistribute configuration?"
+        },
+        "error": {
+          "routerId": "Router ID error: {error}",
+          "autoCost": "Auto-cost error: {error}",
+          "area": "Area {index} error: {error}",
+          "areaRange": "Area {id} range {index} error: {error}",
+          "areaIdRequired": "Please enter area ID",
+          "interfaceCost": "Interface {name} cost error: {error}",
+          "interfacePriority": "Interface {name} priority error: {error}",
+          "interface": "Interface {name} error: {error}",
+          "interfaceNameRequired": "Please enter interface name",
+          "distance": "Distance error: {error}",
+          "gracePeriod": "Grace Period error: {error}",
+          "protocolRequired": "Please select protocol"
+        }
+      }
+    },
+    "ospfv3": {
+      "areaType": {
+        "stub": "Stub",
+        "nssa": "NSSA",
+        "stubNoSummary": "Stub (no-summary)",
+        "nssaNoSummary": "NSSA (no-summary)"
+      },
+      "networkType": {
+        "broadcast": "Broadcast",
+        "nonBroadcast": "Non-Broadcast",
+        "pointToPoint": "Point-to-Point",
+        "pointToMultipoint": "Point-to-Multipoint"
+      },
+      "protocol": {
+        "babel": "Babel",
+        "bgp": "BGP",
+        "connected": "Connected",
+        "isis": "ISIS",
+        "kernel": "Kernel",
+        "ripng": "RIPng",
+        "static": "Static"
+      }
+    },
+    "validation": {
+      "ipv4Format": "Invalid IPv4 address format",
+      "ipv6PrefixFormat": "Invalid IPv6 prefix format",
+      "areaIdRange": "Area ID must be between 0-4294967295",
+      "areaIdFormat": "Area ID must be an integer or IPv4 address format",
+      "costRange": "Cost must be between 1-65535",
+      "priorityRange": "Priority must be between 0-255",
+      "metricRange": "Metric must be between 0-16777214",
+      "metricTypeInvalid": "Metric type must be 1 or 2",
+      "distanceRange": "Distance must be between 1-255",
+      "autoCostRange": "Auto-cost must be between 1-4000000",
+      "gracePeriodRange": "Grace Period must be between 1-1800",
+      "instanceIdRange": "Instance ID must be between 0-255",
+      "mtuRange": "MTU must be between 128-65535"
+    },
+    "common": {
+      "default": "Default",
+      "saved": "Saved",
+      "delete": "Delete",
+      "confirmDelete": "Confirm Delete"
+    }
+  },
+  "ko": {
+    "routing": {
+      "ospfv3": {
+        "tab": {
+          "basic": "Basic",
+          "areas": "Areas",
+          "interfaces": "Interfaces",
+          "redistribute": "Redistribute",
+          "defaultInfo": "Default Info",
+          "distance": "Distance",
+          "gracefulRestart": "Graceful Restart"
+        },
+        "basic": {
+          "title": "Basic Settings",
+          "routerId": "Router ID",
+          "routerIdPlaceholder": "e.g., 1.1.1.1",
+          "routerIdTitle": "Router ID (IPv4 address format)",
+          "referenceBandwidth": "Reference Bandwidth",
+          "referenceBandwidthPlaceholder": "1-4000000",
+          "referenceBandwidthTitle": "Reference bandwidth for auto-cost calculation (1-4000000)",
+          "logAdjacencyChanges": "Log Adjacency Changes",
+          "logAdjacencyChangesDetail": "Log Detail"
+        },
+        "area": {
+          "id": "Area ID",
+          "type": "Area Type",
+          "rangeCount": "Range Count",
+          "title": "Area"
+        },
+        "interface": {
+          "name": "Interface Name",
+          "cost": "Cost",
+          "networkType": "Network Type"
+        },
+        "redistribute": {
+          "protocol": "Protocol",
+          "metric": "Metric",
+          "metricType": "Metric Type"
+        },
+        "defaultInfo": {
+          "title": "Default Information Originate",
+          "alwaysOriginate": "Always Originate",
+          "metric": "Metric",
+          "metricType": "Metric Type",
+          "metricTypeDefault": "Default (2)",
+          "metricType1": "Type 1",
+          "metricType2": "Type 2",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route-map name"
+        },
+        "distance": {
+          "title": "Administrative Distance",
+          "global": "Global Distance",
+          "ospfv3Distance": "OSPFv3 Distance",
+          "external": "External",
+          "interArea": "Inter-area",
+          "intraArea": "Intra-area"
+        },
+        "gracefulRestart": {
+          "title": "Graceful Restart",
+          "gracePeriod": "Grace Period",
+          "gracePeriodPlaceholder": "1-1800",
+          "helperSettings": "Helper Settings",
+          "helperEnable": "Enable Helper",
+          "helperLsaCheckDisable": "Disable LSA Check",
+          "helperPlannedOnly": "Planned Only",
+          "helperSupportedGraceTime": "Supported Grace Time"
+        },
+        "modal": {
+          "addArea": "Add Area",
+          "editArea": "Edit Area",
+          "areaId": "Area ID",
+          "areaIdPlaceholder": "e.g., 0 or 0.0.0.0",
+          "areaType": "Area Type",
+          "exportList": "Export List",
+          "importList": "Import List",
+          "accessListPlaceholder": "Access list name",
+          "ranges": "Ranges",
+          "rangePlaceholder": "e.g., 2001:db8::/32",
+          "advertise": "Advertise",
+          "notAdvertise": "Not Advertise",
+          "addRange": "Add Range",
+          "addInterface": "Add Interface",
+          "editInterface": "Edit Interface",
+          "interfaceName": "Interface Name",
+          "selectInterface": "Select Interface",
+          "area": "Area",
+          "areaPlaceholder": "Area ID",
+          "cost": "Cost",
+          "networkType": "Network Type",
+          "helloInterval": "Hello Interval",
+          "deadInterval": "Dead Interval",
+          "retransmitInterval": "Retransmit Interval",
+          "transmitDelay": "Transmit Delay",
+          "priority": "Priority",
+          "instanceId": "Instance ID",
+          "interfaceMtu": "Interface MTU",
+          "secondsPlaceholder": "seconds",
+          "enableBfd": "Enable BFD",
+          "bfdProfile": "BFD Profile",
+          "bfdProfilePlaceholder": "BFD profile name",
+          "passiveMode": "Passive Mode",
+          "ignoreMtuMismatch": "Ignore MTU Mismatch",
+          "addRedistribute": "Add Redistribute",
+          "editRedistribute": "Edit Redistribute",
+          "protocol": "Protocol",
+          "routeMap": "Route Map",
+          "routeMapPlaceholder": "Route-map name"
+        },
+        "confirm": {
+          "deleteArea": "Confirm delete the following area?",
+          "deleteInterface": "Confirm delete the following interface?",
+          "deleteRedistribute": "Confirm delete the following redistribute configuration?"
+        },
+        "error": {
+          "routerId": "Router ID error: {error}",
+          "autoCost": "Auto-cost error: {error}",
+          "area": "Area {index} error: {error}",
+          "areaRange": "Area {id} range {index} error: {error}",
+          "areaIdRequired": "Please enter area ID",
+          "interfaceCost": "Interface {name} cost error: {error}",
+          "interfacePriority": "Interface {name} priority error: {error}",
+          "interface": "Interface {name} error: {error}",
+          "interfaceNameRequired": "Please enter interface name",
+          "distance": "Distance error: {error}",
+          "gracePeriod": "Grace Period error: {error}",
+          "protocolRequired": "Please select protocol"
+        }
+      }
+    },
+    "ospfv3": {
+      "areaType": {
+        "stub": "Stub",
+        "nssa": "NSSA",
+        "stubNoSummary": "Stub (no-summary)",
+        "nssaNoSummary": "NSSA (no-summary)"
+      },
+      "networkType": {
+        "broadcast": "Broadcast",
+        "nonBroadcast": "Non-Broadcast",
+        "pointToPoint": "Point-to-Point",
+        "pointToMultipoint": "Point-to-Multipoint"
+      },
+      "protocol": {
+        "babel": "Babel",
+        "bgp": "BGP",
+        "connected": "Connected",
+        "isis": "ISIS",
+        "kernel": "Kernel",
+        "ripng": "RIPng",
+        "static": "Static"
+      }
+    },
+    "validation": {
+      "ipv4Format": "Invalid IPv4 address format",
+      "ipv6PrefixFormat": "Invalid IPv6 prefix format",
+      "areaIdRange": "Area ID must be between 0-4294967295",
+      "areaIdFormat": "Area ID must be an integer or IPv4 address format",
+      "costRange": "Cost must be between 1-65535",
+      "priorityRange": "Priority must be between 0-255",
+      "metricRange": "Metric must be between 0-16777214",
+      "metricTypeInvalid": "Metric type must be 1 or 2",
+      "distanceRange": "Distance must be between 1-255",
+      "autoCostRange": "Auto-cost must be between 1-4000000",
+      "gracePeriodRange": "Grace Period must be between 1-1800",
+      "instanceIdRange": "Instance ID must be between 0-255",
+      "mtuRange": "MTU must be between 128-65535"
+    },
+    "common": {
+      "default": "Default",
+      "saved": "Saved",
+      "delete": "Delete",
+      "confirmDelete": "Confirm Delete"
+    }
+  }
+}

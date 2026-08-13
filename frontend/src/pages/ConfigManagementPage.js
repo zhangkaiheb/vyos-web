@@ -1,145 +1,44 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
 import { configApi, api } from '/src/api/index.js';
+import { useConfigStore } from '/src/stores/config.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
+import { useI18n } from '/src/i18n/index.js';
 
-const COLUMNS = [
-  { key: 'index', label: '序号', width: 80 },
-  { key: 'timestamp', label: '时间', width: 200 },
-  { key: 'user', label: '用户', width: 120 },
-  { key: 'source', label: '来源', width: 200 },
-];
+const COMMENT_SECTION_KEYS = ['firewall', 'interfaces', 'policy', 'protocols', 'service', 'system', 'vpn'];
 
-const TAB_ITEMS = [
-  { key: 'revisions', title: '版本历史' },
-  { key: 'compare', title: '配置比较' },
-  { key: 'actions', title: '配置操作' },
-];
+const LOAD_PROTOCOL_VALUES = ['scp', 'sftp', 'http', 'https', 'ftp', 'tftp'];
 
-const COMMENT_SECTIONS = [
-  { value: 'firewall', label: 'Firewall' },
-  { value: 'interfaces', label: 'Network interfaces' },
-  { value: 'policy', label: 'Routing policy' },
-  { value: 'protocols', label: 'Routing protocols' },
-  { value: 'service', label: 'System services' },
-  { value: 'system', label: 'System parameters' },
-  { value: 'vpn', label: 'Virtual Private Network (VPN)' },
-];
-
-const LOAD_PROTOCOLS = [
-  { value: 'scp', label: 'scp://' },
-  { value: 'sftp', label: 'sftp://' },
-  { value: 'http', label: 'http://' },
-  { value: 'https', label: 'https://' },
-  { value: 'ftp', label: 'ftp://' },
-  { value: 'tftp', label: 'tftp://' },
-];
-
-const RENAME_PATHS = [
-  { value: 'firewall', label: 'Firewall', hasSub: false },
-  { value: 'interfaces', label: 'Network Interfaces', hasSub: true, subs: [
-    { value: 'bonding', label: 'Bonding' },
-    { value: 'bridge', label: 'Bridge' },
-    { value: 'dummy', label: 'Dummy' },
-    { value: 'ethernet', label: 'Ethernet' },
-    { value: 'geneve', label: 'GENEVE' },
-    { value: 'input', label: 'Input' },
-    { value: 'l2tpv3', label: 'L2TPv3' },
-    { value: 'loopback', label: 'Loopback' },
-    { value: 'macsec', label: 'MACsec' },
-    { value: 'openvpn', label: 'OpenVPN' },
-    { value: 'pppoe', label: 'PPPoE' },
-    { value: 'pseudo-ethernet', label: 'Pseudo Ethernet' },
-    { value: 'sstpc', label: 'SSTPC' },
-    { value: 'tunnel', label: 'Tunnel' },
-    { value: 'virtual-ethernet', label: 'Virtual Ethernet' },
-    { value: 'vti', label: 'VTI' },
-    { value: 'vxlan', label: 'VXLAN' },
-    { value: 'wireguard', label: 'WireGuard' },
-    { value: 'wireless', label: 'Wireless' },
-    { value: 'wwan', label: 'WWAN' },
-  ]},
-  { value: 'policy', label: 'Routing Policy', hasSub: true, subs: [
-    { value: 'access-list', label: 'Access List' },
-    { value: 'access-list6', label: 'Access List6' },
-    { value: 'as-path-list', label: 'AS Path List' },
-    { value: 'community-list', label: 'Community List' },
-    { value: 'extcommunity-list', label: 'Extended Community List' },
-    { value: 'large-community-list', label: 'Large Community List' },
-    { value: 'local-route', label: 'Local Route' },
-    { value: 'local-route6', label: 'Local Route6' },
-    { value: 'prefix-list', label: 'Prefix List' },
-    { value: 'prefix-list6', label: 'Prefix List6' },
-    { value: 'route', label: 'Route' },
-    { value: 'route-map', label: 'Route Map' },
-    { value: 'route6', label: 'Route6' },
-  ]},
-  { value: 'protocols', label: 'Routing Protocols', hasSub: false },
-  { value: 'qos', label: 'QoS', hasSub: true, subs: [
-    { value: 'interface', label: 'Interface' },
-    { value: 'policy', label: 'Policy' },
-    { value: 'traffic-match-group', label: 'Traffic Match Group' },
-  ]},
-  { value: 'service', label: 'System Services', hasSub: true, subs: [
-    { value: 'aws', label: 'AWS' },
-    { value: 'broadcast-relay', label: 'Broadcast Relay' },
-    { value: 'config-sync', label: 'Config Sync' },
-    { value: 'conntrack-sync', label: 'Conntrack Sync' },
-    { value: 'console-server', label: 'Console Server' },
-    { value: 'dhcp-relay', label: 'DHCP Relay' },
-    { value: 'dhcp-server', label: 'DHCP Server' },
-    { value: 'dhcpv6-relay', label: 'DHCPv6 Relay' },
-    { value: 'dhcpv6-server', label: 'DHCPv6 Server' },
-    { value: 'dns', label: 'DNS' },
-    { value: 'event-handler', label: 'Event Handler' },
-    { value: 'https', label: 'HTTPS' },
-    { value: 'ids', label: 'IDS' },
-    { value: 'ipoe-server', label: 'IPoE Server' },
-    { value: 'lldp', label: 'LLDP' },
-    { value: 'mdns', label: 'mDNS' },
-    { value: 'monitoring', label: 'Monitoring' },
-    { value: 'ndp-proxy', label: 'NDP Proxy' },
-    { value: 'ntp', label: 'NTP' },
-    { value: 'pppoe-server', label: 'PPPoE Server' },
-    { value: 'router-advert', label: 'Router Advert' },
-    { value: 'salt-minion', label: 'Salt Minion' },
-    { value: 'sla', label: 'SLA' },
-    { value: 'snmp', label: 'SNMP' },
-    { value: 'ssh', label: 'SSH' },
-    { value: 'suricata', label: 'Suricata' },
-    { value: 'tftp-server', label: 'TFTP Server' },
-    { value: 'webproxy', label: 'Webproxy' },
-  ]},
-  { value: 'system', label: 'System Parameters', hasSub: false },
-  { value: 'vpn', label: 'VPN', hasSub: true, subs: [
-    { value: 'ipsec', label: 'IPsec' },
-    { value: 'l2tp', label: 'L2TP' },
-    { value: 'openconnect', label: 'OpenConnect' },
-    { value: 'pptp', label: 'PPTP' },
-    { value: 'sstp', label: 'SSTP' },
-  ]},
-  { value: 'vrf', label: 'VRF', hasSub: true, subs: [
-    { value: 'name', label: 'VRF Name' },
-  ]},
-  { value: 'nat', label: 'NAT', hasSub: false },
-  { value: 'nat64', label: 'NAT64', hasSub: true, subs: [
-    { value: 'source', label: 'Source' },
-  ]},
-  { value: 'nat66', label: 'NAT66', hasSub: false },
-  { value: 'netns', label: 'Network Namespace', hasSub: false },
-  { value: 'pki', label: 'PKI', hasSub: false },
-  { value: 'container', label: 'Container', hasSub: false },
-  { value: 'load-balancing', label: 'Load Balancing', hasSub: false },
-  { value: 'high-availability', label: 'High Availability', hasSub: false },
+const RENAME_PATH_KEYS = [
+  { value: 'firewall', hasSub: false },
+  { value: 'interfaces', hasSub: true, subs: ['bonding', 'bridge', 'dummy', 'ethernet', 'geneve', 'input', 'l2tpv3', 'loopback', 'macsec', 'openvpn', 'pppoe', 'pseudoEthernet', 'sstpc', 'tunnel', 'virtualEthernet', 'vti', 'vxlan', 'wireguard', 'wireless', 'wwan'] },
+  { value: 'policy', hasSub: true, subs: ['accessList', 'accessList6', 'asPathList', 'communityList', 'extCommunityList', 'largeCommunityList', 'localRoute', 'localRoute6', 'prefixList', 'prefixList6', 'route', 'routeMap', 'route6'] },
+  { value: 'protocols', hasSub: false },
+  { value: 'qos', hasSub: true, subs: ['interface', 'policyLabel', 'trafficMatchGroup'] },
+  { value: 'service', hasSub: true, subs: ['aws', 'broadcastRelay', 'configSync', 'conntrackSync', 'consoleServer', 'dhcpRelay', 'dhcpServer', 'dhcpv6Relay', 'dhcpv6Server', 'dns', 'eventHandler', 'https', 'ids', 'ipoeServer', 'lldp', 'mdns', 'monitoring', 'ndpProxy', 'ntp', 'pppoeServer', 'routerAdvert', 'saltMinion', 'sla', 'snmp', 'ssh', 'suricata', 'tftpServer', 'webproxy'] },
+  { value: 'system', hasSub: false },
+  { value: 'vpn', hasSub: true, subs: ['ipsec', 'l2tp', 'openconnect', 'pptp', 'sstp'] },
+  { value: 'vrf', hasSub: true, subs: ['vrfName'] },
+  { value: 'nat', hasSub: false },
+  { value: 'nat64', hasSub: true, subs: ['source'] },
+  { value: 'nat66', hasSub: false },
+  { value: 'netns', hasSub: false },
+  { value: 'pki', hasSub: false },
+  { value: 'container', hasSub: false },
+  { value: 'loadBalancing', hasSub: false },
+  { value: 'highAvailability', hasSub: false },
 ];
 
 export default defineComponent({
   name: 'ConfigManagementPage',
   components: { DataTable, DraggableModal, ToolbarButton, TabGroup },
   setup() {
+    const { t } = useI18n();
+    const configStore = useConfigStore();
     const revisions = ref([]);
     const loading = ref(false);
     const selectedIndexes = ref([]);
@@ -201,8 +100,52 @@ export default defineComponent({
     const renameNewName = ref('');
     const showRename = ref(false);
 
+    // Delete confirmation
+    const deleteModalVisible = ref(false);
+    const pendingDeleteIndexes = ref([]);
+
+    // Computed translated data
+    const COLUMNS = computed(() => [
+      { key: 'index', label: t('configManagement.columns.index'), width: 80 },
+      { key: 'timestamp', label: t('configManagement.columns.timestamp'), width: 200 },
+      { key: 'user', label: t('configManagement.columns.user'), width: 120 },
+      { key: 'source', label: t('configManagement.columns.source'), width: 200 },
+    ]);
+
+    const TAB_ITEMS = computed(() => [
+      { key: 'revisions', title: t('configManagement.tabs.revisions') },
+      { key: 'compare', title: t('configManagement.tabs.compare') },
+      { key: 'actions', title: t('configManagement.tabs.actions') },
+    ]);
+
+    const COMMENT_SECTIONS = computed(() =>
+      COMMENT_SECTION_KEYS.map(key => ({
+        value: key,
+        label: t('configManagement.options.commentSections.' + key),
+      }))
+    );
+
+    const LOAD_PROTOCOLS = computed(() =>
+      LOAD_PROTOCOL_VALUES.map(v => ({
+        value: v,
+        label: v + '://',
+      }))
+    );
+
+    const RENAME_PATHS = computed(() =>
+      RENAME_PATH_KEYS.map(cat => ({
+        value: cat.value,
+        label: t('configManagement.options.renamePaths.' + cat.value),
+        hasSub: cat.hasSub,
+        ...(cat.hasSub ? { subs: cat.subs.map(sk => ({
+          value: sk,
+          label: t('configManagement.options.renamePaths.' + sk),
+        })) } : {}),
+      }))
+    );
+
     const renameSubOptions = computed(() => {
-      const cat = RENAME_PATHS.find(c => c.value === renameCategory.value);
+      const cat = RENAME_PATHS.value.find(c => c.value === renameCategory.value);
       return cat && cat.hasSub ? cat.subs : [];
     });
 
@@ -256,9 +199,14 @@ export default defineComponent({
 
     function doDeleteSelected() {
       if (!selectedIndexes.value.length) return;
-      if (!confirm('确定要删除选中的版本记录吗？')) return;
-      // VyOS 修订版本不能直接删除，这里只是提示
-      alert('VyOS 修订版本无法直接删除，可通过系统清理功能管理。');
+      pendingDeleteIndexes.value = [...selectedIndexes.value];
+      deleteModalVisible.value = true;
+    }
+
+    function confirmDeleteSelected() {
+      deleteModalVisible.value = false;
+      showError({ message: t('configManagement.messages.deleteNotAllowed') });
+      pendingDeleteIndexes.value = [];
     }
 
     async function doCompare() {
@@ -293,7 +241,8 @@ export default defineComponent({
         });
         showCommit.value = false;
         commitComment.value = '';
-        alert(res.message || 'Commit 成功');
+        showError({ message: res.message || t('configManagement.messages.commitSuccess') });
+        configStore.markPending();
         loadRevisions();
       } catch (e) {
         showError(e);
@@ -307,7 +256,8 @@ export default defineComponent({
           comment: commitConfirmComment.value,
         });
         showCommitConfirm.value = false;
-        alert(res.message || 'Commit-confirm 成功');
+        showError({ message: res.message || t('configManagement.messages.commitConfirmSuccess') });
+        configStore.markPending();
         loadRevisions();
       } catch (e) {
         showError(e);
@@ -318,7 +268,8 @@ export default defineComponent({
       try {
         const res = await api.post('/config/confirm', {});
         showConfirm.value = false;
-        alert(res.message || 'Confirm 成功');
+        showError({ message: res.message || t('configManagement.messages.confirmSuccess') });
+        configStore.markPending();
       } catch (e) {
         showError(e);
       }
@@ -328,7 +279,8 @@ export default defineComponent({
       try {
         const res = await configApi.discard();
         showDiscard.value = false;
-        alert(res.message || '未提交变更已丢弃');
+        showError({ message: res.message || t('configManagement.messages.discardSuccess') });
+        configStore.markPending();
       } catch (e) {
         showError(e);
       }
@@ -340,7 +292,8 @@ export default defineComponent({
           revision: rollbackSoftRevision.value,
         });
         showRollbackSoft.value = false;
-        alert(res.message || 'Rollback-soft 成功，请检查差异后 commit');
+        showError({ message: res.message || t('configManagement.messages.rollbackSoftSuccess') });
+        configStore.markPending();
         loadRevisions();
       } catch (e) {
         showError(e);
@@ -351,7 +304,8 @@ export default defineComponent({
       try {
         const res = await configApi.rollback(rollbackRevision.value);
         showRollback.value = false;
-        alert(res.message || 'Rollback 成功，需要重启生效');
+        showError({ message: res.message || t('configManagement.messages.rollbackSuccess') });
+        configStore.markPending();
         loadRevisions();
       } catch (e) {
         showError(e);
@@ -367,7 +321,8 @@ export default defineComponent({
         const res = await api.post('/config/load-file', { source, type: loadType.value });
         showLoad.value = false;
         loadSource.value = '';
-        alert(res.message || '配置加载成功');
+        showError({ message: res.message || t('configManagement.messages.loadSuccess') });
+        configStore.markPending();
       } catch (e) {
         showError(e);
       }
@@ -382,7 +337,8 @@ export default defineComponent({
         const res = await api.post('/config/merge-file', { source, type: mergeType.value });
         showMerge.value = false;
         mergeSource.value = '';
-        alert(res.message || '配置合并成功');
+        showError({ message: res.message || t('configManagement.messages.mergeSuccess') });
+        configStore.markPending();
       } catch (e) {
         showError(e);
       }
@@ -397,7 +353,8 @@ export default defineComponent({
         const res = await api.post('/config/save-file', { target, type: saveType.value });
         showSave.value = false;
         saveTarget.value = '';
-        alert(res.message || '配置保存成功');
+        showError({ message: res.message || t('configManagement.messages.saveSuccess') });
+        configStore.markPending();
       } catch (e) {
         showError(e);
       }
@@ -412,7 +369,8 @@ export default defineComponent({
         showComment.value = false;
         commentPath.value = '';
         commentText.value = '';
-        alert(res.message || 'Comment 添加成功');
+        showError({ message: res.message || t('configManagement.messages.commentSuccess') });
+        configStore.markPending();
       } catch (e) {
         showError(e);
       }
@@ -434,7 +392,8 @@ export default defineComponent({
         renameSubCategory.value = '';
         renameOldName.value = '';
         renameNewName.value = '';
-        alert(res.message || 'Rename 成功');
+        showError({ message: res.message || t('configManagement.messages.renameSuccess') });
+        configStore.markPending();
       } catch (e) {
         showError(e);
       }
@@ -442,9 +401,11 @@ export default defineComponent({
 
     onMounted(() => {
       loadRevisions();
+      onMenuRefresh(loadRevisions);
     });
 
     return {
+      t,
       revisions, loading, selectedIndexes, activeTab, currentCommand,
       COLUMNS, TAB_ITEMS, COMMENT_SECTIONS, LOAD_PROTOCOLS, RENAME_PATHS,
       compareType, compareLeft, compareRight, compareResult,
@@ -458,8 +419,9 @@ export default defineComponent({
       saveTarget, saveType, showSave,
       commentPath, commentText, showComment,
       renameCategory, renameSubCategory, renameOldName, renameNewName, showRename, renameSubOptions,
+      deleteModalVisible, pendingDeleteIndexes,
       loadRevisions,
-      doCompareSelected, doRollbackSoftSelected, doRollbackSelected, doDeleteSelected,
+      doCompareSelected, doRollbackSoftSelected, doRollbackSelected, doDeleteSelected, confirmDeleteSelected,
       doCompare, doCommitNormal, doCommitConfirm, doConfirmAction, doDiscardAction,
       doRollbackSoftAction, doRollbackAction,
       doLoadAction, doMergeAction, doSaveAction, doCommentAction, doRenameAction,
@@ -470,11 +432,11 @@ export default defineComponent({
       <div class="section">
         <div class="toolbar">
           <div class="toolbar-left">
-            <ToolbarButton icon="search" @click="doCompareSelected" :disabled="!selectedIndexes.length">比较</ToolbarButton>
-            <ToolbarButton icon="rollback" @click="doRollbackSoftSelected" :disabled="!selectedIndexes.length">软回滚</ToolbarButton>
-            <ToolbarButton icon="rollback" @click="doRollbackSelected" :disabled="!selectedIndexes.length">回滚</ToolbarButton>
-            <ToolbarButton icon="delete" @click="doDeleteSelected" :disabled="!selectedIndexes.length">删除</ToolbarButton>
-            <ToolbarButton icon="refresh" @click="loadRevisions">刷新</ToolbarButton>
+            <ToolbarButton icon="search" @click="doCompareSelected" :disabled="!selectedIndexes.length">{{ t('configManagement.toolbar.compare') }}</ToolbarButton>
+            <ToolbarButton icon="rollback" @click="doRollbackSoftSelected" :disabled="!selectedIndexes.length">{{ t('configManagement.toolbar.rollbackSoft') }}</ToolbarButton>
+            <ToolbarButton icon="rollback" @click="doRollbackSelected" :disabled="!selectedIndexes.length">{{ t('configManagement.toolbar.rollback') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="doDeleteSelected" :disabled="!selectedIndexes.length">{{ t('configManagement.toolbar.delete') }}</ToolbarButton>
+            <ToolbarButton icon="refresh" @click="loadRevisions">{{ t('configManagement.toolbar.refresh') }}</ToolbarButton>
           </div>
         </div>
 
@@ -488,30 +450,30 @@ export default defineComponent({
           <template #compare>
             <div style="padding:16px;">
               <div class="form-row">
-                <label class="form-label">比较类型</label>
+                <label class="form-label">{{ t('configManagement.compare.type') }}</label>
                 <select class="form-control" v-model="compareType" style="width:300px;">
-                  <option value="working-active">工作配置 vs 活动配置</option>
-                  <option value="working-saved">工作配置 vs 已保存配置</option>
-                  <option value="working-revision">工作配置 vs 指定版本</option>
-                  <option value="revision-revision">版本 N vs 版本 M</option>
+                  <option value="working-active">{{ t('configManagement.compare.workingActive') }}</option>
+                  <option value="working-saved">{{ t('configManagement.compare.workingSaved') }}</option>
+                  <option value="working-revision">{{ t('configManagement.compare.workingRevision') }}</option>
+                  <option value="revision-revision">{{ t('configManagement.compare.revisionRevision') }}</option>
                 </select>
               </div>
               <div v-if="compareType === 'working-revision'" class="form-row">
-                <label class="form-label">版本号</label>
+                <label class="form-label">{{ t('configManagement.compare.revisionNumber') }}</label>
                 <input type="number" class="form-control" v-model.number="compareLeft" style="width:120px;" />
               </div>
               <div v-if="compareType === 'revision-revision'" class="form-row">
-                <label class="form-label">版本 N</label>
+                <label class="form-label">{{ t('configManagement.compare.revisionN') }}</label>
                 <input type="number" class="form-control" v-model.number="compareLeft" style="width:120px;display:inline-block;margin-right:16px;" />
-                <label class="form-label">版本 M</label>
+                <label class="form-label">{{ t('configManagement.compare.revisionM') }}</label>
                 <input type="number" class="form-control" v-model.number="compareRight" style="width:120px;display:inline-block;" />
               </div>
               <div class="form-row">
                 <label class="form-label"></label>
-                <ToolbarButton icon="search" primary @click="doCompare">比较</ToolbarButton>
+                <ToolbarButton icon="search" primary @click="doCompare">{{ t('configManagement.compare.compare') }}</ToolbarButton>
               </div>
               <div v-if="compareResult" style="margin-top:12px;">
-                <label class="form-label">比较结果</label>
+                <label class="form-label">{{ t('configManagement.compare.result') }}</label>
                 <pre style="background:#f5f5f5;border:1px solid #ddd;padding:12px;max-height:400px;overflow:auto;white-space:pre-wrap;font-size:13px;">{{ compareResult }}</pre>
               </div>
             </div>
@@ -521,24 +483,24 @@ export default defineComponent({
             <div style="padding:16px;">
               <div style="display:flex;flex-wrap:wrap;gap:12px;">
                 <div style="border:1px solid #e0e0e0;border-radius:4px;padding:16px;min-width:280px;">
-                  <h4 style="margin:0 0 12px;">提交配置</h4>
+                  <h4 style="margin:0 0 12px;">{{ t('configManagement.actions.commitConfig') }}</h4>
                   <ToolbarButton @click="showCommit=true">Commit</ToolbarButton>
                   <ToolbarButton @click="showCommitConfirm=true">Commit-Confirm</ToolbarButton>
                   <ToolbarButton @click="showConfirm=true">Confirm</ToolbarButton>
                   <ToolbarButton danger @click="showDiscard=true">Discard</ToolbarButton>
                 </div>
                 <div style="border:1px solid #e0e0e0;border-radius:4px;padding:16px;min-width:280px;">
-                  <h4 style="margin:0 0 12px;">保存/加载</h4>
+                  <h4 style="margin:0 0 12px;">{{ t('configManagement.actions.saveLoad') }}</h4>
                   <ToolbarButton primary @click="showSave=true">Save</ToolbarButton>
-                  <ToolbarButton @click="showLoad=true">Load (替换)</ToolbarButton>
-                  <ToolbarButton @click="showMerge=true">Merge (合并)</ToolbarButton>
+                  <ToolbarButton @click="showLoad=true">Load</ToolbarButton>
+                  <ToolbarButton @click="showMerge=true">Merge</ToolbarButton>
                 </div>
                 <div style="border:1px solid #e0e0e0;border-radius:4px;padding:16px;min-width:280px;">
-                  <h4 style="margin:0 0 12px;">注释</h4>
-                  <ToolbarButton @click="showComment=true">添加注释</ToolbarButton>
+                  <h4 style="margin:0 0 12px;">{{ t('configManagement.actions.comment') }}</h4>
+                  <ToolbarButton @click="showComment=true">{{ t('configManagement.actions.addComment') }}</ToolbarButton>
                 </div>
                 <div style="border:1px solid #e0e0e0;border-radius:4px;padding:16px;min-width:280px;">
-                  <h4 style="margin:0 0 12px;">重命名</h4>
+                  <h4 style="margin:0 0 12px;">{{ t('configManagement.actions.rename') }}</h4>
                   <ToolbarButton @click="showRename=true">Rename</ToolbarButton>
                 </div>
               </div>
@@ -551,185 +513,193 @@ export default defineComponent({
       </div>
 
       <!-- Commit Modal -->
-      <DraggableModal v-model:visible="showCommit" title="Commit 提交配置" @close="showCommit=false" :width="460">
+      <DraggableModal v-model:visible="showCommit" :title="t('configManagement.modals.commit.title')" @close="showCommit=false" :width="460">
         <div class="form-row">
-          <label class="form-label">提交注释</label>
-          <input class="form-control" v-model="commitComment" placeholder='例如: "add user bob"' style="width:100%;" />
+          <label class="form-label">{{ t('configManagement.modals.commit.comment') }}</label>
+          <input class="form-control" v-model="commitComment" :placeholder="t('configManagement.modals.commit.placeholder')" style="width:100%;" />
         </div>
         <div class="modal-footer">
-          <button @click="showCommit=false">取消</button>
-          <button class="primary" @click="doCommitNormal">确定</button>
+          <button @click="showCommit=false">{{ t('configManagement.modals.commit.cancel') }}</button>
+          <button class="primary" @click="doCommitNormal">{{ t('configManagement.modals.commit.confirm') }}</button>
         </div>
       </DraggableModal>
 
       <!-- Commit-Confirm Modal -->
-      <DraggableModal v-model:visible="showCommitConfirm" title="Commit-Confirm 确认提交" @close="showCommitConfirm=false" :width="460">
+      <DraggableModal v-model:visible="showCommitConfirm" :title="t('configManagement.modals.commitConfirm.title')" @close="showCommitConfirm=false" :width="460">
         <div class="form-row">
-          <label class="form-label">自动回滚时间(分钟)</label>
+          <label class="form-label">{{ t('configManagement.modals.commitConfirm.autoRollbackTime') }}</label>
           <input type="number" class="form-control" v-model.number="commitConfirmMinutes" min="1" style="width:120px;" />
         </div>
         <div class="form-row">
-          <label class="form-label">提交注释</label>
-          <input class="form-control" v-model="commitConfirmComment" placeholder='例如: "test config"' style="width:100%;" />
+          <label class="form-label">{{ t('configManagement.modals.commitConfirm.comment') }}</label>
+          <input class="form-control" v-model="commitConfirmComment" :placeholder="t('configManagement.modals.commitConfirm.placeholder')" style="width:100%;" />
         </div>
         <div class="modal-footer">
-          <button @click="showCommitConfirm=false">取消</button>
-          <button class="primary" @click="doCommitConfirm">确定</button>
+          <button @click="showCommitConfirm=false">{{ t('configManagement.modals.commitConfirm.cancel') }}</button>
+          <button class="primary" @click="doCommitConfirm">{{ t('configManagement.modals.commitConfirm.confirm') }}</button>
         </div>
       </DraggableModal>
 
       <!-- Confirm Modal -->
-      <DraggableModal v-model:visible="showConfirm" title="Confirm 确认" @close="showConfirm=false" :width="400">
-        <p>确认当前 commit-confirm，取消自动回滚？</p>
+      <DraggableModal v-model:visible="showConfirm" :title="t('configManagement.modals.confirm.title')" @close="showConfirm=false" :width="400">
+        <p>{{ t('configManagement.modals.confirm.message') }}</p>
         <div class="modal-footer">
-          <button @click="showConfirm=false">取消</button>
-          <button class="primary" @click="doConfirmAction">确定</button>
+          <button @click="showConfirm=false">{{ t('configManagement.modals.confirm.cancel') }}</button>
+          <button class="primary" @click="doConfirmAction">{{ t('configManagement.modals.confirm.confirm') }}</button>
         </div>
       </DraggableModal>
 
       <!-- Discard Modal -->
-      <DraggableModal v-model:visible="showDiscard" title="Discard 丢弃变更" @close="showDiscard=false" :width="400">
-        <p>确定要丢弃所有未提交的变更吗？</p>
+      <DraggableModal v-model:visible="showDiscard" :title="t('configManagement.modals.discard.title')" @close="showDiscard=false" :width="400">
+        <p>{{ t('configManagement.modals.discard.message') }}</p>
         <div class="modal-footer">
-          <button @click="showDiscard=false">取消</button>
-          <button class="danger" @click="doDiscardAction">确定</button>
+          <button @click="showDiscard=false">{{ t('configManagement.modals.discard.cancel') }}</button>
+          <button class="danger" @click="doDiscardAction">{{ t('configManagement.modals.discard.confirm') }}</button>
         </div>
       </DraggableModal>
 
       <!-- Rollback-Soft Modal -->
-      <DraggableModal v-model:visible="showRollbackSoft" title="Rollback-Soft 软回滚" @close="showRollbackSoft=false" :width="460">
+      <DraggableModal v-model:visible="showRollbackSoft" :title="t('configManagement.modals.rollbackSoft.title')" @close="showRollbackSoft=false" :width="460">
         <div class="form-row">
-          <label class="form-label">回滚到版本号</label>
+          <label class="form-label">{{ t('configManagement.modals.rollbackSoft.revisionNumber') }}</label>
           <input type="number" class="form-control" v-model.number="rollbackSoftRevision" min="0" style="width:120px;" />
         </div>
-        <p style="color:#666;font-size:12px;">软回滚不会立即重启，会将差异应用到当前配置，您可以比较并决定是否 commit。</p>
+        <p style="color:#666;font-size:12px;">{{ t('configManagement.modals.rollbackSoft.description') }}</p>
         <div class="modal-footer">
-          <button @click="showRollbackSoft=false">取消</button>
-          <button class="primary" @click="doRollbackSoftAction">确定</button>
+          <button @click="showRollbackSoft=false">{{ t('configManagement.modals.rollbackSoft.cancel') }}</button>
+          <button class="primary" @click="doRollbackSoftAction">{{ t('configManagement.modals.rollbackSoft.confirm') }}</button>
         </div>
       </DraggableModal>
 
       <!-- Rollback Modal -->
-      <DraggableModal v-model:visible="showRollback" title="Rollback 回滚(需重启)" @close="showRollback=false" :width="460">
+      <DraggableModal v-model:visible="showRollback" :title="t('configManagement.modals.rollback.title')" @close="showRollback=false" :width="460">
         <div class="form-row">
-          <label class="form-label">回滚到版本号</label>
+          <label class="form-label">{{ t('configManagement.modals.rollback.revisionNumber') }}</label>
           <input type="number" class="form-control" v-model.number="rollbackRevision" min="0" style="width:120px;" />
         </div>
-        <p style="color:#f5222d;font-size:12px;">注意：此操作回滚后需要重启设备才能生效。</p>
+        <p style="color:#f5222d;font-size:12px;">{{ t('configManagement.modals.rollback.warning') }}</p>
         <div class="modal-footer">
-          <button @click="showRollback=false">取消</button>
-          <button class="danger" @click="doRollbackAction">确定</button>
+          <button @click="showRollback=false">{{ t('configManagement.modals.rollback.cancel') }}</button>
+          <button class="danger" @click="doRollbackAction">{{ t('configManagement.modals.rollback.confirm') }}</button>
         </div>
       </DraggableModal>
 
       <!-- Load Modal -->
-      <DraggableModal v-model:visible="showLoad" title="Load 加载配置(替换)" @close="showLoad=false" :width="520">
+      <DraggableModal v-model:visible="showLoad" :title="t('configManagement.modals.load.title')" @close="showLoad=false" :width="520">
         <div class="form-row">
-          <label class="form-label">来源类型</label>
+          <label class="form-label">{{ t('configManagement.modals.load.sourceType') }}</label>
           <select class="form-control" v-model="loadType" style="width:200px;">
-            <option value="system">系统配置文件</option>
-            <option value="local">本地文件</option>
+            <option value="system">{{ t('configManagement.modals.load.systemFile') }}</option>
+            <option value="local">{{ t('configManagement.modals.load.localFile') }}</option>
             <option v-for="p in LOAD_PROTOCOLS" :key="p.value" :value="p.value">{{ p.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">{{ loadType === 'system' ? '' : '文件路径/URL' }}</label>
-          <input v-if="loadType !== 'system'" class="form-control" v-model="loadSource" :placeholder="loadType === 'local' ? '/path/to/config.boot' : loadType + '://host/path'" style="width:100%;" />
-          <span v-else style="color:#666;">将从系统默认配置文件加载</span>
+          <label class="form-label">{{ loadType === 'system' ? '' : t('configManagement.modals.load.filePath') }}</label>
+          <input v-if="loadType !== 'system'" class="form-control" v-model="loadSource" :placeholder="loadType === 'local' ? t('configManagement.modals.load.placeholder') : loadType + '://host/path'" style="width:100%;" />
+          <span v-else style="color:#666;">{{ t('configManagement.modals.load.systemMessage') }}</span>
         </div>
-        <p style="color:#f5222d;font-size:12px;">注意：Load 将用加载的配置替换当前运行配置。</p>
+        <p style="color:#f5222d;font-size:12px;">{{ t('configManagement.modals.load.warning') }}</p>
         <div class="modal-footer">
-          <button @click="showLoad=false">取消</button>
-          <button class="primary" @click="doLoadAction">确定</button>
+          <button @click="showLoad=false">{{ t('configManagement.modals.load.cancel') }}</button>
+          <button class="primary" @click="doLoadAction">{{ t('configManagement.modals.load.confirm') }}</button>
         </div>
       </DraggableModal>
 
       <!-- Merge Modal -->
-      <DraggableModal v-model:visible="showMerge" title="Merge 合并配置" @close="showMerge=false" :width="520">
+      <DraggableModal v-model:visible="showMerge" :title="t('configManagement.modals.merge.title')" @close="showMerge=false" :width="520">
         <div class="form-row">
-          <label class="form-label">来源类型</label>
+          <label class="form-label">{{ t('configManagement.modals.merge.sourceType') }}</label>
           <select class="form-control" v-model="mergeType" style="width:200px;">
-            <option value="local">本地文件</option>
+            <option value="local">{{ t('configManagement.modals.merge.localFile') }}</option>
             <option v-for="p in LOAD_PROTOCOLS" :key="p.value" :value="p.value">{{ p.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">文件路径/URL</label>
-          <input class="form-control" v-model="mergeSource" :placeholder="mergeType === 'local' ? '/path/to/config.boot' : mergeType + '://host/path'" style="width:100%;" />
+          <label class="form-label">{{ t('configManagement.modals.merge.filePath') }}</label>
+          <input class="form-control" v-model="mergeSource" :placeholder="mergeType === 'local' ? t('configManagement.modals.merge.placeholder') : mergeType + '://host/path'" style="width:100%;" />
         </div>
         <div class="modal-footer">
-          <button @click="showMerge=false">取消</button>
-          <button class="primary" @click="doMergeAction">确定</button>
+          <button @click="showMerge=false">{{ t('configManagement.modals.merge.cancel') }}</button>
+          <button class="primary" @click="doMergeAction">{{ t('configManagement.modals.merge.confirm') }}</button>
         </div>
       </DraggableModal>
 
       <!-- Save Modal -->
-      <DraggableModal v-model:visible="showSave" title="Save 保存配置" @close="showSave=false" :width="520">
+      <DraggableModal v-model:visible="showSave" :title="t('configManagement.modals.save.title')" @close="showSave=false" :width="520">
         <div class="form-row">
-          <label class="form-label">保存目标</label>
+          <label class="form-label">{{ t('configManagement.modals.save.saveTarget') }}</label>
           <select class="form-control" v-model="saveType" style="width:200px;">
-            <option value="system">系统配置文件</option>
-            <option value="local">本地文件</option>
+            <option value="system">{{ t('configManagement.modals.save.systemFile') }}</option>
+            <option value="local">{{ t('configManagement.modals.save.localFile') }}</option>
             <option v-for="p in LOAD_PROTOCOLS" :key="p.value" :value="p.value">{{ p.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">{{ saveType === 'system' ? '' : '文件路径/URL' }}</label>
-          <input v-if="saveType !== 'system'" class="form-control" v-model="saveTarget" :placeholder="saveType === 'local' ? '/path/to/config.boot' : saveType + '://host/path'" style="width:100%;" />
-          <span v-else style="color:#666;">将保存到系统默认配置文件</span>
+          <label class="form-label">{{ saveType === 'system' ? '' : t('configManagement.modals.save.filePath') }}</label>
+          <input v-if="saveType !== 'system'" class="form-control" v-model="saveTarget" :placeholder="saveType === 'local' ? t('configManagement.modals.save.placeholder') : saveType + '://host/path'" style="width:100%;" />
+          <span v-else style="color:#666;">{{ t('configManagement.modals.save.systemMessage') }}</span>
         </div>
         <div class="modal-footer">
-          <button @click="showSave=false">取消</button>
-          <button class="primary" @click="doSaveAction">确定</button>
+          <button @click="showSave=false">{{ t('configManagement.modals.save.cancel') }}</button>
+          <button class="primary" @click="doSaveAction">{{ t('configManagement.modals.save.confirm') }}</button>
         </div>
       </DraggableModal>
 
       <!-- Comment Modal -->
-      <DraggableModal v-model:visible="showComment" title="Comment 添加注释" @close="showComment=false" :width="460">
+      <DraggableModal v-model:visible="showComment" :title="t('configManagement.modals.comment.title')" @close="showComment=false" :width="460">
         <div class="form-row">
-          <label class="form-label">配置区域</label>
+          <label class="form-label">{{ t('configManagement.modals.comment.configSection') }}</label>
           <select class="form-control" v-model="commentPath" style="width:260px;">
-            <option value="">-- 选择区域 --</option>
+            <option value="">{{ t('configManagement.modals.comment.selectSection') }}</option>
             <option v-for="s in COMMENT_SECTIONS" :key="s.value" :value="s.value">{{ s.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">注释内容</label>
+          <label class="form-label">{{ t('configManagement.modals.comment.commentText') }}</label>
           <textarea class="form-control" v-model="commentText" rows="3" style="width:100%;"></textarea>
         </div>
         <div class="modal-footer">
-          <button @click="showComment=false">取消</button>
-          <button class="primary" @click="doCommentAction">确定</button>
+          <button @click="showComment=false">{{ t('configManagement.modals.comment.cancel') }}</button>
+          <button class="primary" @click="doCommentAction">{{ t('configManagement.modals.comment.confirm') }}</button>
         </div>
       </DraggableModal>
 
       <!-- Rename Modal -->
-      <DraggableModal v-model:visible="showRename" title="Rename 重命名" @close="showRename=false" :width="520">
+      <DraggableModal v-model:visible="showRename" :title="t('configManagement.modals.rename.title')" @close="showRename=false" :width="520">
         <div class="form-row">
-          <label class="form-label">配置类别</label>
+          <label class="form-label">{{ t('configManagement.modals.rename.configCategory') }}</label>
           <select class="form-control" v-model="renameCategory" style="width:260px;" @change="renameSubCategory=''">
-            <option value="">-- 选择类别 --</option>
+            <option value="">{{ t('configManagement.modals.rename.selectCategory') }}</option>
             <option v-for="c in RENAME_PATHS" :key="c.value" :value="c.value">{{ c.label }}</option>
           </select>
         </div>
         <div v-if="renameSubOptions.length" class="form-row">
-          <label class="form-label">子类别</label>
+          <label class="form-label">{{ t('configManagement.modals.rename.subCategory') }}</label>
           <select class="form-control" v-model="renameSubCategory" style="width:260px;">
-            <option value="">-- 选择子类别 --</option>
+            <option value="">{{ t('configManagement.modals.rename.selectSubCategory') }}</option>
             <option v-for="s in renameSubOptions" :key="s.value" :value="s.value">{{ s.label }}</option>
           </select>
         </div>
         <div class="form-row">
-          <label class="form-label">旧名称</label>
-          <input class="form-control" v-model="renameOldName" placeholder="当前名称" style="width:100%;" />
+          <label class="form-label">{{ t('configManagement.modals.rename.oldName') }}</label>
+          <input class="form-control" v-model="renameOldName" :placeholder="t('configManagement.modals.rename.oldNamePlaceholder')" style="width:100%;" />
         </div>
         <div class="form-row">
-          <label class="form-label">新名称</label>
-          <input class="form-control" v-model="renameNewName" placeholder="新名称" style="width:100%;" />
+          <label class="form-label">{{ t('configManagement.modals.rename.newName') }}</label>
+          <input class="form-control" v-model="renameNewName" :placeholder="t('configManagement.modals.rename.newNamePlaceholder')" style="width:100%;" />
         </div>
         <div class="modal-footer">
-          <button @click="showRename=false">取消</button>
-          <button class="primary" @click="doRenameAction">确定</button>
+          <button @click="showRename=false">{{ t('configManagement.modals.rename.cancel') }}</button>
+          <button class="primary" @click="doRenameAction">{{ t('configManagement.modals.rename.confirm') }}</button>
+        </div>
+      </DraggableModal>
+
+      <!-- Delete Confirmation Modal -->
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('configManagement.modals.delete.title')" width="400px" @confirm="confirmDeleteSelected">
+        <div>{{ t('configManagement.modals.delete.message') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="idx in pendingDeleteIndexes" :key="idx" style="padding:2px 0;">{{ t('configManagement.modals.delete.revision') }} {{ idx }}</div>
         </div>
       </DraggableModal>
     </div>

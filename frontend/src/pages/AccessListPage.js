@@ -2,11 +2,13 @@ import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
+import { onMenuRefresh } from '/src/utils/eventBus.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
 import ToolbarButton from '/src/components/Button/ToolbarButton.js';
+import { useI18n } from '/src/i18n/index.js';
 
 const ACTION_OPTIONS = [
   { value: 'permit', label: 'permit' },
@@ -17,12 +19,6 @@ const IPV4_SOURCE_DEST_TYPES = [
   { value: 'any', label: 'any' },
   { value: 'host', label: 'host' },
   { value: 'network', label: 'network + inverse-mask' },
-];
-
-const RULE_TABS = [
-  { key: 'basic', title: '基本' },
-  { key: 'source', title: '源' },
-  { key: 'destination', title: '目的' },
 ];
 
 function normalizeValue(val) {
@@ -48,14 +44,14 @@ function getListType(number) {
   return 'unknown';
 }
 
-function getListTypeLabel(number) {
+function getListTypeLabel(number, t) {
   const type = getListType(number);
   const labels = {
-    standard: '标准 (1-99)',
-    extended: '扩展 (100-199)',
-    'standard-expanded': '标准扩展 (1300-1999)',
-    'extended-expanded': '扩展扩展 (2000-2699)',
-    unknown: '未知',
+    standard: t('accesslist.types.standard'),
+    extended: t('accesslist.types.extended'),
+    'standard-expanded': t('accesslist.types.standardExpanded'),
+    'extended-expanded': t('accesslist.types.extendedExpanded'),
+    unknown: t('accesslist.types.unknown'),
   };
   return labels[type] || type;
 }
@@ -126,8 +122,15 @@ function formRuleToConfig(item) {
 export default defineComponent({
   name: 'AccessListPage',
   setup() {
+    const { t } = useI18n();
     const route = useRoute();
     const configStore = useConfigStore();
+
+    const RULE_TABS = [
+      { key: 'basic', title: t('accesslist.tabs.basic') },
+      { key: 'source', title: t('accesslist.tabs.source') },
+      { key: 'destination', title: t('accesslist.tabs.destination') },
+    ];
     const lists = ref([]);
     const loading = ref(false);
     const selectedListNumbers = ref([]);
@@ -142,6 +145,11 @@ export default defineComponent({
     const editingRuleOriginalNumber = ref('');
     const ruleActiveTab = ref('basic');
 
+    const deleteModalVisible = ref(false);
+    const pendingDeleteNumbers = ref([]);
+    const ruleDeleteModalVisible = ref(false);
+    const pendingDeleteRuleNumbers = ref([]);
+
     const path = computed(() => route.path.replace(/^\//, '').replace(/\//g, ' '));
     const writeDisabled = computed(() => route.meta?.menuItem?.permission === 'read');
 
@@ -150,55 +158,55 @@ export default defineComponent({
     });
 
     const listColumns = [
-      { key: 'number', title: '访问列表编号' },
-      { key: 'type', title: '类型' },
-      { key: 'description', title: '描述' },
-      { key: 'ruleCount', title: '规则数' },
+      { key: 'number', title: t('accesslist.columns.number') },
+      { key: 'type', title: t('accesslist.columns.type') },
+      { key: 'description', title: t('accesslist.columns.description') },
+      { key: 'ruleCount', title: t('accesslist.columns.ruleCount') },
     ];
 
     const ruleColumns = [
-      { key: 'rule', title: '规则编号' },
-      { key: 'action', title: '动作' },
-      { key: 'source', title: '源' },
-      { key: 'destination', title: '目的' },
-      { key: 'description', title: '描述' },
+      { key: 'rule', title: t('accesslist.ruleColumns.rule') },
+      { key: 'action', title: t('accesslist.ruleColumns.action') },
+      { key: 'source', title: t('accesslist.ruleColumns.source') },
+      { key: 'destination', title: t('accesslist.ruleColumns.destination') },
+      { key: 'description', title: t('accesslist.ruleColumns.description') },
     ];
 
     const listSchema = computed(() => [
       {
         key: 'number',
-        title: '访问列表编号',
+        title: t('accesslist.form.number'),
         type: 'number',
         required: true,
-        help: '标准：1-99、1300-1999；扩展：100-199、2000-2699',
+        help: t('accesslist.form.numberHelp'),
       },
-      { key: 'description', title: '描述', type: 'text' },
+      { key: 'description', title: t('accesslist.form.description'), type: 'text' },
     ]);
 
     const sourceSchema = computed(() => [
-      { key: 'type', title: '类型', type: 'select', options: IPV4_SOURCE_DEST_TYPES, default: 'any' },
-      { key: 'host', title: '主机地址', type: 'text', validate: 'ipv4', placeholder: '如 192.168.1.1' },
-      { key: 'network', title: '网络地址', type: 'text', validate: 'ipv4', placeholder: '如 192.168.0.0' },
-      { key: 'inverse-mask', title: '反掩码', type: 'text', placeholder: '如 0.0.255.255', help: '通配符反掩码，每段取值 0/1/3/7/15/31/63/127/255' },
+      { key: 'type', title: t('accesslist.form.type'), type: 'select', options: IPV4_SOURCE_DEST_TYPES, default: 'any' },
+      { key: 'host', title: t('accesslist.form.host'), type: 'text', validate: 'ipv4', placeholder: t('accesslist.form.hostPlaceholder') },
+      { key: 'network', title: t('accesslist.form.network'), type: 'text', validate: 'ipv4', placeholder: t('accesslist.form.networkPlaceholder') },
+      { key: 'inverse-mask', title: t('accesslist.form.inverseMask'), type: 'text', placeholder: t('accesslist.form.inverseMaskPlaceholder'), help: t('accesslist.form.inverseMaskHelp') },
     ]);
 
     const destinationSchema = computed(() => [
-      { key: 'type', title: '类型', type: 'select', options: IPV4_SOURCE_DEST_TYPES, default: 'any' },
-      { key: 'host', title: '主机地址', type: 'text', validate: 'ipv4', placeholder: '如 192.168.1.1' },
-      { key: 'network', title: '网络地址', type: 'text', validate: 'ipv4', placeholder: '如 192.168.0.0' },
-      { key: 'inverse-mask', title: '反掩码', type: 'text', placeholder: '如 0.0.255.255', help: '通配符反掩码，每段取值 0/1/3/7/15/31/63/127/255' },
+      { key: 'type', title: t('accesslist.form.type'), type: 'select', options: IPV4_SOURCE_DEST_TYPES, default: 'any' },
+      { key: 'host', title: t('accesslist.form.host'), type: 'text', validate: 'ipv4', placeholder: t('accesslist.form.hostPlaceholder') },
+      { key: 'network', title: t('accesslist.form.network'), type: 'text', validate: 'ipv4', placeholder: t('accesslist.form.networkPlaceholder') },
+      { key: 'inverse-mask', title: t('accesslist.form.inverseMask'), type: 'text', placeholder: t('accesslist.form.inverseMaskPlaceholder'), help: t('accesslist.form.inverseMaskHelp') },
     ]);
 
     const basicRuleSchema = computed(() => [
-      { key: 'rule', title: '规则编号', type: 'number', min: 1, max: 65535, required: true, help: '范围 1-65535' },
-      { key: 'action', title: '动作', type: 'select', options: ACTION_OPTIONS, required: true },
-      { key: 'description', title: '描述', type: 'text' },
+      { key: 'rule', title: t('accesslist.form.rule'), type: 'number', min: 1, max: 65535, required: true, help: t('accesslist.form.ruleHelp') },
+      { key: 'action', title: t('accesslist.form.action'), type: 'select', options: ACTION_OPTIONS, required: true },
+      { key: 'description', title: t('accesslist.form.description'), type: 'text' },
     ]);
 
     const ruleTabSchemas = computed(() => ({
       basic: basicRuleSchema.value,
-      source: [{ key: 'source', title: '源', type: 'group', children: sourceSchema.value }],
-      destination: [{ key: 'destination', title: '目的', type: 'group', children: destinationSchema.value }],
+      source: [{ key: 'source', title: t('accesslist.form.source'), type: 'group', children: sourceSchema.value }],
+      destination: [{ key: 'destination', title: t('accesslist.form.destination'), type: 'group', children: destinationSchema.value }],
     }));
 
     const displayRules = computed(() => {
@@ -221,7 +229,7 @@ export default defineComponent({
             id: num,
             number: num,
             description: attrs.description || '',
-            type: getListTypeLabel(num),
+            type: getListTypeLabel(num, t),
             ruleCount: Object.keys(rules).length,
             rules,
           });
@@ -238,7 +246,10 @@ export default defineComponent({
       }
     }
 
-    onMounted(load);
+    onMounted(() => {
+      load();
+      onMenuRefresh(load);
+    });
     watch(() => route.path, () => {
       selectedListNumbers.value = [];
       selectedRuleNumbers.value = [];
@@ -276,7 +287,7 @@ export default defineComponent({
     }
 
     async function editList() {
-      if (!selectedListNumbers.value.length) return showError({ message: '请选择一个访问列表' });
+      if (!selectedListNumbers.value.length) return showError({ message: t('accesslist.messages.selectList') });
       const list = lists.value.find(l => String(l.number) === String(selectedListNumbers.value[0]));
       if (!list) return;
       editingList.value = {
@@ -290,24 +301,31 @@ export default defineComponent({
     }
 
     async function removeList() {
-      if (!selectedListNumbers.value.length) return showError({ message: '请选择一个访问列表' });
-      if (!confirm('确认删除选中的访问列表及其所有规则？')) return;
-      for (const num of selectedListNumbers.value) {
+      if (!selectedListNumbers.value.length) return showError({ message: t('accesslist.messages.selectList') });
+      pendingDeleteNumbers.value = [...selectedListNumbers.value];
+      deleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveList() {
+      deleteModalVisible.value = false;
+      for (const num of pendingDeleteNumbers.value) {
         await configStore.deleteConfig(`${path.value} ${num}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selectedListNumbers.value = [];
+      pendingDeleteNumbers.value = [];
       await load();
     }
 
     function validateListNumber(number) {
-      if (!number) return '请输入访问列表编号';
+      if (!number) return t('accesslist.validation.numberRequired');
       const n = parseInt(number, 10);
-      if (isNaN(n)) return '请输入有效的访问列表编号';
+      if (isNaN(n)) return t('accesslist.validation.numberInvalid');
       if ((n >= 1 && n <= 99) || (n >= 100 && n <= 199) || (n >= 1300 && n <= 1999) || (n >= 2000 && n <= 2699)) {
         return '';
       }
-      return '编号必须在 1-99、100-199、1300-1999 或 2000-2699 范围内';
+      return t('accesslist.validation.numberRange');
     }
 
     async function saveList() {
@@ -315,13 +333,14 @@ export default defineComponent({
       if (err) return showError({ message: err });
       const original = editingListOriginalNumber.value;
       if (!original && lists.value.some(l => String(l.number) === String(editingList.value.number))) {
-        return showError({ message: '访问列表编号已存在' });
+        return showError({ message: t('accesslist.validation.numberExists') });
       }
       const value = {};
       if (editingList.value.description) value.description = editingList.value.description;
       try {
         if (original && String(original) !== String(editingList.value.number)) {
           await configStore.deleteConfig(`${path.value} ${original}`);
+          configStore.markPending();
           const newValue = { ...value };
           if (editingList.value.rules?.length) {
             const rules = {};
@@ -331,8 +350,10 @@ export default defineComponent({
             newValue.rule = rules;
           }
           await configStore.setConfig(`${path.value} ${editingList.value.number}`, newValue);
+          configStore.markPending();
         } else {
           await configStore.setConfig(`${path.value} ${editingList.value.number}`, value);
+          configStore.markPending();
         }
         listModalVisible.value = false;
         await configStore.checkSessionChanged();
@@ -347,7 +368,7 @@ export default defineComponent({
       const err = validateListNumber(editingList.value.number);
       if (err) return showError({ message: err });
       if (!editingListOriginalNumber.value && lists.value.some(l => String(l.number) === String(editingList.value.number))) {
-        return showError({ message: '访问列表编号已存在' });
+        return showError({ message: t('accesslist.validation.numberExists') });
       }
       editingRule.value = emptyRule();
       editingRuleOriginalNumber.value = '';
@@ -357,7 +378,7 @@ export default defineComponent({
 
     function editRule() {
       if (!editingList.value) return;
-      if (!selectedRuleNumbers.value.length) return showError({ message: '请选择一条规则' });
+      if (!selectedRuleNumbers.value.length) return showError({ message: t('accesslist.messages.selectRule') });
       const row = editingList.value.rules.find(r => String(r.rule) === String(selectedRuleNumbers.value[0]));
       if (!row) return;
       editingRule.value = JSON.parse(JSON.stringify(row));
@@ -368,41 +389,48 @@ export default defineComponent({
 
     async function removeRule() {
       if (!editingList.value) return;
-      if (!selectedRuleNumbers.value.length) return showError({ message: '请选择一条规则' });
-      if (!confirm('确认删除选中的规则？')) return;
+      if (!selectedRuleNumbers.value.length) return showError({ message: t('accesslist.messages.selectRule') });
+      pendingDeleteRuleNumbers.value = [...selectedRuleNumbers.value];
+      ruleDeleteModalVisible.value = true;
+    }
+
+    async function confirmRemoveRule() {
+      ruleDeleteModalVisible.value = false;
       const listNum = editingList.value.number;
-      for (const num of selectedRuleNumbers.value) {
+      for (const num of pendingDeleteRuleNumbers.value) {
         await configStore.deleteConfig(`${path.value} ${listNum} rule ${num}`);
+        configStore.markPending();
       }
       await configStore.checkSessionChanged();
       selectedRuleNumbers.value = [];
+      pendingDeleteRuleNumbers.value = [];
       await loadListRules(listNum);
       await load();
     }
 
     function validateRule() {
       const r = editingRule.value;
-      if (!r.rule) return '请输入规则编号';
+      if (!r.rule) return t('accesslist.ruleValidation.ruleRequired');
       const n = parseInt(r.rule, 10);
-      if (isNaN(n) || n < 1 || n > 65535) return '规则编号范围 1-65535';
-      if (!r.action) return '请选择动作';
+      if (isNaN(n) || n < 1 || n > 65535) return t('accesslist.ruleValidation.ruleRange');
+      if (!r.action) return t('accesslist.ruleValidation.actionRequired');
       if (r.source?.type === 'host') {
-        if (!r.source.host) return '请输入源主机地址';
-        if (!validIPv4Address(r.source.host)) return '源主机地址必须是 IPv4 地址';
+        if (!r.source.host) return t('accesslist.ruleValidation.sourceHostRequired');
+        if (!validIPv4Address(r.source.host)) return t('accesslist.ruleValidation.sourceHostInvalid');
       }
       if (r.source?.type === 'network') {
-        if (!r.source.network || !r.source['inverse-mask']) return '请输入源网络地址和反掩码';
-        if (!validIPv4Address(r.source.network)) return '源网络地址必须是 IPv4 地址';
-        if (!validIPv4WildcardMask(r.source['inverse-mask'])) return '源反掩码格式无效，如 0.0.255.255';
+        if (!r.source.network || !r.source['inverse-mask']) return t('accesslist.ruleValidation.sourceNetworkRequired');
+        if (!validIPv4Address(r.source.network)) return t('accesslist.ruleValidation.sourceNetworkInvalid');
+        if (!validIPv4WildcardMask(r.source['inverse-mask'])) return t('accesslist.ruleValidation.sourceMaskInvalid');
       }
       if (r.destination?.type === 'host') {
-        if (!r.destination.host) return '请输入目的主机地址';
-        if (!validIPv4Address(r.destination.host)) return '目的主机地址必须是 IPv4 地址';
+        if (!r.destination.host) return t('accesslist.ruleValidation.destHostRequired');
+        if (!validIPv4Address(r.destination.host)) return t('accesslist.ruleValidation.destHostInvalid');
       }
       if (r.destination?.type === 'network') {
-        if (!r.destination.network || !r.destination['inverse-mask']) return '请输入目的网络地址和反掩码';
-        if (!validIPv4Address(r.destination.network)) return '目的网络地址必须是 IPv4 地址';
-        if (!validIPv4WildcardMask(r.destination['inverse-mask'])) return '目的反掩码格式无效，如 0.0.255.255';
+        if (!r.destination.network || !r.destination['inverse-mask']) return t('accesslist.ruleValidation.destNetworkRequired');
+        if (!validIPv4Address(r.destination.network)) return t('accesslist.ruleValidation.destNetworkInvalid');
+        if (!validIPv4WildcardMask(r.destination['inverse-mask'])) return t('accesslist.ruleValidation.destMaskInvalid');
       }
       return '';
     }
@@ -414,7 +442,7 @@ export default defineComponent({
       const listNum = editingList.value.number;
       const original = editingRuleOriginalNumber.value;
       if (!original && editingList.value.rules.some(r => String(r.rule) === String(editingRule.value.rule))) {
-        return showError({ message: '规则编号已存在' });
+        return showError({ message: t('accesslist.ruleValidation.ruleExists') });
       }
       const value = formRuleToConfig(editingRule.value);
       try {
@@ -434,13 +462,15 @@ export default defineComponent({
       }
     }
 
-    return {
+    return {t,
+      
       lists, loading, selectedListNumbers, selectedRuleNumbers,
       listModalVisible, editingList, editingListOriginalNumber,
       ruleModalVisible, ruleActiveTab, editingRule, editingRuleOriginalNumber,
+      deleteModalVisible, pendingDeleteNumbers, ruleDeleteModalVisible, pendingDeleteRuleNumbers,
       listColumns, ruleColumns, listSchema, ruleTabs: RULE_TABS, ruleTabSchemas, displayRules,
       path, writeDisabled, canCreateRule,
-      load, createList, editList, removeList, saveList, createRule, editRule, removeRule, saveRule,
+      load, createList, editList, removeList, confirmRemoveList, saveList, createRule, editRule, removeRule, confirmRemoveRule, saveRule,
     };
   },
   template: `
@@ -448,10 +478,10 @@ export default defineComponent({
       <div class="section">
         <div class="toolbar">
           <div class="toolbar-left">
-            <ToolbarButton icon="create" @click="createList" :disabled="writeDisabled">创建</ToolbarButton>
-            <ToolbarButton icon="edit" @click="editList" :disabled="writeDisabled || !selectedListNumbers.length || selectedListNumbers.length > 1">编辑</ToolbarButton>
-            <ToolbarButton icon="delete" @click="removeList" :disabled="writeDisabled || !selectedListNumbers.length">删除</ToolbarButton>
-            <ToolbarButton icon="refresh" @click="load">刷新</ToolbarButton>
+            <ToolbarButton icon="create" @click="createList" :disabled="writeDisabled">{{ t('accesslist.buttons.create') }}</ToolbarButton>
+            <ToolbarButton icon="edit" @click="editList" :disabled="writeDisabled || !selectedListNumbers.length || selectedListNumbers.length > 1">{{ t('accesslist.buttons.edit') }}</ToolbarButton>
+            <ToolbarButton icon="delete" @click="removeList" :disabled="writeDisabled || !selectedListNumbers.length">{{ t('accesslist.buttons.delete') }}</ToolbarButton>
+            <ToolbarButton icon="refresh" @click="load">{{ t('accesslist.buttons.refresh') }}</ToolbarButton>
           </div>
         </div>
         <DataTable :columns="listColumns" :data="lists" :loading="loading" :disabled="writeDisabled"
@@ -460,16 +490,16 @@ export default defineComponent({
       </div>
       <div class="section">
       </div>
-      <DraggableModal v-model:visible="listModalVisible" :title="editingListOriginalNumber ? '编辑' : '创建'" width="780px" @confirm="saveList">
+      <DraggableModal v-model:visible="listModalVisible" :title="editingListOriginalNumber ? t('accesslist.modals.editList') : t('accesslist.modals.createList')" width="780px" @confirm="saveList">
         <div>
           <ConfigForm v-model="editingList" :schema="listSchema" :disabled="writeDisabled" :showAdvanced="true" />
           <div style="margin-top:16px;">
-            <div class="section-title" style="font-weight:bold;margin-bottom:8px;">规则</div>
+            <div class="section-title" style="font-weight:bold;margin-bottom:8px;">{{ t('accesslist.sections.rules') }}</div>
             <div class="toolbar toolbar-compact">
               <div class="toolbar-left">
-                <ToolbarButton icon="create" @click="createRule" :disabled="writeDisabled || !canCreateRule">创建</ToolbarButton>
-                <ToolbarButton icon="edit" @click="editRule" :disabled="writeDisabled || !selectedRuleNumbers.length || selectedRuleNumbers.length > 1">编辑</ToolbarButton>
-                <ToolbarButton icon="delete" @click="removeRule" :disabled="writeDisabled || !selectedRuleNumbers.length">删除</ToolbarButton>
+                <ToolbarButton icon="create" @click="createRule" :disabled="writeDisabled || !canCreateRule">{{ t('accesslist.buttons.create') }}</ToolbarButton>
+                <ToolbarButton icon="edit" @click="editRule" :disabled="writeDisabled || !selectedRuleNumbers.length || selectedRuleNumbers.length > 1">{{ t('accesslist.buttons.edit') }}</ToolbarButton>
+                <ToolbarButton icon="delete" @click="removeRule" :disabled="writeDisabled || !selectedRuleNumbers.length">{{ t('accesslist.buttons.delete') }}</ToolbarButton>
               </div>
             </div>
             <DataTable :columns="ruleColumns" :data="displayRules" :disabled="writeDisabled"
@@ -478,7 +508,7 @@ export default defineComponent({
           </div>
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="ruleModalVisible" :title="editingRuleOriginalNumber ? '编辑规则' : '创建规则'" width="780px" @confirm="saveRule" modal-class="on-top">
+      <DraggableModal v-model:visible="ruleModalVisible" :title="editingRuleOriginalNumber ? t('accesslist.modals.editRule') : t('accesslist.modals.createRule')" width="780px" @confirm="saveRule" modal-class="on-top">
         <TabGroup v-model="ruleActiveTab" :tabs="ruleTabs">
           <template #basic>
             <ConfigForm v-model="editingRule" :schema="ruleTabSchemas.basic" :disabled="writeDisabled" :showAdvanced="true" />
@@ -490,6 +520,18 @@ export default defineComponent({
             <ConfigForm v-model="editingRule" :schema="ruleTabSchemas.destination" :disabled="writeDisabled" :showAdvanced="true" />
           </template>
         </TabGroup>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('accesslist.modals.confirmDelete')" width="400px" @confirm="confirmRemoveList">
+        <div>{{ t('accesslist.modals.confirmDeleteList') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="num in pendingDeleteNumbers" :key="num" style="padding:2px 0;">{{ num }}</div>
+        </div>
+      </DraggableModal>
+      <DraggableModal v-model:visible="ruleDeleteModalVisible" :title="t('accesslist.modals.confirmDelete')" width="400px" @confirm="confirmRemoveRule">
+        <div>{{ t('accesslist.modals.confirmDeleteRule') }}</div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f5f5f5;border-radius:4px;">
+          <div v-for="num in pendingDeleteRuleNumbers" :key="num" style="padding:2px 0;">{{ num }}</div>
+        </div>
       </DraggableModal>
     </div>
   `,
