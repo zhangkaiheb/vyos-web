@@ -92,7 +92,8 @@ export const FIREWALL_RULE_SCHEMA = [
         "options": [
           "destination",
           "source"
-        ]
+        ],
+        "default": ""
       }
     ],
     "advanced": true
@@ -535,6 +536,7 @@ export const FIREWALL_RULE_SCHEMA = [
       "multicast",
       "other"
     ],
+    "default": "",
     "advanced": true
   },
   {
@@ -631,6 +633,7 @@ export const FIREWALL_RULE_SCHEMA = [
           "minute",
           "hour"
         ],
+        "default": "",
         "advanced": true
       }
     ],
@@ -815,6 +818,7 @@ export const FIREWALL_RULE_SCHEMA = [
         "title": "标志",
         "help": "firewall.rule.help.flags",
         "type": "group",
+        "horizontal": true,
         "children": [
           {
             "key": "ack",

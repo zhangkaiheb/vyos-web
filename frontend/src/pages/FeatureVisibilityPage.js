@@ -1,5 +1,8 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
 import { useConfigStore } from '/src/stores/config.js';
+import { useAuthStore } from '/src/stores/auth.js';
+import { useVisibilityStore } from '/src/stores/visibility.js';
+import { updateRouterMenu } from '/src/router/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import { useI18n } from '/src/i18n/index.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
@@ -37,6 +40,8 @@ export default defineComponent({
   setup() {
     const { t } = useI18n();
     const configStore = useConfigStore();
+    const authStore = useAuthStore();
+    const visibilityStore = useVisibilityStore();
     const features = ref([]);
     const loading = ref(false);
     const saving = ref(false);
@@ -121,6 +126,12 @@ export default defineComponent({
         const data = await res.json();
         if (data.success) {
           changedKeys.value.clear();
+          // Reload visibility and menu to reflect changes
+          await Promise.all([
+            visibilityStore.load(),
+            authStore.loadMenu(),
+          ]);
+          updateRouterMenu(authStore.menu);
         } else {
           showError(data.message || '保存失败');
         }

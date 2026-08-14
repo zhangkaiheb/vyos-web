@@ -1820,6 +1820,25 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   padding: 12px;
 }
 
+.form-group-content-horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.form-group-content-horizontal .form-row {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0;
+}
+
+.form-group-content-horizontal .form-label {
+  min-width: auto;
+  width: auto;
+  margin-bottom: 0;
+}
+
 .nested-group {
   margin-bottom: 12px;
 }

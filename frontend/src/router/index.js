@@ -322,18 +322,20 @@ export function createRouter(menu = []) {
 
 export function updateRouterMenu(menu) {
   if (!router) return;
-  const newRoutes = buildRoutes(menu);
-  let added = false;
-  for (const r of newRoutes) {
-    if (!router.hasRoute(r.name)) {
-      router.addRoute(r);
-      added = true;
+  // Remove all previously added menu routes
+  const currentRoutes = router.getRoutes();
+  for (const r of currentRoutes) {
+    if (r.meta?.menuItem && r.name !== '/') {
+      router.removeRoute(r.name);
     }
   }
-  if (added) {
-    // Re-resolve current location so dynamically added routes match immediately
-    router.replace(router.currentRoute.value.fullPath).catch(() => {});
+  // Add routes from the current menu
+  const newRoutes = buildRoutes(menu);
+  for (const r of newRoutes) {
+    router.addRoute(r);
   }
+  // Re-resolve current location so dynamically added routes match immediately
+  router.replace(router.currentRoute.value.fullPath).catch(() => {});
 }
 
 export { router };

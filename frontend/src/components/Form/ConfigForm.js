@@ -481,10 +481,11 @@ export default defineComponent({
       }
       if (field.type === 'group') {
         const groupClass = level > 0 ? 'form-group nested-group' : 'form-group';
+        const contentClass = field.horizontal ? 'form-group-content form-group-content-horizontal' : 'form-group-content';
         const groupModel = formObj[field.key] || {};
         const groupChildren = [];
         groupChildren.push(h('div', { class: 'form-group-title' }, translateTitle(field.title)));
-        groupChildren.push(h('div', { class: 'form-group-content' }, renderFields(field.children || [], groupModel, [...path, field.key], level + 1)));
+        groupChildren.push(h('div', { class: contentClass }, renderFields(field.children || [], groupModel, [...path, field.key], level + 1)));
         return h('div', { class: groupClass }, groupChildren);
       }
       if (field.type === 'checkbox') {

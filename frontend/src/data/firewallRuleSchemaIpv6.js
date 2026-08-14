@@ -92,7 +92,8 @@ export const FIREWALL_RULE_SCHEMA_IPV6 = [
         "options": [
           "destination",
           "source"
-        ]
+        ],
+        "default": ""
       }
     ],
     "advanced": true
@@ -380,7 +381,8 @@ export const FIREWALL_RULE_SCHEMA_IPV6 = [
           "mpl-control-message",
           "extended-echo-request",
           "extended-echo-reply"
-        ]
+        ],
+        "default": ""
       }
     ],
     "advanced": true
@@ -589,6 +591,7 @@ export const FIREWALL_RULE_SCHEMA_IPV6 = [
       "multicast",
       "other"
     ],
+    "default": "",
     "advanced": true
   },
   {
@@ -646,6 +649,7 @@ export const FIREWALL_RULE_SCHEMA_IPV6 = [
           "minute",
           "hour"
         ],
+        "default": "",
         "advanced": true
       }
     ],
@@ -823,6 +827,7 @@ export const FIREWALL_RULE_SCHEMA_IPV6 = [
         "title": "标志",
         "help": "firewall.rule.help.ipv6.flags",
         "type": "group",
+        "horizontal": true,
         "children": [
           {
             "key": "ack",
