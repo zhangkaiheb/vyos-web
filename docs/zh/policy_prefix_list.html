@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,235 +152,229 @@
 <div itemprop="articleBody">
              
   <section id="prefix-list-policy">
-<h1>Prefix List 策略</h1>
-<p>Prefix lists provides the most powerful prefix based filtering mechanism. In
-addition to access-list functionality, ip prefix-list has prefix length range
-specification.</p>
-<p>If no ip prefix list is specified, it acts as permit. If ip prefix list is
-defined, and no match is found, default deny is applied.</p>
-<p>Prefix filtering 可以 done using prefix-list and prefix-list6.</p>
+<h1>前缀列表策略（Prefix List Policy）</h1>
+<p>前缀列表提供了最强大的基于前缀的过滤机制。除了访问控制列表（access-list）的功能外，IP 前缀列表（ip prefix-list）还支持指定前缀长度范围。</p>
+<p>若未指定任何 IP 前缀列表，则默认行为为允许（permit）。若已定义 IP 前缀列表，但未匹配到任何规则，则应用默认拒绝（default deny）策略。</p>
+<p>前缀过滤可使用 prefix-list（IPv4）和 prefix-list6（IPv6）实现。</p>
 <section id="configuration">
 <h2>配置</h2>
 <section id="ipv4-prefix-lists-prefix-list">
-<h3>IPv4 Prefix Lists (prefix-list)</h3>
+<h3>IPv4 前缀列表（prefix-list）</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy prefix-list <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command creates the new prefix-list policy, identified by <code class="docutils literal notranslate"><text></code>.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set policy prefix-list <text> description <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-text-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 description for the prefix-list policy.</p>
+set policy prefix-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令创建一个新的前缀列表策略，其标识符为 <code class="docutils literal notranslate">&lt;text&gt;</code>。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy prefix-list <text> rule <1-65535> action <permit|deny>
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-text-rule-1-65535-action-permit-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command creates a new rule in the prefix-list and defines an action.</p>
+set policy prefix-list &lt;text&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-text-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为前缀列表策略设置描述信息。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy prefix-list <text> rule <1-65535> description <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-text-rule-1-65535-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 description for rule in the prefix-list.</p>
+set policy prefix-list &lt;text&gt; rule &lt;1-65535&gt; action &lt;permit|deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-text-rule-1-65535-action-permit-deny" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令在前缀列表中创建一条新规则，并定义其动作。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy prefix-list <text> rule <1-65535> prefix <x.x.x.x/x>
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-text-rule-1-65535-prefix-x-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Prefix to match against.</p>
+set policy prefix-list &lt;text&gt; rule &lt;1-65535&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-text-rule-1-65535-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为前缀列表中的某条规则设置描述信息。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy prefix-list <text> rule <1-65535> ge <0-32>
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-text-rule-1-65535-ge-0-32" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Netmask greater than length.</p>
+set policy prefix-list &lt;text&gt; rule &lt;1-65535&gt; prefix &lt;x.x.x.x/x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-text-rule-1-65535-prefix-x-x-x-x-x" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>待匹配的前缀。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy prefix-list <text> rule <1-65535> le <0-32>
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-text-rule-1-65535-le-0-32" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Netmask less than length</p>
+set policy prefix-list &lt;text&gt; rule &lt;1-65535&gt; ge &lt;0-32&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-text-rule-1-65535-ge-0-32" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>子网掩码长度大于指定值。</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy prefix-list &lt;text&gt; rule &lt;1-65535&gt; le &lt;0-32&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-text-rule-1-65535-le-0-32" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>子网掩码长度小于指定值。</p>
 </div>
 </div>
 </section>
 <section id="example-ipv4-prefix-lists-prefix-list">
-<h3>示例: IPv4 Prefix Lists (prefix-list)</h3>
-<p>This example creates an IPv4 prefix-list named PL4-EXAMPLE-NAME, defines 3
-rules each with 1 prefix, and matches le (less than/equal to) /32.</p>
+<h3>示例：IPv4 前缀列表（prefix-list）</h3>
+<p>本示例创建一个名为 PL4-EXAMPLE-NAME 的 IPv4 前缀列表，定义了 3 条规则，每条规则各含 1 个前缀，并匹配 le（小于或等于）/32。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list PL4-EXAMPLE-NAME rule 10 action ‘permit’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-10-action-permit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-10-action-permit" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list PL4-EXAMPLE-NAME rule 10 le ‘32’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-10-le-32" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-10-le-32" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list PL4-EXAMPLE-NAME rule 10 prefix ‘192.0.2.0/24’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-10-prefix-192-0-2-0-24" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-10-prefix-192-0-2-0-24" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list PL4-EXAMPLE-NAME rule 20 action ‘permit’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-20-action-permit" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-20-action-permit" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list PL4-EXAMPLE-NAME rule 20 le ‘32’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-20-le-32" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-20-le-32" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list PL4-EXAMPLE-NAME rule 20 prefix ‘198.51.100.0/24’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-20-prefix-198-51-100-0-24" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-20-prefix-198-51-100-0-24" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list PL4-EXAMPLE-NAME rule 30 action ‘permit’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-30-action-permit" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-30-action-permit" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list PL4-EXAMPLE-NAME rule 30 le ‘32’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-30-le-32" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-30-le-32" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list PL4-EXAMPLE-NAME rule 30 prefix ‘203.0.113.0/24’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-30-prefix-203-0-113-0-24" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list-pl4-example-name-rule-30-prefix-203-0-113-0-24" title="此命令的永久链接"></a></div></div>
 </section>
 <section id="ipv6-prefix-lists-prefix-list6">
-<h3>IPv6 Prefix Lists (prefix-list6)</h3>
+<h3>IPv6 前缀列表（prefix-list6）</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy prefix-list6 <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command creates the new IPv6 prefix-list policy, identified by <code class="docutils literal notranslate"><text></code>.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set policy prefix-list6 <text> description <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-text-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 description for the IPv6 prefix-list policy.</p>
+set policy prefix-list6 &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令创建一个新的 IPv6 前缀列表策略，其标识符为 <code class="docutils literal notranslate">&lt;text&gt;</code>。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy prefix-list6 <text> rule <1-65535> action <permit|deny>
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-text-rule-1-65535-action-permit-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command creates a new rule in the IPv6 prefix-list and defines an
-action.</p>
+set policy prefix-list6 &lt;text&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-text-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为 IPv6 前缀列表策略设置描述信息。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy prefix-list6 <text> rule <1-65535> description <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-text-rule-1-65535-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 description for rule in IPv6 prefix-list.</p>
+set policy prefix-list6 &lt;text&gt; rule &lt;1-65535&gt; action &lt;permit|deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-text-rule-1-65535-action-permit-deny" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令在 IPv6 前缀列表中创建一条新规则，并定义其动作。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy prefix-list6 <text> rule <1-65535> prefix <h:h:h:h:h:h:h:h/x>
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-text-rule-1-65535-prefix-h-h-h-h-h-h-h-h-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>IPv6 prefix.</p>
+set policy prefix-list6 &lt;text&gt; rule &lt;1-65535&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-text-rule-1-65535-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为 IPv6 前缀列表中的某条规则设置描述信息。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy prefix-list6 <text> rule <1-65535> ge <0-128>
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-text-rule-1-65535-ge-0-128" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Netmask greater than length.</p>
+set policy prefix-list6 &lt;text&gt; rule &lt;1-65535&gt; prefix &lt;h:h:h:h:h:h:h:h/x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-text-rule-1-65535-prefix-h-h-h-h-h-h-h-h-x" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>IPv6 前缀。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy prefix-list6 <text> rule <1-65535> le <0-128>
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-text-rule-1-65535-le-0-128" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Netmask less than length</p>
+set policy prefix-list6 &lt;text&gt; rule &lt;1-65535&gt; ge &lt;0-128&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-text-rule-1-65535-ge-0-128" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>子网掩码长度大于指定值。</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy prefix-list6 &lt;text&gt; rule &lt;1-65535&gt; le &lt;0-128&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-text-rule-1-65535-le-0-128" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>子网掩码长度小于指定值。</p>
 </div>
 </div>
 </section>
 <section id="example-ipv6-prefix-lists-prefix-list6">
-<h3>示例: IPv6 Prefix Lists (prefix-list6)</h3>
-<p>This example creates an IPv6 prefix-list6 named PL6-EXAMPLE-NAME, defines 3
-rules each with 1 prefix, and matches le (less than/equal to) /128.</p>
+<h3>示例：IPv6 前缀列表（prefix-list6）</h3>
+<p>本示例创建一个名为 PL6-EXAMPLE-NAME 的 IPv6 前缀列表，定义了 3 条规则，每条规则各含 1 个前缀，并匹配 le（小于或等于）/128。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list6 PL6-EXAMPLE-NAME rule 10 action ‘permit’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-10-action-permit" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-10-action-permit" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list6 PL6-EXAMPLE-NAME rule 10 le ‘128’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-10-le-128" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-10-le-128" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list6 PL6-EXAMPLE-NAME rule 10 prefix ‘2001:db8:0:0::/64’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-10-prefix-2001-db8-0-0-64" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-10-prefix-2001-db8-0-0-64" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list6 PL6-EXAMPLE-NAME rule 20 action ‘permit’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-20-action-permit" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-20-action-permit" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list6 PL6-EXAMPLE-NAME rule 20 le ‘128’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-20-le-128" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-20-le-128" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list6 PL6-EXAMPLE-NAME rule 20 prefix ‘2001:db8:0:1::/64’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-20-prefix-2001-db8-0-1-64" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-20-prefix-2001-db8-0-1-64" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list6 PL6-EXAMPLE-NAME rule 30 action ‘permit’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-30-action-permit" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-30-action-permit" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list6 PL6-EXAMPLE-NAME rule 30 le ‘128’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-30-le-128" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-30-le-128" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set policy prefix-list6 PL6-EXAMPLE-NAME rule 30 prefix ‘2001:db8:0:2::/64’
-<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-30-prefix-2001-db8-0-2-64" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-policy-prefix-list6-pl6-example-name-rule-30-prefix-2001-db8-0-2-64" title="此命令的永久链接"></a></div></div>
 </section>
 </section>
 </section>

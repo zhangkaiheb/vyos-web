@@ -371,7 +371,7 @@ set interfaces pseudo-ethernet &lt;interface&gt; ip enable-directed-broadcast
 интерфейсе.</strong></p>
 <p><strong>Поведение по умолчанию:</strong> Пакеты IP-направленного вещания отбрасываются.</p>
 <p><strong>Если настроено:</strong> Пакеты IP-направленного вещания передаются всем хостам
-на целевом подсети, как определено в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> и <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+на целевом подсети, как определено в <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> и <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
 <p>Пример:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 ip enable-directed-broadcast
 </pre></div>
@@ -456,7 +456,7 @@ VLAN (PVLAN). В конфигурациях PVLAN, хосты на изолир�
 </div>
 <p>Локальный прокси-ARP также известен как:</p>
 <ul class="simple">
-<li><p>Агрегация VLAN (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>Агрегация VLAN (<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
 <li><p>Частный VLAN (Cisco, Allied Telesyn).</p></li>
 <li><p>Фильтрация порта источника или изоляция порта (Hewlett-Packard).</p></li>
 <li><p>Передача MAC-адреса (Ericsson).</p></li>
@@ -468,7 +468,7 @@ VLAN (PVLAN). В конфигурациях PVLAN, хосты на изолир�
 
 set interfaces pseudo-ethernet &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
 <a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ip-source-validation-strict-loose-disable" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
-<p><strong>Настройте проверку исходного IP-адреса с помощью</strong> <abbr title="Обратное пересылание пути">RPF</abbr> <strong>на этом интерфейсе, как указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p><strong>Настройте проверку исходного IP-адреса с помощью</strong> <abbr title="Обратное пересылание пути">RPF</abbr> <strong>на этом интерфейсе, как указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
 <p>Доступны следующие варианты:</p>
 <ul class="simple">
 <li><p><strong>strict:</strong> Каждый входящий пакет проверяет исходный IP-адрес против

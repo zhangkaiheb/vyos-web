@@ -1,19 +1,19 @@
 {
   "zh-CN": {
     "interfaceStats": {
-      "fetch_failed": "fetch_失败",
-      "non_physical_interfaces": "non_physical_接口s",
-      "physical_interfaces": "physical_接口s",
-      "rx_bytes": "rx_bytes",
-      "rx_dropped": "rx_dropped",
-      "rx_errors": "rx_错误",
-      "rx_overruns": "rx_overruns",
-      "rx_packets": "rx_packets",
-      "tx_bytes": "tx_bytes",
-      "tx_dropped": "tx_dropped",
-      "tx_errors": "tx_错误",
-      "tx_overruns": "tx_overruns",
-      "tx_packets": "tx_packets"
+      "fetch_failed": "获取失败",
+      "non_physical_interfaces": "虚拟接口",
+      "physical_interfaces": "物理接口",
+      "rx_bytes": "接收字节",
+      "rx_dropped": "接收丢弃",
+      "rx_errors": "接收错误",
+      "rx_overruns": "接收溢出",
+      "rx_packets": "接收数据包",
+      "tx_bytes": "发送字节",
+      "tx_dropped": "发送丢弃",
+      "tx_errors": "发送错误",
+      "tx_overruns": "发送溢出",
+      "tx_packets": "发送数据包"
     }
   },
   "en": {

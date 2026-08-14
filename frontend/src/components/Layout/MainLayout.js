@@ -40,7 +40,16 @@ export default defineComponent({
     }
 
     const pageTitle = computed(() => auth.hostname || 'VyOS');
-    watch(pageTitle, (val) => { document.title = val; }, { immediate: true });
+    function updateTitle() {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        document.title = pageTitle.value;
+      }
+    }
+    watch(pageTitle, updateTitle);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', updateTitle);
+    }
+    updateTitle();
 
     return { auth, breadcrumbs, refreshCurrentPage, pageTitle, route, t };
   },

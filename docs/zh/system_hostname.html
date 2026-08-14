@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,78 +152,61 @@
 <div itemprop="articleBody">
              
   <section id="host-information">
-<h1>主机 信息rmation</h1>
-<p>This section describes the system’s host information and how to configure them,
-it covers the following topics:</p>
+<h1>主机信息</h1>
+<p>本节介绍系统的主机信息及其配置方法，涵盖以下主题：</p>
 <ul class="simple">
-<li><p>主机 name</p></li>
-<li><p>域</p></li>
-<li><p>IP address</p></li>
-<li><p>Aliases</p></li>
+<li><p>主机名</p></li>
+<li><p>域名</p></li>
+<li><p>IP 地址</p></li>
+<li><p>别名</p></li>
 </ul>
 <section id="hostname">
 <h2>主机名</h2>
-<p>A hostname is the label (name) assigned to a network device (a host) on a
-network and 用于 distinguish one device from another on specific networks
-or over the internet. On the other hand this 将 the name which appears on
-the command line prompt.</p>
+<p>主机名是分配给网络设备（即主机）的标签（名称），用于在特定网络或互联网上区分不同设备。此外，该名称也将显示在命令行提示符中。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system host-name <hostname>
-<a class="cmdlink" href="#cfgcmd-set-system-host-name-hostname" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>The hostname 可以 up to 63 characters. A hostname
-must start and end with a letter or digit, and have as interior characters
-only letters, digits, or a hyphen.</p>
-<p>The default hostname used is <code class="docutils literal notranslate">vyos</code>.</p>
+set system host-name &lt;hostname&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-host-name-hostname" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>主机名最多可包含 63 个字符。主机名必须以字母或数字开头和结尾，且中间字符只能为字母、数字或连字符（-）。</p>
+<p>默认主机名为 <code class="docutils literal notranslate">vyos</code>。</p>
 </div>
 </div>
 </section>
 <section id="domain-name">
-<h2>域 名称</h2>
-<p>A domain name is the label (name) assigned to a computer network and is thus
-unique. VyOS appends the domain name as a suffix to any unqualified name. For
-example, if you set the domain name <code class="docutils literal notranslate">example.com</code>, and you would ping the
-unqualified name of <code class="docutils literal notranslate">crux</code>, then VyOS qualifies the name to <code class="docutils literal notranslate">crux.example.com</code>.</p>
+<h2>域名</h2>
+<p>域名是分配给计算机网络的标签（名称），因此具有唯一性。VyOS 将域名作为后缀附加到任何未限定的名称之后。例如，若您将域名设置为 <code class="docutils literal notranslate">example.com</code>，并尝试对未限定名称 <code class="docutils literal notranslate">crux</code> 执行 ping 操作，则 VyOS 会将该名称解析为 <code class="docutils literal notranslate">crux.example.com</code>。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system domain-name <domain>
-<a class="cmdlink" href="#cfgcmd-set-system-domain-name-domain" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure system domain name. A domain name must start and end with a letter
-or digit, and have as interior characters only letters, digits, or a hyphen.</p>
+set system domain-name &lt;domain&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-domain-name-domain" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>配置系统域名。域名必须以字母或数字开头和结尾，且中间字符只能为字母、数字或连字符（-）。</p>
 </div>
 </div>
 </section>
 <section id="static-hostname-mapping">
-<h2>Static 主机名 Mapping</h2>
-<p>How an IP address is assigned to an interface in <a class="reference internal" href="../interfaces/ethernet.html#ethernet-interface">Ethernet</a>.
-This section shows how to statically map an IP address to a hostname for local
-(meaning on this VyOS instance) name resolution. This is the VyOS equivalent to
-<code class="docutils literal notranslate">/etc/hosts</code> file entries.</p>
+<h2>静态主机名映射</h2>
+<p>如何在 <a class="reference internal" href="../interfaces/ethernet.html#ethernet-interface">以太网接口</a> 上为接口分配 IP 地址。本节介绍如何为本地（即在此 VyOS 实例上）名称解析静态地将 IP 地址映射到主机名。这相当于 VyOS 中的 <code class="docutils literal notranslate">/etc/hosts</code> 文件条目。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>Do <em>not</em> manually edit <code class="docutils literal notranslate">/etc/hosts</code>. This file will automatically be
-regenerated on boot based on the settings in this section, which means you’ll
-lose all your manual edits. Instead, configure static host mappings as follows.</p>
+<p>请 <em>不要</em> 手动编辑 <code class="docutils literal notranslate">/etc/hosts</code> 文件。该文件将在启动时根据本节中的配置自动生成，这意味着您手动所做的所有修改都将丢失。请按如下方式配置静态主机映射。</p>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system static-host-mapping host-name <hostname> inet <address>
-<a class="cmdlink" href="#cfgcmd-set-system-static-host-mapping-host-name-hostname-inet-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>创建 a static hostname mapping which will always resolve the name
-<code class="docutils literal notranslate"><hostname></code> to IP address <code class="docutils literal notranslate"><address></code>.</p>
+set system static-host-mapping host-name &lt;hostname&gt; inet &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-static-host-mapping-host-name-hostname-inet-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>创建一个静态主机名映射，使名称 <code class="docutils literal notranslate">&lt;hostname&gt;</code> 始终解析为 IP 地址 <code class="docutils literal notranslate">&lt;address&gt;</code>。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system static-host-mapping host-name <hostname> alias <alias>
-<a class="cmdlink" href="#cfgcmd-set-system-static-host-mapping-host-name-hostname-alias-alias" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>创建 named <code class="docutils literal notranslate"><alias></code> for the configured static mapping for <code class="docutils literal notranslate"><hostname></code>.
-Thus the address configured as <code class="docutils literal notranslate">set system static-host-mapping host-name <hostname> inet <address></code> 可以 reached via multiple names.</p>
-<p>Multiple aliases 可以 specified per host-name.</p>
+set system static-host-mapping host-name &lt;hostname&gt; alias &lt;alias&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-static-host-mapping-host-name-hostname-alias-alias" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为已配置的主机名 <code class="docutils literal notranslate">&lt;hostname&gt;</code> 的静态映射创建命名别名 <code class="docutils literal notranslate">&lt;alias&gt;</code>。因此，通过 <code class="docutils literal notranslate">set system static-host-mapping host-name &lt;hostname&gt; inet &lt;address&gt;</code> 配置的地址可通过多个名称访问。</p>
+<p>每个主机名可指定多个别名。</p>
 </div>
 </div>
 </section>

@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -155,32 +155,28 @@
 <h1>系统 DNS</h1>
 <div class="admonition warning">
 <p class="admonition-title">警告</p>
-<p>If you are configuring a VRF for management purposes, there is
-currently no way to force system DNS traffic via a specific VRF.</p>
+<p>如果您正在为管理目的配置 VRF，则目前无法强制系统 DNS 流量经由特定 VRF。</p>
 </div>
-<p>This section describes configuring DNS on the system, namely:</p>
+<p>本节介绍如何在系统上配置 DNS，具体包括：</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>DNS name servers</p></li>
-<li><p>域 search order</p></li>
+<li><p>DNS 名称服务器</p></li>
+<li><p>域名搜索顺序</p></li>
 </ul>
 </div></blockquote>
 <section id="dns-name-servers">
-<h2>DNS name servers</h2>
+<h2>DNS 名称服务器</h2>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system name-server <address>
-<a class="cmdlink" href="#cfgcmd-set-system-name-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to specify a DNS server for the system to be used
-for DNS lookups. More than one DNS server 可以 added, configuring
-one at a time. Both IPv4 and IPv6 addresses are supported.</p>
+set system name-server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-name-server-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>使用此命令指定系统用于 DNS 查询的 DNS 服务器。可添加多个 DNS 服务器，但需逐个配置。同时支持 IPv4 和 IPv6 地址。</p>
 </div>
 </div>
 <section id="example">
 <h3>示例</h3>
-<p>In this example, some <em>OpenNIC</em> servers are used, two IPv4 addresses
-and two IPv6 addresses:</p>
+<p>在此示例中，使用了若干 <em>OpenNIC</em> 服务器，包括两个 IPv4 地址和两个 IPv6 地址：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set system name-server 176.9.37.132
 set system name-server 195.10.195.195
 set system name-server 2a01:4f8:161:3441::1
@@ -190,27 +186,23 @@ set system name-server 2a00:f826:8:2::195
 </section>
 </section>
 <section id="domain-search-order">
-<h2>域 search order</h2>
-<p>In order for the system to use and complete unqualified host names, a
-list 可以 defined which 将 used for domain searches.</p>
+<h2>域名搜索顺序</h2>
+<p>为使系统能够解析并补全未限定的主机名，可定义一个域名列表，系统将按该列表顺序执行域名搜索。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system domain-search <domain>
-<a class="cmdlink" href="#cfgcmd-set-system-domain-search-domain" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to define domains, one at a time, so that the system
-uses them to complete unqualified host names. Maximum: 6 entries.</p>
+set system domain-search &lt;domain&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-domain-search-domain" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>使用此命令逐个定义域名，以便系统用其补全未限定的主机名。最多支持 6 个条目。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>域 names can include letters, numbers, hyphens and periods
-with a maximum length of 253 characters.</p>
+<p>域名可包含字母、数字、连字符和句点，最大长度为 253 个字符。</p>
 </div>
 <section id="name-server-domain-search-order-example">
 <h3>示例</h3>
-<p>The system is configured to attempt domain completion in the following
-order: vyos.io (first), vyos.net (second) and vyos.network (last):</p>
+<p>系统被配置为按以下顺序尝试域名补全：vyos.io（第一）、vyos.net（第二）和 vyos.network（最后）：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set system domain-search vyos.io
 set system domain-search vyos.net
 set system domain-search vyos.network

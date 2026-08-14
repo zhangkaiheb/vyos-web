@@ -234,6 +234,30 @@ def init_db():
             CREATE INDEX IF NOT EXISTS idx_notifications_timestamp ON notifications (timestamp DESC)
         ''')
 
+        # Feature visibility settings
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS feature_visibility (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                feature_key TEXT NOT NULL UNIQUE,
+                feature_label TEXT NOT NULL,
+                feature_label_en TEXT,
+                category TEXT NOT NULL,
+                category_label TEXT,
+                category_label_en TEXT,
+                is_visible INTEGER DEFAULT 0,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        cursor.execute('''
+            CREATE INDEX IF NOT EXISTS idx_feature_visibility_category ON feature_visibility (category)
+        ''')
+        cursor.execute('''
+            CREATE INDEX IF NOT EXISTS idx_feature_visibility_key ON feature_visibility (feature_key)
+        ''')
+
+        # Initialize default feature visibility settings
+        _init_default_feature_visibility(cursor)
+
         # Builtin ACLs
         cursor.execute('''
             INSERT OR IGNORE INTO access_control_tables (id, name, description, is_builtin)
@@ -260,6 +284,71 @@ def _init_default_quotas(cursor):
             INSERT OR IGNORE INTO quotas (table_type, max_entries)
             VALUES (?, 1024)
         ''', (table_type,))
+
+
+def _init_default_feature_visibility(cursor):
+    """Initialize default feature visibility settings"""
+    default_features = [
+        # Category: system-interfaces (系统管理-网络接口)
+        ('vxlan', 'VXLAN', 'system-interfaces', '网络接口', 'Network Interfaces'),
+        ('l2tpv3', 'L2TPv3', 'system-interfaces', '网络接口', 'Network Interfaces'),
+        ('wireguard', 'WireGuard', 'system-interfaces', '网络接口', 'Network Interfaces'),
+        ('macsec', 'MACsec', 'system-interfaces', '网络接口', 'Network Interfaces'),
+        ('loopback', 'Loopback', 'system-interfaces', '网络接口', 'Network Interfaces'),
+        ('geneve', 'Geneve', 'system-interfaces', '网络接口', 'Network Interfaces'),
+        ('input', 'Input', 'system-interfaces', '网络接口', 'Network Interfaces'),
+        ('ethernet-eapol', 'EAPoL', 'system-interfaces', '网络接口', 'Network Interfaces'),
+
+        # Category: system-container (系统管理-容器)
+        ('container', '容器', 'system-container', '容器', 'Container'),
+
+        # Category: system-ha (系统管理-系统设置-高可用性)
+        ('ha-virtual-server', '虚拟服务器', 'system-ha', '高可用性', 'High Availability'),
+
+        # Category: routing-protocols (路由-路由协议)
+        ('babel', 'Babel', 'routing-protocols', '路由协议', 'Routing Protocols'),
+        ('igmp-proxy', 'IGMP代理', 'routing-protocols', '路由协议', 'Routing Protocols'),
+        ('mpls', 'MPLS', 'routing-protocols', '路由协议', 'Routing Protocols'),
+        ('nhrp', 'NHRP', 'routing-protocols', '路由协议', 'Routing Protocols'),
+        ('failover', '故障转移', 'routing-protocols', '路由协议', 'Routing Protocols'),
+        ('rpki', 'RPKI', 'routing-protocols', '路由协议', 'Routing Protocols'),
+        ('segment-routing', '段路由', 'routing-protocols', '路由协议', 'Routing Protocols'),
+
+        # Category: bgp-tabs (路由-路由协议-BGP标签)
+        ('bgp-bmp', 'BMP', 'bgp-tabs', 'BGP标签', 'BGP Tabs'),
+        ('bgp-sid', 'SID', 'bgp-tabs', 'BGP标签', 'BGP Tabs'),
+        ('bgp-srv6', 'SRv6', 'bgp-tabs', 'BGP标签', 'BGP Tabs'),
+
+        # Category: ospf-tabs (路由-路由协议-OSPF标签)
+        ('ospf-mpls-te', 'MPLS-TE', 'ospf-tabs', 'OSPF标签', 'OSPF Tabs'),
+        ('ospf-ldp-sync', 'LDP同步', 'ospf-tabs', 'OSPF标签', 'OSPF Tabs'),
+        ('ospf-segment-routing', '段路由', 'ospf-tabs', 'OSPF标签', 'OSPF Tabs'),
+
+        # Category: system-services (系统服务)
+        ('lldp', 'LLDP', 'system-services', '系统服务', 'System Services'),
+        ('ids-ddos', 'IDS DDoS防护', 'system-services', '系统服务', 'System Services'),
+        ('ntp', 'NTP', 'system-services', '系统服务', 'System Services'),
+
+        # Category: qos (服务质量-QoS策略)
+        ('qos-network-emulator', '网络模拟器', 'qos', 'QoS策略', 'QoS Policy'),
+        ('qos-random-detection', '随机检测', 'qos', 'QoS策略', 'QoS Policy'),
+        ('qos-shaper-hfsc', 'Shaper HFSC', 'qos', 'QoS策略', 'QoS Policy'),
+
+        # Category: vpn (虚拟专用网络)
+        ('vpn-sstp', 'SSTP', 'vpn', '虚拟专用网络', 'VPN'),
+        ('vpn-l2tp', 'L2TP', 'vpn', '虚拟专用网络', 'VPN'),
+        ('ipsec-remote-access', '远程接入', 'vpn', '虚拟专用网络', 'VPN'),
+
+        # Category: vpp (VPP)
+        ('vpp', 'VPP', 'vpp', 'VPP', 'VPP'),
+    ]
+
+    for feature_key, feature_label, category, category_label, category_label_en in default_features:
+        cursor.execute('''
+            INSERT OR IGNORE INTO feature_visibility
+            (feature_key, feature_label, feature_label_en, category, category_label, category_label_en, is_visible)
+            VALUES (?, ?, ?, ?, ?, ?, 0)
+        ''', (feature_key, feature_label, feature_label, category, category_label, category_label_en))
 
 
 def _init_builtin_acl_items(cursor):

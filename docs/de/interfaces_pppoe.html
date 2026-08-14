@@ -414,14 +414,14 @@ set interfaces pppoe &lt;interface&gt; ip source-validation &lt;strict | loose |
 <a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p><strong>Konfigurieren Sie die Quell-IP-Adressen-Validierung mit</strong>
 <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>auf dieser Schnittstelle, wie in</strong>
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> <strong>beschrieben.</strong></p>
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> <strong>beschrieben.</strong></p>
 <p>Die folgenden Optionen sind verfügbar:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate">strict</code>: Jedes eingehende Paket wird anhand des <abbr title="Forwarding Information Base">FIB</abbr> überprüft. Wenn die Schnittstelle nicht der beste Weg zurück zu diesem Quell-IP-Adress ist, schlägt die Validierung fehl und das Paket wird gelöscht.</p></li>
 <li><p><code class="docutils literal notranslate">loose</code>: Jedes eingehende Paket wird anhand des <abbr title="Forwarding Information Base">FIB</abbr> überprüft. Wenn die Quell-IP-Adresse über keine Schnittstelle erreichbar ist, schlägt die Validierung fehl.</p></li>
 <li><p><code class="docutils literal notranslate">disable</code>: Keine Quell-IP-Adressen-Validierung wird durchgeführt. Alle eingehenden Pakete werden akzeptiert.</p></li>
 </ul>
-<p><a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> empfiehlt, den <code class="docutils literal notranslate">strict</code>-Modus zu aktivieren, um IP-Spoofing, wie z. B. DDoS-Angriffe, zu verhindern. Für asynchrone oder komplexe Routing-Szenarien verwenden Sie den <code class="docutils literal notranslate">loose</code>-Modus.</p>
+<p><a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> empfiehlt, den <code class="docutils literal notranslate">strict</code>-Modus zu aktivieren, um IP-Spoofing, wie z. B. DDoS-Angriffe, zu verhindern. Für asynchrone oder komplexe Routing-Szenarien verwenden Sie den <code class="docutils literal notranslate">loose</code>-Modus.</p>
 </div>
 </div>
 <section id="ipv6">
@@ -464,7 +464,7 @@ set interfaces pppoe &lt;interface&gt; ipv6 disable-forwarding
 </div>
 </div>
 <p><strong>DHCPv6 Prefix Delegation (PD)</strong></p>
-<p>VyOS unterstützt DHCPv6 Prefix Delegation (DHCPv6-PD), wie in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3633.html"><strong>RFC 3633</strong></a> beschrieben.
+<p>VyOS unterstützt DHCPv6 Prefix Delegation (DHCPv6-PD), wie in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3633.html"><strong>RFC 3633</strong></a> beschrieben.
 DHCPv6-PD wird von den meisten ISPs unterstützt, die native IPv6 für Verbraucher auf festen Netzwerken anbieten.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">

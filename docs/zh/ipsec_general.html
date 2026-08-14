@@ -1,0 +1,226 @@
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+<div itemprop="articleBody">
+
+<h1>IPsec 常规信息</h1>
+
+<h2>IPsec 概述</h2>
+<p>IPsec 是用于保护数据的框架。IPsec 通过提供身份验证、IP 网络数据包加密、密钥交换和密钥管理来实现这些目标。VyOS 使用 Strongswan 软件包来实现 IPsec。</p>
+
+<p><strong>认证头 (AH)</strong> 定义于 <a href="https://datatracker.ietf.org/doc/html/rfc4302.html">RFC 4302</a>。它使用 IP 头和数据负载创建哈希，并将其附加到数据包前面。此哈希用于验证数据在网络传输过程中未被更改。</p>
+
+<p><strong>封装安全载荷 (ESP)</strong> 定义于 <a href="https://datatracker.ietf.org/doc/html/rfc4303.html">RFC 4303</a>。它提供数据的加密和身份验证。</p>
+
+<p>有两种 IPsec 模式：</p>
+<p><strong>IPsec 传输模式：</strong>在传输模式下，IPSec 头（AH 或 ESP）插入在 IP 头和上层协议头之间。</p>
+<p><strong>IPsec 隧道模式：</strong>在隧道模式下，原始 IP 数据包被封装在另一个 IP 数据报中，IPsec 头（AH 或 ESP）插入在外层和内层头之间。</p>
+
+<h2>IKE（互联网密钥交换）</h2>
+<p>IKE 协议是 IPsec 安全密钥协商的默认方法。IKE 旨在提供系统的相互身份验证，以及建立共享密钥以创建 IPsec 安全关联 (SA)。安全关联 (SA) 包括连接的所有相关属性，包括使用的加密算法、IPsec 模式、加密密钥以及与通过 VPN 连接传输数据相关的其他参数。</p>
+
+<h3>IKEv1</h3>
+<p>IKEv1 是较旧的版本，至今仍在使用。如今，大多数制造商建议使用 IKEv2 协议。</p>
+<p>IKEv1 在以下 RFC 中描述：<a href="https://datatracker.ietf.org/doc/html/rfc2409.html">RFC 2409</a>（IKE）、<a href="https://datatracker.ietf.org/doc/html/rfc3407.html">RFC 3407</a>（IPsec DOI）、<a href="https://datatracker.ietf.org/doc/html/rfc3947.html">RFC 3947</a>（NAT-T）、<a href="https://datatracker.ietf.org/doc/html/rfc3948.html">RFC 3948</a>（ESP 数据包的 UDP 封装）、<a href="https://datatracker.ietf.org/doc/html/rfc3706.html">RFC 3706</a>（DPD）</p>
+
+<p>IKEv1 分两个阶段运行以建立 IKE 和 IPsec SA：</p>
+<ul>
+<li><strong>阶段 1</strong> 提供 IKE 对等体的相互身份验证和会话密钥的建立。此阶段使用 DH 交换、cookies 和 ID 交换创建 IKE SA。一旦建立 IKE SA，发起者和响应者之间的所有 IKE 通信都受到加密和身份验证完整性检查的保护。IKE 阶段 1 提供两种模式：主模式和激进模式。
+<ul>
+<li><strong>主模式</strong> 用于站点到站点 VPN 连接。</li>
+<li><strong>激进模式</strong> 用于远程访问 VPN 连接。</li>
+</ul>
+</li>
+<li><strong>阶段 2</strong> 提供使用 ESP 或 AH 保护 IP 数据流量的 IPsec SA 的协商和建立。</li>
+</ul>
+
+<h3>IKEv2</h3>
+<p>IKEv2 在 <a href="https://datatracker.ietf.org/doc/html/rfc7296.html">RFC 7296</a> 中描述。IKEv1 和 IKEv2 之间最大的区别是 IKEv2 比 IKEv1 更简单、更可靠，因为在 VPN 建立期间交换的消息更少，并且具有额外的安全功能。</p>
+
+<h3>IKE 身份验证</h3>
+<p>VyOS 支持 3 种身份验证方法：</p>
+<ul>
+<li><strong>预共享密钥</strong>：在此方法中，IPsec 隧道的两个对等体必须具有相同的预共享密钥。</li>
+<li><strong>数字证书</strong>：在此方法中使用 PKI。</li>
+<li><strong>RSA 密钥</strong>：如果在 IKE 策略中使用 RSA 密钥方法，需要确保每个对等体拥有另一个对等体的公钥。</li>
+</ul>
+
+<h2>DPD（死对等体检测）</h2>
+<p>这是一种用于检测 VPN 对等体是否不再活跃的机制。此机制在 VyOS 中的 IKEv1 和 IKEv2 中有不同的算法。DPD 请求作为 ISAKMP R-U-THERE 消息发送，DPD 响应作为 ISAKMP R-U-THERE-ACK 消息发送。在 IKEv1 中，DPD 每隔配置的间隔发送消息。如果在 DPD 超时内未收到对这些数据包的响应，则认为远程对等体不可达。在 IKEv2 中，DPD 每隔配置的间隔发送消息。如果一个请求未得到响应，Strongswan 将执行其重传算法及其定时器。</p>
+
+<h2>后量子预共享密钥 (PPK)</h2>
+<p>后量子预共享密钥有助于在 ML-KEM 等后量子密钥交换算法不可用时为 IPSec 隧道提供一些量子抗性。IKEv2 中 PPK 的使用在 <a href="https://datatracker.ietf.org/doc/html/rfc8784.html">RFC 8784</a> 中描述。</p>
+<p>PPK 可以在 VyOS 的 <code>vpn ipsec authentication ppk</code> 配置下进行配置。PPK 需要一个 ID 和一个秘密值。如果 PPK 是成功 IPsec 连接所必需的，则 ID 和秘密必须匹配。秘密可以是纯文本、十六进制值或 Base64 值。默认为纯文本。如果使用其他类型的值，则必须定义秘密类型。</p>
+
+<h2>IKE 配置</h2>
+<h3>IKE 属性</h3>
+<p>VyOS IKE 组有以下选项：</p>
+<p><code>set vpn ipsec ike-group &lt;name&gt; close-action &lt;action&gt;</code></p>
+<p>定义远程对等体意外关闭 CHILD_SA 时要采取的操作：</p>
+<ul>
+<li><strong>none</strong> - 设置为无（默认）</li>
+<li><strong>trap</strong> - 为 CHILD_SA 安装陷阱策略，匹配这些策略的流量将触发获取事件，使守护进程建立所需的 IKE/IPsec SA。</li>
+<li><strong>start</strong> - 尝试立即重新创建 CHILD_SA。</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; ikev2-reauth</code></p>
+<p>IKE_SA 的重新密钥是否也应重新身份验证对等体。在 IKEv1 中，始终进行重新身份验证。设置此参数可在 IKE 重新密钥期间启用远程主机重新身份验证。</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; key-exchange</code></p>
+<p>应使用哪个协议来初始化连接。如果未设置，则处理两种协议，连接在发起时使用 IKEv2，但在响应时接受任何协议版本：</p>
+<ul>
+<li><strong>ikev1</strong> - 使用 IKEv1 进行密钥交换。</li>
+<li><strong>ikev2</strong> - 使用 IKEv2 进行密钥交换。</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; lifetime</code></p>
+<p>IKE 生命周期（秒）&lt;0-86400&gt;（默认 28800）。</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; mode</code></p>
+<p>IKEv1 阶段 1 模式选择：</p>
+<ul>
+<li><strong>main</strong> - 在 IKEv1 协议中使用主模式进行密钥交换（推荐的默认值）。</li>
+<li><strong>aggressive</strong> - 在 IKEv1 协议中使用激进模式进行密钥交换，激进模式比主模式更不安全。</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; dh-group &lt;dh-group number&gt;</code></p>
+<p>DH 组。默认值为 <strong>2</strong>。</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; encryption &lt;encryption&gt;</code></p>
+<p>加密算法。默认值为 <strong>aes128</strong>。</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; hash &lt;hash&gt;</code></p>
+<p>哈希算法。默认值为 <strong>sha1</strong>。</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; prf &lt;prf&gt;</code></p>
+<p>伪随机函数。</p>
+
+<h3>DPD 配置</h3>
+<p><code>set vpn ipsec ike-group &lt;name&gt; dead-peer-detection action &lt;action&gt;</code></p>
+<p>DPD 超时时对此 CHILD_SA 执行的操作：</p>
+<ul>
+<li><strong>trap</strong> - 安装陷阱策略，将捕获匹配的流量并尝试按需重新协商隧道。</li>
+<li><strong>clear</strong> - 关闭 CHILD_SA 且不采取进一步操作（默认）。</li>
+<li><strong>restart</strong> - 立即尝试在新的 IKE_SA 下重新协商 CHILD_SA。</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; dead-peer-detection interval &lt;interval&gt;</code></p>
+<p>保活间隔（秒）&lt;2-86400&gt;（默认 30）。</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; dead-peer-detection timeout &lt;timeout&gt;</code></p>
+<p>保活超时（秒）&lt;2-86400&gt;（默认 120）<strong>仅 IKEv1</strong></p>
+
+<h3>ESP 属性</h3>
+<p>在 VyOS 中，ESP 属性通过 ESP 组指定。可以在单个组中指定多个提案。</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; compression</code></p>
+<p>启用 IPComp（IP 载荷压缩）协议，允许压缩 IP 数据包的内容。</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; disable-rekey</code></p>
+<p>不在本地发起 SA 的重新密钥，远程对等体必须在到期前重新密钥。</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; life-bytes &lt;bytes&gt;</code></p>
+<p>ESP 生命周期（字节）&lt;1024-26843545600000&gt;。IPsec SA 过期前传输的字节数。</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; life-packets &lt;packets&gt;</code></p>
+<p>ESP 生命周期（数据包）&lt;1000-26843545600000&gt;。IPsec SA 过期前传输的数据包数。</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; lifetime &lt;timeout&gt;</code></p>
+<p>ESP 生命周期（秒）&lt;30-86400&gt;（默认 3600）。连接的特定实例（用户数据包的加密/身份验证密钥集）应持续多长时间，从成功协商到到期。</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; mode &lt;mode&gt;</code></p>
+<p>连接类型：</p>
+<ul>
+<li><strong>tunnel</strong> - 隧道模式（默认）。</li>
+<li><strong>transport</strong> - 传输模式。</li>
+</ul>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; pfs &lt;dh-group&gt;</code></p>
+<p>是否需要在连接的密钥通道上实现完美前向保密，并定义 PFS 的 Diffie-Hellman 组：</p>
+<ul>
+<li><strong>enable</strong> - 从 IKE 组继承 Diffie-Hellman 组（默认）。</li>
+<li><strong>disable</strong> - 禁用 PFS。</li>
+<li><strong>&lt;dh-group&gt;</strong> - 定义 PFS 的 Diffie-Hellman 组。</li>
+</ul>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; proposal &lt;number&gt; encryption &lt;encryption&gt;</code></p>
+<p>加密算法。默认值为 <strong>aes128</strong>。</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; proposal &lt;number&gt; hash &lt;hash&gt;</code></p>
+<p>哈希算法。默认值为 <strong>sha1</strong>。</p>
+
+<h2>全局 IPsec 设置</h2>
+<p><code>set vpn ipsec interface &lt;name&gt;</code></p>
+<p>用于限制出站 IPsec 策略的接口名称。可以指定多个接口。如果未指定接口，IPsec 策略适用于所有接口。</p>
+
+<p><code>set vpn ipsec log level &lt;number&gt;</code></p>
+<p>日志级别。默认值为 <strong>0</strong>。</p>
+
+<p><code>set vpn ipsec log subsystem &lt;name&gt;</code></p>
+<p>守护进程的子系统。</p>
+
+<h2>选项</h2>
+<p><code>set vpn ipsec options disable-route-autoinstall</code></p>
+<p>不自动安装到远程网络的路由。</p>
+
+<p><code>set vpn ipsec options flexvpn</code></p>
+<p>允许 FlexVPN 供应商 ID 载荷（仅 IKEv2）。发送 Cisco FlexVPN 供应商 ID 载荷（仅 IKEv2），这是使 Cisco 品牌设备允许协商本地流量选择器所必需的。</p>
+
+<p><code>set vpn ipsec options interface &lt;name&gt;</code></p>
+<p>要使用的接口名称。应在其上安装虚拟 IP 地址的接口名称。如果未指定，地址将安装在出站接口上。</p>
+
+<p><code>set vpn ipsec options virtual-ip</code></p>
+<p>允许安装虚拟 IP 地址。</p>
+
+<h2>IKEv2 重传</h2>
+<p>如果对等体未响应 DPD 数据包，路由器将启动重传程序。使用以下公式计算超时：</p>
+<pre><code>relative timeout = timeout * base ^ (attempts-1)</code></pre>
+
+<p><code>set vpn ipsec options retransmission attempts</code></p>
+<p>在认为对等体处于关闭状态之前的尝试次数。默认值为 <strong>5</strong>。</p>
+
+<p><code>set vpn ipsec options retransmission base</code></p>
+<p>指数退避的基数。默认值为 <strong>1.8</strong>。</p>
+
+<p><code>set vpn ipsec options retransmission timeout</code></p>
+<p>第一次重传之前的超时时间（秒）。默认值为 <strong>4</strong>。</p>
+
+<p>使用默认值，数据包按以下方式重传：</p>
+<table>
+<thead><tr><th>尝试次数</th><th>公式</th><th>相对超时</th><th>绝对超时</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>4 * 1.8 ^ 0</td><td>4s</td><td>4s</td></tr>
+<tr><td>2</td><td>4 * 1.8 ^ 1</td><td>7s</td><td>11s</td></tr>
+<tr><td>3</td><td>4 * 1.8 ^ 2</td><td>13s</td><td>24s</td></tr>
+<tr><td>4</td><td>4 * 1.8 ^ 3</td><td>23s</td><td>47s</td></tr>
+<tr><td>5</td><td>4 * 1.8 ^ 4</td><td>42s</td><td>89s</td></tr>
+<tr><td>对等体关闭</td><td>4 * 1.8 ^ 5</td><td>76s</td><td>165s</td></tr>
+</tbody>
+</table>
+
+</div>

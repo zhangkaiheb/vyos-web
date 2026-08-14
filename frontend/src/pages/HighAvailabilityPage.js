@@ -1,6 +1,7 @@
 import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
+import { useVisibilityStore } from '/src/stores/visibility.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
@@ -89,16 +90,28 @@ export default defineComponent({
     const syncDeleteModalVisible = ref(false);
     const pendingDeleteSyncNames = ref([]);
 
+    const visibilityStore = useVisibilityStore();
+    onMounted(() => { visibilityStore.load(); });
+
     const path = computed(() => 'high-availability');
     const writeDisabled = computed(() => route.meta?.menuItem?.permission === 'read');
-    const activeTab = ref('virtual-server');
+    const activeTab = ref('');
 
-    const TABS = computed(() => [
-      { key: 'virtual-server', title: t('highAvailability.tabs.virtualServer') },
-      { key: 'vrrp-group', title: t('highAvailability.tabs.vrrpGroup') },
-      { key: 'vrrp-sync', title: t('highAvailability.tabs.vrrpSync') },
-      { key: 'vrrp-global', title: t('highAvailability.tabs.vrrpGlobal') },
-    ]);
+    const TABS = computed(() => {
+      const tabs = [
+        { key: 'virtual-server', title: t('highAvailability.tabs.virtualServer'), hidden: !visibilityStore.isVisible('ha-virtual-server') },
+        { key: 'vrrp-group', title: t('highAvailability.tabs.vrrpGroup') },
+        { key: 'vrrp-sync', title: t('highAvailability.tabs.vrrpSync') },
+        { key: 'vrrp-global', title: t('highAvailability.tabs.vrrpGlobal') },
+      ].filter(tab => !tab.hidden);
+      
+      // Set default activeTab to first visible tab
+      if (!activeTab.value && tabs.length) {
+        activeTab.value = tabs[0].key;
+      }
+      
+      return tabs;
+    });
 
     const vsColumns = computed(() => [
       { key: 'name', title: t('highAvailability.columns.name') },

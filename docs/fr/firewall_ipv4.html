@@ -163,7 +163,7 @@ configuration commands:</p>
 
 set firewall ipv4 …
 <a class="cmdlink" href="#cfgcmd-set-firewall-ipv4" title="Permalink to this Command"></a></div></div>
-<p>To learn about the general traffic flow in VyOS firewalls, see <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Firewall</a>.</p>
+<p>To learn about the general traffic flow in VyOS firewalls, see <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">Firewall</a>.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
     * ipv4
          - forward
@@ -184,17 +184,17 @@ stage.</p>
 <p>This stage includes:</p>
 <ul class="simple">
 <li><p><strong>Firewall Prerouting</strong>: commands found under <code class="docutils literal notranslate">set firewall ipv4 prerouting raw ...</code></p></li>
-<li><p><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/../system/conntrack.html">Conntrack Ignore</a>: <code class="docutils literal notranslate">set system conntrack ignore ipv4...</code></p></li>
-<li><p><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/../policy/route.html">Policy Route</a>: commands found under
+<li><p><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/../system/conntrack.html">Conntrack Ignore</a>: <code class="docutils literal notranslate">set system conntrack ignore ipv4...</code></p></li>
+<li><p><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/../policy/route.html">Policy Route</a>: commands found under
 <code class="docutils literal notranslate">set policy route ...</code></p></li>
-<li><p><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/../nat/nat44.html">Destination NAT</a>: commands found under
+<li><p><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/../nat/nat44.html">Destination NAT</a>: commands found under
 <code class="docutils literal notranslate">set nat destination ...</code></p></li>
 </ul>
 <p>For transit traffic, which is received by the router and forwarded, the base
 chain is <strong>forward</strong>. The following is a simplified packet flow diagram for
 transit traffic:</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-fwd-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-fwd-packet-flow.webp"></img>
+<img alt="../../_images/firewall-fwd-packet-flow.webp" src="https://docs.vyos.io/en/latest/_images/firewall-fwd-packet-flow.webp"></img>
 </figure>
 <p>The base firewall chain for configuring filtering rules for transit traffic is
 <code class="docutils literal notranslate">set firewall ipv4 forward filter ...</code>, which occurs in stage 5, highlighted
@@ -204,7 +204,7 @@ the router originates, the base chain is <strong>output</strong>. A simplified p
 diagram is shown next, which shows the path for traffic destined to the router
 itself and traffic the router generates (starting from circle number 6):</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-input-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-input-packet-flow.webp"></img>
+<img alt="../../_images/firewall-input-packet-flow.webp" src="https://docs.vyos.io/en/latest/_images/firewall-input-packet-flow.webp"></img>
 </figure>
 <p>The base chain for traffic towards the router is
 <code class="docutils literal notranslate">set firewall ipv4 input filter ...</code></p>

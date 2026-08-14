@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,85 +152,67 @@
 <div itemprop="articleBody">
              
   <section id="zone-based-firewall">
-<h1>区域-Based 防火墙</h1>
+<h1>基于区域的防火墙</h1>
 <section id="overview">
-<h2>Overview</h2>
+<h2>概述</h2>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>All VyOS versions built after 2023-10-22 (VyOS 1.4 and 1.5) support
-this feature.</p>
+<p>所有在 2023-10-22 之后构建的 VyOS 版本（VyOS 1.4 和 1.5）均支持此功能。</p>
 </div>
-<p>This section provides information on firewall configuration for the
-zone-based firewall. This section covers the following configuration
-commands:</p>
+<p>本节提供有关基于区域的防火墙的防火墙配置信息。本节涵盖以下配置命令：</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set firewall zone …
-<a class="cmdlink" href="#cfgcmd-set-firewall-zone" title="Permalink to this Command"></a></div></div>
-<p>To learn about the general traffic flow in VyOS firewalls,
-see <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">防火墙</a>.</p>
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone" title="此命令的永久链接"></a></div></div>
+<p>如需了解 VyOS 防火墙中通用流量流向的相关信息，请参阅 <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">防火墙</a>。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
     * zone
          - custom_zone_name
             + ...
 </pre></div>
 </div>
-<p>In zone-based policy, you assign interfaces to zones and apply inspection
-policy to traffic moving between zones. The firewall acts on traffic
-according to rules. A zone is a group of interfaces that have similar
-functions or features. It establishes the security borders of a network.
-A zone defines a boundary where the system subjects traffic to policy
-restrictions as it crosses to another region of a network.</p>
-<p>密钥 Points:</p>
+<p>在基于区域的策略中，您将接口分配给区域，并对在区域之间流动的流量应用检查策略。防火墙根据规则对流量执行操作。区域是一组具有相似功能或特性的接口。它建立了网络的安全边界。区域定义了一个边界，在该边界处，系统会对穿越至网络另一区域的流量施加策略限制。</p>
+<p>关键要点：</p>
 <ul class="simple">
-<li><p>A zone 必须 configured before you assign an interface to it, and you
-can assign an interface to only a single zone.</p></li>
-<li><p>All traffic to and from an interface within a zone flows freely.</p></li>
-<li><p>Existing policies affect all traffic between zones.</p></li>
-<li><p>流量 cannot flow between a zone member interface and any interface that
-is not a zone member.</p></li>
-<li><p>You must define 2 separate firewalls to define traffic: one for each
-direction.</p></li>
+<li><p>必须先配置区域，然后才能将接口分配给该区域；且一个接口只能分配给一个区域。</p></li>
+<li><p>区域内接口之间的所有入站和出站流量均可自由流动。</p></li>
+<li><p>现有策略会影响所有区域之间的流量。</p></li>
+<li><p>流量无法在某个区域成员接口与任何非区域成员接口之间流动。</p></li>
+<li><p>您必须定义两个独立的防火墙来定义流量：每个方向各一个。</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>In <a class="reference external" href="https://vyos.dev/T2199">T2199</a> the syntax of the zone configuration was changed.
-The zone configuration moved from <code class="docutils literal notranslate">zone-policy zone <name></code> to
-<code class="docutils literal notranslate">firewall zone <name></code>.</p>
+<p>在 <a class="reference external" href="https://vyos.dev/T2199">T2199</a> 中，区域配置语法已更改。
+区域配置已从 <code class="docutils literal notranslate">zone-policy zone &lt;name&gt;</code> 迁移至
+<code class="docutils literal notranslate">firewall zone &lt;name&gt;</code>。</p>
 </div>
 </section>
 <section id="configuration">
 <h2>配置</h2>
-<p>As an alternative to applying policy to an interface directly, you can
-create a zone-based firewall to simplify configuration when multiple
-interfaces belong to the same security zone. Instead of applying rule-sets
-to interfaces, you apply them to source-destination zone pairs.</p>
-<p>You can find a basic introduction to zone-based firewalls in the
-<a class="reference external" href="https://support.vyos.io/en/kb/articles/a-primer-to-zone-based-firewall">VyOS Knowledge Base</a>,
-and an example at <a class="reference internal" href="../../configexamples/zone-policy.html#examples-zone-policy">区域-策略 example</a>.</p>
-<p>The following steps are required to create a zone-based firewall:</p>
+<p>作为直接对接口应用策略的替代方案，您可以创建基于区域的防火墙，以便在多个接口属于同一安全区域时简化配置。您无需将规则集应用于接口，而是将其应用于源区域-目的区域对。</p>
+<p>您可在 <a class="reference external" href="https://support.vyos.io/en/kb/articles/a-primer-to-zone-based-firewall">VyOS 知识库</a> 中找到关于基于区域的防火墙的基本介绍，
+并在 <a class="reference internal" href="../../configexamples/zone-policy.html#examples-zone-policy">基于区域的策略示例</a> 中查看示例。</p>
+<p>创建基于区域的防火墙需要执行以下步骤：</p>
 <ol class="arabic simple">
-<li><p>Define both the source and destination zones</p></li>
-<li><p>Define the rule-set</p></li>
-<li><p>应用 the rule-set to the zones</p></li>
+<li><p>定义源区域和目的区域</p></li>
+<li><p>定义规则集</p></li>
+<li><p>将规则集应用于区域</p></li>
 </ol>
 <section id="define-a-zone">
-<h3>Define a 区域</h3>
-<p>To define a zone, set up either one with interfaces or as the local zone.</p>
+<h3>定义区域</h3>
+<p>要定义区域，可设置一个包含接口的区域，或将其设置为本地区域。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall zone <name> interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Assign interfaces as a member of a zone.</p>
+set firewall zone &lt;name&gt; interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-interface-interface" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>将接口指定为区域的成员。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
 <ul class="simple">
-<li><p>An interface can only be a member of one zone.</p></li>
-<li><p>You can have multiple interfaces in a zone. 流量 between
-interfaces in the same zone follows the intra-zone-filtering
-policy (allowed by default).</p></li>
+<li><p>一个接口只能属于一个区域。</p></li>
+<li><p>一个区域中可以包含多个接口。同一区域内的接口之间的流量遵循区域内过滤策略（默认允许）。</p></li>
 </ul>
 </div>
 </div>
@@ -238,15 +220,14 @@ policy (allowed by default).</p></li>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall zone <name> local-zone
-<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-local-zone" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Define the zone as the local zone for traffic that originates from or is
-destined to the router itself.</p>
+set firewall zone &lt;name&gt; local-zone
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-local-zone" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>将该区域定义为本地区域，用于源自路由器本身或发往路由器本身的流量。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
 <ul class="simple">
-<li><p>A local zone cannot have any member interfaces</p></li>
-<li><p>You cannot have multiple local zones</p></li>
+<li><p>本地区域不能包含任何成员接口</p></li>
+<li><p>您不能配置多个本地区域</p></li>
 </ul>
 </div>
 </div>
@@ -254,95 +235,82 @@ destined to the router itself.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall zone <name> default-action [drop | reject]
-<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-default-action-drop-reject" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>修改 the zone default-action, which applies to traffic destined to this
-zone that does not match any of the source zone rulesets applied.</p>
+set firewall zone &lt;name&gt; default-action [drop | reject]
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-default-action-drop-reject" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>修改区域的默认操作，该操作适用于未匹配任何已应用的源区域规则集的目的地流量。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall zone <name> default-log
-<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-default-log" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Enable logging of packets that match this zone’s default-action (disabled
-by default).</p>
+set firewall zone &lt;name&gt; default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-default-log" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>启用记录匹配该区域默认操作的数据包（默认禁用）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall zone <name> description
-<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>添加 a meaningful description.</p>
+set firewall zone &lt;name&gt; description
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-name-description" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>添加有意义的描述。</p>
 </div>
 </div>
 </section>
 <section id="defining-a-rule-set">
-<h3>Defining a 规则-设置</h3>
-<p>区域-based firewall rule-sets define traffic from a <em>源 区域</em> to a
-<em>目的 区域</em>.</p>
-<p>You create rule-sets as a custom firewall chain using the commands below
-(refer to the firewall IPv4/IPv6 sections for the full syntax):</p>
+<h3>定义规则集</h3>
+<p>基于区域的防火墙规则集定义了从 <em>源区域</em> 到 <em>目的区域</em> 的流量。</p>
+<p>您可使用以下命令将规则集创建为自定义防火墙链（请参阅防火墙 IPv4/IPv6 章节以获取完整语法）：</p>
 <ul class="simple">
-<li><p>For <a class="reference internal" href="ipv4.html#firewall-ipv4-rules">IPv4</a>:
-<code class="docutils literal notranslate">set firewall ipv4 name <name> ...</code></p></li>
-<li><p>For <a class="reference internal" href="ipv6.html#firewall-ipv6-rules">IPv6</a>:
-<code class="docutils literal notranslate">set firewall ipv6 name <name> ...</code></p></li>
+<li><p>对于 <a class="reference internal" href="ipv4.html#firewall-ipv4-rules">IPv4</a>：
+<code class="docutils literal notranslate">set firewall ipv4 name &lt;name&gt; ...</code></p></li>
+<li><p>对于 <a class="reference internal" href="ipv6.html#firewall-ipv6-rules">IPv6</a>：
+<code class="docutils literal notranslate">set firewall ipv6 name &lt;name&gt; ...</code></p></li>
 </ul>
-<p>It is helpful to name the rule-sets in the format
-<code class="docutils literal notranslate"><Source Zone>-<Destination Zone>-<v4 | v6></code> to make them easily
-identifiable.</p>
+<p>为便于识别，建议按格式 <code class="docutils literal notranslate">&lt;源区域&gt;-&lt;目的区域&gt;-&lt;v4 | v6&gt;</code> 命名规则集。</p>
 </section>
 <section id="applying-a-rule-set-to-a-zone">
-<h3>应用ing a 规则-设置 to a 区域</h3>
-<p>After you define a rule-set, apply it to the source and destination zones.
-The configuration syntax anchors to the destination zone, with each of the
-source zone rule-sets listed against the destination.</p>
+<h3>将规则集应用于区域</h3>
+<p>定义规则集后，将其应用于源区域和目的区域。配置语法以目的区域为锚点，每个源区域的规则集均列于目的区域之下。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall zone <Destination Zone> from <Source Zone> firewall name <ipv4-rule-set-name>
-<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-from-source-zone-firewall-name-ipv4-rule-set-name" title="Permalink to this Command"></a></div></div>
+set firewall zone &lt;Destination Zone&gt; from &lt;Source Zone&gt; firewall name &lt;ipv4-rule-set-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-from-source-zone-firewall-name-ipv4-rule-set-name" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall zone <Destination Zone> from <Source Zone> firewall ipv6-name <ipv6-rule-set-name>
-<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-from-source-zone-firewall-ipv6-name-ipv6-rule-set-name" title="Permalink to this Command"></a></div></div>
-<p>You should create two rule-sets for each source-destination zone
-pair.</p>
+set firewall zone &lt;Destination Zone&gt; from &lt;Source Zone&gt; firewall ipv6-name &lt;ipv6-rule-set-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-from-source-zone-firewall-ipv6-name-ipv6-rule-set-name" title="此命令的永久链接"></a></div></div>
+<p>您应为每个源区域-目的区域对创建两个规则集。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set firewall zone DMZ from LAN firewall name LAN-DMZ-v4
 set firewall zone LAN from DMZ firewall name DMZ-LAN-v4
 </pre></div>
 </div>
 </section>
 <section id="applying-a-default-rule-set-to-a-zone">
-<h3>应用ing a 默认 规则-设置 to a 区域</h3>
-<p>When a destination zone shares a common rule-set for multiple source zones,
-or when you require a complex set of default policies, you can apply an
-optional default rule-set. The default rule-set applies to all zones that do
-not have a rule-set configured as defined in
-<a class="reference internal" href="#applying-a-rule-set-to-a-zone">IPv4</a></p>
+<h3>将默认规则集应用于区域</h3>
+<p>当某个目的区域对多个源区域共享一个通用规则集，或需要一组复杂的默认策略时，您可以应用一个可选的默认规则集。默认规则集适用于所有未按 <a class="reference internal" href="#applying-a-rule-set-to-a-zone">IPv4</a> 所述配置规则集的区域。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall zone <Destination Zone> default-firewall name <ipv4-rule-set-name>
-<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-default-firewall-name-ipv4-rule-set-name" title="Permalink to this Command"></a></div></div>
+set firewall zone &lt;Destination Zone&gt; default-firewall name &lt;ipv4-rule-set-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-default-firewall-name-ipv4-rule-set-name" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall zone <Destination Zone> default-firewall ipv6-name <ipv6-rule-set-name>
-<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-default-firewall-ipv6-name-ipv6-rule-set-name" title="Permalink to this Command"></a></div></div>
+set firewall zone &lt;Destination Zone&gt; default-firewall ipv6-name &lt;ipv6-rule-set-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-zone-destination-zone-default-firewall-ipv6-name-ipv6-rule-set-name" title="此命令的永久链接"></a></div></div>
 </section>
 </section>
 <section id="operation-mode">
-<h2>Operation-mode</h2>
+<h2>操作模式</h2>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show firewall zone-policy
-<a class="cmdlink" href="#opcmd-show-firewall-zone-policy" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 a basic summary of the zone configuration.</p>
+<a class="cmdlink" href="#opcmd-show-firewall-zone-policy" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示区域配置的基本摘要。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show firewall zone-policy
 Zone    Interfaces    From Zone    Firewall IPv4    Firewall IPv6
 ------  ------------  -----------  ---------------  ---------------
@@ -359,9 +327,9 @@ eth0          LOCAL        LOCAL-WAN-v4
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show firewall zone-policy zone <zone>
-<a class="cmdlink" href="#opcmd-show-firewall-zone-policy-zone-zone" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 a basic summary of a particular zone.</p>
+show firewall zone-policy zone &lt;zone&gt;
+<a class="cmdlink" href="#opcmd-show-firewall-zone-policy-zone-zone" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示特定区域的基本摘要。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show firewall zone-policy zone WAN
 Zone    Interfaces    From Zone    Firewall IPv4    Firewall IPv6
 ------  ------------  -----------  ---------------  ---------------

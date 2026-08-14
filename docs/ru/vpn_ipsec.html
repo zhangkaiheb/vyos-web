@@ -1,9 +1,5 @@
-<!DOCTYPE html>
-<html lang="Ru">
-<head>
-<meta charset="UTF-8">
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; padding: 12px; }
   h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
   h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
   h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
@@ -29,77 +25,798 @@
   hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
   img { max-width: 100%; height: auto; }
   blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+  .command-block { background: #f8f9fa; border-left: 3px solid #fd7e14; border-radius: 0 4px 4px 0; padding: 10px 14px; margin: 10px 0; font-family: "SFMono-Regular", Consolas, monospace; font-size: 13px; }
+  .command-block::before { content: '$ '; color: #fd7e14; font-weight: bold; }
+  .ipsec-tabs { display: flex; border-bottom: 2px solid #4361ee; margin-bottom: 0; flex-wrap: wrap; }
+  .ipsec-tabs input[type="radio"] { display: none; }
+  .ipsec-tabs label { padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 600; color: #666; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .ipsec-tabs label:hover { color: #4361ee; background: #f0f4ff; }
+  .ipsec-tabs input[type="radio"]:checked + label { color: #4361ee; border-bottom-color: #4361ee; }
+  .ipsec-tab-content { display: none; padding: 16px 0; }
+  .ipsec-tabs input[type="radio"]:nth-of-type(1):checked ~ .ipsec-tab-content:nth-of-type(1),
+  .ipsec-tabs input[type="radio"]:nth-of-type(2):checked ~ .ipsec-tab-content:nth-of-type(2),
+  .ipsec-tabs input[type="radio"]:nth-of-type(3):checked ~ .ipsec-tab-content:nth-of-type(3),
+  .ipsec-tabs input[type="radio"]:nth-of-type(4):checked ~ .ipsec-tab-content:nth-of-type(4) { display: block; }
 </style>
-
-<style>
-  /* VyOS-style command blocks */
-  .vyos-cmd {
-    background: #f8f9fa;
-    border-left: 3px solid #e67e22;
-    border-radius: 0 4px 4px 0;
-    padding: 8px 12px;
-    margin: 8px 0;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-    font-size: 13px;
-    color: #333;
-    white-space: pre-wrap;
-    word-break: break-all;
-  }
-  .vyos-cmd::before {
-    content: "$ ";
-    color: #e67e22;
-    font-weight: bold;
-  }
-  /* Inline code */
-  code {
-    background: #f0f0f0;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-    font-size: 13px;
-    color: #c0392b;
-  }
-  /* Pre blocks for multi-line commands */
-  pre.vyos-cmd-block {
-    background: #f8f9fa;
-    border-left: 3px solid #e67e22;
-    border-radius: 0 4px 4px 0;
-    padding: 12px;
-    margin: 12px 0;
-    overflow-x: auto;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-    font-size: 13px;
-    line-height: 1.6;
-    color: #333;
-  }
-  pre.vyos-cmd-block code {
-    background: none;
-    padding: 0;
-    color: #333;
-  }
-  pre.vyos-cmd-block code::before {
-    content: "$ ";
-    color: #e67e22;
-    font-weight: bold;
-  }
-</style>
-</head>
-<body>
 <div itemprop="articleBody">
-             
-  <section id="ipsec">
-<h1>IPsec</h1>
-<div class="toctree-wrapper compound">
+
+<div class="ipsec-tabs">
+<input type="radio" name="ipsec-tab" id="tab-general" checked>
+<label for="tab-general">Общие сведения</label>
+<input type="radio" name="ipsec-tab" id="tab-site2site">
+<label for="tab-site2site">Сайт-сайт</label>
+<input type="radio" name="ipsec-tab" id="tab-remoteaccess">
+<label for="tab-remoteaccess">Удалённый доступ</label>
+<input type="radio" name="ipsec-tab" id="tab-troubleshooting">
+<label for="tab-troubleshooting">Устранение неполадок</label>
+
+<div class="ipsec-tab-content">
+
+<h3>Общие сведения об IPsec</h3>
+<p>IPsec — это фреймворк, используемый для защиты данных. IPsec обеспечивает это за счёт аутентификации, шифрования IP-пакетов, обмена ключами и управления ключами. VyOS использует пакет Strongswan для реализации IPsec.</p>
+
+<p><strong>Заголовок аутентификации (AH)</strong> определён в <a href="https://datatracker.ietf.org/doc/html/rfc4302.html">RFC 4302</a>. Он использует IP-заголовок и полезную нагрузку данных для создания хеша, который затем добавляется к пакету. Этот хеш используется для проверки того, что данные не были изменены во время передачи по сети.</p>
+
+<p><strong>Инкапсулирующая полезная нагрузка безопасности (ESP)</strong> определена в <a href="https://datatracker.ietf.org/doc/html/rfc4303.html">RFC 4303</a>. Она обеспечивает как шифрование, так и аутентификацию данных.</p>
+
+<p>Существует два режима IPsec:</p>
+<p><strong>Транспортный режим IPsec:</strong> В транспортном режиме заголовок IPsec (AH или ESP) вставляется между IP-заголовком и заголовком протокола верхнего уровня.</p>
+<p><strong>Режим туннеля IPsec:</strong> В режиме туннеля исходный IP-пакет инкапсулируется в другую IP-датаграмму, при этом заголовок IPsec (AH или ESP) вставляется между внешним и внутренним заголовками.</p>
+
+<h3>IKE (Internet Key Exchange)</h3>
+<p>Протокол IKE является стандартным методом безопасного согласования ключей IPsec. IKE предназначен для обеспечения взаимной аутентификации узлов IKE и установления общих ключей для создания ассоциаций безопасности IPsec (SA). Ассоциация безопасности (SA) включает все соответствующие атрибуты соединения, включая используемые алгоритмы шифрования, режим IPsec, ключи шифрования и другие параметры, связанные с передачей данных через VPN-соединение.</p>
+
+<h4>IKEv1</h4>
+<p>IKEv1 — это более старая версия, которая до сих пор используется. Большинство производителей теперь рекомендуют использовать протокол IKEv2.</p>
+<p>IKEv1 описан в следующих RFC: <a href="https://datatracker.ietf.org/doc/html/rfc2409.html">RFC 2409</a> (IKE), <a href="https://datatracker.ietf.org/doc/html/rfc3407.html">RFC 3407</a> (IPsec DOI), <a href="https://datatracker.ietf.org/doc/html/rfc3947.html">RFC 3947</a> (NAT-T), <a href="https://datatracker.ietf.org/doc/html/rfc3948.html">RFC 3948</a> (UDP-инкапсуляция пакетов ESP), <a href="https://datatracker.ietf.org/doc/html/rfc3706.html">RFC 3706</a> (DPD)</p>
+
+<p>IKEv1 работает в две фазы для установления IKE и IPsec SA:</p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipsec_general.html">Общая информация о IPsec</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/site2site_ipsec.html">IPsec Site-to-Site VPN</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/remoteaccess_ipsec.html">IPSec IKEv2 Remote Access VPN</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/troubleshooting_ipsec.html">Устранение неполадок Site-to-Site VPN IPsec</a></li>
+<li><strong>Фаза 1</strong> обеспечивает взаимную аутентификацию узлов IKE и установление сеансовых ключей. Эта фаза использует обмен DH, куки и обмен идентификаторами для создания IKE SA. После установления IKE SA вся коммуникация IKE между инициатором и респондентом защищена шифрованием и проверками целостности аутентификации. IKE Фаза 1 предоставляет два режима: основной режим и агрессивный режим.
+<ul>
+<li><strong>Основной режим</strong> используется для VPN-соединений сайт-сайт.</li>
+<li><strong>Агрессивный режим</strong> используется для VPN-соединений удалённого доступа.</li>
 </ul>
+</li>
+<li><strong>Фаза 2</strong> обеспечивает согласование и установление IPsec SA, которые защищают IP-трафик данных с использованием ESP или AH.</li>
+</ul>
+
+<h4>IKEv2</h4>
+<p>IKEv2 описан в <a href="https://datatracker.ietf.org/doc/html/rfc7296.html">RFC 7296</a>. Основное отличие между IKEv1 и IKEv2 заключается в том, что IKEv2 проще и надёжнее, чем IKEv1, с меньшим количеством сообщений, обмениваемых при установлении VPN, и дополнительными функциями безопасности.</p>
+
+<h3>Аутентификация IKE</h3>
+<p>VyOS поддерживает 3 метода аутентификации:</p>
+<ul>
+<li><strong>Предварительно распределённый ключ</strong>: при этом методе оба узла туннеля IPsec должны иметь одинаковый предварительно распределённый ключ.</li>
+<li><strong>Цифровые сертификаты</strong>: при этом методе используется PKI.</li>
+<li><strong>Ключи RSA</strong>: если в политике IKE используется метод ключей RSA, убедитесь, что каждый узел имеет открытый ключ другого узла.</li>
+</ul>
+
+<h3>DPD (Dead Peer Detection)</h3>
+<p>Это механизм, используемый для обнаружения случаев, когда узел VPN больше не активен. Этот механизм имеет различные алгоритмы для IKEv1 и IKEv2 в VyOS. Запросы DPD отправляются как сообщения ISAKMP R-U-THERE, а ответы DPD отправляются как сообщения ISAKMP R-U-THERE-ACK. В IKEv1 DPD отправляет сообщения через настроенные интервалы. Если в течение тайм-аута DPD не получен ответ на эти пакеты, удалённый узел считается недоступным. В IKEv2 DPD отправляет сообщения через настроенные интервалы. Если один запрос остаётся без ответа, Strongswan выполнит свой алгоритм повторной передачи со своими таймерами.</p>
+
+<h3>Постквантовый предварительно распределённый ключ (PPK)</h3>
+<p>Постквантовые предварительно распределённые ключи помогают обеспечить некоторую квантовую устойчивость туннелей IPsec, когда постквантовые алгоритмы обмена ключами, такие как ML-KEM, недоступны. Использование PPK в IKEv2 описано в <a href="https://datatracker.ietf.org/doc/html/rfc8784.html">RFC 8784</a>.</p>
+<p>PPK может быть настроен в VyOS в разделе <code>vpn ipsec authentication ppk</code>. PPK требует идентификатор и секретное значение. Если PPK необходим для успешного соединения IPsec, оба значения — идентификатор и секрет — должны совпадать. Секрет может быть открытым текстом, шестнадцатеричным значением или значением Base64. По умолчанию используется открытый текст. При использовании других типов значений необходимо определить тип секрета.</p>
+
+<h3>Конфигурация IKE</h3>
+<h4>Атрибуты IKE</h4>
+<p>Группы IKE в VyOS имеют следующие параметры:</p>
+<p><code>set vpn ipsec ike-group &lt;name&gt; close-action &lt;action&gt;</code></p>
+<p>Определяет действие, которое необходимо предпринять, когда удалённый узел неожиданно закрывает CHILD_SA:</p>
+<ul>
+<li><strong>none</strong> — не выполнять никаких действий (по умолчанию)</li>
+<li><strong>trap</strong> — установить политику-ловушку для CHILD_SA; трафик, соответствующий этим политикам, вызовет событие acquire, что заставит демон установить необходимую IKE/IPsec SA.</li>
+<li><strong>start</strong> — немедленно попытаться пересоздать CHILD_SA.</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; ikev2-reauth</code></p>
+<p>Должна ли повторная генерация ключей IKE_SA также повторно аутентифицировать узел. В IKEv1 повторная аутентификация выполняется всегда. Установка этого параметра включает повторную аутентификацию удалённого узла во время обновления ключей IKE.</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; key-exchange</code></p>
+<p>Какой протокол должен использоваться для инициирования соединения. Если не задано, обрабатываются оба протокола, и соединение использует IKEv2 при инициировании, но принимает любую версию протокола при ответе:</p>
+<ul>
+<li><strong>ikev1</strong> — использовать IKEv1 для обмена ключами.</li>
+<li><strong>ikev2</strong> — использовать IKEv2 для обмена ключами.</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; lifetime</code></p>
+<p>Время жизни IKE (секунды) &lt;0-86400&gt; (по умолчанию 28800).</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; mode</code></p>
+<p>Выбор режима Фазы 1 IKEv1:</p>
+<ul>
+<li><strong>main</strong> — использовать основной режим для обмена ключами в протоколе IKEv1 (рекомендуемый по умолчанию).</li>
+<li><strong>aggressive</strong> — использовать агрессивный режим для обмена ключами в протоколе IKEv1; агрессивный режим менее безопасен, чем основной режим.</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; dh-group &lt;dh-group number&gt;</code></p>
+<p>Группа DH. Значение по умолчанию — <strong>2</strong>.</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; encryption &lt;encryption&gt;</code></p>
+<p>Алгоритм шифрования. Значение по умолчанию — <strong>aes128</strong>.</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; hash &lt;hash&gt;</code></p>
+<p>Алгоритм хеширования. Значение по умолчанию — <strong>sha1</strong>.</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; prf &lt;prf&gt;</code></p>
+<p>Псевдослучайная функция.</p>
+
+<h4>Конфигурация DPD</h4>
+<p><code>set vpn ipsec ike-group &lt;name&gt; dead-peer-detection action &lt;action&gt;</code></p>
+<p>Действие, выполняемое для данного CHILD_SA при истечении времени ожидания DPD:</p>
+<ul>
+<li><strong>trap</strong> — установить политику-ловушку, которая будет перехватывать соответствующий трафик и пытаться пересогласовать туннель по требованию.</li>
+<li><strong>clear</strong> — закрыть CHILD_SA без дальнейших действий (по умолчанию).</li>
+<li><strong>restart</strong> — немедленно попытаться пересогласовать CHILD_SA под новой IKE_SA.</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; dead-peer-detection interval &lt;interval&gt;</code></p>
+<p>Интервал проверки активности (секунды) &lt;2-86400&gt; (по умолчанию 30).</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; dead-peer-detection timeout &lt;timeout&gt;</code></p>
+<p>Тайм-аут проверки активности (секунды) &lt;2-86400&gt; (по умолчанию 120) <strong>только IKEv1</strong></p>
+
+<h3>Атрибуты ESP</h3>
+<p>В VyOS атрибуты ESP задаются через группы ESP. В рамках одной группы может быть указано несколько предложений.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; compression</code></p>
+<p>Включить протокол IPComp (сжатие полезной нагрузки IP), позволяющий сжимать содержимое IP-пакетов.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; disable-rekey</code></p>
+<p>Не инициировать повторную генерацию ключей SA локально; удалённый узел должен выполнить повторную генерацию до истечения срока.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; life-bytes &lt;bytes&gt;</code></p>
+<p>Время жизни ESP (байты) &lt;1024-26843545600000&gt;. Количество переданных байт до истечения срока IPsec SA.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; life-packets &lt;packets&gt;</code></p>
+<p>Время жизни ESP (пакеты) &lt;1000-26843545600000&gt;. Количество переданных пакетов до истечения срока IPsec SA.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; lifetime &lt;timeout&gt;</code></p>
+<p>Время жизни ESP (секунды) &lt;30-86400&gt; (по умолчанию 3600). Как долго должен существовать конкретный экземпляр соединения (набор ключей шифрования/аутентификации для пакетов пользовательских данных) от успешного согласования до истечения срока.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; mode &lt;mode&gt;</code></p>
+<p>Тип соединения:</p>
+<ul>
+<li><strong>tunnel</strong> — режим туннеля (по умолчанию).</li>
+<li><strong>transport</strong> — транспортный режим.</li>
+</ul>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; pfs &lt;dh-group&gt;</code></p>
+<p>Требуется ли совершенная прямая секретность (PFS) для ключевого канала соединения, и определяет группу Диффи-Хеллмана для PFS:</p>
+<ul>
+<li><strong>enable</strong> — наследовать группу Диффи-Хеллмана из группы IKE (по умолчанию).</li>
+<li><strong>disable</strong> — отключить PFS.</li>
+<li><strong>&lt;dh-group&gt;</strong> — определить группу Диффи-Хеллмана для PFS.</li>
+</ul>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; proposal &lt;number&gt; encryption &lt;encryption&gt;</code></p>
+<p>Алгоритм шифрования. Значение по умолчанию — <strong>aes128</strong>.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; proposal &lt;number&gt; hash &lt;hash&gt;</code></p>
+<p>Алгоритм хеширования. Значение по умолчанию — <strong>sha1</strong>.</p>
+
+<h3>Глобальные настройки IPsec</h3>
+<p><code>set vpn ipsec interface &lt;name&gt;</code></p>
+<p>Имя интерфейса, используемое для ограничения исходящих политик IPsec. Может быть указано несколько интерфейсов. Если интерфейс не задан, политики IPsec применяются ко всем интерфейсам.</p>
+
+<p><code>set vpn ipsec log level &lt;number&gt;</code></p>
+<p>Уровень логирования. Значение по умолчанию — <strong>0</strong>.</p>
+
+<p><code>set vpn ipsec log subsystem &lt;name&gt;</code></p>
+<p>Подсистема демона.</p>
+
+<h3>Параметры</h3>
+<p><code>set vpn ipsec options disable-route-autoinstall</code></p>
+<p>Не устанавливать маршруты к удалённым сетям автоматически.</p>
+
+<p><code>set vpn ipsec options flexvpn</code></p>
+<p>Разрешить загрузку идентификатора поставщика FlexVPN (только IKEv2). Отправляет загрузку идентификатора поставщика Cisco FlexVPN (только IKEv2), которая необходима для разрешения устройствам с маркой Cisco согласовывать селекторы локального трафика.</p>
+
+<p><code>set vpn ipsec options interface &lt;name&gt;</code></p>
+<p>Имя используемого интерфейса. Имя интерфейса, на котором должны быть установлены виртуальные IP-адреса. Если не задано, адреса устанавливаются на исходящем интерфейсе.</p>
+
+<p><code>set vpn ipsec options virtual-ip</code></p>
+<p>Разрешить установку виртуальных IP-адресов.</p>
+
+<h3>Повторная передача IKEv2</h3>
+<p>Если узел не отвечает на пакеты DPD, маршрутизатор инициирует процедуру повторной передачи. Тайм-аут рассчитывается по следующей формуле:</p>
+<pre><code>relative timeout = timeout * base ^ (attempts-1)</code></pre>
+
+<p><code>set vpn ipsec options retransmission attempts</code></p>
+<p>Количество попыток перед тем, как считать узел недоступным. Значение по умолчанию — <strong>5</strong>.</p>
+
+<p><code>set vpn ipsec options retransmission base</code></p>
+<p>Основание для экспоненциальной задержки. Значение по умолчанию — <strong>1.8</strong>.</p>
+
+<p><code>set vpn ipsec options retransmission timeout</code></p>
+<p>Тайм-аут перед первой повторной передачей (секунды). Значение по умолчанию — <strong>4</strong>.</p>
+
+<p>При использовании значений по умолчанию пакеты повторно передаются следующим образом:</p>
+<table>
+<thead><tr><th>Попытка</th><th>Формула</th><th>Относительный тайм-аут</th><th>Абсолютный тайм-аут</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>4 * 1.8 ^ 0</td><td>4с</td><td>4с</td></tr>
+<tr><td>2</td><td>4 * 1.8 ^ 1</td><td>7с</td><td>11с</td></tr>
+<tr><td>3</td><td>4 * 1.8 ^ 2</td><td>13с</td><td>24с</td></tr>
+<tr><td>4</td><td>4 * 1.8 ^ 3</td><td>23с</td><td>47с</td></tr>
+<tr><td>5</td><td>4 * 1.8 ^ 4</td><td>42с</td><td>89с</td></tr>
+<tr><td>Узел недоступен</td><td>4 * 1.8 ^ 5</td><td>76с</td><td>165с</td></tr>
+</tbody>
+</table>
+
 </div>
-</section>
 
+<div class="ipsec-tab-content">
 
-           </div>
-</body>
-</html>
+<h3>Типы VPN IPsec сайт-сайт</h3>
+<p>VyOS поддерживает два типа VPN IPsec: VPN на основе политик и VPN на основе маршрутов.</p>
+
+<h4>VPN на основе политик</h4>
+<p>VPN на основе политик опирается на статически настроенные политики. Каждая политика создаёт независимую IPSec SA. Трафик, соответствующий этим SA, будет зашифрован и направлен удалённому узлу.</p>
+
+<h4>VPN на основе маршрутов</h4>
+<p>VPN на основе маршрутов основано на безопасном прохождении трафика через виртуальный туннельный интерфейс (VTI). Этот тип VPN IPsec позволяет использовать протоколы маршрутизации.</p>
+
+<h3>Конфигурация VPN сайт-сайт</h3>
+
+<h4>Требования и предварительные условия для VPN сайт-сайт</h4>
+<p><strong>Параметры согласования, которые должны совпадать</strong></p>
+
+<h5>Фаза 1</h5>
+<ul>
+<li>Версия IKE</li>
+<li>Аутентификация</li>
+<li>Шифрование</li>
+<li>Хеширование</li>
+<li>PRF</li>
+<li>Время жизни</li>
+</ul>
+
+<div class="note">
+<strong>Примечание:</strong> Strongswan рекомендует использовать одинаковые значения времени жизни на обоих узлах
+</div>
+
+<h5>Фаза 2</h5>
+<ul>
+<li>Шифрование</li>
+<li>Хеширование</li>
+<li>PFS</li>
+<li>Режим (туннель или транспортный)</li>
+<li>Время жизни</li>
+</ul>
+
+<div class="note">
+<strong>Примечание:</strong> Strongswan рекомендует использовать одинаковые значения времени жизни на обоих узлах
+</div>
+
+<ul>
+<li>Удалённые и локальные сети в SA должны быть совместимы на обоих узлах</li>
+</ul>
+
+<h4>Этапы конфигурации VPN сайт-сайт</h4>
+<p>Следующий пример показывает конфигурацию для одного маршрутизатора, участвующего в VPN IPsec.</p>
+
+<p><strong>Информация о туннеле:</strong></p>
+<ul>
+<li>Фаза 1:
+<ul>
+<li>Шифрование: AES256</li>
+<li>Хеширование: SHA256</li>
+<li>PRF: SHA256</li>
+<li>DH: 14</li>
+<li>Время жизни: 28800</li>
+</ul>
+</li>
+<li>Фаза 2:
+<ul>
+<li>Режим IPsec: Туннель</li>
+<li>Шифрование: AES256</li>
+<li>Хеширование: SHA256</li>
+<li>PFS: наследуется от DH Фазы 1</li>
+<li>Время жизни: 3600</li>
+</ul>
+</li>
+<li>При использовании VPN на основе политик
+<ul>
+<li>Удалённая сеть — 192.168.50.0/24. Локальная сеть — 192.168.10.0/24</li>
+</ul>
+</li>
+<li>При использовании VPN на основе маршрутов
+<ul>
+<li>IP-адрес интерфейса VTI — 10.0.0.1/30</li>
+</ul>
+</li>
+</ul>
+
+<div class="note">
+<strong>Примечание:</strong> Не рекомендуется одновременно использовать конфигурации VPN на основе политик и на основе маршрутов для одного и того же узла.
+</div>
+
+<p><strong>1. Настройка ike-group (Фаза 1 IKE)</strong></p>
+<pre><code>set vpn ipsec ike-group IKE close-action 'start'
+set vpn ipsec ike-group IKE key-exchange 'ikev1'
+set vpn ipsec ike-group IKE lifetime '28800'
+set vpn ipsec ike-group IKE proposal 10 dh-group '14'
+set vpn ipsec ike-group IKE proposal 10 encryption 'aes256'
+set vpn ipsec ike-group IKE proposal 10 hash 'sha256'
+set vpn ipsec ike-group IKE proposal 10 prf 'prfsha256'</code></pre>
+
+<p><strong>2. Настройка ESP-group (Фаза 2 IKE)</strong></p>
+<pre><code>set vpn ipsec esp-group ESP lifetime '3600'
+set vpn ipsec esp-group ESP mode 'tunnel'
+set vpn ipsec esp-group ESP pfs 'enable'
+set vpn ipsec esp-group ESP proposal 10 encryption 'aes256'
+set vpn ipsec esp-group ESP proposal 10 hash 'sha256'</code></pre>
+
+<p><strong>3. Указание публичного IP-адреса интерфейса eth0</strong></p>
+<pre><code>set vpn ipsec ipsec-interfaces interface eth0</code></pre>
+
+<p><strong>4. Настройка узла сайт-сайт</strong></p>
+
+<p><em>Конфигурация VPN на основе политик:</em></p>
+<pre><code>set vpn ipsec site-to-site peer 203.0.113.2 authentication mode 'pre-shared-secret'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication id '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication remote-id '203.0.113.2'
+set vpn ipsec site-to-site peer 203.0.113.2 connection-type 'respond'
+set vpn ipsec site-to-site peer 203.0.113.2 default-esp-group 'ESP'
+set vpn ipsec site-to-site peer 203.0.113.2 ike-group 'IKE'
+set vpn ipsec site-to-site peer 203.0.113.2 local-address '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 tunnel 1 local prefix '192.168.10.0/24'
+set vpn ipsec site-to-site peer 203.0.113.2 tunnel 1 remote prefix '192.168.50.0/24'</code></pre>
+
+<p><em>Конфигурация VPN на основе маршрутов:</em></p>
+<pre><code>set interfaces vti vti0 address '10.0.0.1/30'
+set interfaces vti vti0 description 'VPN VTI interface'
+
+set vpn ipsec site-to-site peer 203.0.113.2 authentication mode 'pre-shared-secret'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication id '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication remote-id '203.0.113.2'
+set vpn ipsec site-to-site peer 203.0.113.2 connection-type 'respond'
+set vpn ipsec site-to-site peer 203.0.113.2 default-esp-group 'ESP'
+set vpn ipsec site-to-site peer 203.0.113.2 ike-group 'IKE'
+set vpn ipsec site-to-site peer 203.0.113.2 local-address '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 vti bind to 'vti0'
+set vpn ipsec site-to-site peer 203.0.113.2 vti esp-group 'ESP'</code></pre>
+
+</div>
+
+<div class="ipsec-tab-content">
+
+<h3>Общие сведения о VPN удалённого доступа</h3>
+<p>VPN удалённого доступа позволяет удалённым пользователям безопасно подключаться к корпоративной сети через туннель IPsec. VyOS поддерживает несколько методов конфигурации VPN удалённого доступа, включая аутентификацию на основе предварительно распределённого ключа, сертификатов и EAP.</p>
+
+<h3>Типы VPN удалённого доступа</h3>
+
+<h4>Удалённый доступ на основе предварительно распределённого ключа</h4>
+<p>Простейший метод конфигурации удалённого доступа, при котором каждый удалённый пользователь аутентифицируется с использованием одного и того же предварительно распределённого ключа. Подходит для небольших развёртываний или тестовых сред.</p>
+
+<h4>Удалённый доступ на основе сертификатов</h4>
+<p>Использует сертификаты X.509 для аутентификации, обеспечивая более высокий уровень безопасности. Каждый пользователь может иметь свой собственный сертификат, что упрощает управление и отзыв.</p>
+
+<h4>Удалённый доступ на основе EAP</h4>
+<p>Расширяемый протокол аутентификации (EAP) позволяет аутентифицировать пользователей с помощью сервера RADIUS. Поддерживает несколько методов EAP, таких как EAP-MSCHAPv2, EAP-TLS и другие.</p>
+
+<h3>Конфигурация VPN удалённого доступа</h3>
+
+<h4>Основные этапы конфигурации</h4>
+
+<p><strong>1. Настройка групп IKE и ESP</strong></p>
+<pre><code>set vpn ipsec ike-group IKE-RA lifetime '28800'
+set vpn ipsec ike-group IKE-RA proposal 1 encryption 'aes256'
+set vpn ipsec ike-group IKE-RA proposal 1 hash 'sha256'
+set vpn ipsec ike-group IKE-RA proposal 1 dh-group '14'
+
+set vpn ipsec esp-group ESP-RA lifetime '3600'
+set vpn ipsec esp-group ESP-RA proposal 1 encryption 'aes256'
+set vpn ipsec esp-group ESP-RA proposal 1 hash 'sha256'</code></pre>
+
+<p><strong>2. Настройка пула IP-адресов</strong></p>
+<pre><code>set vpn ipsec remote-access connection RA pool 'RA-POOL'
+set vpn ipsec remote-access connection RA pool RA-POOL prefix '100.64.0.0/24'
+set vpn ipsec remote-access connection RA pool RA-POOL name-server '192.0.2.53'</code></pre>
+
+<p><strong>3. Настройка соединения удалённого доступа</strong></p>
+<pre><code>set vpn ipsec remote-access connection RA authentication local-id '192.0.2.1'
+set vpn ipsec remote-access connection RA authentication server-mode 'x509'
+set vpn ipsec remote-access connection RA authentication x509 certificate 'ipsec-cert'
+
+set vpn ipsec remote-access connection RA remote-access-interface 'ppp0'
+set vpn ipsec remote-access connection RA ike-group 'IKE-RA'
+set vpn ipsec remote-access connection RA default-esp-group 'ESP-RA'</code></pre>
+
+<h4>Конфигурация на основе EAP-RADIUS</h4>
+<p>Использование сервера RADIUS для аутентификации пользователей:</p>
+
+<pre><code>set vpn ipsec remote-access connection RA authentication client-mode 'eap-radius'
+set vpn ipsec remote-access connection RA eap-radius server 1 address '192.0.2.100'
+set vpn ipsec remote-access connection RA eap-radius server 1 key 'testing123'
+
+set vpn ipsec remote-access connection RA pool RA-POOL name-server '192.0.2.53'
+set vpn ipsec remote-access connection RA pool RA-POOL prefix '100.64.0.0/24'</code></pre>
+
+<h4>Конфигурация на основе предварительно распределённого ключа</h4>
+<p>Подходит для простых сценариев удалённого доступа:</p>
+
+<pre><code>set vpn ipsec remote-access connection RA authentication mode 'pre-shared-secret'
+set vpn ipsec remote-access connection RA authentication id '192.0.2.1'
+set vpn ipsec remote-access connection RA authentication local-id '192.0.2.1'
+
+set vpn ipsec remote-access connection RA remote-access-interface 'ppp0'
+set vpn ipsec remote-access connection RA ike-group 'IKE-RA'
+set vpn ipsec remote-access connection RA default-esp-group 'ESP-RA'
+
+set vpn ipsec remote-access connection RA pool RA-POOL prefix '100.64.0.0/24'</code></pre>
+
+<h3>Конфигурация интерфейса удалённого доступа</h3>
+<p>VPN удалённого доступа использует виртуальные интерфейсы PPP. Необходимо указать интерфейс удалённого доступа:</p>
+
+<pre><code>set interfaces ppp ppp0 description 'Remote Access VPN Interface'
+set vpn ipsec remote-access connection RA remote-access-interface 'ppp0'</code></pre>
+
+<h3>Примеры конфигурации клиентов</h3>
+
+<h4>Клиент Windows</h4>
+<p>Встроенный VPN-клиент Windows поддерживает IKEv2 и L2TP/IPsec. Этапы конфигурации:</p>
+<ol>
+<li>Откройте «Параметры» > «Сеть и Интернет» > «VPN»</li>
+<li>Нажмите «Добавить VPN-подключение»</li>
+<li>Заполните имя поставщика VPN, имя сервера или адрес</li>
+<li>Выберите тип VPN (IKEv2 или L2TP/IPsec)</li>
+<li>Введите данные для аутентификации (имя пользователя/пароль или сертификат)</li>
+</ol>
+
+<h4>Клиент Linux</h4>
+<p>Пользователи Linux могут настроить VPN IPsec с помощью NetworkManager или инструментов командной строки:</p>
+<pre><code># Использование клиента strongswan
+sudo apt install strongswan strongswan-pki libcharon-extra-plugins
+
+# Конфигурация /etc/ipsec.conf
+conn vyos-ra
+    right=192.0.2.1
+    rightid=@192.0.2.1
+    rightsubnet=0.0.0.0/0
+    left=%defaultroute
+    leftid=user@example.com
+    eap_identity=user@example.com
+    auto=start</code></pre>
+
+<h4>Клиент macOS</h4>
+<p>macOS имеет встроенную поддержку VPN IKEv2:</p>
+<ol>
+<li>Откройте «Системные настройки» > «Сеть»</li>
+<li>Нажмите «+» для добавления нового соединения</li>
+<li>Выберите интерфейс «VPN», тип «IKEv2»</li>
+<li>Заполните адрес сервера и удалённый идентификатор</li>
+<li>Настройте метод аутентификации</li>
+</ol>
+
+<h4>Мобильные устройства</h4>
+<p>Устройства iOS и Android имеют встроенную поддержку VPN IKEv2:</p>
+<ul>
+<li><strong>iOS:</strong> Настройки > Основные > VPN и сеть > Добавить конфигурацию VPN</li>
+<li><strong>Android:</strong> Настройки > Сеть и Интернет > VPN > Добавить профиль VPN</li>
+</ul>
+
+<h3>Устранение неполадок</h3>
+
+<h4>Типичные проблемы</h4>
+<ul>
+<li><strong>Сбой подключения:</strong> проверьте совпадение параметров IKE и ESP, убедитесь, что предварительно распределённый ключ или сертификат верны</li>
+<li><strong>Сбой аутентификации:</strong> убедитесь, что конфигурация сервера RADIUS корректна, проверьте учётные данные пользователя</li>
+<li><strong>Невозможно получить IP-адрес:</strong> проверьте конфигурацию пула IP-адресов, убедитесь, что достаточно доступных адресов</li>
+<li><strong>Нестабильное соединение:</strong> проверьте настройки DPD, скорректируйте параметры времени жизни</li>
+</ul>
+
+<h4>Команды отладки</h4>
+<pre><code># Просмотр состояния IPsec SA
+show vpn ipsec sa
+
+# Просмотр состояния IKE SA
+show vpn ike sa
+
+# Просмотр подробной информации о соединении IPsec
+show vpn ipsec sa detail
+
+# Просмотр логов IPsec
+tail -f /var/log/charon.log</code></pre>
+
+</div>
+
+<div class="ipsec-tab-content">
+
+<p>В данном разделе описаны методы устранения неполадок и диагностические шаги для типичных проблем VPN IPsec.</p>
+
+<h3>Основные диагностические команды</h3>
+
+<p>VyOS предоставляет ряд команд для диагностики проблем IPsec:</p>
+
+<h4>Просмотр состояния IPsec</h4>
+
+<p>Просмотр текущего состояния туннелей IPsec и ассоциаций безопасности:</p>
+
+<div class="command-block">show vpn ipsec status</div>
+
+<p>Эта команда отображает текущее состояние всех туннелей IPsec, включая информацию о том, установлены ли соединения, активны ли SA (ассоциации безопасности) и т.д.</p>
+
+<h4>Просмотр ассоциаций безопасности</h4>
+
+<p>Просмотр подробной информации об IKE SA и Child SA:</p>
+
+<div class="command-block">show vpn ipsec sa</div>
+
+<p>Вывод включает следующую информацию:</p>
+<ul>
+  <li><strong>IKE SA</strong>: ассоциации безопасности Фазы 1 IKE</li>
+  <li><strong>Child Sa</strong>: ассоциации безопасности Фазы 2 IKE (туннели данных)</li>
+  <li><strong>Состояние</strong>: ESTABLISHED, INSTALLED и т.д.</li>
+  <li><strong>Алгоритмы шифрования</strong>: используемые алгоритмы шифрования и аутентификации</li>
+  <li><strong>Статистика трафика</strong>: количество пакетов и байт, прошедших через туннель</li>
+</ul>
+
+<h4>Просмотр конфигурации IPsec</h4>
+
+<p>Просмотр текущей действующей конфигурации IPsec:</p>
+
+<div class="command-block">show vpn ipsec detail</div>
+
+<h3>Типичные проблемы и решения</h3>
+
+<h4>Туннель не устанавливается</h4>
+
+<p><strong>Симптомы</strong>: состояние туннеля IPsec отображается как «down» или «connecting».</p>
+
+<p><strong>Возможные причины и решения</strong>:</p>
+
+<ol>
+  <li>
+    <p><strong>Несовпадение предварительно распределённого ключа</strong></p>
+    <p>Убедитесь, что предварительно распределённые ключи на обоих концах абсолютно одинаковы, включая регистр и пробелы.</p>
+    <div class="command-block">show vpn ipsec site-to-site peer &lt;peer-address&gt;</div>
+  </li>
+  <li>
+    <p><strong>Несовпадение предложений IKE</strong></p>
+    <p>Проверьте, совместимы ли конфигурации групп IKE на обоих концах. Алгоритм шифрования, алгоритм хеширования и группа Диффи-Хеллмана должны совпадать.</p>
+    <div class="command-block">show vpn ipsec ike-group</div>
+  </li>
+  <li>
+    <p><strong>Несовпадение предложений ESP</strong></p>
+    <p>Убедитесь, что конфигурации групп ESP согласованы.</p>
+    <div class="command-block">show vpn ipsec esp-group</div>
+  </li>
+  <li>
+    <p><strong>Блокировка межсетевым экраном</strong></p>
+    <p>Убедитесь, что межсетевой экран разрешает прохождение следующих портов:</p>
+    <ul>
+      <li>UDP 500 (IKE)</li>
+      <li>UDP 4500 (NAT-T)</li>
+      <li>Протокол 50 (ESP)</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Ошибки в конфигурации локальной/удалённой подсети</strong></p>
+    <p>Проверьте правильность конфигурации локальной и удалённой подсетей для VPN сайт-сайт.</p>
+  </li>
+</ol>
+
+<h4>Туннель поднят, но данных нет</h4>
+
+<p><strong>Симптомы</strong>: туннель IPsec отображается как «up», но данные не могут передаваться через туннель.</p>
+
+<p><strong>Возможные причины и решения</strong>:</p>
+
+<ol>
+  <li>
+    <p><strong>Child SA не установлена</strong></p>
+    <p>Проверьте, была ли Child SA успешно установлена:</p>
+    <div class="command-block">show vpn ipsec sa</div>
+    <p>Если Child SA не отображается, это может быть вызвано несовпадением предложений ESP.</p>
+  </li>
+  <li>
+    <p><strong>Проблемы с маршрутизацией</strong></p>
+    <p>Проверьте корректность таблицы маршрутизации, убедившись, что трафик может проходить через туннельный интерфейс:</p>
+    <div class="command-block">show ip route</div>
+  </li>
+  <li>
+    <p><strong>Проблемы с MTU</strong></p>
+    <p>IPsec добавляет накладные расходы на пакет. Если пакеты слишком велики, они могут быть отброшены. Попробуйте настроить MTU:</p>
+    <div class="command-block">set interfaces ethernet &lt;interface&gt; mtu 1400</div>
+  </li>
+  <li>
+    <p><strong>Асимметричная маршрутизация</strong></p>
+    <p>Убедитесь, что обратный трафик также проходит через туннель IPsec; проверьте конфигурацию маршрутизации по политикам.</p>
+  </li>
+</ol>
+
+<h4>Туннель часто обрывается</h4>
+
+<p><strong>Симптомы</strong>: туннель IPsec повторно устанавливается и отключается.</p>
+
+<p><strong>Возможные причины и решения</strong>:</p>
+
+<ol>
+  <li>
+    <p><strong>Конфигурация DPD (Dead Peer Detection)</strong></p>
+    <p>Проверьте, не слишком ли агрессивны настройки DPD:</p>
+    <div class="command-block">show vpn ipsec site-to-site peer &lt;peer-address&gt; dead-peer-detection</div>
+    <p>Рекомендуемые настройки DPD:</p>
+    <ul>
+      <li>interval: 15-30 секунд</li>
+      <li>timeout: 30-60 секунд</li>
+      <li>action: restart</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Сбой повторной генерации ключей IKE</strong></p>
+    <p>Проверьте настройки времени жизни IKE, убедившись в совместимости на обоих концах.</p>
+  </li>
+  <li>
+    <p><strong>Проблемы с NAT</strong></p>
+    <p>Если один из концов находится за NAT, убедитесь, что NAT Traversal (NAT-T) включён.</p>
+  </li>
+</ol>
+
+<h4>Сбои аутентификации</h4>
+
+<p><strong>Симптомы</strong>: в логах отображаются ошибки аутентификации.</p>
+
+<p><strong>Возможные причины и решения</strong>:</p>
+
+<ol>
+  <li>
+    <p><strong>Ошибка предварительно распределённого ключа</strong></p>
+    <p>Перенастройте предварительно распределённый ключ, убедившись в точном совпадении на обоих концах.</p>
+  </li>
+  <li>
+    <p><strong>Проблемы с сертификатами</strong></p>
+    <p>При использовании аутентификации на основе сертификатов:</p>
+    <ul>
+      <li>Убедитесь, что срок действия сертификата не истёк</li>
+      <li>Проверьте полноту цепочки сертификатов</li>
+      <li>Подтвердите совпадение имён субъектов сертификатов</li>
+      <li>Убедитесь, что сертификат CA правильно установлен</li>
+    </ul>
+  </li>
+</ol>
+
+<h3>Логи и отладка</h3>
+
+<h4>Просмотр логов IPsec</h4>
+
+<p>Просмотр информации, связанной с IPsec, в системных логах:</p>
+
+<div class="command-block">show log | match charon</div>
+
+<p>Или просмотр более подробных логов:</p>
+
+<div class="command-block">tail -f /var/log/syslog | grep charon</div>
+
+<h4>Включение подробного логирования</h4>
+
+<p>Для получения более подробной отладочной информации можно включить подробное логирование IPsec:</p>
+
+<div class="command-block">set vpn ipsec logging log-level 3</div>
+
+<p>Описание уровней логирования:</p>
+<ul>
+  <li><strong>0</strong>: только ошибки</li>
+  <li><strong>1</strong>: предупреждения</li>
+  <li><strong>2</strong>: информация (по умолчанию)</li>
+  <li><strong>3</strong>: отладка</li>
+  <li><strong>4</strong>: подробная отладка</li>
+</ul>
+
+<div class="warning">
+  <strong>Предупреждение:</strong> Высокие уровни логирования могут генерировать большой объём записей в логе и влиять на производительность системы. Включайте временно только на время устранения неполадок.
+</div>
+
+<h4>Типичные сообщения в логах</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Сообщение лога</th>
+      <th>Значение</th>
+      <th>Решение</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>received INVALID_ID_INFORMATION</code></td>
+      <td>Несовпадение идентификатора</td>
+      <td>Проверьте конфигурацию локального и удалённого идентификатора</td>
+    </tr>
+    <tr>
+      <td><code>no matching proposal found</code></td>
+      <td>Несовпадение предложений</td>
+      <td>Проверьте конфигурацию групп IKE/ESP</td>
+    </tr>
+    <tr>
+      <td><code>authentication failed</code></td>
+      <td>Сбой аутентификации</td>
+      <td>Проверьте предварительно распределённый ключ или сертификат</td>
+    </tr>
+    <tr>
+      <td><code>peer not responding</code></td>
+      <td>Узел не отвечает</td>
+      <td>Проверьте сетевое подключение и межсетевой экран</td>
+    </tr>
+    <tr>
+      <td><code>SA lifetime expired</code></td>
+      <td>Время жизни SA истекло</td>
+      <td>Нормальное явление, проверьте конфигурацию повторной генерации ключей</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Захват сетевых пакетов</h3>
+
+<p>Когда другие методы не позволяют решить проблему, можно использовать tcpdump для захвата сетевых пакетов:</p>
+
+<h4>Захват трафика IKE</h4>
+
+<div class="command-block">tcpdump -i any -n port 500 or port 4500</div>
+
+<h4>Захват трафика ESP</h4>
+
+<div class="command-block">tcpdump -i any -n proto 50</div>
+
+<h4>Сохранение файла захвата пакетов</h4>
+
+<div class="command-block">tcpdump -i any -n -w /tmp/ipsec.pcap port 500 or port 4500 or proto 50</div>
+
+<p>Для анализа сохранённого файла pcap можно использовать Wireshark.</p>
+
+<h3>Сброс и перезапуск</h3>
+
+<h4>Сброс туннеля IPsec</h4>
+
+<p>Сброс туннеля IPsec для конкретного узла:</p>
+
+<div class="command-block">reset vpn ipsec site-to-site peer &lt;peer-address&gt;</div>
+
+<h4>Перезапуск службы IPsec</h4>
+
+<p>Для перезапуска всей службы IPsec:</p>
+
+<div class="command-block">restart vpn ipsec</div>
+
+<div class="warning">
+  <strong>Предупреждение:</strong> Перезапуск службы IPsec прервёт все активные VPN-соединения.
+</div>
+
+<h3>Проблемы производительности</h3>
+
+<h4>Тест производительности шифрования</h4>
+
+<p>Тестирование производительности шифрования системы:</p>
+
+<div class="command-block">show vpn ipsec performance</div>
+
+<h4>Аппаратное ускорение</h4>
+
+<p>Если поддерживается аппаратное ускорение шифрования, убедитесь, что оно включено:</p>
+
+<div class="command-block">show vpn ipsec hardware-acceleration</div>
+
+<div class="tip">
+  <strong>Совет:</strong> Некоторые процессоры поддерживают набор инструкций AES-NI, который может значительно повысить производительность IPsec. Используйте <code>lscpu | grep aes</code> для проверки поддержки.
+</div>
+
+<h3>Обращение в поддержку</h3>
+
+<p>Если указанные выше шаги не позволяют решить проблему, соберите следующую информацию и обратитесь в техническую поддержку:</p>
+
+<ol>
+  <li>Полный экспорт конфигурации: <code>show configuration commands | match vpn</code></li>
+  <li>Вывод состояния IPsec: <code>show vpn ipsec status</code></li>
+  <li>Информация об ассоциациях безопасности: <code>show vpn ipsec sa</code></li>
+  <li>Системные логи: <code>show log | match charon</code></li>
+  <li>Файл захвата сетевых пакетов (при наличии)</li>
+</ol>
+
+</div>
+
+</div>
+
+</div>

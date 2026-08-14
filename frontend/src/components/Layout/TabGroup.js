@@ -8,7 +8,7 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   setup(props, { emit, slots }) {
-    const active = ref(props.modelValue || (props.tabs[0]?.key || ''));
+    const active = ref(props.modelValue || props.tabs[0]?.key || '');
 
     function select(key) {
       active.value = key;
@@ -18,6 +18,13 @@ export default defineComponent({
     watch(() => props.modelValue, (val) => {
       if (val && val !== active.value) active.value = val;
     });
+
+    watch(() => props.tabs, (newTabs) => {
+      if (newTabs.length && !newTabs.some(t => t.key === active.value)) {
+        active.value = newTabs[0].key;
+        emit('update:modelValue', active.value);
+      }
+    }, { immediate: true });
 
     const activeTab = computed(() => props.tabs.find(t => t.key === active.value) || props.tabs[0]);
 

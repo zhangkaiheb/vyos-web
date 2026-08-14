@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -153,74 +153,38 @@
              
   <section id="mpls">
 <h1>MPLS</h1>
-<p><abbr title="Multiprotocol Label Switching">MPLS</abbr> is a packet-forwarding method
-that differs from traditional IP forwarding. Instead of performing IP address
-lookups, MPLS routers forward traffic using exact-match lookups on MPLS labels
-inserted between the 层 2 (Ethernet) and 层 3 (IP) headers.</p>
-<p>MPLS labels 可以 assigned statically or dynamically. This section focuses on
-dynamic label allocation using label distribution protocols such as the
-<abbr title="Label Distribution Protocol">LDP</abbr> and
-<abbr title="Resource Reservation Protocol for Traffic Engineering">RSVP-TE</abbr>, or
-via <abbr title="Segment Routing">SR</abbr> extensions to OSPF or IS-IS.</p>
-<p>These protocols establish a unidirectional path called a
-<abbr title="Label-Switched Path">LSP</abbr> across the network. When a packet enters
-the MPLS network, the ingress router pushes an MPLS label onto it based on
-the destination and forwards the packet along the LSP. Each intermediate
-router uses the incoming label to look up the outgoing interface and next
-label value, swaps the label, and forwards the packet on that interface. The
-egress router pops the label and forwards the original packet using normal
-IP routing.</p>
+<p><abbr title="多协议标签交换">MPLS</abbr> 是一种数据包转发方法，与传统的 IP 转发方式不同。MPLS 路由器不执行 IP 地址查找，而是通过在第 2 层（以太网）和第 3 层（IP）报头之间插入的 MPLS 标签进行精确匹配查找来转发流量。</p>
+<p>MPLS 标签可以静态或动态分配。本节重点介绍使用标签分发协议（例如 <abbr title="标签分发协议">LDP</abbr> 和 <abbr title="用于流量工程的资源预留协议">RSVP-TE</abbr>）或通过 OSPF 或 IS-IS 的 <abbr title="分段路由">SR</abbr> 扩展实现的动态标签分配。</p>
+<p>这些协议在网络中建立一条称为 <abbr title="标签交换路径">LSP</abbr> 的单向路径。当数据包进入 MPLS 网络时，入口路由器根据目的地址为其压入一个 MPLS 标签，并沿 LSP 转发该数据包。每个中间路由器使用入向标签查找出向接口和下一跳标签值，交换标签后将数据包从该接口转发出去。出口路由器弹出标签，并使用常规 IP 路由转发原始数据包。</p>
 <section id="mpls-support-in-vyos">
-<h2>MPLS support in VyOS</h2>
-<p>MPLS support in VyOS is under development, so its feature set is currently
-limited. Basic MPLS forwarding is functional, as the underlying FRR routing
-stack supports <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc3031">RFC 3031</a>.</p>
-<p>Supported features:</p>
+<h2>VyOS 中的 MPLS 支持</h2>
+<p>VyOS 中的 MPLS 支持尚处于开发阶段，因此其功能集目前有限。基础 MPLS 转发功能已可用，因为底层 FRR 路由栈支持 <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc3031">RFC 3031</a>。</p>
+<p>支持的功能：</p>
 <ul class="simple">
-<li><p><strong>LDP</strong>: Implemented according to
-<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5036">RFC 5036</a>.</p></li>
+<li><p><strong>LDP</strong>：依据 <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5036">RFC 5036</a> 实现。</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>Other related LDP standards include RFCs
-<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6720">6720</a>,
-<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6667">6667</a>,
-<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5919">5919</a>,
-<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5561">5561</a>, and
-<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7552">7552</a>.</p>
+<p>其他相关 LDP 标准还包括 RFC <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6720">6720</a>、<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6667">6667</a>、<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5919">5919</a>、<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5561">5561</a> 和 <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7552">7552</a>。</p>
 </div>
-<p>Current limitations:</p>
+<p>当前限制：</p>
 <ul class="simple">
-<li><p><strong>MPLS VPNs</strong>: No support yet for MPLS-enabled VPN services, such as
-L2VPNs and mVPNs.</p></li>
-<li><p><strong>RSVP-TE</strong>: Not supported, as the underlying FRR stack does not currently
-implement it.</p></li>
+<li><p><strong>MPLS VPN</strong>：暂不支持 MPLS 启用的 VPN 服务，例如 L2VPN 和 mVPN。</p></li>
+<li><p><strong>RSVP-TE</strong>：不支持，因为底层 FRR 栈当前未实现该协议。</p></li>
 </ul>
 </section>
 <section id="label-distribution-protocol-ldp">
-<h2>标签 Distribution 协议 (LDP)</h2>
-<p>MPLS supports various protocols for path creation. VyOS implements LDP via
-the underlying FRR routing stack, per
-<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5036">RFC 5036</a>.</p>
-<p>LDP is a TCP-based MPLS signaling protocol that dynamically distributes
-labels to create label-switched paths. It is not a routing protocol and
-depends on existing routing protocols for forwarding decisions and
-communication with other LDP-enabled routers.</p>
-<p>To exchange label advertisements, LDP establishes TCP sessions with
-automatically discovered or statically configured neighbors. Each session is
-formed using the peer’s transport address, which 必须 present in the routing
-table and continuously reachable.</p>
+<h2>标签分发协议 (LDP)</h2>
+<p>MPLS 支持多种路径创建协议。VyOS 通过底层 FRR 路由栈实现 LDP，符合 <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5036">RFC 5036</a>。</p>
+<p>LDP 是一种基于 TCP 的 MPLS 信令协议，可动态分发标签以创建标签交换路径。它本身并非路由协议，依赖现有路由协议进行转发决策，并与其他启用 LDP 的路由器通信。</p>
+<p>为交换标签通告，LDP 会与自动发现或静态配置的邻居建立 TCP 会话。每个会话均使用对端的传输地址建立，该地址必须存在于路由表中且持续可达。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>It 建议 use the same address for both the LDP router
-ID and the discovery transport address. For MPLS LDP to function in VyOS,
-both parameters 必须 explicitly configured.</p>
+<p>建议对 LDP 路由器 ID 和发现传输地址使用同一地址。要在 VyOS 中启用 MPLS LDP，这两个参数必须显式配置。</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>LDP has no mechanism to refresh an existing session. To apply a
-configuration change or a change to negotiated session capabilities, the
-LDP neighbor 必须 reset on the local router.</p>
+<p>LDP 没有刷新现有会话的机制。要应用配置更改或协商会话能力的变更，必须在本地路由器上重置 LDP 邻居。</p>
 </div>
 </section>
 <section id="configuration">
@@ -228,12 +192,12 @@ LDP neighbor 必须 reset on the local router.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable MPLS on the specified interface.</strong></p>
+set protocols mpls interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-interface-interface" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上启用 MPLS。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls interface eth1
 </pre></div>
 </div>
@@ -241,334 +205,302 @@ set protocols mpls interface <interface>
 <div class="cfgcmd-heading">
 
 set protocols mpls parameters no-propagate-ttl
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-parameters-no-propagate-ttl" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable propagation of the IP TTL into the MPLS header at label
-imposition.</strong></p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-parameters-no-propagate-ttl" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>禁用在标签压入时将 IP TTL 值传播到 MPLS 报头中。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls parameters no-propagate-ttl
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls parameters maximum-ttl <1-255>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-parameters-maximum-ttl-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the maximum TTL value for MPLS packets.</strong></p>
-<p>This value is used when the TTL is not propagated from the IP header.
-The default is 255.</p>
+set protocols mpls parameters maximum-ttl &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-parameters-maximum-ttl-1-255" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 MPLS 数据包的最大 TTL 值。</strong></p>
+<p>当 TTL 不从 IP 报头传播时，使用此值。默认值为 255。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls parameters maximum-ttl 15
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable LDP on the specified interface.</strong></p>
+set protocols mpls ldp interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-interface-interface" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上启用 LDP。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp interface eth1
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp interface <interface> disable-establish-hello
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-interface-interface-disable-establish-hello" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable the triggered Hello that the router sends on the specified
-interface in response to receiving an LDP Hello from a peer.</strong></p>
+set protocols mpls ldp interface &lt;interface&gt; disable-establish-hello
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-interface-interface-disable-establish-hello" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>禁用路由器在指定接口上收到对端 LDP Hello 消息后触发发送的 Hello 消息。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp interface eth0 disable-establish-hello
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp router-id <address>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-router-id-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IP address used as the LDP router ID for the local device.</strong></p>
+set protocols mpls ldp router-id &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-router-id-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置本地设备使用的 LDP 路由器 ID 的 IP 地址。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp router-id 192.0.2.1
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp discovery transport-ipv4-address <address>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-transport-ipv4-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IPv4 transport address for IPv4 LDP connections.</strong></p>
+set protocols mpls ldp discovery transport-ipv4-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-transport-ipv4-address-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 IPv4 LDP 连接的 IPv4 传输地址。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery transport-ipv4-address 192.0.2.1
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp discovery transport-ipv6-address <address>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-transport-ipv6-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IPv6 transport address for IPv6 LDP connections.</strong></p>
+set protocols mpls ldp discovery transport-ipv6-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-transport-ipv6-address-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 IPv6 LDP 连接的 IPv6 传输地址。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery transport-ipv6-address 2001:db8::1
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp neighbor <ipv4-address> password <password>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-neighbor-ipv4-address-password-password" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure authentication for the LDP session with the specified
-neighbor.</strong></p>
+set protocols mpls ldp neighbor &lt;ipv4-address&gt; password &lt;password&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-neighbor-ipv4-address-password-password" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为与指定邻居的 LDP 会话配置认证。</strong></p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>For the session to establish successfully, both peers 必须 configured
-with the same password.</p>
+<p>为使会话成功建立，双方对等体必须配置相同的密码。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp neighbor 192.0.2.2 password mysharedsecret
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp neighbor <ipv4-address> session-holdtime <15-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-neighbor-ipv4-address-session-holdtime-15-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the LDP session hold time, in seconds, advertised to the
-specified neighbor.</strong></p>
-<p>The neighbor 必须 reset for this change to take effect.</p>
+set protocols mpls ldp neighbor &lt;ipv4-address&gt; session-holdtime &lt;15-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-neighbor-ipv4-address-session-holdtime-15-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置向指定邻居通告的 LDP 会话保持时间（单位：秒）。</strong></p>
+<p>邻居必须重置才能使此更改生效。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp neighbor 192.0.2.2 session-holdtime 180
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp neighbor <ipv4-address> ttl-security <disable | 1-254>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-neighbor-ipv4-address-ttl-security-disable-1-254" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure TTL security (<abbr title="Generalized TTL Security Mechanism">GTSM</abbr>)
-for the LDP session with the specified neighbor.</strong></p>
-<p>Use <code class="docutils literal notranslate">disable</code> to turn off TTL security, or set a hop-count value (1-254) to
-restrict which incoming packets are accepted based on their TTL.</p>
+set protocols mpls ldp neighbor &lt;ipv4-address&gt; ttl-security &lt;disable | 1-254&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-neighbor-ipv4-address-ttl-security-disable-1-254" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为与指定邻居的 LDP 会话配置 TTL 安全性（<abbr title="通用 TTL 安全机制">GTSM</abbr>）。</strong></p>
+<p>使用 <code class="docutils literal notranslate">disable</code> 关闭 TTL 安全性，或设置跳数（1-254）以根据传入数据包的 TTL 值限制允许接收的数据包。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp neighbor 192.0.2.2 ttl-security 5
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp discovery hello-ipv4-interval <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv4-interval-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interval, in seconds, at which the router sends IPv4 LDP
-Hello messages.</strong></p>
+set protocols mpls ldp discovery hello-ipv4-interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv4-interval-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器发送 IPv4 LDP Hello 消息的时间间隔（单位：秒）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery hello-ipv4-interval 5
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp discovery hello-ipv4-holdtime <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv4-holdtime-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the hold time, in seconds, advertised in IPv4 LDP Hello
-messages.</strong></p>
+set protocols mpls ldp discovery hello-ipv4-holdtime &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv4-holdtime-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置在 IPv4 LDP Hello 消息中通告的保持时间（单位：秒）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery hello-ipv4-holdtime 15
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp discovery hello-ipv6-interval <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv6-interval-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interval, in seconds, at which the router sends IPv6 LDP
-Hello messages.</strong></p>
+set protocols mpls ldp discovery hello-ipv6-interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv6-interval-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器发送 IPv6 LDP Hello 消息的时间间隔（单位：秒）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery hello-ipv6-interval 5
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp discovery hello-ipv6-holdtime <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv6-holdtime-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the hold time, in seconds, advertised in IPv6 LDP Hello
-messages.</strong></p>
+set protocols mpls ldp discovery hello-ipv6-holdtime &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-hello-ipv6-holdtime-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置在 IPv6 LDP Hello 消息中通告的保持时间（单位：秒）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery hello-ipv6-holdtime 15
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp discovery session-ipv4-holdtime <15-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-session-ipv4-holdtime-15-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the LDP session hold time, in seconds, advertised in IPv4 LDP
-Initialization messages.</strong></p>
+set protocols mpls ldp discovery session-ipv4-holdtime &lt;15-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-session-ipv4-holdtime-15-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置在 IPv4 LDP 初始化消息中通告的 LDP 会话保持时间（单位：秒）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery session-ipv4-holdtime 180
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp discovery session-ipv6-holdtime <15-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-session-ipv6-holdtime-15-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the LDP session hold time, in seconds, advertised in IPv6 LDP
-Initialization messages.</strong></p>
+set protocols mpls ldp discovery session-ipv6-holdtime &lt;15-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-discovery-session-ipv6-holdtime-15-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置在 IPv6 LDP 初始化消息中通告的 LDP 会话保持时间（单位：秒）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp discovery session-ipv6-holdtime 180
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp import ipv4 import-filter filter-access-list <1-2699>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv4-import-filter-filter-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>过滤器 the IPv4 label bindings (associations between an IPv4 prefix and
-an MPLS label) from LDP peers using the specified access list.</strong></p>
-<p>Only label bindings whose prefix is permitted by the access list are
-accepted.</p>
+set protocols mpls ldp import ipv4 import-filter filter-access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv4-import-filter-filter-access-list-1-2699" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>使用指定访问控制列表过滤来自 LDP 对等体的 IPv4 标签绑定（IPv4 前缀与 MPLS 标签之间的关联）。</strong></p>
+<p>仅接受访问控制列表允许的前缀对应的标签绑定。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp import ipv4 import-filter filter-access-list 10
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp import ipv4 import-filter neighbor-access-list <1-2699>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv4-import-filter-neighbor-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>过滤器 the IPv4 label bindings (associations between an IPv4 prefix
-and an MPLS label) from LDP peers using the specified access list.</strong></p>
-<p>Only label bindings received from a peer whose IPv4 address is permitted
-by the access list are accepted.</p>
+set protocols mpls ldp import ipv4 import-filter neighbor-access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv4-import-filter-neighbor-access-list-1-2699" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>使用指定访问控制列表过滤来自 LDP 对等体的 IPv4 标签绑定（IPv4 前缀与 MPLS 标签之间的关联）。</strong></p>
+<p>仅接受来自访问控制列表允许其 IPv4 地址的对等体的标签绑定。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp import ipv4 import-filter neighbor-access-list 20
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp import ipv6 import-filter filter-access-list6 <1-2699>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv6-import-filter-filter-access-list6-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>过滤器 the IPv6 label bindings (associations between an IPv6 prefix and
-an MPLS label) from LDP peers using the specified access list.</strong></p>
-<p>Only label bindings whose prefix is permitted by the access list are
-accepted.</p>
+set protocols mpls ldp import ipv6 import-filter filter-access-list6 &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv6-import-filter-filter-access-list6-1-2699" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>使用指定访问控制列表过滤来自 LDP 对等体的 IPv6 标签绑定（IPv6 前缀与 MPLS 标签之间的关联）。</strong></p>
+<p>仅接受访问控制列表允许的前缀对应的标签绑定。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp import ipv6 import-filter filter-access-list6 10
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp import ipv6 import-filter neighbor-access-list6 <1-2699>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv6-import-filter-neighbor-access-list6-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>过滤器 the IPv6 label bindings (associations between an IPv6 prefix
-and an MPLS label) from LDP peers using the specified access list.</strong></p>
-<p>Only label bindings received from a peer whose IPv6 address is permitted
-by the access list are accepted.</p>
+set protocols mpls ldp import ipv6 import-filter neighbor-access-list6 &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-import-ipv6-import-filter-neighbor-access-list6-1-2699" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>使用指定访问控制列表过滤来自 LDP 对等体的 IPv6 标签绑定（IPv6 前缀与 MPLS 标签之间的关联）。</strong></p>
+<p>仅接受来自访问控制列表允许其 IPv6 地址的对等体的标签绑定。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp import ipv6 import-filter neighbor-access-list6 20
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp export ipv4 export-filter filter-access-list <1-2699>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv4-export-filter-filter-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>过滤器 the IPv4 label bindings (associations between an IPv4 prefix and
-an MPLS label) advertised to LDP peers using the specified access list.</strong></p>
-<p>Only label bindings whose prefix is permitted by the access list are
-advertised.</p>
+set protocols mpls ldp export ipv4 export-filter filter-access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv4-export-filter-filter-access-list-1-2699" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>使用指定访问控制列表过滤向 LDP 对等体通告的 IPv4 标签绑定（IPv4 前缀与 MPLS 标签之间的关联）。</strong></p>
+<p>仅通告访问控制列表允许的前缀对应的标签绑定。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv4 export-filter filter-access-list 10
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp export ipv4 export-filter neighbor-access-list <1-2699>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv4-export-filter-neighbor-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>过滤器 the IPv4 label bindings (associations between an IPv4 prefix
-and an MPLS label) advertised to LDP peers using the specified access
-list.</strong></p>
-<p>标签 bindings are advertised only to peers whose IPv4 address is
-permitted by the access list.</p>
+set protocols mpls ldp export ipv4 export-filter neighbor-access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv4-export-filter-neighbor-access-list-1-2699" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>使用指定访问控制列表过滤向 LDP 对等体通告的 IPv4 标签绑定（IPv4 前缀与 MPLS 标签之间的关联）。</strong></p>
+<p>仅向访问控制列表允许其 IPv4 地址的对等体通告标签绑定。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv4 export-filter neighbor-access-list 20
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp export ipv6 export-filter filter-access-list6 <1-2699>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv6-export-filter-filter-access-list6-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>过滤器 the IPv6 label bindings (associations between an IPv6 prefix and
-an MPLS label) advertised to LDP peers using the specified access list.</strong></p>
-<p>Only label bindings whose prefix is permitted by the access list are
-advertised.</p>
+set protocols mpls ldp export ipv6 export-filter filter-access-list6 &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv6-export-filter-filter-access-list6-1-2699" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>使用指定访问控制列表过滤向 LDP 对等体通告的 IPv6 标签绑定（IPv6 前缀与 MPLS 标签之间的关联）。</strong></p>
+<p>仅通告访问控制列表允许的前缀对应的标签绑定。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv6 export-filter filter-access-list6 10
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp export ipv6 export-filter neighbor-access-list6 <1-2699>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv6-export-filter-neighbor-access-list6-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>过滤器 the IPv6 label bindings (associations between an IPv6 prefix
-and an MPLS label) advertised to LDP peers using the specified access
-list.</strong></p>
-<p>标签 bindings are advertised only to peers whose IPv6 address is
-permitted by the access list.</p>
+set protocols mpls ldp export ipv6 export-filter neighbor-access-list6 &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv6-export-filter-neighbor-access-list6-1-2699" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>使用指定访问控制列表过滤向 LDP 对等体通告的 IPv6 标签绑定（IPv6 前缀与 MPLS 标签之间的关联）。</strong></p>
+<p>仅向访问控制列表允许其 IPv6 地址的对等体通告标签绑定。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv6 export-filter neighbor-access-list6 20
 </pre></div>
 </div>
@@ -576,14 +508,12 @@ permitted by the access list.</p>
 <div class="cfgcmd-heading">
 
 set protocols mpls ldp export ipv4 explicit-null
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv4-explicit-null" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to advertise the Explicit Null label for its
-directly connected IPv4 prefixes to LDP neighbors.</strong></p>
-<p>This instructs the penultimate-hop router to forward labeled packets
-unchanged without removing the MPLS label.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv4-explicit-null" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器向 LDP 邻居通告其直连 IPv4 前缀的显式空标签。</strong></p>
+<p>这指示倒数第二跳路由器在不移除 MPLS 标签的情况下直接转发带标签的数据包。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv4 explicit-null
 </pre></div>
 </div>
@@ -591,46 +521,38 @@ unchanged without removing the MPLS label.</p>
 <div class="cfgcmd-heading">
 
 set protocols mpls ldp export ipv6 explicit-null
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv6-explicit-null" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to advertise the Explicit Null label for its
-directly connected IPv6 prefixes to LDP neighbors.</strong></p>
-<p>This instructs the penultimate-hop router to forward labeled packets
-unchanged without removing the MPLS label.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-export-ipv6-explicit-null" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器向 LDP 邻居通告其直连 IPv6 前缀的显式空标签。</strong></p>
+<p>这指示倒数第二跳路由器在不移除 MPLS 标签的情况下直接转发带标签的数据包。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp export ipv6 explicit-null
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp allocation ipv4 access-list <1-2699>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-allocation-ipv4-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Restrict MPLS label allocation to IPv4 prefixes permitted by the
-specified access list.</strong></p>
-<p>By default, LDP allocates a label for every IPv4 prefix in the routing
-table. A common best practice is to limit allocation to loopback
-addresses.</p>
+set protocols mpls ldp allocation ipv4 access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-allocation-ipv4-access-list-1-2699" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>将 MPLS 标签分配限制为指定访问控制列表允许的 IPv4 前缀。</strong></p>
+<p>默认情况下，LDP 为路由表中的每个 IPv4 前缀分配一个标签。常见的最佳实践是将分配限制为环回地址。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp allocation ipv4 access-list 10
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp allocation ipv6 access-list6 <1-2699>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-allocation-ipv6-access-list6-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Restrict MPLS label allocation to IPv6 prefixes permitted by the
-specified access list.</strong></p>
-<p>By default, LDP allocates a label for every IPv6 prefix in the routing
-table. A common best practice is to limit allocation to loopback
-addresses.</p>
+set protocols mpls ldp allocation ipv6 access-list6 &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-allocation-ipv6-access-list6-1-2699" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>将 MPLS 标签分配限制为指定访问控制列表允许的 IPv6 前缀。</strong></p>
+<p>默认情况下，LDP 为路由表中的每个 IPv6 前缀分配一个标签。常见的最佳实践是将分配限制为环回地址。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp allocation ipv6 access-list6 10
 </pre></div>
 </div>
@@ -638,14 +560,11 @@ addresses.</p>
 <div class="cfgcmd-heading">
 
 set protocols mpls ldp parameters cisco-interop-tlv
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-parameters-cisco-interop-tlv" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to negotiate the Dual-Stack capability
-<abbr title="Type-Length-Value">TLV</abbr>
-(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7552">RFC 7552</a>) using a Cisco
-non-compliant format for dual-stack LDP sessions.</strong></p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-parameters-cisco-interop-tlv" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器使用 Cisco 非合规格式，在双栈 LDP 会话中协商双栈能力 <abbr title="类型-长度-值">TLV</abbr>（<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7552">RFC 7552</a>）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp parameters cisco-interop-tlv
 </pre></div>
 </div>
@@ -653,15 +572,12 @@ non-compliant format for dual-stack LDP sessions.</strong></p>
 <div class="cfgcmd-heading">
 
 set protocols mpls ldp parameters ordered-control
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-parameters-ordered-control" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable LDP Ordered 标签 Distribution Control mode
-(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5036">RFC 5036</a>) for the
-router.</strong></p>
-<p>By default, the router operates in Independent 标签 Distribution Control
-mode.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-parameters-ordered-control" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为路由器启用 LDP 有序标签分发控制模式（<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5036">RFC 5036</a>）。</strong></p>
+<p>默认情况下，路由器运行于独立标签分发控制模式。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp parameters ordered-control
 </pre></div>
 </div>
@@ -669,13 +585,11 @@ mode.</p>
 <div class="cfgcmd-heading">
 
 set protocols mpls ldp parameters transport-prefer-ipv4
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-parameters-transport-prefer-ipv4" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to prefer an IPv4 TCP transport connection for LDP
-peering when LDP is configured for dual-stack operation (both IPv4 and
-IPv6 address families are enabled).</strong></p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-parameters-transport-prefer-ipv4" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器在 LDP 配置为双栈操作（同时启用 IPv4 和 IPv6 地址族）时，优先选择 IPv4 TCP 传输连接进行 LDP 对等连接。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp parameters transport-prefer-ipv4
 </pre></div>
 </div>
@@ -683,14 +597,12 @@ IPv6 address families are enabled).</strong></p>
 <div class="cfgcmd-heading">
 
 set protocols mpls ldp targeted-neighbor ipv4 enable
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable the router to accept targeted IPv4 LDP sessions.</strong></p>
-<p>This allows the router to establish LDP adjacencies with non-directly
-connected peers by responding to inbound targeted (unicast) LDP Hello
-messages.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-enable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>启用路由器接受定向 IPv4 LDP 会话。</strong></p>
+<p>这允许路由器通过响应入站定向（单播）LDP Hello 消息，与非直连对等体建立 LDP 邻接关系。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv4 enable
 </pre></div>
 </div>
@@ -698,244 +610,230 @@ messages.</p>
 <div class="cfgcmd-heading">
 
 set protocols mpls ldp targeted-neighbor ipv6 enable
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable the router to accept targeted IPv6 LDP sessions.</strong></p>
-<p>This allows the router to establish LDP adjacencies with non-directly
-connected peers by responding to inbound targeted (unicast) LDP Hello
-messages.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-enable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>启用路由器接受定向 IPv6 LDP 会话。</strong></p>
+<p>这允许路由器通过响应入站定向（单播）LDP Hello 消息，与非直连对等体建立 LDP 邻接关系。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv6 enable
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp targeted-neighbor ipv4 address <address>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to initiate a targeted IPv4 LDP session with the
-specified remote <abbr title="Label Switching Router">LSR</abbr>.</strong></p>
+set protocols mpls ldp targeted-neighbor ipv4 address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-address-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器发起与指定远程 <abbr title="标签交换路由器">LSR</abbr> 的定向 IPv4 LDP 会话。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv4 address 192.0.2.5
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp targeted-neighbor ipv6 address <address>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to initiate a targeted IPv6 LDP session with the
-specified remote LSR.</strong></p>
+set protocols mpls ldp targeted-neighbor ipv6 address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-address-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器发起与指定远程 LSR 的定向 IPv6 LDP 会话。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv6 address 2001:db8::5
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp targeted-neighbor ipv4 hello-holdtime <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-hello-holdtime-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the hold time, in seconds, advertised in targeted IPv4 LDP
-Hello messages.</strong></p>
+set protocols mpls ldp targeted-neighbor ipv4 hello-holdtime &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-hello-holdtime-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置在定向 IPv4 LDP Hello 消息中通告的保持时间（单位：秒）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv4 hello-holdtime 45
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp targeted-neighbor ipv4 hello-interval <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-hello-interval-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interval, in seconds, between targeted IPv4 LDP Hello
-messages sent to remote LSRs.</strong></p>
+set protocols mpls ldp targeted-neighbor ipv4 hello-interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv4-hello-interval-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置向远程 LSR 发送定向 IPv4 LDP Hello 消息的时间间隔（单位：秒）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv4 hello-interval 15
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp targeted-neighbor ipv6 hello-holdtime <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-hello-holdtime-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the hold time, in seconds, advertised in targeted IPv6 LDP
-Hello messages.</strong></p>
+set protocols mpls ldp targeted-neighbor ipv6 hello-holdtime &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-hello-holdtime-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置在定向 IPv6 LDP Hello 消息中通告的保持时间（单位：秒）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv6 hello-holdtime 45
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols mpls ldp targeted-neighbor ipv6 hello-interval <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-hello-interval-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interval, in seconds, between targeted IPv6 LDP Hello
-messages sent to remote LSRs.</strong></p>
+set protocols mpls ldp targeted-neighbor ipv6 hello-interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-mpls-ldp-targeted-neighbor-ipv6-hello-interval-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置向远程 LSR 发送定向 IPv6 LDP Hello 消息的时间间隔（单位：秒）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols mpls ldp targeted-neighbor ipv6 hello-interval 15
 </pre></div>
 </div>
 </section>
 <section id="operation">
-<h2>Operation</h2>
-<p>When LDP is established, you can view label assignments directly within the
-<code class="docutils literal notranslate">show ip route</code> or <code class="docutils literal notranslate">show ipv6 route</code> outputs. To inspect LDP operational
-states, use the following commands.</p>
+<h2>操作</h2>
+<p>当 LDP 建立后，您可在 <code class="docutils literal notranslate">show ip route</code> 或 <code class="docutils literal notranslate">show ipv6 route</code> 输出中直接查看标签分配情况。要检查 LDP 运行状态，请使用以下命令。</p>
 <section id="show">
 <h3>显示</h3>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show mpls ldp binding
-<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 the <abbr title="Label Information Base">LIB</abbr>.</p>
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示 <abbr title="标签信息库">LIB</abbr>。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show mpls ldp binding <prefix>
-<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-prefix" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 LDP label bindings for the specified prefix.</p>
-<p>The <code class="docutils literal notranslate"><prefix></code> parameter accepts an IPv4 prefix (<code class="docutils literal notranslate">x.x.x.x/x</code>) or IPv6
-prefix (<code class="docutils literal notranslate">h:h:h:h:h:h:h:h/h</code>).</p>
+show mpls ldp binding &lt;prefix&gt;
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-prefix" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示指定前缀的 LDP 标签绑定。</p>
+<p><code class="docutils literal notranslate">&lt;prefix&gt;</code> 参数接受 IPv4 前缀（<code class="docutils literal notranslate">x.x.x.x/x</code>）或 IPv6 前缀（<code class="docutils literal notranslate">h:h:h:h:h:h:h:h/h</code>）。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show mpls ldp binding detail
-<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-detail" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 detailed LDP 标签 信息rmation Base (LIB) entries.</p>
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-detail" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示详细的 LDP 标签信息库（LIB）条目。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show mpls ldp binding neighbor <address>
-<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-neighbor-address" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 LDP label bindings learned from the specified peer.</p>
-<p>The <code class="docutils literal notranslate"><address></code> parameter accepts an IPv4 or IPv6 address.</p>
+show mpls ldp binding neighbor &lt;address&gt;
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-neighbor-address" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示从指定对等体学习到的 LDP 标签绑定。</p>
+<p><code class="docutils literal notranslate">&lt;address&gt;</code> 参数接受 IPv4 或 IPv6 地址。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show mpls ldp binding local-label <label>
-<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-local-label-label" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 LDP label bindings associated with the specified locally
-assigned label value.</p>
+show mpls ldp binding local-label &lt;label&gt;
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-local-label-label" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示与指定本地分配标签值关联的 LDP 标签绑定。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show mpls ldp binding remote-label <label>
-<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-remote-label-label" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 LDP label bindings associated with the specified remotely
-assigned label value.</p>
+show mpls ldp binding remote-label &lt;label&gt;
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-binding-remote-label-label" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示与指定远程分配标签值关联的 LDP 标签绑定。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show mpls ldp discovery
-<a class="cmdlink" href="#opcmd-show-mpls-ldp-discovery" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 LDP discovery Hello information.</p>
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-discovery" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示 LDP 发现 Hello 信息。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show mpls ldp discovery detail
-<a class="cmdlink" href="#opcmd-show-mpls-ldp-discovery-detail" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 detailed LDP discovery Hello information.</p>
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-discovery-detail" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示详细的 LDP 发现 Hello 信息。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show mpls ldp interface
-<a class="cmdlink" href="#opcmd-show-mpls-ldp-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 LDP interface information.</p>
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-interface" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示 LDP 接口信息。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show mpls ldp neighbor
-<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 basic LDP neighbor information.</p>
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示基本的 LDP 邻居信息。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show mpls ldp neighbor detail
-<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-detail" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 detailed LDP neighbor information.</p>
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-detail" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示详细的 LDP 邻居信息。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show mpls ldp neighbor capabilities
-<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-capabilities" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 the LDP capabilities negotiated with each peer during session
-initialization.</p>
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-capabilities" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示会话初始化期间与各对等体协商的 LDP 能力。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show mpls ldp neighbor <address>
-<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-address" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 LDP neighbor information for the specified peer.</p>
-<p>The <code class="docutils literal notranslate"><address></code> parameter accepts an IPv4 or IPv6 address.</p>
+show mpls ldp neighbor &lt;address&gt;
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-address" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示指定对等体的 LDP 邻居信息。</p>
+<p><code class="docutils literal notranslate">&lt;address&gt;</code> 参数接受 IPv4 或 IPv6 地址。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show mpls ldp neighbor <address> detail
-<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-address-detail" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 detailed LDP session information for the specified peer.</p>
+show mpls ldp neighbor &lt;address&gt; detail
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-address-detail" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示指定对等体的详细 LDP 会话信息。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show mpls ldp neighbor <address> capabilities
-<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-address-capabilities" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 the LDP capabilities negotiated with the specified peer.</p>
+show mpls ldp neighbor &lt;address&gt; capabilities
+<a class="cmdlink" href="#opcmd-show-mpls-ldp-neighbor-address-capabilities" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示与指定对等体协商的 LDP 能力。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show mpls table
-<a class="cmdlink" href="#opcmd-show-mpls-table" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 the MPLS table.</p>
+<a class="cmdlink" href="#opcmd-show-mpls-table" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示 MPLS 表。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show mpls pseudowire
-<a class="cmdlink" href="#opcmd-show-mpls-pseudowire" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 MPLS pseudowire interfaces.</p>
+<a class="cmdlink" href="#opcmd-show-mpls-pseudowire" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示 MPLS 伪线接口。</p>
 </div>
 </div>
 </section>
@@ -944,42 +842,34 @@ show mpls pseudowire
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-reset mpls ldp neighbor <address>
-<a class="cmdlink" href="#opcmd-reset-mpls-ldp-neighbor-address" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>重置 the established LDP session with the specified neighbor.</p>
-<p>The <code class="docutils literal notranslate"><address></code> parameter accepts an IPv4 or IPv6 address.</p>
+reset mpls ldp neighbor &lt;address&gt;
+<a class="cmdlink" href="#opcmd-reset-mpls-ldp-neighbor-address" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>重置与指定邻居建立的 LDP 会话。</p>
+<p><code class="docutils literal notranslate">&lt;address&gt;</code> 参数接受 IPv4 或 IPv6 地址。</p>
 </div>
 </div>
 </section>
 </section>
 <section id="example">
 <h2>示例</h2>
-<p>The following configuration sets up a basic MPLS LDP-enabled router.
-OSPF is used as the underlying IGP to provide reachability between LDP
-peers’ loopback addresses, which are then used as the LDP transport
-addresses and router IDs. MPLS forwarding and LDP are enabled on the
-interface connecting to the network.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospf area 0 network '192.0.2.1/32'
-set protocols ospf area 0 network '192.0.2.4/31'
-set protocols ospf parameters router-id '192.0.2.1'
-set protocols mpls interface 'eth1'
-set protocols mpls ldp discovery transport-ipv4-address '192.0.2.1'
-set protocols mpls ldp interface 'eth1'
-set protocols mpls ldp interface 'lo'
-set protocols mpls ldp router-id '192.0.2.1'
-set interfaces ethernet eth1 address '192.0.2.5/31'
-set interfaces loopback lo address '192.0.2.1/32'
+<p>以下配置建立了一个基本的启用 MPLS LDP 的路由器。OSPF 作为底层 IGP 提供 LDP 对等体环回地址之间的可达性，这些环回地址随后被用作 LDP 传输地址和路由器 ID。MPLS 转发和 LDP 在连接网络的接口上启用。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospf area 0 network &#39;192.0.2.1/32&#39;
+set protocols ospf area 0 network &#39;192.0.2.4/31&#39;
+set protocols ospf parameters router-id &#39;192.0.2.1&#39;
+set protocols mpls interface &#39;eth1&#39;
+set protocols mpls ldp discovery transport-ipv4-address &#39;192.0.2.1&#39;
+set protocols mpls ldp interface &#39;eth1&#39;
+set protocols mpls ldp interface &#39;lo&#39;
+set protocols mpls ldp router-id &#39;192.0.2.1&#39;
+set interfaces ethernet eth1 address &#39;192.0.2.5/31&#39;
+set interfaces loopback lo address &#39;192.0.2.1/32&#39;
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This example assumes a transit (P-router) role: MPLS forwarding is
-enabled on the transit interface only, not on the loopback. If the
-router needs to terminate MPLS-encapsulated traffic on its loopback
-(PE-router role), also configure <code class="docutils literal notranslate">set protocols mpls interface 'lo'</code>.</p>
+<p>本示例假设中转（P 路由器）角色：仅在中转接口上启用 MPLS 转发，不在环回接口上启用。如果路由器需要在其环回接口上终止 MPLS 封装的流量（PE 路由器角色），还需配置 <code class="docutils literal notranslate">set protocols mpls interface 'lo'</code>。</p>
 </div>
-<p>应用 the same configuration on the LDP peer (using its own loopback and
-transit interface addresses) to establish a basic LDP session.</p>
+<p>在 LDP 对等体上应用相同配置（使用其自身的环回和中转接口地址），以建立基本的 LDP 会话。</p>
 </section>
 </section>
 

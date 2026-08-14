@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,58 +152,52 @@
 <div itemprop="articleBody">
              
   <section id="task-scheduler">
-<h1>Task Scheduler</h1>
-<p>The task scheduler 允许您 execute tasks on a given schedule. It makes
-use of UNIX <a class="reference external" href="https://en.wikipedia.org/wiki/Cron">cron</a>.</p>
+<h1>任务调度器</h1>
+<p>任务调度器允许您按指定时间表执行任务。它基于 UNIX <a class="reference external" href="https://en.wikipedia.org/wiki/Cron">cron</a> 实现。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>All scripts executed this way are executed as root user - this may
-be dangerous. Together with <a class="reference internal" href="../../automation/command-scripting.html#command-scripting">Command scripting</a> this 可以 used for
-automating (re-)configuration.</p>
+<p>所有通过此方式执行的脚本均以 root 用户身份运行——这可能存在危险。结合<a class="reference internal" href="../../automation/command-scripting.html#command-scripting">命令脚本编写</a>功能，可用于自动化（重新）配置。</p>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system task-scheduler task <task> interval <interval>
+set system task-scheduler task &lt;task&gt; interval &lt;interval&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-task-scheduler-task-task-interval-interval" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specify the time interval when <code class="docutils literal notranslate"><task></code> 应该 executed. The interval
-is specified as number with one of the following suffixes:</p>
+<p>指定 <code class="docutils literal notranslate">&lt;task&gt;</code> 的执行时间间隔。该间隔以数字形式指定，并需附加以下后缀之一：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">none</code> - Execution interval in minutes</p></li>
-<li><p><code class="docutils literal notranslate">m</code> - Execution interval in minutes</p></li>
-<li><p><code class="docutils literal notranslate">h</code> - Execution interval in hours</p></li>
-<li><p><code class="docutils literal notranslate">d</code> - Execution interval in days</p></li>
+<li><p><code class="docutils literal notranslate">none</code> —— 以分钟为单位的执行间隔</p></li>
+<li><p><code class="docutils literal notranslate">m</code> —— 以分钟为单位的执行间隔</p></li>
+<li><p><code class="docutils literal notranslate">h</code> —— 以小时为单位的执行间隔</p></li>
+<li><p><code class="docutils literal notranslate">d</code> —— 以天为单位的执行间隔</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>If suffix is omitted, minutes are implied.</p>
+<p>若省略后缀，则默认单位为分钟。</p>
 </div>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system task-scheduler task <task> crontab-spec <spec>
+set system task-scheduler task &lt;task&gt; crontab-spec &lt;spec&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-task-scheduler-task-task-crontab-spec-spec" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 execution time in common cron time format. A cron <code class="docutils literal notranslate"><spec></code> of
-<code class="docutils literal notranslate">30 */6 * * *</code> would execute the <code class="docutils literal notranslate"><task></code> at minute 30 past every 6th hour.</p>
+<p>以标准 cron 时间格式设置执行时间。<code class="docutils literal notranslate">&lt;spec&gt;</code> 值为 <code class="docutils literal notranslate">30 */6 * * *</code> 表示在每 6 小时的第 30 分钟执行 <code class="docutils literal notranslate">&lt;task&gt;</code>。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system task-scheduler task <task> executable path <path>
+set system task-scheduler task &lt;task&gt; executable path &lt;path&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-task-scheduler-task-task-executable-path-path" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specify absolute <code class="docutils literal notranslate"><path></code> to script which 将 run when <code class="docutils literal notranslate"><task></code> is
-executed.</p>
+<p>指定当执行 <code class="docutils literal notranslate">&lt;task&gt;</code> 时所运行脚本的绝对路径 <code class="docutils literal notranslate">&lt;path&gt;</code>。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system task-scheduler task <task> executable arguments <args>
+set system task-scheduler task &lt;task&gt; executable arguments &lt;args&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-task-scheduler-task-task-executable-arguments-args" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Arguments which 将 passed to the executable.</p>
+<p>传递给可执行文件的参数。</p>
 </div>
 </div>
 </section>

@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,29 +152,26 @@
 <div itemprop="articleBody">
              
   <section id="firewall-groups">
-<h1>防火墙 groups</h1>
+<h1>防火墙组</h1>
 <section id="configuration">
 <h2>配置</h2>
-<p>防火墙 groups represent collections of IP addresses, networks, ports,
-MAC addresses, domains, or interfaces. You can reference a group in firewall,
-NAT, and policy route rules as either a source or destination matcher, and/or
-as inbound or outbound in the case of interface groups.</p>
+<p>防火墙组表示一组 IP 地址、网络、端口、MAC 地址、域名或接口的集合。您可以在防火墙规则、NAT 规则和策略路由规则中将某个组用作源或目的匹配项；对于接口组，还可将其用作入站或出站方向。</p>
 <section id="address-groups">
-<h3>地址 组s</h3>
-<p>An <strong>address group</strong> contains a single IP address or IP address range.</p>
+<h3>地址组</h3>
+<p><strong>地址组</strong>包含单个 IP 地址或 IP 地址范围。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group address-group <name> address [address | address range]
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-address-group-name-address-address-address-range" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+set firewall group address-group &lt;name&gt; address [address | address range]
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-address-group-name-address-address-address-range" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group ipv6-address-group <name> address <address>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-ipv6-address-group-name-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Define an IPv4 or IPv6 address group.</p>
+set firewall group ipv6-address-group &lt;name&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-ipv6-address-group-name-address-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>定义 IPv4 或 IPv6 地址组。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group address-group ADR-INSIDE-v4 address 192.168.0.1
 set firewall group address-group ADR-INSIDE-v4 address 10.0.0.1-10.0.0.8
 set firewall group ipv6-address-group ADR-INSIDE-v6 address 2001:db8::1
@@ -185,46 +182,37 @@ set firewall group ipv6-address-group ADR-INSIDE-v6 address 2001:db8::1
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group address-group <name> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-address-group-name-description-text" title="Permalink to this Command"></a></div></div>
+set firewall group address-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-address-group-name-description-text" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group ipv6-address-group <name> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-ipv6-address-group-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Provide an IPv4 or IPv6 address group description.</p>
+set firewall group ipv6-address-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-ipv6-address-group-name-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为 IPv4 或 IPv6 地址组提供描述信息。</p>
 </div>
 </div>
 </section>
 <section id="remote-groups">
-<h3>Remote 组s</h3>
-<p>A <strong>remote-group</strong> uses a URL that hosts a newline-delimited list of IPv4
-and/or IPv6 addresses, CIDRs, and ranges. VyOS pulls this list periodically
-according to the frequency you define in the firewall <strong>resolver-interval</strong>
-and loads matching entries into the group for use in rules. The list is cached
-in persistent storage, so rules continue to function if updates fail.</p>
+<h3>远程组</h3>
+<p><strong>远程组</strong>使用一个托管换行符分隔的 IPv4 和/或 IPv6 地址、CIDR 前缀及地址范围列表的 URL。VyOS 将根据您在防火墙 <strong>resolver-interval</strong> 中定义的频率定期拉取该列表，并将匹配的条目加载到组中以供规则使用。该列表被缓存在持久化存储中，因此即使更新失败，规则仍可继续正常工作。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group remote-group <name> url <http(s) url>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-remote-group-name-url-http-s-url" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specify a remote list of IPv4 and/or IPv6 addresses, ranges, and CIDRs
-to fetch.</p>
+set firewall group remote-group &lt;name&gt; url &lt;http(s) url&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-remote-group-name-url-http-s-url" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定要获取的远程 IPv4 和/或 IPv6 地址、地址范围及 CIDR 列表。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group remote-group <name> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-remote-group-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 a description for a remote group.</p>
+set firewall group remote-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-remote-group-name-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为远程组设置描述信息。</p>
 </div>
 </div>
-<p>The remote list format is flexible. VyOS attempts to parse the first word of
-each line as an entry and skips lines it cannot match. Lines that begin with
-an alphanumeric character but do not match valid IPv4 or IPv6 addresses,
-ranges, or CIDRs are logged to the system log. The following examples show
-acceptable formats that VyOS parses correctly:</p>
+<p>远程列表格式灵活。VyOS 尝试将每行的第一个单词解析为一个条目，并跳过无法匹配的行。以字母数字字符开头但不符合有效 IPv4 或 IPv6 地址、地址范围或 CIDR 格式的行将记录到系统日志中。以下示例展示了 VyOS 可正确解析的可接受格式：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>127.0.0.1
 127.0.0.0/24
 127.0.0.1-127.0.0.254
@@ -235,21 +223,19 @@ acceptable formats that VyOS parses correctly:</p>
 </div>
 </section>
 <section id="network-groups">
-<h3>网络 组s</h3>
-<p><strong>网络 groups</strong> accept IP networks in CIDR notation. You can add specific
-IP addresses as a 32-bit prefix. If you need to add a mix of addresses and
-networks, use a network group.</p>
+<h3>网络组</h3>
+<p><strong>网络组</strong>接受 CIDR 表示法的 IP 网络。您可以将特定 IP 地址作为 32 位前缀添加。如果您需要同时添加地址和网络，请使用网络组。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group network-group <name> network <CIDR>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-network-group-name-network-cidr" title="Permalink to this Command"></a></div></div>
+set firewall group network-group &lt;name&gt; network &lt;CIDR&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-network-group-name-network-cidr" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group ipv6-network-group <name> network <CIDR>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-ipv6-network-group-name-network-cidr" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Define an IPv4 or IPv6 network group.</p>
+set firewall group ipv6-network-group &lt;name&gt; network &lt;CIDR&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-ipv6-network-group-name-network-cidr" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>定义 IPv4 或 IPv6 网络组。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group network-group NET-INSIDE-v4 network 192.168.0.0/24
 set firewall group network-group NET-INSIDE-v4 network 192.168.1.0/24
 set firewall group ipv6-network-group NET-INSIDE-v6 network 2001:db8::/64
@@ -260,28 +246,28 @@ set firewall group ipv6-network-group NET-INSIDE-v6 network 2001:db8::/64
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group network-group <name> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-network-group-name-description-text" title="Permalink to this Command"></a></div></div>
+set firewall group network-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-network-group-name-description-text" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group ipv6-network-group <name> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-ipv6-network-group-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Provide an IPv4 or IPv6 network group description.</p>
+set firewall group ipv6-network-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-ipv6-network-group-name-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为 IPv4 或 IPv6 网络组提供描述信息。</p>
 </div>
 </div>
 </section>
 <section id="interface-groups">
-<h3>接口 组s</h3>
-<p>An <strong>interface group</strong> represents a collection of interfaces.</p>
+<h3>接口组</h3>
+<p><strong>接口组</strong>表示一组接口的集合。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group interface-group <name> interface <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-interface-group-name-interface-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Define an interface group.
-Wildcard <code class="docutils literal notranslate">*</code> is supported. For example: <code class="docutils literal notranslate">eth3*</code>.
-Prepend the character <code class="docutils literal notranslate">!</code> to invert the criteria. For example: <code class="docutils literal notranslate">!eth2</code>.</p>
+set firewall group interface-group &lt;name&gt; interface &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-interface-group-name-interface-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>定义接口组。
+支持通配符 <code class="docutils literal notranslate">*</code>。例如：<code class="docutils literal notranslate">eth3*</code>。
+可在前面添加字符 <code class="docutils literal notranslate">!</code> 来反转匹配条件。例如：<code class="docutils literal notranslate">!eth2</code>。</p>
 </div>
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group interface-group LAN interface bond1001
@@ -291,25 +277,21 @@ set firewall group interface-group LAN interface eth3*
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group interface-group <name> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-interface-group-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Provide an interface group description.</p>
+set firewall group interface-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-interface-group-name-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为接口组提供描述信息。</p>
 </div>
 </div>
 </section>
 <section id="port-groups">
-<h3>端口 组s</h3>
-<p>A <strong>port group</strong> represents only port numbers, not the protocol. You can
-reference port groups for either TCP or UDP. 创建 TCP and UDP groups
-separately to avoid accidentally filtering unnecessary ports. Specify port
-ranges by using <code class="docutils literal notranslate">-</code>.</p>
+<h3>端口组</h3>
+<p><strong>端口组</strong>仅表示端口号，不包含协议。您可将端口组用于 TCP 或 UDP 协议。为避免意外过滤不必要的端口，请分别创建 TCP 和 UDP 组。使用 <code class="docutils literal notranslate">-</code> 指定端口范围。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group port-group <name> port [portname | portnumber | startport-endport]
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-port-group-name-port-portname-portnumber-startport-endport" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Define a port group. A port name 可以 any name defined in
-/etc/services. For example, <code class="docutils literal notranslate">http</code>.</p>
+set firewall group port-group &lt;name&gt; port [portname | portnumber | startport-endport]
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-port-group-name-port-portname-portnumber-startport-endport" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>定义端口组。端口名称可以是 /etc/services 中定义的任意名称。例如：<code class="docutils literal notranslate">http</code>。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group port-group PORT-TCP-SERVER1 port http
 set firewall group port-group PORT-TCP-SERVER1 port 443
 set firewall group port-group PORT-TCP-SERVER1 port 5000-5010
@@ -320,21 +302,21 @@ set firewall group port-group PORT-TCP-SERVER1 port 5000-5010
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group port-group <name> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-port-group-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Provide a port group description.</p>
+set firewall group port-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-port-group-name-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为端口组提供描述信息。</p>
 </div>
 </div>
 </section>
 <section id="mac-groups">
-<h3>MAC 组s</h3>
-<p>A <strong>mac group</strong> represents a collection of mac addresses.</p>
+<h3>MAC 组</h3>
+<p><strong>MAC 组</strong>表示一组 MAC 地址的集合。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group mac-group <name> mac-address <mac-address>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-mac-group-name-mac-address-mac-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Define a mac group.</p>
+set firewall group mac-group &lt;name&gt; mac-address &lt;mac-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-mac-group-name-mac-address-mac-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>定义 MAC 组。</p>
 </div>
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group mac-group MAC-G01 mac-address 88:a4:c2:15:b6:4f
@@ -344,21 +326,21 @@ set firewall group mac-group MAC-G01 mac-address 4c:d5:77:c0:19:81
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group mac-group <name> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-mac-group-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Provide a MAC group description.</p>
+set firewall group mac-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-mac-group-name-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为 MAC 组提供描述信息。</p>
 </div>
 </div>
 </section>
 <section id="domain-groups">
-<h3>域 组s</h3>
-<p>A <strong>domain group</strong> represents a collection of domains.</p>
+<h3>域名组</h3>
+<p><strong>域名组</strong>表示一组域名的集合。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group domain-group <name> address <domain>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-domain-group-name-address-domain" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Define a domain group.</p>
+set firewall group domain-group &lt;name&gt; address &lt;domain&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-domain-group-name-address-domain" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>定义域名组。</p>
 </div>
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group domain-group DOM address example.com
@@ -367,134 +349,124 @@ set firewall group domain-group <name> address <domain>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group domain-group <name> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-domain-group-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Provide a domain group description.</p>
+set firewall group domain-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-domain-group-name-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为域名组提供描述信息。</p>
 </div>
 </div>
 </section>
 <section id="dynamic-groups">
-<h3>Dynamic 组s</h3>
-<p>防火墙 dynamic groups differ from other groups because you can use them as
-source/destination in firewall rules, and members are not defined statically
-in VyOS configuration. Instead, firewall rules dynamically add members to
-these groups.</p>
+<h3>动态组</h3>
+<p>防火墙动态组与其他组不同，因为您可在防火墙规则中将其用作源/目的匹配项，且其成员并非在 VyOS 配置中静态定义。相反，防火墙规则会动态地向这些组中添加成员。</p>
 <section id="defining-dynamic-address-groups">
-<h4>Defining Dynamic 地址 组s</h4>
-<p>Dynamic address groups support both IPv4 and IPv6 families. Use these
-commands to define dynamic IPv4 and IPv6 address groups:</p>
+<h4>定义动态地址组</h4>
+<p>动态地址组支持 IPv4 和 IPv6 两种协议族。请使用以下命令定义动态 IPv4 和 IPv6 地址组：</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group dynamic-group address-group <name>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-dynamic-group-address-group-name" title="Permalink to this Command"></a></div></div>
+set firewall group dynamic-group address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-dynamic-group-address-group-name" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group dynamic-group ipv6-address-group <name>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-dynamic-group-ipv6-address-group-name" title="Permalink to this Command"></a></div></div>
-<p>添加 description to firewall groups:</p>
+set firewall group dynamic-group ipv6-address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-dynamic-group-ipv6-address-group-name" title="此命令的永久链接"></a></div></div>
+<p>为防火墙组添加描述信息：</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group dynamic-group address-group <name> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-dynamic-group-address-group-name-description-text" title="Permalink to this Command"></a></div></div>
+set firewall group dynamic-group address-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-dynamic-group-address-group-name-description-text" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall group dynamic-group ipv6-address-group <name> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-group-dynamic-group-ipv6-address-group-name-description-text" title="Permalink to this Command"></a></div></div>
+set firewall group dynamic-group ipv6-address-group &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-group-dynamic-group-ipv6-address-group-name-description-text" title="此命令的永久链接"></a></div></div>
 </section>
 <section id="adding-elements-to-dynamic-firewall-groups">
-<h4>添加ing elements to Dynamic 防火墙 组s</h4>
-<p>After you define dynamic firewall groups, use them in firewall rules to
-dynamically add elements to them.</p>
-<p>Commands used for this task are:</p>
+<h4>向动态防火墙组中添加元素</h4>
+<p>定义动态防火墙组后，您可在防火墙规则中使用它们，从而动态地向其中添加元素。</p>
+<p>执行此任务所使用的命令如下：</p>
 <ul class="simple">
-<li><p>添加 destination IP address of the connection to a dynamic address group:</p></li>
+<li><p>将连接的目的 IP 地址添加到动态地址组：</p></li>
 </ul>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall ipv4 [forward | input | output] filter rule <1-999999> add-address-to-group destination-address address-group <name>
-<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-forward-input-output-filter-rule-1-999999-add-address-to-group-destination-address-address-group-name" title="Permalink to this Command"></a></div></div>
+set firewall ipv4 [forward | input | output] filter rule &lt;1-999999&gt; add-address-to-group destination-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-forward-input-output-filter-rule-1-999999-add-address-to-group-destination-address-address-group-name" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall ipv4 name <name> rule <1-999999> add-address-to-group destination-address address-group <name>
-<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-name-name-rule-1-999999-add-address-to-group-destination-address-address-group-name" title="Permalink to this Command"></a></div></div>
+set firewall ipv4 name &lt;name&gt; rule &lt;1-999999&gt; add-address-to-group destination-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-name-name-rule-1-999999-add-address-to-group-destination-address-address-group-name" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall ipv6 [forward | input | output] filter rule <1-999999> add-address-to-group destination-address address-group <name>
-<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-input-output-filter-rule-1-999999-add-address-to-group-destination-address-address-group-name" title="Permalink to this Command"></a></div></div>
+set firewall ipv6 [forward | input | output] filter rule &lt;1-999999&gt; add-address-to-group destination-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-input-output-filter-rule-1-999999-add-address-to-group-destination-address-address-group-name" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall ipv6 name <name> rule <1-999999> add-address-to-group destination-address address-group <name>
-<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-add-address-to-group-destination-address-address-group-name" title="Permalink to this Command"></a></div></div>
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; add-address-to-group destination-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-add-address-to-group-destination-address-address-group-name" title="此命令的永久链接"></a></div></div>
 <ul class="simple">
-<li><p>添加 source IP address of the connection to a dynamic address group:</p></li>
+<li><p>将连接的源 IP 地址添加到动态地址组：</p></li>
 </ul>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall ipv4 [forward | input | output] filter rule <1-999999> add-address-to-group source-address address-group <name>
-<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-forward-input-output-filter-rule-1-999999-add-address-to-group-source-address-address-group-name" title="Permalink to this Command"></a></div></div>
+set firewall ipv4 [forward | input | output] filter rule &lt;1-999999&gt; add-address-to-group source-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-forward-input-output-filter-rule-1-999999-add-address-to-group-source-address-address-group-name" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall ipv4 name <name> rule <1-999999> add-address-to-group source-address address-group <name>
-<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-name-name-rule-1-999999-add-address-to-group-source-address-address-group-name" title="Permalink to this Command"></a></div></div>
+set firewall ipv4 name &lt;name&gt; rule &lt;1-999999&gt; add-address-to-group source-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-name-name-rule-1-999999-add-address-to-group-source-address-address-group-name" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall ipv6 [forward | input | output] filter rule <1-999999> add-address-to-group source-address address-group <name>
-<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-input-output-filter-rule-1-999999-add-address-to-group-source-address-address-group-name" title="Permalink to this Command"></a></div></div>
+set firewall ipv6 [forward | input | output] filter rule &lt;1-999999&gt; add-address-to-group source-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-input-output-filter-rule-1-999999-add-address-to-group-source-address-address-group-name" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall ipv6 name <name> rule <1-999999> add-address-to-group source-address address-group <name>
-<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-add-address-to-group-source-address-address-group-name" title="Permalink to this Command"></a></div></div>
-<p>You can define specific timeouts per rule. When a rule matches, the source or
-destination address is added to the group, and the element remains in the group
-until the timeout expires. If you do not define a timeout, the element remains
-in the group until the next reboot or until you commit firewall configuration
-changes.</p>
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; add-address-to-group source-address address-group &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-add-address-to-group-source-address-address-group-name" title="此命令的永久链接"></a></div></div>
+<p>您可以为每条规则定义特定超时时间。当某条规则匹配时，源或目的地址将被添加到组中，且该元素将在组中保留至超时到期。如果您未定义超时时间，则该元素将保留在组中直至下次重启或直至您提交防火墙配置更改。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall ipv4 [forward | input | output] filter rule <1-999999> add-address-to-group [destination-address | source-address] timeout <timeout>
-<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-forward-input-output-filter-rule-1-999999-add-address-to-group-destination-address-source-address-timeout-timeout" title="Permalink to this Command"></a></div></div>
+set firewall ipv4 [forward | input | output] filter rule &lt;1-999999&gt; add-address-to-group [destination-address | source-address] timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-forward-input-output-filter-rule-1-999999-add-address-to-group-destination-address-source-address-timeout-timeout" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall ipv4 name <name> rule <1-999999> add-address-to-group [destination-address | source-address] timeout <timeout>
-<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-name-name-rule-1-999999-add-address-to-group-destination-address-source-address-timeout-timeout" title="Permalink to this Command"></a></div></div>
+set firewall ipv4 name &lt;name&gt; rule &lt;1-999999&gt; add-address-to-group [destination-address | source-address] timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-name-name-rule-1-999999-add-address-to-group-destination-address-source-address-timeout-timeout" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall ipv6 [forward | input | output] filter rule <1-999999> add-address-to-group [destination-address | source-address] timeout <timeout>
-<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-input-output-filter-rule-1-999999-add-address-to-group-destination-address-source-address-timeout-timeout" title="Permalink to this Command"></a></div></div>
+set firewall ipv6 [forward | input | output] filter rule &lt;1-999999&gt; add-address-to-group [destination-address | source-address] timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-forward-input-output-filter-rule-1-999999-add-address-to-group-destination-address-source-address-timeout-timeout" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall ipv6 name <name> rule <1-999999> add-address-to-group [destination-address | source-address] timeout <timeout>
-<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-add-address-to-group-destination-address-source-address-timeout-timeout" title="Permalink to this Command"></a></div></div>
-<p>Timeout 可以 defined using seconds, minutes, hours or days:</p>
+set firewall ipv6 name &lt;name&gt; rule &lt;1-999999&gt; add-address-to-group [destination-address | source-address] timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv6-name-name-rule-1-999999-add-address-to-group-destination-address-source-address-timeout-timeout" title="此命令的永久链接"></a></div></div>
+<p>超时时间可使用秒（s）、分钟（m）、小时（h）或天（d）来定义：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv6 name FOO rule 10 add-address-to-group source-address timeout
 Possible completions:
-<number>s            Timeout value in seconds
-<number>m            Timeout value in minutes
-<number>h            Timeout value in hours
-<number>d            Timeout value in days
+&lt;number&gt;s            以秒为单位的超时值
+&lt;number&gt;m            以分钟为单位的超时值
+&lt;number&gt;h            以小时为单位的超时值
+&lt;number&gt;d            以天为单位的超时值
 </pre></div>
 </div>
 </section>
 <section id="using-dynamic-firewall-groups">
-<h4>Using Dynamic 防火墙 组s</h4>
-<p>Like other firewall groups, you can use dynamic firewall groups in firewall
-rules as matching options. For example:</p>
+<h4>使用动态防火墙组</h4>
+<p>与其他防火墙组一样，您可在防火墙规则中将动态防火墙组用作匹配选项。例如：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv4 input filter rule 10 source group dynamic-address-group FOO
 set firewall ipv4 input filter rule 10 destination group dynamic-address-group BAR
 </pre></div>
@@ -505,10 +477,8 @@ set firewall ipv4 input filter rule 10 destination group dynamic-address-group B
 <section id="examples">
 <h2>示例</h2>
 <section id="general-example">
-<h3>General example</h3>
-<p>After you create firewall groups, you can reference them in firewall, NAT,
-NAT66, and/or policy-route rules. The following example creates multiple
-groups:</p>
+<h3>通用示例</h3>
+<p>创建防火墙组后，您可在防火墙规则、NAT 规则、NAT66 规则和/或策略路由规则中引用它们。以下示例创建多个组：</p>
 <blockquote>
 <div><div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group address-group SERVERS address 198.51.100.101
 set firewall group address-group SERVERS address 198.51.100.102
@@ -523,7 +493,7 @@ set firewall group port-group PORT-SERVERS port 5000-5010
 </pre></div>
 </div>
 </div></blockquote>
-<p>And next, some configuration example where groups are used:</p>
+<p>接下来是使用这些组的一些配置示例：</p>
 <blockquote>
 <div><div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv4 output filter rule 10 action accept
 set firewall ipv4 output filter rule 10 outbound-interface group !LAN
@@ -544,49 +514,47 @@ set policy route PBR rule 201 set table 15
 </div></blockquote>
 </section>
 <section id="port-knocking-example">
-<h3>端口 knocking example</h3>
-<p>You can use dynamic firewall groups with port knocking to secure access to
-the router or any other device. The following example shows a 4-step port
-knocking configuration:</p>
+<h3>端口敲击示例</h3>
+<p>您可以将动态防火墙组与端口敲击结合使用，以保护路由器或任何其他设备的访问安全。以下示例展示了一个四步端口敲击配置：</p>
 <blockquote>
-<div><div class="highlight-none notranslate"><div class="highlight"><pre>set firewall global-options state-policy established action 'accept'
-set firewall global-options state-policy invalid action 'drop'
-set firewall global-options state-policy related action 'accept'
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>set firewall global-options state-policy established action &#39;accept&#39;
+set firewall global-options state-policy invalid action &#39;drop&#39;
+set firewall global-options state-policy related action &#39;accept&#39;
 set firewall group dynamic-group address-group ALLOWED
 set firewall group dynamic-group address-group PN_01
 set firewall group dynamic-group address-group PN_02
-set firewall ipv4 input filter default-action 'drop'
-set firewall ipv4 input filter rule 5 action 'accept'
-set firewall ipv4 input filter rule 5 protocol 'icmp'
-set firewall ipv4 input filter rule 10 action 'drop'
-set firewall ipv4 input filter rule 10 add-address-to-group source-address address-group 'PN_01'
-set firewall ipv4 input filter rule 10 add-address-to-group source-address timeout '2m'
-set firewall ipv4 input filter rule 10 description 'Port_nock 01'
-set firewall ipv4 input filter rule 10 destination port '9990'
-set firewall ipv4 input filter rule 10 protocol 'tcp'
-set firewall ipv4 input filter rule 20 action 'drop'
-set firewall ipv4 input filter rule 20 add-address-to-group source-address address-group 'PN_02'
-set firewall ipv4 input filter rule 20 add-address-to-group source-address timeout '3m'
-set firewall ipv4 input filter rule 20 description 'Port_nock 02'
-set firewall ipv4 input filter rule 20 destination port '9991'
-set firewall ipv4 input filter rule 20 protocol 'tcp'
-set firewall ipv4 input filter rule 20 source group dynamic-address-group 'PN_01'
-set firewall ipv4 input filter rule 30 action 'drop'
-set firewall ipv4 input filter rule 30 add-address-to-group source-address address-group 'ALLOWED'
-set firewall ipv4 input filter rule 30 add-address-to-group source-address timeout '2h'
-set firewall ipv4 input filter rule 30 description 'Port_nock 03'
-set firewall ipv4 input filter rule 30 destination port '9992'
-set firewall ipv4 input filter rule 30 protocol 'tcp'
-set firewall ipv4 input filter rule 30 source group dynamic-address-group 'PN_02'
-set firewall ipv4 input filter rule 99 action 'accept'
-set firewall ipv4 input filter rule 99 description 'Port_nock 04 - Allow ssh'
-set firewall ipv4 input filter rule 99 destination port '22'
-set firewall ipv4 input filter rule 99 protocol 'tcp'
-set firewall ipv4 input filter rule 99 source group dynamic-address-group 'ALLOWED'
+set firewall ipv4 input filter default-action &#39;drop&#39;
+set firewall ipv4 input filter rule 5 action &#39;accept&#39;
+set firewall ipv4 input filter rule 5 protocol &#39;icmp&#39;
+set firewall ipv4 input filter rule 10 action &#39;drop&#39;
+set firewall ipv4 input filter rule 10 add-address-to-group source-address address-group &#39;PN_01&#39;
+set firewall ipv4 input filter rule 10 add-address-to-group source-address timeout &#39;2m&#39;
+set firewall ipv4 input filter rule 10 description &#39;Port_nock 01&#39;
+set firewall ipv4 input filter rule 10 destination port &#39;9990&#39;
+set firewall ipv4 input filter rule 10 protocol &#39;tcp&#39;
+set firewall ipv4 input filter rule 20 action &#39;drop&#39;
+set firewall ipv4 input filter rule 20 add-address-to-group source-address address-group &#39;PN_02&#39;
+set firewall ipv4 input filter rule 20 add-address-to-group source-address timeout &#39;3m&#39;
+set firewall ipv4 input filter rule 20 description &#39;Port_nock 02&#39;
+set firewall ipv4 input filter rule 20 destination port &#39;9991&#39;
+set firewall ipv4 input filter rule 20 protocol &#39;tcp&#39;
+set firewall ipv4 input filter rule 20 source group dynamic-address-group &#39;PN_01&#39;
+set firewall ipv4 input filter rule 30 action &#39;drop&#39;
+set firewall ipv4 input filter rule 30 add-address-to-group source-address address-group &#39;ALLOWED&#39;
+set firewall ipv4 input filter rule 30 add-address-to-group source-address timeout &#39;2h&#39;
+set firewall ipv4 input filter rule 30 description &#39;Port_nock 03&#39;
+set firewall ipv4 input filter rule 30 destination port &#39;9992&#39;
+set firewall ipv4 input filter rule 30 protocol &#39;tcp&#39;
+set firewall ipv4 input filter rule 30 source group dynamic-address-group &#39;PN_02&#39;
+set firewall ipv4 input filter rule 99 action &#39;accept&#39;
+set firewall ipv4 input filter rule 99 description &#39;Port_nock 04 - Allow ssh&#39;
+set firewall ipv4 input filter rule 99 destination port &#39;22&#39;
+set firewall ipv4 input filter rule 99 protocol &#39;tcp&#39;
+set firewall ipv4 input filter rule 99 source group dynamic-address-group &#39;ALLOWED&#39;
 </pre></div>
 </div>
 </div></blockquote>
-<p>Before testing, we can check the members of firewall groups:</p>
+<p>测试前，我们可以检查防火墙组的成员：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# run show firewall group
 Firewall Groups
 
@@ -599,10 +567,9 @@ PN_02    address_group(dynamic)  ipv4-input-filter-20  N/D            N/D       
 vyos@vyos#
 </pre></div>
 </div>
-<p>With this configuration, to gain SSH access to the router, the user must:</p>
+<p>通过此配置，用户若要获得对路由器的 SSH 访问权限，必须执行以下步骤：</p>
 <ol class="arabic">
-<li><p>创建 a new TCP connection to destination port 9990. A new entry is added
-to dynamic firewall group <code class="docutils literal notranslate">PN_01</code>.</p>
+<li><p>建立一个新的 TCP 连接，目标端口为 9990。新条目将被添加到动态防火墙组 <code class="docutils literal notranslate">PN_01</code> 中。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# run show firewall group
 Firewall Groups
 
@@ -616,8 +583,7 @@ vyos@vyos#
 </pre></div>
 </div>
 </li>
-<li><p>创建 a new TCP connection to destination port 9991. A new entry is added
-to dynamic firewall group <code class="docutils literal notranslate">PN_02</code>.</p>
+<li><p>建立一个新的 TCP 连接，目标端口为 9991。新条目将被添加到动态防火墙组 <code class="docutils literal notranslate">PN_02</code> 中。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# run show firewall group
 Firewall Groups
 
@@ -631,8 +597,7 @@ vyos@vyos#
 </pre></div>
 </div>
 </li>
-<li><p>创建 a new TCP connection to destination port 9992. A new entry is added
-to dynamic firewall group <code class="docutils literal notranslate">ALLOWED</code>.</p>
+<li><p>建立一个新的 TCP 连接，目标端口为 9992。新条目将被添加到动态防火墙组 <code class="docutils literal notranslate">ALLOWED</code> 中。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# run show firewall group
 Firewall Groups
 
@@ -646,29 +611,26 @@ vyos@vyos#
 </pre></div>
 </div>
 </li>
-<li><p>Now you can connect via SSH to the router (assuming SSH is
-configured).</p></li>
+<li><p>现在您可以连接到路由器进行 SSH 访问（假设已配置 SSH）。</p></li>
 </ol>
 </section>
 </section>
 <section id="operation-mode">
-<h2>Operation-mode</h2>
+<h2>操作模式</h2>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show firewall group
-<a class="cmdlink" href="#opcmd-show-firewall-group" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#opcmd-show-firewall-group" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show firewall group <name>
-<a class="cmdlink" href="#opcmd-show-firewall-group-name" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 an overview of defined groups, including the firewall group name,
-type, references (where the group is used), members, timeout, and
-expiration (the last two only apply to dynamic firewall groups).</p>
+show firewall group &lt;name&gt;
+<a class="cmdlink" href="#opcmd-show-firewall-group-name" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示已定义组的概览，包括防火墙组名称、类型、引用（组被使用的位置）、成员、超时时间以及过期时间（后两项仅适用于动态防火墙组）。</p>
 </div>
 </div>
-<p>Here is an example of such command:</p>
+<p>此类命令的示例如下：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show firewall group
 Firewall Groups
 

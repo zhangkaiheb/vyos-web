@@ -271,7 +271,53 @@ class ConfigService:
     def get_menu(self, user):
         username = user.get('username', '')
         menu = self._filter_menu_by_acl(username, self.menu)
+        menu = self._filter_menu_by_visibility(menu)
         return {'success': True, 'menu': menu}
+
+    def _get_visible_features(self):
+        """Get set of visible feature keys from database."""
+        try:
+            conn = get_db_connection()
+            rows = conn.execute('SELECT feature_key FROM feature_visibility WHERE is_visible = 1').fetchall()
+            conn.close()
+            return {row['feature_key'] for row in rows}
+        except Exception:
+            return set()
+
+    def _filter_menu_by_visibility(self, menu):
+        """Filter menu items based on feature visibility settings."""
+        visible = self._get_visible_features()
+
+        result = []
+        for l1 in menu:
+            l2_items = []
+            for l2 in l1.get('children', []):
+                l3_items = []
+                for l3 in l2.get('children', []):
+                    if self._should_hide_item(l3, visible):
+                        continue
+                    l3_items.append(l3)
+                if l3_items:
+                    l2_copy = dict(l2)
+                    l2_copy['children'] = l3_items
+                    l2_items.append(l2_copy)
+                elif not self._should_hide_item(l2, visible):
+                    l2_items.append(l2)
+            if l2_items:
+                l1_copy = dict(l1)
+                l1_copy['children'] = l2_items
+                result.append(l1_copy)
+            elif not self._should_hide_item(l1, visible):
+                result.append(l1)
+        return result
+
+    def _should_hide_item(self, item, visible_features):
+        """Check if a menu item should be hidden based on feature visibility.
+        Uses the featureKey field from menu.json."""
+        feature_key = item.get('featureKey')
+        if feature_key:
+            return feature_key not in visible_features
+        return False
 
     def _filter_menu_by_acl(self, username, menu):
         if not username:
@@ -879,6 +925,41 @@ class ConfigService:
         except Exception as e:
             return _structured_error('EXPORT_ERROR', str(e), traceback.format_exc())
 
+    def export_config_file(self, user, password='', include_sensitive=True):
+        """Export config as file bytes. Returns (content_bytes, filename, content_type)."""
+        try:
+            cfg = vyos.config.Config()
+            data = cfg.show_config([], default='', effective=True)
+            if not include_sensitive:
+                for pattern in SENSITIVE_PATHS:
+                    data = re.sub(rf'(^|\n)({re.escape(pattern)} [^\n]+(\n(?!set )[^\n]+)*)', '', data)
+            encrypted = _encrypt_config(data, password)
+            if password:
+                # Create password-protected zip using subprocess
+                import subprocess
+                import tempfile
+                import os
+                with tempfile.NamedTemporaryFile(mode='w', suffix='.boot', delete=False) as f:
+                    f.write(encrypted)
+                    tmp_path = f.name
+                zip_path = tmp_path + '.zip'
+                try:
+                    subprocess.run(
+                        ['zip', '-P', password, '-j', zip_path, tmp_path],
+                        check=True, capture_output=True
+                    )
+                    with open(zip_path, 'rb') as zf:
+                        content = zf.read()
+                    return content, 'vyos_config.zip', 'application/zip'
+                finally:
+                    os.unlink(tmp_path)
+                    if os.path.exists(zip_path):
+                        os.unlink(zip_path)
+            else:
+                return encrypted.encode('utf-8'), 'vyos_config.boot', 'text/plain'
+        except Exception as e:
+            raise RuntimeError(str(e))
+
     def session_changed(self):
         """Check if config session has changed, with caching to avoid expensive Config() creation."""
         now = time.time()
@@ -1215,7 +1296,7 @@ class ConfigService:
             mapping_file = os.path.join(base_dir, 'backend', 'data', 'help_mapping.json')
 
             # Supported languages
-            supported_langs = ['en', 'zh', 'ru', 'fr', 'de']
+            supported_langs = ['en', 'zh', 'ru', 'fr', 'de', 'ko']
             if lang not in supported_langs:
                 lang = 'en'
 
@@ -1310,3 +1391,57 @@ class ConfigService:
             }
         except Exception as e:
             return _structured_error('CONNTRACK_LOG_CONFIG_ERROR', str(e), traceback.format_exc())
+
+    # ---------- feature visibility ----------
+
+    def get_feature_visibility(self):
+        try:
+            conn = get_db_connection()
+            rows = conn.execute('SELECT * FROM feature_visibility ORDER BY category, feature_key').fetchall()
+            conn.close()
+            features = []
+            for row in rows:
+                features.append({
+                    'id': row['id'],
+                    'feature_key': row['feature_key'],
+                    'feature_label': row['feature_label'],
+                    'feature_label_en': row['feature_label_en'],
+                    'category': row['category'],
+                    'category_label': row['category_label'],
+                    'category_label_en': row['category_label_en'],
+                    'is_visible': bool(row['is_visible']),
+                })
+            return {'success': True, 'features': features}
+        except Exception as e:
+            return _structured_error('FEATURE_VISIBILITY_ERROR', str(e), traceback.format_exc())
+
+    def update_feature_visibility(self, user, feature_key, is_visible):
+        try:
+            conn = get_db_connection()
+            conn.execute('''
+                UPDATE feature_visibility SET is_visible = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE feature_key = ?
+            ''', (1 if is_visible else 0, feature_key))
+            conn.commit()
+            conn.close()
+            _log_action(user.get('username', 'unknown'), 'update_feature_visibility', feature_key,
+                        {'is_visible': is_visible})
+            return {'success': True, 'feature_key': feature_key, 'is_visible': is_visible}
+        except Exception as e:
+            return _structured_error('FEATURE_VISIBILITY_UPDATE_ERROR', str(e), traceback.format_exc())
+
+    def update_feature_visibility_batch(self, user, updates):
+        try:
+            conn = get_db_connection()
+            for item in updates:
+                conn.execute('''
+                    UPDATE feature_visibility SET is_visible = ?, updated_at = CURRENT_TIMESTAMP
+                    WHERE feature_key = ?
+                ''', (1 if item.get('is_visible', False) else 0, item['feature_key']))
+            conn.commit()
+            conn.close()
+            _log_action(user.get('username', 'unknown'), 'update_feature_visibility_batch', '',
+                        {'updates': updates})
+            return {'success': True, 'count': len(updates)}
+        except Exception as e:
+            return _structured_error('FEATURE_VISIBILITY_BATCH_ERROR', str(e), traceback.format_exc())

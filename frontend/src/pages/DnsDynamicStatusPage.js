@@ -81,12 +81,6 @@ export default defineComponent({
   components: { DataTable, ToolbarButton },
   template: `
     <div class="page-container">
-      <div class="toolbar toolbar-split">
-        <div class="toolbar-left"><h3>{{ t('dnsDynamicStatus.title') }}</h3></div>
-        <div class="toolbar-right">
-          <ToolbarButton icon="refresh" @click="load">{{ t('dnsDynamicStatus.buttons.refresh') }}</ToolbarButton>
-        </div>
-      </div>
       <div class="data-table-wrapper">
         <DataTable :columns="columns" :data="rows" row-key="hostname" :selectable="false" :external-toolbar="true" />
       </div>

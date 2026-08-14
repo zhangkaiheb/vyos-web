@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -88,155 +88,114 @@
 <div itemprop="articleBody">
              
   <section id="nat66-nptv6">
-<h1>NAT66(NPTv6)</h1>
+<h1>NAT66（NPTv6）</h1>
 <div class="admonition-todo admonition" id="id1">
-<p class="admonition-title">Todo</p>
-<p>Convert raw command blocks in this file to cfgcmd/opcmd
-directives for command coverage tracking.</p>
+<p class="admonition-title">待办事项</p>
+<p>将本文件中的原始命令块转换为 cfgcmd/opcmd 指令，以实现命令覆盖率跟踪。</p>
 </div>
-<p><abbr title="IPv6-to-IPv6 Network Prefix Translation">NPTv6</abbr> is an address
-translation technology based on IPv6 networks, used to convert an IPv6
-address prefix in an IPv6 message into another IPv6 address prefix.
-We call this address translation method NAT66. Devices that support the NAT66
-function are called NAT66 devices, which can provide NAT66 source
-and destination address translation functions.</p>
+<p><abbr title="IPv6-to-IPv6 Network Prefix Translation">NPTv6</abbr> 是一种基于 IPv6 网络的地址转换技术，用于将 IPv6 报文中的 IPv6 地址前缀转换为另一个 IPv6 地址前缀。
+我们将这种地址转换方法称为 NAT66。支持 NAT66 功能的设备称为 NAT66 设备，可提供 NAT66 的源地址和目的地址转换功能。</p>
 <section id="overview">
-<h2>Overview</h2>
+<h2>概述</h2>
 <section id="different-nat-types">
-<h3>Different NAT 类型</h3>
+<h3>不同类型的 NAT</h3>
 <section id="snat66">
 <h4>SNAT66</h4>
-<p><abbr title="Source IPv6-to-IPv6 Network Prefix Translation">SNPTv6</abbr> The conversion
-function is mainly used in the following scenarios:</p>
+<p><abbr title="Source IPv6-to-IPv6 Network Prefix Translation">SNPTv6</abbr> 转换功能主要应用于以下场景：</p>
 <ul class="simple">
-<li><p>A single internal network and external network. Use the NAT66 device to
-connect a single internal network and public network, and the hosts in
-the internal network use IPv6 address prefixes that only support
-routing within the local range. When a host in the internal network
-accesses the external network, the source IPv6 address prefix in
-the message 将 converted into a global unicast IPv6 address
-prefix by the NAT66 device.</p></li>
-<li><p>Redundancy and load sharing. There are multiple NAT66 devices at the edge
-of an IPv6 network to another IPv6 network. The path through the NAT66
-device to another IPv6 network forms an equivalent route, and traffic
-可以 load-shared on these NAT66 devices. In this case, you
-can configure the same source address translation rules on these
-NAT66 devices, so that any NAT66 device can handle IPv6 traffic between
-different sites.</p></li>
-<li><p>Multi-homed. In a multi-homed network environment, the NAT66 device
-connects to an internal network and simultaneously connects to
-different external networks. 地址 translation 可以 configured
-on each external network side interface of the NAT66 device to
-convert the same internal network address into different external
-network addresses, and realize the mapping of the same internal
-address to multiple external addresses.</p></li>
+<li><p>单一内部网络与外部网络。使用 NAT66 设备连接单一内部网络与公共网络，内部网络中的主机使用仅支持在本地范围内路由的 IPv6 地址前缀。当内部网络中的主机访问外部网络时，NAT66 设备会将报文中的源 IPv6 地址前缀转换为全局单播 IPv6 地址前缀。</p></li>
+<li><p>冗余与负载分担。在 IPv6 网络边缘存在多个 NAT66 设备，用于连接至另一 IPv6 网络。通过这些 NAT66 设备通往另一 IPv6 网络的路径构成等价路由，流量可在这些 NAT66 设备上进行负载分担。在此情况下，您可以在这些 NAT66 设备上配置相同的源地址转换规则，从而使任意 NAT66 设备均可处理不同站点之间的 IPv6 流量。</p></li>
+<li><p>多宿主。在多宿主网络环境中，NAT66 设备连接至内部网络，并同时连接至不同的外部网络。可在 NAT66 设备面向每个外部网络的接口上配置地址转换，将同一内部网络地址转换为不同的外部网络地址，从而实现同一内部地址到多个外部地址的映射。</p></li>
 </ul>
 </section>
 <section id="dnat66">
 <h4>DNAT66</h4>
-<p>The <abbr title="Destination IPv6-to-IPv6 Network Prefix Translation">DNPTv6</abbr>
-destination address translation function is used in scenarios where the
-server in the internal network provides services to the external network,
-such as providing Web services or FTP services to the external network.
-By configuring the mapping relationship between the internal server
-address and the external network address on the external network
-side interface of the NAT66 device, external network users can
-access the internal network server through the designated
-external network address.</p>
+<p><abbr title="Destination IPv6-to-IPv6 Network Prefix Translation">DNPTv6</abbr> 目的地址转换功能应用于内部网络服务器向外部网络提供服务的场景，例如向外部网络提供 Web 服务或 FTP 服务。
+通过在 NAT66 设备面向外部网络的接口上配置内部服务器地址与外部网络地址之间的映射关系，外部网络用户即可通过指定的外部网络地址访问内部网络服务器。</p>
 </section>
 </section>
 <section id="prefix-conversion">
-<h3>Prefix Conversion</h3>
+<h3>前缀转换</h3>
 <section id="source-prefix">
-<h4>源 Prefix</h4>
-<p>Every SNAT66 rule has a translation command defined. The prefix defined
-for the translation is the prefix used when the address information in
-a packet is replaced.、</p>
-<p>The <a class="reference internal" href="#source-nat66">SNAT66</a> rule replaces the source address of the packet
-and calculates the converted address using the prefix specified in the rule.</p>
-<p>示例:</p>
+<h4>源前缀</h4>
+<p>每条 SNAT66 规则均定义了一个转换命令。该转换所定义的前缀即为报文中地址信息被替换时所使用的前缀。</p>
+<p><a class="reference internal" href="#source-nat66">SNAT66</a> 规则会替换报文的源地址，并使用规则中指定的前缀计算转换后的地址。</p>
+<p>示例：</p>
 <ul class="simple">
-<li><p>Convert the address prefix of a single <code class="docutils literal notranslate">fc01::/64</code> network to <code class="docutils literal notranslate">fc00::/64</code></p></li>
-<li><p>Output from <code class="docutils literal notranslate">eth0</code> network interface</p></li>
+<li><p>将单个 <code class="docutils literal notranslate">fc01::/64</code> 网络的地址前缀转换为 <code class="docutils literal notranslate">fc00::/64</code></p></li>
+<li><p>从 <code class="docutils literal notranslate">eth0</code> 网络接口输出</p></li>
 </ul>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set nat66 source rule 1 outbound-interface name 'eth0'
-set nat66 source rule 1 source prefix 'fc01::/64'
-set nat66 source rule 1 translation address 'fc00::/64'
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat66 source rule 1 outbound-interface name &#39;eth0&#39;
+set nat66 source rule 1 source prefix &#39;fc01::/64&#39;
+set nat66 source rule 1 translation address &#39;fc00::/64&#39;
 </pre></div>
 </div>
 </section>
 <section id="destination-prefix">
-<h4>目的 Prefix</h4>
-<p>For the <a class="reference internal" href="#destination-nat66">DNAT66</a> rule, the destination address of
-the packet isreplaced by the address calculated from the specified
-address or prefix in the <code class="docutils literal notranslate">translation address</code> command</p>
-<p>示例:</p>
+<h4>目的前缀</h4>
+<p>对于 <a class="reference internal" href="#destination-nat66">DNAT66</a> 规则，报文的目的地址将被替换为根据 <code class="docutils literal notranslate">translation address</code> 命令中指定的地址或前缀计算得出的地址。</p>
+<p>示例：</p>
 <ul class="simple">
-<li><p>Convert the address prefix of a single <code class="docutils literal notranslate">fc00::/64</code> network
-to <code class="docutils literal notranslate">fc01::/64</code></p></li>
-<li><p>Input from <code class="docutils literal notranslate">eth0</code> network interface</p></li>
+<li><p>将单个 <code class="docutils literal notranslate">fc00::/64</code> 网络的地址前缀转换为 <code class="docutils literal notranslate">fc01::/64</code></p></li>
+<li><p>从 <code class="docutils literal notranslate">eth0</code> 网络接口输入</p></li>
 </ul>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set nat66 destination rule 1 inbound-interface name 'eth0'
-set nat66 destination rule 1 destination address 'fc00::/64'
-set nat66 destination rule 1 translation address 'fc01::/64'
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat66 destination rule 1 inbound-interface name &#39;eth0&#39;
+set nat66 destination rule 1 destination address &#39;fc00::/64&#39;
+set nat66 destination rule 1 translation address &#39;fc01::/64&#39;
 </pre></div>
 </div>
-<p>For the destination, groups can also be used instead of an address.</p>
-<p>示例:</p>
+<p>对于目的地址，也可使用地址组代替具体地址。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set firewall group ipv6-address-group ADR-INSIDE-v6 address fc00::1
 
-set nat66 destination rule 1 inbound-interface name 'eth0'
+set nat66 destination rule 1 inbound-interface name &#39;eth0&#39;
 set nat66 destination rule 1 destination group address-group ADR-INSIDE-v6
-set nat66 destination rule 1 translation address 'fc01::/64'
+set nat66 destination rule 1 translation address &#39;fc01::/64&#39;
 </pre></div>
 </div>
 </section>
 </section>
 </section>
 <section id="configuration-examples">
-<h2>配置 示例</h2>
-<p>Use the following topology to build a nat66 based isolated
-network between internal and external networks (dynamic prefix is
-not supported):</p>
+<h2>配置示例</h2>
+<p>使用以下拓扑结构，在内部网络与外部网络之间构建基于 nat66 的隔离网络（不支持动态前缀）：</p>
 <figure class="align-default">
-<img alt="VyOS NAT66 Simple Configure" src="https://docs.vyos.io/en/rolling/_images/vyos_1_4_nat66_simple.webp"></img>
+<img alt="VyOS NAT66 简单配置" src="https://docs.vyos.io/en/latest/_images/vyos_1_4_nat66_simple.webp" />
 </figure>
-<p>R1:</p>
+<p>R1：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 ipv6 address autoconf
-set interfaces ethernet eth1 address 'fc01::1/64'
-set nat66 destination rule 1 destination address 'fc00:470:f1cd:101::/64'
-set nat66 destination rule 1 inbound-interface name 'eth0'
-set nat66 destination rule 1 translation address 'fc01::/64'
-set nat66 source rule 1 outbound-interface name 'eth0'
-set nat66 source rule 1 source prefix 'fc01::/64'
-set nat66 source rule 1 translation address 'fc00:470:f1cd:101::/64'
+set interfaces ethernet eth1 address &#39;fc01::1/64&#39;
+set nat66 destination rule 1 destination address &#39;fc00:470:f1cd:101::/64&#39;
+set nat66 destination rule 1 inbound-interface name &#39;eth0&#39;
+set nat66 destination rule 1 translation address &#39;fc01::/64&#39;
+set nat66 source rule 1 outbound-interface name &#39;eth0&#39;
+set nat66 source rule 1 source prefix &#39;fc01::/64&#39;
+set nat66 source rule 1 translation address &#39;fc00:470:f1cd:101::/64&#39;
 </pre></div>
 </div>
-<p>R2:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bridge br1 address 'fc01::2/64'
+<p>R2：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces bridge br1 address &#39;fc01::2/64&#39;
 set interfaces bridge br1 member interface eth0
 set interfaces bridge br1 member interface eth1
 set protocols static route6 ::/0 next-hop fc01::1
 set service router-advert interface br1 prefix ::/0
 </pre></div>
 </div>
-<p>Use the following topology to translate internal user local addresses
-(<code class="docutils literal notranslate">fc::/7</code>) to DHCPv6-PD provided prefixes from an ISP connected to
-a VyOS HA pair.</p>
+<p>使用以下拓扑结构，将内部用户本地地址（<code class="docutils literal notranslate">fc::/7</code>）转换为连接至 VyOS 高可用性（HA）对的 ISP 所提供的 DHCPv6-PD 前缀。</p>
 <figure class="align-default">
-<img alt="VyOS NAT66 DHCPv6 using a dummy interface" src="https://docs.vyos.io/en/rolling/_images/vyos_1_5_nat66_dhcpv6_wdummy.webp"></img>
+<img alt="VyOS NAT66 使用虚拟接口的 DHCPv6" src="https://docs.vyos.io/en/latest/_images/vyos_1_5_nat66_dhcpv6_wdummy.webp" />
 </figure>
-<p>Configure both routers (a and b) for DHCPv6-PD via dummy interface:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum1 description 'DHCPv6-PD NPT dummy'
-set interfaces bonding bond0 vif 20 dhcpv6-options pd 0 interface dum1 address '0'
-set interfaces bonding bond0 vif 20 dhcpv6-options pd 1 interface dum1 address '0'
-set interfaces bonding bond0 vif 20 dhcpv6-options pd 2 interface dum1 address '0'
-set interfaces bonding bond0 vif 20 dhcpv6-options pd 3 interface dum1 address '0'
+<p>在两台路由器（a 和 b）上通过虚拟接口配置 DHCPv6-PD：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum1 description &#39;DHCPv6-PD NPT dummy&#39;
+set interfaces bonding bond0 vif 20 dhcpv6-options pd 0 interface dum1 address &#39;0&#39;
+set interfaces bonding bond0 vif 20 dhcpv6-options pd 1 interface dum1 address &#39;0&#39;
+set interfaces bonding bond0 vif 20 dhcpv6-options pd 2 interface dum1 address &#39;0&#39;
+set interfaces bonding bond0 vif 20 dhcpv6-options pd 3 interface dum1 address &#39;0&#39;
 set interfaces bonding bond0 vif 20 dhcpv6-options rapid-commit
 commit
 </pre></div>
 </div>
-<p>Get the DHCPv6-PD prefixes from both routers:</p>
+<p>从两台路由器获取 DHCPv6-PD 前缀：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>trae@cr01a-vyos# run show interfaces dummy dum1 br
 Codes: S - State, L - Link, u - Up, D - Down, A - Admin Down
 Interface        IP Address                        S/L  Description
@@ -256,47 +215,47 @@ dum1             2001:db8:123:b00d::/64           u/u  DHCPv6-PD NPT dummy
                  2001:db8:123:b00f::/64
 </pre></div>
 </div>
-<p>Configure the A-side router for NPTv6 using the prefixes above:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set nat66 source rule 10 description 'NPT to VLAN 10'
-set nat66 source rule 10 outbound-interface name 'bond0.20'
-set nat66 source rule 10 source prefix 'fd52:d62e:8011:a::/64'
-set nat66 source rule 10 translation address '2001:db8:123:b008::/64'
-set nat66 source rule 20 description 'NPT to VLAN 70'
-set nat66 source rule 20 outbound-interface name 'bond0.20'
-set nat66 source rule 20 source prefix 'fd52:d62e:8011:46::/64'
-set nat66 source rule 20 translation address '2001:db8:123:b009::/64'
-set nat66 source rule 30 description 'NPT to VLAN 200'
-set nat66 source rule 30 outbound-interface name 'bond0.20'
-set nat66 source rule 30 source prefix 'fd52:d62e:8011:c8::/64'
-set nat66 source rule 30 translation address '2001:db8:123:b00a::/64'
-set nat66 source rule 40 description 'NPT to VLAN 240'
-set nat66 source rule 40 outbound-interface name 'bond0.20'
-set nat66 source rule 40 source prefix 'fd52:d62e:8011:f0::/64'
-set nat66 source rule 40 translation address '2001:db8:123:b00b::/64'
+<p>使用上述前缀在 A 侧路由器上配置 NPTv6：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat66 source rule 10 description &#39;NPT to VLAN 10&#39;
+set nat66 source rule 10 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 10 source prefix &#39;fd52:d62e:8011:a::/64&#39;
+set nat66 source rule 10 translation address &#39;2001:db8:123:b008::/64&#39;
+set nat66 source rule 20 description &#39;NPT to VLAN 70&#39;
+set nat66 source rule 20 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 20 source prefix &#39;fd52:d62e:8011:46::/64&#39;
+set nat66 source rule 20 translation address &#39;2001:db8:123:b009::/64&#39;
+set nat66 source rule 30 description &#39;NPT to VLAN 200&#39;
+set nat66 source rule 30 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 30 source prefix &#39;fd52:d62e:8011:c8::/64&#39;
+set nat66 source rule 30 translation address &#39;2001:db8:123:b00a::/64&#39;
+set nat66 source rule 40 description &#39;NPT to VLAN 240&#39;
+set nat66 source rule 40 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 40 source prefix &#39;fd52:d62e:8011:f0::/64&#39;
+set nat66 source rule 40 translation address &#39;2001:db8:123:b00b::/64&#39;
 commit
 </pre></div>
 </div>
-<p>Configure the B-side router for NPTv6 using the prefixes above:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set nat66 source rule 10 description 'NPT to VLAN 10'
-set nat66 source rule 10 outbound-interface name 'bond0.20'
-set nat66 source rule 10 source prefix 'fd52:d62e:8011:a::/64'
-set nat66 source rule 10 translation address '2001:db8:123:b00c::/64'
-set nat66 source rule 20 description 'NPT to VLAN 70'
-set nat66 source rule 20 outbound-interface name 'bond0.20'
-set nat66 source rule 20 source prefix 'fd52:d62e:8011:46::/64'
-set nat66 source rule 20 translation address '2001:db8:123:b00d::/64'
-set nat66 source rule 30 description 'NPT to VLAN 200'
-set nat66 source rule 30 outbound-interface name 'bond0.20'
-set nat66 source rule 30 source prefix 'fd52:d62e:8011:c8::/64'
-set nat66 source rule 30 translation address '2001:db8:123:b00e::/64'
-set nat66 source rule 40 description 'NPT to VLAN 240'
-set nat66 source rule 40 outbound-interface name 'bond0.20'
-set nat66 source rule 40 source prefix 'fd52:d62e:8011:f0::/64'
-set nat66 source rule 40 translation address '2001:db8:123:b00f::/64'
+<p>使用上述前缀在 B 侧路由器上配置 NPTv6：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat66 source rule 10 description &#39;NPT to VLAN 10&#39;
+set nat66 source rule 10 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 10 source prefix &#39;fd52:d62e:8011:a::/64&#39;
+set nat66 source rule 10 translation address &#39;2001:db8:123:b00c::/64&#39;
+set nat66 source rule 20 description &#39;NPT to VLAN 70&#39;
+set nat66 source rule 20 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 20 source prefix &#39;fd52:d62e:8011:46::/64&#39;
+set nat66 source rule 20 translation address &#39;2001:db8:123:b00d::/64&#39;
+set nat66 source rule 30 description &#39;NPT to VLAN 200&#39;
+set nat66 source rule 30 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 30 source prefix &#39;fd52:d62e:8011:c8::/64&#39;
+set nat66 source rule 30 translation address &#39;2001:db8:123:b00e::/64&#39;
+set nat66 source rule 40 description &#39;NPT to VLAN 240&#39;
+set nat66 source rule 40 outbound-interface name &#39;bond0.20&#39;
+set nat66 source rule 40 source prefix &#39;fd52:d62e:8011:f0::/64&#39;
+set nat66 source rule 40 translation address &#39;2001:db8:123:b00f::/64&#39;
 commit
 </pre></div>
 </div>
-<p>验证 that connections are hitting the rule on both sides:</p>
+<p>验证连接是否命中两侧的规则：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>trae@cr01a-vyos# run show nat66 source statistics
 Rule    Packets    Bytes    Interface
 ------  ---------  -------  -----------

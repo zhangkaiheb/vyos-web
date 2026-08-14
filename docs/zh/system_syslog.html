@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,37 +152,34 @@
 <div itemprop="articleBody">
              
   <section id="syslog">
-<h1>Syslog</h1>
+<h1>系统日志（Syslog）</h1>
 <section id="overview">
-<h2>Overview</h2>
-<p>By default, VyOS provides a minimal logging configuration with local storage
-and log rotation. All errors, including local7 messages, are saved to a local
-file. Emergency alerts are sent to the console.</p>
-<p>To change these settings, enter configuration mode.</p>
+<h2>概述</h2>
+<p>默认情况下，VyOS 提供一个最小化的日志配置，包括本地存储和日志轮转。所有错误（包括 local7 类消息）均保存至本地文件中。紧急警报则发送至控制台。</p>
+<p>如需更改这些设置，请进入配置模式。</p>
 </section>
 <section id="syslog-configuration">
-<h2>Syslog configuration</h2>
-<p>Syslog supports logging to multiple destinations: a local file, a console, or
-a remote syslog server over UDP or TCP.</p>
-<p>The syslog configuration is organized into the following categories:</p>
+<h2>系统日志（Syslog）配置</h2>
+<p>Syslog 支持将日志记录到多个目标：本地文件、控制台或通过 UDP/TCP 协议连接的远程 syslog 服务器。</p>
+<p>Syslog 配置分为以下几类：</p>
 <ul class="simple">
-<li><p>Global settings</p></li>
-<li><p>Local logging</p></li>
-<li><p>Console logging</p></li>
-<li><p>Remote logging</p></li>
-<li><p>TLS-encrypted remote logging</p></li>
+<li><p>全局设置</p></li>
+<li><p>本地日志记录</p></li>
+<li><p>控制台日志记录</p></li>
+<li><p>远程日志记录</p></li>
+<li><p>基于 TLS 加密的远程日志记录</p></li>
 </ul>
 <section id="global-settings">
-<h3>Global settings</h3>
-<p>Configure the general behavior of the syslog service.</p>
+<h3>全局设置</h3>
+<p>配置 syslog 服务的一般行为。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system syslog marker interval <number>
+set system syslog marker interval &lt;number&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-marker-interval-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interval, in seconds, for sending syslog mark messages.</strong></p>
-<p>Syslog mark messages confirm the logging service is operational.</p>
-<p>默认: 1200 seconds.</p>
+<p><strong>配置发送 syslog 标记消息的时间间隔（单位：秒）。</strong></p>
+<p>Syslog 标记消息用于确认日志服务处于正常运行状态。</p>
+<p>默认值：1200 秒。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
@@ -190,7 +187,7 @@ set system syslog marker interval <number>
 
 set system syslog marker disable
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-marker-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Disable sending syslog mark messages.</p>
+<p>禁用发送 syslog 标记消息。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
@@ -198,88 +195,81 @@ set system syslog marker disable
 
 set system syslog preserve-fqdn
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-preserve-fqdn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure how the logging device’s hostname appears in log messages sent
-to a remote syslog server.</strong></p>
-<p>If configured, the device includes its <abbr title="Fully Qualified Domain Name">FQDN</abbr> in log messages, even if the syslog server is in the same domain.</p>
+<p><strong>配置日志设备主机名在发送至远程 syslog 服务器的日志消息中的显示方式。</strong></p>
+<p>若启用该选项，设备将在日志消息中包含其 <abbr title="Fully Qualified Domain Name">FQDN</abbr>（完全限定域名），即使 syslog 服务器位于同一域名内亦如此。</p>
 </div>
 </div>
 </section>
 <section id="local-logging">
-<h3>Local logging</h3>
-<p>Configure which log messages to save to a local log file.</p>
+<h3>本地日志记录</h3>
+<p>配置要保存至本地日志文件的日志消息。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system syslog local <filename> facility <keyword> level <keyword>
+set system syslog local &lt;filename&gt; facility &lt;keyword&gt; level &lt;keyword&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-local-filename-facility-keyword-level-keyword" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure syslog to save log messages for a specific facility and
-severity level to ``/var/log/messages``.</strong></p>
-<p>Refer to the tables below for valid facility and severity options.</p>
+<p><strong>配置 syslog 将特定设施（facility）和严重性级别（severity level）的日志消息保存至 ``/var/log/messages`` 文件中。</strong></p>
+<p>有关有效的设施和严重性选项，请参见下方表格。</p>
 </div>
 </div>
 </section>
 <section id="console-logging">
-<h3>Console logging</h3>
-<p>Configure which log messages to send to <code class="docutils literal notranslate">/dev/console</code>.</p>
+<h3>控制台日志记录</h3>
+<p>配置要发送至 <code class="docutils literal notranslate">/dev/console</code> 的日志消息。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system syslog console facility <keyword> level <keyword>
+set system syslog console facility &lt;keyword&gt; level &lt;keyword&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-console-facility-keyword-level-keyword" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure syslog to send log messages for a specific facility and severity
-level to the device’s console.</strong></p>
-<p>Refer to the tables below for valid facility and severity options.</p>
+<p><strong>配置 syslog 将特定设施（facility）和严重性级别（severity level）的日志消息发送至设备控制台。</strong></p>
+<p>有关有效的设施和严重性选项，请参见下方表格。</p>
 </div>
 </div>
 </section>
 <section id="remote-logging">
-<h3>Remote logging</h3>
-<p>Configure <strong>remote logging</strong> to send log messages to a remote syslog server.</p>
-<p>Remote logging does not affect either <strong>local</strong> or <strong>console logging</strong> and
-runs in parallel with them. Remote logging supports sending log messages
-to multiple hosts.</p>
+<h3>远程日志记录</h3>
+<p>配置<strong>远程日志记录</strong>功能，以将日志消息发送至远程 syslog 服务器。</p>
+<p>远程日志记录不会影响<strong>本地日志记录</strong>或<strong>控制台日志记录</strong>，而是与二者并行运行。远程日志记录支持向多个主机发送日志消息。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system syslog remote <address> facility <keyword> level <keyword>
+set system syslog remote &lt;address&gt; facility &lt;keyword&gt; level &lt;keyword&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-facility-keyword-level-keyword" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure log transmission to the remote syslog server for a specific
-facility and severity level.</strong></p>
-<p>The server’s address 可以 specified using either a <abbr title="Fully Qualified Domain Name">FQDN</abbr> or an IP address.</p>
-<p>Refer to the tables below for valid facility and severity options.</p>
+<p><strong>为特定设施（facility）和严重性级别（severity level）配置向远程 syslog 服务器传输日志。</strong></p>
+<p>服务器地址可使用 <abbr title="Fully Qualified Domain Name">FQDN</abbr>（完全限定域名）或 IP 地址指定。</p>
+<p>有关有效的设施和严重性选项，请参见下方表格。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system syslog remote <address> protocol <udp | tcp>
+set system syslog remote &lt;address&gt; protocol &lt;udp | tcp&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-protocol-udp-tcp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the protocol for log transmission.</strong></p>
-<p>The protocol 可以 either UDP or TCP. By default, log messages are sent
-over UDP.</p>
+<p><strong>配置日志传输所使用的协议。</strong></p>
+<p>协议可选 UDP 或 TCP。默认情况下，日志消息通过 UDP 发送。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system syslog remote <address> port <port>
+set system syslog remote &lt;address&gt; port &lt;port&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the port for log transmission.</strong></p>
-<p>By default, the standard port 514 is used.</p>
+<p><strong>配置日志传输所使用的端口。</strong></p>
+<p>默认使用标准端口 514。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system syslog remote <address> format include-timezone
+set system syslog remote &lt;address&gt; format include-timezone
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-format-include-timezone" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure log transmission in the RFC 5424 format.</strong></p>
-<p>The RFC 5424 format includes the timezone in the timestamp. For example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><34>1 2003-10-11T22:14:15.003-07:00 mymachine.example.com su - ID47 - BOM’su root’ failed for lonvick on /dev/pts/8.
+<p><strong>以 RFC 5424 格式配置日志传输。</strong></p>
+<p>RFC 5424 格式在时间戳中包含时区信息。例如：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>&lt;34&gt;1 2003-10-11T22:14:15.003-07:00 mymachine.example.com su - ID47 - BOM’su root’ failed for lonvick on /dev/pts/8.
 </pre></div>
 </div>
-<p>By default, log messages are sent in the RFC 3164 format. For example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><34>Oct 11 22:14:15 mymachine su: ‘su root’ failed for lonvick on /dev/pts/8
+<p>默认情况下，日志消息以 RFC 3164 格式发送。例如：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>&lt;34&gt;Oct 11 22:14:15 mymachine su: ‘su root’ failed for lonvick on /dev/pts/8
 </pre></div>
 </div>
 </div>
@@ -287,114 +277,99 @@ set system syslog remote <address> format include-timezone
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system syslog remote <address> format octet-counted
+set system syslog remote &lt;address&gt; format octet-counted
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-format-octet-counted" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable octet-counted framing for log transmission.</strong></p>
-<p>When enabled, multi-line log messages are sent without splitting. Ensure
-the remote server supports octet-counted framing to avoid parsing errors.</p>
-<p>Octet-counted framing is not available for the UDP protocol.</p>
+<p><strong>启用日志传输的八位字节计数帧格式（octet-counted framing）。</strong></p>
+<p>启用后，多行日志消息将不被拆分而直接发送。请确保远程服务器支持八位字节计数帧格式，以免出现解析错误。</p>
+<p>UDP 协议不支持八位字节计数帧格式。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system syslog remote <address> vrf <name>
+set system syslog remote &lt;address&gt; vrf &lt;name&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure the <abbr title="Virtual Routing and Forwarding">VRF</abbr> instance
-for log transmission.</p>
+<p>为日志传输配置 <abbr title="Virtual Routing and Forwarding">VRF</abbr>（虚拟路由转发）实例。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system syslog remote <address> source-address <address>
+set system syslog remote &lt;address&gt; source-address &lt;address&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure the source IP address (IPv4 or IPv6) for log transmission.</p>
+<p>为日志传输配置源 IP 地址（IPv4 或 IPv6）。</p>
 </div>
 </div>
 <section id="tls-encrypted-remote-logging">
-<h4><abbr title="Transport Layer Security">TLS</abbr>-encrypted remote logging</h4>
-<p>VyOS supports <abbr title="Transport Layer Security">TLS</abbr>-encrypted remote logging
-over TCP to ensure secure transmission of syslog data to remote syslog servers.</p>
-<p><strong>Prerequisites</strong>: Before configuring <abbr title="Transport Layer Security">TLS</abbr>-encrypted remote logging, ensure you have:</p>
+<h4><abbr title="Transport Layer Security">TLS</abbr>（传输层安全）加密的远程日志记录</h4>
+<p>VyOS 支持通过 TCP 协议进行 <abbr title="Transport Layer Security">TLS</abbr> 加密的远程日志记录，以确保 syslog 数据安全传输至远程 syslog 服务器。</p>
+<p><strong>先决条件</strong>：在配置 <abbr title="Transport Layer Security">TLS</abbr> 加密的远程日志记录前，请确保已完成以下准备：</p>
 <ul>
-<li><p>A valid remote syslog server address.</p></li>
-<li><p>有效 <abbr title="Certificate Authority">CA</abbr> and client certificates uploaded
-to the local <abbr title="Public Key Infrastructure">PKI</abbr> storage.</p></li>
-<li><p>The <strong>remote syslog transport protocol</strong> is set to <strong>TCP</strong>:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set system syslog remote <address> protocol tcp
+<li><p>已配置有效的远程 syslog 服务器地址。</p></li>
+<li><p>已将有效的 <abbr title="Certificate Authority">CA</abbr>（证书颁发机构）证书和客户端证书上传至本地 <abbr title="Public Key Infrastructure">PKI</abbr>（公钥基础设施）存储区。</p></li>
+<li><p>已将<strong>远程 syslog 传输协议</strong>设置为<strong>TCP</strong>：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system syslog remote &lt;address&gt; protocol tcp
 </pre></div>
 </div>
 </li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p><abbr title="Transport Layer Security">TLS</abbr>-encrypted remote logging is
-<strong>not supported</strong> over <strong>UDP</strong>.</p>
+<p><abbr title="Transport Layer Security">TLS</abbr> 加密的远程日志记录<strong>不支持</strong>通过<strong>UDP</strong> 协议实现。</p>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system syslog remote <address> tls
+set system syslog remote &lt;address&gt; tls
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-tls" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Enable TLS-encrypted remote logging.</p>
+<p>启用 TLS 加密的远程日志记录。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system syslog remote <address> tls ca-certificate <ca_name>
+set system syslog remote &lt;address&gt; tls ca-certificate &lt;ca_name&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-tls-ca-certificate-ca-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the</strong> <abbr title="Certificate Authority">CA</abbr> <strong>certificate.</strong></p>
-<p>The syslog client uses the <abbr title="Certificate Authority">CA</abbr> certificate to
-verify the identity of the remote syslog server.</p>
-<p>The <abbr title="Certificate Authority">CA</abbr> certificate is required for <strong>all</strong>
-authentication modes except <code class="docutils literal notranslate">anon</code>.</p>
+<p><strong>配置</strong> <abbr title="Certificate Authority">CA</abbr> <strong>证书。</strong></p>
+<p>syslog 客户端使用 <abbr title="Certificate Authority">CA</abbr> 证书验证远程 syslog 服务器的身份。</p>
+<p>除 <code class="docutils literal notranslate">anon</code> 认证模式外，<abbr title="Certificate Authority">CA</abbr> 证书对<strong>所有</strong>认证模式均为必需。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system syslog remote <address> tls certificate <cert_name>
+set system syslog remote &lt;address&gt; tls certificate &lt;cert_name&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-tls-certificate-cert-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the client certificate.</strong></p>
-<p>The remote syslog server uses the client certificate to verify the identity
-of the syslog client.</p>
-<p>The client certificate is required if the remote syslog server enforces
-client certificate verification.</p>
+<p><strong>配置客户端证书。</strong></p>
+<p>远程 syslog 服务器使用客户端证书验证 syslog 客户端的身份。</p>
+<p>若远程 syslog 服务器强制执行客户端证书验证，则必须提供客户端证书。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system syslog remote <address> tls auth-mode <anon | fingerprint | certvalid | name>
+set system syslog remote &lt;address&gt; tls auth-mode &lt;anon | fingerprint | certvalid | name&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-tls-auth-mode-anon-fingerprint-certvalid-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the authentication mode.</strong></p>
-<p>The authentication mode defines how the syslog client verifies the syslog
-server’s identity.</p>
-<p>The following authentication modes are available:</p>
+<p><strong>配置认证模式。</strong></p>
+<p>认证模式定义了 syslog 客户端如何验证 syslog 服务器的身份。</p>
+<p>可用的认证模式如下：</p>
 <ul>
-<li><p><code class="docutils literal notranslate">anon</code> <strong>(default)</strong>: 允许s encrypted connections without verifying the syslog
-server’s identity. This mode is <strong>not recommended</strong>, as it is vulnerable to
-<abbr title="Man-in-the-Middle">MITM</abbr> attacks.</p></li>
-<li><p><code class="docutils literal notranslate">fingerprint</code>: Verifies the server’s certificate fingerprint against the
-value preconfigured with:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set system syslog remote <address> tls permitted-peer <peer>
+<li><p><code class="docutils literal notranslate">anon</code> <strong>（默认）</strong>：允许建立加密连接，但不验证 syslog 服务器身份。此模式<strong>不推荐使用</strong>，因其易受 <abbr title="Man-in-the-Middle">MITM</abbr>（中间人）攻击。</p></li>
+<li><p><code class="docutils literal notranslate">fingerprint</code>：将服务器证书指纹与预先配置的值进行比对验证：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system syslog remote &lt;address&gt; tls permitted-peer &lt;peer&gt;
 </pre></div>
 </div>
 </li>
-<li><p><code class="docutils literal notranslate">certvalid</code>: Verifies the server certificate is signed by a trusted
-<abbr title="Certificate Authority">CA</abbr>, skipping <abbr title="Common Name">CN</abbr> check.</p></li>
-<li><p><code class="docutils literal notranslate">name</code>: Verifies that:</p>
+<li><p><code class="docutils literal notranslate">certvalid</code>：验证服务器证书是否由受信任的 <abbr title="Certificate Authority">CA</abbr> 签发，并跳过 <abbr title="Common Name">CN</abbr>（通用名称）检查。</p></li>
+<li><p><code class="docutils literal notranslate">name</code>：验证以下两项：</p>
 <ul class="simple">
-<li><p>The server’s certificate is signed by a trusted <abbr title="Certificate Authority">CA</abbr>.</p></li>
-<li><p>The <abbr title="Common Name">CN</abbr> in the certificate matches the value
-preconfigured with:</p></li>
+<li><p>服务器证书是否由受信任的 <abbr title="Certificate Authority">CA</abbr> 签发。</p></li>
+<li><p>证书中的 <abbr title="Common Name">CN</abbr>（通用名称）是否与预先配置的值匹配：</p></li>
 </ul>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set system syslog remote <address> tls permitted-peer <peer>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system syslog remote &lt;address&gt; tls permitted-peer &lt;peer&gt;
 </pre></div>
 </div>
-<p>This is a <strong>recommended</strong> secure mode for production environments.</p>
+<p>这是面向生产环境的<strong>推荐</strong>安全模式。</p>
 </li>
 </ul>
 </div>
@@ -402,308 +377,287 @@ preconfigured with:</p></li>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system syslog remote <address> tls permitted-peer <peer>
+set system syslog remote &lt;address&gt; tls permitted-peer &lt;peer&gt;
 <a class="cmdlink" href="#cfgcmd-set-system-syslog-remote-address-tls-permitted-peer-peer" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the peer certificate identifiers.</strong></p>
-<p>The certificate identifier format depends on the authentication mode:</p>
+<p><strong>配置对等证书标识符。</strong></p>
+<p>证书标识符格式取决于所选认证模式：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">fingerprint</code>: Enter the expected certificate fingerprints (SHA-1 or
-SHA-256).</p></li>
-<li><p><code class="docutils literal notranslate">name</code>: Enter the expected certificate <abbr title="Common Names">CNs</abbr>.</p></li>
+<li><p><code class="docutils literal notranslate">fingerprint</code>：输入预期的证书指纹（SHA-1 或 SHA-256）。</p></li>
+<li><p><code class="docutils literal notranslate">name</code>：输入预期的证书 <abbr title="Common Names">CNs</abbr>（通用名称）。</p></li>
 </ul>
-<p>For <code class="docutils literal notranslate">anon</code> and <code class="docutils literal notranslate">certvalid</code> authentication modes, certificate identifiers
-are not required.</p>
+<p>对于 <code class="docutils literal notranslate">anon</code> 和 <code class="docutils literal notranslate">certvalid</code> 认证模式，无需提供证书标识符。</p>
 </div>
 </div>
 </section>
 <section id="examples">
-<h4>示例:</h4>
-<div class="highlight-none notranslate"><div class="highlight"><pre># Example of 'anon' authentication mode
+<h4>示例：</h4>
+<div class="highlight-none notranslate"><div class="highlight"><pre># 'anon' 认证模式示例
 set system syslog remote 10.10.2.3 facility all level debug
 set system syslog remote 10.10.2.3 port 6514
 set system syslog remote 10.10.2.3 protocol tcp
 set system syslog remote 10.10.2.3 tls auth-mode anon
-# or just use 'set system syslog remote 10.10.2.3 tls'
+# 或仅使用 'set system syslog remote 10.10.2.3 tls'
 
-# Example of 'certvalid' authentication mode
+# 'certvalid' 认证模式示例
 set system syslog remote elk.example.com facility all level debug
 set system syslog remote elk.example.com port 6514
 set system syslog remote elk.example.com protocol tcp
 set system syslog remote elk.example.com tls ca-certificate my-ca
 set system syslog remote elk.example.com tls auth-mode certvalid
 
-# Example of 'fingerprint' authentication mode
+# 'fingerprint' 认证模式示例
 set system syslog remote syslog.example.com facility all level debug
 set system syslog remote syslog.example.com port 6514
 set system syslog remote syslog.example.com protocol tcp
 set system syslog remote syslog.example.com tls ca-certificate my-ca
 set system syslog remote syslog.example.com tls auth-mode fingerprint
-set system syslog remote syslog.example.com tls permitted-peers 'SHA1:10:C4:26:...,SHA256:7B:4B:10:...'
+set system syslog remote syslog.example.com tls permitted-peers &#39;SHA1:10:C4:26:...,SHA256:7B:4B:10:...&#39;
 
-# Example of 'name' authentication mode
+# 'name' 认证模式示例
 set system syslog remote graylog.example.com facility all level debug
 set system syslog remote graylog.example.com port 6514
 set system syslog remote graylog.example.com protocol tcp
 set system syslog remote graylog.example.com tls ca-certificate my-ca
 set system syslog remote graylog.example.com tls certificate syslog-client
 set system syslog remote graylog.example.com tls auth-mode name
-set system syslog remote graylog.example.com tls permitted-peers 'graylog.example.com'
+set system syslog remote graylog.example.com tls permitted-peers &#39;graylog.example.com&#39;
 </pre></div>
 </div>
 </section>
 <section id="security-recommendations">
-<h4>Security recommendations</h4>
+<h4>安全建议</h4>
 <ul class="simple">
-<li><p>For secure deployments, always use the <code class="docutils literal notranslate">name</code> authentication mode. It
-ensures that the server is validated by a trusted <abbr title="Certificate Authority">CA</abbr> and that the hostname matches the certificate.</p></li>
-<li><p>Use the <code class="docutils literal notranslate">anon</code> authentication mode only in testing environments, as it
-doesn’t provide  server authentication.</p></li>
-<li><p>Ensure private keys are generated, stored, and maintained exclusively within
-the <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/../pki/index.html">PKI system</a>.</p></li>
+<li><p>对于安全部署，始终使用 <code class="docutils literal notranslate">name</code> 认证模式。它可确保服务器经受信任的 <abbr title="Certificate Authority">CA</abbr> 验证，且主机名与证书匹配。</p></li>
+<li><p>仅在测试环境中使用 <code class="docutils literal notranslate">anon</code> 认证模式，因其不提供服务器身份验证功能。</p></li>
+<li><p>确保私钥仅在 <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/../pki/index.html">PKI 系统</a> 内生成、存储和维护。</p></li>
 </ul>
 </section>
 </section>
 </section>
 <section id="syslog-facilities">
-<h2>Syslog facilities</h2>
-<p>This section lists facilities used by syslog. Most facility names are self-
-explanatory. The local0–local7 facilities are used for custom purposes, such as
-logging from network nodes and equipment. Facility assignment is flexible and
-应该 tailored to your company’s needs. Consider facilities as categorization
-tools, rather than strict directives.</p>
+<h2>Syslog 设施（Facilities）</h2>
+<p>本节列出了 syslog 所使用的设施（facilities）。大多数设施名称具有自解释性。“local0” 至 “local7” 设施专用于自定义用途，例如记录来自网络节点和设备的日志。设施分配具有灵活性，应根据贵公司的具体需求进行定制。请将设施视为分类工具，而非严格指令。</p>
 <table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head"><p>Facility
-code</p></th>
-<th class="head"><p>密钥word</p></th>
-<th class="head"><p>描述</p></th>
+<tr class="row-odd"><th class="head"><p>设施代码</p></th>
+<th class="head"><p>关键字</p></th>
+<th class="head"><p>说明</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td></td>
 <td><p>all</p></td>
-<td><p>All facilities</p></td>
+<td><p>所有设施</p></td>
 </tr>
 <tr class="row-odd"><td><p>0</p></td>
 <td><p>kern</p></td>
-<td><p>Kernel messages</p></td>
+<td><p>内核消息</p></td>
 </tr>
 <tr class="row-even"><td><p>1</p></td>
 <td><p>user</p></td>
-<td><p>用户-level messages</p></td>
+<td><p>用户级消息</p></td>
 </tr>
 <tr class="row-odd"><td><p>2</p></td>
 <td><p>mail</p></td>
-<td><p>Mail system</p></td>
+<td><p>邮件系统</p></td>
 </tr>
 <tr class="row-even"><td><p>3</p></td>
 <td><p>daemon</p></td>
-<td><p>系统 daemons</p></td>
+<td><p>系统守护进程</p></td>
 </tr>
 <tr class="row-odd"><td><p>4</p></td>
 <td><p>auth</p></td>
-<td><p>Security/authentication messages</p></td>
+<td><p>安全/身份验证消息</p></td>
 </tr>
 <tr class="row-even"><td><p>5</p></td>
 <td><p>syslog</p></td>
-<td><p>Messages generated internally by syslog</p></td>
+<td><p>syslog 内部生成的消息</p></td>
 </tr>
 <tr class="row-odd"><td><p>6</p></td>
 <td><p>lpr</p></td>
-<td><p>Line printer subsystem</p></td>
+<td><p>行式打印机子系统</p></td>
 </tr>
 <tr class="row-even"><td><p>7</p></td>
 <td><p>news</p></td>
-<td><p>网络 news subsystem</p></td>
+<td><p>网络新闻子系统</p></td>
 </tr>
 <tr class="row-odd"><td><p>8</p></td>
 <td><p>uucp</p></td>
-<td><p>UUCP subsystem</p></td>
+<td><p>UUCP 子系统</p></td>
 </tr>
 <tr class="row-even"><td><p>9</p></td>
 <td><p>cron</p></td>
-<td><p>Clock daemon</p></td>
+<td><p>时钟守护进程</p></td>
 </tr>
 <tr class="row-odd"><td><p>10</p></td>
 <td><p>security</p></td>
-<td><p>Security/authentication messages</p></td>
+<td><p>安全/身份验证消息</p></td>
 </tr>
 <tr class="row-even"><td><p>11</p></td>
 <td><p>ftp</p></td>
-<td><p>FTP daemon</p></td>
+<td><p>FTP 守护进程</p></td>
 </tr>
 <tr class="row-odd"><td><p>12</p></td>
 <td><p>ntp</p></td>
-<td><p>NTP subsystem</p></td>
+<td><p>NTP 子系统</p></td>
 </tr>
 <tr class="row-even"><td><p>13</p></td>
 <td><p>logaudit</p></td>
-<td><p>日志 audit</p></td>
+<td><p>日志审计</p></td>
 </tr>
 <tr class="row-odd"><td><p>14</p></td>
 <td><p>logalert</p></td>
-<td><p>日志 alert</p></td>
+<td><p>日志警报</p></td>
 </tr>
 <tr class="row-even"><td><p>15</p></td>
 <td><p>clock</p></td>
-<td><p>clock daemon (note 2)</p></td>
+<td><p>时钟守护进程（注 2）</p></td>
 </tr>
 <tr class="row-odd"><td><p>16</p></td>
 <td><p>local0</p></td>
-<td><p>local use 0 (local0)</p></td>
+<td><p>本地使用 0（local0）</p></td>
 </tr>
 <tr class="row-even"><td><p>17</p></td>
 <td><p>local1</p></td>
-<td><p>local use 1 (local1)</p></td>
+<td><p>本地使用 1（local1）</p></td>
 </tr>
 <tr class="row-odd"><td><p>18</p></td>
 <td><p>local2</p></td>
-<td><p>local use 2 (local2)</p></td>
+<td><p>本地使用 2（local2）</p></td>
 </tr>
 <tr class="row-even"><td><p>19</p></td>
 <td><p>local3</p></td>
-<td><p>local use 3 (local3)</p></td>
+<td><p>本地使用 3（local3）</p></td>
 </tr>
 <tr class="row-odd"><td><p>20</p></td>
 <td><p>local4</p></td>
-<td><p>local use 4 (local4)</p></td>
+<td><p>本地使用 4（local4）</p></td>
 </tr>
 <tr class="row-even"><td><p>21</p></td>
 <td><p>local5</p></td>
-<td><p>local use 5 (local5)</p></td>
+<td><p>本地使用 5（local5）</p></td>
 </tr>
 <tr class="row-odd"><td><p>22</p></td>
 <td><p>local6</p></td>
-<td><p>local use 6 (local6)</p></td>
+<td><p>本地使用 6（local6）</p></td>
 </tr>
 <tr class="row-even"><td><p>23</p></td>
 <td><p>local7</p></td>
-<td><p>local use 7 (local7)</p></td>
+<td><p>本地使用 7（local7）</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="severity-levels">
-<h2>Severity levels</h2>
+<h2>严重性级别</h2>
 <table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head"><p>Value</p></th>
-<th class="head"><p>Severity</p></th>
-<th class="head"><p>密钥word</p></th>
-<th class="head"><p>描述</p></th>
+<tr class="row-odd"><th class="head"><p>数值</p></th>
+<th class="head"><p>严重性</p></th>
+<th class="head"><p>关键字</p></th>
+<th class="head"><p>说明</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td></td>
 <td></td>
 <td><p>all</p></td>
-<td><p>日志 everything.</p></td>
+<td><p>记录所有内容。</p></td>
 </tr>
 <tr class="row-odd"><td><p>0</p></td>
-<td><p>Emergency</p></td>
+<td><p>紧急（Emergency）</p></td>
 <td><p>emerg</p></td>
-<td><p>系统 is unusable - a panic condition.</p></td>
+<td><p>系统不可用 —— 出现恐慌（panic）状况。</p></td>
 </tr>
 <tr class="row-even"><td><p>1</p></td>
-<td><p>Alert</p></td>
+<td><p>警报（Alert）</p></td>
 <td><p>alert</p></td>
-<td><p>动作 必须 taken immediately - A
-condition that 应该 corrected
-immediately, such as a corrupted system
-database.</p></td>
+<td><p>必须立即采取行动 —— 应立即纠正的状况，例如损坏的系统数据库。</p></td>
 </tr>
 <tr class="row-odd"><td><p>2</p></td>
-<td><p>严重</p></td>
+<td><p>严重（Critical）</p></td>
 <td><p>crit</p></td>
-<td><p>严重 conditions - e.g., hard drive
-errors.</p></td>
+<td><p>严重状况 —— 例如硬盘错误。</p></td>
 </tr>
 <tr class="row-even"><td><p>3</p></td>
-<td><p>错误</p></td>
+<td><p>错误（Error）</p></td>
 <td><p>err</p></td>
-<td><p>错误 conditions.</p></td>
+<td><p>错误状况。</p></td>
 </tr>
 <tr class="row-odd"><td><p>4</p></td>
-<td><p>警告</p></td>
+<td><p>警告（Warning）</p></td>
 <td><p>warning</p></td>
-<td><p>警告 conditions.</p></td>
+<td><p>警告状况。</p></td>
 </tr>
 <tr class="row-even"><td><p>5</p></td>
-<td><p>Notice</p></td>
+<td><p>注意（Notice）</p></td>
 <td><p>notice</p></td>
-<td><p>Normal but significant conditions -
-conditions that are not error conditions,
-but that may require special handling.</p></td>
+<td><p>正常但重要的状况 —— 非错误状况，但可能需要特殊处理。</p></td>
 </tr>
 <tr class="row-odd"><td><p>6</p></td>
-<td><p>信息rmational</p></td>
+<td><p>信息（Informational）</p></td>
 <td><p>info</p></td>
-<td><p>信息rmational messages.</p></td>
+<td><p>信息性消息。</p></td>
 </tr>
 <tr class="row-even"><td><p>7</p></td>
-<td><p>调试</p></td>
+<td><p>调试（Debug）</p></td>
 <td><p>debug</p></td>
-<td><p>调试-level messages - Messages that
-contain information normally of use only
-when debugging a program.</p></td>
+<td><p>调试级别消息 —— 通常仅在调试程序时有用的信息。</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="display-logs">
-<h2>显示 logs</h2>
+<h2>显示日志</h2>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show log [all | authorization | cluster | conntrack-sync | …]
 <a class="cmdlink" href="#opcmd-show-log-all-authorization-cluster-conntrack-sync" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p><strong>显示 logs for a specific category on the console.</strong></p>
-<p>Use tab completion to view a list of available categories.</p>
-<p>If no category is specified, all logs are shown.</p>
+<p><strong>在控制台上显示特定类别的日志。</strong></p>
+<p>使用 Tab 键自动补全功能可查看可用类别的列表。</p>
+<p>若未指定类别，则显示所有日志。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show log image <name> [all | authorization | directory | file <file name> | tail <lines>]
+show log image &lt;name&gt; [all | authorization | directory | file &lt;file name&gt; | tail &lt;lines&gt;]
 <a class="cmdlink" href="#opcmd-show-log-image-name-all-authorization-directory-file-file-name-tail-lines" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p><strong>显示 logs for a specific image on the console.</strong></p>
-<p>Available log categories:</p>
+<p><strong>在控制台上显示特定镜像（image）的日志。</strong></p>
+<p>可用的日志类别如下：</p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 25.0%"></col>
-<col style="width: 75.0%"></col>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p>all</p></td>
-<td><p>显示s the contents of system log files of the specified image.</p></td>
+<td><p>显示指定镜像的系统日志文件内容。</p></td>
 </tr>
 <tr class="row-even"><td><p>authorization</p></td>
-<td><p>显示s authorization attempts of the specified image.</p></td>
+<td><p>显示指定镜像的授权尝试记录。</p></td>
 </tr>
 <tr class="row-odd"><td><p>directory</p></td>
-<td><p>显示s user-defined log files of the specified image.</p></td>
+<td><p>显示指定镜像的用户自定义日志文件。</p></td>
 </tr>
-<tr class="row-even"><td><p>file <file name></p></td>
-<td><p>显示s the contents of a specified user-defined log file of the specified
-image.</p></td>
+<tr class="row-even"><td><p>file &lt;file name&gt;</p></td>
+<td><p>显示指定镜像的某个用户自定义日志文件的内容。</p></td>
 </tr>
 <tr class="row-odd"><td><p>tail</p></td>
-<td><p>显示s last lines of the system log of the specified image.</p></td>
+<td><p>显示指定镜像的系统日志末尾若干行。</p></td>
 </tr>
-<tr class="row-even"><td><p><lines></p></td>
-<td><p>Number of lines to be displayed, default 10.</p></td>
+<tr class="row-even"><td><p>&lt;lines&gt;</p></td>
+<td><p>要显示的行数，默认为 10 行。</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<p>If no category is specified, the contents of the main syslog file are
-displayed.</p>
+<p>若未指定类别，则显示主 syslog 文件的内容。</p>
 <div class="admonition hint">
-<p class="admonition-title">Hint</p>
-<p>Use <code class="docutils literal notranslate">show log | strip-private</code> to hide private data
-when displaying your logs.</p>
+<p class="admonition-title">提示</p>
+<p>显示日志时，可使用 <code class="docutils literal notranslate">show log | strip-private</code> 命令隐藏私有数据。</p>
 </div>
 </section>
 </section>

@@ -33,7 +33,8 @@ export const FIREWALL_RULE_SCHEMA = [
             "title": "地址组",
             "help": "firewall.rule.help.dynamic-addr-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "timeout",
@@ -54,7 +55,8 @@ export const FIREWALL_RULE_SCHEMA = [
             "title": "地址组",
             "help": "firewall.rule.help.dynamic-addr-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "timeout",
@@ -178,42 +180,48 @@ export const FIREWALL_RULE_SCHEMA = [
             "title": "地址组",
             "help": "firewall.rule.help.address-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "domain-group",
             "title": "域名组",
             "help": "firewall.rule.help.domain-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "dynamic-address-group",
             "title": "动态地址组",
             "help": "firewall.rule.help.dynamic-address-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "mac-group",
             "title": "MAC 组",
             "help": "firewall.rule.help.mac-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "network-group",
             "title": "网络组",
             "help": "firewall.rule.help.network-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "port-group",
             "title": "端口组",
             "help": "firewall.rule.help.port-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           }
         ]
       },
@@ -688,42 +696,48 @@ export const FIREWALL_RULE_SCHEMA = [
             "title": "地址组",
             "help": "firewall.rule.help.address-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "domain-group",
             "title": "域名组",
             "help": "firewall.rule.help.domain-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "dynamic-address-group",
             "title": "动态地址组",
             "help": "firewall.rule.help.dynamic-address-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "mac-group",
             "title": "MAC 组",
             "help": "firewall.rule.help.mac-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "network-group",
             "title": "网络组",
             "help": "firewall.rule.help.network-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "port-group",
             "title": "端口组",
             "help": "firewall.rule.help.port-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           }
         ]
       },

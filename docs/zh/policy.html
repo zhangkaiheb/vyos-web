@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -88,52 +88,46 @@
 <div itemprop="articleBody">
              
   <div class="error admonition">
-<p class="admonition-title">Call for Contributions</p>
-<p>Help improve this section with additional content, examples, and explanations.</p>
-<p>For contribution guidelines, see <a class="reference internal" href="../../documentation.html#documentation">写入 Documentation</a>.</p>
+<p class="admonition-title">贡献邀请</p>
+<p>欢迎通过补充内容、示例和说明来帮助改进本章节。</p>
+<p>有关贡献指南，请参阅 <a class="reference internal" href="../../documentation.html#documentation">编写文档</a>。</p>
 </div>
 <section id="policy">
 <h1>策略</h1>
-<p>Policies are used for filtering and traffic management. With policies, network
-administrators could filter and treat traffic
-according to their needs.</p>
-<p>There 可能 a wide range of routing policies. Some examples are listed
-below:</p>
+<p>策略用于流量过滤和流量管理。借助策略，网络管理员可根据自身需求对流量进行过滤和处理。</p>
+<p>路由策略的种类非常广泛。以下是一些示例：</p>
 <ul class="simple">
-<li><p>过滤器 traffic based on source/destination address.</p></li>
-<li><p>设置 some metric to routes learned from a particular neighbor.</p></li>
-<li><p>设置 some attributes (like AS PATH or Community value) to advertised routes
-to neighbors.</p></li>
-<li><p>Prefer a specific routing protocol routes over another routing protocol
-running on the same router.</p></li>
+<li><p>根据源地址/目的地址过滤流量。</p></li>
+<li><p>为从特定邻居学习到的路由设置某些度量值（metric）。</p></li>
+<li><p>为向邻居发布的路由设置某些属性（例如 AS PATH 或 Community 值）。</p></li>
+<li><p>在运行于同一台路由器上的多个路由协议之间，优先选择某一特定路由协议的路由。</p></li>
 </ul>
-<p>Policies, in VyOS, are implemented using FRR filtering and route maps. Detailed
-information of FRR 可能 found in <a class="reference external" href="http://docs.frrouting.org/">http://docs.frrouting.org/</a></p>
+<p>VyOS 中的策略通过 FRR 过滤器和路由映射（route maps）实现。有关 FRR 的详细信息，请参阅 <a class="reference external" href="http://docs.frrouting.org/">http://docs.frrouting.org/</a></p>
 <section id="policy-sections">
-<h2>策略 Sections</h2>
+<h2>策略分类</h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/access-list.html">Access List 策略</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/prefix-list.html">Prefix List 策略</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/route.html">路由 and 路由6 策略</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/route-map.html">路由 Map 策略</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/local-route.html">Local 路由 策略</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/as-path-list.html">BGP - AS 路径 策略</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/community-list.html">BGP - Community List</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/extcommunity-list.html">BGP - Extended Community List</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/large-community-list.html">BGP - Large Community List</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/access-list.html">访问控制列表（ACL）策略</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/prefix-list.html">前缀列表（Prefix List）策略</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/route.html">IPv4 和 IPv6 路由策略</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/route-map.html">路由映射（Route Map）策略</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/local-route.html">本地路由策略</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/as-path-list.html">BGP — AS 路径策略</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/community-list.html">BGP — Community 列表</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/extcommunity-list.html">BGP — 扩展 Community 列表</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/large-community-list.html">BGP — 大型 Community 列表</a></li>
 </ul>
 </div>
 </section>
 <section id="examples">
 <h2>示例</h2>
-<p>示例 of policies usage:</p>
+<p>策略使用示例：</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/examples.html">BGP 示例</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html#transparent-proxy">Transparent Proxy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html#multiple-uplinks">Multiple Uplinks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html#clamp-mss-for-a-specific-ip">Clamp MSS for a specific IP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/examples.html">BGP 示例</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html#transparent-proxy">透明代理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html#multiple-uplinks">多上行链路</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html#clamp-mss-for-a-specific-ip">为特定 IP 地址限制 MSS</a></li>
 </ul>
 </div>
 </section>

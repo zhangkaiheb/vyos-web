@@ -147,6 +147,7 @@ export default defineComponent({
         :selectable="false"
         :actions="[]"
         rowKey="id"
+        :externalToolbar="true"
       />
     </div>
   `,

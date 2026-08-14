@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,133 +152,110 @@
 <div itemprop="articleBody">
              
   <section id="login-user-management">
-<h1>日志in/user management</h1>
-<p>The default VyOS user account (<code class="docutils literal notranslate">vyos</code>), as well as newly created user accounts,
-possess full system configuration privileges. These accounts are granted sudo
-privileges, allowing them to execute commands as the root user.</p>
-<p>VyOS supports both local authentication and remote authentication via
-<abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>/ <abbr title="Terminal Access Controller Access-Control System">TACACS+</abbr>.</p>
+<h1>登录/用户管理</h1>
+<p>默认的 VyOS 用户账户（<code class="docutils literal notranslate">vyos</code>）以及新创建的用户账户均拥有完整的系统配置权限。这些账户被授予 sudo 权限，允许其以 root 用户身份执行命令。</p>
+<p>VyOS 支持本地认证和通过 <abbr title="远程认证拨号用户服务">RADIUS</abbr>/<abbr title="终端访问控制器访问控制系统">TACACS+</abbr> 进行的远程认证。</p>
 <section id="local-authentication">
-<h2>Local authentication</h2>
+<h2>本地认证</h2>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login user <name> full-name “<string>”
-<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-full-name-string" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the real name or description for a system user.</strong></p>
-<p>If the description includes spaces, enclose <code class="docutils literal notranslate"><string></code> in double quotes.</p>
-<p>If the user <code class="docutils literal notranslate"><name></code> already exists, the command updates the current
-description. If not, it creates a new user with the specified description.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set system login user <name> authentication plaintext-password <password>
-<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-authentication-plaintext-password-password" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a password for a system user.</strong></p>
-<p>Enter the password in plaintext. Upon <code class="docutils literal notranslate">commit</code>, VyOS hashes the password for
-secure storage and removes the plaintext value.</p>
-<p>If the user <code class="docutils literal notranslate"><name></code> already exists, the command updates the current password.
-If not, it creates a new user with the specified plaintext password.</p>
+set system login user &lt;name&gt; full-name “&lt;string&gt;”
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-full-name-string" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为系统用户配置真实姓名或描述信息。</strong></p>
+<p>如果描述中包含空格，请将 <code class="docutils literal notranslate">&lt;string&gt;</code> 用双引号括起。</p>
+<p>如果用户 <code class="docutils literal notranslate">&lt;name&gt;</code> 已存在，则该命令会更新当前描述；否则，它将创建一个具有指定描述的新用户。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login user <name> authentication encrypted-password <password>
-<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-authentication-encrypted-password-password" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a pre-encrypted password for a system user.</strong></p>
-<p>Enter the password in its hashed format. Upon <code class="docutils literal notranslate">commit</code>, VyOS stores this value
-directly without modification.</p>
-<p>If the user <code class="docutils literal notranslate"><name></code> already exists, the command updates the current password.
-If not, it creates a new user with the specified pre-encrypted password.</p>
+set system login user &lt;name&gt; authentication plaintext-password &lt;password&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-authentication-plaintext-password-password" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为系统用户配置密码。</strong></p>
+<p>以明文形式输入密码。在执行 <code class="docutils literal notranslate">commit</code> 后，VyOS 将对密码进行哈希处理以实现安全存储，并移除明文值。</p>
+<p>如果用户 <code class="docutils literal notranslate">&lt;name&gt;</code> 已存在，则该命令会更新当前密码；否则，它将创建一个具有指定明文密码的新用户。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login user <name> authentication principal <principal>
-<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-authentication-principal-principal" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure an SSH certificate principal for a system user.</strong></p>
-<p>Enter the principal (a string included in the user’s signed SSH certificate).
-Upon <code class="docutils literal notranslate">commit</code>, VyOS stores this mapping, allowing the user to log in if the
-certificate they present contains this principal.</p>
-<p>If the user <code class="docutils literal notranslate"><name></code> already exists, the command updates the principal. If not,
-it creates a new user linked to the specified principal.</p>
-<p><strong>If not configured</strong>, the principal defaults to <code class="docutils literal notranslate"><name></code>.</p>
+set system login user &lt;name&gt; authentication encrypted-password &lt;password&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-authentication-encrypted-password-password" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为系统用户配置预加密密码。</strong></p>
+<p>以哈希格式输入密码。在执行 <code class="docutils literal notranslate">commit</code> 后，VyOS 将直接存储该值而不作任何修改。</p>
+<p>如果用户 <code class="docutils literal notranslate">&lt;name&gt;</code> 已存在，则该命令会更新当前密码；否则，它将创建一个具有指定预加密密码的新用户。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login user <name> disable
-<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable a system user account.</strong></p>
-<p>VyOS locks the account, preventing the user from logging in.</p>
+set system login user &lt;name&gt; authentication principal &lt;principal&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-authentication-principal-principal" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为系统用户配置 SSH 证书主体（principal）。</strong></p>
+<p>输入主体（即用户已签名 SSH 证书中包含的字符串）。在执行 <code class="docutils literal notranslate">commit</code> 后，VyOS 将存储此映射关系，当用户出示的证书包含该主体时，即可成功登录。</p>
+<p>如果用户 <code class="docutils literal notranslate">&lt;name&gt;</code> 已存在，则该命令会更新主体；否则，它将创建一个与指定主体关联的新用户。</p>
+<p><strong>若未配置</strong>，则主体默认为 <code class="docutils literal notranslate">&lt;name&gt;</code>。</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user &lt;name&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-name-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>禁用系统用户账户。</strong></p>
+<p>VyOS 将锁定该账户，阻止用户登录。</p>
 </div>
 </div>
 </section>
 <section id="key-based-authentication">
-<h2>密钥-based authentication</h2>
-<p>密钥-based authentication is the recommended method for securing SSH access in
-VyOS. It uses a <strong>public/private key pair</strong> to verify user identity without
-requiring a password. To authorize access, you assign <strong>SSH public keys</strong> to
-user accounts on the router, while SSH private keys remain on local devices.
-VyOS allows assigning multiple SSH public keys to a single user account, which
-is useful for accessing a router from different devices.</p>
+<h2>基于密钥的认证</h2>
+<p>基于密钥的认证是 VyOS 中保障 SSH 访问安全的推荐方法。它使用<strong>公钥/私钥对</strong>来验证用户身份，而无需密码。要授权访问，您需将<strong>SSH 公钥</strong>分配给路由器上的用户账户，而 SSH 私钥则保留在本地设备上。VyOS 允许为单个用户账户分配多个 SSH 公钥，这对于从不同设备访问路由器非常有用。</p>
 <section id="generate-the-key-pair">
-<h3>Generate the key pair</h3>
-<p>Generate an SSH key pair on your <strong>local machine</strong> using the <code class="docutils literal notranslate">ssh-keygen</code>
-command. This creates two files:</p>
+<h3>生成密钥对</h3>
+<p>请在您的<strong>本地机器</strong>上使用 <code class="docutils literal notranslate">ssh-keygen</code> 命令生成 SSH 密钥对。这将创建两个文件：</p>
 <ul class="simple">
-<li><p><strong>Private key</strong> (e.g., <code class="docutils literal notranslate">id_rsa</code>): Remains on your local machine and must
-never be shared.</p></li>
-<li><p><strong>Public key</strong> (e.g., <code class="docutils literal notranslate">id_rsa.pub</code>): Is used to configure the VyOS user
-account. By default, it is saved to <code class="docutils literal notranslate">~/.ssh/id_rsa.pub</code>.</p></li>
+<li><p><strong>私钥</strong>（例如 <code class="docutils literal notranslate">id_rsa</code>）：保留在您的本地机器上，且绝不可共享。</p></li>
+<li><p><strong>公钥</strong>（例如 <code class="docutils literal notranslate">id_rsa.pub</code>）：用于配置 VyOS 用户账户。默认情况下，它保存在 <code class="docutils literal notranslate">~/.ssh/id_rsa.pub</code> 中。</p></li>
 </ul>
-<p>Each SSH public key consists of three parts, separated by spaces:</p>
+<p>每个 SSH 公钥由三部分组成，各部分之间以空格分隔：</p>
 <ul class="simple">
-<li><p><strong>Encryption algorithm type:</strong> <code class="docutils literal notranslate">ssh-rsa</code>, <code class="docutils literal notranslate">ssh-ed25519</code>, etc.</p></li>
-<li><p><strong>密钥:</strong> The actual data (a long string beginning with <code class="docutils literal notranslate">AAAA...</code>).</p></li>
-<li><p><strong>Comment:</strong> An identifier for your reference (e.g., <code class="docutils literal notranslate">user@host</code>).</p></li>
+<li><p><strong>加密算法类型：</strong><code class="docutils literal notranslate">ssh-rsa</code>、<code class="docutils literal notranslate">ssh-ed25519</code> 等。</p></li>
+<li><p><strong>密钥：</strong>实际数据（以 <code class="docutils literal notranslate">AAAA...</code> 开头的长字符串）。</p></li>
+<li><p><strong>注释：</strong>供您参考的标识符（例如 <code class="docutils literal notranslate">user&#64;host</code>）。</p></li>
 </ul>
-<p>Only the encryption algorithm type and key parts are required to
-configure the authorization entry in VyOS. The comment part is optional.</p>
+<p>在 VyOS 中配置授权条目时，仅需加密算法类型和密钥部分。注释部分为可选。</p>
 <div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p>SSH operation</p>
+<p class="admonition-title">另请参阅</p>
+<p>SSH 操作</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">警告</p>
-<p>SSH key strings are long. When copying and pasting, ensure your
-terminal does not insert line breaks. The key 必须 entered as a <strong>single
-line</strong> to function correctly.</p>
+<p>SSH 密钥字符串较长。复制粘贴时，请确保终端不会插入换行符。密钥必须作为<strong>单行</strong>输入才能正常工作。</p>
 </div>
 </section>
 <section id="configure-the-router">
-<h3>Configure the router</h3>
-<p>To configure SSH public key authentication for a user account, run the
-following two commands using the same <code class="docutils literal notranslate"><identifier></code>:</p>
+<h3>配置路由器</h3>
+<p>要为用户账户配置 SSH 公钥认证，请使用相同的 <code class="docutils literal notranslate">&lt;identifier&gt;</code> 执行以下两条命令：</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login user <username> authentication public-keys <identifier> key <key>
-<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-public-keys-identifier-key-key" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the SSH public key for the user account.</strong></p>
+set system login user &lt;username&gt; authentication public-keys &lt;identifier&gt; key &lt;key&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-public-keys-identifier-key-key" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为用户账户配置 SSH 公钥。</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><identifier></code>: A unique label that identifies this specific key entry.</p></li>
-<li><p><code class="docutils literal notranslate"><key></code>: The actual string of characters from your public key.</p></li>
+<li><p><code class="docutils literal notranslate">&lt;identifier&gt;</code>：唯一标识此特定密钥条目的标签。</p></li>
+<li><p><code class="docutils literal notranslate">&lt;key&gt;</code>：您公钥中的实际字符字符串。</p></li>
 </ul>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login user <username> authentication public-keys <identifier> type <type>
-<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-public-keys-identifier-type-type" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the SSH key’s encryption type.</strong></p>
-<p>The following encryption algorithm types are available:</p>
+set system login user &lt;username&gt; authentication public-keys &lt;identifier&gt; type &lt;type&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-public-keys-identifier-type-type" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 SSH 密钥的加密类型。</strong></p>
+<p>支持以下加密算法类型：</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate">ecdsa-sha2-nistp256</code></p></li>
 <li><p><code class="docutils literal notranslate">ecdsa-sha2-nistp384</code></p></li>
@@ -289,101 +266,85 @@ set system login user <username> authentication public-keys <identifier> type <t
 </ul>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>To assign multiple SSH public keys to a user account, repeat the
-commands above with a unique identifier for each key.</p>
+<p>如需为用户账户分配多个 SSH 公钥，请重复上述命令，并为每个密钥指定唯一的标识符。</p>
 </div>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login user <username> authentication public-keys <identifier> options <options>
-<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-public-keys-identifier-options-options" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure specific restrictions or behaviors for an SSH public key.</strong></p>
-<p><code class="docutils literal notranslate"><options></code>: A string of comma-separated values that define permissions
-or restrictions for this key.</p>
-<p>The command accepts standard OpenSSH options listed in the router’s
-<code class="docutils literal notranslate">~/.ssh/authorized_keys</code> file.</p>
-<p>To include a <code class="docutils literal notranslate">"</code> character in the options string, use <code class="docutils literal notranslate">&quot;</code>.</p>
-<p>For example, to restrict allowed source IP addresses for an SSH public key,
-use: <code class="docutils literal notranslate">from=&quot;10.0.0.0/24&quot;</code>.</p>
+set system login user &lt;username&gt; authentication public-keys &lt;identifier&gt; options &lt;options&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-public-keys-identifier-options-options" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为 SSH 公钥配置特定的限制或行为。</strong></p>
+<p><code class="docutils literal notranslate">&lt;options&gt;</code>：定义此密钥权限或限制的逗号分隔字符串。</p>
+<p>该命令接受路由器 <code class="docutils literal notranslate">~/.ssh/authorized_keys</code> 文件中列出的标准 OpenSSH 选项。</p>
+<p>如需在选项字符串中包含 <code class="docutils literal notranslate">&quot;</code> 字符，请使用 <code class="docutils literal notranslate">&amp;quot;</code>。</p>
+<p>例如，要限制 SSH 公钥允许的源 IP 地址，请使用：<code class="docutils literal notranslate">from=&amp;quot;10.0.0.0/24&amp;quot;</code>。</p>
 </div>
 </div>
 </section>
 </section>
 <section id="otp-based-mfa">
-<h2>OTP-based MFA</h2>
-<p>VyOS lets you enhance user access security by enabling <abbr title="One-time password">OTP</abbr>-based <abbr title="Multi-factor Authentication">MFA</abbr> for individual
-users. 用户 with <abbr title="One-time password">OTP</abbr>-based <abbr title="Multi-factor Authentication">MFA</abbr> must enter a valid <abbr title="One-time password">OTP</abbr> along with their password at login. 用户 without <abbr title="One-time password">OTP</abbr>-based <abbr title="Multi-factor Authentication">MFA</abbr> use
-standard authentication.</p>
+<h2>基于一次性密码（OTP）的多因素认证（MFA）</h2>
+<p>VyOS 允许您通过为个别用户启用基于<abbr title="一次性密码">OTP</abbr>的<abbr title="多因素认证">MFA</abbr>来增强用户访问安全性。启用基于<abbr title="一次性密码">OTP</abbr>的<abbr title="多因素认证">MFA</abbr>的用户在登录时必须同时输入有效的<abbr title="一次性密码">OTP</abbr>和密码。未启用基于<abbr title="一次性密码">OTP</abbr>的<abbr title="多因素认证">MFA</abbr>的用户则使用标准认证方式。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login user <username> authentication otp key <key>
-<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-key-key" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure</strong> <abbr title="One-time password">OTP</abbr><strong>-based</strong> <abbr title="Multi-factor Authentication">MFA</abbr> <strong>for a user.</strong></p>
-<p><code class="docutils literal notranslate"><key></code>: A Base32-encoded secret key. This key 必须 added to the user’s
-authenticator app to generate valid <abbr title="One-time passwords">OTPs</abbr>.</p>
-<p><strong>When configured</strong>, the user 需要 enter their password followed by
-a valid OTP for all subsequent logins.</p>
+set system login user &lt;username&gt; authentication otp key &lt;key&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-key-key" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为用户配置</strong><abbr title="一次性密码">OTP</abbr><strong>的</strong><abbr title="多因素认证">MFA</abbr><strong>。</strong></p>
+<p><code class="docutils literal notranslate">&lt;key&gt;</code>：Base32 编码的密钥。该密钥必须添加到用户的认证器应用程序中，以生成有效的<abbr title="一次性密码">OTP</abbr>。</p>
+<p><strong>配置后</strong>，用户在后续所有登录过程中均需先输入密码，再输入有效的 OTP。</p>
 </div>
 </div>
 <section id="otp-settings">
-<h3>OTP settings</h3>
+<h3>OTP 设置</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login user <username> authentication otp rate-limit <limit>
-<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-rate-limit-limit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the number of</strong> <abbr title="One-time password">OTP</abbr> <strong>authentication
-attempts allowed within a specified time period.</strong></p>
-<p>If this limit is exceeded, the user is temporarily blocked.</p>
-<p>The default value is 3 attempts. The valid range is 1 to 10 attempts.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set system login user <username> authentication otp rate-time <seconds>
-<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-rate-time-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the time period, in seconds, for tracking</strong> <abbr title="One-time password">OTP</abbr> <strong>authentication attempts.</strong></p>
-<p>The default value is 30 seconds. The valid range is 1 to 600 seconds.</p>
+set system login user &lt;username&gt; authentication otp rate-limit &lt;limit&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-rate-limit-limit" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置在指定时间段内允许的</strong><abbr title="一次性密码">OTP</abbr><strong>认证尝试次数。</strong></p>
+<p>若超出此限制，用户将被临时阻止登录。</p>
+<p>默认值为 3 次。有效范围为 1 至 10 次。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login user <username> authentication otp window-size <size>
-<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-window-size-size" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the</strong> <abbr title="One-time password">OTP</abbr> <strong>window size for a user.</strong></p>
-<p>The <abbr title="One-time password">OTP</abbr> window size defines the number of
-concurrently valid <abbr title="One-time passwords">OTPs</abbr> that the authentication
-server accepts. This setting assumes a new token is generated every 30 seconds.</p>
-<p>The default value is 3. This permits 3 concurrent codes: the code for the
-current 30-second interval, the preceding code, and the following code. This
-allows up to 30 seconds of time skew between the authentication server and
-client.</p>
-<p>If the window size is increased to 17, the system permits 17 concurrent codes
-(the current code, the 8 preceding codes, and the 8 following codes). This
-allows for a time skew of up to 4 minutes.</p>
-<p>The valid range is 1 to 21.</p>
+set system login user &lt;username&gt; authentication otp rate-time &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-rate-time-seconds" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置跟踪</strong><abbr title="一次性密码">OTP</abbr><strong>认证尝试的时间段（单位：秒）。</strong></p>
+<p>默认值为 30 秒。有效范围为 1 至 600 秒。</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set system login user &lt;username&gt; authentication otp window-size &lt;size&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-user-username-authentication-otp-window-size-size" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为用户配置</strong><abbr title="一次性密码">OTP</abbr><strong>窗口大小。</strong></p>
+<p><abbr title="一次性密码">OTP</abbr> 窗口大小定义了认证服务器接受的同时有效的<abbr title="一次性密码">OTP</abbr>数量。此设置假设每 30 秒生成一个新令牌。</p>
+<p>默认值为 3。这意味着允许 3 个并发代码：当前 30 秒间隔内的代码、前一个代码和后一个代码。这允许认证服务器与客户端之间最多存在 30 秒的时间偏差。</p>
+<p>若将窗口大小增加至 17，则系统允许 17 个并发代码（当前代码、前 8 个代码和后 8 个代码），从而允许最多 4 分钟的时间偏差。</p>
+<p>有效范围为 1 至 21。</p>
 </div>
 </div>
 </section>
 <section id="generate-an-otp-key">
-<h3>Generate an OTP-key</h3>
-<p>Use the following command to generate an OTP key:</p>
+<h3>生成 OTP 密钥</h3>
+<p>请使用以下命令生成 OTP 密钥：</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-generate system login username <username> otp-key hotp-time rate-limit <1-10> rate-time <15-600> window-size <1-21>
-<a class="cmdlink" href="#cfgcmd-generate-system-login-username-username-otp-key-hotp-time-rate-limit-1-10-rate-time-15-600-window-size-1-21" title="Permalink to this Command"></a></div></div>
-<p>密钥 generation example:</p>
+generate system login username &lt;username&gt; otp-key hotp-time rate-limit &lt;1-10&gt; rate-time &lt;15-600&gt; window-size &lt;1-21&gt;
+<a class="cmdlink" href="#cfgcmd-generate-system-login-username-username-otp-key-hotp-time-rate-limit-1-10-rate-time-15-600-window-size-1-21" title="此命令的永久链接"></a></div></div>
+<p>密钥生成示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ generate system login username otptester otp-key hotp-time rate-limit 2 rate-time 20 window-size 5
-# You can share it with the user, he just needs to scan the QR in his OTP app
-# username:  otptester
-# OTP KEY:  J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY
-# OTP URL:  otpauth://totp/otptester@vyos?secret=J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY&digits=6&period=30
+# 您可以将此密钥分享给用户，他只需在其 OTP 应用程序中扫描二维码即可
+# 用户名：  otptester
+# OTP 密钥：  J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY
+# OTP URL：  otpauth://totp/otptester@vyos?secret=J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY&amp;digits=6&amp;period=30
 █████████████████████████████████████████████
 █████████████████████████████████████████████
 ████ ▄▄▄▄▄ █▀█ █▄   ▀▄▀▄█▀▄  ▀█▀ █ ▄▄▄▄▄ ████
@@ -407,29 +368,28 @@ generate system login username <username> otp-key hotp-time rate-limit <1-10> ra
 ████▄▄▄▄▄▄▄█▄█▄█▄█▄▄▄▄▄█▄▄▄█▄██████▄██▄▄▄████
 █████████████████████████████████████████████
 █████████████████████████████████████████████
-# To add this OTP key to configuration, run the following commands:
-set system login user otptester authentication otp key 'J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY'
-set system login user otptester authentication otp rate-limit '2'
-set system login user otptester authentication otp rate-time '20'
-set system login user otptester authentication otp window-size '5'
+# 要将此 OTP 密钥添加到配置中，请运行以下命令：
+set system login user otptester authentication otp key &#39;J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY&#39;
+set system login user otptester authentication otp rate-limit &#39;2&#39;
+set system login user otptester authentication otp rate-time &#39;20&#39;
+set system login user otptester authentication otp window-size &#39;5&#39;
 </pre></div>
 </div>
 </section>
 <section id="display-the-otp-key-for-a-user">
-<h3>显示 the OTP key for a user</h3>
-<p>Use the following command to display the <abbr title="One-time password">OTP</abbr>
-key for a user:</p>
+<h3>显示用户的 OTP 密钥</h3>
+<p>请使用以下命令显示用户的<abbr title="一次性密码">OTP</abbr>密钥：</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-sh system login authentication user <username> otp <full | key-b32 | qrcode | uri>
-<a class="cmdlink" href="#cfgcmd-sh-system-login-authentication-user-username-otp-full-key-b32-qrcode-uri" title="Permalink to this Command"></a></div></div>
-<p>示例:</p>
+sh system login authentication user &lt;username&gt; otp &lt;full | key-b32 | qrcode | uri&gt;
+<a class="cmdlink" href="#cfgcmd-sh-system-login-authentication-user-username-otp-full-key-b32-qrcode-uri" title="此命令的永久链接"></a></div></div>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ sh system login authentication user otptester otp full
-# You can share the OTP key with the user. They just need to scan the QR in their OTP app.
-# username: otptester
-# OTP KEY: J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY
-# OTP URL: otpauth://totp/otptester@vyos?secret=J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY&digits=6&period=30
+# 您可以将 OTP 密钥分享给用户。他们只需在其 OTP 应用程序中扫描二维码即可。
+# 用户名： otptester
+# OTP 密钥： J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY
+# OTP URL： otpauth://totp/otptester@vyos?secret=J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY&amp;digits=6&amp;period=30
 █████████████████████████████████████████████
 █████████████████████████████████████████████
 ████ ▄▄▄▄▄ █▀█ █▄   ▀▄▀▄█▀▄  ▀█▀ █ ▄▄▄▄▄ ████
@@ -453,305 +413,254 @@ sh system login authentication user <username> otp <full | key-b32 | qrcode | ur
 ████▄▄▄▄▄▄▄█▄█▄█▄█▄▄▄▄▄█▄▄▄█▄██████▄██▄▄▄████
 █████████████████████████████████████████████
 █████████████████████████████████████████████
-# To add this OTP key to configuration, run the following commands:
-set system login user otptester authentication otp key 'J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY'
-set system login user otptester authentication otp rate-limit '2'
-set system login user otptester authentication otp rate-time '20'
-set system login user otptester authentication otp window-size '5'
+# 要将此 OTP 密钥添加到配置中，请运行以下命令：
+set system login user otptester authentication otp key &#39;J5A64ERPMGJOZXY6FMHHLKXKANNI6TCY&#39;
+set system login user otptester authentication otp rate-limit &#39;2&#39;
+set system login user otptester authentication otp rate-time &#39;20&#39;
+set system login user otptester authentication otp window-size &#39;5&#39;
 </pre></div>
 </div>
-<p>Once <abbr title="One-time password">OTP</abbr>-based <abbr title="Multi-factor Authentication">MFA</abbr> is configured for a user account, this user must enter their
-standard password followed by the current 6-digit OTP code at login. For
-example, if the user’s password is <code class="docutils literal notranslate">vyosrocks</code> and the OTP is <code class="docutils literal notranslate">817454</code>, they
-should enter <code class="docutils literal notranslate">vyosrocks817454</code>.</p>
+<p>一旦为用户账户配置了基于<abbr title="一次性密码">OTP</abbr>的<abbr title="多因素认证">MFA</abbr>，该用户在登录时必须先输入标准密码，再输入当前的 6 位 OTP 代码。例如，若用户密码为 <code class="docutils literal notranslate">vyosrocks</code>，OTP 为 <code class="docutils literal notranslate">817454</code>，则应输入 <code class="docutils literal notranslate">vyosrocks817454</code>。</p>
 </section>
 </section>
 <section id="radius-authentication">
-<h2>RADIUS authentication</h2>
-<p>For large-scale deployments, managing individual user accounts across multiple
-VyOS instances is inefficient. VyOS supports centralized authentication via
-<abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>, consolidating user
-account management on a single backend server.</p>
+<h2>RADIUS 认证</h2>
+<p>对于大规模部署，跨多个 VyOS 实例单独管理用户账户效率低下。VyOS 支持通过<abbr title="远程认证拨号用户服务">RADIUS</abbr>进行集中式认证，将用户账户管理统一到单一后端服务器上。</p>
 <section id="configuration">
 <h3>配置</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login radius server <address> key <secret>
-<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-key-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the</strong> <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>
-<strong>server’s IP address and shared secret.</strong></p>
-<p>The shared secret 用于 verify the router’s identity and to encrypt user
-passwords during authentication.</p>
-<p>You can configure multiple <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> servers.</p>
+set system login radius server &lt;address&gt; key &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-key-secret" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置</strong><abbr title="远程认证拨号用户服务">RADIUS</abbr><strong>服务器的 IP 地址和共享密钥。</strong></p>
+<p>共享密钥用于验证路由器的身份，并在认证过程中加密用户密码。</p>
+<p>您可以配置多个<abbr title="远程认证拨号用户服务">RADIUS</abbr>服务器。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login radius server <address> port <port>
-<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the UDP port for communication with the</strong> <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> <strong>server.</strong></p>
-<p>The default port is 1812.</p>
+set system login radius server &lt;address&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-port-port" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置与</strong><abbr title="远程认证拨号用户服务">RADIUS</abbr><strong>服务器通信所使用的 UDP 端口。</strong></p>
+<p>默认端口为 1812。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login radius server <address> disable
-<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable a</strong> <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>
-<strong>server from the authentication process.</strong></p>
-<p>Disabling a specific <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> server doesn’t remove its configuration settings (the server’s IP
-address and shared secret).</p>
+set system login radius server &lt;address&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在认证过程中禁用某个</strong><abbr title="远程认证拨号用户服务">RADIUS</abbr><strong>服务器。</strong></p>
+<p>禁用特定<abbr title="远程认证拨号用户服务">RADIUS</abbr>服务器并不会删除其配置设置（服务器的 IP 地址和共享密钥）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login radius server <address> timeout <timeout>
-<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure the duration, in seconds, that the VyOS router waits for a
-response from the <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>
-server after sending an authentication request.</p>
-<p>If the server does not respond within this timeframe, the VyOS router tries to
-connect to another configured server or falls back to local authentication.</p>
+set system login radius server &lt;address&gt; timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-server-address-timeout-timeout" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>配置 VyOS 路由器在发送认证请求后等待<abbr title="远程认证拨号用户服务">RADIUS</abbr>服务器响应的持续时间（单位：秒）。</p>
+<p>若服务器在此时间段内无响应，VyOS 路由器将尝试连接其他已配置的服务器，或回退至本地认证。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login radius source-address <address>
-<a class="cmdlink" href="#cfgcmd-set-system-login-radius-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the source IP address the router uses for</strong> <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> <strong>authentication requests.</strong></p>
-<p>A consistent source IP address is recommended as RADIUS servers typically
-accept requests only from known, trusted IP addresses.</p>
-<p>If not explicitly defined, the router uses the current egress interface
-address, which may change (e.g., due to a link outage), causing authentication
-failures.</p>
+set system login radius source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-source-address-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器用于</strong><abbr title="远程认证拨号用户服务">RADIUS</abbr><strong>认证请求的源 IP 地址。</strong></p>
+<p>建议使用一致的源 IP 地址，因为 RADIUS 服务器通常只接受来自已知可信 IP 地址的请求。</p>
+<p>若未显式定义，路由器将使用当前出口接口地址，该地址可能发生变化（例如因链路中断），从而导致认证失败。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login radius vrf <name>
-<a class="cmdlink" href="#cfgcmd-set-system-login-radius-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to send all</strong> <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> <strong>authentication requests via a specific VRF.</strong></p>
-<p>By default, <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>
-authentication requests are sent via the global routing table.</p>
+set system login radius vrf &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-radius-vrf-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器通过特定 VRF 发送所有</strong><abbr title="远程认证拨号用户服务">RADIUS</abbr><strong>认证请求。</strong></p>
+<p>默认情况下，<abbr title="远程认证拨号用户服务">RADIUS</abbr>认证请求通过全局路由表发送。</p>
 </div>
 </div>
 </section>
 <section id="configuration-example">
-<h3>配置 example</h3>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set system login radius server 192.168.0.2 key 'test-vyos'
-set system login radius server 192.168.0.2 port '1812'
-set system login radius server 192.168.0.2 timeout '5'
-set system login radius source-address '192.168.0.1'
+<h3>配置示例</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system login radius server 192.168.0.2 key &#39;test-vyos&#39;
+set system login radius server 192.168.0.2 port &#39;1812&#39;
+set system login radius server 192.168.0.2 timeout &#39;5&#39;
+set system login radius source-address &#39;192.168.0.1&#39;
 </pre></div>
 </div>
-<p>If communication with the <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> server fails, the router falls back to local user authentication.
-During this process, users may experience a login delay while the system waits
-for the <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr> request to
-time out. This delay depends on the configured timeout value.</p>
+<p>若与<abbr title="远程认证拨号用户服务">RADIUS</abbr>服务器的通信失败，路由器将回退至本地用户认证。在此过程中，用户可能会因系统等待<abbr title="远程认证拨号用户服务">RADIUS</abbr>请求超时而经历登录延迟。此延迟取决于所配置的超时值。</p>
 <div class="admonition hint">
-<p class="admonition-title">Hint</p>
-<p>To grant administrative privileges to <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>-authenticated users, the server must
-return the Cisco-AV-Pair attribute set to <code class="docutils literal notranslate">shell:priv-lvl=15</code>. Otherwise, users
-receive standard privileges and cannot perform configuration tasks.</p>
+<p class="admonition-title">提示</p>
+<p>要向经<abbr title="远程认证拨号用户服务">RADIUS</abbr>认证的用户授予管理权限，服务器必须返回 Cisco-AV-Pair 属性，其值设为 <code class="docutils literal notranslate">shell:priv-lvl=15</code>。否则，用户仅获得标准权限，无法执行配置任务。</p>
 </div>
 </section>
 </section>
 <section id="tacacs-authentication">
-<h2>TACACS+ authentication</h2>
-<p>In addition to <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>,
-VyOS supports <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr>, which is commonly used in large enterprise environments.</p>
-<p>Unlike <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>,
-<abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> separates
-认证, Authorization, and Accounting (AAA) into independent processes
-and encrypts the entire packet body for enhanced security.</p>
-<p><abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> is defined
-in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc8907.html"><strong>RFC 8907</strong></a>.</p>
+<h2>TACACS+ 认证</h2>
+<p>除了<abbr title="远程认证拨号用户服务">RADIUS</abbr>外，VyOS 还支持<abbr title="终端访问控制器访问控制系统">TACACS+</abbr>，后者常用于大型企业环境中。</p>
+<p>与<abbr title="远程认证拨号用户服务">RADIUS</abbr>不同，<abbr title="终端访问控制器访问控制系统">TACACS+</abbr> 将认证（Authentication）、授权（Authorization）和计费（Accounting）（AAA）分离为独立流程，并对整个数据包载荷进行加密，以增强安全性。</p>
+<p><abbr title="终端访问控制器访问控制系统">TACACS+</abbr> 在 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc8907.html"><strong>RFC 8907</strong></a> 中定义。</p>
 <section id="tacacs-configuration">
 <h3>配置</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login tacacs server <address> key <secret>
-<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-key-secret" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the</strong> <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> <strong>server IP address and shared secret.</strong></p>
-<p>Unlike <abbr title="Remote Authentication Dial-In User Service">RADIUS</abbr>, which
-encrypts only passwords, <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> encrypts the entire packet body for enhanced security.</p>
-<p>You can configure multiple <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> servers.</p>
+set system login tacacs server &lt;address&gt; key &lt;secret&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-key-secret" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置</strong><abbr title="终端访问控制器访问控制系统">TACACS+</abbr><strong>服务器的 IP 地址和共享密钥。</strong></p>
+<p>与仅加密密码的<abbr title="远程认证拨号用户服务">RADIUS</abbr>不同，<abbr title="终端访问控制器访问控制系统">TACACS+</abbr> 对整个数据包载荷进行加密，以增强安全性。</p>
+<p>您可以配置多个<abbr title="终端访问控制器访问控制系统">TACACS+</abbr>服务器。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login tacacs server <address> port <port>
-<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the TCP port for communication with the</strong> <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> <strong>server.</strong></p>
-<p>The default port is 49.</p>
+set system login tacacs server &lt;address&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-port-port" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置与</strong><abbr title="终端访问控制器访问控制系统">TACACS+</abbr><strong>服务器通信所使用的 TCP 端口。</strong></p>
+<p>默认端口为 49。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login tacacs server <address> disable
-<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable a</strong> <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> <strong>server from the authentication process.</strong></p>
-<p>Disabling a specific <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> server doesn’t remove its configuration settings (the server’s IP
-address and shared secret).</p>
+set system login tacacs server &lt;address&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在认证过程中禁用某个</strong><abbr title="终端访问控制器访问控制系统">TACACS+</abbr><strong>服务器。</strong></p>
+<p>禁用特定<abbr title="终端访问控制器访问控制系统">TACACS+</abbr>服务器并不会删除其配置设置（服务器的 IP 地址和共享密钥）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login tacacs server <address> timeout <timeout>
-<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure the duration, in seconds, that the VyOS router waits for a
-response from the <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> server after sending an authentication request.</p>
-<p>If the server does not respond within this timeframe, the VyOS router tries
-to connect to another configured server or falls back to local authentication.</p>
+set system login tacacs server &lt;address&gt; timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-server-address-timeout-timeout" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>配置 VyOS 路由器在发送认证请求后等待<abbr title="终端访问控制器访问控制系统">TACACS+</abbr>服务器响应的持续时间（单位：秒）。</p>
+<p>若服务器在此时间段内无响应，VyOS 路由器将尝试连接其他已配置的服务器，或回退至本地认证。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login tacacs source-address <address>
-<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-source-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the source IP address the router uses for</strong>
-<abbr title="Terminal Access Controller Access Control System">TACACS+</abbr>
-<strong>authentication requests.</strong></p>
-<p>A consistent source IP address is recommended as <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> servers typically accept requests
-only from known, trusted IP addresses.</p>
-<p>If not explicitly defined, the router uses the current egress interface address,
-which may change (e.g., due to a link outage), causing authentication failures.</p>
+set system login tacacs source-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-source-address-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器用于</strong><abbr title="终端访问控制器访问控制系统">TACACS+</abbr><strong>认证请求的源 IP 地址。</strong></p>
+<p>建议使用一致的源 IP 地址，因为<abbr title="终端访问控制器访问控制系统">TACACS+</abbr>服务器通常只接受来自已知可信 IP 地址的请求。</p>
+<p>若未显式定义，路由器将使用当前出口接口地址，该地址可能发生变化（例如因链路中断），从而导致认证失败。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login tacacs vrf <name>
-<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure the router to send all <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> authentication requests via a specific VRF.</p>
-<p>By default, <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr>
-authentication requests are sent via the global routing table.</p>
+set system login tacacs vrf &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-tacacs-vrf-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>配置路由器通过特定 VRF 发送所有<abbr title="终端访问控制器访问控制系统">TACACS+</abbr>认证请求。</p>
+<p>默认情况下，<abbr title="终端访问控制器访问控制系统">TACACS+</abbr>认证请求通过全局路由表发送。</p>
 </div>
 </div>
 </section>
 <section id="login-tacacs-example">
-<h3>配置 example</h3>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set system login tacacs server 192.168.0.2 key 'test-vyos'
-set system login tacacs server 192.168.0.2 port '49'
-set system login tacacs source-address '192.168.0.1'
+<h3>配置示例</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system login tacacs server 192.168.0.2 key &#39;test-vyos&#39;
+set system login tacacs server 192.168.0.2 port &#39;49&#39;
+set system login tacacs source-address &#39;192.168.0.1&#39;
 </pre></div>
 </div>
-<p>If communication with the <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> server fails, the router falls back to local user
-authentication.</p>
+<p>若与<abbr title="终端访问控制器访问控制系统">TACACS+</abbr>服务器的通信失败，路由器将回退至本地用户认证。</p>
 </section>
 </section>
 <section id="login-banners">
-<h2>日志in banners</h2>
-<p>VyOS 允许您 configure <strong>pre-login</strong> and <strong>post-login</strong> banners.
-Pre-login banners are typically used for system identification, legal disclaimers, or security warnings
-displayed before authentication, while post-login banners provide system
-information or operational notices to users after login.</p>
+<h2>登录横幅</h2>
+<p>VyOS 允许您配置<strong>登录前</strong>和<strong>登录后</strong>横幅。登录前横幅通常用于系统标识、法律免责声明或安全警告，显示于认证之前；登录后横幅则在用户登录后提供系统信息或操作通知。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login banner pre-login <message>
-<a class="cmdlink" href="#cfgcmd-set-system-login-banner-pre-login-message" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure a message to be shown to users before the <code class="docutils literal notranslate">username</code> and <code class="docutils literal notranslate">password</code>
-prompts appear.</p>
+set system login banner pre-login &lt;message&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-banner-pre-login-message" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>配置一条消息，在出现 <code class="docutils literal notranslate">username</code> 和 <code class="docutils literal notranslate">password</code> 提示之前向用户显示。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login banner post-login <message>
-<a class="cmdlink" href="#cfgcmd-set-system-login-banner-post-login-message" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure a message to be shown to users after successful authentication.</p>
+set system login banner post-login &lt;message&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-banner-post-login-message" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>配置一条消息，在成功认证后向用户显示。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>Use <code class="docutils literal notranslate">\\n</code> to insert line breaks in multi-line banner messages.</p>
+<p>在多行横幅消息中使用 <code class="docutils literal notranslate">\\n</code> 插入换行符。</p>
 </div>
 </section>
 <section id="login-session-limits">
-<h2>日志in session limits</h2>
+<h2>登录会话限制</h2>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login max-login-session <number>
-<a class="cmdlink" href="#cfgcmd-set-system-login-max-login-session-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the maximum number of concurrent login sessions.</strong></p>
+set system login max-login-session &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-max-login-session-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置最大并发登录会话数。</strong></p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>If you limit concurrent login sessions, you must also configure a
-session <code class="docutils literal notranslate"><timeout></code>. This clears inactive sessions and prevents blocking new
-login attempts.</p>
+<p>如果您限制并发登录会话数，则还必须配置会话 <code class="docutils literal notranslate">&lt;timeout&gt;</code>。这将清除非活跃会话，防止阻塞新的登录尝试。</p>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set system login timeout <timeout>
-<a class="cmdlink" href="#cfgcmd-set-system-login-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the login session timeout, （以秒为单位）。</strong></p>
-<p>Idle login sessions are terminated after this period.</p>
+set system login timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-system-login-timeout-timeout" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置登录会话超时时间（单位：秒）。</strong></p>
+<p>空闲登录会话将在该时间段后终止。</p>
 </div>
 </div>
 </section>
 <section id="configuration-examples">
-<h2>配置 examples</h2>
-<p>示例 1: Multi-key SSH with MFA and source restrictions</p>
-<p>In this configuration, <code class="docutils literal notranslate">User1</code> and <code class="docutils literal notranslate">User2</code> both use the vyos user account,
-each with a unique SSH key. <code class="docutils literal notranslate">User1</code> is restricted to authentication from a
-single IP address.</p>
-<p>For both users, password-based logins require <abbr title="One-time password">OTP</abbr>
--based <abbr title="Multi-factor Authentication">MFA</abbr>.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set system login user vyos authentication public-keys 'User1' key "AAAAB3Nz...KwEW"
-set system login user vyos authentication public-keys 'User1' type ssh-rsa
-set system login user vyos authentication public-keys 'User1' options "from=&quot;192.168.0.100&quot;"
+<h2>配置示例</h2>
+<p>示例 1：带 MFA 和源限制的多密钥 SSH</p>
+<p>在此配置中，<code class="docutils literal notranslate">User1</code> 和 <code class="docutils literal notranslate">User2</code> 均使用 vyos 用户账户，各自拥有唯一的 SSH 密钥。<code class="docutils literal notranslate">User1</code> 的认证被限制为仅来自单一 IP 地址。</p>
+<p>对于两位用户，基于密码的登录均需要基于<abbr title="一次性密码">OTP</abbr>的<abbr title="多因素认证">MFA</abbr>。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set system login user vyos authentication public-keys &#39;User1&#39; key &quot;AAAAB3Nz...KwEW&quot;
+set system login user vyos authentication public-keys &#39;User1&#39; type ssh-rsa
+set system login user vyos authentication public-keys &#39;User1&#39; options &quot;from=&amp;quot;192.168.0.100&amp;quot;&quot;
 
-set system login user vyos authentication public-keys 'User2' key "AAAAQ39x...fbV3"
-set system login user vyos authentication public-keys 'User2' type ssh-rsa
+set system login user vyos authentication public-keys &#39;User2&#39; key &quot;AAAAQ39x...fbV3&quot;
+set system login user vyos authentication public-keys &#39;User2&#39; type ssh-rsa
 
 set system login user vyos authentication otp key OHZ3OJ7U2N25BK4G7SOFFJTZDTCFUUE2
 set system login user vyos authentication plaintext-password vyos
 </pre></div>
 </div>
-<p>示例 2: 容器ized <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr>
-deployment with redundancy.</p>
-<p>In this configuration, the VyOS router hosts its own authentication
-infrastructure using two containerized <abbr title="Terminal Access Controller Access Control System">TACACS+</abbr> servers (<code class="docutils literal notranslate">tacacs1</code> and <code class="docutils literal notranslate">tacacs2</code>) on a
-private network for redundancy.</p>
-<p>系统 logins are authenticated against credentials stored within these internal
-containers rather than the router’s local user database.</p>
-<p>First, download the image in operational mode:</p>
+<p>示例 2：具备冗余性的容器化<abbr title="终端访问控制器访问控制系统">TACACS+</abbr>部署</p>
+<p>在此配置中，VyOS 路由器通过两个容器化的<abbr title="终端访问控制器访问控制系统">TACACS+</abbr>服务器（<code class="docutils literal notranslate">tacacs1</code> 和 <code class="docutils literal notranslate">tacacs2</code>）在私有网络上托管自身的认证基础设施，以实现冗余性。</p>
+<p>系统登录将针对这些内部容器中存储的凭证进行认证，而非路由器的本地用户数据库。</p>
+<p>首先，在操作模式下下载镜像：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>add container image lfkeitel/tacacs_plus:latest
 </pre></div>
 </div>
-<p>Next, configure the containers in configuration mode:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set container network tac-test prefix '100.64.0.0/24'
+<p>接下来，在配置模式下配置容器：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set container network tac-test prefix &#39;100.64.0.0/24&#39;
 
-set container name tacacs1 image 'lfkeitel/tacacs_plus:latest'
-set container name tacacs1 network tac-test address '100.64.0.11'
+set container name tacacs1 image &#39;lfkeitel/tacacs_plus:latest&#39;
+set container name tacacs1 network tac-test address &#39;100.64.0.11&#39;
 
-set container name tacacs2 image 'lfkeitel/tacacs_plus:latest'
-set container name tacacs2 network tac-test address '100.64.0.12'
+set container name tacacs2 image &#39;lfkeitel/tacacs_plus:latest&#39;
+set container name tacacs2 network tac-test address &#39;100.64.0.12&#39;
 
-set system login tacacs server 100.64.0.11 key 'tac_plus_key'
-set system login tacacs server 100.64.0.12 key 'tac_plus_key'
+set system login tacacs server 100.64.0.11 key &#39;tac_plus_key&#39;
+set system login tacacs server 100.64.0.12 key &#39;tac_plus_key&#39;
 
 commit
 </pre></div>
 </div>
-<p>You can now log in via SSH or console using <code class="docutils literal notranslate">admin/admin</code> credentials supplied
-by the container image.</p>
+<p>现在，您可以使用容器镜像提供的 <code class="docutils literal notranslate">admin/admin</code> 凭据通过 SSH 或控制台登录。</p>
 </section>
 </section>
 

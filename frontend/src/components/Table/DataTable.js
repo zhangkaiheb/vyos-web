@@ -333,7 +333,7 @@ export default defineComponent({
                 <input type="checkbox" :checked="allPageSelected()" @change="toggleSelectAll" />
               </th>
               <th v-for="col in columns.filter(c => visibleColumns.includes(c.key))" :key="col.key"
-                  @click="toggleSort(col.key)" style="cursor:pointer;">
+                  @click="toggleSort(col.key)" style="cursor:pointer;" :style="col.width ? { width: col.width } : {}">
                 {{ t(col.title) }}
                 <span v-if="sortKey === col.key">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
               </th>

@@ -70,6 +70,7 @@ class VyOSWebApp:
                 '/api/config/merge': self.handle_config_merge,
                 '/api/config/import': self.handle_config_import,
                 '/api/config/export': self.handle_config_export,
+                '/api/config/export-file': self.handle_config_export_file,
                 '/api/firewall/import': self.handle_firewall_import,
                 '/api/firewall/move-rule': self.handle_firewall_move_rule,
                 '/api/firewall/copy-rule': self.handle_firewall_copy_rule,
@@ -98,6 +99,8 @@ class VyOSWebApp:
                 '/api/system/generate': self.handle_generate_command,
                 '/api/references': self.handle_add_reference,
                 '/api/conntrack-log-config': self.handle_set_conntrack_log_config,
+                '/api/feature-visibility': self.handle_update_feature_visibility,
+                '/api/feature-visibility/batch': self.handle_update_feature_visibility_batch,
                 '/api/webapp/version': self.handle_webapp_version,
                 '/api/webapp/check-update': self.handle_webapp_check_update,
                 '/api/op-mode': self.handle_op_mode_execute,
@@ -131,6 +134,7 @@ class VyOSWebApp:
                 '/api/firewall/references': self.handle_firewall_references,
                 '/api/op-mode/show': self.handle_op_mode_show,
                 '/api/conntrack-log-config': self.handle_get_conntrack_log_config,
+                '/api/feature-visibility': self.handle_get_feature_visibility,
                 '/api/help': self.handle_help,
                 '/api/monitor/history': self.handle_monitor_history,
                 '/api/monitor/stream': self.handle_monitor_stream,
@@ -214,6 +218,7 @@ class VyOSWebApp:
 
         try:
             result = handler(environ, body)
+            extra_headers = []
             # Allow handlers to return extra response headers as (data, headers) tuple
             if isinstance(result, tuple) and len(result) == 2 and isinstance(result[1], list):
                 data, extra_headers = result
@@ -221,6 +226,21 @@ class VyOSWebApp:
                 result = data
             if hasattr(result, '__iter__') and not isinstance(result, (dict, list, bytes, str)):
                 return sse_response(start_response, result)
+            # Handle binary file download
+            if isinstance(result, bytes):
+                response_headers = [
+                    ('Content-Type', 'application/octet-stream'),
+                    ('Access-Control-Allow-Origin', '*'),
+                ]
+                for h in headers:
+                    if h[0] not in ('Content-Type',):
+                        response_headers.append(h)
+                # Override Content-Type from extra headers if present
+                for h in extra_headers:
+                    if h[0] == 'Content-Type':
+                        response_headers = [(k, v) if k != 'Content-Type' else h for k, v in response_headers]
+                start_response('200 OK', response_headers)
+                return [result]
             return json_response(start_response, 200, result, headers)
         except Exception as e:
             traceback.print_exc()
@@ -392,6 +412,16 @@ class VyOSWebApp:
         password = body.get('password', '')
         include_sensitive = body.get('include_sensitive', True)
         return self.config_service.export_config(user, password, include_sensitive)
+
+    def handle_config_export_file(self, environ, body):
+        user = environ.get('user', {})
+        password = body.get('password', '')
+        include_sensitive = body.get('include_sensitive', True)
+        content, filename, content_type = self.config_service.export_config_file(user, password, include_sensitive)
+        return content, [
+            ('Content-Type', content_type),
+            ('Content-Disposition', f'attachment; filename="{filename}"'),
+        ]
 
     def handle_get_commands(self, environ, body):
         query = parse_qs(environ.get('QUERY_STRING', ''))
@@ -675,6 +705,23 @@ class VyOSWebApp:
             user, body.get('enabled', False), body.get('level', 'info'),
             body.get('tcp', False), body.get('udp', False),
             body.get('icmp', False), body.get('other', False)
+        )
+
+    # ---------- feature visibility ----------
+
+    def handle_get_feature_visibility(self, environ, body):
+        return self.config_service.get_feature_visibility()
+
+    def handle_update_feature_visibility(self, environ, body):
+        user = environ.get('user', {})
+        return self.config_service.update_feature_visibility(
+            user, body.get('feature_key', ''), body.get('is_visible', False)
+        )
+
+    def handle_update_feature_visibility_batch(self, environ, body):
+        user = environ.get('user', {})
+        return self.config_service.update_feature_visibility_batch(
+            user, body.get('updates', [])
         )
 
     # ---------- webapp upgrade ----------

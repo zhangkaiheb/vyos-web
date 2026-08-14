@@ -33,7 +33,8 @@ export const FIREWALL_RULE_SCHEMA_IPV6 = [
             "title": "地址组",
             "help": "firewall.rule.help.ipv6.dynamic-address-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "timeout",
@@ -54,7 +55,8 @@ export const FIREWALL_RULE_SCHEMA_IPV6 = [
             "title": "地址组",
             "help": "firewall.rule.help.ipv6.dynamic-address-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "timeout",
@@ -171,42 +173,48 @@ export const FIREWALL_RULE_SCHEMA_IPV6 = [
             "title": "地址组",
             "help": "firewall.rule.help.ipv6.address-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "domain-group",
             "title": "域名组",
             "help": "firewall.rule.help.ipv6.domain-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "dynamic-address-group",
             "title": "动态地址组",
             "help": "firewall.rule.help.ipv6.dynamic-address-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "mac-group",
             "title": "MAC 组",
             "help": "firewall.rule.help.ipv6.mac-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "network-group",
             "title": "网络组",
             "help": "firewall.rule.help.ipv6.network-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "port-group",
             "title": "端口组",
             "help": "firewall.rule.help.ipv6.port-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           }
         ]
       },
@@ -696,42 +704,48 @@ export const FIREWALL_RULE_SCHEMA_IPV6 = [
             "title": "地址组",
             "help": "firewall.rule.help.ipv6.address-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "domain-group",
             "title": "域名组",
             "help": "firewall.rule.help.ipv6.domain-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "dynamic-address-group",
             "title": "动态地址组",
             "help": "firewall.rule.help.ipv6.dynamic-address-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "mac-group",
             "title": "MAC 组",
             "help": "firewall.rule.help.ipv6.mac-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "network-group",
             "title": "网络组",
             "help": "firewall.rule.help.ipv6.network-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           },
           {
             "key": "port-group",
             "title": "端口组",
             "help": "firewall.rule.help.ipv6.port-group",
             "type": "select",
-            "dynamic": true
+            "dynamic": true,
+            "noAutoFill": true
           }
         ]
       },

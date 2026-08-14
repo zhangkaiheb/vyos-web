@@ -16,6 +16,7 @@ export const {
   keepAlive,
   nextTick,
   toRaw,
+  toRef,
   shallowRef,
   watchEffect,
 } = window.Vue;

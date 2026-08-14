@@ -1,0 +1,323 @@
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f1f3f5; font-weight: 600; }
+  .command-block { background: #f8f9fa; border-left: 3px solid #fd7e14; border-radius: 0 4px 4px 0; padding: 10px 14px; margin: 10px 0; font-family: "SFMono-Regular", Consolas, monospace; font-size: 13px; }
+  .command-block::before { content: '$ '; color: #fd7e14; font-weight: bold; }
+</style>
+
+<div itemprop="articleBody">
+
+<h1>IPsec 故障排除</h1>
+
+<p>本文档提供 IPsec VPN 常见问题的故障排除方法和诊断步骤。</p>
+
+<h2>基本诊断命令</h2>
+
+<p>VyOS 提供了一系列命令来帮助诊断 IPsec 问题：</p>
+
+<h3>查看 IPsec 状态</h3>
+
+<p>查看当前 IPsec 隧道和安全关联的状态：</p>
+
+<div class="command-block">show vpn ipsec status</div>
+
+<p>此命令显示所有 IPsec 隧道的当前状态，包括连接是否建立、SA（安全关联）是否活动等。</p>
+
+<h3>查看安全关联</h3>
+
+<p>查看详细的 IKE 和 Child SA 信息：</p>
+
+<div class="command-block">show vpn ipsec sa</div>
+
+<p>输出包含以下信息：</p>
+<ul>
+  <li><strong>IKE SA</strong>：IKE 阶段 1 安全关联</li>
+  <li><strong>Child SA</strong>：IKE 阶段 2 安全关联（数据隧道）</li>
+  <li><strong>状态</strong>：ESTABLISHED（已建立）、INSTALLED（已安装）等</li>
+  <li><strong>加密算法</strong>：使用的加密和认证算法</li>
+  <li><strong>流量统计</strong>：通过隧道的数据包和字节数</li>
+</ul>
+
+<h3>查看 IPsec 配置</h3>
+
+<p>查看当前运行的 IPsec 配置：</p>
+
+<div class="command-block">show vpn ipsec detail</div>
+
+<h2>常见问题及解决方案</h2>
+
+<h3>隧道无法建立</h3>
+
+<p><strong>症状</strong>：IPsec 隧道状态显示为 "down" 或 "connecting"。</p>
+
+<p><strong>可能原因和解决方案</strong>：</p>
+
+<ol>
+  <li>
+    <p><strong>预共享密钥不匹配</strong></p>
+    <p>确保两端的预共享密钥完全相同，包括大小写和空格。</p>
+    <div class="command-block">show vpn ipsec site-to-site peer &lt;peer-address&gt;</div>
+  </li>
+  <li>
+    <p><strong>IKE 提议不匹配</strong></p>
+    <p>检查两端的 IKE 组配置是否兼容。加密算法、哈希算法和 Diffie-Hellman 组必须匹配。</p>
+    <div class="command-block">show vpn ipsec ike-group</div>
+  </li>
+  <li>
+    <p><strong>ESP 提议不匹配</strong></p>
+    <p>验证 ESP 组配置是否一致。</p>
+    <div class="command-block">show vpn ipsec esp-group</div>
+  </li>
+  <li>
+    <p><strong>防火墙阻止</strong></p>
+    <p>确保防火墙允许以下端口通过：</p>
+    <ul>
+      <li>UDP 500（IKE）</li>
+      <li>UDP 4500（NAT-T）</li>
+      <li>协议 50（ESP）</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>本地/远端子网配置错误</strong></p>
+    <p>检查站点到站点 VPN 的本地子网和远端子网配置是否正确。</p>
+  </li>
+</ol>
+
+<h3>隧道建立但不传输数据</h3>
+
+<p><strong>症状</strong>：IPsec 隧道显示为 "up"，但无法通过隧道传输数据。</p>
+
+<p><strong>可能原因和解决方案</strong>：</p>
+
+<ol>
+  <li>
+    <p><strong>Child SA 未安装</strong></p>
+    <p>检查 Child SA 是否成功安装：</p>
+    <div class="command-block">show vpn ipsec sa</div>
+    <p>如果 Child SA 未显示，可能是 ESP 提议不匹配。</p>
+  </li>
+  <li>
+    <p><strong>路由问题</strong></p>
+    <p>验证路由表是否正确，确保流量能够通过隧道接口：</p>
+    <div class="command-block">show ip route</div>
+  </li>
+  <li>
+    <p><strong>MTU 问题</strong></p>
+    <p>IPsec 会增加数据包开销。如果数据包过大，可能会被丢弃。尝试调整 MTU：</p>
+    <div class="command-block">set interfaces ethernet &lt;interface&gt; mtu 1400</div>
+  </li>
+  <li>
+    <p><strong>非对称路由</strong></p>
+    <p>确保返回流量也通过 IPsec 隧道，检查策略路由配置。</p>
+  </li>
+</ol>
+
+<h3>隧道频繁断开</h3>
+
+<p><strong>症状</strong>：IPsec 隧道反复建立和断开。</p>
+
+<p><strong>可能原因和解决方案</strong>：</p>
+
+<ol>
+  <li>
+    <p><strong>DPD（Dead Peer Detection）配置</strong></p>
+    <p>检查 DPD 设置是否过于激进：</p>
+    <div class="command-block">show vpn ipsec site-to-site peer &lt;peer-address&gt; dead-peer-detection</div>
+    <p>建议的 DPD 设置：</p>
+    <ul>
+      <li>interval: 15-30 秒</li>
+      <li>timeout: 30-60 秒</li>
+      <li>action: restart</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>IKE 重协商失败</strong></p>
+    <p>检查 IKE 生命周期设置，确保两端兼容。</p>
+  </li>
+  <li>
+    <p><strong>NAT 问题</strong></p>
+    <p>如果任一端位于 NAT 之后，确保启用了 NAT 穿透（NAT-T）。</p>
+  </li>
+</ol>
+
+<h3>认证失败</h3>
+
+<p><strong>症状</strong>：日志显示认证错误。</p>
+
+<p><strong>可能原因和解决方案</strong>：</p>
+
+<ol>
+  <li>
+    <p><strong>预共享密钥错误</strong></p>
+    <p>重新配置预共享密钥，确保两端完全匹配。</p>
+  </li>
+  <li>
+    <p><strong>证书问题</strong></p>
+    <p>如果使用证书认证：</p>
+    <ul>
+      <li>验证证书是否过期</li>
+      <li>检查证书链是否完整</li>
+      <li>确认证书主题名称匹配</li>
+      <li>验证 CA 证书已正确安装</li>
+    </ul>
+  </li>
+</ol>
+
+<h2>日志和调试</h2>
+
+<h3>查看 IPsec 日志</h3>
+
+<p>查看系统日志中的 IPsec 相关信息：</p>
+
+<div class="command-block">show log | match charon</div>
+
+<p>或者查看更详细的日志：</p>
+
+<div class="command-block">tail -f /var/log/syslog | grep charon</div>
+
+<h3>启用详细日志</h3>
+
+<p>如需更详细的调试信息，可以启用 IPsec 调试日志：</p>
+
+<div class="command-block">set vpn ipsec logging log-level 3</div>
+
+<p>日志级别说明：</p>
+<ul>
+  <li><strong>0</strong>：仅错误</li>
+  <li><strong>1</strong>：警告</li>
+  <li><strong>2</strong>：信息（默认）</li>
+  <li><strong>3</strong>：调试</li>
+  <li><strong>4</strong>：详细调试</li>
+</ul>
+
+<div class="warning">
+  <strong>警告：</strong>高日志级别会产生大量日志输出，可能影响系统性能。仅在故障排除时临时启用。
+</div>
+
+<h3>常见日志消息</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>日志消息</th>
+      <th>含义</th>
+      <th>解决方案</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>received INVALID_ID_INFORMATION</code></td>
+      <td>身份标识不匹配</td>
+      <td>检查本地和远端身份配置</td>
+    </tr>
+    <tr>
+      <td><code>no matching proposal found</code></td>
+      <td>提议不匹配</td>
+      <td>检查 IKE/ESP 组配置</td>
+    </tr>
+    <tr>
+      <td><code>authentication failed</code></td>
+      <td>认证失败</td>
+      <td>验证预共享密钥或证书</td>
+    </tr>
+    <tr>
+      <td><code>peer not responding</code></td>
+      <td>对等体无响应</td>
+      <td>检查网络连接和防火墙</td>
+    </tr>
+    <tr>
+      <td><code>SA lifetime expired</code></td>
+      <td>SA 生命周期到期</td>
+      <td>正常现象，检查重协商配置</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>网络抓包</h2>
+
+<p>当其他方法无法解决问题时，可以使用 tcpdump 进行网络抓包：</p>
+
+<h3>捕获 IKE 流量</h3>
+
+<div class="command-block">tcpdump -i any -n port 500 or port 4500</div>
+
+<h3>捕获 ESP 流量</h3>
+
+<div class="command-block">tcpdump -i any -n proto 50</div>
+
+<h3>保存抓包文件</h3>
+
+<div class="command-block">tcpdump -i any -n -w /tmp/ipsec.pcap port 500 or port 4500 or proto 50</div>
+
+<p>可以使用 Wireshark 分析保存的 pcap 文件。</p>
+
+<h2>重置和重启</h2>
+
+<h3>重置 IPsec 隧道</h3>
+
+<p>重置特定站点的 IPsec 隧道：</p>
+
+<div class="command-block">reset vpn ipsec site-to-site peer &lt;peer-address&gt;</div>
+
+<h3>重启 IPsec 服务</h3>
+
+<p>如需重启整个 IPsec 服务：</p>
+
+<div class="command-block">restart vpn ipsec</div>
+
+<div class="warning">
+  <strong>警告：</strong>重启 IPsec 服务会中断所有活动的 VPN 连接。
+</div>
+
+<h2>性能问题</h2>
+
+<h3>加密性能测试</h3>
+
+<p>测试系统的加密性能：</p>
+
+<div class="command-block">show vpn ipsec performance</div>
+
+<h3>硬件加速</h3>
+
+<p>如果支持硬件加密加速，确保已启用：</p>
+
+<div class="command-block">show vpn ipsec hardware-acceleration</div>
+
+<div class="tip">
+  <strong>提示：</strong>某些 CPU 支持 AES-NI 指令集，可以显著提高 IPsec 性能。使用 <code>lscpu | grep aes</code> 检查是否支持。
+</div>
+
+<h2>联系支持</h2>
+
+<p>如果以上步骤无法解决问题，请收集以下信息并联系技术支持：</p>
+
+<ol>
+  <li>完整的配置导出：<code>show configuration commands | match vpn</code></li>
+  <li>IPsec 状态输出：<code>show vpn ipsec status</code></li>
+  <li>安全关联信息：<code>show vpn ipsec sa</code></li>
+  <li>系统日志：<code>show log | match charon</code></li>
+  <li>网络抓包文件（如适用）</li>
+</ol>
+
+</div>

@@ -164,7 +164,7 @@ et les commandes op-mode associées.</p>
 set firewall bridge &lt;options&gt;
 <a class="cmdlink" href="#cfgcmd-set-firewall-bridge-options" title="Permalink to this Command"></a></div></div>
 <p>À partir de la structure principale définie dans
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Aperçu du pare-feu</a>
+<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">Aperçu du pare-feu</a>
 dans cette section, vous pouvez trouver des informations détaillées uniquement pour la prochaine partie
 de la structure générale :</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
@@ -189,21 +189,21 @@ tous les paquets sont analysés au <strong>Prerouting</strong>. Des filtres peuv
 </ul>
 <p>Pour le trafic qui doit être commuté internement par le pont, la chaîne de base est <strong>forward</strong>, et sa commande de base pour le filtrage est <code class="docutils literal notranslate">set firewall bridge forward filter ...</code>, qui se produit à l'étape 4, surlignée en rouge.</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-bridge-forward.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-forward.webp" />
+<img alt="../../_images/firewall-bridge-forward.webp" src="https://docs.vyos.io/en/latest/_images/firewall-bridge-forward.webp" />
 </figure>
 <p>Pour le trafic destiné au routeur lui-même ou qui doit être routé
 (à supposer qu'un pont de couche 3 soit configuré), la chaîne de base est <strong>input</strong>, et la
 commande de base est <code class="docutils literal notranslate">set firewall bridge input filter ...</code> et le chemin est :</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-bridge-input.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-input.webp" />
+<img alt="../../_images/firewall-bridge-input.webp" src="https://docs.vyos.io/en/latest/_images/firewall-bridge-input.webp" />
 </figure>
 <p>Si ce n'est pas supprimé, le paquet est envoyé au <strong>Niveau IP</strong>, et sera
 traité par le pare-feu du <strong>Niveau IP</strong> : ensemble de règles IPv4 ou IPv6. Vérifiez à nouveau
-le <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">diagramme du flux de paquet général</a> si nécessaire.</p>
+le <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">diagramme du flux de paquet général</a> si nécessaire.</p>
 <p>Pour le trafic provenant du pont lui-même, la chaîne de base est
 <strong>output</strong>, et la commande de base est <code class="docutils literal notranslate">set firewall bridge output filter ...</code>, et le chemin est :</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-bridge-output.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-output.webp" />
+<img alt="../../_images/firewall-bridge-output.webp" src="https://docs.vyos.io/en/latest/_images/firewall-bridge-output.webp" />
 </figure>
 <p>Des chaînes de pare-feu de pont personnalisées peuvent être créées avec la commande <code class="docutils literal notranslate">set firewall bridge name &lt;name&gt; ...</code>. Pour utiliser une telle chaîne personnalisée, une règle avec une action jump et la cible appropriée doit être définie dans une chaîne de base.</p>
 </section>
@@ -665,8 +665,8 @@ set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; disable
 <section id="matching-criteria">
 <h3>Critères de correspondance</h3>
 <p>Il existe de nombreux critères de correspondance contre lesquels un paquet peut être testé. Se référer
-à <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv4.html">IPv4</a> et
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv6.html">IPv6</a> pour plus de détails.</p>
+à <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/ipv4.html">IPv4</a> et
+<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/ipv6.html">IPv6</a> pour plus de détails.</p>
 <p>Comme les ponts fonctionnent au niveau 2, les deux matchers pour IPv4 et IPv6 sont
 pris en charge dans la configuration du pare-feu de pont. La même chose s'applique aux groupes de pare-feu.</p>
 <p>Les critères de correspondance spécifiques qui peuvent être utilisés dans le pare-feu de pont sont

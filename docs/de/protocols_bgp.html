@@ -155,7 +155,7 @@
 <h1>BGP</h1>
 <p><abbr title="Border Gateway Protocol">BGP</abbr> ist eines der Exterior Gateway Protokolle
 und das de facto Standard-Interdomain-Routing-Protokoll. Die neueste BGP-Version
-ist 4. BGP-4 wird in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1771.html"><strong>RFC 1771</strong></a> und aktualisiert durch <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4271.html"><strong>RFC 4271</strong></a> beschrieben. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2858.html"><strong>RFC 2858</strong></a>
+ist 4. BGP-4 wird in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1771.html"><strong>RFC 1771</strong></a> und aktualisiert durch <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4271.html"><strong>RFC 4271</strong></a> beschrieben. <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2858.html"><strong>RFC 2858</strong></a>
 fügt Multiprotokollunterstützung zu BGP hinzu.</p>
 <p>VyOS verwendet <abbr title="Free Range Routing">FRR</abbr> und wir möchten uns bei
 ihnen für ihre Arbeit bedanken!</p>
@@ -163,7 +163,7 @@ ihnen für ihre Arbeit bedanken!</p>
 <h2>Grundlagen</h2>
 <section id="autonomous-systems">
 <h3>Autonome Systeme</h3>
-<p>Aus <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1930.html"><strong>RFC 1930</strong></a>:</p>
+<p>Aus <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1930.html"><strong>RFC 1930</strong></a>:</p>
 <blockquote>
 <div><p>EIN AS ist eine verbundene Gruppe von einem oder mehreren IP-Präfixen, die von einem oder mehreren
 Netzwerk-Operatoren betrieben werden und ein eindeutiges und klar definiertes Routing-Politik hat.</p>
@@ -171,7 +171,7 @@ Netzwerk-Operatoren betrieben werden und ein eindeutiges und klar definiertes Ro
 <p>Jedes <abbr title="Autonomous System">AS</abbr> hat eine identifizierende Nummer, die als <abbr title="Autonomous System Number">ASN</abbr> bezeichnet wird.
 Dies ist ein zweistelliger Wert
 mit Werten von 1 bis 65535. Die AS-Nummern 64512 bis 65535 sind als private AS-Nummern definiert. Private AS-Nummern dürfen nicht auf dem globalen
-Internet beworben werden. Der 2-Byte-AS-Nummernbereich ist erschöpft. 4-Byte-AS-Nummern sind in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6793.html"><strong>RFC 6793</strong></a> definiert und bieten einen Pool von 4294967296 AS-Nummern.</p>
+Internet beworben werden. Der 2-Byte-AS-Nummernbereich ist erschöpft. 4-Byte-AS-Nummern sind in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc6793.html"><strong>RFC 6793</strong></a> definiert und bieten einen Pool von 4294967296 AS-Nummern.</p>
 <p>Der <abbr title="Autonomous System Number">ASN</abbr> ist eines der wesentlichen Elemente von
 BGP. BGP ist ein Distanzvektor-Routingprotokoll, und das AS-Path-Framework
 bietet Distanzvektor-Metrik und Schleifen-Erkennung für BGP.</p>
@@ -249,11 +249,11 @@ spiegelt den iBGP-Reflektionspfad wider, den die Route genommen hat.</p>
 <p>Beim Hinzufügen von IPv6-Routinginformationsaustauschfunktionen zu BGP gab es einige
 Vorschläge. <abbr title="Internet Engineering Task Force">IETF</abbr>
 <abbr title="Inter Domain Routing">IDR</abbr> hat einen Vorschlag namens Multiprotokoll
-Erweiterung für BGP übernommen. Die Spezifikation wird in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2283.html"><strong>RFC 2283</strong></a> beschrieben. Das Protokoll
+Erweiterung für BGP übernommen. Die Spezifikation wird in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2283.html"><strong>RFC 2283</strong></a> beschrieben. Das Protokoll
 definiert keine neuen Protokolle. Es definiert neue Attribute für vorhandenes BGP. Wenn
 es zum Austausch von IPv6-Routinginformationen verwendet wird, wird es BGP-4+ genannt. Wenn es zum Austausch von Multicast-Routinginformationen verwendet wird, wird es MBGP genannt.</p>
 <p><em>bgpd</em> unterstützt Multiprotokoll-Erweiterung für BGP. Daher kann, wenn ein entfernter Peer die Funktion unterstützt, <em>bgpd</em> IPv6 und/oder Multicast-Routinginformationen austauschen.</p>
-<p>Traditionelles BGP hatte keine Funktion, um die Fähigkeiten eines entfernten Peers zu erkennen, z. B. ob er andere Präfixtypen als IPv4-Unicast-Routen verarbeiten kann. Dies war ein großes Problem beim Einsatz der Multiprotokoll-Erweiterung für BGP in einem operativen Netzwerk. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2842.html"><strong>RFC 2842</strong></a> hat eine Funktion namens Fähigkeitsvereinbarung übernommen. <em>bgpd</em> nutzt diese Fähigkeitsvereinbarung, um die Fähigkeiten des entfernten Peers zu erkennen. Wenn ein Peer nur als IPv4-Unicast-Nachbar konfiguriert ist, sendet <em>bgpd</em> keine solchen Fähigkeitsvereinbarungspakete (zumindest nicht, es sei denn, andere optionale BGP-Funktionen erfordern eine Fähigkeitsvereinbarung).</p>
+<p>Traditionelles BGP hatte keine Funktion, um die Fähigkeiten eines entfernten Peers zu erkennen, z. B. ob er andere Präfixtypen als IPv4-Unicast-Routen verarbeiten kann. Dies war ein großes Problem beim Einsatz der Multiprotokoll-Erweiterung für BGP in einem operativen Netzwerk. <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2842.html"><strong>RFC 2842</strong></a> hat eine Funktion namens Fähigkeitsvereinbarung übernommen. <em>bgpd</em> nutzt diese Fähigkeitsvereinbarung, um die Fähigkeiten des entfernten Peers zu erkennen. Wenn ein Peer nur als IPv4-Unicast-Nachbar konfiguriert ist, sendet <em>bgpd</em> keine solchen Fähigkeitsvereinbarungspakete (zumindest nicht, es sei denn, andere optionale BGP-Funktionen erfordern eine Fähigkeitsvereinbarung).</p>
 <p>Standardmäßig bringt FRR die Peering mit minimaler gemeinsamen Fähigkeit für beide Seiten. Zum Beispiel, wenn der lokale Router Unicast- und Multicast-Fähigkeiten hat und der entfernte Router nur Unicast-Fähigkeiten hat, wird der lokale Router die Verbindung mit Unicast-Fähigkeiten herstellen. Wenn es keine gemeinsamen Fähigkeiten gibt, sendet FRR einen Unsupported Capability Fehler und setzt dann die Verbindung zurück.</p>
 </section>
 </section>
@@ -316,7 +316,7 @@ set protocols bgp neighbor &lt;address|interface&gt; remote-as auto
 
 set protocols bgp neighbor &lt;address|interface&gt; local-role &lt;role&gt; [strict]
 <a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-local-role-role-strict" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>BGP-Rollen sind in RFC <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> definiert und bieten eine einfache Möglichkeit,
+<p>BGP-Rollen sind in RFC <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> definiert und bieten eine einfache Möglichkeit,
 um Routen-Leck-Prävention, -Erkennung und -Minderung zu implementieren. Der lokale Rolle
 Wert wird mit der neuen BGP-Rollen-Fähigkeit vereinbart, die eine eingebaute Überprüfung des entsprechenden Werts enthält. Im Fall eines Fehlers wird die neue OPEN-Rollen-Mismatch-Benachrichtigung &lt;2, 11&gt; gesendet.
 Die korrekten Rollenpaare sind:</p>
@@ -325,7 +325,7 @@ Die korrekten Rollenpaare sind:</p>
 <p>RS-Server - RS-Client</p>
 <p>Wenn <code class="docutils literal notranslate">strict</code> gesetzt ist, wird die BGP-Sitzung nicht hergestellt,
 bis der BGP-Nachbar seine lokale Rolle auf seiner Seite setzt. Dieser
-Konfigurationsparameter ist in RFC <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> definiert und wird verwendet, um
+Konfigurationsparameter ist in RFC <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> definiert und wird verwendet, um
 die entsprechende Konfiguration auf der Gegenstelle zu erzwingen.</p>
 <p>Routen, die vom Anbieter, rs-server oder dem peer local-role gesendet werden (oder wenn sie vom Kunden, rs-client oder dem peer local-role empfangen werden), werden mit einem neuen Only to Customer (OTC)-Attribut markiert.</p>
 <p>Routen mit diesem Attribut können nur an Ihren Nachbarn gesendet werden, wenn Ihre

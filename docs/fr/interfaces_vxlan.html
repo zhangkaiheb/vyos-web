@@ -156,7 +156,7 @@
 <p><abbr title="Virtual Extensible LAN">VXLAN</abbr> est une technologie de virtualisation réseau qui répond aux défis d'évolutivité dans les environnements informatiques cloud de grande taille. Il encapsule les trames Ethernet (couche 2) dans des datagrammes UDP (couche 4), qui sont ensuite transmis via le port UDP 4789, comme assigné par l'IANA. Les extrémités VXLAN, appelées <abbr title="VXLAN tunnel endpoints">VTEPs</abbr>, terminent les tunnels VXLAN et peuvent être soit des ports de commutateur virtuel ou physique.</p>
 <p>VXLAN prend en charge jusqu'à 16 millions de réseaux logiques et permet la connectivité au niveau 2 à travers des réseaux IP au niveau 3. Il utilise le multicast ou le unicast avec la réplication de tête (HER) pour diffuser le trafic de diffusion, de broadcast inconnu et multicast (BUM).</p>
 <p>La spécification VXLAN a été initialement développée par VMware, Arista Networks et Cisco. D'autres soutiens incluent Huawei, Broadcom, Citrix, Pica8, Big Switch Networks, Cumulus Networks, Dell EMC, Ericsson, Mellanox, FreeBSD, OpenBSD, Red Hat, Joyent et Juniper Networks.</p>
-<p>VXLAN est officiellement documenté par l'IETF dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc7348.html"><strong>RFC 7348</strong></a>.</p>
+<p>VXLAN est officiellement documenté par l'IETF dans <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc7348.html"><strong>RFC 7348</strong></a>.</p>
 <p>Lors de la configuration du VXLAN dans une machine virtuelle VyOS, assurez-vous que le spoofing MAC (Hyper-V) ou les transmissions falsifiées (ESX) sont autorisés. Sinon, l'hyperviseur peut bloquer les trames transmises.</p>
 <div class="admonition note">
 <p class="admonition-title">Remarque</p>
@@ -323,7 +323,7 @@ set interfaces vxlan &lt;interface&gt; ip enable-directed-broadcast
 <a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p><strong>Configurez si les paquets broadcast directs IP reçus sur cette interface doivent être transmis.</strong></p>
 <p><strong>Comportement par défaut :</strong> Les paquets broadcast directs IP sont supprimés.</p>
-<p><strong>Si configuré :</strong> Les paquets broadcast directs IP sont transmis à tous les hôtes sur le sous-réseau de destination, conformément à <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> et <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+<p><strong>Si configuré :</strong> Les paquets broadcast directs IP sont transmis à tous les hôtes sur le sous-réseau de destination, conformément à <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> et <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
 <p>Exemple :</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip enable-directed-broadcast
 </pre></div>
@@ -403,7 +403,7 @@ set interfaces vxlan &lt;interface&gt; ip proxy-arp-pvlan
 </div>
 <p>Le proxy ARP local est également connu sous les noms suivants :</p>
 <ul class="simple">
-<li><p>Aggrégation de VLAN (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>Aggrégation de VLAN (<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
 <li><p>VLAN privé (Cisco, Allied Telesyn).</p></li>
 <li><p>Filtrage de port source ou isolation de port (Hewlett-Packard).</p></li>
 <li><p>Transfert forcé MAC (Ericsson).</p></li>
@@ -415,7 +415,7 @@ set interfaces vxlan &lt;interface&gt; ip proxy-arp-pvlan
 
 set interfaces vxlan &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
 <a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configurez la validation de l'adresse IP source à l'aide de</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>sur cette interface, comme spécifié dans</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p><strong>Configurez la validation de l'adresse IP source à l'aide de</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>sur cette interface, comme spécifié dans</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
 <p>Les options suivantes sont disponibles :</p>
 <ul class="simple">
 <li><p><strong>strict :</strong> Chaque adresse IP source des paquets entrants est vérifiée contre la base d'informations de routage (FIB). Si l'interface n'est pas le meilleur chemin de retour à cette source, la validation échoue et le paquet est supprimé.</p></li>
@@ -432,7 +432,7 @@ set interfaces vxlan &lt;interface&gt; ipv6 address autoconf
 <a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p><strong>Configurez l'interface pour obtenir automatiquement une adresse IPv6 à l'aide de</strong>
 <abbr title="Autoconfiguration d'adresse sans état">SLAAC</abbr>, <strong>comme spécifié dans</strong>
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
 <p>Les hôtes IPv6 peuvent se configurer automatiquement lorsqu'ils sont connectés à un réseau IPv6 en utilisant le protocole de découverte de voisins via les messages de découverte de routeur ICMPv6. Lorsqu'ils se connectent pour la première fois à un réseau, un hôte envoie une requête de diffusion de routeur link-local pour ses paramètres de configuration. Le routeur répond avec un paquet de publication de routeur contenant les paramètres de configuration du niveau Internet.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -450,7 +450,7 @@ set interfaces vxlan &lt;interface&gt; ipv6 address autoconf
 set interfaces vxlan &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
 <a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-address-eui64-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p><strong>Configurez l'interface pour lui attribuer une adresse IPv6 à l'aide de la méthode</strong>
-<abbr title="Identifiant unique étendu de 64 bits">EUI-64</abbr> <strong>, comme spécifié</strong> dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+<abbr title="Identifiant unique étendu de 64 bits">EUI-64</abbr> <strong>, comme spécifié</strong> dans <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
 <p>Exemple :</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ipv6 address eui64 2001:db8:beef::/64
 </pre></div>

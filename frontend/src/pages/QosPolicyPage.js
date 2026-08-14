@@ -1,5 +1,6 @@
 import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue-import.js';
 import { useConfigStore } from '/src/stores/config.js';
+import { useVisibilityStore } from '/src/stores/visibility.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import DataTable from '/src/components/Table/DataTable.js';
@@ -718,8 +719,16 @@ export default defineComponent({
       return result;
     });
 
+    const visibilityStore = useVisibilityStore();
+    onMounted(() => { visibilityStore.load(); });
+
     const filterTabs = computed(() => {
-      return POLICY_TYPES.map(pt => ({ key: pt.value, title: t(pt.label) }));
+      return POLICY_TYPES.filter(pt => {
+        if (['network-emulator', 'random-detect', 'shaper-hfsc'].includes(pt.value)) {
+          return visibilityStore.isVisible(`qos-${pt.value}`);
+        }
+        return true;
+      }).map(pt => ({ key: pt.value, title: t(pt.label) }));
     });
 
     const filteredData = computed(() => {

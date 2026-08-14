@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -89,56 +89,50 @@
              
   <section id="nat64">
 <h1>NAT64</h1>
-<p><abbr title="IPv6-to-IPv4 Prefix Translation">NAT64</abbr> is a critical component in
-modern networking, facilitating communication between IPv6 and IPv4 networks.
-This documentation outlines the setup, configuration, and usage of the NAT64
-feature in your project. Whether you are transitioning to IPv6 or need to
-seamlessly connect IPv4 and IPv6 devices.
-NAT64 is a stateful translation mechanism that translates IPv6 addresses to
-IPv4 addresses and IPv4 addresses to IPv6 addresses. NAT64 用于 enable
-IPv6-only clients to contact IPv4 servers using unicast UDP, TCP, or ICMP.</p>
+<p><abbr title="IPv6到IPv4前缀翻译">NAT64</abbr> 是现代网络中的关键组件，用于实现 IPv6 网络与 IPv4 网络之间的通信。
+本文档概述了在您的项目中配置、设置和使用 NAT64 功能的方法。无论您正在向 IPv6 迁移，还是需要无缝连接 IPv4 和 IPv6 设备，
+NAT64 都是一种有状态的地址转换机制，可将 IPv6 地址转换为 IPv4 地址，也可将 IPv4 地址转换为 IPv6 地址。NAT64 用于使仅支持 IPv6 的客户端能够通过单播 UDP、TCP 或 ICMP 协议访问 IPv4 服务器。</p>
 <section id="overview">
-<h2>Overview</h2>
+<h2>概述</h2>
 <section id="different-nat-types">
-<h3>Different NAT 类型</h3>
+<h3>不同类型的 NAT</h3>
 <section id="snat64">
 <h4>SNAT64</h4>
-<p><abbr title="IPv6-to-IPv4 Source Address Translation">SNAT64</abbr> is a stateful
-translation mechanism that translates IPv6 addresses to IPv4 addresses.</p>
-<p><code class="docutils literal notranslate">64:ff9b::/96</code> is the well-known prefix for IPv4-embedded IPv6 addresses.
-The prefix 用于 represent IPv4 addresses in an IPv6 address format.
-The IPv4 address is encoded in the low-order 32 bits of the IPv6 address.
-The high-order 32 bits are set to the well-known prefix 64:ff9b::/96.</p>
+<p><abbr title="IPv6到IPv4源地址转换">SNAT64</abbr> 是一种有状态的地址转换机制，用于将 IPv6 地址转换为 IPv4 地址。</p>
+<p><code class="docutils literal notranslate">64:ff9b::/96</code> 是 IPv4 嵌入式 IPv6 地址的知名前缀。
+该前缀用于以 IPv6 地址格式表示 IPv4 地址。
+IPv4 地址被编码在 IPv6 地址的低 32 位中。
+IPv6 地址的高 32 位则设置为知名前缀 64:ff9b::/96。</p>
 </section>
 </section>
 </section>
 <section id="configuration-examples">
-<h2>配置 示例</h2>
-<p>The following examples show how to configure NAT64 on a VyOS router.
-The 192.0.2.10 address is used as the IPv4 address for the translation pool.</p>
-<p>NAT64 server configuration:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address '192.0.2.1/24'
-set interfaces ethernet eth0 address '192.0.2.10/24'
-set interfaces ethernet eth0 description 'WAN'
-set interfaces ethernet eth1 address '2001:db8::1/64'
-set interfaces ethernet eth1 description 'LAN'
+<h2>配置示例</h2>
+<p>以下示例展示了如何在 VyOS 路由器上配置 NAT64。
+其中，192.0.2.10 地址用作地址转换池中的 IPv4 地址。</p>
+<p>NAT64 服务器配置：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address &#39;192.0.2.1/24&#39;
+set interfaces ethernet eth0 address &#39;192.0.2.10/24&#39;
+set interfaces ethernet eth0 description &#39;WAN&#39;
+set interfaces ethernet eth1 address &#39;2001:db8::1/64&#39;
+set interfaces ethernet eth1 description &#39;LAN&#39;
 
-set service dns forwarding allow-from '2001:db8::/64'
-set service dns forwarding dns64-prefix '64:ff9b::/96'
-set service dns forwarding listen-address '2001:db8::1'
+set service dns forwarding allow-from &#39;2001:db8::/64&#39;
+set service dns forwarding dns64-prefix &#39;64:ff9b::/96&#39;
+set service dns forwarding listen-address &#39;2001:db8::1&#39;
 
-set nat64 source rule 100 source prefix '64:ff9b::/96'
-set nat64 source rule 100 translation pool 10 address '192.0.2.10'
-set nat64 source rule 100 translation pool 10 port '1-65535'
+set nat64 source rule 100 source prefix &#39;64:ff9b::/96&#39;
+set nat64 source rule 100 translation pool 10 address &#39;192.0.2.10&#39;
+set nat64 source rule 100 translation pool 10 port &#39;1-65535&#39;
 </pre></div>
 </div>
-<p>NAT64 client configuration:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address '2001:db8::2/64'
+<p>NAT64 客户端配置：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address &#39;2001:db8::2/64&#39;
 set protocols static route6 64:ff9b::/96 next-hop 2001:db8::1
-set system name-server '2001:db8::1'
+set system name-server &#39;2001:db8::1&#39;
 </pre></div>
 </div>
-<p>测试 from the IPv6 only client:</p>
+<p>从仅支持 IPv6 的客户端执行测试：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@r1:~$ ping 64:ff9b::192.0.2.1 count 2
 PING 64:ff9b::192.0.2.1(64:ff9b::c000:201) 56 data bytes
 64 bytes from 64:ff9b::c000:201: icmp_seq=1 ttl=63 time=0.351 ms

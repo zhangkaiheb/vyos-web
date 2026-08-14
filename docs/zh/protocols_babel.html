@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -153,333 +153,283 @@
              
   <section id="babel">
 <h1>Babel</h1>
-<p>The Babel protocol provides robust and efficient routing for both wired and
-wireless mesh networks. By default, Babel uses hop-count metrics on wired links
-and a variant of Expected Transmission Count (ETX) on wireless links.
-Administrators can configure Babel to account for radio diversity,
-automatically compute link latency, and include that latency in the routing
-metric. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc8966.html"><strong>RFC 8966</strong></a> defines the Babel protocol.</p>
-<p>Babel is a dual-stack protocol. A single Babel instance routes both IPv4 and
-IPv6 traffic simultaneously.</p>
+<p>Babel 协议为有线和无线网状网络提供健壮且高效的路由功能。默认情况下，Babel 在有线链路上使用跳数度量，在无线链路上使用期望传输次数（ETX）的变体。管理员可配置 Babel 以支持射频多样性、自动计算链路延迟，并将该延迟纳入路由度量中。<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc8966.html"><strong>RFC 8966</strong></a> 定义了 Babel 协议。</p>
+<p>Babel 是一种双栈协议。单个 Babel 实例可同时路由 IPv4 和 IPv6 流量。</p>
 <section id="general-configuration">
-<h2>General configuration</h2>
-<p>VyOS does not require a specific command to start the Babel process. The system
-automatically starts the routing process when you configure the first
-Babel-enabled interface.</p>
+<h2>常规配置</h2>
+<p>VyOS 不需要执行特定命令来启动 Babel 进程。当您配置首个启用 Babel 的接口时，系统会自动启动路由进程。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable Babel routing on the specified interface.</strong></p>
-<p>The system immediately begins sending and receiving Babel packets on this
-interface.</p>
+set protocols babel interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上启用 Babel 路由功能。</strong></p>
+<p>系统将立即开始在此接口上发送和接收 Babel 数据包。</p>
 </div>
 </div>
 </section>
 <section id="optional-configuration">
-<h2>可选 configuration</h2>
+<h2>可选配置</h2>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols babel parameters diversity
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-parameters-diversity" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable radio-frequency diversity routing for the Babel process.</strong></p>
-<p>Enabling this feature is highly recommended for networks with many
-wireless nodes.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-parameters-diversity" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为 Babel 进程启用射频频段多样性路由功能。</strong></p>
+<p>对于包含大量无线节点的网络，强烈建议启用此功能。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>When you enable diversity routing, you should also configure the
-<code class="docutils literal notranslate">diversity-factor</code> and <code class="docutils literal notranslate">channel</code> parameters.</p>
+<p>启用多样性路由后，还应配置 <code class="docutils literal notranslate">diversity-factor</code> 和 <code class="docutils literal notranslate">channel</code> 参数。</p>
 </div>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel parameters diversity-factor <1-256>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-parameters-diversity-factor-1-256" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the multiplicative factor for diversity routing, in units of
-1/256.</strong></p>
-<p>Lower multiplicative factors give greater weight to diversity in route
-selection. The default value is 256, which disables diversity routing.
-On nodes with multiple independent radios, configure a value of 128 or less.</p>
+set protocols babel parameters diversity-factor &lt;1-256&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-parameters-diversity-factor-1-256" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置多样性路由的乘法因子，单位为 1/256。</strong></p>
+<p>较小的乘法因子会在路由选择中赋予多样性更高的权重。默认值为 256，即禁用多样性路由。对于配备多个独立无线电设备的节点，应配置为 128 或更小的值。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel parameters resend-delay <20-655340>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-parameters-resend-delay-20-655340" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the delay in milliseconds before the system resends an
-important request or update.</strong></p>
-<p>The default value is 2000 ms.</p>
+set protocols babel parameters resend-delay &lt;20-655340&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-parameters-resend-delay-20-655340" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置系统重发重要请求或更新前的延迟时间（毫秒）。</strong></p>
+<p>默认值为 2000 毫秒。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel parameters smoothing-half-life <0-65534>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-parameters-smoothing-half-life-0-65534" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the time constant, in seconds, for the smoothing algorithm used
-to implement hysteresis.</strong></p>
-<p>Higher values reduce route oscillation but slightly increase convergence
-time. A value of 0 disables hysteresis and is suitable for wired networks.
-The default is 4 seconds.</p>
+set protocols babel parameters smoothing-half-life &lt;0-65534&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-parameters-smoothing-half-life-0-65534" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置用于实现迟滞效应的平滑算法的时间常数（秒）。</strong></p>
+<p>较大的值可减少路由振荡，但会略微增加收敛时间。值为 0 将禁用迟滞效应，适用于有线网络。默认值为 4 秒。</p>
 </div>
 </div>
 </section>
 <section id="interfaces-configuration">
-<h2>接口 configuration</h2>
+<h2>接口配置</h2>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel interface <interface> type <auto|wired|wireless>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-type-auto-wired-wireless" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the network type for the Babel-enabled interface.</strong></p>
-<p>Choose from the following:</p>
+set protocols babel interface &lt;interface&gt; type &lt;auto|wired|wireless&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-type-auto-wired-wireless" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为启用 Babel 的接口配置网络类型。</strong></p>
+<p>可从以下选项中选择：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">auto</code>: Babel automatically detects if an interface is wired or
-wireless.</p></li>
-<li><p><code class="docutils literal notranslate">wired</code>: Babel enables optimizations for wired interfaces.</p></li>
-<li><p><code class="docutils literal notranslate">wireless</code>: Babel disables optimizations suitable only for wired
-interfaces. Specifying wireless is always correct, but may cause slower
-convergence and increased routing traffic.</p></li>
+<li><p><code class="docutils literal notranslate">auto</code>：Babel 自动检测接口为有线还是无线类型。</p></li>
+<li><p><code class="docutils literal notranslate">wired</code>：Babel 启用针对有线接口的优化功能。</p></li>
+<li><p><code class="docutils literal notranslate">wireless</code>：Babel 禁用仅适用于有线接口的优化功能。指定 wireless 总是正确的，但可能导致收敛速度变慢及路由流量增加。</p></li>
 </ul>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel interface <interface> split-horizon <default|disable|enable>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-split-horizon-default-disable-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the split-horizon routing behavior for the specified
-interface.</strong></p>
-<p>Use one of the following options:</p>
+set protocols babel interface &lt;interface&gt; split-horizon &lt;default|disable|enable&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-split-horizon-default-disable-enable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定接口配置水平分割路由行为。</strong></p>
+<p>可使用以下选项之一：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">default</code>: Babel automatically enables split-horizon on wired
-interfaces and disables it on wireless interfaces.</p></li>
-<li><p><code class="docutils literal notranslate">enable</code>: Babel enables split-horizon on the interface. This
-optimization 应该 used only on symmetric, transitive (wired)
-networks.</p></li>
-<li><p><code class="docutils literal notranslate">disable</code>: Babel disables split-horizon on the interface. Disabling
-split-horizon is always safe and correct.</p></li>
+<li><p><code class="docutils literal notranslate">default</code>：Babel 自动在有线接口上启用水平分割，在无线接口上禁用水平分割。</p></li>
+<li><p><code class="docutils literal notranslate">enable</code>：Babel 在该接口上启用水平分割。此优化仅适用于对称、可传递（有线）网络。</p></li>
+<li><p><code class="docutils literal notranslate">disable</code>：Babel 在该接口上禁用水平分割。禁用水平分割始终安全且正确。</p></li>
 </ul>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel interface <interface> hello-interval <20-655340>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-hello-interval-20-655340" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interval, in milliseconds, between scheduled hello messages
-on the specified interface.</strong></p>
-<p>On wired links, Babel detects link failures within two hello intervals.
-On wireless links, link quality is reestimated at each interval. The
-default is 4000 ms.</p>
+set protocols babel interface &lt;interface&gt; hello-interval &lt;20-655340&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-hello-interval-20-655340" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置在指定接口上发送 Hello 消息的间隔时间（毫秒）。</strong></p>
+<p>在有线链路上，Babel 可在两个 Hello 间隔内检测到链路故障；在无线链路上，链路质量在每个间隔内重新估算。默认值为 4000 毫秒。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel interface <interface> update-interval <20-655340>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-update-interval-20-655340" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interval, in milliseconds, between scheduled routing
-updates on the specified interface.</strong></p>
-<p>Because Babel uses triggered updates extensively, you can increase this
-value on reliable links with minimal packet loss. The default is 20000 ms.</p>
+set protocols babel interface &lt;interface&gt; update-interval &lt;20-655340&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-update-interval-20-655340" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置在指定接口上发送路由更新的间隔时间（毫秒）。</strong></p>
+<p>由于 Babel 广泛使用触发式更新，因此可在丢包率极低的可靠链路上增大此值。默认值为 20000 毫秒。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel interface <interface> rxcost <1-65534>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-rxcost-1-65534" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the base receive cost for the specified interface.</strong></p>
-<p>Babel applies this value based on the configured network type:</p>
+set protocols babel interface &lt;interface&gt; rxcost &lt;1-65534&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-rxcost-1-65534" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置指定接口的基础接收开销。</strong></p>
+<p>Babel 根据所配置的网络类型应用该值：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">wired</code>: The value is the routing cost advertised to neighboring
-routers.</p></li>
-<li><p><code class="docutils literal notranslate">wireless</code>: The value is a multiplier used to compute the ETX
-(Expected Transmission Count) reception cost.</p></li>
+<li><p><code class="docutils literal notranslate">wired</code>：该值为向邻接路由器通告的路由开销。</p></li>
+<li><p><code class="docutils literal notranslate">wireless</code>：该值为用于计算 ETX（期望传输次数）接收开销的乘数。</p></li>
 </ul>
-<p>The default value is 256.</p>
+<p>默认值为 256。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel interface <interface> rtt-decay <1-256>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-rtt-decay-1-256" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the decay factor for the exponential moving average of RTT
-samples, in units of 1/256.</strong></p>
-<p>Higher values discard older samples faster. The default value is 42.</p>
+set protocols babel interface &lt;interface&gt; rtt-decay &lt;1-256&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-rtt-decay-1-256" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 RTT 样本指数移动平均值的衰减因子，单位为 1/256。</strong></p>
+<p>较大值会更快地舍弃旧样本。默认值为 42。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel interface <interface> rtt-min <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-rtt-min-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the minimum RTT, in milliseconds, at which the cost to a
-neighbor begins to increase.</strong></p>
-<p>The additional cost is linear in (rtt - rtt-min). The default value is 10 ms.</p>
+set protocols babel interface &lt;interface&gt; rtt-min &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-rtt-min-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置邻居开销开始增加时的最小 RTT（毫秒）。</strong></p>
+<p>额外开销与 (rtt - rtt-min) 呈线性关系。默认值为 10 毫秒。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel interface <interface> rtt-max <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-rtt-max-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the maximum RTT, in milliseconds, above which the cost to a
-neighbor stops increasing.</strong></p>
-<p>The default value is 120 ms.</p>
+set protocols babel interface &lt;interface&gt; rtt-max &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-rtt-max-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置邻居开销停止增加时的最大 RTT（毫秒）。</strong></p>
+<p>默认值为 120 毫秒。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel interface <interface> max-rtt-penalty <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-max-rtt-penalty-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the maximum cost added to a neighbor when RTT meets or exceeds
-rtt-max.</strong></p>
-<p>设置ting this value to 0 disables RTT-based costs. The default value is 150.</p>
+set protocols babel interface &lt;interface&gt; max-rtt-penalty &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-max-rtt-penalty-0-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置当 RTT 达到或超过 rtt-max 时，添加至邻居的最大开销。</strong></p>
+<p>将此值设为 0 将禁用基于 RTT 的开销。默认值为 150。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel interface <interface> enable-timestamps
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-enable-timestamps" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure adding timestamps to each Hello and IHU message to calculate
-RTT values.</strong></p>
-<p>Enabling timestamps is recommended for tunnel interfaces.</p>
+set protocols babel interface &lt;interface&gt; enable-timestamps
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-enable-timestamps" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置为每个 Hello 和 IHU 消息添加时间戳，以计算 RTT 值。</strong></p>
+<p>建议在隧道接口上启用时间戳功能。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel interface <interface> channel <1-254|interfering|noninterfering>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-channel-1-254-interfering-noninterfering" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the channel identifier that diversity routing uses for the
-specified interface.</strong></p>
-<p>接口 interfere with each other based on the assigned channel
-identifier:</p>
+set protocols babel interface &lt;interface&gt; channel &lt;1-254|interfering|noninterfering&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-interface-interface-channel-1-254-interfering-noninterfering" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置多样性路由为指定接口使用的信道标识符。</strong></p>
+<p>接口根据分配的信道标识符相互干扰：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">1–254</code>: The interface interferes with interfaces sharing the same
-channel number and with interfaces configured as <code class="docutils literal notranslate">interfering</code>.</p></li>
-<li><p><code class="docutils literal notranslate">interfering</code>: The interface interferes with all others except those
-configured as <code class="docutils literal notranslate">noninterfering</code>.</p></li>
-<li><p><code class="docutils literal notranslate">noninterfering</code>: The interface interferes only with itself.</p></li>
+<li><p><code class="docutils literal notranslate">1–254</code>：该接口与共享相同信道编号的其他接口以及配置为 <code class="docutils literal notranslate">interfering</code> 的接口相互干扰。</p></li>
+<li><p><code class="docutils literal notranslate">interfering</code>：该接口与所有其他接口相互干扰，但配置为 <code class="docutils literal notranslate">noninterfering</code> 的接口除外。</p></li>
+<li><p><code class="docutils literal notranslate">noninterfering</code>：该接口仅与自身相互干扰。</p></li>
 </ul>
 </div>
 </div>
 </section>
 <section id="redistribution-configuration">
-<h2>Redistribution configuration</h2>
+<h2>重分发配置</h2>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel redistribute <ipv4|ipv6> <route source>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-redistribute-ipv4-ipv6-route-source" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the redistribution of routing information from the specified
-route source into the Babel process.</strong></p>
-<p>The following route sources are available:</p>
+set protocols babel redistribute &lt;ipv4|ipv6&gt; &lt;route source&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-redistribute-ipv4-ipv6-route-source" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置将来自指定路由源的路由信息重分发至 Babel 进程。</strong></p>
+<p>可用的路由源如下：</p>
 <ul class="simple">
-<li><p><strong>ipv4:</strong> <code class="docutils literal notranslate">bgp</code>, <code class="docutils literal notranslate">connected</code>, <code class="docutils literal notranslate">eigrp</code>, <code class="docutils literal notranslate">isis</code>, <code class="docutils literal notranslate">kernel</code>,
-<code class="docutils literal notranslate">nhrp</code>, <code class="docutils literal notranslate">ospf</code>, <code class="docutils literal notranslate">rip</code>, <code class="docutils literal notranslate">static</code></p></li>
-<li><p><strong>ipv6:</strong> <code class="docutils literal notranslate">bgp</code>, <code class="docutils literal notranslate">connected</code>, <code class="docutils literal notranslate">eigrp</code>, <code class="docutils literal notranslate">isis</code>, <code class="docutils literal notranslate">kernel</code>,
-<code class="docutils literal notranslate">nhrp</code>, <code class="docutils literal notranslate">ospfv3</code>, <code class="docutils literal notranslate">ripng</code>, <code class="docutils literal notranslate">static</code></p></li>
+<li><p><strong>ipv4：</strong> <code class="docutils literal notranslate">bgp</code>、<code class="docutils literal notranslate">connected</code>、<code class="docutils literal notranslate">eigrp</code>、<code class="docutils literal notranslate">isis</code>、<code class="docutils literal notranslate">kernel</code>、<code class="docutils literal notranslate">nhrp</code>、<code class="docutils literal notranslate">ospf</code>、<code class="docutils literal notranslate">rip</code>、<code class="docutils literal notranslate">static</code></p></li>
+<li><p><strong>ipv6：</strong> <code class="docutils literal notranslate">bgp</code>、<code class="docutils literal notranslate">connected</code>、<code class="docutils literal notranslate">eigrp</code>、<code class="docutils literal notranslate">isis</code>、<code class="docutils literal notranslate">kernel</code>、<code class="docutils literal notranslate">nhrp</code>、<code class="docutils literal notranslate">ospfv3</code>、<code class="docutils literal notranslate">ripng</code>、<code class="docutils literal notranslate">static</code></p></li>
 </ul>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel distribute-list <ipv4|ipv6> access-list <in|out> <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-distribute-list-ipv4-ipv6-access-list-in-out-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure global Babel route filtering using an access list.</strong></p>
-<p>Specify the direction in which the access list is applied:</p>
+set protocols babel distribute-list &lt;ipv4|ipv6&gt; access-list &lt;in|out&gt; &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-distribute-list-ipv4-ipv6-access-list-in-out-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>使用访问控制列表（ACL）配置全局 Babel 路由过滤。</strong></p>
+<p>指定访问控制列表的应用方向：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">in</code>: 过滤器 incoming routes.</p></li>
-<li><p><code class="docutils literal notranslate">out</code>: 过滤器 outgoing routes.</p></li>
+<li><p><code class="docutils literal notranslate">in</code>：过滤入站路由。</p></li>
+<li><p><code class="docutils literal notranslate">out</code>：过滤出站路由。</p></li>
 </ul>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel distribute-list <ipv4|ipv6> interface <interface> access-list <in|out> <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-distribute-list-ipv4-ipv6-interface-interface-access-list-in-out-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure Babel route filtering on the specified interface using an
-access list.</strong></p>
-<p>Specify the direction in which the access list is applied:</p>
+set protocols babel distribute-list &lt;ipv4|ipv6&gt; interface &lt;interface&gt; access-list &lt;in|out&gt; &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-distribute-list-ipv4-ipv6-interface-interface-access-list-in-out-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>使用访问控制列表（ACL）在指定接口上配置 Babel 路由过滤。</strong></p>
+<p>指定访问控制列表的应用方向：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">in</code>: 过滤器 incoming routes.</p></li>
-<li><p><code class="docutils literal notranslate">out</code>: 过滤器 outgoing routes.</p></li>
+<li><p><code class="docutils literal notranslate">in</code>：过滤入站路由。</p></li>
+<li><p><code class="docutils literal notranslate">out</code>：过滤出站路由。</p></li>
 </ul>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel distribute-list <ipv4|ipv6> prefix-list <in|out> <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-distribute-list-ipv4-ipv6-prefix-list-in-out-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure global Babel route filtering using a prefix list.</strong></p>
-<p>Specify the direction in which the prefix list is applied:</p>
+set protocols babel distribute-list &lt;ipv4|ipv6&gt; prefix-list &lt;in|out&gt; &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-distribute-list-ipv4-ipv6-prefix-list-in-out-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>使用前缀列表配置全局 Babel 路由过滤。</strong></p>
+<p>指定前缀列表的应用方向：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">in</code>: 过滤器 incoming routes.</p></li>
-<li><p><code class="docutils literal notranslate">out</code>: 过滤器 outgoing routes.</p></li>
+<li><p><code class="docutils literal notranslate">in</code>：过滤入站路由。</p></li>
+<li><p><code class="docutils literal notranslate">out</code>：过滤出站路由。</p></li>
 </ul>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols babel distribute-list <ipv4|ipv6> interface <interface> prefix-list <in|out> <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-babel-distribute-list-ipv4-ipv6-interface-interface-prefix-list-in-out-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure Babel route filtering on the specified interface using a
-prefix list.</strong></p>
-<p>Specify the direction in which the prefix list is applied:</p>
+set protocols babel distribute-list &lt;ipv4|ipv6&gt; interface &lt;interface&gt; prefix-list &lt;in|out&gt; &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-babel-distribute-list-ipv4-ipv6-interface-interface-prefix-list-in-out-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>使用前缀列表在指定接口上配置 Babel 路由过滤。</strong></p>
+<p>指定前缀列表的应用方向：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">in</code>: 过滤器 incoming routes.</p></li>
-<li><p><code class="docutils literal notranslate">out</code>: 过滤器 outgoing routes.</p></li>
+<li><p><code class="docutils literal notranslate">in</code>：过滤入站路由。</p></li>
+<li><p><code class="docutils literal notranslate">out</code>：过滤出站路由。</p></li>
 </ul>
 </div>
 </div>
 </section>
 <section id="configuration-example">
-<h2>配置 example</h2>
+<h2>配置示例</h2>
 <section id="basic-two-node-babel-network">
-<h3>Basic two-node babel network</h3>
-<p><strong>Goal:</strong> The following example connects two routers (Node 1 and Node 2) via
-their eth0 interfaces and uses the Babel routing protocol to advertise
-(redistribute) each router’s locally configured networks (represented by
-loopback addresses) to one another.</p>
-<p><strong>Node 1:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre># Configure the loopback (local networks) and physical (eth0) addresses
+<h3>基础双节点 Babel 网络</h3>
+<p><strong>目标：</strong>以下示例通过 eth0 接口连接两台路由器（节点 1 和节点 2），并使用 Babel 路由协议向彼此通告（重分发）各路由器本地配置的网络（以环回地址表示）。</p>
+<p><strong>节点 1：</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># 配置环回接口（本地网络）和物理接口（eth0）地址
 set interfaces loopback lo address 10.1.1.1/32
 set interfaces loopback lo address fd12:3456:dead:beef::1/128
 set interfaces ethernet eth0 address 192.168.1.1/24
 
-# Enable Babel on the physical link
+# 在物理链路上启用 Babel
 set protocols babel interface eth0 type wired
 
-# Instruct Babel to advertise (redistribute) the locally configured networks
+# 指示 Babel 通告（重分发）本地配置的网络
 set protocols babel redistribute ipv4 connected
 set protocols babel redistribute ipv6 connected
 </pre></div>
 </div>
-<p><strong>Node 2:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre># Configure the loopback (local networks) and physical (eth0) addresses
+<p><strong>节点 2：</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># 配置环回接口（本地网络）和物理接口（eth0）地址
 set interfaces loopback lo address 10.2.2.2/32
 set interfaces loopback lo address fd12:3456:beef:dead::2/128
 set interfaces ethernet eth0 address 192.168.1.2/24
 
-# Enable Babel on the physical link
+# 在物理链路上启用 Babel
 set protocols babel interface eth0 type wired
 
-# Tell Babel to advertise (redistribute) the locally configured networks
+# 指示 Babel 通告（重分发）本地配置的网络
 set protocols babel redistribute ipv4 connected
 set protocols babel redistribute ipv6 connected
 </pre></div>

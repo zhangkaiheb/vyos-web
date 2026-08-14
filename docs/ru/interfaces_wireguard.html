@@ -160,7 +160,7 @@
 <h2>VPN между сайтами</h2>
 <p>Следующая диаграмма иллюстрирует настройку VPN между сайтами.</p>
 <figure class="align-default">
-<img alt="../../_images/wireguard_site2site_diagram.webp" src="https://docs.vyos.io/en/rolling/_images/wireguard_site2site_diagram.webp" />
+<img alt="../../_images/wireguard_site2site_diagram.webp" src="https://docs.vyos.io/en/latest/_images/wireguard_site2site_diagram.webp" />
 </figure>
 </section>
 <section id="keypairs">
@@ -308,7 +308,7 @@ set protocols static route 192.168.2.0/24 interface wg01
 <div class="admonition warning">
 <p class="admonition-title">Предупреждение</p>
 <p>Вы не можете назначить один и тот же <code class="docutils literal notranslate">allowed-ips</code> нескольким пирям WireGuard. Это строгое ограничение дизайна. Для получения дополнительной информации обратитесь к
-<a class="reference external" href="https://docs.vyos.io/en/rolling/configuration/https://lists.zx2c4.com/pipermail/wireguard/2018-December/003704.html">WireGuard mailing list</a>.</p>
+<a class="reference external" href="https://docs.vyos.io/en/latest/configuration/https://lists.zx2c4.com/pipermail/wireguard/2018-December/003704.html">WireGuard mailing list</a>.</p>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
@@ -531,7 +531,7 @@ generate wireguard client-config &lt;name&gt; interface &lt;interface&gt; server
 <p>Команда также генерирует фрагмент конфигурации, который можно скопировать в CLI VyOS. Имя, которое вы предоставляете, будет использоваться как имя пира в фрагменте.</p>
 <p>Вам также необходимо указать IP-адрес или FQDN сервера, к которому подключается клиент. Параметр адреса можно использовать дважды, чтобы назначить как IPv4 (/32), так и IPv6 (/128) адрес клиенту.</p>
 <figure class="align-default">
-<img alt="QR-код клиента WireGuard" src="https://docs.vyos.io/en/rolling/_images/wireguard_qrcode.webp" />
+<img alt="QR-код клиента WireGuard" src="https://docs.vyos.io/en/latest/_images/wireguard_qrcode.webp" />
 </figure>
 </div>
 </div>

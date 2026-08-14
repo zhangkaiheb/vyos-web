@@ -162,7 +162,7 @@
 
 set firewall ipv6 …
 <a class="cmdlink" href="#cfgcmd-set-firewall-ipv6" title="Постоянная ссылка на эту Команду"></a></div></div>
-<p>Чтобы узнать о общем потоке трафика в брандмауерах VyOS, см. <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Брандмауэр</a>.</p>
+<p>Чтобы узнать о общем потоке трафика в брандмауерах VyOS, см. <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">Брандмауэр</a>.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
     * ipv6
          - forward
@@ -182,18 +182,18 @@ set firewall ipv6 …
 <p>Этот этап включает:</p>
 <ul class="simple">
 <li><p><strong>IPv6 Prerouting</strong>: команды, найденные под <code class="docutils literal notranslate">set firewall ipv6 prerouting raw ...</code></p></li>
-<li><p><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/../system/conntrack.html">Conntrack Ignore</a>: <code class="docutils literal notranslate">set system conntrack ignore ipv6...</code></p></li>
-<li><p><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/../policy/route.html">Policy Route</a>: команды, найденные под <code class="docutils literal notranslate">set policy route6 ...</code></p></li>
-<li><p><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/../nat/nat44.html">Destination NAT</a>: команды, найденные под <code class="docutils literal notranslate">set nat66 destination ...</code></p></li>
+<li><p><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/../system/conntrack.html">Conntrack Ignore</a>: <code class="docutils literal notranslate">set system conntrack ignore ipv6...</code></p></li>
+<li><p><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/../policy/route.html">Policy Route</a>: команды, найденные под <code class="docutils literal notranslate">set policy route6 ...</code></p></li>
+<li><p><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/../nat/nat44.html">Destination NAT</a>: команды, найденные под <code class="docutils literal notranslate">set nat66 destination ...</code></p></li>
 </ul>
 <p>Для трафика, который роутер получает и передает, базовая цепочка — это <strong>forward</strong>. Ниже приведена упрощенная диаграмма потока пакетов для транзитного трафика:</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-fwd-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-fwd-packet-flow.webp" />
+<img alt="../../_images/firewall-fwd-packet-flow.webp" src="https://docs.vyos.io/en/latest/_images/firewall-fwd-packet-flow.webp" />
 </figure>
 <p>Используйте <code class="docutils literal notranslate">set firewall ipv6 forward filter ...</code>, чтобы настроить правила фильтрации для транзитного трафика. Эта команда соответствует этапу 5 и выделена красным на диаграмме.</p>
 <p>Для трафика, предназначенного для роутера, используйте цепочку <strong>input</strong>. Для трафика, который генерирует роутер, используйте цепочку <strong>output</strong>. Ниже представлена диаграмма потока пакетов для трафика, предназначенного роутеру, и трафика, который генерирует роутер (начиная с круга номер 6):</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-input-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-input-packet-flow.webp" />
+<img alt="../../_images/firewall-input-packet-flow.webp" src="https://docs.vyos.io/en/latest/_images/firewall-input-packet-flow.webp" />
 </figure>
 <p>Используйте <code class="docutils literal notranslate">set firewall ipv6 input filter ...</code>, чтобы настроить трафик, предназначенный роутеру.</p>
 <p>Используйте <code class="docutils literal notranslate">set firewall ipv6 output ...</code>, чтобы настроить трафик, который генерирует роутер. Доступны две подцепочки: <strong>filter</strong> и <strong>raw</strong>:</p>

@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,9 +152,8 @@
 <div itemprop="articleBody">
              
   <section id="bgp-large-community-list">
-<h1>BGP - Large Community List</h1>
-<p>VyOS provides policies commands exclusively for BGP traffic filtering and
-manipulation: <strong>large-community-list</strong> is one of them.</p>
+<h1>BGP — 大型社区列表</h1>
+<p>VyOS 提供了专用于 BGP 流量过滤和操作的策略命令：<strong>large-community-list</strong> 即为其中之一。</p>
 <section id="configuration">
 <h2>配置</h2>
 <section id="policy-large-community-list">
@@ -162,41 +161,41 @@ manipulation: <strong>large-community-list</strong> is one of them.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy large-community-list <text>
+set policy large-community-list &lt;text&gt;
 <a class="cmdlink" href="#cfgcmd-set-policy-large-community-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>创建 large-community-list policy identified by name <code class="docutils literal notranslate"><text></code>.</p>
+<p>创建以名称 <code class="docutils literal notranslate">&lt;text&gt;</code> 标识的大型社区列表策略。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy large-community-list <text> description <text>
+set policy large-community-list &lt;text&gt; description &lt;text&gt;
 <a class="cmdlink" href="#cfgcmd-set-policy-large-community-list-text-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 description for large-community-list policy.</p>
+<p>为大型社区列表策略设置描述信息。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy large-community-list <text> rule <1-65535> action <permit|deny>
+set policy large-community-list &lt;text&gt; rule &lt;1-65535&gt; action &lt;permit|deny&gt;
 <a class="cmdlink" href="#cfgcmd-set-policy-large-community-list-text-rule-1-65535-action-permit-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 action to take on entries matching this rule.</p>
+<p>设置匹配此规则的条目所应执行的操作。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy large-community-list <text> rule <1-65535> description <text>
+set policy large-community-list &lt;text&gt; rule &lt;1-65535&gt; description &lt;text&gt;
 <a class="cmdlink" href="#cfgcmd-set-policy-large-community-list-text-rule-1-65535-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 description for rule.</p>
+<p>为规则设置描述信息。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy large-community-list <text> rule <1-65535> regex <aa:nn:nn>
+set policy large-community-list &lt;text&gt; rule &lt;1-65535&gt; regex &lt;aa:nn:nn&gt;
 <a class="cmdlink" href="#cfgcmd-set-policy-large-community-list-text-rule-1-65535-regex-aa-nn-nn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Regular expression to match against a large community list.</p>
+<p>用于匹配大型社区列表的正则表达式。</p>
 </div>
 </div>
 </section>

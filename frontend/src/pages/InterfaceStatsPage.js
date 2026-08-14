@@ -148,12 +148,6 @@ export default defineComponent({
   components: { DataTable, ToolbarButton, HelpButton, TabGroup },
   template: `
     <div class="page-container interface-stats-page">
-      <div class="toolbar toolbar-compact">
-        <div class="toolbar-left">
-          <ToolbarButton icon="refresh" @click="load">{{ t('interfaceStats.refresh') }}</ToolbarButton>
-          <HelpButton routePath="/monitor/interface-traffic/interface-stats" />
-        </div>
-      </div>
       <TabGroup v-model="activeTab" :tabs="tabs">
         <template #physical>
           <DataTable

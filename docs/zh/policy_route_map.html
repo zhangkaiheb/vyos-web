@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,278 +152,275 @@
 <div itemprop="articleBody">
              
   <section id="route-map-policy">
-<h1>路由 Map 策略</h1>
-<p>路由 map is a powerful command, that gives network administrators a very
-useful and flexible tool for traffic manipulation.</p>
+<h1>路由映射策略</h1>
+<p>路由映射（Route map）是一项功能强大的命令，为网络管理员提供了一种非常有用且灵活的流量操控工具。</p>
 <section id="configuration">
 <h2>配置</h2>
 <section id="route-map">
-<h3>路由 Map</h3>
+<h3>路由映射</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command creates a new route-map policy, identified by <text>.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set policy route-map <text> description <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 description for the route-map policy.</p>
+set policy route-map &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令创建一个由 &lt;text&gt; 标识的新路由映射策略。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> action <permit|deny>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-action-permit-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 action for the route-map policy.</p>
+set policy route-map &lt;text&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为路由映射策略设置描述信息。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> call <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-call-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Call another route-map policy on match.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; action &lt;permit|deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-action-permit-deny" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为路由映射策略设置操作动作。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> continue <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-continue-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Jump to a different rule in this route-map on a match.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; call &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-call-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配时调用另一个路由映射策略。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> description <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 description for the rule in the route-map policy.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; continue &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-continue-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配时跳转至该路由映射中的另一条规则。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match as-path <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-as-path-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>BGP as-path list to match.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为路由映射策略中的规则设置描述信息。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match community community-list <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-community-community-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>BGP community-list to match.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match as-path &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-as-path-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配 BGP AS 路径列表。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match community exact-match
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-community-exact-match" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 BGP community-list to exactly match.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match community community-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-community-community-list-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配 BGP 社区列表（community-list）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match extcommunity <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-extcommunity-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>BGP extended community to match.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match community exact-match
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-community-exact-match" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置 BGP 社区列表（community-list）进行精确匹配。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match interface <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-interface-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>First hop interface of a route to match.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match extcommunity &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-extcommunity-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配 BGP 扩展社区（extended community）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match ip address access-list <1-2699>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-address-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>IP address of route to match, based on access-list.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match interface &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-interface-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配路由的第一跳接口。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match ip address prefix-list <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-address-prefix-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>IP address of route to match, based on prefix-list.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip address access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-address-access-list-1-2699" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于访问控制列表（access-list）匹配路由的 IP 地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match ip address prefix-len <0-32>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-address-prefix-len-0-32" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>IP address of route to match, based on specified prefix-length.
-注意 that this 可以 used for kernel routes only.
-Do not apply to the routes of dynamic routing protocols (e.g. BGP,
-RIP, OSFP), as this can lead to unexpected results..</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip address prefix-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-address-prefix-list-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于前缀列表（prefix-list）匹配路由的 IP 地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match ip nexthop access-list <1-2699>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>IP next-hop of route to match, based on access-list.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip address prefix-len &lt;0-32&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-address-prefix-len-0-32" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于指定前缀长度匹配路由的 IP 地址。
+注意：此参数仅适用于内核路由。
+请勿将其应用于动态路由协议（例如 BGP、RIP、OSFP）的路由，否则可能导致意外结果。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match ip nexthop address <x.x.x.x>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-address-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>IP next-hop of route to match, based on ip address.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip nexthop access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-access-list-1-2699" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于访问控制列表（access-list）匹配路由的 IP 下一跳地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match ip nexthop prefix-len <0-32>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-prefix-len-0-32" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>IP next-hop of route to match, based on prefix length.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip nexthop address &lt;x.x.x.x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-address-x-x-x-x" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于 IP 地址匹配路由的 IP 下一跳地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match ip nexthop prefix-list <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-prefix-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>IP next-hop of route to match, based on prefix-list.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip nexthop prefix-len &lt;0-32&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-prefix-len-0-32" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于前缀长度匹配路由的 IP 下一跳地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match ip nexthop type <blackhole>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-type-blackhole" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>IP next-hop of route to match, based on type.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip nexthop prefix-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-prefix-list-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于前缀列表（prefix-list）匹配路由的 IP 下一跳地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match ip route-source access-list <1-2699>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-route-source-access-list-1-2699" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>IP route source of route to match, based on access-list.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip nexthop type &lt;blackhole&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-nexthop-type-blackhole" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于类型匹配路由的 IP 下一跳地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match ip route-source prefix-list <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-route-source-prefix-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>IP route source of route to match, based on prefix-list.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip route-source access-list &lt;1-2699&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-route-source-access-list-1-2699" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于访问控制列表（access-list）匹配路由的 IP 源地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match ipv6 address access-list <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-address-access-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>IPv6 address of route to match, based on IPv6 access-list.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ip route-source prefix-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ip-route-source-prefix-list-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于前缀列表（prefix-list）匹配路由的 IP 源地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match ipv6 address prefix-list <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-address-prefix-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>IPv6 address of route to match, based on IPv6 prefix-list.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ipv6 address access-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-address-access-list-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于 IPv6 访问控制列表（IPv6 access-list）匹配路由的 IPv6 地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match ipv6 address prefix-len <0-128>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-address-prefix-len-0-128" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>IPv6 address of route to match, based on specified prefix-length.
-注意 that this 可以 used for kernel routes only.
-Do not apply to the routes of dynamic routing protocols (e.g. BGP,
-RIP, OSFP), as this can lead to unexpected results..</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ipv6 address prefix-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-address-prefix-list-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于 IPv6 前缀列表（IPv6 prefix-list）匹配路由的 IPv6 地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match ipv6 nexthop <h:h:h:h:h:h:h:h>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-nexthop-h-h-h-h-h-h-h-h" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Nexthop IPv6 address to match.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ipv6 address prefix-len &lt;0-128&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-address-prefix-len-0-128" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于指定前缀长度匹配路由的 IPv6 地址。
+注意：此参数仅适用于内核路由。
+请勿将其应用于动态路由协议（例如 BGP、RIP、OSFP）的路由，否则可能导致意外结果。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match large-community large-community-list <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-large-community-large-community-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 BGP large communities.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match ipv6 nexthop &lt;h:h:h:h:h:h:h:h&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-ipv6-nexthop-h-h-h-h-h-h-h-h" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配下一跳 IPv6 地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match local-preference <0-4294967295>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-local-preference-0-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 local preference.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match large-community large-community-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-large-community-large-community-list-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配 BGP 大型社区（large communities）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match metric <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-metric-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 route metric.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match local-preference &lt;0-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-local-preference-0-4294967295" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配本地优先级（local preference）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match origin <egp|igp|incomplete>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-origin-egp-igp-incomplete" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Boarder 网关 协议 (BGP) origin code to match.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match metric &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-metric-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配路由度量值（metric）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match peer <x.x.x.x>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-peer-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Peer IP address to match.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match origin &lt;egp|igp|incomplete&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-origin-egp-igp-incomplete" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配边界网关协议（BGP）起源代码（origin code）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match protocol <protocol>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-protocol-protocol" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match peer &lt;x.x.x.x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-peer-x-x-x-x" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配对等体（peer）IP 地址。</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match protocol &lt;protocol&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-protocol-protocol" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
 <dl class="simple">
-<dt>源 protocol to match.</dt><dd><ul class="simple">
-<li><p><code class="docutils literal notranslate">babel</code> - Babel routing protocol (Babel)</p></li>
-<li><p><code class="docutils literal notranslate">bgp</code> - Border 网关 协议 (BGP)</p></li>
-<li><p><code class="docutils literal notranslate">connected</code> - 连接ed routes (directly attached subnet or host)</p></li>
-<li><p><code class="docutils literal notranslate">isis</code> - Intermediate 系统 to Intermediate 系统 (IS-IS)</p></li>
-<li><p><code class="docutils literal notranslate">kernel</code> - Kernel routes</p></li>
-<li><p><code class="docutils literal notranslate">ospf</code> - Open Shortest 路径 First (OSPFv2)</p></li>
-<li><p><code class="docutils literal notranslate">ospfv3</code> - Open Shortest 路径 First (IPv6) (OSPFv3)</p></li>
-<li><p><code class="docutils literal notranslate">rip</code> - 路由 信息rmation 协议 (RIP)</p></li>
-<li><p><code class="docutils literal notranslate">ripng</code> - 路由 信息rmation 协议 next-generation (IPv6) (RIPng)</p></li>
-<li><p><code class="docutils literal notranslate">static</code> - Statically configured routes</p></li>
-<li><p><code class="docutils literal notranslate">table</code> - Non-main Kernel 路由 表</p></li>
-<li><p><code class="docutils literal notranslate">vnc</code> - Virtual 网络 Control (VNC)</p></li>
+<dt>匹配源协议。</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate">babel</code> — Babel 路由协议（Babel）</p></li>
+<li><p><code class="docutils literal notranslate">bgp</code> — 边界网关协议（BGP）</p></li>
+<li><p><code class="docutils literal notranslate">connected</code> — 直连路由（直接连接的子网或主机）</p></li>
+<li><p><code class="docutils literal notranslate">isis</code> — 中间系统到中间系统（IS-IS）</p></li>
+<li><p><code class="docutils literal notranslate">kernel</code> — 内核路由</p></li>
+<li><p><code class="docutils literal notranslate">ospf</code> — 开放最短路径优先（OSPFv2）</p></li>
+<li><p><code class="docutils literal notranslate">ospfv3</code> — 开放最短路径优先（IPv6）（OSPFv3）</p></li>
+<li><p><code class="docutils literal notranslate">rip</code> — 路由信息协议（RIP）</p></li>
+<li><p><code class="docutils literal notranslate">ripng</code> — 下一代路由信息协议（IPv6）（RIPng）</p></li>
+<li><p><code class="docutils literal notranslate">static</code> — 静态配置的路由</p></li>
+<li><p><code class="docutils literal notranslate">table</code> — 非主内核路由表</p></li>
+<li><p><code class="docutils literal notranslate">vnc</code> — 虚拟网络控制（VNC）</p></li>
 </ul>
 </dd>
 </dl>
@@ -432,334 +429,319 @@ set policy route-map <text> rule <1-65535> match protocol <protocol>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match rpki <invalid|notfound|valid>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-rpki-invalid-notfound-valid" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 RPKI validation result.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match rpki &lt;invalid|notfound|valid&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-rpki-invalid-notfound-valid" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配 RPKI 验证结果。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match source-vrf <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-source-vrf-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>源 VRF to match.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match source-vrf &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-source-vrf-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配源 VRF。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> match tag <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-tag-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>路由 tag to match.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; match tag &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-match-tag-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配路由标记（tag）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> on-match goto <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-on-match-goto-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Exit policy on match: go to rule <1-65535></p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; on-match goto &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-on-match-goto-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配时退出策略：跳转至规则 &lt;1-65535&gt;</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> on-match next
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-on-match-next" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Exit policy on match: go to next sequence number.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; on-match next
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-on-match-next" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配时退出策略：跳转至下一个序列号。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set aggregator <as|ip> <1-4294967295|x.x.x.x>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-aggregator-as-ip-1-4294967295-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>BGP aggregator attribute: AS number or IP address of an aggregation.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set aggregator &lt;as|ip&gt; &lt;1-4294967295|x.x.x.x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-aggregator-as-ip-1-4294967295-x-x-x-x" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>BGP 聚合器（aggregator）属性：聚合的 AS 编号或 IP 地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set as-path exclude <1-4294967295 | all>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-as-path-exclude-1-4294967295-all" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>丢弃 AS-NUMBER from the BGP AS path.</p>
-<p>If <code class="docutils literal notranslate">all</code> is specified, remove all AS numbers from the AS_PATH of the BGP
-path’s NLRI.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set as-path exclude &lt;1-4294967295 | all&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-as-path-exclude-1-4294967295-all" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>从 BGP AS 路径中删除 AS 编号。</p>
+<p>若指定 <code class="docutils literal notranslate">all</code>，则从 BGP 路径 NLRI 的 AS_PATH 中移除所有 AS 编号。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set as-path prepend <1-4294967295>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-as-path-prepend-1-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Prepend the given string of AS numbers to the AS_PATH of the BGP path’s NLRI.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set as-path prepend &lt;1-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-as-path-prepend-1-4294967295" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>将给定的 AS 编号字符串前置添加至 BGP 路径 NLRI 的 AS_PATH 中。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set as-path prepend-last-as <n>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-as-path-prepend-last-as-n" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Prepend the existing last AS number (the leftmost ASN) to the AS_PATH.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set as-path prepend-last-as &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-as-path-prepend-last-as-n" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>将现有最后一个 AS 编号（最左侧 ASN）前置添加至 AS_PATH 中。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set atomic-aggregate
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-atomic-aggregate" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>BGP atomic aggregate attribute.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set atomic-aggregate
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-atomic-aggregate" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>BGP 原子聚合（atomic aggregate）属性。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set community <add|replace> <community>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-community-add-replace-community" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>添加 or replace BGP community attribute in format <code class="docutils literal notranslate"><0-65535:0-65535></code>
-or from well-known community list</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set community &lt;add|replace&gt; &lt;community&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-community-add-replace-community" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>以格式 <code class="docutils literal notranslate">&lt;0-65535:0-65535&gt;</code> 添加或替换 BGP 社区属性，或从知名社区列表中选取</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set community none
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-community-none" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>删除 all BGP communities</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set community none
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-community-none" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>删除所有 BGP 社区</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set community delete <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-community-delete-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>删除 BGP communities matching the community-list.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set community delete &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-community-delete-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>删除与社区列表（community-list）匹配的 BGP 社区。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set large-community <add|replace> <GA:LDP1:LDP2>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-large-community-add-replace-ga-ldp1-ldp2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>添加 or replace BGP large-community attribute in format
-<code class="docutils literal notranslate"><0-4294967295:0-4294967295:0-4294967295></code></p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set large-community &lt;add|replace&gt; &lt;GA:LDP1:LDP2&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-large-community-add-replace-ga-ldp1-ldp2" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>以格式 <code class="docutils literal notranslate">&lt;0-4294967295:0-4294967295:0-4294967295&gt;</code> 添加或替换 BGP 大型社区（large-community）属性</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set large-community none
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-large-community-none" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>删除 all BGP large-communities</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set large-community none
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-large-community-none" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>删除所有 BGP 大型社区（large-communities）</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set large-community delete <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-large-community-delete-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>删除 BGP communities matching the large-community-list.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set large-community delete &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-large-community-delete-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>删除与大型社区列表（large-community-list）匹配的 BGP 社区。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set extcommunity bandwidth <1-25600|cumulative|num-multipaths>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-bandwidth-1-25600-cumulative-num-multipaths" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 extcommunity bandwidth</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set extcommunity bandwidth &lt;1-25600|cumulative|num-multipaths&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-bandwidth-1-25600-cumulative-num-multipaths" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置扩展社区（extcommunity）带宽</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set extcommunity bandwidth-non-transitive
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-bandwidth-non-transitive" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>The link bandwidth extended community is encoded as non-transitive</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set extcommunity bandwidth-non-transitive
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-bandwidth-non-transitive" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>链路带宽扩展社区编码为非传递性</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set extcommunity rt <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-rt-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 route target value in format <code class="docutils literal notranslate"><0-65535:0-4294967295></code> or <code class="docutils literal notranslate"><IP:0-65535></code>.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set extcommunity rt &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-rt-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>以格式 <code class="docutils literal notranslate">&lt;0-65535:0-4294967295&gt;</code> 或 <code class="docutils literal notranslate">&lt;IP:0-65535&gt;</code> 设置路由目标（route target）值。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set extcommunity soo <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-soo-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 site of origin value in format <code class="docutils literal notranslate"><0-65535:0-4294967295></code> or <code class="docutils literal notranslate"><IP:0-65535></code>.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set extcommunity soo &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-soo-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>以格式 <code class="docutils literal notranslate">&lt;0-65535:0-4294967295&gt;</code> 或 <code class="docutils literal notranslate">&lt;IP:0-65535&gt;</code> 设置源站点（site of origin）值。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set extcommunity none
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-none" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>清除 all BGP extcommunities.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set extcommunity none
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-extcommunity-none" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>清除所有 BGP 扩展社区（extcommunities）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set distance <0-255>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-distance-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Locally significant administrative distance.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set distance &lt;0-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-distance-0-255" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>本地有效的管理距离（administrative distance）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set ip-next-hop <x.x.x.x>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ip-next-hop-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Nexthop IP address.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ip-next-hop &lt;x.x.x.x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ip-next-hop-x-x-x-x" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>下一跳 IP 地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set ip-next-hop unchanged
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ip-next-hop-unchanged" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the next-hop as unchanged. Pass through the route-map without
-changing its value</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ip-next-hop unchanged
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ip-next-hop-unchanged" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>将下一跳设为不变。在不更改其值的情况下通过路由映射。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set ip-next-hop peer-address
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ip-next-hop-peer-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the BGP nexthop address to the address of the peer. For an incoming
-route-map this means the ip address of our peer is used. For an
-outgoing route-map this means the ip address of our self 用于
-establish the peering with our neighbor.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ip-next-hop peer-address
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ip-next-hop-peer-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>将 BGP 下一跳地址设为对等体（peer）地址。对于入向路由映射，这意味着使用对等体的 IP 地址；对于出向路由映射，这意味着使用自身的 IP 地址来与邻居建立对等关系。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set ipv6-next-hop <global|local> <h:h:h:h:h:h:h:h>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ipv6-next-hop-global-local-h-h-h-h-h-h-h-h" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Nexthop IPv6 address.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ipv6-next-hop &lt;global|local&gt; &lt;h:h:h:h:h:h:h:h&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ipv6-next-hop-global-local-h-h-h-h-h-h-h-h" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>下一跳 IPv6 地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set ipv6-next-hop peer-address
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ipv6-next-hop-peer-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the BGP nexthop address to the address of the peer. For an incoming
-route-map this means the ip address of our peer is used. For an
-outgoing route-map this means the ip address of our self 用于
-establish the peering with our neighbor.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ipv6-next-hop peer-address
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ipv6-next-hop-peer-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>将 BGP 下一跳地址设为对等体（peer）地址。对于入向路由映射，这意味着使用对等体的 IP 地址；对于出向路由映射，这意味着使用自身的 IP 地址来与邻居建立对等关系。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set ipv6-next-hop prefer-global
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ipv6-next-hop-prefer-global" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>For Incoming and 导入 路由-maps if we receive a v6 global and v6 LL
-address for the route, then prefer to use the global address as the
-nexthop.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set ipv6-next-hop prefer-global
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-ipv6-next-hop-prefer-global" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>对于入向和导入路由映射，如果为路由同时接收到 IPv6 全局地址和 IPv6 链路本地（LL）地址，则优先使用全局地址作为下一跳。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set local-preference <0-4294967295>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-local-preference-0-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 BGP local preference attribute.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set local-preference &lt;0-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-local-preference-0-4294967295" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置 BGP 本地优先级（local preference）属性。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set metric <+/-metric|0-4294967295|rtt|+rtt|-rtt>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-metric-metric-0-4294967295-rtt-rtt-rtt" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the route metric. When used with BGP, set the BGP attribute MED
-to a specific value. Use <code class="docutils literal notranslate">+/-</code> to add or subtract the specified value
-to/from the existing/MED. Use <code class="docutils literal notranslate">rtt</code> to set the MED to the round trip
-time or <code class="docutils literal notranslate">+rtt/-rtt</code> to add/subtract the round trip time to/from the MED.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set metric &lt;+/-metric|0-4294967295|rtt|+rtt|-rtt&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-metric-metric-0-4294967295-rtt-rtt-rtt" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置路由度量值（metric）。当与 BGP 一起使用时，将 BGP 属性 MED 设置为特定值。使用 <code class="docutils literal notranslate">+/-</code> 可将指定值加/减至现有 MED 值；使用 <code class="docutils literal notranslate">rtt</code> 可将 MED 设为往返时间（RTT），或使用 <code class="docutils literal notranslate">+rtt/-rtt</code> 将往返时间加/减至 MED。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set metric-type <type-1|type-2>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-metric-type-type-1-type-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 OSPF external metric-type.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set metric-type &lt;type-1|type-2&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-metric-type-type-1-type-2" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置 OSPF 外部度量类型（metric-type）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set origin <igp|egp|incomplete>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-origin-igp-egp-incomplete" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 BGP origin code.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set origin &lt;igp|egp|incomplete&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-origin-igp-egp-incomplete" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置 BGP 起源代码（origin code）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set originator-id <x.x.x.x>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-originator-id-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 BGP originator ID attribute.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set originator-id &lt;x.x.x.x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-originator-id-x-x-x-x" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置 BGP 起源者 ID（originator ID）属性。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set src <x.x.x.x|h:h:h:h:h:h:h:h>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-src-x-x-x-x-h-h-h-h-h-h-h-h" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 source IP/IPv6 address for route.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set src &lt;x.x.x.x|h:h:h:h:h:h:h:h&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-src-x-x-x-x-h-h-h-h-h-h-h-h" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为路由设置源 IP/IPv6 地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set table <1-200>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-table-1-200" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 prefixes to table.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set table &lt;1-200&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-table-1-200" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>将前缀设置到指定路由表。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set tag <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-tag-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 tag value for routing protocol.</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set tag &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-tag-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为路由协议设置标记（tag）值。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy route-map <text> rule <1-65535> set weight <0-4294967295>
-<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-weight-0-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 BGP weight attribute</p>
+set policy route-map &lt;text&gt; rule &lt;1-65535&gt; set weight &lt;0-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-route-map-text-rule-1-65535-set-weight-0-4294967295" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置 BGP 权重（weight）属性</p>
 </div>
 </div>
 </section>
 <section id="list-of-well-known-communities">
-<h3>List of well-known communities</h3>
+<h3>知名社区列表</h3>
 <blockquote>
 <div><ul class="simple">
-<li><p><code class="docutils literal notranslate">local-as</code> - Well-known communities value NO_EXPORT_SUBCONFED 0xFFFFFF03</p></li>
-<li><p><code class="docutils literal notranslate">no-advertise</code> - Well-known communities value NO_ADVERTISE 0xFFFFFF02</p></li>
-<li><p><code class="docutils literal notranslate">no-export</code> - Well-known communities value NO_EXPORT 0xFFFFFF01</p></li>
-<li><p><code class="docutils literal notranslate">graceful-shutdown</code> - Well-known communities value GRACEFUL_SHUTDOWN 0xFFFF0000</p></li>
-<li><p><code class="docutils literal notranslate">accept-own</code> - Well-known communities value ACCEPT_OWN 0xFFFF0001</p></li>
-<li><p><code class="docutils literal notranslate">route-filter-translated-v4</code> - Well-known communities value ROUTE_FILTER_TRANSLATED_v4 0xFFFF0002</p></li>
-<li><p><code class="docutils literal notranslate">route-filter-v4</code> - Well-known communities value ROUTE_FILTER_v4 0xFFFF0003</p></li>
-<li><p><code class="docutils literal notranslate">route-filter-translated-v6</code> - Well-known communities value ROUTE_FILTER_TRANSLATED_v6 0xFFFF0004</p></li>
-<li><p><code class="docutils literal notranslate">route-filter-v6</code> - Well-known communities value ROUTE_FILTER_v6 0xFFFF0005</p></li>
-<li><p><code class="docutils literal notranslate">llgr-stale</code> - Well-known communities value LLGR_STALE 0xFFFF0006</p></li>
-<li><p><code class="docutils literal notranslate">no-llgr</code> - Well-known communities value NO_LLGR 0xFFFF0007</p></li>
-<li><p><code class="docutils literal notranslate">accept-own-nexthop</code> - Well-known communities value accept-own-nexthop 0xFFFF0008</p></li>
-<li><p><code class="docutils literal notranslate">blackhole</code> - Well-known communities value BLACKHOLE 0xFFFF029A</p></li>
-<li><p><code class="docutils literal notranslate">no-peer</code> - Well-known communities value NOPEER 0xFFFFFF04</p></li>
+<li><p><code class="docutils literal notranslate">local-as</code> — 知名社区值 NO_EXPORT_SUBCONFED 0xFFFFFF03</p></li>
+<li><p><code class="docutils literal notranslate">no-advertise</code> — 知名社区值 NO_ADVERTISE 0xFFFFFF02</p></li>
+<li><p><code class="docutils literal notranslate">no-export</code> — 知名社区值 NO_EXPORT 0xFFFFFF01</p></li>
+<li><p><code class="docutils literal notranslate">graceful-shutdown</code> — 知名社区值 GRACEFUL_SHUTDOWN 0xFFFF0000</p></li>
+<li><p><code class="docutils literal notranslate">accept-own</code> — 知名社区值 ACCEPT_OWN 0xFFFF0001</p></li>
+<li><p><code class="docutils literal notranslate">route-filter-translated-v4</code> — 知名社区值 ROUTE_FILTER_TRANSLATED_v4 0xFFFF0002</p></li>
+<li><p><code class="docutils literal notranslate">route-filter-v4</code> — 知名社区值 ROUTE_FILTER_v4 0xFFFF0003</p></li>
+<li><p><code class="docutils literal notranslate">route-filter-translated-v6</code> — 知名社区值 ROUTE_FILTER_TRANSLATED_v6 0xFFFF0004</p></li>
+<li><p><code class="docutils literal notranslate">route-filter-v6</code> — 知名社区值 ROUTE_FILTER_v6 0xFFFF0005</p></li>
+<li><p><code class="docutils literal notranslate">llgr-stale</code> — 知名社区值 LLGR_STALE 0xFFFF0006</p></li>
+<li><p><code class="docutils literal notranslate">no-llgr</code> — 知名社区值 NO_LLGR 0xFFFF0007</p></li>
+<li><p><code class="docutils literal notranslate">accept-own-nexthop</code> — 知名社区值 accept-own-nexthop 0xFFFF0008</p></li>
+<li><p><code class="docutils literal notranslate">blackhole</code> — 知名社区值 BLACKHOLE 0xFFFF029A</p></li>
+<li><p><code class="docutils literal notranslate">no-peer</code> — 知名社区值 NOPEER 0xFFFFFF04</p></li>
 </ul>
 </div></blockquote>
 </section>

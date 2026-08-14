@@ -1,6 +1,7 @@
 import { defineComponent, ref, computed, onMounted } from '/src/utils/vue-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
 import { useConfigStore } from '/src/stores/config.js';
+import { useVisibilityStore } from '/src/stores/visibility.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
@@ -1797,6 +1798,20 @@ export default defineComponent({
     const activeAfTab = ref('ipv4-unicast');
     const writeDisabled = ref(false);
     const interfaces = ref([]);
+    const visibilityStore = useVisibilityStore();
+    onMounted(() => { visibilityStore.load(); });
+    const bgpTabs = computed(() => [
+      { key: 'basic', title: t('bgp.tab.basic') },
+      { key: 'neighbors', title: t('bgp.tab.neighbors') },
+      { key: 'peer-groups', title: t('bgp.tab.peerGroups') },
+      { key: 'interfaces', title: t('bgp.tab.interfaces') },
+      { key: 'bmp', title: t('bgp.tab.bmp'), hidden: !visibilityStore.isVisible('bgp-bmp') },
+      { key: 'listen', title: t('bgp.tab.listen') },
+      { key: 'parameters', title: t('bgp.tab.parameters') },
+      { key: 'address-family', title: t('bgp.tab.addressFamily') },
+      { key: 'sid', title: t('bgp.tab.sid'), hidden: !visibilityStore.isVisible('bgp-sid') },
+      { key: 'srv6', title: t('bgp.tab.srv6'), hidden: !visibilityStore.isVisible('bgp-srv6') },
+    ].filter(tab => !tab.hidden));
 
     // Neighbor modal
     const neighborModalVisible = ref(false);
@@ -3579,7 +3594,7 @@ export default defineComponent({
 
     return {t,
       
-      loading, saving, saved, config, activeTab, activeAfTab, writeDisabled,
+      loading, saving, saved, config, activeTab, activeAfTab, writeDisabled, bgpTabs,
       interfaces,
       neighborColumns, peerGroupColumns, bmpColumns, listenColumns, networkColumns, aggregateColumns, interfaceColumns, redistributeColumns,
       ipv6NetworkColumns, ipv6AggregateColumns, ipv6RedistributeColumns, ipv6DistancePrefixColumns,
@@ -3676,18 +3691,7 @@ export default defineComponent({
   template: `
     <div class="page-container">
       <div v-if="saved" class="alert alert-success">{{ t('bgp.alert.saved') }}</div>
-      <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: t('bgp.tab.basic') },
-        { key: 'neighbors', title: t('bgp.tab.neighbors') },
-        { key: 'peer-groups', title: t('bgp.tab.peerGroups') },
-        { key: 'interfaces', title: t('bgp.tab.interfaces') },
-        { key: 'bmp', title: t('bgp.tab.bmp') },
-        { key: 'listen', title: t('bgp.tab.listen') },
-        { key: 'parameters', title: t('bgp.tab.parameters') },
-        { key: 'address-family', title: t('bgp.tab.addressFamily') },
-        { key: 'sid', title: t('bgp.tab.sid') },
-        { key: 'srv6', title: t('bgp.tab.srv6') }
-      ]">
+      <TabGroup v-model="activeTab" :tabs="bgpTabs">
 
         <template #basic>
           <div style="padding:16px;">

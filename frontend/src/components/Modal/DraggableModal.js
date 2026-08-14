@@ -9,6 +9,7 @@ export default defineComponent({
     width: { type: String, default: '600px' },
     modalClass: { type: String, default: '' },
     hideFooter: { type: Boolean, default: false },
+    zIndex: { type: Number, default: null },
   },
   emits: ['update:visible', 'close', 'confirm'],
   setup(props, { emit }) {
@@ -70,7 +71,7 @@ export default defineComponent({
   },
   components: { ToolbarButton },
   template: `
-    <div v-if="visible" class="modal-overlay" :class="modalClass">
+    <div v-if="visible" class="modal-overlay" :class="modalClass" :style="zIndex !== null ? { zIndex } : {}">
       <div ref="modalRef" class="modal-container" :style="{ width, transform: 'translate(' + translate.x + 'px, ' + translate.y + 'px)' }" @mousedown="onMouseDown">
         <div class="modal-header">
           <span class="modal-title">{{ title }}</span>

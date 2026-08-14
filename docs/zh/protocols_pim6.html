@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -153,173 +153,148 @@
              
   <section id="pimv6">
 <h1>PIMv6</h1>
-<p>VyOS supports IPv6 multicast routing through
-<abbr title="Protocol Independent Multicast for IPv6">PIMv6</abbr> and
-<abbr title="Multicast Listener Discovery">MLD</abbr> versions 1 and 2.</p>
-<p>PIMv6 operates similarly to its IPv4 counterpart: it uses the existing unicast
-IPv6 routing table for path decisions, and traffic from multicast sources is
-forwarded toward a <abbr title="Rendezvous Point">RP</abbr>. IPv6 multicast receivers use
-MLD to signal their local router which groups they want to receive, and the
-router uses PIMv6 to pull that traffic from the RP via a shared distribution
-tree.</p>
-<p>A working PIMv6 deployment requires:</p>
+<p>VyOS 通过 <abbr title="IPv6 协议无关组播">PIMv6</abbr> 和 <abbr title="组播侦听者发现">MLD</abbr> 版本 1 与版本 2 支持 IPv6 组播路由。</p>
+<p>PIMv6 的工作方式与其 IPv4 对应协议类似：它利用现有的单播 IPv6 路由表进行路径决策，来自组播源的流量被转发至 <abbr title="汇聚点">RP</abbr>。IPv6 组播接收器使用 MLD 向其本地路由器通告希望接收的组，而路由器则使用 PIMv6 通过共享分发树从 RP 拉取该流量。</p>
+<p>一个正常运行的 PIMv6 部署需要满足以下条件：</p>
 <ul class="simple">
-<li><p>PIMv6 enabled on every interface participating in IPv6 multicast
-forwarding.</p></li>
-<li><p>The location of the Rendezvous Point (RP) declared identically on every
-router in the PIMv6 domain.</p></li>
-<li><p>MLD enabled on interfaces facing multicast receivers.</p></li>
+<li><p>在参与 IPv6 组播转发的每个接口上启用 PIMv6。</p></li>
+<li><p>在 PIMv6 域内的每台路由器上以完全相同的方式声明汇聚点（RP）的位置。</p></li>
+<li><p>在面向组播接收器的接口上启用 MLD。</p></li>
 </ul>
 <section id="basic-commands">
-<h2>Basic commands</h2>
-<p>Use the following commands for a basic PIMv6 setup.</p>
+<h2>基本命令</h2>
+<p>请使用以下命令完成基本的 PIMv6 配置。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim6 interface <interface-name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable PIMv6 on the specified PIMv6 interface.</strong></p>
-<p>This command also enables MLD, allowing the router to process MLD queries
-and reports from IPv6 multicast receivers.</p>
+set protocols pim6 interface &lt;interface-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定的 PIMv6 接口上启用 PIMv6。</strong></p>
+<p>该命令同时启用 MLD，使路由器能够处理来自 IPv6 组播接收器的 MLD 查询和报告。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim6 interface <interface-name> mld disable
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable MLD on the specified PIMv6 interface.</strong></p>
-<p>This command turns off MLD processing on the interface while keeping PIMv6
-enabled.</p>
+set protocols pim6 interface &lt;interface-name&gt; mld disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定的 PIMv6 接口上禁用 MLD。</strong></p>
+<p>该命令在保持 PIMv6 启用的同时，关闭该接口上的 MLD 处理功能。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld disable
 </pre></div>
 </div>
 </section>
 <section id="tuning-commands">
-<h2>Tuning commands</h2>
-<p>You can also tune multicast with the following commands.</p>
+<h2>调优命令</h2>
+<p>您还可以使用以下命令对组播进行调优。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim6 interface <interface-name> mld interval <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-interval-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the MLD Query Interval, in seconds, on the specified
-interface.</strong></p>
-<p>This setting determines how often the router sends MLD queries to discover
-which IPv6 multicast groups have active listeners on the attached network.</p>
-<p>The default value is 125 seconds.</p>
+set protocols pim6 interface &lt;interface-name&gt; mld interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-interval-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上配置 MLD 查询间隔（单位：秒）。</strong></p>
+<p>该设置决定路由器向连接网络中发送 MLD 查询的频率，以发现哪些 IPv6 组播组具有活跃的侦听器。</p>
+<p>默认值为 125 秒。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld interval 100
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim6 interface <interface-name> mld join <multicast-address>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-join-multicast-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interface to join a specific IPv6 multicast group.</strong></p>
+set protocols pim6 interface &lt;interface-name&gt; mld join &lt;multicast-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-join-multicast-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置接口加入特定的 IPv6 组播组。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld join ff0e::db8:0:1234
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim6 interface <interface-name> mld join <multicast-address> source <source-address>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-join-multicast-address-source-source-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interface to join a specific (S,G) channel.</strong></p>
-<p>A channel is identified by the combination of a source IPv6 address (S)
-and a multicast IPv6 address (G).</p>
+set protocols pim6 interface &lt;interface-name&gt; mld join &lt;multicast-address&gt; source &lt;source-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-join-multicast-address-source-source-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置接口加入特定的 (S,G) 信道。</strong></p>
+<p>信道由源 IPv6 地址（S）和组播 IPv6 地址（G）的组合标识。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld join ff3e::1234 source 2001:db8::1
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim6 interface <interface-name> mld last-member-query-count <1-255>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-last-member-query-count-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the number of MLD Last Listener Queries the router sends on
-the specified interface after a listener leaves a multicast group.</strong></p>
-<p>The default value is 2.</p>
+set protocols pim6 interface &lt;interface-name&gt; mld last-member-query-count &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-last-member-query-count-1-255" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器在侦听器离开某个组播组后，于指定接口上发送的 MLD 最后侦听者查询次数。</strong></p>
+<p>默认值为 2。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld last-member-query-count 3
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim6 interface <interface-name> mld last-member-query-interval <100-6553500>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-last-member-query-interval-100-6553500" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the MLD Last Listener Query Interval, in milliseconds, on the
-specified interface.</strong></p>
-<p>This setting determines how long the router waits between Last Listener
-Queries.</p>
-<p>The default value is 1000 milliseconds.</p>
+set protocols pim6 interface &lt;interface-name&gt; mld last-member-query-interval &lt;100-6553500&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-last-member-query-interval-100-6553500" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上配置 MLD 最后侦听者查询间隔（单位：毫秒）。</strong></p>
+<p>该设置决定路由器两次最后侦听者查询之间等待的时间长度。</p>
+<p>默认值为 1000 毫秒。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld last-member-query-interval 500
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim6 interface <interface-name> mld max-response-time <100-6553500>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-max-response-time-100-6553500" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the MLD maximum response delay, in milliseconds, on the
-specified interface.</strong></p>
-<p>This value is inserted in MLD queries and specifies the maximum time hosts
-have to respond with a membership report. If no report is received within
-the specified window, PIMv6 assumes there are no longer any active local
-receivers and may time out the associated (*,G) or (S,G) state.</p>
+set protocols pim6 interface &lt;interface-name&gt; mld max-response-time &lt;100-6553500&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-max-response-time-100-6553500" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上配置 MLD 最大响应延迟（单位：毫秒）。</strong></p>
+<p>该值将插入到 MLD 查询中，并指定主机响应成员报告的最大时限。若在指定时间窗口内未收到任何报告，PIMv6 将假定本地已无活跃接收器，并可能使关联的 (*,G) 或 (S,G) 状态超时。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld max-response-time 5000
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim6 interface <interface-name> mld version <1-2>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-version-1-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the MLD version on the specified interface.</strong></p>
-<p>The default version is 2.</p>
+set protocols pim6 interface &lt;interface-name&gt; mld version &lt;1-2&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim6-interface-interface-name-mld-version-1-2" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上配置 MLD 版本。</strong></p>
+<p>默认版本为 2。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld version 1
 </pre></div>
 </div>
 </section>
 <section id="configuration-example">
-<h2>配置 example</h2>
-<p>To enable PIMv6 on interfaces eth0 and eth1 (which also enables MLD
-automatically, allowing the router to process MLD queries and reports from
-connected IPv6 multicast listeners):</p>
+<h2>配置示例</h2>
+<p>要在接口 eth0 和 eth1 上启用 PIMv6（这也将自动启用 MLD，从而使路由器能够处理所连接 IPv6 组播侦听器发出的 MLD 查询和报告）：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0
 set protocols pim6 interface eth1
 </pre></div>
 </div>
-<p>The following configuration explicitly joins the IPv6 multicast group
-ff0e::db8:0:1234 on interface eth0, and the (S,G) channel
-(2001:db8::1, ff3e::5678) on interface eth1:</p>
+<p>以下配置显式地在接口 eth0 上加入 IPv6 组播组 ff0e::db8:0:1234，并在接口 eth1 上加入 (S,G) 信道 (2001:db8::1, ff3e::5678)：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim6 interface eth0 mld join ff0e::db8:0:1234
 set protocols pim6 interface eth1 mld join ff3e::5678 source 2001:db8::1
 </pre></div>

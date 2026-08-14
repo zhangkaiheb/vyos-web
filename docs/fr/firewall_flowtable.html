@@ -167,7 +167,7 @@
 set firewall flowtable …
 <a class="cmdlink" href="#cfgcmd-set-firewall-flowtable" title="Permalink to this Command"></a></div></div>
 <p>Pour en savoir plus sur le flux général du trafic dans les pare-feux VyOS,
-voir <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Pare-feu</a>.</p>
+voir <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">Pare-feu</a>.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
     * flowtable
          - custom_flow_table
@@ -177,14 +177,14 @@ voir <a class="reference internal" href="https://docs.vyos.io/en/rolling/configu
 <p>Les flowtables vous permettent de définir un chemin rapide à travers le datapath du flowtable.
 Les flowtables prennent en charge les protocoles de couche 3 (IPv4 et IPv6) et de couche 4 (TCP et UDP).</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-flowtable-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-flowtable-packet-flow.webp" />
+<img alt="../../_images/firewall-flowtable-packet-flow.webp" src="https://docs.vyos.io/en/latest/_images/firewall-flowtable-packet-flow.webp" />
 </figure>
 <p>Après que le premier paquet traverse avec succès le chemin de routage IP (chemin en cercles noirs), vous pouvez décharger les paquets suivants vers le flowtable via votre règlement. Vous spécifiez quand ajouter un flux au flowtable pendant le filtrage de transfert (cercle rouge numéro 6).</p>
 <p>Lorsqu'un paquet trouve une entrée correspondante dans le flowtable (hit de flowtable), le système l'envoie vers le périphérique réseau de sortie. Cela signifie que les paquets évitent le chemin de routage IP classique et utilisent le <strong>chemin rapide</strong> (chemin en cercles orange). En conséquence, vous ne voyez pas ces paquets depuis aucun hook Netfilter après l'ingress. Si aucune entrée correspondante n'existe dans le flowtable (miss de flowtable), le paquet traverse le chemin de routage IP classique.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><strong>Référence Flowtable:</strong>
-<a class="reference external" href="https://docs.vyos.io/en/rolling/configuration/https://docs.kernel.org/networking/nf_flowtable.html">https://docs.kernel.org/networking/nf_flowtable.html</a></p>
+<a class="reference external" href="https://docs.vyos.io/en/latest/configuration/https://docs.kernel.org/networking/nf_flowtable.html">https://docs.kernel.org/networking/nf_flowtable.html</a></p>
 </div>
 </section>
 <section id="flowtable-configuration">
@@ -346,7 +346,7 @@ set firewall ipv4 forward filter rule 200 inbound-interface name &#39;bond*&#39;
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Les directions d'interface dans cet exemple proviennent de la perspective du trafic client-vers-serveur. En pratique, chaque interface gère le trafic dans les deux sens, et le flowtable gère le déchargement de manière symétrique une fois le flux établi.
-Pour confirmer les interfaces d'ingress et d'égress, activez <code class="docutils literal notranslate">log</code> sur une règle dans le hook forward et vérifiez les journaux du pare-feu — voir la section <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Pare-feu</a> pour la configuration.</p>
+Pour confirmer les interfaces d'ingress et d'égress, activez <code class="docutils literal notranslate">log</code> sur une règle dans le hook forward et vérifiez les journaux du pare-feu — voir la section <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">Pare-feu</a> pour la configuration.</p>
 </div>
 </section>
 <section id="checks">

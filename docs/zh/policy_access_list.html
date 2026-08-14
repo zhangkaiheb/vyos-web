@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -152,96 +152,89 @@
 <div itemprop="articleBody">
              
   <section id="access-list-policy">
-<h1>Access List 策略</h1>
-<p>过滤器ing is used for both input and output of the routing information. Once
-filtering is defined, it 可以 applied in any direction. VyOS makes filtering
-possible using acls and prefix lists.</p>
-<p>Basic filtering 可以 done using access-list and access-list6.</p>
+<h1>访问控制列表（ACL）策略</h1>
+<p>过滤功能用于路由信息的输入和输出方向。一旦定义了过滤规则，即可在任一方向上应用该规则。VyOS 通过访问控制列表（ACL）和前缀列表（prefix list）实现过滤功能。</p>
+<p>基本过滤可通过 access-list 和 access-list6 实现。</p>
 <section id="configuration">
 <h2>配置</h2>
 <section id="access-lists">
-<h3>Access Lists</h3>
+<h3>访问控制列表（ACL）</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy access-list <acl_number>
-<a class="cmdlink" href="#cfgcmd-set-policy-access-list-acl-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command creates the new access list policy, where <code class="docutils literal notranslate"><acl_number></code> 必须
-a number from 1 to 2699.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set policy access-list <acl_number> description <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-access-list-acl-number-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 description for the access list.</p>
+set policy access-list &lt;acl_number&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-access-list-acl-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令创建一个新的访问控制列表策略，其中 <code class="docutils literal notranslate">&lt;acl_number&gt;</code> 必须为 1 至 2699 之间的数字。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy access-list <acl_number> rule <1-65535> action <permit|deny>
-<a class="cmdlink" href="#cfgcmd-set-policy-access-list-acl-number-rule-1-65535-action-permit-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command creates a new rule in the access list and defines an action.</p>
+set policy access-list &lt;acl_number&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-access-list-acl-number-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为访问控制列表设置描述信息。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy access-list <acl_number> rule <1-65535> <destination|source> <any|host|inverse-mask|network>
-<a class="cmdlink" href="#cfgcmd-set-policy-access-list-acl-number-rule-1-65535-destination-source-any-host-inverse-mask-network" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command defines matching parameters for access list rule. 匹配ing
-criteria 可能 applied to destination or source parameters:</p>
+set policy access-list &lt;acl_number&gt; rule &lt;1-65535&gt; action &lt;permit|deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-access-list-acl-number-rule-1-65535-action-permit-deny" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令在访问控制列表中创建一条新规则，并定义其动作。</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy access-list &lt;acl_number&gt; rule &lt;1-65535&gt; &lt;destination|source&gt; &lt;any|host|inverse-mask|network&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-access-list-acl-number-rule-1-65535-destination-source-any-host-inverse-mask-network" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令定义访问控制列表规则的匹配参数。匹配条件可应用于目的地址或源地址参数：</p>
 <ul class="simple">
-<li><p>any: any IP address to match.</p></li>
-<li><p>host: single host IP address to match.</p></li>
-<li><p>inverse-match: network/netmask to match (requires network be defined).</p></li>
-<li><p>network: network/netmask to match (requires inverse-match be defined).</p></li>
+<li><p>any：匹配任意 IP 地址。</p></li>
+<li><p>host：匹配单个主机的 IP 地址。</p></li>
+<li><p>inverse-mask：匹配网络/子网掩码（需同时指定 network 参数）。</p></li>
+<li><p>network：匹配网络/子网掩码（需同时指定 inverse-mask 参数）。</p></li>
 </ul>
 </div>
 </div>
 </section>
 <section id="ipv6-access-list">
-<h3>IPv6 Access List</h3>
-<p>Basic filtering could also be applied to IPv6 traffic.</p>
+<h3>IPv6 访问控制列表</h3>
+<p>基本过滤功能也可应用于 IPv6 流量。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy access-list6 <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-access-list6-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command creates the new IPv6 access list, identified by <code class="docutils literal notranslate"><text></code></p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set policy access-list6 <text> description <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-access-list6-text-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 description for the IPv6 access list.</p>
+set policy access-list6 &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-access-list6-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令创建一个新的 IPv6 访问控制列表，由 <code class="docutils literal notranslate">&lt;text&gt;</code> 标识。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy access-list6 <text> rule <1-65535> action <permit|deny>
-<a class="cmdlink" href="#cfgcmd-set-policy-access-list6-text-rule-1-65535-action-permit-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command creates a new rule in the IPv6 access list and defines an
-action.</p>
+set policy access-list6 &lt;text&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-access-list6-text-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为 IPv6 访问控制列表设置描述信息。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy access-list6 <text> rule <1-65535> source <any|exact-match|network>
-<a class="cmdlink" href="#cfgcmd-set-policy-access-list6-text-rule-1-65535-source-any-exact-match-network" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command defines matching parameters for IPv6 access list rule. 匹配ing
-criteria 可能 applied to source parameters:</p>
+set policy access-list6 &lt;text&gt; rule &lt;1-65535&gt; action &lt;permit|deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-access-list6-text-rule-1-65535-action-permit-deny" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令在 IPv6 访问控制列表中创建一条新规则，并定义其动作。</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy access-list6 &lt;text&gt; rule &lt;1-65535&gt; source &lt;any|exact-match|network&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-access-list6-text-rule-1-65535-source-any-exact-match-network" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令定义 IPv6 访问控制列表规则的匹配参数。匹配条件可应用于源地址参数：</p>
 <ul class="simple">
-<li><p>any: any IPv6 address to match.</p></li>
-<li><p>exact-match: exact match of the network prefixes.</p></li>
-<li><p>network: network/netmask to match (requires inverse-match be defined) BUG,
-NO invert-match option in access-list6</p></li>
+<li><p>any：匹配任意 IPv6 地址。</p></li>
+<li><p>exact-match：精确匹配网络前缀。</p></li>
+<li><p>network：匹配网络/前缀长度（需同时指定 inverse-match 参数；注意：access-list6 中无 inverse-match 选项）</p></li>
 </ul>
 </div>
 </div>

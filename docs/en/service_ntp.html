@@ -172,8 +172,8 @@ to be a potential time source. Implementations send and receive timestamps using
 <p>NTP supplies a warning of any impending leap second adjustment, but no
 information about local time zones or daylight saving time is transmitted.</p>
 <p>The current protocol is version 4 (NTPv4), which is a proposed standard as
-documented in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5905.html"><strong>RFC 5905</strong></a>. It is backward compatible with version 3, specified
-in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1305.html"><strong>RFC 1305</strong></a>.</p>
+documented in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc5905.html"><strong>RFC 5905</strong></a>. It is backward compatible with version 3, specified
+in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1305.html"><strong>RFC 1305</strong></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>VyOS 1.4 uses chrony instead of ntpd (see <a class="reference external" href="https://vyos.dev/T3008">T3008</a>) which will
@@ -209,7 +209,7 @@ set service ntp server &lt;address&gt; &lt;noselect | nts | pool | prefer | ptp 
 <li><p><code class="docutils literal notranslate">noselect</code> marks the server as unused, except for display purposes. The
 server is discarded by the selection algorithm.</p></li>
 <li><p><code class="docutils literal notranslate">nts</code> enables Network Time Security (NTS) for the server as specified
-in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc8915.html"><strong>RFC 8915</strong></a></p></li>
+in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc8915.html"><strong>RFC 8915</strong></a></p></li>
 <li><p><code class="docutils literal notranslate">pool</code> mobilizes persistent client mode association with a number of
 remote servers.</p></li>
 <li><p><code class="docutils literal notranslate">prefer</code> marks the server as preferred. All other things being equal,

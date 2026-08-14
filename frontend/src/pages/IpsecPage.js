@@ -2,6 +2,7 @@ import { defineComponent, ref, computed, watch, onMounted } from '/src/utils/vue
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { configApi, firewallApi } from '/src/api/index.js';
 import { useConfigStore } from '/src/stores/config.js';
+import { useVisibilityStore } from '/src/stores/visibility.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import { validateField, validIP, validIPOrSegment } from '/src/utils/validators.js';
@@ -426,6 +427,9 @@ export default defineComponent({
     const raModalVisible = ref(false);
     const raPoolModalVisible = ref(false);
     const raRadiusServerModalVisible = ref(false);
+    const ikeProposalModalVisible = ref(false);
+    const espProposalModalVisible = ref(false);
+    const tunnelModalVisible = ref(false);
 
     const editingIke = ref(null);
     const editingEsp = ref(null);
@@ -435,6 +439,9 @@ export default defineComponent({
     const editingRa = ref(null);
     const editingRaPool = ref(null);
     const editingRaRadiusServer = ref(null);
+    const editingIkeProposal = ref(null);
+    const editingEspProposal = ref(null);
+    const editingTunnel = ref(null);
 
     // Delete modal refs
     const ikeDeleteModalVisible = ref(false);
@@ -489,7 +496,10 @@ export default defineComponent({
       onMenuRefresh(load);
     });
 
-    const tabs = [
+    const visibilityStore = useVisibilityStore();
+    onMounted(() => { visibilityStore.load(); });
+
+    const tabs = computed(() => [
       { key: 'ike', title: t('ipsec.tabs.ike') },
       { key: 'esp', title: t('ipsec.tabs.esp') },
       { key: 'auth', title: t('ipsec.tabs.auth') },
@@ -498,8 +508,8 @@ export default defineComponent({
       { key: 'log', title: t('ipsec.tabs.log') },
       { key: 'profile', title: t('ipsec.tabs.profile') },
       { key: 'site_to_site', title: t('ipsec.tabs.siteToSite') },
-      { key: 'remote_access', title: t('ipsec.tabs.remoteAccess') },
-    ];
+      { key: 'remote_access', title: t('ipsec.tabs.remoteAccess'), hidden: !visibilityStore.isVisible('ipsec-remote-access') },
+    ].filter(tab => !tab.hidden));
 
     const raTabs = [
       { key: 'connection', title: t('ipsec.raTabs.connection') },
@@ -1267,6 +1277,111 @@ export default defineComponent({
       editingIke.value.proposals.splice(index, 1);
     }
 
+    function getDhGroupLabel(value) {
+      if (!value) return '';
+      const opt = DH_GROUP_OPTIONS.find(o => optionValue(o) === value);
+      return opt ? optionLabel(opt) : value;
+    }
+
+    function openIkeProposalModal(index) {
+      if (index === null) {
+        editingIkeProposal.value = { number: '', dh_group: '', encryption: '', hash: '', prf: '', _new: true };
+      } else {
+        const p = editingIke.value.proposals[index];
+        editingIkeProposal.value = { ...p, _index: index, _new: false };
+      }
+      ikeProposalModalVisible.value = true;
+    }
+
+    function saveIkeProposal() {
+      const p = editingIkeProposal.value;
+      if (!p) return;
+      if (p._new) {
+        if (!editingIke.value.proposals) editingIke.value.proposals = [];
+        editingIke.value.proposals.push({ number: p.number, dh_group: p.dh_group, encryption: p.encryption, hash: p.hash, prf: p.prf });
+      } else {
+        editingIke.value.proposals[p._index] = { number: p.number, dh_group: p.dh_group, encryption: p.encryption, hash: p.hash, prf: p.prf };
+      }
+      ikeProposalModalVisible.value = false;
+    }
+
+    function openEspProposalModal(index) {
+      if (index === null) {
+        editingEspProposal.value = { number: '', encryption: '', hash: '', _new: true };
+      } else {
+        const p = editingEsp.value.proposals[index];
+        editingEspProposal.value = { ...p, _index: index, _new: false };
+      }
+      espProposalModalVisible.value = true;
+    }
+
+    function saveEspProposal() {
+      const p = editingEspProposal.value;
+      if (!p) return;
+      if (p._new) {
+        if (!editingEsp.value.proposals) editingEsp.value.proposals = [];
+        editingEsp.value.proposals.push({ number: p.number, encryption: p.encryption, hash: p.hash });
+      } else {
+        editingEsp.value.proposals[p._index] = { number: p.number, encryption: p.encryption, hash: p.hash };
+      }
+      espProposalModalVisible.value = false;
+    }
+
+    function deleteIkeProposals(indices) {
+      if (!indices || !indices.length) return;
+      const sorted = [...indices].sort((a, b) => b - a);
+      for (const i of sorted) {
+        editingIke.value.proposals.splice(i, 1);
+      }
+    }
+
+    function deleteEspProposals(indices) {
+      if (!indices || !indices.length) return;
+      const sorted = [...indices].sort((a, b) => b - a);
+      for (const i of sorted) {
+        editingEsp.value.proposals.splice(i, 1);
+      }
+    }
+
+    function openTunnelModal(index) {
+      if (index === null) {
+        editingTunnel.value = {
+          number: '', esp_group: '', priority: '', protocol: '',
+          local_port: '', remote_port: '', local_prefix: '', remote_prefix: '', disable: false,
+          _new: true
+        };
+      } else {
+        const t = editingS2s.value.tunnels[index];
+        editingTunnel.value = { ...t, _index: index, _new: false };
+      }
+      tunnelModalVisible.value = true;
+    }
+
+    function saveTunnel() {
+      const t = editingTunnel.value;
+      if (!t) return;
+      const data = {
+        number: t.number, esp_group: t.esp_group, priority: t.priority,
+        protocol: t.protocol, local_port: t.local_port, remote_port: t.remote_port,
+        local_prefix: t.local_prefix, remote_prefix: t.remote_prefix, disable: t.disable
+      };
+      if (t._new) {
+        if (!editingS2s.value.tunnels) editingS2s.value.tunnels = [];
+        editingS2s.value.tunnels.push(data);
+      } else {
+        editingS2s.value.tunnels[t._index] = data;
+      }
+      tunnelModalVisible.value = false;
+    }
+
+    function deleteTunnels(indices) {
+      if (!indices || !indices.length) return;
+      const sorted = [...indices].sort((a, b) => b - a);
+      for (const i of sorted) {
+        editingS2s.value.tunnels.splice(i, 1);
+      }
+    }
+
     function addEspProposal() {
       if (!editingEsp.value.proposals) editingEsp.value.proposals = [];
       editingEsp.value.proposals.push({ number: '', encryption: '', hash: '' });
@@ -1304,6 +1419,7 @@ export default defineComponent({
       selectedRaPool, selectedRaRadiusServer,
       ikeModalVisible, espModalVisible, pskModalVisible, profileModalVisible,
       s2sModalVisible, raModalVisible, raPoolModalVisible, raRadiusServerModalVisible,
+      ikeProposalModalVisible, espProposalModalVisible, tunnelModalVisible,
       ikeDeleteModalVisible, pendingDeleteIkeNames,
       espDeleteModalVisible, pendingDeleteEspNames,
       pskDeleteModalVisible, pendingDeletePskNames,
@@ -1313,7 +1429,8 @@ export default defineComponent({
       poolDeleteModalVisible, pendingDeletePoolNames,
       radiusDeleteModalVisible, pendingDeleteRadiusNames,
       editingIke, editingEsp, editingPsk, editingProfile, editingS2s, editingRa,
-      editingRaPool, editingRaRadiusServer,
+      editingRaPool, editingRaRadiusServer, editingIkeProposal, editingEspProposal,
+      editingTunnel,
       ikeColumns, espColumns, pskColumns, profileColumns, s2sColumns, raColumns,
       raPoolColumns, raRadiusServerColumns,
       load, save,
@@ -1327,6 +1444,9 @@ export default defineComponent({
       saveRaDhcp,
       createRaRadiusServer, editRaRadiusServer, removeRaRadiusServer, confirmRemoveRaRadiusServer, saveRaRadiusServer, saveRaRadius,
       addIkeProposal, removeIkeProposal, addEspProposal, removeEspProposal,
+      openIkeProposalModal, saveIkeProposal, openEspProposalModal, saveEspProposal,
+      deleteIkeProposals, deleteEspProposals, getDhGroupLabel,
+      openTunnelModal, saveTunnel, deleteTunnels,
       addLogSubsystem, removeLogSubsystem, addS2sTunnel, removeS2sTunnel,
       formatProposals, formatLines, optionValue, optionLabel,
       KEY_EXCHANGE_OPTIONS, IKE_MODE_OPTIONS, CLOSE_ACTION_OPTIONS,
@@ -1513,27 +1633,47 @@ export default defineComponent({
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.closeActionTitle')">{{ t('ipsec.form.closeAction') }}</label><select class="form-control" v-model="editingIke.close_action" :title="t('ipsec.form.closeActionTitle')"><option v-for="o in CLOSE_ACTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.disableMobikeTitle')">{{ t('ipsec.form.disableMobike') }}</label><input type="checkbox" v-model="editingIke.disable_mobike" :title="t('ipsec.form.disableMobikeTitle')" /></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.ikev2ReauthTitle')">{{ t('ipsec.form.ikev2Reauth') }}</label><input type="checkbox" v-model="editingIke.ikev2_reauth" :title="t('ipsec.form.ikev2ReauthTitle')" /></div>
-        <div style="font-weight:bold;margin:12px 0 8px;">{{ t('ipsec.form.dpd') }}</div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.dpdActionTitle')">{{ t('ipsec.form.dpdAction') }}</label><select class="form-control" v-model="editingIke.dpd_action" :title="t('ipsec.form.dpdActionTitle')"><option v-for="o in DPD_ACTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.dpdIntervalTitle')">{{ t('ipsec.form.dpdInterval') }}</label><div style="flex:1;"><input class="form-control" type="number" min="2" max="86400" v-model="editingIke.dpd_interval" :placeholder="t('ipsec.form.dpdIntervalPlaceholder')" :title="t('ipsec.form.dpdIntervalTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.dpdIntervalHint') }}</div></div></div>
-        <div class="form-row"><label class="form-label" :title="t('ipsec.form.dpdTimeoutTitle')">{{ t('ipsec.form.dpdTimeout') }}</label><div style="flex:1;"><input class="form-control" type="number" min="2" max="86400" v-model="editingIke.dpd_timeout" :placeholder="t('ipsec.form.dpdTimeoutPlaceholder')" :title="t('ipsec.form.dpdTimeoutTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.dpdTimeoutHint') }}</div></div></div>
-        <div style="font-weight:bold;margin:12px 0 8px;">{{ t('ipsec.form.proposal') }}</div>
-        <div style="display:grid;grid-template-columns:70px 140px 110px 140px 110px auto;gap:8px;align-items:end;margin-bottom:4px;">
-          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.proposalNumber') }}</div>
-          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.encryption') }}</div>
-          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.hash') }}</div>
-          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.dhGroup') }}</div>
-          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.prf') }}</div>
+        <div class="form-group">
+          <div class="form-group-title">{{ t('ipsec.form.dpd') }}</div>
+          <div class="form-group-content">
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.dpdActionTitle')">{{ t('ipsec.form.dpdAction') }}</label><select class="form-control" v-model="editingIke.dpd_action" :title="t('ipsec.form.dpdActionTitle')"><option v-for="o in DPD_ACTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.dpdIntervalTitle')">{{ t('ipsec.form.dpdInterval') }}</label><div style="flex:1;"><input class="form-control" type="number" min="2" max="86400" v-model="editingIke.dpd_interval" :placeholder="t('ipsec.form.dpdIntervalPlaceholder')" :title="t('ipsec.form.dpdIntervalTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.dpdIntervalHint') }}</div></div></div>
+            <div class="form-row"><label class="form-label" :title="t('ipsec.form.dpdTimeoutTitle')">{{ t('ipsec.form.dpdTimeout') }}</label><div style="flex:1;"><input class="form-control" type="number" min="2" max="86400" v-model="editingIke.dpd_timeout" :placeholder="t('ipsec.form.dpdTimeoutPlaceholder')" :title="t('ipsec.form.dpdTimeoutTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.dpdTimeoutHint') }}</div></div></div>
+          </div>
         </div>
-        <div v-for="(p, i) in editingIke.proposals" :key="i" style="display:grid;grid-template-columns:70px 140px 110px 140px 110px auto;gap:8px;align-items:start;">
-          <input class="form-control" v-model="p.number" :placeholder="t('ipsec.form.proposalNumberPlaceholder')" :title="t('ipsec.form.proposalNumberTitle')" />
-          <select class="form-control" v-model="p.encryption" :title="t('ipsec.form.encryptionTitle')"><option v-for="o in ENCRYPTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select>
-          <select class="form-control" v-model="p.hash" :title="t('ipsec.form.hashTitle')"><option v-for="o in HASH_OPTIONS" :key="o" :value="o">{{ o }}</option></select>
-          <select class="form-control" v-model="p.dh_group" :title="t('ipsec.form.dhGroupTitle')"><option v-for="o in DH_GROUP_OPTIONS" :key="optionValue(o)" :value="optionValue(o)">{{ optionLabel(o) }}</option></select>
-          <select class="form-control" v-model="p.prf" :title="t('ipsec.form.prfTitle')"><option v-for="o in PRF_OPTIONS" :key="o" :value="o">{{ o }}</option></select>
-          <ToolbarButton icon="delete" @click="removeIkeProposal(i)">{{ t('ipsec.buttons.delete') }}</ToolbarButton>
+        <div class="form-group">
+          <div class="form-group-title">{{ t('ipsec.form.proposal') }}</div>
+          <div class="form-group-content">
+            <DataTable rowKey="actions" :columns="[
+              { key: 'number', title: t('ipsec.form.proposalNumber'), width: 100 },
+              { key: 'encryption', title: t('ipsec.form.encryption'), width: 150 },
+              { key: 'hash', title: t('ipsec.form.hash'), width: 120 },
+              { key: 'dh_group', title: t('ipsec.form.dhGroup'), width: 150 },
+              { key: 'prf', title: t('ipsec.form.prf'), width: 120 },
+            ]" :data="editingIke.proposals.map((p, i) => ({
+              number: p.number,
+              encryption: p.encryption,
+              hash: p.hash,
+              dh_group: getDhGroupLabel(p.dh_group),
+              prf: p.prf,
+              actions: i,
+            }))"
+            :actions="['create', 'edit', 'delete']"
+            @create="openIkeProposalModal(null)"
+            @edit="openIkeProposalModal($event.actions)"
+            @delete="deleteIkeProposals($event)">
+            </DataTable>
+          </div>
         </div>
-        <ToolbarButton icon="create" @click="addIkeProposal">{{ t('ipsec.buttons.addProposal') }}</ToolbarButton>
+      </DraggableModal>
+
+      <!-- IKE Proposal Modal -->
+      <DraggableModal v-model:visible="ikeProposalModalVisible" :title="t('ipsec.modals.ikeProposal')" width="600px" @confirm="saveIkeProposal">
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.proposalNumber') }}</label><input class="form-control" v-model="editingIkeProposal.number" :placeholder="t('ipsec.form.proposalNumberPlaceholder')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.encryption') }}</label><select class="form-control" v-model="editingIkeProposal.encryption"><option v-for="o in ENCRYPTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.hash') }}</label><select class="form-control" v-model="editingIkeProposal.hash"><option v-for="o in HASH_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.dhGroup') }}</label><select class="form-control" v-model="editingIkeProposal.dh_group"><option v-for="o in DH_GROUP_OPTIONS" :key="optionValue(o)" :value="optionValue(o)">{{ optionLabel(o) }}</option></select></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.prf') }}</label><select class="form-control" v-model="editingIkeProposal.prf"><option v-for="o in PRF_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
       </DraggableModal>
 
       <DraggableModal v-model:visible="espModalVisible" :title="t('ipsec.modals.espGroup')" width="700px" @confirm="saveEsp">
@@ -1544,19 +1684,46 @@ export default defineComponent({
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.compressionTitle')">{{ t('ipsec.form.compression') }}</label><select class="form-control" v-model="editingEsp.compression" :title="t('ipsec.form.compressionTitle')"><option v-for="o in COMPRESSION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.lifeBytesTitle')">{{ t('ipsec.form.lifeBytes') }}</label><div style="flex:1;"><input class="form-control" type="number" min="1024" max="26843545600000" v-model="editingEsp.life_bytes" :title="t('ipsec.form.lifeBytesTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.lifeBytesHint') }}</div></div></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.lifePacketsTitle')">{{ t('ipsec.form.lifePackets') }}</label><div style="flex:1;"><input class="form-control" type="number" min="1000" max="26843545600000" v-model="editingEsp.life_packets" :title="t('ipsec.form.lifePacketsTitle')" style="width:100%;" /><div class="form-hint">{{ t('ipsec.form.lifePacketsHint') }}</div></div></div>
-        <div style="font-weight:bold;margin:12px 0 8px;">{{ t('ipsec.form.proposal') }}</div>
-        <div style="display:grid;grid-template-columns:70px 180px 150px auto;gap:8px;align-items:end;margin-bottom:4px;">
-          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.proposalNumber') }}</div>
-          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.encryption') }}</div>
-          <div style="font-size:12px;color:#666;">{{ t('ipsec.form.hash') }}</div>
+        <div class="form-group">
+          <div class="form-group-title">{{ t('ipsec.form.proposal') }}</div>
+          <div class="form-group-content">
+            <DataTable rowKey="actions" :columns="[
+              { key: 'number', title: t('ipsec.form.proposalNumber'), width: 100 },
+              { key: 'encryption', title: t('ipsec.form.encryption'), width: 150 },
+              { key: 'hash', title: t('ipsec.form.hash'), width: 120 },
+            ]" :data="editingEsp.proposals.map((p, i) => ({
+              number: p.number,
+              encryption: p.encryption,
+              hash: p.hash,
+              actions: i,
+            }))"
+            :actions="['create', 'edit', 'delete']"
+            @create="openEspProposalModal(null)"
+            @edit="openEspProposalModal($event.actions)"
+            @delete="deleteEspProposals($event)">
+            </DataTable>
+          </div>
         </div>
-        <div v-for="(p, i) in editingEsp.proposals" :key="i" style="display:grid;grid-template-columns:70px 180px 150px auto;gap:8px;align-items:start;">
-          <input class="form-control" v-model="p.number" :placeholder="t('ipsec.form.proposalNumberPlaceholder')" :title="t('ipsec.form.proposalNumberTitle')" />
-          <select class="form-control" v-model="p.encryption" :title="t('ipsec.form.encryptionTitle')"><option v-for="o in ENCRYPTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select>
-          <select class="form-control" v-model="p.hash" :title="t('ipsec.form.hashTitle')"><option v-for="o in HASH_OPTIONS" :key="o" :value="o">{{ o }}</option></select>
-          <ToolbarButton icon="delete" @click="removeEspProposal(i)">{{ t('ipsec.buttons.delete') }}</ToolbarButton>
-        </div>
-        <ToolbarButton icon="create" @click="addEspProposal">{{ t('ipsec.buttons.addProposal') }}</ToolbarButton>
+      </DraggableModal>
+
+      <!-- ESP Proposal Modal -->
+      <DraggableModal v-model:visible="espProposalModalVisible" :title="t('ipsec.modals.espProposal')" width="600px" @confirm="saveEspProposal">
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.proposalNumber') }}</label><input class="form-control" v-model="editingEspProposal.number" :placeholder="t('ipsec.form.proposalNumberPlaceholder')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.encryption') }}</label><select class="form-control" v-model="editingEspProposal.encryption"><option v-for="o in ENCRYPTION_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.hash') }}</label><select class="form-control" v-model="editingEspProposal.hash"><option v-for="o in HASH_OPTIONS" :key="o" :value="o">{{ o }}</option></select></div>
+      </DraggableModal>
+
+      <!-- Tunnel Modal -->
+      <DraggableModal v-model:visible="tunnelModalVisible" :title="t('ipsec.modals.tunnel')" width="800px" :z-index="2001" @confirm="saveTunnel">
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelNumber') }}</label><input class="form-control" type="number" min="0" max="4294967295" v-model="editingTunnel.number" :placeholder="t('ipsec.form.tunnelNumberPlaceholder')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelEspGroup') }}</label><select class="form-control" v-model="editingTunnel.esp_group"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelPriority') }}</label><input class="form-control" type="number" min="1" max="100" v-model="editingTunnel.priority" :placeholder="t('ipsec.form.tunnelPriorityPlaceholder')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelProtocol') }}</label><select class="form-control" v-model="editingTunnel.protocol"><option v-for="o in protocolOptions" :key="o" :value="o">{{ o }}</option></select></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelLocalPort') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="editingTunnel.local_port" :placeholder="t('ipsec.form.tunnelLocalPortPlaceholder')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelRemotePort') }}</label><input class="form-control" type="number" min="1" max="65535" v-model="editingTunnel.remote_port" :placeholder="t('ipsec.form.tunnelRemotePortPlaceholder')" /></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelLocalPrefix') }}</label><textarea class="form-control" v-model="editingTunnel.local_prefix" :placeholder="t('ipsec.form.tunnelLocalPrefixPlaceholder')" rows="2" /></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelRemotePrefix') }}</label><textarea class="form-control" v-model="editingTunnel.remote_prefix" :placeholder="t('ipsec.form.tunnelRemotePrefixPlaceholder')" rows="2" /></div>
+        <div class="form-row"><label class="form-label">{{ t('ipsec.form.tunnelDisable') }}</label><input type="checkbox" v-model="editingTunnel.disable" /></div>
       </DraggableModal>
 
       <DraggableModal v-model:visible="pskModalVisible" :title="t('ipsec.modals.pskAuth')" width="600px" @confirm="savePsk">
@@ -1576,7 +1743,7 @@ export default defineComponent({
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.disableFieldTitle')">{{ t('ipsec.form.disableField') }}</label><input type="checkbox" v-model="editingProfile.disable" :title="t('ipsec.form.disableFieldTitle')" /></div>
       </DraggableModal>
 
-      <DraggableModal v-model:visible="s2sModalVisible" :title="t('ipsec.modals.s2sPeer')" width="760px" @confirm="saveS2s">
+      <DraggableModal v-model:visible="s2sModalVisible" :title="t('ipsec.modals.s2sPeer')" width="900px" @confirm="saveS2s">
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.nameTitle')">{{ t('ipsec.form.name') }}</label><input class="form-control" v-model="editingS2s.name" :disabled="editingS2s._name" :title="t('ipsec.form.nameTitle')" /></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.remoteAddressTitle')">{{ t('ipsec.form.remoteAddress') }}</label><textarea class="form-control" v-model="editingS2s.remote_address" :placeholder="t('ipsec.form.remoteAddressPlaceholder')" :title="t('ipsec.form.remoteAddressTitle')" /></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.localAddressTitle')">{{ t('ipsec.form.localAddress') }}</label><input class="form-control" v-model="editingS2s.local_address" :placeholder="t('ipsec.form.localAddressPlaceholder')" :title="t('ipsec.form.localAddressTitle')" /></div>
@@ -1596,50 +1763,38 @@ export default defineComponent({
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.forceUdpEncapTitle')">{{ t('ipsec.form.forceUdpEncap') }}</label><input type="checkbox" v-model="editingS2s.force_udp_encapsulation" :title="t('ipsec.form.forceUdpEncapTitle')" /></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.disableFieldTitle')">{{ t('ipsec.form.disableField') }}</label><input type="checkbox" v-model="editingS2s.disable" :title="t('ipsec.form.disableFieldTitle')" /></div>
         <div class="form-row"><label class="form-label" :title="t('ipsec.form.ikev2ReauthTitle')">{{ t('ipsec.form.ikev2Reauth') }}</label><input type="checkbox" v-model="editingS2s.ikev2_reauth" :title="t('ipsec.form.ikev2ReauthTitle')" /></div>
-        <div style="font-weight:bold;margin:12px 0 8px;">{{ t('ipsec.form.tunnel') }}</div>
-        <div v-for="(tun, i) in editingS2s.tunnels" :key="i" style="border:1px solid var(--color-border);border-radius:4px;padding:12px;margin-bottom:12px;background:#fafafa;">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
-            <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelNumber') }}</div>
-              <input class="form-control" type="number" min="0" max="4294967295" v-model="tun.number" :placeholder="t('ipsec.form.tunnelNumberPlaceholder')" :title="t('ipsec.form.tunnelNumberTitle')" style="width:100%;" />
-            </div>
-            <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelEspGroup') }}</div>
-              <select class="form-control" v-model="tun.esp_group" :title="t('ipsec.form.tunnelEspGroupTitle')" style="width:100%;"><option value=""></option><option v-for="g in espGroups" :key="g.name" :value="g.name">{{ g.name }}</option></select>
-            </div>
-            <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelPriority') }}</div>
-              <input class="form-control" type="number" min="1" max="100" v-model="tun.priority" :placeholder="t('ipsec.form.tunnelPriorityPlaceholder')" :title="t('ipsec.form.tunnelPriorityTitle')" style="width:100%;" />
-            </div>
-            <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelProtocol') }}</div>
-              <select class="form-control" v-model="tun.protocol" :title="t('ipsec.form.tunnelProtocolTitle')" style="width:100%;"><option v-for="o in protocolOptions" :key="o" :value="o">{{ o }}</option></select>
-            </div>
-            <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelLocalPort') }}</div>
-              <input class="form-control" type="number" min="1" max="65535" v-model="tun.local_port" :placeholder="t('ipsec.form.tunnelLocalPortPlaceholder')" :title="t('ipsec.form.tunnelLocalPortTitle')" style="width:100%;" />
-            </div>
-            <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelRemotePort') }}</div>
-              <input class="form-control" type="number" min="1" max="65535" v-model="tun.remote_port" :placeholder="t('ipsec.form.tunnelRemotePortPlaceholder')" :title="t('ipsec.form.tunnelRemotePortTitle')" style="width:100%;" />
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
-            <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelLocalPrefix') }}</div>
-              <textarea class="form-control" v-model="tun.local_prefix" :placeholder="t('ipsec.form.tunnelLocalPrefixPlaceholder')" :title="t('ipsec.form.tunnelLocalPrefixTitle')" rows="2" style="width:100%;" />
-            </div>
-            <div>
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">{{ t('ipsec.form.tunnelRemotePrefix') }}</div>
-              <textarea class="form-control" v-model="tun.remote_prefix" :placeholder="t('ipsec.form.tunnelRemotePrefixPlaceholder')" :title="t('ipsec.form.tunnelRemotePrefixTitle')" rows="2" style="width:100%;" />
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:12px;margin-top:12px;">
-            <label style="white-space:nowrap;" :title="t('ipsec.form.tunnelDisableTitle')"><input type="checkbox" v-model="tun.disable" /> {{ t('ipsec.form.tunnelDisable') }}</label>
-            <ToolbarButton icon="delete" @click="removeS2sTunnel(i)">{{ t('ipsec.buttons.deleteTunnel') }}</ToolbarButton>
+        <div class="form-group">
+          <div class="form-group-title">{{ t('ipsec.form.tunnel') }}</div>
+          <div class="form-group-content">
+            <DataTable rowKey="actions" :columns="[
+              { key: 'number', title: t('ipsec.form.tunnelNumber'), width: 80 },
+              { key: 'esp_group', title: t('ipsec.form.tunnelEspGroup'), width: 100 },
+              { key: 'priority', title: t('ipsec.form.tunnelPriority'), width: 70 },
+              { key: 'protocol', title: t('ipsec.form.tunnelProtocol'), width: 80 },
+              { key: 'local_port', title: t('ipsec.form.tunnelLocalPort'), width: 80 },
+              { key: 'remote_port', title: t('ipsec.form.tunnelRemotePort'), width: 80 },
+              { key: 'local_prefix', title: t('ipsec.form.tunnelLocalPrefix'), width: 140 },
+              { key: 'remote_prefix', title: t('ipsec.form.tunnelRemotePrefix'), width: 140 },
+              { key: 'disable', title: t('ipsec.form.tunnelDisable'), width: 70 },
+            ]" :data="editingS2s.tunnels.map((t, i) => ({
+              number: t.number,
+              esp_group: t.esp_group,
+              priority: t.priority,
+              protocol: t.protocol,
+              local_port: t.local_port,
+              remote_port: t.remote_port,
+              local_prefix: t.local_prefix || '',
+              remote_prefix: t.remote_prefix || '',
+              disable: t.disable ? '是' : '否',
+              actions: i,
+            }))"
+            :actions="['create', 'edit', 'delete']"
+            @create="openTunnelModal(null)"
+            @edit="openTunnelModal($event.actions)"
+            @delete="deleteTunnels($event)">
+            </DataTable>
           </div>
         </div>
-        <ToolbarButton icon="create" @click="addS2sTunnel">{{ t('ipsec.buttons.addTunnel') }}</ToolbarButton>
       </DraggableModal>
 
       <DraggableModal v-model:visible="raModalVisible" :title="t('ipsec.modals.raConnection')" width="650px" @confirm="saveRa">

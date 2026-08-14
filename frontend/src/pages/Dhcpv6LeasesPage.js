@@ -111,7 +111,7 @@ export default defineComponent({
   template: `
     <div class="page-container">
       <DataTable :columns="columns" :data="filteredLeases" :loading="loading" :selectable="false" :actions="[]" @refresh="load">
-        <template #toolbar-right-extra>
+        <template #toolbar-left-extra>
           <select v-model="filterPool" @change="load" :title="t('dhcpv6Leases.filter.byPool')">
             <option value="">{{ t('dhcpv6Leases.filter.allPools') }}</option>
             <option v-for="p in poolOptions" :key="p" :value="p">{{ p }}</option>

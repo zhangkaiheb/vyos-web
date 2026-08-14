@@ -97,6 +97,9 @@
       "tabs": {
         "auth": "认证",
         "basic": "基本设置",
+        "clientIp": "客户端 IP 设置",
+        "clientIpv6": "客户端 IPv6 地址池",
+        "dns": "DNS 设置",
         "listen": "监听",
         "network": "网络"
       },
@@ -238,6 +241,9 @@
       "tabs": {
         "auth": "Auth",
         "basic": "Basic",
+        "clientIp": "Client IP",
+        "clientIpv6": "Client IPv6 Pool",
+        "dns": "DNS",
         "listen": "Listen",
         "network": "Network"
       },
@@ -379,6 +385,9 @@
       "tabs": {
         "auth": "Auth",
         "basic": "Basic",
+        "clientIp": "Client IP",
+        "clientIpv6": "Client IPv6 Pool",
+        "dns": "DNS",
         "listen": "Listen",
         "network": "Network"
       },
@@ -520,6 +529,9 @@
       "tabs": {
         "auth": "Auth",
         "basic": "Basic",
+        "clientIp": "Client IP",
+        "clientIpv6": "Client IPv6 Pool",
+        "dns": "DNS",
         "listen": "Listen",
         "network": "Network"
       },
@@ -661,6 +673,9 @@
       "tabs": {
         "auth": "Auth",
         "basic": "Basic",
+        "clientIp": "Client IP",
+        "clientIpv6": "Client IPv6 Pool",
+        "dns": "DNS",
         "listen": "Listen",
         "network": "Network"
       },
@@ -802,6 +817,9 @@
       "tabs": {
         "auth": "Auth",
         "basic": "Basic",
+        "clientIp": "Client IP",
+        "clientIpv6": "Client IPv6 Pool",
+        "dns": "DNS",
         "listen": "Listen",
         "network": "Network"
       },
@@ -943,6 +961,9 @@
       "tabs": {
         "auth": "Auth",
         "basic": "Basic",
+        "clientIp": "Client IP",
+        "clientIpv6": "Client IPv6 Pool",
+        "dns": "DNS",
         "listen": "Listen",
         "network": "Network"
       },

@@ -377,7 +377,7 @@ set service webproxy authentication ldap bind-dn &lt;bind-dn&gt;
 set service webproxy authentication ldap filter-expression &lt;expr&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-filter-expression-expr" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p>LDAP-Suchfilter, um den Benutzer-DN zu lokalisieren. Erforderlich, wenn die Benutzer unter dem Basis-DN hierarchisch sind oder wenn der Login-Name nicht der Teil des Benutzer-DN ist.</p>
-<p>Der Suchfilter kann bis zu 15 Vorkommen von %s enthalten, die durch den Benutzernamen ersetzt werden, wie z.B. „uid=%s“ für <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2037.html"><strong>RFC 2037</strong></a> Verzeichnisse. Für eine detaillierte Beschreibung der LDAP-Suche Filter Syntax siehe <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2254.html"><strong>RFC 2254</strong></a>.</p>
+<p>Der Suchfilter kann bis zu 15 Vorkommen von %s enthalten, die durch den Benutzernamen ersetzt werden, wie z.B. „uid=%s“ für <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2037.html"><strong>RFC 2037</strong></a> Verzeichnisse. Für eine detaillierte Beschreibung der LDAP-Suche Filter Syntax siehe <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2254.html"><strong>RFC 2254</strong></a>.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap filter-expression (cn=%s)
 </pre></div>
 </div>

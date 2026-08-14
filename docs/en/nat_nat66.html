@@ -199,7 +199,7 @@ set nat66 destination rule 1 translation address &#39;fc01::/64&#39;
 network between internal and external networks (dynamic prefix is
 not supported):</p>
 <figure class="align-default">
-<img alt="VyOS NAT66 Simple Configure" src="https://docs.vyos.io/en/rolling/_images/vyos_1_4_nat66_simple.webp" />
+<img alt="VyOS NAT66 Simple Configure" src="https://docs.vyos.io/en/latest/_images/vyos_1_4_nat66_simple.webp" />
 </figure>
 <p>R1:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 ipv6 address autoconf
@@ -224,7 +224,7 @@ set service router-advert interface br1 prefix ::/0
 (<code class="docutils literal notranslate">fc::/7</code>) to DHCPv6-PD provided prefixes from an ISP connected to
 a VyOS HA pair.</p>
 <figure class="align-default">
-<img alt="VyOS NAT66 DHCPv6 using a dummy interface" src="https://docs.vyos.io/en/rolling/_images/vyos_1_5_nat66_dhcpv6_wdummy.webp" />
+<img alt="VyOS NAT66 DHCPv6 using a dummy interface" src="https://docs.vyos.io/en/latest/_images/vyos_1_5_nat66_dhcpv6_wdummy.webp" />
 </figure>
 <p>Configure both routers (a and b) for DHCPv6-PD via dummy interface:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum1 description &#39;DHCPv6-PD NPT dummy&#39;

@@ -7,6 +7,7 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { useConfigStore } from '/src/stores/config.js';
+import { useVisibilityStore } from '/src/stores/visibility.js';
 import { useI18n } from '/src/i18n/index.js';
 
 function toArray(val) {
@@ -707,6 +708,7 @@ export default defineComponent({
     }
 
     const configStore = useConfigStore();
+    const visibilityStore = useVisibilityStore();
     const loading = ref(false);
     const saving = ref(false);
     const saved = ref(false);
@@ -716,6 +718,18 @@ export default defineComponent({
     const newPassiveInterface = ref('');
     const newAccessList = ref('');
     const interfaces = ref([]);
+
+    onMounted(() => { visibilityStore.load(); });
+    const ospfTabs = computed(() => [
+      { key: 'basic', title: t('ospf.tabs.basic') },
+      { key: 'areas', title: t('ospf.tabs.areas') },
+      { key: 'interfaces', title: t('ospf.tabs.interfaces') },
+      { key: 'redistribute', title: t('ospf.tabs.redistribute') },
+      { key: 'summary-address', title: t('ospf.tabs.summaryAddress') },
+      { key: 'mpls-te', title: t('ospf.tabs.mplsTe'), hidden: !visibilityStore.isVisible('ospf-mpls-te') },
+      { key: 'ldp-sync', title: t('ospf.tabs.ldpSync'), hidden: !visibilityStore.isVisible('ospf-ldp-sync') },
+      { key: 'segment-routing', title: t('ospf.tabs.segmentRouting'), hidden: !visibilityStore.isVisible('ospf-segment-routing') },
+    ].filter(tab => !tab.hidden));
 
     // Summary address modal
     const summaryAddressModalVisible = ref(false);
@@ -1536,8 +1550,7 @@ export default defineComponent({
     });
 
     return {t,
-      
-      loading, saving, saved, config, activeTab, writeDisabled,
+      loading, saving, saved, config, activeTab, writeDisabled, ospfTabs,
       interfaces,
       newPassiveInterface, addPassiveInterface, removePassiveInterface,
       accessListModalVisible, editingAccessListIndex, accessListForm,
@@ -1571,23 +1584,7 @@ export default defineComponent({
   template: `
     <div class="page-container">
       <div v-if="saved" class="alert alert-success">{{ t('common.saved') }}</div>
-      <TabGroup v-model="activeTab" :tabs="[
-        { key: 'basic', title: t('ospf.tabs.basic') },
-        { key: 'areas', title: t('ospf.tabs.areas') },
-        { key: 'interfaces', title: t('ospf.tabs.interfaces') },
-        { key: 'neighbors', title: t('ospf.tabs.neighbors') },
-        { key: 'redistribute', title: t('ospf.tabs.redistribute') },
-        { key: 'access-list', title: t('ospf.tabs.accessList') },
-        { key: 'summary-address', title: t('ospf.tabs.summaryAddress') },
-        { key: 'distance', title: t('ospf.tabs.distance') },
-        { key: 'graceful-restart', title: t('ospf.tabs.gracefulRestart') },
-        { key: 'timers', title: t('ospf.tabs.timers') },
-        { key: 'default-info', title: t('ospf.tabs.defaultInfo') },
-        { key: 'max-metric', title: t('ospf.tabs.maxMetric') },
-        { key: 'mpls-te', title: t('ospf.tabs.mplsTe') },
-        { key: 'ldp-sync', title: t('ospf.tabs.ldpSync') },
-        { key: 'segment-routing', title: t('ospf.tabs.segmentRouting') }
-      ]">
+      <TabGroup v-model="activeTab" :tabs="ospfTabs">
 
         <template #basic>
           <div style="padding:16px;">

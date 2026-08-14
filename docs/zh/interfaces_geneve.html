@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -153,22 +153,11 @@
              
   <section id="geneve">
 <h1>Geneve</h1>
-<p><abbr title="Generic Network Virtualization Encapsulation">Geneve</abbr> interfaces
-operate as virtual network ports. Administrators can apply standard network
-configurations on them, such as IP addressing, bridging, or firewall rules,
-just as they would on physical Ethernet ports.</p>
-<p>The Geneve protocol encapsulates 层 2 Ethernet frames originating from
-endpoints such as virtual machines, containers, or physical servers inside UDP
-packets. It unifies the features of earlier encapsulation protocols, including
-VXLAN, NVGRE, and STT, and addresses their limitations, such as fixed header
-structures and a lack of metadata support. Because of its extensibility, Geneve
-may eventually replace those older protocols.</p>
-<p>Geneve tunnels are used to connect virtual switches residing within
-hypervisors, physical switches, middleboxes, and other network appliances.</p>
-<p>Geneve tunnels operate over any standard IP network. In larger deployments,
-the underlying network (underlay) is often built using a <strong>Clos</strong> topology,
-also known as a <em>leaf-and-spine</em> or <em>fat-tree</em> topology.</p>
-<p>Geneve header:</p>
+<p><abbr title="通用网络虚拟化封装">Geneve</abbr> 接口作为虚拟网络端口运行。管理员可在其上应用标准网络配置，例如 IP 地址分配、网桥或防火墙规则，其方式与在物理以太网端口上操作完全相同。</p>
+<p>Geneve 协议将来自虚拟机、容器或物理服务器等端点的第 2 层以太网帧封装在 UDP 数据包内。它统一了早期封装协议（包括 VXLAN、NVGRE 和 STT）的功能，并解决了这些协议的局限性，例如固定报头结构和缺乏元数据支持。由于 Geneve 具有高度可扩展性，未来可能最终取代这些较旧的协议。</p>
+<p>Geneve 隧道用于连接驻留在管理程序、物理交换机、中间设备及其他网络设备内的虚拟交换机。</p>
+<p>Geneve 隧道可在任何标准 IP 网络上运行。在大规模部署中，底层网络（underlay）通常采用 <strong>Clos</strong> 拓扑构建，也称为 <em>叶脊（leaf-and-spine）</em> 或 <em>胖树（fat-tree）</em> 拓扑。</p>
+<p>Geneve 报头：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |Ver|  Opt Len  |O|C|    Rsvd.  |          Protocol Type        |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -181,16 +170,15 @@ also known as a <em>leaf-and-spine</em> or <em>fat-tree</em> topology.</p>
 <section id="configuration">
 <h2>配置</h2>
 <section id="common-interface-configuration">
-<h3>Common interface configuration</h3>
+<h3>通用接口配置</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> address <address>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure one or more interface IP addresses.</strong></p>
-<p><code class="docutils literal notranslate"><address></code> supports IPv4 and IPv6 in CIDR notation. For example, use
-<code class="docutils literal notranslate">192.0.2.1/24</code> for IPv4 or <code class="docutils literal notranslate">2001:db8::1/64</code> for IPv6.</p>
-<p>示例:</p>
+set interfaces geneve &lt;interface&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-address-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置一个或多个接口 IP 地址。</strong></p>
+<p><code class="docutils literal notranslate">&lt;address&gt;</code> 支持 CIDR 表示法的 IPv4 和 IPv6 地址。例如，IPv4 使用 <code class="docutils literal notranslate">192.0.2.1/24</code>，IPv6 使用 <code class="docutils literal notranslate">2001:db8::1/64</code>。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 address 192.0.2.1/24
 set interfaces geneve gnv0 address 2001:db8::1/64
 </pre></div>
@@ -200,13 +188,12 @@ set interfaces geneve gnv0 address 2001:db8::1/64
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> description <description>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a clear, descriptive alias for the interface.</strong></p>
-<p>This alias appears in the <code class="docutils literal notranslate">show interfaces</code> command and SNMP-based
-monitoring tools.</p>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 description 'This is an interface running on VyOS.'
+set interfaces geneve &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-description-description" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为接口配置清晰、描述性的别名。</strong></p>
+<p>该别名将在 <code class="docutils literal notranslate">show interfaces</code> 命令及基于 SNMP 的监控工具中显示。</p>
+<p>示例：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 description &#39;这是一个在 VyOS 上运行的接口。&#39;
 </pre></div>
 </div>
 </div>
@@ -214,12 +201,11 @@ monitoring tools.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> disable
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable the interface.</strong></p>
-<p>The interface 将 set to the administratively down
-(<code class="docutils literal notranslate">A/D</code>) state.</p>
-<p>示例:</p>
+set interfaces geneve &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>禁用该接口。</strong></p>
+<p>该接口将被设置为管理性关闭（<code class="docutils literal notranslate">A/D</code>）状态。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 disable
 </pre></div>
 </div>
@@ -228,11 +214,11 @@ set interfaces geneve <interface> disable
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> mac <xx:xx:xx:xx:xx:xx>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-mac-xx-xx-xx-xx-xx-xx" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a custom MAC address on the interface.</strong></p>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 mac '00:53:01:02:03:04'
+set interfaces geneve &lt;interface&gt; mac &lt;xx:xx:xx:xx:xx:xx&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-mac-xx-xx-xx-xx-xx-xx" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在接口上配置自定义 MAC 地址。</strong></p>
+<p>示例：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 mac &#39;00:53:01:02:03:04&#39;
 </pre></div>
 </div>
 </div>
@@ -240,12 +226,11 @@ set interfaces geneve <interface> mac <xx:xx:xx:xx:xx:xx>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> mtu <mtu>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the MTU on the interface.</strong></p>
-<p>This value defines the largest packet size, in bytes, that the interface
-transmits without fragmentation.</p>
-<p>示例:</p>
+set interfaces geneve &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-mtu-mtu" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在接口上配置 MTU。</strong></p>
+<p>该值定义了接口在不进行分片的情况下所能传输的最大数据包大小（字节）。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 mtu 1600
 </pre></div>
 </div>
@@ -254,36 +239,26 @@ transmits without fragmentation.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ip adjust-mss <mss | clamp-mss-to-pmtu>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>advertised in outgoing
-TCP SYN packets on the specified interface.</strong></p>
-<p>By clamping the MSS value in TCP SYN packets, you explicitly inform the
-remote side not to send packets larger than that size. This prevents
-connection issues that occur when 路径 MTU Discovery (PMTUD) fails.</p>
-<p>The following options are available:</p>
+set interfaces geneve &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置在指定接口上发出的 TCP SYN 数据包中通告的</strong> <abbr title="最大分段大小">MSS</abbr> <strong>值。</strong></p>
+<p>通过限制 TCP SYN 数据包中的 MSS 值，可明确告知远端不要发送大于该尺寸的数据包。这可以防止因路径 MTU 发现（PMTUD）失败而导致的连接问题。</p>
+<p>以下选项可用：</p>
 <ul class="simple">
-<li><p><strong>mss:</strong> 设置s the MSS to a specific value, in bytes. Use this option if
-you need to enforce a specific MSS, for example, to troubleshoot
-connectivity issues or accommodate specific network requirements.</p></li>
-<li><p><strong>clamp-mss-to-pmtu:</strong> The router automatically calculates the MSS to be
-the interface’s MTU minus 40 bytes for IPv4 traffic (20 bytes for the IPv4
-header and 20 bytes for the TCP header). This option 建议
-automatically set the proper value.</p></li>
+<li><p><strong>mss:</strong> 将 MSS 设置为特定字节数值。当需要强制执行特定 MSS（例如排查连通性问题或满足特定网络需求）时，请使用此选项。</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> 路由器自动计算 MSS 值，即接口 MTU 减去 IPv4 流量所需的 40 字节（IPv4 报头 20 字节 + TCP 报头 20 字节）。建议使用此选项以自动设置合适值。</p></li>
 </ul>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ip arp-cache-timeout
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-arp-cache-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure how long an ARP entry remains valid after learning an IP-to-MAC
-address mapping on this interface.</strong></p>
-<p>The default duration is 30 seconds.</p>
-<p>An ARP entry remains valid if it receives positive feedback from
-higher-level protocols.</p>
-<p>示例:</p>
+set interfaces geneve &lt;interface&gt; ip arp-cache-timeout
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-arp-cache-timeout" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 ARP 条目在学习到本接口上的 IP 到 MAC 地址映射后保持有效的时间长度。</strong></p>
+<p>默认持续时间为 30 秒。</p>
+<p>如果 ARP 条目从更高级别的协议接收到正向反馈，则该条目保持有效。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip arp-cache-timeout 180
 </pre></div>
 </div>
@@ -292,18 +267,12 @@ higher-level protocols.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ip disable-arp-filter
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-disable-arp-filter" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure ARP filtering on this interface.</strong></p>
-<p><strong>默认 behavior:</strong> The kernel responds to ARP requests on this interface
-only if the traffic 将 routed back to the ARP sender through that
-specific interface.</p>
-<p><strong>If configured:</strong> The kernel responds to ARP requests on this interface for any
-IP address configured on the local host, regardless of which specific interface
-that IP address is assigned to, and regardless of the routing table. This
-reflects the Linux concept that IP addresses belong to the host, not individual
-interfaces.</p>
-<p>示例:</p>
+set interfaces geneve &lt;interface&gt; ip disable-arp-filter
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-disable-arp-filter" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在本接口上配置 ARP 过滤。</strong></p>
+<p><strong>默认行为：</strong> 内核仅在流量将通过该特定接口路由回 ARP 请求发送方时，才响应本接口上的 ARP 请求。</p>
+<p><strong>若已配置：</strong> 内核将响应本接口上针对本地主机所配置的任意 IP 地址的 ARP 请求，而不论该 IP 地址实际分配给哪个具体接口，也不论路由表如何。这体现了 Linux 中“IP 地址属于主机而非单个接口”的概念。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip disable-arp-filter
 </pre></div>
 </div>
@@ -312,12 +281,11 @@ interfaces.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ip disable-forwarding
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interface for host or router behavior.</strong></p>
-<p>If configured, the interface switches to host mode, and IPv4 forwarding is
-disabled on it.</p>
-<p>示例:</p>
+set interfaces geneve &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-disable-forwarding" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置接口为主机模式或路由器模式行为。</strong></p>
+<p>若已配置，接口将切换至主机模式，且在该接口上禁用 IPv4 转发功能。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip disable-forwarding
 </pre></div>
 </div>
@@ -326,14 +294,12 @@ disabled on it.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ip enable-directed-broadcast
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure whether to forward IP-directed broadcast packets received on this
-interface.</strong></p>
-<p><strong>默认 behavior:</strong> IP-directed broadcast packets are dropped.</p>
-<p><strong>If configured:</strong> IP-directed broadcast packets are forwarded to all hosts
-on the destination subnet, as defined in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> and <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
-<p>示例:</p>
+set interfaces geneve &lt;interface&gt; ip enable-directed-broadcast
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-enable-directed-broadcast" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置是否转发在本接口上接收的 IP 定向广播数据包。</strong></p>
+<p><strong>默认行为：</strong> IP 定向广播数据包将被丢弃。</p>
+<p><strong>若已配置：</strong> IP 定向广播数据包将根据 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> 和 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a> 的规定，转发至目标子网内的所有主机。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip enable-directed-broadcast
 </pre></div>
 </div>
@@ -342,17 +308,15 @@ on the destination subnet, as defined in <a class="rfc reference external" href=
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ip enable-arp-accept
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-enable-arp-accept" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure how to process gratuitous ARPs on this interface.</strong></p>
-<p>If configured, an IP-to-MAC address mapping is added to the ARP table based
-on gratuitous ARP requests or replies.</p>
+set interfaces geneve &lt;interface&gt; ip enable-arp-accept
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-enable-arp-accept" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置本接口对免费 ARP（gratuitous ARP）的处理方式。</strong></p>
+<p>若已配置，将根据免费 ARP 请求或应答，在 ARP 表中添加 IP 到 MAC 地址映射。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>If the ARP table already contains the IP address from a gratuitous
-ARP, its entry is updated regardless of whether this setting is configured.</p>
+<p>如果 ARP 表中已存在来自免费 ARP 的 IP 地址，无论是否启用此设置，其条目均会被更新。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip enable-arp-accept
 </pre></div>
 </div>
@@ -361,17 +325,12 @@ ARP, its entry is updated regardless of whether this setting is configured.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ip enable-arp-announce
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-enable-arp-announce" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the source IP selection for ARP requests on this interface.</strong></p>
-<p><strong>默认 behavior:</strong> The kernel can use any IP address the host owns as
-the source IP address in ARP requests on this interface.</p>
-<p><strong>If configured:</strong> The kernel first attempts to select a source IP address
-configured on the interface that shares a common subnet with the target
-IP address. If there is no such subnet, the kernel selects the IP address
-it would normally use (based on the routing table to reach the target
-destination).</p>
-<p>示例:</p>
+set interfaces geneve &lt;interface&gt; ip enable-arp-announce
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-enable-arp-announce" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置本接口上 ARP 请求的源 IP 地址选择方式。</strong></p>
+<p><strong>默认行为：</strong> 内核可使用主机拥有的任意 IP 地址作为本接口上 ARP 请求的源 IP 地址。</p>
+<p><strong>若已配置：</strong> 内核首先尝试选择一个配置在本接口上、且与目标 IP 地址处于同一子网的源 IP 地址；若不存在此类子网，则内核将选择其通常使用的 IP 地址（即依据路由表到达目标目的地所选的地址）。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip enable-arp-announce
 </pre></div>
 </div>
@@ -380,14 +339,12 @@ destination).</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ip enable-arp-ignore
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-enable-arp-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure which ARP requests 将 ignored on this interface.</strong></p>
-<p><strong>默认 behavior:</strong> The kernel responds to ARP requests for any local
-IP addresses, regardless of which interface they are assigned to.</p>
-<p><strong>If configured:</strong> The kernel responds to ARP requests only if the target
-IP address is assigned to this specific interface.</p>
-<p>示例:</p>
+set interfaces geneve &lt;interface&gt; ip enable-arp-ignore
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-enable-arp-ignore" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置本接口上将被忽略的 ARP 请求类型。</strong></p>
+<p><strong>默认行为：</strong> 内核将响应针对任意本地 IP 地址的 ARP 请求，而不论这些 IP 地址分配给了哪个接口。</p>
+<p><strong>若已配置：</strong> 内核仅在目标 IP 地址分配给本接口时，才响应 ARP 请求。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip enable-arp-ignore
 </pre></div>
 </div>
@@ -396,15 +353,11 @@ IP address is assigned to this specific interface.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ip enable-proxy-arp
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-enable-proxy-arp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure proxy ARP on this interface.</strong></p>
-<p>If configured, the router (kernel) intercepts ARP requests for non-local IP
-addresses and replies with the <abbr title="Media Access Control">MAC</abbr> address
-of the interface that received the request. Subsequent packets destined
-to these IP addresses are forwarded to their actual destinations on remote
-subnets.</p>
-<p>示例:</p>
+set interfaces geneve &lt;interface&gt; ip enable-proxy-arp
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-enable-proxy-arp" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在本接口上配置代理 ARP。</strong></p>
+<p>若已配置，路由器（内核）将截获针对非本地 IP 地址的 ARP 请求，并以接收请求的接口的 <abbr title="媒体访问控制">MAC</abbr> 地址作为应答。后续发往这些 IP 地址的数据包将被转发至远程子网上的实际目的地。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ip enable-proxy-arp
 </pre></div>
 </div>
@@ -413,75 +366,52 @@ subnets.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ip proxy-arp-pvlan
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-proxy-arp-pvlan" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure local proxy ARP on the interface.</strong></p>
-<p>If configured, the router (kernel) responds to ARP requests on this VLAN
-interface even if the target IP address resides on the same subnet and
-interface.</p>
-<p>This 用于 support network isolation requirements (RFC 3069) for private
-VLANs (PVLANs). In PVLAN configurations, hosts on isolated ports are NOT
-allowed to communicate directly with each other at 层 2, but they can
-communicate with the upstream router.</p>
-<p>By replying to inter-host ARP requests with its own <abbr title="Media Access Control">MAC</abbr>
-address, the router (kernel) directs inter-host traffic through itself instead of
-directly between hosts.</p>
+set interfaces geneve &lt;interface&gt; ip proxy-arp-pvlan
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-proxy-arp-pvlan" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在接口上配置本地代理 ARP。</strong></p>
+<p>若已配置，路由器（内核）即使在目标 IP 地址位于同一子网和同一接口上时，也会响应本 VLAN 接口上的 ARP 请求。</p>
+<p>此功能用于支持私有 VLAN（PVLAN）的网络隔离要求（RFC 3069）。在 PVLAN 配置中，隔离端口上的主机在第 2 层不允许直接相互通信，但可与上游路由器通信。</p>
+<p>通过以自身 <abbr title="媒体访问控制">MAC</abbr> 地址应答主机间 ARP 请求，路由器（内核）将主机间流量引导至自身，而非在主机之间直接转发。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command works independently and does not require enabling
-the standard proxy ARP on the interface.</p>
+<p>此命令独立工作，无需在接口上启用标准代理 ARP。</p>
 </div>
-<p>Local proxy ARP is also known as:</p>
+<p>本地代理 ARP 也称为：</p>
 <ul class="simple">
-<li><p>VLAN aggregation (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
-<li><p>Private VLAN  (Cisco, Allied Telesyn).</p></li>
-<li><p>源-port filtering or port isolation (Hewlett-Packard).</p></li>
-<li><p>MAC-Forced Forwarding (Ericsson).</p></li>
+<li><p>VLAN 聚合（<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>）。</p></li>
+<li><p>私有 VLAN（Cisco、Allied Telesyn）。</p></li>
+<li><p>源端口过滤或端口隔离（Hewlett-Packard）。</p></li>
+<li><p>MAC 强制转发（Ericsson）。</p></li>
 </ul>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ip source-validation <strict | loose | disable>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure source IP address validation using</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>on this interface, as specified in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
-<p>The following options are available:</p>
+set interfaces geneve &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ip-source-validation-strict-loose-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>根据</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> <strong>的规定，在本接口上使用</strong> <abbr title="反向路径转发">RPF</abbr> <strong>配置源 IP 地址验证。</strong></p>
+<p>以下选项可用：</p>
 <ul class="simple">
-<li><p><strong>strict:</strong> Each incoming packet’s source IP address is checked against the
-Forwarding 信息rmation Base (FIB). If the interface is not the best route
-back to that source, validation fails, and the packet is dropped.</p></li>
-<li><p><strong>loose:</strong> Each incoming packet’s source IP address is checked against the
-FIB. If the source IP address is unreachable through any interface, validation
-fails.</p></li>
-<li><p><strong>disable:</strong> No source IP address validation is performed. All incoming
-packets are accepted.</p></li>
+<li><p><strong>strict:</strong> 对每个入站数据包的源 IP 地址检查其是否匹配转发信息库（FIB）。若该接口并非返回该源地址的最佳路径，则验证失败，数据包将被丢弃。</p></li>
+<li><p><strong>loose:</strong> 对每个入站数据包的源 IP 地址检查其是否匹配 FIB。若该源 IP 地址无法通过任何接口到达，则验证失败。</p></li>
+<li><p><strong>disable:</strong> 不执行源 IP 地址验证，接受所有入站数据包。</p></li>
 </ul>
-<p>RFC 3704 recommends enabling strict mode to prevent IP spoofing, such as
-DDoS attacks. For asymmetric or other complex routing scenarios, use loose
-mode.</p>
+<p>RFC 3704 建议启用严格模式以防止 IP 欺骗（如 DDoS 攻击）。对于非对称路由或其他复杂路由场景，请使用宽松模式。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ipv6 address autoconf
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interface to automatically obtain an IPv6 address using</strong>
-<abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>as specified in</strong>
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
-<p>IPv6 hosts can configure themselves automatically when connected to an
-IPv6 network using the Neighbor Discovery 协议 via ICMPv6 router
-discovery messages. When first connected to a network, a host sends a
-link-local router solicitation multicast request for its configuration
-parameters. The router responds with a router advertisement packet
-containing Internet 层 configuration parameters.</p>
+set interfaces geneve &lt;interface&gt; ipv6 address autoconf
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-address-autoconf" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>根据</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a> <strong>的规定，配置接口使用</strong> <abbr title="无状态地址自动配置">SLAAC</abbr> <strong>自动获取 IPv6 地址。</strong></p>
+<p>IPv6 主机在接入 IPv6 网络时，可通过 ICMPv6 路由器发现消息利用邻居发现协议（NDP）自动配置自身。主机首次接入网络时，会发送链路本地路由器请求多播请求以获取其配置参数；路由器则以包含网络层配置参数的路由器通告数据包进行响应。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This method automatically disables IPv6 traffic forwarding
-on the interface.</p>
+<p>此方法将自动禁用接口上的 IPv6 流量转发功能。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ipv6 address autoconf
 </pre></div>
 </div>
@@ -490,12 +420,10 @@ on the interface.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ipv6 address eui64 <prefix>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-address-eui64-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interface to assign itself an IPv6 address using the</strong>
-<abbr title="64-Bit Extended Unique Identifier">EUI-64</abbr> <strong>method, as
-specified</strong> in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
-<p>示例:</p>
+set interfaces geneve &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-address-eui64-prefix" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>根据</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a> <strong>的规定，配置接口使用</strong> <abbr title="64 位扩展唯一标识符">EUI-64</abbr> <strong>方法为其自身分配 IPv6 地址。</strong></p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ipv6 address eui64 2001:db8:beef::/64
 </pre></div>
 </div>
@@ -504,11 +432,10 @@ specified</strong> in <a class="rfc reference external" href="https://docs.vyos.
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ipv6 address no-default-link-local
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-address-no-default-link-local" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable the automatic assignment of a link-local IPv6 address to
-this interface.</strong></p>
-<p>示例:</p>
+set interfaces geneve &lt;interface&gt; ipv6 address no-default-link-local
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-address-no-default-link-local" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>禁用为本接口自动分配链路本地 IPv6 地址的功能。</strong></p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ipv6 address no-default-link-local
 </pre></div>
 </div>
@@ -517,12 +444,11 @@ this interface.</strong></p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ipv6 disable-forwarding
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interface for host or router behavior.</strong></p>
-<p>If configured, the interface switches to host mode, and IPv6 forwarding is
-disabled on it.</p>
-<p>示例:</p>
+set interfaces geneve &lt;interface&gt; ipv6 disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-disable-forwarding" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置接口为主机模式或路由器模式行为。</strong></p>
+<p>若已配置，接口将切换至主机模式，且在该接口上禁用 IPv6 转发功能。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ipv6 disable-forwarding
 </pre></div>
 </div>
@@ -531,41 +457,30 @@ disabled on it.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ipv6 adjust-mss <mss | clamp-mss-to-pmtu>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>advertised in outgoing
-TCP SYN packets on the specified interface.</strong></p>
-<p>By clamping the MSS value in TCP SYN packets, you explicitly inform
-the remote side not to send packets larger than that size. This prevents
-connection issues when 路径 MTU Discovery (PMTUD) fails.</p>
-<p>The following options are available:</p>
+set interfaces geneve &lt;interface&gt; ipv6 adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-adjust-mss-mss-clamp-mss-to-pmtu" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置在指定接口上发出的 TCP SYN 数据包中通告的</strong> <abbr title="最大分段大小">MSS</abbr> <strong>值。</strong></p>
+<p>通过限制 TCP SYN 数据包中的 MSS 值，可明确告知远端不要发送大于该尺寸的数据包。这可以防止因路径 MTU 发现（PMTUD）失败而导致的连接问题。</p>
+<p>以下选项可用：</p>
 <ul class="simple">
-<li><p><strong>mss:</strong> 设置 the MSS to a specific value, in bytes. Use this option to
-enforce a specific MSS, for example, to troubleshoot connectivity issues
-or accommodate specific network requirements.</p></li>
-<li><p><strong>clamp-mss-to-pmtu:</strong> The router calculates the MSS to be the interface’s
-MTU minus 60 bytes for IPv6 traffic (40 bytes for the IPv6 header and 20
-bytes for the TCP header). This option is recommended to automatically
-set the proper value.</p></li>
+<li><p><strong>mss:</strong> 将 MSS 设置为特定字节数值。使用此选项可强制执行特定 MSS，例如排查连通性问题或满足特定网络需求。</p></li>
+<li><p><strong>clamp-mss-to-pmtu:</strong> 路由器计算 MSS 值，即接口 MTU 减去 IPv6 流量所需的 60 字节（IPv6 报头 40 字节 + TCP 报头 20 字节）。建议使用此选项以自动设置合适值。</p></li>
 </ul>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ipv6 accept-dad <0 | 1 | 2>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-accept-dad-0-1-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure IPv6</strong> <abbr title="Duplicate Address Detection">DAD</abbr> <strong>on the
-interface.</strong></p>
-<p>The following options are available:</p>
+set interfaces geneve &lt;interface&gt; ipv6 accept-dad &lt;0 | 1 | 2&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-accept-dad-0-1-2" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在接口上配置 IPv6</strong> <abbr title="重复地址检测">DAD</abbr> <strong>功能。</strong></p>
+<p>以下选项可用：</p>
 <ul class="simple">
-<li><p><strong>0:</strong> Disables DAD. No duplicate address detection is performed.</p></li>
-<li><p><strong>1:</strong> Enables DAD (default). Duplicate addresses are detected. The
-interface’s IPv6 operation continues for valid IPv6 addresses.</p></li>
-<li><p><strong>2:</strong> Enables DAD and, if a MAC-based duplicate link-local address
-is found, disables IPv6 operation on this interface.</p></li>
+<li><p><strong>0:</strong> 禁用 DAD。不执行重复地址检测。</p></li>
+<li><p><strong>1:</strong> 启用 DAD（默认）。检测重复地址。接口的 IPv6 功能对有效的 IPv6 地址继续运行。</p></li>
+<li><p><strong>2:</strong> 启用 DAD；若发现基于 MAC 的重复链路本地地址，则禁用本接口上的 IPv6 功能。</p></li>
 </ul>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ipv6 accept-dad 2
 </pre></div>
 </div>
@@ -574,13 +489,11 @@ is found, disables IPv6 operation on this interface.</p></li>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve <interface> ipv6 dup-addr-detect-transmits <n>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-dup-addr-detect-transmits-n" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the number of</strong> <abbr title="Duplicate Address Detection">DAD</abbr>
-<strong>messages that the router (kernel) sends during IPv6 address assignment
-on this interface.</strong></p>
-<p>The default value is 1.</p>
-<p>示例:</p>
+set interfaces geneve &lt;interface&gt; ipv6 dup-addr-detect-transmits &lt;n&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-interface-ipv6-dup-addr-detect-transmits-n" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器（内核）在本接口上执行 IPv6 地址分配期间发送的</strong> <abbr title="重复地址检测">DAD</abbr> <strong>消息数量。</strong></p>
+<p>默认值为 1。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces geneve gnv0 ipv6 dup-addr-detect-transmits 5
 </pre></div>
 </div>
@@ -588,36 +501,31 @@ on this interface.</strong></p>
 </div>
 </section>
 <section id="geneve-options">
-<h3>Geneve options</h3>
+<h3>Geneve 选项</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces geneve gnv0 remote <address>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-gnv0-remote-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure the remote endpoint IP address for the Geneve tunnel.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set interfaces geneve gnv0 vni <vni>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-gnv0-vni-vni" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure</strong> <abbr title="Virtual Network Identifier">VNI</abbr> <strong>for the Geneve
-interface.</strong></p>
-<p>The VNI is a virtual network identifier. It allows multiple virtual networks to
-share the same physical infrastructure and remain isolated.</p>
-<p>The VNI is also used to distribute traffic after it leaves the tunnel, for
-example, to map packets with overlapping IP addresses to specific routing
-tables.</p>
+set interfaces geneve gnv0 remote &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-gnv0-remote-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>配置 Geneve 隧道的远端端点 IP 地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces gnv0 <interface> port <port>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-gnv0-interface-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the destination UDP port for the remote Geneve tunnel endpoint.</strong>
-Ensure the remote peer is configured to listen on this specific port.</p>
+set interfaces geneve gnv0 vni &lt;vni&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-geneve-gnv0-vni-vni" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为 Geneve 接口配置</strong> <abbr title="虚拟网络标识符">VNI</abbr> <strong>。</strong></p>
+<p>VNI 是一个虚拟网络标识符，允许多个虚拟网络共享同一物理基础设施并保持相互隔离。</p>
+<p>VNI 还用于隧道出口后的流量分发，例如将具有重叠 IP 地址的数据包映射到特定的路由表。</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set interfaces gnv0 &lt;interface&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-gnv0-interface-port-port" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置远端 Geneve 隧道端点的目标 UDP 端口。</strong> 请确保远端对等体已配置为在此特定端口上监听。</p>
 </div>
 </div>
 </section>

@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -152,310 +152,247 @@
 <div itemprop="articleBody">
              
   <section id="flowtables-firewall-configuration">
-<h1>Flowtables 防火墙 配置</h1>
+<h1>流表防火墙配置</h1>
 <div class="error admonition">
-<p class="admonition-title">Call for Contributions</p>
-<p>Help improve this section with additional content, examples, and explanations.</p>
-<p>For contribution guidelines, see <a class="reference internal" href="../../documentation.html#documentation">写入 Documentation</a>.</p>
+<p class="admonition-title">诚邀贡献</p>
+<p>欢迎通过补充内容、示例和说明来改进本节。</p>
+<p>有关贡献指南，请参阅 <a class="reference internal" href="../../documentation.html#documentation">编写文档</a>。</p>
 </div>
 <section id="overview">
-<h2>Overview</h2>
-<p>This section provides information on firewall configuration for flowtables.</p>
+<h2>概述</h2>
+<p>本节提供有关流表防火墙配置的信息。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set firewall flowtable …
-<a class="cmdlink" href="#cfgcmd-set-firewall-flowtable" title="Permalink to this Command"></a></div></div>
-<p>To learn about the general traffic flow in VyOS firewalls,
-see <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">防火墙</a>.</p>
+<a class="cmdlink" href="#cfgcmd-set-firewall-flowtable" title="此命令的永久链接"></a></div></div>
+<p>如需了解 VyOS 防火墙中的一般流量流向，请参阅 <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">防火墙</a>。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
     * flowtable
          - custom_flow_table
             + ...
 </pre></div>
 </div>
-<p>Flowtables let you define a fastpath through the flowtable datapath.
-Flowtables support layer 3 (IPv4 and IPv6) and layer 4 (TCP and UDP)
-protocols.</p>
+<p>流表允许您定义一条经由流表数据路径的快速转发路径。流表支持第 3 层（IPv4 和 IPv6）和第 4 层（TCP 和 UDP）协议。</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-flowtable-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-flowtable-packet-flow.webp"></img>
+<img alt="../../_images/firewall-flowtable-packet-flow.webp" src="https://docs.vyos.io/en/latest/_images/firewall-flowtable-packet-flow.webp" />
 </figure>
-<p>After the first packet successfully traverses the IP forwarding path (black
-circles path), you can offload subsequent packets to the flowtable through your
-ruleset. You specify when to add a flow to the flowtable during forward
-filtering (red circle number 6).</p>
-<p>When a packet finds a matching entry in the flowtable (flowtable hit), the
-system transmits it to the output netdevice. This means packets bypass the
-classic IP forwarding path and use the <strong>Fast 路径</strong> (orange circles path).
-As a result, you do not see these packets from any Netfilter hooks after
-ingress. If no matching entry exists in the flowtable (flowtable miss), the
-packet traverses the classic IP forwarding path.</p>
+<p>首个数据包成功穿越 IP 转发路径（黑色圆圈路径）后，您可通过规则集将后续数据包卸载至流表。您可在转发过滤阶段（红色圆圈编号 6）指定何时向流表添加流条目。</p>
+<p>当数据包在流表中找到匹配项（流表命中）时，系统将其直接传输至输出网络设备。这意味着数据包绕过传统 IP 转发路径，转而使用<strong>快速路径</strong>（橙色圆圈路径）。因此，在入口之后，您无法再从任何 Netfilter 钩子中看到这些数据包。若流表中不存在匹配项（流表未命中），则数据包将沿传统 IP 转发路径进行处理。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p><strong>Flowtable Reference:</strong>
-<a class="reference external" href="https://docs.vyos.io/en/rolling/configuration/https://docs.kernel.org/networking/nf_flowtable.html">https://docs.kernel.org/networking/nf_flowtable.html</a></p>
+<p><strong>流表参考：</strong>
+<a class="reference external" href="https://docs.vyos.io/en/latest/configuration/https://docs.kernel.org/networking/nf_flowtable.html">https://docs.kernel.org/networking/nf_flowtable.html</a></p>
 </div>
 </section>
 <section id="flowtable-configuration">
-<h2>Flowtable 配置</h2>
-<p>To use flowtables, you need to configure the following:</p>
+<h2>流表配置</h2>
+<p>要使用流表，您需要配置以下内容：</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>创建 a flowtable that includes the interfaces
-that are going to be used by the flowtable.</p></li>
-<li><p>创建 a firewall rule. 设置 the action to
-<code class="docutils literal notranslate">offload</code> and use your desired flowtable for <code class="docutils literal notranslate">offload-target</code>.</p></li>
+<li><p>创建一个流表，并包含将在流表中使用的接口。</p></li>
+<li><p>创建一条防火墙规则：将操作设置为 <code class="docutils literal notranslate">offload</code>，并为 <code class="docutils literal notranslate">offload-target</code> 指定所需的流表。</p></li>
 </ul>
 </div></blockquote>
-<p>Creating a flow table:</p>
+<p>创建流表：</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall flowtable <flow_table_name> interface <iface> Specify interfaces to use in the flowtable.
-<a class="cmdlink" href="#cfgcmd-set-firewall-flowtable-flow-table-name-interface-iface-specify-interfaces-to-use-in-the-flowtable" title="Permalink to this Command"></a></div></div>
+set firewall flowtable &lt;flow_table_name&gt; interface &lt;iface&gt; 指定流表中要使用的接口。
+<a class="cmdlink" href="#cfgcmd-set-firewall-flowtable-flow-table-name-interface-iface-specify-interfaces-to-use-in-the-flowtable" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall flowtable <flow_table_name> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-flowtable-flow-table-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Provide a description for the flow table.</p>
+set firewall flowtable &lt;flow_table_name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-flowtable-flow-table-name-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为流表提供描述信息。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall flowtable <flow_table_name> offload <hardware | software>
-<a class="cmdlink" href="#cfgcmd-set-firewall-flowtable-flow-table-name-offload-hardware-software" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specify the offload type the flowtable uses: <code class="docutils literal notranslate">hardware</code> or
-<code class="docutils literal notranslate">software</code>. The default is <code class="docutils literal notranslate">software</code> offload.</p>
+set firewall flowtable &lt;flow_table_name&gt; offload &lt;hardware | software&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-flowtable-flow-table-name-offload-hardware-software" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定流表所用的卸载类型：<code class="docutils literal notranslate">hardware</code> 或 <code class="docutils literal notranslate">software</code>。默认为 <code class="docutils literal notranslate">software</code> 卸载。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p><strong>Hardware offload</strong>: Make sure your network interface controller
-(NIC) supports hardware offloading and that you have the necessary drivers
-installed before enabling this option.</p>
+<p><strong>硬件卸载</strong>：启用该选项前，请确保您的网卡（NIC）支持硬件卸载功能，并已安装必要的驱动程序。</p>
 </div>
-<p>Creating rules for using flow tables:</p>
+<p>创建用于使用流表的规则：</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall [ipv4 | ipv6] forward filter rule <1-999999> action offload
-<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-ipv6-forward-filter-rule-1-999999-action-offload" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>创建 a firewall rule in the forward chain with the action set to
-<code class="docutils literal notranslate">offload</code>.</p>
+set firewall [ipv4 | ipv6] forward filter rule &lt;1-999999&gt; action offload
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-ipv6-forward-filter-rule-1-999999-action-offload" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>在转发链中创建一条防火墙规则，并将操作设为 <code class="docutils literal notranslate">offload</code>。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall [ipv4 | ipv6] forward filter rule <1-999999> offload-target <flowtable>
-<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-ipv6-forward-filter-rule-1-999999-offload-target-flowtable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>创建 a firewall rule in the forward chain and specify which flowtable
-to use. Only applicable if the action is <code class="docutils literal notranslate">offload</code>.</p>
+set firewall [ipv4 | ipv6] forward filter rule &lt;1-999999&gt; offload-target &lt;flowtable&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-ipv4-ipv6-forward-filter-rule-1-999999-offload-target-flowtable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>在转发链中创建一条防火墙规则，并指定要使用的流表。仅当操作为 <code class="docutils literal notranslate">offload</code> 时适用。</p>
 </div>
 </div>
 <section id="interface-selection">
-<h3>接口 Selection</h3>
+<h3>接口选择</h3>
 <div class="admonition important">
 <p class="admonition-title">重要</p>
-<p>Always configure the flowtable with the interface that VyOS observes
-at the forward hook — which is not necessarily the physical interface.
-When traffic is received or transmitted via a logical interface, VyOS
-tracks that logical interface, not the underlying physical device. Registering
-the wrong interface in the flowtable causes every flow lookup to miss,
-falling back to the classic forwarding path and defeating the purpose of
-fast-path offload.</p>
+<p>始终使用 VyOS 在转发钩子（forward hook）处观察到的接口来配置流表——该接口不一定是物理接口。当流量经由逻辑接口接收或发送时，VyOS 跟踪的是该逻辑接口，而非底层物理设备。若在流表中注册了错误的接口，则每次流查找均会失败，从而回退至传统转发路径，导致快速路径卸载失去意义。</p>
 </div>
 </section>
 </section>
 <section id="configuration-example">
-<h2>配置 示例</h2>
-<p>Consider the following in this setup:</p>
+<h2>配置示例</h2>
+<p>考虑本示例中的以下设置：</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>This example uses two interfaces in the flowtables: <code class="docutils literal notranslate">eth0</code> and <code class="docutils literal notranslate">eth1</code>.</p></li>
-<li><p>The example provides a minimal firewall ruleset with filtering rules
-and rules for using flowtable offload capabilities.</p></li>
+<li><p>本示例在流表中使用两个接口：<code class="docutils literal notranslate">eth0</code> 和 <code class="docutils literal notranslate">eth1</code>。</p></li>
+<li><p>本示例提供了一个最小化的防火墙规则集，包括过滤规则以及利用流表卸载功能的规则。</p></li>
 </ul>
 </div></blockquote>
-<p>The first packet is evaluated by the firewall path, so a
-desired connection 应该 explicitly accepted.
-The same should occur for traffic in reverse order.
-In most cases, state policies are
-used to accept a connection in the reverse path.</p>
-<p>In the following example only traffic coming from interface <code class="docutils literal notranslate">eth0</code>,
-TCP protocol, and destination port 1122 is accepted.
-All other traffic to the router is dropped.</p>
+<p>首个数据包由防火墙路径评估，因此应显式接受所需连接。反向流量也应执行相同操作。在大多数情况下，会使用状态策略在反向路径中接受连接。</p>
+<p>在以下示例中，仅接受来自接口 <code class="docutils literal notranslate">eth0</code>、使用 TCP 协议且目标端口为 1122 的流量。所有其他发往路由器的流量均被丢弃。</p>
 <section id="commands">
-<h3>Commands</h3>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall flowtable FT01 interface 'eth0'
-set firewall flowtable FT01 interface 'eth1'
-set firewall ipv4 forward filter default-action 'drop'
-set firewall ipv4 forward filter rule 10 action 'offload'
-set firewall ipv4 forward filter rule 10 offload-target 'FT01'
-set firewall ipv4 forward filter rule 10 state 'established'
-set firewall ipv4 forward filter rule 20 action 'accept'
-set firewall ipv4 forward filter rule 20 state 'established'
-set firewall ipv4 forward filter rule 20 state 'related'
-set firewall ipv4 forward filter rule 110 action 'accept'
-set firewall ipv4 forward filter rule 110 destination address '192.0.2.100'
-set firewall ipv4 forward filter rule 110 destination port '1122'
-set firewall ipv4 forward filter rule 110 inbound-interface name 'eth0'
-set firewall ipv4 forward filter rule 110 protocol 'tcp'
+<h3>命令</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall flowtable FT01 interface &#39;eth0&#39;
+set firewall flowtable FT01 interface &#39;eth1&#39;
+set firewall ipv4 forward filter default-action &#39;drop&#39;
+set firewall ipv4 forward filter rule 10 action &#39;offload&#39;
+set firewall ipv4 forward filter rule 10 offload-target &#39;FT01&#39;
+set firewall ipv4 forward filter rule 10 state &#39;established&#39;
+set firewall ipv4 forward filter rule 20 action &#39;accept&#39;
+set firewall ipv4 forward filter rule 20 state &#39;established&#39;
+set firewall ipv4 forward filter rule 20 state &#39;related&#39;
+set firewall ipv4 forward filter rule 110 action &#39;accept&#39;
+set firewall ipv4 forward filter rule 110 destination address &#39;192.0.2.100&#39;
+set firewall ipv4 forward filter rule 110 destination port &#39;1122&#39;
+set firewall ipv4 forward filter rule 110 inbound-interface name &#39;eth0&#39;
+set firewall ipv4 forward filter rule 110 protocol &#39;tcp&#39;
 </pre></div>
 </div>
 </section>
 <section id="explanation">
-<h3>Explanation</h3>
-<p>Here’s what happens for a desired connection:</p>
+<h3>说明</h3>
+<p>对于所需连接，其处理过程如下：</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li><p>A packet arrives on <code class="docutils literal notranslate">eth0</code> with destination address <code class="docutils literal notranslate">192.0.2.100</code>, TCP
-protocol, and destination port 1122. Assume this address is reachable
-through interface <code class="docutils literal notranslate">eth1</code>.</p></li>
-<li><p>For this first packet, the connection state is <strong>new</strong>. Neither rule 10
-nor rule 20 applies.</p></li>
-<li><p>规则 110 matches, so the connection is accepted.</p></li>
-<li><p>When the server 192.0.2.100 replies, the connection state becomes
-<strong>established</strong>, and rule 20 accepts the reply.</p></li>
-<li><p>The router receives the second packet for this connection. Because the
-connection state is <strong>established</strong>, rule 10 matches and adds a new
-entry in the flowtable FT01 for this connection.</p></li>
-<li><p>Subsequent packets skip the traditional path and use the <strong>Fast 路径</strong>
-for offloading.</p></li>
+<li><p>一个数据包经 <code class="docutils literal notranslate">eth0</code> 到达，目标地址为 <code class="docutils literal notranslate">192.0.2.100</code>，使用 TCP 协议，目标端口为 1122。假设该地址可通过接口 <code class="docutils literal notranslate">eth1</code> 访问。</p></li>
+<li><p>对于该首个数据包，连接状态为 <strong>new</strong>。规则 10 和规则 20 均不适用。</p></li>
+<li><p>规则 110 匹配，因此接受该连接。</p></li>
+<li><p>当服务器 192.0.2.100 回复时，连接状态变为 <strong>established</strong>，规则 20 接受该回复。</p></li>
+<li><p>路由器收到该连接的第二个数据包。由于连接状态为 <strong>established</strong>，规则 10 匹配，并在流表 FT01 中为此连接添加新条目。</p></li>
+<li><p>后续数据包跳过传统路径，使用<strong>快速路径</strong>进行卸载。</p></li>
 </ol>
 </div></blockquote>
 </section>
 </section>
 <section id="flowtable-configuration-on-logical-and-sub-interfaces">
-<h2>Flowtable 配置 on 日志ical and Sub-接口</h2>
-<p>Configure the flowtable with the interface name you used in VyOS
-configuration. When VLANs, bonds, or bridges are involved, that is the
-logical interface (<code class="docutils literal notranslate">bond0</code>, <code class="docutils literal notranslate">br0</code>, <code class="docutils literal notranslate">eth0.10</code>) — not the underlying physical
-port.</p>
-<p>For example:</p>
+<h2>逻辑接口与子接口上的流表配置</h2>
+<p>请使用 VyOS 配置中所用的接口名称配置流表。当涉及 VLAN、bond 或桥接时，该名称即为逻辑接口（例如 <code class="docutils literal notranslate">bond0</code>、<code class="docutils literal notranslate">br0</code>、<code class="docutils literal notranslate">eth0.10</code>），而非底层物理端口。</p>
+<p>例如：</p>
 <ul class="simple">
-<li><p>If <code class="docutils literal notranslate">bond0</code> is configured, VyOS sees <code class="docutils literal notranslate">bond0</code> — not <code class="docutils literal notranslate">eth0</code> or <code class="docutils literal notranslate">eth1</code></p></li>
-<li><p>If <code class="docutils literal notranslate">br0</code> is configured, VyOS sees <code class="docutils literal notranslate">br0</code> — not its member interfaces</p></li>
-<li><p>The flowtable must reference the same interface name VyOS observes</p></li>
+<li><p>若配置了 <code class="docutils literal notranslate">bond0</code>，VyOS 观察到的是 <code class="docutils literal notranslate">bond0</code>，而非 <code class="docutils literal notranslate">eth0</code> 或 <code class="docutils literal notranslate">eth1</code></p></li>
+<li><p>若配置了 <code class="docutils literal notranslate">br0</code>，VyOS 观察到的是 <code class="docutils literal notranslate">br0</code>，而非其成员接口</p></li>
+<li><p>流表必须引用 VyOS 实际观察到的相同接口名称</p></li>
 </ul>
-<p>Two forms are accepted, but registering the parent is recommended:</p>
+<p>支持两种形式，但推荐注册父接口：</p>
 <ul class="simple">
-<li><p>Registering <code class="docutils literal notranslate">bond1</code> offloads the parent interface <strong>and all its VLAN
-sub-interfaces</strong> (<code class="docutils literal notranslate">bond1.10</code>, <code class="docutils literal notranslate">bond1.20</code>, etc.) — the kernel
-automatically discovers them by parsing L2 headers (Linux 5.13+).</p></li>
-<li><p>Registering <code class="docutils literal notranslate">bond1.10</code> directly offloads <strong>only VLAN 10</strong> traffic.
-But the sub-interface <strong>must exist at commit time</strong>; if it is not
-yet present when the ruleset is loaded, the configuration might fail.</p></li>
+<li><p>注册 <code class="docutils literal notranslate">bond1</code> 可对父接口<strong>及其所有 VLAN 子接口</strong>（例如 <code class="docutils literal notranslate">bond1.10</code>、<code class="docutils literal notranslate">bond1.20</code> 等）执行卸载——内核会通过解析 L2 头部自动发现它们（Linux 5.13+）。</p></li>
+<li><p>直接注册 <code class="docutils literal notranslate">bond1.10</code> 仅对<strong>VLAN 10 流量</strong>执行卸载。但子接口<strong>必须在提交时已存在</strong>；若在规则集加载时尚未创建该子接口，则配置可能失败。</p></li>
 </ul>
-<div class="highlight-none notranslate"><div class="highlight"><pre># Offload bond1 and all sub-interfaces (bond1.10, bond1.20, ...)
-set firewall flowtable FT01 interface 'bond1'
+<div class="highlight-none notranslate"><div class="highlight"><pre># 卸载 bond1 及其所有子接口（bond1.10、bond1.20 等）
+set firewall flowtable FT01 interface &#39;bond1&#39;
 
-# Offload VLAN 10 only: register the sub-interface directly
-set firewall flowtable FT01 interface 'bond1.10'
+# 仅卸载 VLAN 10：直接注册子接口
+set firewall flowtable FT01 interface &#39;bond1.10&#39;
 </pre></div>
 </div>
 <section id="example-mixed-parent-and-sub-interface-offload">
-<h3>示例: Mixed parent and sub-interface offload</h3>
-<p>Consider a setup where:</p>
+<h3>示例：混合父接口与子接口卸载</h3>
+<p>考虑以下场景：</p>
 <ul class="simple">
-<li><p>流量 ingresses on <code class="docutils literal notranslate">bond1.10</code> (VLAN 10)</p></li>
-<li><p>流量 egresses on <code class="docutils literal notranslate">bond2.20</code> (VLAN 20)</p></li>
+<li><p>流量经 <code class="docutils literal notranslate">bond1.10</code>（VLAN 10）进入</p></li>
+<li><p>流量经 <code class="docutils literal notranslate">bond2.20</code>（VLAN 20）发出</p></li>
 </ul>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall flowtable FT01 interface 'bond1'
-set firewall flowtable FT01 interface 'bond2.20'
-set firewall ipv4 forward filter default-action 'drop'
-set firewall ipv4 forward filter rule 10 action 'offload'
-set firewall ipv4 forward filter rule 10 offload-target 'FT01'
-set firewall ipv4 forward filter rule 10 state 'established'
-set firewall ipv4 forward filter rule 20 action 'accept'
-set firewall ipv4 forward filter rule 20 state 'established'
-set firewall ipv4 forward filter rule 20 state 'related'
-set firewall ipv4 forward filter rule 200 action 'accept'
-set firewall ipv4 forward filter rule 200 inbound-interface name 'bond*'
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall flowtable FT01 interface &#39;bond1&#39;
+set firewall flowtable FT01 interface &#39;bond2.20&#39;
+set firewall ipv4 forward filter default-action &#39;drop&#39;
+set firewall ipv4 forward filter rule 10 action &#39;offload&#39;
+set firewall ipv4 forward filter rule 10 offload-target &#39;FT01&#39;
+set firewall ipv4 forward filter rule 10 state &#39;established&#39;
+set firewall ipv4 forward filter rule 20 action &#39;accept&#39;
+set firewall ipv4 forward filter rule 20 state &#39;established&#39;
+set firewall ipv4 forward filter rule 20 state &#39;related&#39;
+set firewall ipv4 forward filter rule 200 action &#39;accept&#39;
+set firewall ipv4 forward filter rule 200 inbound-interface name &#39;bond*&#39;
 </pre></div>
 </div>
-<p>In this configuration:</p>
+<p>在此配置中：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">bond1</code> covers ingress from <code class="docutils literal notranslate">bond1.10</code> and any other <code class="docutils literal notranslate">bond1</code> sub-interfaces.</p></li>
-<li><p><code class="docutils literal notranslate">bond2.20</code> offloads VLAN 20 only — other <code class="docutils literal notranslate">bond2</code> sub-interfaces remain on
-the standard forwarding path. This illustrates how to selectively offload
-a single VLAN while leaving others on the slow path.</p></li>
-<li><p>规则 200 uses a wildcard to accept any traffic arriving
-on any bond interface or sub-interface before the flow reaches established
-state and is eligible for offload</p></li>
-<li><p>Once a flow is established, rule 10 adds it to the flowtable and subsequent
-packets bypass the forward hook entirely via the fast path</p></li>
+<li><p><code class="docutils literal notranslate">bond1</code> 覆盖来自 <code class="docutils literal notranslate">bond1.10</code> 及任何其他 <code class="docutils literal notranslate">bond1</code> 子接口的入站流量。</p></li>
+<li><p><code class="docutils literal notranslate">bond2.20</code> 仅卸载 VLAN 20 流量——其他 <code class="docutils literal notranslate">bond2</code> 子接口仍走标准转发路径。这展示了如何有选择性地卸载单个 VLAN，同时让其余 VLAN 继续走慢速路径。</p></li>
+<li><p>规则 200 使用通配符，在连接达到 established 状态并具备卸载资格之前，接受任何到达任意 bond 接口或子接口的流量。</p></li>
+<li><p>一旦流建立完成，规则 10 将其加入流表，后续数据包将完全绕过转发钩子，通过快速路径转发。</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>The interface directions in this example are from the perspective of
-client-to-server traffic. In practice each interface handles traffic in
-both directions, and the flowtable manages offload symmetrically once the
-flow is established.
-To confirm the ingress and egress interfaces, enable <code class="docutils literal notranslate">log</code> on a rule in the
-forward hook and check the firewall logs — see the
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">防火墙</a> section for configuration.</p>
+<p>本示例中的接口方向是从客户端到服务器流量的角度出发。实际上，每个接口均双向处理流量，且流表在流建立后对称管理卸载。为确认入站和出站接口，请在转发钩子中的某条规则上启用 <code class="docutils literal notranslate">log</code> 并检查防火墙日志——有关配置方法，请参阅 <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">防火墙</a> 章节。</p>
 </div>
 </section>
 <section id="checks">
-<h3>检查s</h3>
-<p>检查 the conntrack table to verify that the system accepted and properly
-offloaded connections.</p>
+<h3>检查</h3>
+<p>检查 conntrack 表以验证系统是否已正确接受并卸载连接。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@FlowTables:~$ show firewall ipv4 forward filter
-Ruleset Information
+规则集信息
 
 ---------------------------------
-ipv4 Firewall "forward filter"
+ipv4 防火墙 “forward filter”
 
-Rule     Action    Protocol      Packets    Bytes  Conditions
+规则     动作      协议        数据包数     字节数   条件
 -------  --------  ----------  ---------  -------  ----------------------------------------------------------------
 10       offload   all                 8      468  ct state { established, related }  flow add @VYOS_FLOWTABLE_FT01
 20       accept    all                 8      468  ct state { established, related }  accept
-110      accept    tcp                 2      120  ip daddr 192.0.2.100 tcp dport 1122 iifname "eth0"  accept
+110      accept    tcp                 2      120  ip daddr 192.0.2.100 tcp dport 1122 iifname &quot;eth0&quot;  accept
 default  drop      all                 7      420
 
 vyos@FlowTables:~$ show conntrack table ipv4
-Original src        Original dst    Reply src        Reply dst           Protocol    State    Timeout    Mark    Zone
+原始源地址        原始目标地址    回复源地址        回复目标地址           协议        状态      超时      标记      区域
 ------------------  --------------  ---------------  ------------------  ----------  -------  ---------  ------  ------
 198.51.100.100:41676  192.0.2.100:1122  192.0.2.100:1122  198.51.100.100:41676  tcp                  n/a        0
 </pre></div>
 </div>
 <section id="interface-identification">
-<h4>接口 identification</h4>
-<p>To verify that VyOS identifies traffic by its logical sub-interface
-and not the underlying physical device, inspect the firewall log:</p>
+<h4>接口识别</h4>
+<p>为验证 VyOS 是否按逻辑子接口（而非底层物理设备）识别流量，请检查防火墙日志：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@FlowTables:~$ show log firewall
 Jun 18 22:22:00 kernel: [ipv4-FWD-filter-200-A] IN=bond1.10 OUT=bond2.20 \
   MAC=00:53:00:00:00:02:00:53:00:00:00:01:08:00 SRC=192.168.10.2 \
   DST=192.168.20.2 LEN=84 PROTO=ICMP TYPE=8 CODE=0 ID=3572 SEQ=1
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate">IN</code> and <code class="docutils literal notranslate">OUT</code> fields show <code class="docutils literal notranslate">bond1.10</code> and <code class="docutils literal notranslate">bond2.20</code> — the logical
-sub-interfaces — not the underlying physical or bond device.</p>
+<p><code class="docutils literal notranslate">IN</code> 和 <code class="docutils literal notranslate">OUT</code> 字段显示的是 <code class="docutils literal notranslate">bond1.10</code> 和 <code class="docutils literal notranslate">bond2.20</code> —— 即逻辑子接口，而非底层物理或 bond 设备。</p>
 </section>
 <section id="flowtable-offload">
-<h4>Flowtable offload</h4>
-<p>运行 the following command to verify that the connections are offloaded to
-the flowtable fast path:</p>
+<h4>流表卸载</h4>
+<p>运行以下命令以验证连接是否已卸载至流表快速路径：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@FlowTables:~$ show conntrack table ipv4
-Original src        Original dst       Reply src          Reply dst           Protocol    State    Timeout    Mark    Zone
+原始源地址        原始目标地址       回复源地址          回复目标地址           协议        状态      超时      标记      区域
 ------------------  -----------------  -----------------  ------------------  ----------  -------  ---------  ------  ------
 192.168.10.2:45140  192.168.20.2:5201  192.168.20.2:5201  192.168.10.2:45140  tcp                  n/a        0
 192.168.10.2:45124  192.168.20.2:5201  192.168.20.2:5201  192.168.10.2:45124  tcp                  n/a        0
 
 
 vyos@FlowTables:~$ show conntrack table ipv4
-Original src        Original dst       Reply src          Reply dst           Protocol    State      Timeout    Mark    Zone
+原始源地址        原始目标地址       回复源地址          回复目标地址           协议        状态        超时      标记      区域
 ------------------  -----------------  -----------------  ------------------  ----------  ---------  ---------  ------  ------
 192.168.10.2:45124  192.168.20.2:5201  192.168.20.2:5201  192.168.10.2:45124  tcp         TIME_WAIT  105        0
 </pre></div>
 </div>
-<p>Entries with <code class="docutils literal notranslate">Timeout</code> shown as <code class="docutils literal notranslate">n/a</code> and a blank <code class="docutils literal notranslate">State</code> confirm that
-the flows are offloaded to the flowtable fast path — subsequent packets
-bypass the firewall entirely. Once the TCP session closes, the entry
-transitions to <code class="docutils literal notranslate">TIME_WAIT</code> and the timeout counter resumes.</p>
+<p>条目中 <code class="docutils literal notranslate">Timeout</code> 显示为 <code class="docutils literal notranslate">n/a</code> 且 <code class="docutils literal notranslate">State</code> 为空，表明该流已卸载至流表快速路径——后续数据包将完全绕过防火墙。一旦 TCP 会话关闭，该条目将转换为 <code class="docutils literal notranslate">TIME_WAIT</code> 状态，超时计数器重新开始计时。</p>
 </section>
 </section>
 </section>

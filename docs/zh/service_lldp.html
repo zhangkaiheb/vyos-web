@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,29 +152,19 @@
 <div itemprop="articleBody">
              
   <section id="lldp">
-<h1>LLDP</h1>
-<p><abbr title="Link Layer Discovery Protocol">LLDP</abbr> is a vendor-neutral link layer
-protocol in the Internet 协议 Suite used by network devices for advertising
-their identity, capabilities, and neighbors on an IEEE 802 local area network,
-principally wired Ethernet. The protocol is formally referred to by the IEEE
-as Station and Media Access Control 连接ivity Discovery specified in IEEE
-802.1AB and IEEE 802.3-2012 section 6 clause 79.</p>
-<p>LLDP performs functions similar to several proprietary protocols, such as
-<abbr title="Cisco Discovery Protocol">CDP</abbr>,
-<abbr title="Foundry Discovery Protocol">FDP</abbr>,
-<abbr title="Nortel Discovery Protocol">NDP</abbr> and <abbr title="Link Layer Topology Discovery">LLTD</abbr>.</p>
-<p>信息rmation gathered with LLDP is stored in the device as a <abbr title="Management Information Database">MIB</abbr> and 可以 queried with <abbr title="Simple Network Management Protocol">SNMP</abbr> as specified in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2922.html"><strong>RFC 2922</strong></a>. The topology of an
-LLDP-enabled network 可以 discovered by crawling the hosts and querying this
-database. 信息rmation that 可能 retrieved include:</p>
+<h1>链路层发现协议（LLDP）</h1>
+<p><abbr title="链路层发现协议">LLDP</abbr> 是互联网协议套件中一种与厂商无关的链路层协议，网络设备使用该协议在 IEEE 802 局域网（主要是有线以太网）上广播其身份、能力及邻居信息。该协议由 IEEE 正式称为“站点和媒体访问控制连接性发现”，定义于 IEEE 802.1AB 和 IEEE 802.3-2012 第 6 章第 79 节。</p>
+<p>LLDP 执行的功能类似于若干专有协议，例如：<abbr title="思科发现协议">CDP</abbr>、<abbr title="Foundry 发现协议">FDP</abbr>、<abbr title="北电发现协议">NDP</abbr> 和 <abbr title="链路层拓扑发现">LLTD</abbr>。</p>
+<p>通过 LLDP 获取的信息存储在设备中作为 <abbr title="管理信息库">MIB</abbr>，并可依据 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2922.html"><strong>RFC 2922</strong></a> 中规定的 <abbr title="简单网络管理协议">SNMP</abbr> 进行查询。可通过遍历主机并查询该数据库来发现启用 LLDP 的网络拓扑结构。可检索的信息包括：</p>
 <ul class="simple">
-<li><p>系统 名称 and 描述</p></li>
-<li><p>端口 name and description</p></li>
-<li><p>VLAN name</p></li>
-<li><p>IP management address</p></li>
-<li><p>系统 capabilities (switching, routing, etc.)</p></li>
-<li><p>MAC/PHY information</p></li>
-<li><p>MDI power</p></li>
-<li><p>Link aggregation</p></li>
+<li><p>系统名称和描述</p></li>
+<li><p>端口名称和描述</p></li>
+<li><p>VLAN 名称</p></li>
+<li><p>IP 管理地址</p></li>
+<li><p>系统能力（交换、路由等）</p></li>
+<li><p>MAC/PHY 信息</p></li>
+<li><p>MDI 供电能力</p></li>
+<li><p>链路聚合</p></li>
 </ul>
 <section id="configuration">
 <h2>配置</h2>
@@ -182,72 +172,67 @@ database. 信息rmation that 可能 retrieved include:</p>
 <div class="cfgcmd-heading">
 
 set service lldp
-<a class="cmdlink" href="#cfgcmd-set-service-lldp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Enable LLDP service</p>
+<a class="cmdlink" href="#cfgcmd-set-service-lldp" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>启用 LLDP 服务</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service lldp management-address <address>
-<a class="cmdlink" href="#cfgcmd-set-service-lldp-management-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Define IPv4/IPv6 management address transmitted via LLDP. Multiple addresses
-可以 defined. Only addresses connected to the system 将 transmitted.</p>
+set service lldp management-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-lldp-management-address-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>定义通过 LLDP 传输的 IPv4/IPv6 管理地址。可定义多个地址。仅传输与系统相连的地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service lldp interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-service-lldp-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Enable transmission of LLDP information on given <interface>. You can also
-say <code class="docutils literal notranslate">all</code> here so LLDP is turned on on every interface.</p>
+set service lldp interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-lldp-interface-interface" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>在指定的 &lt;interface&gt; 接口上启用 LLDP 信息传输。此处也可使用 <code class="docutils literal notranslate">all</code>，从而在所有接口上启用 LLDP。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service lldp interface <interface> mode [disable|rx-tx|rx|tx]
-<a class="cmdlink" href="#cfgcmd-set-service-lldp-interface-interface-mode-disable-rx-tx-rx-tx" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure the administrative status of the given port.</p>
-<p>By default, all ports are configured to be in rx-tx mode. This means they
-can receive and transmit LLDP frames.</p>
-<p>In rx mode, they won’t emit any frames. In tx mode, they won’t receive
-any frames. In disabled mode, no frame 将 sent and any incoming frame
-将 discarded.</p>
+set service lldp interface &lt;interface&gt; mode [disable|rx-tx|rx|tx]
+<a class="cmdlink" href="#cfgcmd-set-service-lldp-interface-interface-mode-disable-rx-tx-rx-tx" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>配置指定端口的管理状态。</p>
+<p>默认情况下，所有端口均配置为 rx-tx 模式，即既可接收也可发送 LLDP 帧。</p>
+<p>在 rx 模式下，端口不会发送任何帧；在 tx 模式下，端口不会接收任何帧；在 disabled 模式下，不发送任何帧且丢弃所有入站帧。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set service lldp snmp
-<a class="cmdlink" href="#cfgcmd-set-service-lldp-snmp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Enable SNMP queries of the LLDP database</p>
+<a class="cmdlink" href="#cfgcmd-set-service-lldp-snmp" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>启用对 LLDP 数据库的 SNMP 查询</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service lldp legacy-protocols <cdp|edp|fdp|sonmp>
-<a class="cmdlink" href="#cfgcmd-set-service-lldp-legacy-protocols-cdp-edp-fdp-sonmp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Enable given legacy protocol on this LLDP instance. Legacy protocols include:</p>
+set service lldp legacy-protocols &lt;cdp|edp|fdp|sonmp&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-lldp-legacy-protocols-cdp-edp-fdp-sonmp" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>在此 LLDP 实例上启用指定的旧版协议。旧版协议包括：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">cdp</code> - Listen for CDP for Cisco routers/switches</p></li>
-<li><p><code class="docutils literal notranslate">edp</code> - Listen for EDP for Extreme routers/switches</p></li>
-<li><p><code class="docutils literal notranslate">fdp</code> - Listen for FDP for Foundry routers/switches</p></li>
-<li><p><code class="docutils literal notranslate">sonmp</code> - Listen for SONMP for Nortel routers/switches</p></li>
+<li><p><code class="docutils literal notranslate">cdp</code> — 监听思科路由器/交换机的 CDP</p></li>
+<li><p><code class="docutils literal notranslate">edp</code> — 监听 Extreme 路由器/交换机的 EDP</p></li>
+<li><p><code class="docutils literal notranslate">fdp</code> — 监听 Foundry 路由器/交换机的 FDP</p></li>
+<li><p><code class="docutils literal notranslate">sonmp</code> — 监听北电路由器/交换机的 SONMP</p></li>
 </ul>
 </div>
 </div>
 </section>
 <section id="operation">
-<h2>Operation</h2>
+<h2>运行</h2>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show lldp neighbors
-<a class="cmdlink" href="#opcmd-show-lldp-neighbors" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示s information about all neighbors discovered via LLDP.</p>
+<a class="cmdlink" href="#opcmd-show-lldp-neighbors" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示通过 LLDP 发现的所有邻居的信息。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show lldp neighbors
 Capability Codes: R - Router, B - Bridge, W - Wlan r - Repeater, S - Station
                   D - Docsis, T - Telephone, O - Other
@@ -265,8 +250,8 @@ SW1.vyos.net              eth0      LLDP   B     Cisco IOS Software   GigabitEth
 <div class="opcmd-heading">
 
 show lldp neighbors detail
-<a class="cmdlink" href="#opcmd-show-lldp-neighbors-detail" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>Get detailed information about LLDP neighbors.</p>
+<a class="cmdlink" href="#opcmd-show-lldp-neighbors-detail" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>获取有关 LLDP 邻居的详细信息。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show lldp neighbors detail
 -------------------------------------------------------------------------------
 LLDP neighbors:
@@ -314,17 +299,17 @@ LLDP-MED:
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show lldp neighbors interface <interface>
-<a class="cmdlink" href="#opcmd-show-lldp-neighbors-interface-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 LLDP neighbors connected via interface <interface>.</p>
+show lldp neighbors interface &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-show-lldp-neighbors-interface-interface" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示通过接口 &lt;interface&gt; 连接的 LLDP 邻居。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show log lldp
-<a class="cmdlink" href="#opcmd-show-log-lldp" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>Used for troubleshooting.</p>
+<a class="cmdlink" href="#opcmd-show-log-lldp" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>用于故障排查。</p>
 </div>
 </div>
 </section>

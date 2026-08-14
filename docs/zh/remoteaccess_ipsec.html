@@ -1,0 +1,171 @@
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+</style>
+<div itemprop="articleBody">
+
+<h1>IPsec 远程访问 VPN</h1>
+
+<h2>远程访问 VPN 概述</h2>
+<p>远程访问 VPN 允许远程用户通过 IPsec 隧道安全地连接到公司网络。VyOS 支持多种远程访问 VPN 配置方式，包括基于预共享密钥、证书和 EAP 的身份验证。</p>
+
+<h2>远程访问 VPN 类型</h2>
+
+<h3>基于预共享密钥的远程访问</h3>
+<p>最简单的远程访问配置方式，每个远程用户使用相同的预共享密钥进行身份验证。适用于小型部署或测试环境。</p>
+
+<h3>基于证书的远程访问</h3>
+<p>使用 X.509 证书进行身份验证，提供更高的安全性。每个用户可以拥有自己的证书，便于管理和撤销。</p>
+
+<h3>基于 EAP 的远程访问</h3>
+<p>可扩展身份验证协议 (EAP) 允许使用 RADIUS 服务器进行用户身份验证。支持多种 EAP 方法，如 EAP-MSCHAPv2、EAP-TLS 等。</p>
+
+<h2>配置远程访问 VPN</h2>
+
+<h3>基本配置步骤</h3>
+
+<p><strong>1. 配置 IKE 和 ESP 组</strong></p>
+<pre><code>set vpn ipsec ike-group IKE-RA lifetime '28800'
+set vpn ipsec ike-group IKE-RA proposal 1 encryption 'aes256'
+set vpn ipsec ike-group IKE-RA proposal 1 hash 'sha256'
+set vpn ipsec ike-group IKE-RA proposal 1 dh-group '14'
+
+set vpn ipsec esp-group ESP-RA lifetime '3600'
+set vpn ipsec esp-group ESP-RA proposal 1 encryption 'aes256'
+set vpn ipsec esp-group ESP-RA proposal 1 hash 'sha256'</code></pre>
+
+<p><strong>2. 配置 IP 地址池</strong></p>
+<pre><code>set vpn ipsec remote-access connection RA pool 'RA-POOL'
+set vpn ipsec remote-access connection RA pool RA-POOL prefix '100.64.0.0/24'
+set vpn ipsec remote-access connection RA pool RA-POOL name-server '192.0.2.53'</code></pre>
+
+<p><strong>3. 配置远程访问连接</strong></p>
+<pre><code>set vpn ipsec remote-access connection RA authentication local-id '192.0.2.1'
+set vpn ipsec remote-access connection RA authentication server-mode 'x509'
+set vpn ipsec remote-access connection RA authentication x509 certificate 'ipsec-cert'
+
+set vpn ipsec remote-access connection RA remote-access-interface 'ppp0'
+set vpn ipsec remote-access connection RA ike-group 'IKE-RA'
+set vpn ipsec remote-access connection RA default-esp-group 'ESP-RA'</code></pre>
+
+<h3>基于 EAP-RADIUS 的配置</h3>
+<p>使用 RADIUS 服务器进行用户身份验证：</p>
+
+<pre><code>set vpn ipsec remote-access connection RA authentication client-mode 'eap-radius'
+set vpn ipsec remote-access connection RA eap-radius server 1 address '192.0.2.100'
+set vpn ipsec remote-access connection RA eap-radius server 1 key 'testing123'
+
+set vpn ipsec remote-access connection RA pool RA-POOL name-server '192.0.2.53'
+set vpn ipsec remote-access connection RA pool RA-POOL prefix '100.64.0.0/24'</code></pre>
+
+<h3>基于预共享密钥的配置</h3>
+<p>适用于简单的远程访问场景：</p>
+
+<pre><code>set vpn ipsec remote-access connection RA authentication mode 'pre-shared-secret'
+set vpn ipsec remote-access connection RA authentication id '192.0.2.1'
+set vpn ipsec remote-access connection RA authentication local-id '192.0.2.1'
+
+set vpn ipsec remote-access connection RA remote-access-interface 'ppp0'
+set vpn ipsec remote-access connection RA ike-group 'IKE-RA'
+set vpn ipsec remote-access connection RA default-esp-group 'ESP-RA'
+
+set vpn ipsec remote-access connection RA pool RA-POOL prefix '100.64.0.0/24'</code></pre>
+
+<h2>远程访问接口配置</h2>
+<p>远程访问 VPN 使用虚拟 PPP 接口。需要指定远程访问接口：</p>
+
+<pre><code>set interfaces ppp ppp0 description 'Remote Access VPN Interface'
+set vpn ipsec remote-access connection RA remote-access-interface 'ppp0'</code></pre>
+
+<h2>客户端配置示例</h2>
+
+<h3>Windows 客户端</h3>
+<p>Windows 内置的 VPN 客户端支持 IKEv2 和 L2TP/IPsec。配置步骤：</p>
+<ol>
+<li>打开"设置" > "网络和 Internet" > "VPN"</li>
+<li>点击"添加 VPN 连接"</li>
+<li>填写 VPN 提供程序名称、服务器名称或地址</li>
+<li>选择 VPN 类型（IKEv2 或 L2TP/IPsec）</li>
+<li>输入身份验证信息（用户名/密码或证书）</li>
+</ol>
+
+<h3>Linux 客户端</h3>
+<p>Linux 用户可以使用 NetworkManager 或命令行工具配置 IPsec VPN：</p>
+<pre><code># 使用 strongswan 客户端
+sudo apt install strongswan strongswan-pki libcharon-extra-plugins
+
+# 配置 /etc/ipsec.conf
+conn vyos-ra
+    right=192.0.2.1
+    rightid=@192.0.2.1
+    rightsubnet=0.0.0.0/0
+    left=%defaultroute
+    leftid=user@example.com
+    eap_identity=user@example.com
+    auto=start</code></pre>
+
+<h3>macOS 客户端</h3>
+<p>macOS 内置支持 IKEv2 VPN：</p>
+<ol>
+<li>打开"系统偏好设置" > "网络"</li>
+<li>点击"+"添加新连接</li>
+<li>选择接口为"VPN"，类型为"IKEv2"</li>
+<li>填写服务器地址和远程 ID</li>
+<li>配置身份验证方法</li>
+</ol>
+
+<h3>移动设备</h3>
+<p>iOS 和 Android 设备都内置支持 IKEv2 VPN：</p>
+<ul>
+<li><strong>iOS:</strong> 设置 > 通用 > VPN 与网络 > 添加 VPN 配置</li>
+<li><strong>Android:</strong> 设置 > 网络与互联网 > VPN > 添加 VPN 配置文件</li>
+</ul>
+
+<h2>故障排除</h2>
+
+<h3>常见问题</h3>
+<ul>
+<li><strong>连接失败：</strong>检查 IKE 和 ESP 参数是否匹配，验证预共享密钥或证书是否正确</li>
+<li><strong>身份验证失败：</strong>确认 RADIUS 服务器配置正确，检查用户凭据</li>
+<li><strong>无法获取 IP 地址：</strong>验证 IP 地址池配置，确保有足够的可用地址</li>
+<li><strong>连接不稳定：</strong>检查 DPD 设置，调整生命周期参数</li>
+</ul>
+
+<h3>调试命令</h3>
+<pre><code># 查看 IPsec SA 状态
+show vpn ipsec sa
+
+# 查看 IKE SA 状态
+show vpn ike sa
+
+# 查看详细的 IPsec 连接信息
+show vpn ipsec sa detail
+
+# 查看 IPsec 日志
+tail -f /var/log/charon.log</code></pre>
+
+</div>

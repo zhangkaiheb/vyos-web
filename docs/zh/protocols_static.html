@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -152,353 +152,306 @@
 <div itemprop="articleBody">
              
   <section id="static">
-<h1>Static</h1>
-<p>Static routes are manually configured entries in the router’s <abbr title="Routing Information Base">RIB</abbr>
-that define how traffic should reach specific destinations. Unlike dynamic
-routing protocols, static routes are not automatically updated when the network
-topology changes.</p>
-<p>Static routes are best suited for simple network topologies or to override
-dynamic routing protocol behavior for a limited number of routes.</p>
-<p>The <abbr title="Routing Information Base">RIB</abbr> stores all routing information,
-including manually configured static routes and any dynamically learned routes.
-From the <abbr title="Routing Information Base">RIB</abbr>, the router derives unicast
-routes to build the <abbr title="Forwarding Information Base">FIB</abbr>.</p>
+<h1>静态路由</h1>
+<p>静态路由是路由器的<abbr title="路由信息库">RIB</abbr>中手动配置的条目，用于定义流量如何到达特定目的地。与动态路由协议不同，当网络拓扑发生变化时，静态路由不会自动更新。</p>
+<p>静态路由最适合用于简单的网络拓扑，或仅对少量路由覆盖动态路由协议的行为。</p>
+<p><abbr title="路由信息库">RIB</abbr>存储所有路由信息，包括手动配置的静态路由以及任何动态学习到的路由。路由器从<abbr title="路由信息库">RIB</abbr>中推导出单播路由，以构建<abbr title="转发信息库">FIB</abbr>。</p>
 <section id="ipv4-unicast-routes">
-<h2>IPv4 unicast routes</h2>
-<p>IPv4 unicast routes direct traffic destined for a single IPv4 host or subnet
-toward a specific next hop. Use the following commands to configure IPv4
-unicast routes for a specific remote subnet.</p>
+<h2>IPv4 单播路由</h2>
+<p>IPv4 单播路由将发往单个 IPv4 主机或子网的流量导向特定下一跳。使用以下命令为特定远程子网配置 IPv4 单播路由。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> next-hop <address>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the next-hop IP address for the specified subnet.</strong></p>
-<p>You can configure multiple next-hop IP addresses for the same destination
-subnet.</p>
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定子网配置下一跳 IP 地址。</strong></p>
+<p>您可以为同一目的子网配置多个下一跳 IP 地址。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> next-hop <address> disable
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable the route via the specified next-hop IP address.</strong></p>
-<p>This command temporarily deactivates the route while preserving the
-configured subnet, next-hop, and distance parameters.</p>
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>禁用通过指定下一跳 IP 地址的路由。</strong></p>
+<p>该命令会临时停用该路由，同时保留已配置的子网、下一跳和管理距离参数。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 disable
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> next-hop <address> distance <distance>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the administrative distance for the route via the specified
-next-hop IP address.</strong></p>
-<p>路由s with a lower administrative distance are prioritized over routes with
-a higher distance.</p>
-<p>The allowed range is 1 to 255. The default distance is 1.</p>
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-distance-distance" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为通过指定下一跳 IP 地址的路由配置管理距离。</strong></p>
+<p>管理距离较低的路由优先于管理距离较高的路由。</p>
+<p>允许的取值范围为 1 至 255。默认管理距离为 1。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>路由s with a distance of 255 are disabled and not used for packet
-forwarding.</p>
+<p>管理距离为 255 的路由将被禁用，且不用于数据包转发。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 distance 10
 </pre></div>
 </div>
 <section id="ipv4-interface-routes">
-<h3>IPv4 interface routes</h3>
-<p>IPv4 interface routes direct traffic destined for a single IPv4 host or subnet
-out of a specific local interface. Use the following commands to configure IPv4
-interface routes for a specific remote subnet.</p>
+<h3>IPv4 接口路由</h3>
+<p>IPv4 接口路由将发往单个 IPv4 主机或子网的流量从特定本地接口发出。使用以下命令为特定远程子网配置 IPv4 接口路由。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the next-hop interface for the specified subnet.</strong></p>
-<p>You can configure multiple next-hop interfaces for the same destination
-subnet.</p>
+set protocols static route &lt;subnet&gt; interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-interface-interface" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定子网配置下一跳接口。</strong></p>
+<p>您可以为同一目的子网配置多个下一跳接口。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 interface eth0
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> interface <interface> disable
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-interface-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable the route via the specified next-hop interface.</strong></p>
-<p>This command temporarily deactivates the route while preserving the
-configured subnet, interface, and distance parameters.</p>
+set protocols static route &lt;subnet&gt; interface &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-interface-interface-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>禁用通过指定下一跳接口的路由。</strong></p>
+<p>该命令会临时停用该路由，同时保留已配置的子网、接口和管理距离参数。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 interface eth0 disable
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> interface <interface> distance <distance>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-interface-interface-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the administrative distance for the route via the specified
-next-hop interface.</strong></p>
-<p>路由s with a lower administrative distance are prioritized over routes with
-a higher distance.</p>
-<p>The allowed range is 1 to 255. The default distance is 1.</p>
+set protocols static route &lt;subnet&gt; interface &lt;interface&gt; distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-interface-interface-distance-distance" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为通过指定下一跳接口的路由配置管理距离。</strong></p>
+<p>管理距离较低的路由优先于管理距离较高的路由。</p>
+<p>允许的取值范围为 1 至 255。默认管理距离为 1。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 interface eth0 distance 10
 </pre></div>
 </div>
 </section>
 <section id="ipv4-bfd">
 <h3>IPv4 BFD</h3>
-<p><abbr title="Bidirectional Forwarding Detection">BFD</abbr> monitors the reachability
-of a static route’s next-hop IP address. Use the following commands to
-configure <abbr title="Bidirectional Forwarding Detection">BFD</abbr> parameters for your
-IPv4 static routes.</p>
+<p><abbr title="双向转发检测">BFD</abbr>监控静态路由下一跳 IP 地址的可达性。使用以下命令为 IPv4 静态路由配置<abbr title="双向转发检测">BFD</abbr>参数。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> next-hop <address> bfd
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable BFD monitoring for the route via the specified next-hop IP address.</strong></p>
-<p>The system uses the next-hop IP address as the BFD peer destination.</p>
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为通过指定下一跳 IP 地址的路由启用 BFD 监控。</strong></p>
+<p>系统使用下一跳 IP 地址作为 BFD 对等体的目的地址。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 bfd
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> next-hop <address> bfd profile <profile>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd-profile-profile" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 the settings from a designated BFD profile to the BFD session that monitors
-the specified next-hop IP address.</strong></p>
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; bfd profile &lt;profile&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd-profile-profile" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>将指定 BFD 配置文件的设置应用到监控指定下一跳 IP 地址的 BFD 会话。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 bfd profile custom-profile
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> next-hop <address> bfd multi-hop source-address <source-address>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd-multi-hop-source-address-source-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable a multi-hop BFD session to monitor the reachability of the
-specified next-hop IP address.</strong></p>
-<p>The system initiates the BFD session from the specified local source IPv4
-address.</p>
+set protocols static route &lt;subnet&gt; next-hop &lt;address&gt; bfd multi-hop source-address &lt;source-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-next-hop-address-bfd-multi-hop-source-address-source-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>启用多跳 BFD 会话，以监控指定下一跳 IP 地址的可达性。</strong></p>
+<p>系统从指定的本地源 IPv4 地址发起 BFD 会话。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 next-hop 10.0.0.254 bfd multi-hop source-address 172.16.1.1
 </pre></div>
 </div>
 </section>
 <section id="dhcp-interface-routes">
-<h3>DHCP interface routes</h3>
-<p>DHCP interface routes direct traffic destined for a single IPv4 host or subnet
-toward a next-hop gateway obtained from a DHCP-enabled interface. Use the
-following command to configure DHCP interface routes.</p>
+<h3>DHCP 接口路由</h3>
+<p>DHCP 接口路由将发往单个 IPv4 主机或子网的流量导向从启用了 DHCP 的接口获取的下一跳网关。使用以下命令配置 DHCP 接口路由。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> dhcp-interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-dhcp-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a static route that derives its next-hop IP address from
-the specified DHCP-enabled interface.</strong></p>
+set protocols static route &lt;subnet&gt; dhcp-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-dhcp-interface-interface" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置一条静态路由，其下一跳 IP 地址源自指定的启用了 DHCP 的接口。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 dhcp-interface eth0
 </pre></div>
 </div>
 </section>
 <section id="ipv4-reject-routes">
-<h3>IPv4 reject routes</h3>
-<p>IPv4 reject routes explicitly drop traffic destined for a single IPv4 host or
-subnet and return an ICMP unreachable message to the sending device. Use the
-following commands to configure IPv4 reject routes.</p>
+<h3>IPv4 拒绝路由</h3>
+<p>IPv4 拒绝路由显式丢弃发往单个 IPv4 主机或子网的流量，并向发送设备返回 ICMP 不可达消息。使用以下命令配置 IPv4 拒绝路由。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> reject
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-reject" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a reject route for the specified subnet.</strong></p>
-<p>The system discards traffic destined for this subnet and returns an ICMP
-destination unreachable message to the sending device.</p>
+set protocols static route &lt;subnet&gt; reject
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-reject" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定子网配置拒绝路由。</strong></p>
+<p>系统丢弃发往该子网的流量，并向发送设备返回 ICMP 目的地不可达消息。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 reject
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> reject distance <distance>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-reject-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the administrative distance for the reject route.</strong></p>
-<p>路由s with a lower administrative distance are prioritized over routes with
-a higher distance.</p>
-<p>The allowed range is 1 to 255.</p>
+set protocols static route &lt;subnet&gt; reject distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-reject-distance-distance" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为拒绝路由配置管理距离。</strong></p>
+<p>管理距离较低的路由优先于管理距离较高的路由。</p>
+<p>允许的取值范围为 1 至 255。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 reject distance 200
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> reject tag <tag>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-reject-tag-tag" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a numeric tag for the reject route.</strong></p>
-<p>The allowed range is 1 to 4294967295.</p>
+set protocols static route &lt;subnet&gt; reject tag &lt;tag&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-reject-tag-tag" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为拒绝路由配置数值标签。</strong></p>
+<p>允许的取值范围为 1 至 4294967295。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 192.0.2.0/24 reject tag 100
 </pre></div>
 </div>
 </section>
 <section id="ipv4-blackhole-routes">
-<h3>IPv4 blackhole routes</h3>
-<p>Blackhole routes silently discard traffic destined for a specific subnet.
-Unlike a reject route, which notifies the sender with an ICMP destination
-unreachable message, a blackhole route drops the packets without generating
-any response.</p>
+<h3>IPv4 黑洞路由</h3>
+<p>黑洞路由静默丢弃发往特定子网的流量。与拒绝路由（向发送方通知 ICMP 目的地不可达消息）不同，黑洞路由在丢弃数据包时不生成任何响应。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> blackhole
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-blackhole" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a blackhole route for the specified subnet.</strong></p>
-<p>The system silently discards matching packets without sending an ICMP
-response to the source.</p>
+set protocols static route &lt;subnet&gt; blackhole
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-blackhole" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定子网配置黑洞路由。</strong></p>
+<p>系统静默丢弃匹配的数据包，且不向源端发送 ICMP 响应。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/8 blackhole
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> blackhole distance <distance>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-blackhole-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the administrative distance for the blackhole route.</strong></p>
-<p>路由s with a lower administrative distance are prioritized over routes with
-a higher distance.</p>
-<p>The allowed range is 1 to 255.</p>
+set protocols static route &lt;subnet&gt; blackhole distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-blackhole-distance-distance" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为黑洞路由配置管理距离。</strong></p>
+<p>管理距离较低的路由优先于管理距离较高的路由。</p>
+<p>允许的取值范围为 1 至 255。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/8 blackhole distance 200
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route <subnet> blackhole tag <tag>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-blackhole-tag-tag" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a numeric tag for the blackhole route.</strong></p>
-<p>The allowed range is 1 to 4294967295.</p>
+set protocols static route &lt;subnet&gt; blackhole tag &lt;tag&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route-subnet-blackhole-tag-tag" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为黑洞路由配置数值标签。</strong></p>
+<p>允许的取值范围为 1 至 4294967295。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route 10.0.0.0/8 blackhole tag 100
 </pre></div>
 </div>
 </section>
 </section>
 <section id="ipv6-unicast-routes">
-<h2>IPv6 unicast routes</h2>
-<p>IPv6 unicast routes direct traffic destined for a single IPv6 host or subnet
-toward a specific next hop. Use the following commands to configure IPv6
-unicast routes for a specific remote subnet.</p>
+<h2>IPv6 单播路由</h2>
+<p>IPv6 单播路由将发往单个 IPv6 主机或子网的流量导向特定下一跳。使用以下命令为特定远程子网配置 IPv6 单播路由。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> next-hop <address>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the next-hop IPv6 address for the specified subnet.</strong></p>
-<p>You can configure multiple next-hop IPv6 addresses for the same destination
-subnet.</p>
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定子网配置下一跳 IPv6 地址。</strong></p>
+<p>您可以为同一目的子网配置多个下一跳 IPv6 地址。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> next-hop <address> disable
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable the route via the specified next-hop IPv6 address.</strong></p>
-<p>This command temporarily deactivates the route while preserving the
-configured subnet, next-hop, and distance parameters.</p>
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>禁用通过指定下一跳 IPv6 地址的路由。</strong></p>
+<p>该命令会临时停用该路由，同时保留已配置的子网、下一跳和管理距离参数。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 disable
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> next-hop <address> distance <distance>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the administrative distance for the route via the
-specified next-hop IPv6 address.</strong></p>
-<p>路由s with a lower administrative distance are prioritized over routes with
-a higher distance.</p>
-<p>The allowed range is 1 to 255. The default distance is 1.</p>
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-distance-distance" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为通过指定下一跳 IPv6 地址的路由配置管理距离。</strong></p>
+<p>管理距离较低的路由优先于管理距离较高的路由。</p>
+<p>允许的取值范围为 1 至 255。默认管理距离为 1。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>路由s with a distance of 255 are disabled and not used for packet
-forwarding.</p>
+<p>管理距离为 255 的路由将被禁用，且不用于数据包转发。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 distance 10
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> next-hop <address> segments <segments>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-segments-segments" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure an IPv6 unicast route that utilizes Segment 路由 over IPv6 (SRv6)
-to reach the destination subnet.</strong></p>
-<p>Use a forward slash (<code class="docutils literal notranslate">/</code>) to separate multiple IPv6 segment identifiers
-(SIDs) in your sequence.</p>
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; segments &lt;segments&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-segments-segments" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置一条利用 IPv6 上分段路由（SRv6）到达目的子网的 IPv6 单播路由。</strong></p>
+<p>在序列中使用正斜杠（<code class="docutils literal notranslate">/</code>）分隔多个 IPv6 分段标识符（SID）。</p>
 </div>
 </div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1000::/36 next-hop 2001:db8:201::ffff segments '2001:db8:aaaa::7/2002::4/2002::3/2002::2'
+<p>示例：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1000::/36 next-hop 2001:db8:201::ffff segments &#39;2001:db8:aaaa::7/2002::4/2002::3/2002::2&#39;
 </pre></div>
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show ipv6 route
@@ -506,228 +459,203 @@ Codes: K - kernel route, C - connected, S - static, R - RIPng,
        O - OSPFv3, I - IS-IS, B - BGP, N - NHRP, T - Table,
        v - VNC, V - VNC-Direct, A - Babel, F - PBR,
        f - OpenFabric,
-       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       &gt; - selected route, * - FIB route, q - queued, r - rejected, b - backup
        t - trapped, o - offload failure
- C>* 2001:db8:201::/64 is directly connected, eth0.201, 00:00:46
- S>* 2001:db8:1000::/36 [1/0] via 2001:db8:201::ffff, eth0.201, seg6 2001:db8:aaaa::7,2002::4,2002::3,2002::2, weight 1, 00:00:08
+ C&gt;* 2001:db8:201::/64 is directly connected, eth0.201, 00:00:46
+ S&gt;* 2001:db8:1000::/36 [1/0] via 2001:db8:201::ffff, eth0.201, seg6 2001:db8:aaaa::7,2002::4,2002::3,2002::2, weight 1, 00:00:08
 </pre></div>
 </div>
 <section id="ipv6-interface-routes">
-<h3>IPv6 interface routes</h3>
-<p>IPv6 interface routes direct traffic destined for a single IPv6 host or subnet
-out of a specific local interface. Use the following commands to configure IPv6
-interface routes for a specific remote subnet.</p>
+<h3>IPv6 接口路由</h3>
+<p>IPv6 接口路由将发往单个 IPv6 主机或子网的流量从特定本地接口发出。使用以下命令为特定远程子网配置 IPv6 接口路由。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the next-hop interface for the specified subnet.</strong></p>
-<p>You can configure multiple next-hop interfaces for the same destination
-subnet.</p>
+set protocols static route6 &lt;subnet&gt; interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定子网配置下一跳接口。</strong></p>
+<p>您可以为同一目的子网配置多个下一跳接口。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 interface eth0
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> interface <interface> disable
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable the route via the specified next-hop interface.</strong></p>
-<p>This command temporarily deactivates the route while preserving the
-configured subnet, interface, and distance parameters.</p>
+set protocols static route6 &lt;subnet&gt; interface &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>禁用通过指定下一跳接口的路由。</strong></p>
+<p>该命令会临时停用该路由，同时保留已配置的子网、接口和管理距离参数。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 interface eth0 disable
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> interface <interface> distance <distance>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the administrative distance for the route via the
-specified next-hop interface.</strong></p>
-<p>路由s with a lower administrative distance are prioritized over routes with
-a higher distance.</p>
-<p>The allowed range is 1 to 255. The default distance is 1.</p>
+set protocols static route6 &lt;subnet&gt; interface &lt;interface&gt; distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface-distance-distance" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为通过指定下一跳接口的路由配置管理距离。</strong></p>
+<p>管理距离较低的路由优先于管理距离较高的路由。</p>
+<p>允许的取值范围为 1 至 255。默认管理距离为 1。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 interface eth0 distance 10
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> interface <interface> segments <segments>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface-segments-segments" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure an IPv6 interface route that utilizes Segment 路由 over IPv6
-(SRv6) to reach a destination subnet.</strong></p>
-<p>Use a forward slash (<code class="docutils literal notranslate">/</code>) to separate multiple IPv6 segment identifiers
-(SIDs) in your sequence.</p>
+set protocols static route6 &lt;subnet&gt; interface &lt;interface&gt; segments &lt;segments&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-interface-interface-segments-segments" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置一条利用 IPv6 上分段路由（SRv6）到达目的子网的 IPv6 接口路由。</strong></p>
+<p>在序列中使用正斜杠（<code class="docutils literal notranslate">/</code>）分隔多个 IPv6 分段标识符（SID）。</p>
 </div>
 </div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1000::/36 interface eth0 segments '2001:db8:aaaa::7/2002::4/2002::3/2002::2'
+<p>示例：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1000::/36 interface eth0 segments &#39;2001:db8:aaaa::7/2002::4/2002::3/2002::2&#39;
 </pre></div>
 </div>
 </section>
 <section id="ipv6-bfd">
 <h3>IPv6 BFD</h3>
-<p><abbr title="Bidirectional Forwarding Detection">BFD</abbr> monitors the reachability
-of a static route’s next-hop IPv6 address. Use the following commands to
-configure <abbr title="Bidirectional Forwarding Detection">BFD</abbr> parameters for your
-IPv6 static routes.</p>
+<p><abbr title="双向转发检测">BFD</abbr>监控静态路由下一跳 IPv6 地址的可达性。使用以下命令为 IPv6 静态路由配置<abbr title="双向转发检测">BFD</abbr>参数。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> next-hop <address> bfd
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable BFD monitoring for the route via the specified next-hop IPv6
-address.</strong></p>
-<p>The system uses the next-hop IPv6 address as the BFD peer destination.</p>
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为通过指定下一跳 IPv6 地址的路由启用 BFD 监控。</strong></p>
+<p>系统使用下一跳 IPv6 地址作为 BFD 对等体的目的地址。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 bfd
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> next-hop <address> bfd profile <profile>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd-profile-profile" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 the settings from a designated BFD profile to the BFD session
-that monitors the specified next-hop IPv6 address.</strong></p>
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; bfd profile &lt;profile&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd-profile-profile" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>将指定 BFD 配置文件的设置应用到监控指定下一跳 IPv6 地址的 BFD 会话。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 bfd profile custom-profile
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> next-hop <address> bfd multi-hop source-address <source-address>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd-multi-hop-source-address-source-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable a multi-hop BFD session to monitor the reachability of the
-specified next-hop IPv6 address.</strong></p>
-<p>The system initiates the BFD session from the specified local source IPv6
-address.</p>
+set protocols static route6 &lt;subnet&gt; next-hop &lt;address&gt; bfd multi-hop source-address &lt;source-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-next-hop-address-bfd-multi-hop-source-address-source-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>启用多跳 BFD 会话，以监控指定下一跳 IPv6 地址的可达性。</strong></p>
+<p>系统从指定的本地源 IPv6 地址发起 BFD 会话。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 next-hop 2001:db8:100::1 bfd multi-hop source-address 2001:db8:200::1
 </pre></div>
 </div>
 </section>
 <section id="ipv6-reject-routes">
-<h3>IPv6 reject routes</h3>
-<p>IPv6 reject routes explicitly drop traffic destined for a single IPv6 host or
-subnet and return an ICMPv6 unreachable message to the sending device. Use the
-following commands to configure IPv6 reject routes.</p>
+<h3>IPv6 拒绝路由</h3>
+<p>IPv6 拒绝路由显式丢弃发往单个 IPv6 主机或子网的流量，并向发送设备返回 ICMPv6 不可达消息。使用以下命令配置 IPv6 拒绝路由。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> reject
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-reject" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a reject route for the specified subnet.</strong></p>
-<p>The system discards traffic destined for this subnet and returns an ICMPv6
-destination unreachable message to the sending device.</p>
+set protocols static route6 &lt;subnet&gt; reject
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-reject" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定子网配置拒绝路由。</strong></p>
+<p>系统丢弃发往该子网的流量，并向发送设备返回 ICMPv6 目的地不可达消息。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 reject
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> reject distance <distance>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-reject-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the administrative distance for the reject route.</strong></p>
-<p>路由s with a lower administrative distance are prioritized over routes with
-a higher distance.</p>
-<p>The allowed range is 1 to 255.</p>
+set protocols static route6 &lt;subnet&gt; reject distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-reject-distance-distance" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为拒绝路由配置管理距离。</strong></p>
+<p>管理距离较低的路由优先于管理距离较高的路由。</p>
+<p>允许的取值范围为 1 至 255。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 reject distance 200
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> reject tag <tag>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-reject-tag-tag" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a numeric tag for the reject route.</strong></p>
-<p>The allowed range is 1 to 4294967295.</p>
+set protocols static route6 &lt;subnet&gt; reject tag &lt;tag&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-reject-tag-tag" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为拒绝路由配置数值标签。</strong></p>
+<p>允许的取值范围为 1 至 4294967295。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 reject tag 100
 </pre></div>
 </div>
 </section>
 <section id="ipv6-blackhole-routes">
-<h3>IPv6 blackhole routes</h3>
-<p>Blackhole routes silently discard traffic destined for a specific subnet.
-Unlike a reject route, which notifies the sender with an ICMPv6 destination
-unreachable message, a blackhole route drops the packets without generating
-any response.</p>
+<h3>IPv6 黑洞路由</h3>
+<p>黑洞路由静默丢弃发往特定子网的流量。与拒绝路由（向发送方通知 ICMPv6 目的地不可达消息）不同，黑洞路由在丢弃数据包时不生成任何响应。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> blackhole
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-blackhole" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a blackhole route for the specified subnet.</strong></p>
-<p>The system silently discards matching packets without sending an ICMPv6
-response to the source.</p>
+set protocols static route6 &lt;subnet&gt; blackhole
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-blackhole" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定子网配置黑洞路由。</strong></p>
+<p>系统静默丢弃匹配的数据包，且不向源端发送 ICMPv6 响应。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 blackhole
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> blackhole distance <distance>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-blackhole-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the administrative distance for the blackhole route.</strong></p>
-<p>路由s with a lower administrative distance are prioritized over routes with
-a higher distance.</p>
-<p>The allowed range is 1 to 255.</p>
+set protocols static route6 &lt;subnet&gt; blackhole distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-blackhole-distance-distance" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为黑洞路由配置管理距离。</strong></p>
+<p>管理距离较低的路由优先于管理距离较高的路由。</p>
+<p>允许的取值范围为 1 至 255。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 blackhole distance 200
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols static route6 <subnet> blackhole tag <tag>
-<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-blackhole-tag-tag" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a numeric tag for the blackhole route.</strong></p>
-<p>The allowed range is 1 to 4294967295.</p>
+set protocols static route6 &lt;subnet&gt; blackhole tag &lt;tag&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-static-route6-subnet-blackhole-tag-tag" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为黑洞路由配置数值标签。</strong></p>
+<p>允许的取值范围为 1 至 4294967295。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols static route6 2001:db8:1::/64 blackhole tag 100
 </pre></div>
 </div>
 </section>
 </section>
 <section id="alternate-routing-tables">
-<h2>Alternate routing tables</h2>
-<p>Alternate routing tables are utilized to implement both 策略-Based 路由
-(PBR) and Virtual 路由 and Forwarding (<a class="reference internal" href="../vrf/index.html#vrf">VRF</a>).</p>
+<h2>备用路由表</h2>
+<p>备用路由表用于实现基于策略的路由（PBR）和虚拟路由与转发（<a class="reference internal" href="../vrf/index.html#vrf">VRF</a>）。</p>
 </section>
 </section>
 

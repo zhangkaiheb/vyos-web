@@ -37,7 +37,7 @@ function parseRoutes(output) {
     const code = m[1];
     const prefix = m[2];
     const metric = m[3] || '';
-    const rest = m[4];
+    let rest = m[4];
 
     let type = '';
     let nextHop = '';
@@ -45,13 +45,19 @@ function parseRoutes(output) {
     let weight = '';
     let uptime = '';
 
-    const viaMatch = rest.match(/^via\s+([^,]+)(?:,\s*([^,]+))?(?:,\s*weight\s+(\d+))?(?:,\s*(.+))?$/);
+    // Extract weight from any route type: "weight N" pattern
+    const weightMatch = rest.match(/,\s*weight\s+(\d+)/);
+    if (weightMatch) {
+      weight = weightMatch[1];
+      rest = rest.replace(/,\s*weight\s+\d+/, '');
+    }
+
+    const viaMatch = rest.match(/^via\s+([^,]+)(?:,\s*([^,]+))?(?:,\s*(.+))?$/);
     if (viaMatch) {
       type = 'via';
       nextHop = viaMatch[1] ? viaMatch[1].trim() : '';
       iface = viaMatch[2] ? viaMatch[2].trim() : '';
-      weight = viaMatch[3] || '';
-      uptime = viaMatch[4] ? viaMatch[4].trim() : '';
+      uptime = viaMatch[3] ? viaMatch[3].trim() : '';
     } else {
       const dcMatch = rest.match(/^is\s+directly\s+connected,\s*([^,]+)(?:,\s*(.+))?$/i);
       if (dcMatch) {
@@ -159,6 +165,7 @@ export default defineComponent({
         :selectable="false"
         :actions="[]"
         rowKey="id"
+        :externalToolbar="true"
       />
     </div>
   `,

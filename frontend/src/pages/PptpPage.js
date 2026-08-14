@@ -591,23 +591,35 @@ export default defineComponent({
       </template>
 
       <template #advanced>
-        <div style="font-weight:bold;margin-bottom:8px;">{{ t('pptp.labels.extendedScripts') }}</div>
-        <div class="form-row"><label class="form-label">{{ t('pptp.labels.onUp') }}</label><input class="form-control" v-model="config.extended_scripts.on_up" :title="t('pptp.titles.onUpDesc')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('pptp.labels.onDown') }}</label><input class="form-control" v-model="config.extended_scripts.on_down" :title="t('pptp.titles.onDownDesc')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('pptp.labels.onChange') }}</label><input class="form-control" v-model="config.extended_scripts.on_change" :title="t('pptp.titles.onChangeDesc')" /></div>
+        <div class="form-group">
+          <div class="form-group-title">{{ t('pptp.labels.extendedScripts') }}</div>
+          <div class="form-group-content">
+            <div class="form-row"><label class="form-label">{{ t('pptp.labels.onUp') }}</label><input class="form-control" v-model="config.extended_scripts.on_up" :title="t('pptp.titles.onUpDesc')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('pptp.labels.onDown') }}</label><input class="form-control" v-model="config.extended_scripts.on_down" :title="t('pptp.titles.onDownDesc')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('pptp.labels.onChange') }}</label><input class="form-control" v-model="config.extended_scripts.on_change" :title="t('pptp.titles.onChangeDesc')" /></div>
+          </div>
+        </div>
 
-        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('pptp.labels.connectionLimits') }}</div>
-        <div class="form-row"><label class="form-label">{{ t('pptp.labels.burst') }}</label><input class="form-control" v-model="config.limits.burst" :title="t('pptp.titles.burstDesc')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('pptp.labels.rate') }}</label><input class="form-control" v-model="config.limits.rate" :title="t('pptp.titles.rateDesc')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('pptp.labels.timeout') }}</label><input class="form-control" v-model="config.limits.timeout" :title="t('pptp.titles.timeoutLimitDesc')" /></div>
+        <div class="form-group">
+          <div class="form-group-title">{{ t('pptp.labels.connectionLimits') }}</div>
+          <div class="form-group-content">
+            <div class="form-row"><label class="form-label">{{ t('pptp.labels.burst') }}</label><input class="form-control" v-model="config.limits.burst" :title="t('pptp.titles.burstDesc')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('pptp.labels.rate') }}</label><input class="form-control" v-model="config.limits.rate" :title="t('pptp.titles.rateDesc')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('pptp.labels.timeout') }}</label><input class="form-control" v-model="config.limits.timeout" :title="t('pptp.titles.timeoutLimitDesc')" /></div>
+          </div>
+        </div>
 
         <div class="form-row"><label class="form-label">{{ t('pptp.labels.log') }}</label><input class="form-control" v-model="config.log" :placeholder="t('pptp.placeholders.log')" :title="t('pptp.titles.logDesc')" /></div>
         <div class="form-row"><label class="form-label">{{ t('pptp.labels.shaper') }}</label><input class="form-control" v-model="config.shaper" :title="t('pptp.titles.shaperDesc')" /></div>
 
-        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('pptp.labels.pppOptions') }}</div>
-        <div class="form-row"><label class="form-label">{{ t('pptp.labels.ccp') }}</label><input type="checkbox" v-model="config.ppp_options.ccp" :title="t('pptp.titles.ccpDesc')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('pptp.labels.mppe') }}</label><input type="checkbox" v-model="config.ppp_options.mppe" :title="t('pptp.titles.mppeDesc')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('pptp.labels.snmp') }}</label><input type="checkbox" v-model="config.snmp" :title="t('pptp.titles.snmpDesc')" /></div>
+        <div class="form-group">
+          <div class="form-group-title">{{ t('pptp.labels.pppOptions') }}</div>
+          <div class="form-group-content">
+            <div class="form-row"><label class="form-label">{{ t('pptp.labels.ccp') }}</label><input type="checkbox" v-model="config.ppp_options.ccp" :title="t('pptp.titles.ccpDesc')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('pptp.labels.mppe') }}</label><input type="checkbox" v-model="config.ppp_options.mppe" :title="t('pptp.titles.mppeDesc')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('pptp.labels.snmp') }}</label><input type="checkbox" v-model="config.snmp" :title="t('pptp.titles.snmpDesc')" /></div>
+          </div>
+        </div>
       </template>
       </TabGroup>
 

@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -152,31 +152,26 @@
 <div itemprop="articleBody">
              
   <section id="sstp-client">
-<h1>SSTP client</h1>
-<p><abbr title="Secure Socket Tunneling Protocol">SSTP</abbr> transports PPP traffic over an
-SSL/TLS channel, providing transport-level security through key negotiation,
-encryption, and traffic integrity checking. The use of SSL/TLS over TCP port
-443 (by default, the port 可以 changed) allows SSTP to pass through virtually
-all firewalls and proxy servers, except for authenticated web proxies.</p>
+<h1>SSTP 客户端</h1>
+<p><abbr title="安全套接字隧道协议">SSTP</abbr> 通过 SSL/TLS 通道传输 PPP 流量，利用密钥协商、加密和流量完整性检查提供传输层安全性。SSL/TLS 默认使用 TCP 端口 443（该端口可更改），因此 SSTP 几乎能够穿透所有防火墙和代理服务器，但经过身份验证的 Web 代理除外。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>VyOS includes a built-in SSTP server. For more information, see
-<a class="reference internal" href="../vpn/sstp.html#sstp">SSTP服务器</a>.</p>
+<p>VyOS 内置了 SSTP 服务器。更多信息，请参阅
+<a class="reference internal" href="../vpn/sstp.html#sstp">SSTP 服务器</a>。</p>
 </div>
 <section id="configuration">
 <h2>配置</h2>
 <section id="common-interface-configuration">
-<h3>Common interface configuration</h3>
+<h3>通用接口配置</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces sstpc <interface> description <description>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a clear, descriptive alias for the interface.</strong></p>
-<p>This alias appears in the <code class="docutils literal notranslate">show interfaces</code> command and SNMP-based
-monitoring tools.</p>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces sstpc sstpc0 description 'This is an interface running on VyOS.'
+set interfaces sstpc &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-description-description" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为接口配置清晰、描述性强的别名。</strong></p>
+<p>该别名将显示在 <code class="docutils literal notranslate">show interfaces</code> 命令以及基于 SNMP 的监控工具中。</p>
+<p>示例：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces sstpc sstpc0 description &#39;这是运行在 VyOS 上的一个接口。&#39;
 </pre></div>
 </div>
 </div>
@@ -184,12 +179,11 @@ monitoring tools.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces sstpc <interface> disable
-<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable the interface.</strong></p>
-<p>The interface 将 set to the administratively down
-(<code class="docutils literal notranslate">A/D</code>) state.</p>
-<p>示例:</p>
+set interfaces sstpc &lt;interface&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>禁用该接口。</strong></p>
+<p>该接口将被设置为管理性关闭（<code class="docutils literal notranslate">A/D</code>）状态。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces sstpc sstpc0 disable
 </pre></div>
 </div>
@@ -198,12 +192,11 @@ set interfaces sstpc <interface> disable
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces sstpc <interface> mtu <mtu>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-mtu-mtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the MTU on the interface.</strong></p>
-<p>This value defines the largest packet size, in bytes, that the interface
-transmits without fragmentation.</p>
-<p>示例:</p>
+set interfaces sstpc &lt;interface&gt; mtu &lt;mtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-mtu-mtu" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在接口上配置 MTU。</strong></p>
+<p>该值定义了接口在不进行分片的情况下所能传输的最大数据包大小（以字节为单位）。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces sstpc sstpc0 mtu 1600
 </pre></div>
 </div>
@@ -212,15 +205,15 @@ transmits without fragmentation.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces sstpc <interface> vrf <vrf>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-vrf-vrf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Assign the interface to a specific</strong> <abbr title="Virtual Routing and Forwarding">VRF</abbr> <strong>instance.</strong></p>
+set interfaces sstpc &lt;interface&gt; vrf &lt;vrf&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-vrf-vrf" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>将接口分配给特定的</strong> <abbr title="虚拟路由与转发">VRF</abbr> <strong>实例。</strong></p>
 <div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p>For information on configuring a VRF, refer to the <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>
-section.</p>
+<p class="admonition-title">另请参阅</p>
+<p>有关配置 VRF 的信息，请参阅 <a class="reference internal" href="../vrf/index.html#vrf">VRF</a>
+章节。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces sstpc sstpc0 vrf red
 </pre></div>
 </div>
@@ -228,31 +221,30 @@ section.</p>
 </div>
 </section>
 <section id="sstp-client-options">
-<h3>SSTP client options</h3>
+<h3>SSTP 客户端选项</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces sstpc <interface> no-default-route
-<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-no-default-route" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Request an IP address from the SSTP server without installing a default route.</p>
-<p>示例:</p>
+set interfaces sstpc &lt;interface&gt; no-default-route
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-no-default-route" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>向 SSTP 服务器请求 IP 地址，但不安装默认路由。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces sstpc sstpc0 no-default-route
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>Introduced in VyOS 1.4, this command inverts the logic of the former
-<code class="docutils literal notranslate">default-route</code> CLI option.</p>
+<p>该命令自 VyOS 1.4 版本起引入，其逻辑与旧版 <code class="docutils literal notranslate">default-route</code> CLI 选项相反。</p>
 </div>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces sstpc <interface> default-route-distance <distance>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-default-route-distance-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure the distance for the default gateway provided by the SSTP server.</p>
-<p>示例:</p>
+set interfaces sstpc &lt;interface&gt; default-route-distance &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-default-route-distance-distance" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>配置由 SSTP 服务器提供的默认网关的距离值。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces sstpc sstpc0 default-route-distance 220
 </pre></div>
 </div>
@@ -261,89 +253,77 @@ set interfaces sstpc <interface> default-route-distance <distance>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces sstpc <interface> no-peer-dns
-<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-no-peer-dns" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Disable the installation of advertised DNS nameservers on the local system.</p>
+set interfaces sstpc &lt;interface&gt; no-peer-dns
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-no-peer-dns" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>禁用在本地系统上安装通告的 DNS 服务器地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces sstpc <interface> server <address>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the remote SSTP server address for the client connection.</strong></p>
-<p>The address 可以 either an IP address or a <abbr title="Fully Qualified Domain Name">FQDN</abbr>.</p>
+set interfaces sstpc &lt;interface&gt; server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-server-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为客户端连接配置远程 SSTP 服务器地址。</strong></p>
+<p>该地址可以是 IP 地址或 <abbr title="完全限定域名">FQDN</abbr>。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces sstpc <interface> ip adjust-mss <mss | clamp-mss-to-pmtu>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the</strong> <abbr title="Maximum Segment Size">MSS</abbr> <strong>advertised in outgoing
-TCP SYN packets on the specified interface.</strong></p>
-<p>By clamping the MSS value in TCP SYN packets, you instruct the remote side not
-to send packets larger than the specified size. This helps prevent connection
-issues if <abbr title="Path MTU Discovery">PMTUD</abbr> fails.</p>
-<p>The following options are available:</p>
+set interfaces sstpc &lt;interface&gt; ip adjust-mss &lt;mss | clamp-mss-to-pmtu&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-ip-adjust-mss-mss-clamp-mss-to-pmtu" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口的出站 TCP SYN 数据包中配置所通告的</strong> <abbr title="最大段长度">MSS</abbr> <strong>值。</strong></p>
+<p>通过在 TCP SYN 数据包中限制 MSS 值，可指示对端不要发送大于指定大小的数据包。当 <abbr title="路径 MTU 发现">PMTUD</abbr> 失败时，这有助于防止连接问题。</p>
+<p>以下选项可用：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">mss</code>: 设置s the MSS to a specific value in bytes.</p></li>
-<li><p><code class="docutils literal notranslate">clamp-mss-to-pmtu</code>: 设置s the MSS to the interface’s MTU minus 40 bytes for
-IPv4 traffic (20 bytes for the IPv4 header and 20 bytes for the TCP header).
-This option 建议 automatically set the proper value.</p></li>
+<li><p><code class="docutils literal notranslate">mss</code>：将 MSS 设置为特定的字节数值。</p></li>
+<li><p><code class="docutils literal notranslate">clamp-mss-to-pmtu</code>：将 MSS 设置为接口 MTU 减去 40 字节（IPv4 流量：20 字节 IPv4 报头 + 20 字节 TCP 报头）。建议使用此选项以自动设置合适的值。</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>Introduced in VyOS 1.4, this command replaces the older <code class="docutils literal notranslate">set firewall options interface <name> adjust-mss <value></code> syntax.</p>
+<p>该命令自 VyOS 1.4 版本起引入，替代了旧语法 <code class="docutils literal notranslate">set firewall options interface &lt;name&gt; adjust-mss &lt;value&gt;</code>。</p>
 </div>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces sstpc <interface> ip disable-forwarding
-<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-ip-disable-forwarding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interface for host or router behavior.</strong></p>
-<p>If configured, the interface switches to host mode, and IPv4 forwarding is
-disabled on it.</p>
+set interfaces sstpc &lt;interface&gt; ip disable-forwarding
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-ip-disable-forwarding" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置接口为主机行为或路由器行为。</strong></p>
+<p>若启用该配置，接口将切换至主机模式，并在此接口上禁用 IPv4 转发功能。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces sstpc <interface> ip source-validation <strict | loose | disable>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure source IP address validation using</strong>
-<abbr title="Reverse Path Forwarding">RPF</abbr> <strong>on this interface, as specified in</strong>
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
-<p>The following options are available:</p>
+set interfaces sstpc &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-ip-source-validation-strict-loose-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>根据</strong>
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> <strong>中规定的</strong>
+<abbr title="反向路径转发">RPF</abbr> <strong>机制，在此接口上配置源 IP 地址验证。</strong></p>
+<p>以下选项可用：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">strict</code>: Each incoming packet’s source IP address is checked against the
-<abbr title="Forwarding Information Base">FIB</abbr>. If the interface is not the best
-route back to that source, validation fails, and the packet is dropped.</p></li>
-<li><p><code class="docutils literal notranslate">loose</code>: Each incoming packet’s source IP address is checked against the
-<abbr title="Forwarding Information Base">FIB</abbr>. If the source IP address is
-unreachable through any interface, validation fails.</p></li>
-<li><p><code class="docutils literal notranslate">disable</code>: No source IP address validation is performed. All incoming
-packets are accepted.</p></li>
+<li><p><code class="docutils literal notranslate">strict</code>：每个入站数据包的源 IP 地址均与 <abbr title="转发信息库">FIB</abbr> 进行比对。若该接口并非返回该源地址的最佳路径，则验证失败，数据包将被丢弃。</p></li>
+<li><p><code class="docutils literal notranslate">loose</code>：每个入站数据包的源 IP 地址均与 <abbr title="转发信息库">FIB</abbr> 进行比对。若该源 IP 地址无法通过任何接口到达，则验证失败。</p></li>
+<li><p><code class="docutils literal notranslate">disable</code>：不执行源 IP 地址验证，接受所有入站数据包。</p></li>
 </ul>
-<p><a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> recommends enabling <code class="docutils literal notranslate">strict</code> mode to prevent IP spoofing, such as
-DDoS attacks. For asymmetric or other complex routing scenarios, use <code class="docutils literal notranslate">loose</code>
-mode.</p>
+<p><a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> 建议启用 <code class="docutils literal notranslate">strict</code> 模式以防止 IP 欺骗（例如 DDoS 攻击）。对于非对称路由或其他复杂路由场景，请使用 <code class="docutils literal notranslate">loose</code>
+模式。</p>
 </div>
 </div>
 </section>
 </section>
 <section id="operation">
-<h2>Operation</h2>
+<h2>操作</h2>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show interfaces sstpc <interface>
-<a class="cmdlink" href="#opcmd-show-interfaces-sstpc-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 detailed information about the specified interface.</p>
+show interfaces sstpc &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-show-interfaces-sstpc-interface" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示指定接口的详细信息。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show interfaces sstpc sstpc10
-sstpc10: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UNKNOWN group default qlen 3
+sstpc10: &lt;POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UNKNOWN group default qlen 3
     link/ppp
     inet 192.0.2.5 peer 192.0.2.254/32 scope global sstpc10
        valid_lft forever preferred_lft forever
@@ -359,21 +339,21 @@ sstpc10: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast sta
 </div>
 </div>
 <section id="connect-disconnect">
-<h3>连接/disconnect</h3>
+<h3>连接/断开连接</h3>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-disconnect interface <interface>
-<a class="cmdlink" href="#opcmd-disconnect-interface-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>断开 the specified interface.</p>
+disconnect interface &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-disconnect-interface-interface" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>断开指定接口的连接。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-connect interface <interface>
-<a class="cmdlink" href="#opcmd-connect-interface-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>Initiate a session on the specified interface.</p>
+connect interface &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-connect-interface-interface" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>在指定接口上启动会话。</p>
 </div>
 </div>
 </section>

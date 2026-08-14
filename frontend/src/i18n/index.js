@@ -22,6 +22,8 @@ const defaultMessages = {
     config: { commit: '提交配置', discard: '丢弃变更', save: '保存配置', load: '加载配置', compare: '对比配置', rollback: '回滚配置', import: '导入', export: '导出', commands: '对应命令行', copy: '复制' },
     errors: { required: '此项为必填项', invalid_ipv4: '请输入有效的IPv4地址', invalid_ipv6: '请输入有效的IPv6地址', invalid_mac: '请输入有效的MAC地址', invalid_port: '端口号范围为1-65535' },
     msg: { saved: '保存成功', deleted: '删除成功', confirmDelete: '确认删除选中的项？', noSelection: '请选择一行' },
+    common: { saving: '保存中', save: '保存' },
+    featureVisibility: { title: '功能可见性', visible: '可见', hidden: '隐藏' },
     mpls: {
       columns: { interfaceName: '接口名称', helloInterval: 'Hello 间隔', helloHoldtime: 'Hello 保持时间' },
       tabs: { basic: '基本设置', interfaces: '接口', ldp: 'LDP', parameters: '参数' },
@@ -109,6 +111,8 @@ const defaultMessages = {
     config: { commit: 'Commit', discard: 'Discard', save: 'Save Config', load: 'Load Config', compare: 'Compare', rollback: 'Rollback', import: 'Import', export: 'Export', commands: 'CLI Commands', copy: 'Copy' },
     errors: { required: 'This field is required', invalid_ipv4: 'Invalid IPv4 address', invalid_ipv6: 'Invalid IPv6 address', invalid_mac: 'Invalid MAC address', invalid_port: 'Port range is 1-65535' },
     msg: { saved: 'Saved successfully', deleted: 'Deleted successfully', confirmDelete: 'Confirm delete selected items?', noSelection: 'Please select a row' },
+    common: { saving: 'Saving', save: 'Save' },
+    featureVisibility: { title: 'Feature Visibility', visible: 'Visible', hidden: 'Hidden' },
     mpls: {
       columns: { interfaceName: 'Interface Name', helloInterval: 'Hello Interval', helloHoldtime: 'Hello Holdtime' },
       tabs: { basic: 'Basic', interfaces: 'Interfaces', ldp: 'LDP', parameters: 'Parameters' },

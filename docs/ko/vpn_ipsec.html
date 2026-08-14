@@ -1,0 +1,822 @@
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; padding: 12px; }
+  h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
+  h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
+  h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
+  h4 { font-size: 14px; color: #533483; margin-top: 12px; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; color: #c0392b; }
+  pre { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: #333; }
+  ul, ol { padding-left: 20px; }
+  li { margin: 4px 0; }
+  .note, .warning, .tip { padding: 10px 14px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+  .note { background: #fff3cd; border-left: 4px solid #ffc107; }
+  .note strong { color: #856404; }
+  .warning { background: #f8d7da; border-left: 4px solid #dc3545; }
+  .warning strong { color: #721c24; }
+  .tip { background: #d4edda; border-left: 4px solid #28a745; }
+  .tip strong { color: #155724; }
+  a { color: #4361ee; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+  th { background: #f8f9fa; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
+  img { max-width: 100%; height: auto; }
+  blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+  .command-block { background: #f8f9fa; border-left: 3px solid #fd7e14; border-radius: 0 4px 4px 0; padding: 10px 14px; margin: 10px 0; font-family: "SFMono-Regular", Consolas, monospace; font-size: 13px; }
+  .command-block::before { content: '$ '; color: #fd7e14; font-weight: bold; }
+  .ipsec-tabs { display: flex; border-bottom: 2px solid #4361ee; margin-bottom: 0; flex-wrap: wrap; }
+  .ipsec-tabs input[type="radio"] { display: none; }
+  .ipsec-tabs label { padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 600; color: #666; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .ipsec-tabs label:hover { color: #4361ee; background: #f0f4ff; }
+  .ipsec-tabs input[type="radio"]:checked + label { color: #4361ee; border-bottom-color: #4361ee; }
+  .ipsec-tab-content { display: none; padding: 16px 0; }
+  .ipsec-tabs input[type="radio"]:nth-of-type(1):checked ~ .ipsec-tab-content:nth-of-type(1),
+  .ipsec-tabs input[type="radio"]:nth-of-type(2):checked ~ .ipsec-tab-content:nth-of-type(2),
+  .ipsec-tabs input[type="radio"]:nth-of-type(3):checked ~ .ipsec-tab-content:nth-of-type(3),
+  .ipsec-tabs input[type="radio"]:nth-of-type(4):checked ~ .ipsec-tab-content:nth-of-type(4) { display: block; }
+</style>
+<div itemprop="articleBody">
+
+<div class="ipsec-tabs">
+<input type="radio" name="ipsec-tab" id="tab-general" checked>
+<label for="tab-general">일반</label>
+<input type="radio" name="ipsec-tab" id="tab-site2site">
+<label for="tab-site2site">사이트 간</label>
+<input type="radio" name="ipsec-tab" id="tab-remoteaccess">
+<label for="tab-remoteaccess">원격 액세스</label>
+<input type="radio" name="ipsec-tab" id="tab-troubleshooting">
+<label for="tab-troubleshooting">문제 해결</label>
+
+<div class="ipsec-tab-content">
+
+<h3>IPsec 개요</h3>
+<p>IPsec은 데이터를 보호하기 위해 사용되는 프레임워크입니다. IPsec은 인증, IP 네트워크 패킷 암호화, 키 교환 및 키 관리를 제공하여 이를 달성합니다. VyOS는 IPsec을 구현하기 위해 Strongswan 패키지를 사용합니다.</p>
+
+<p><strong>인증 헤더(AH)</strong>는 <a href="https://datatracker.ietf.org/doc/html/rfc4302.html">RFC 4302</a>에 정의되어 있습니다. IP 헤더와 데이터 페이로드를 사용하여 해시를 생성하고, 이 해시는 패킷에 추가됩니다. 이 해시는 데이터가 네트워크 전송 중에 변경되지 않았음을 확인하는 데 사용됩니다.</p>
+
+<p><strong>캡슐화 보안 페이로드(ESP)</strong>는 <a href="https://datatracker.ietf.org/doc/html/rfc4303.html">RFC 4303</a>에 정의되어 있습니다. 데이터의 암호화와 인증을 모두 제공합니다.</p>
+
+<p>IPsec 모드에는 두 가지가 있습니다:</p>
+<p><strong>IPsec 전송 모드:</strong> 전송 모드에서는 IPsec 헤더(AH 또는 ESP)가 IP 헤더와 상위 계층 프로토콜 헤더 사이에 삽입됩니다.</p>
+<p><strong>IPsec 터널 모드:</strong> 터널 모드에서는 원래 IP 패킷이 다른 IP 데이터그램 내에 캡슐화되며, IPsec 헤더(AH 또는 ESP)가 외부 헤더와 내부 헤더 사이에 삽입됩니다.</p>
+
+<h3>IKE (Internet Key Exchange)</h3>
+<p>IKE 프로토콜은 IPsec 보안 키 협상의 기본 방법입니다. IKE는 IKE 피어 간의 상호 인증을 제공하고 공유 키를 설정하여 IPsec 보안 연대(SA)를 생성하도록 설계되었습니다. 보안 연대(SA)는 암호화에 사용되는 알고리즘, IPsec 모드, 암호화 키 및 VPN 연결을 통한 데이터 전송과 관련된 기타 매개변수를 포함한 연결의 모든 관련 속성을 포함합니다.</p>
+
+<h4>IKEv1</h4>
+<p>IKEv1은 오래된 버전으로 현재에도 사용되고 있습니다. 대부분의 제조업체는 이제 IKEv2 프로토콜 사용을 권장합니다.</p>
+<p>IKEv1은 다음 RFC에 설명되어 있습니다: <a href="https://datatracker.ietf.org/doc/html/rfc2409.html">RFC 2409</a> (IKE), <a href="https://datatracker.ietf.org/doc/html/rfc3407.html">RFC 3407</a> (IPsec DOI), <a href="https://datatracker.ietf.org/doc/html/rfc3947.html">RFC 3947</a> (NAT-T), <a href="https://datatracker.ietf.org/doc/html/rfc3948.html">RFC 3948</a> (UDP Encapsulation of ESP Packets), <a href="https://datatracker.ietf.org/doc/html/rfc3706.html">RFC 3706</a> (DPD)</p>
+
+<p>IKEv1은 IKE 및 IPsec SA를 설정하기 위해 두 단계로 작동합니다:</p>
+<ul>
+<li><strong>1단계</strong>는 IKE 피어의 상호 인증과 세션 키 설정을 제공합니다. 이 단계는 DH 교환, 쿠키 및 ID 교환을 사용하여 IKE SA를 생성합니다. IKE SA가 설정되면, 시작자와 응답자 간의 모든 IKE 통신은 암호화 및 인증 무결성 검사로 보호됩니다. IKE 1단계는 두 가지 모드를 제공합니다: 메인 모드와 애그레시브 모드.
+<ul>
+<li><strong>메인 모드</strong>는 사이트 간 VPN 연결에 사용됩니다.</li>
+<li><strong>애그레시브 모드</strong>는 원격 액세스 VPN 연결에 사용됩니다.</li>
+</ul>
+</li>
+<li><strong>2단계</strong>는 ESP 또는 AH를 사용하여 IP 데이터 트래픽을 보호하는 IPsec SA의 협상 및 설정을 제공합니다.</li>
+</ul>
+
+<h4>IKEv2</h4>
+<p>IKEv2는 <a href="https://datatracker.ietf.org/doc/html/rfc7296.html">RFC 7296</a>에 설명되어 있습니다. IKEv1과 IKEv2의 가장 큰 차이점은 IKEv2가 IKEv1보다 더 단순하고 신뢰할 수 있으며, VPN 설정 중에 교환되는 메시지가 적고 추가적인 보안 기능을 제공한다는 것입니다.</p>
+
+<h3>IKE 인증</h3>
+<p>VyOS는 3가지 인증 방법을 지원합니다:</p>
+<ul>
+<li><strong>사전 공유 키</strong>: 이 방법에서는 IPsec 터널의 양쪽 피어가 동일한 사전 공유 키를 가져야 합니다.</li>
+<li><strong>디지털 인증서</strong>: 이 방법에서는 PKI가 사용됩니다.</li>
+<li><strong>RSA 키</strong>: IKE 정책에서 RSA 키 방법이 사용되는 경우, 각 피어가 다른 피어의 공개 키를 가지고 있는지 확인하십시오.</li>
+</ul>
+
+<h3>DPD (Dead Peer Detection)</h3>
+<p>이것은 VPN 피어가 더 이상 활성 상태가 아닐 때를 감지하는 데 사용되는 메커니즘입니다. 이 메커니즘은 VyOS에서 IKEv1과 IKEv2에 대해 서로 다른 알고리즘을 가집니다. DPD 요청은 ISAKMP R-U-THERE 메시지로 전송되고, DPD 응답은 ISAKMP R-U-THERE-ACK 메시지로 전송됩니다. IKEv1에서 DPD는 설정된 간격으로 메시지를 전송합니다. DPD 타임아웃 내에 이러한 패킷에 대한 응답이 수신되지 않으면 원격 피어가 도달할 수 없는 것으로 간주됩니다. IKEv2에서 DPD는 설정된 간격으로 메시지를 전송합니다. 하나의 요청에 대한 응답이 없으면 Strongswan은 타이머와 함께 재전송 알고리즘을 실행합니다.</p>
+
+<h3>Post-Quantum Pre-Shared Key (PPK)</h3>
+<p>Post-quantum 사전 공유 키는 ML-KEM과 같은 post-quantum 키 교환 알고리즘을 사용할 수 없을 때 IPsec 터널에 양자 내성을 일부 제공하는 데 도움이 됩니다. IKEv2에서 PPK 사용은 <a href="https://datatracker.ietf.org/doc/html/rfc8784.html">RFC 8784</a>에 설명되어 있습니다.</p>
+<p>PPK는 VyOS에서 <code>vpn ipsec authentication ppk</code> 아래에서 구성할 수 있습니다. PPK에는 ID와 비밀값이 필요합니다. 성공적인 IPsec 연결에 PPK가 필요한 경우 ID와 비밀값이 모두 일치해야 합니다. 비밀값은 일반 텍스트, 16진수 값 또는 Base64 값일 수 있습니다. 기본값은 일반 텍스트입니다. 다른 값 유형을 사용하는 경우 비밀값 유형을 정의해야 합니다.</p>
+
+<h3>IKE 구성</h3>
+<h4>IKE 속성</h4>
+<p>VyOS IKE 그룹에는 다음 옵션이 있습니다:</p>
+<p><code>set vpn ipsec ike-group &lt;name&gt; close-action &lt;action&gt;</code></p>
+<p>원격 피어가 예기치 않게 CHILD_SA를 닫을 때 수행할 작업을 정의합니다:</p>
+<ul>
+<li><strong>none</strong> - none으로 설정 (기본값)</li>
+<li><strong>trap</strong> - CHILD_SA에 대한 트랩 정책을 설치합니다. 이 정책에 일치하는 트래픽은 acquire 이벤트를 발생시켜 데몬이 필요한 IKE/IPsec SA를 설정하도록 합니다.</li>
+<li><strong>start</strong> - 즉시 CHILD_SA를 다시 생성하려고 시도합니다.</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; ikev2-reauth</code></p>
+<p>IKE_SA의 rekeying이 피어를 재인증해야 하는지 여부입니다. IKEv1에서는 재인증이 항상 수행됩니다. 이 매개변수를 설정하면 IKE rekeying 중에 원격 호스트 재인증이 활성화됩니다.</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; key-exchange</code></p>
+<p>연결을 시작하는 데 사용해야 하는 프로토콜입니다. 설정하지 않으면 두 프로토콜이 모두 처리되며, 연결을 시작할 때는 IKEv2를 사용하지만 응답할 때는 모든 프로토콜 버전을 허용합니다:</p>
+<ul>
+<li><strong>ikev1</strong> - 키 교환에 IKEv1을 사용합니다.</li>
+<li><strong>ikev2</strong> - 키 교환에 IKEv2를 사용합니다.</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; lifetime</code></p>
+<p>IKE 수명 (초) &lt;0-86400&gt; (기본값 28800).</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; mode</code></p>
+<p>IKEv1 1단계 모드 선택:</p>
+<ul>
+<li><strong>main</strong> - IKEv1 프로토콜에서 키 교환에 메인 모드를 사용합니다 (권장 기본값).</li>
+<li><strong>aggressive</strong> - IKEv1 프로토콜에서 키 교환에 애그레시브 모드를 사용합니다. 애그레시브 모드는 메인 모드보다 보안이 낮습니다.</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; dh-group &lt;dh-group number&gt;</code></p>
+<p>DH 그룹. 기본값은 <strong>2</strong>입니다.</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; encryption &lt;encryption&gt;</code></p>
+<p>암호화 알고리즘. 기본값은 <strong>aes128</strong>입니다.</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; hash &lt;hash&gt;</code></p>
+<p>해시 알고리즘. 기본값은 <strong>sha1</strong>입니다.</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; prf &lt;prf&gt;</code></p>
+<p>의사 난수 함수.</p>
+
+<h4>DPD 구성</h4>
+<p><code>set vpn ipsec ike-group &lt;name&gt; dead-peer-detection action &lt;action&gt;</code></p>
+<p>DPD 타임아웃 시 이 CHILD_SA에 대해 수행할 작업:</p>
+<ul>
+<li><strong>trap</strong> - 일치하는 트래픽을 캡처하고 온디맨드로 터널을 재협상하려는 트랩 정책을 설치합니다.</li>
+<li><strong>clear</strong> - 추가 작업 없이 CHILD_SA를 닫습니다 (기본값).</li>
+<li><strong>restart</strong> - 새 IKE_SA에서 CHILD_SA를 즉시 재협상하려고 시도합니다.</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; dead-peer-detection interval &lt;interval&gt;</code></p>
+<p>Keepalive 간격 (초) &lt;2-86400&gt; (기본값 30).</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; dead-peer-detection timeout &lt;timeout&gt;</code></p>
+<p>Keepalive 타임아웃 (초) &lt;2-86400&gt; (기본값 120) <strong>IKEv1 전용</strong></p>
+
+<h3>ESP 속성</h3>
+<p>VyOS에서 ESP 속성은 ESP 그룹을 통해 지정됩니다. 단일 그룹 내에서 여러 제안 사항을 지정할 수 있습니다.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; compression</code></p>
+<p>IPComp (IP 페이로드 압축) 프로토콜을 활성화하여 IP 패킷 내용의 압축을 허용합니다.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; disable-rekey</code></p>
+<p>로컬에서 SA의 rekeying을 시작하지 않습니다. 원격 피어가 만료 전에 rekeying을 수행해야 합니다.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; life-bytes &lt;bytes&gt;</code></p>
+<p>ESP 수명 (바이트) &lt;1024-26843545600000&gt;. IPsec SA가 만료되기 전에 전송되는 바이트 수입니다.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; life-packets &lt;packets&gt;</code></p>
+<p>ESP 수명 (패킷) &lt;1000-26843545600000&gt;. IPsec SA가 만료되기 전에 전송되는 패킷 수입니다.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; lifetime &lt;timeout&gt;</code></p>
+<p>ESP 수명 (초) &lt;30-86400&gt; (기본값 3600). 연결의 특정 인스턴스(사용자 데이터 패킷에 대한 암호화/인증 키 세트)가 성공적인 협상부터 만료까지 얼마나 지속되어야 하는지를 정의합니다.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; mode &lt;mode&gt;</code></p>
+<p>연결 유형:</p>
+<ul>
+<li><strong>tunnel</strong> - 터널 모드 (기본값).</li>
+<li><strong>transport</strong> - 전송 모드.</li>
+</ul>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; pfs &lt;dh-group&gt;</code></p>
+<p>연결의 키 채널에서 Perfect Forward Secrecy가 필요한지 여부를 정의하며, PFS에 대한 Diffie-Hellman 그룹을 정의합니다:</p>
+<ul>
+<li><strong>enable</strong> - IKE 그룹에서 Diffie-Hellman 그룹을 상속합니다 (기본값).</li>
+<li><strong>disable</strong> - PFS를 비활성화합니다.</li>
+<li><strong>&lt;dh-group&gt;</strong> - PFS에 대한 Diffie-Hellman 그룹을 정의합니다.</li>
+</ul>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; proposal &lt;number&gt; encryption &lt;encryption&gt;</code></p>
+<p>암호화 알고리즘. 기본값은 <strong>aes128</strong>입니다.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; proposal &lt;number&gt; hash &lt;hash&gt;</code></p>
+<p>해시 알고리즘. 기본값은 <strong>sha1</strong>입니다.</p>
+
+<h3>전역 IPsec 설정</h3>
+<p><code>set vpn ipsec interface &lt;name&gt;</code></p>
+<p>아웃바운드 IPsec 정책을 제한하는 데 사용되는 인터페이스 이름입니다. 여러 인터페이스를 지정할 수 있습니다. 인터페이스를 지정하지 않으면 IPsec 정책이 모든 인터페이스에 적용됩니다.</p>
+
+<p><code>set vpn ipsec log level &lt;number&gt;</code></p>
+<p>로그 수준. 기본값은 <strong>0</strong>입니다.</p>
+
+<p><code>set vpn ipsec log subsystem &lt;name&gt;</code></p>
+<p>데몬 서브시스템.</p>
+
+<h3>옵션</h3>
+<p><code>set vpn ipsec options disable-route-autoinstall</code></p>
+<p>원격 네트워크로의 경로를 자동으로 설치하지 않습니다.</p>
+
+<p><code>set vpn ipsec options flexvpn</code></p>
+<p>FlexVPN 벤더 ID 페이로드를 허용합니다 (IKEv2 전용). Cisco FlexVPN 벤더 ID 페이로드 (IKEv2 전용)를 전송합니다. 이는 Cisco 브랜드 장치가 로컬 트래픽 선택자를 협상할 수 있도록 하는 데 필요합니다.</p>
+
+<p><code>set vpn ipsec options interface &lt;name&gt;</code></p>
+<p>사용할 인터페이스 이름입니다. 가상 IP 주소를 설치해야 하는 인터페이스 이름입니다. 지정하지 않으면 주소는 아웃바운드 인터페이스에 설치됩니다.</p>
+
+<p><code>set vpn ipsec options virtual-ip</code></p>
+<p>가상 IP 주소 설치를 허용합니다.</p>
+
+<h3>IKEv2 재전송</h3>
+<p>피어가 DPD 패킷에 응답하지 않으면 라우터는 재전송 절차를 시작합니다. 타임아웃은 다음 공식을 사용하여 계산됩니다:</p>
+<pre><code>상대 타임아웃 = timeout * base ^ (attempts-1)</code></pre>
+
+<p><code>set vpn ipsec options retransmission attempts</code></p>
+<p>피어가 다운된 것으로 간주되기 전의 시도 횟수입니다. 기본값은 <strong>5</strong>입니다.</p>
+
+<p><code>set vpn ipsec options retransmission base</code></p>
+<p>지수 백오프의 기본값입니다. 기본값은 <strong>1.8</strong>입니다.</p>
+
+<p><code>set vpn ipsec options retransmission timeout</code></p>
+<p>첫 번째 재전송 전 타임아웃 (초). 기본값은 <strong>4</strong>입니다.</p>
+
+<p>기본값을 사용하면 패킷이 다음과 같이 재전송됩니다:</p>
+<table>
+<thead><tr><th>시도</th><th>공식</th><th>상대 타임아웃</th><th>절대 타임아웃</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>4 * 1.8 ^ 0</td><td>4초</td><td>4초</td></tr>
+<tr><td>2</td><td>4 * 1.8 ^ 1</td><td>7초</td><td>11초</td></tr>
+<tr><td>3</td><td>4 * 1.8 ^ 2</td><td>13초</td><td>24초</td></tr>
+<tr><td>4</td><td>4 * 1.8 ^ 3</td><td>23초</td><td>47초</td></tr>
+<tr><td>5</td><td>4 * 1.8 ^ 4</td><td>42초</td><td>89초</td></tr>
+<tr><td>피어 다운</td><td>4 * 1.8 ^ 5</td><td>76초</td><td>165초</td></tr>
+</tbody>
+</table>
+
+</div>
+
+<div class="ipsec-tab-content">
+
+<h3>IPsec 사이트 간 VPN 유형</h3>
+<p>VyOS는 두 가지 유형의 IPsec VPN을 지원합니다: 정책 기반 IPsec VPN과 경로 기반 IPsec VPN.</p>
+
+<h4>정책 기반 VPN</h4>
+<p>정책 기반 VPN은 정적으로 구성된 정책을 기반으로 합니다. 각 정책은 독립적인 IPSec SA를 생성합니다. 이러한 SA와 일치하는 트래픽은 암호화되어 원격 피어로 전송됩니다.</p>
+
+<h4>경로 기반 VPN</h4>
+<p>경로 기반 VPN은 가상 터널 인터페이스(VTI)를 통과하는 보안 트래픽을 기반으로 합니다. 이 유형의 IPsec VPN은 라우팅 프로토콜의 사용을 허용합니다.</p>
+
+<h3>사이트 간 VPN 구성</h3>
+
+<h4>사이트 간 VPN의 요구 사항 및 사전 준비 사항</h4>
+<p><strong>일치해야 하는 협상 매개변수</strong></p>
+
+<h5>1단계</h5>
+<ul>
+<li>IKE 버전</li>
+<li>인증</li>
+<li>암호화</li>
+<li>해시</li>
+<li>PRF</li>
+<li>수명</li>
+</ul>
+
+<div class="note">
+<strong>참고:</strong> Strongswan은 양쪽 피어에서 동일한 수명 값을 사용하는 것을 권장합니다.
+</div>
+
+<h5>2단계</h5>
+<ul>
+<li>암호화</li>
+<li>해시</li>
+<li>PFS</li>
+<li>모드 (tunnel 또는 transport)</li>
+<li>수명</li>
+</ul>
+
+<div class="note">
+<strong>참고:</strong> Strongswan은 양쪽 피어에서 동일한 수명 값을 사용하는 것을 권장합니다.
+</div>
+
+<ul>
+<li>SA의 원격 및 로컬 네트워크는 양쪽 피어에서 호환되어야 합니다.</li>
+</ul>
+
+<h4>사이트 간 VPN 구성 단계</h4>
+<p>다음 예제는 IPsec VPN에 참여하는 하나의 라우터에 대한 구성을 보여줍니다.</p>
+
+<p><strong>터널 정보:</strong></p>
+<ul>
+<li>1단계:
+<ul>
+<li>암호화: AES256</li>
+<li>해시: SHA256</li>
+<li>PRF: SHA256</li>
+<li>DH: 14</li>
+<li>수명: 28800</li>
+</ul>
+</li>
+<li>2단계:
+<ul>
+<li>IPsec 모드: 터널</li>
+<li>암호화: AES256</li>
+<li>해시: SHA256</li>
+<li>PFS: DH 1단계에서 상속</li>
+<li>수명: 3600</li>
+</ul>
+</li>
+<li>정책 기반 VPN을 사용하는 경우
+<ul>
+<li>원격 네트워크는 192.168.50.0/24입니다. 로컬 네트워크는 192.168.10.0/24입니다.</li>
+</ul>
+</li>
+<li>경로 기반 VPN을 사용하는 경우
+<ul>
+<li>VTI 인터페이스 IP는 10.0.0.1/30입니다.</li>
+</ul>
+</li>
+</ul>
+
+<div class="note">
+<strong>참고:</strong> 동일한 피어에 대해 정책 기반 및 경로 기반 VPN 구성을 동시에 사용하는 것은 권장하지 않습니다.
+</div>
+
+<p><strong>1. ike-group 구성 (IKE 1단계)</strong></p>
+<pre><code>set vpn ipsec ike-group IKE close-action 'start'
+set vpn ipsec ike-group IKE key-exchange 'ikev1'
+set vpn ipsec ike-group IKE lifetime '28800'
+set vpn ipsec ike-group IKE proposal 10 dh-group '14'
+set vpn ipsec ike-group IKE proposal 10 encryption 'aes256'
+set vpn ipsec ike-group IKE proposal 10 hash 'sha256'
+set vpn ipsec ike-group IKE proposal 10 prf 'prfsha256'</code></pre>
+
+<p><strong>2. ESP-group 구성 (IKE 2단계)</strong></p>
+<pre><code>set vpn ipsec esp-group ESP lifetime '3600'
+set vpn ipsec esp-group ESP mode 'tunnel'
+set vpn ipsec esp-group ESP pfs 'enable'
+set vpn ipsec esp-group ESP proposal 10 encryption 'aes256'
+set vpn ipsec esp-group ESP proposal 10 hash 'sha256'</code></pre>
+
+<p><strong>3. 인터페이스 eth0의 공용 IP 주소 지정</strong></p>
+<pre><code>set vpn ipsec ipsec-interfaces interface eth0</code></pre>
+
+<p><strong>4. 사이트 간 피어 구성</strong></p>
+
+<p><em>정책 기반 VPN 구성:</em></p>
+<pre><code>set vpn ipsec site-to-site peer 203.0.113.2 authentication mode 'pre-shared-secret'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication id '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication remote-id '203.0.113.2'
+set vpn ipsec site-to-site peer 203.0.113.2 connection-type 'respond'
+set vpn ipsec site-to-site peer 203.0.113.2 default-esp-group 'ESP'
+set vpn ipsec site-to-site peer 203.0.113.2 ike-group 'IKE'
+set vpn ipsec site-to-site peer 203.0.113.2 local-address '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 tunnel 1 local prefix '192.168.10.0/24'
+set vpn ipsec site-to-site peer 203.0.113.2 tunnel 1 remote prefix '192.168.50.0/24'</code></pre>
+
+<p><em>경로 기반 VPN 구성:</em></p>
+<pre><code>set interfaces vti vti0 address '10.0.0.1/30'
+set interfaces vti vti0 description 'VPN VTI interface'
+
+set vpn ipsec site-to-site peer 203.0.113.2 authentication mode 'pre-shared-secret'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication id '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication remote-id '203.0.113.2'
+set vpn ipsec site-to-site peer 203.0.113.2 connection-type 'respond'
+set vpn ipsec site-to-site peer 203.0.113.2 default-esp-group 'ESP'
+set vpn ipsec site-to-site peer 203.0.113.2 ike-group 'IKE'
+set vpn ipsec site-to-site peer 203.0.113.2 local-address '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 vti bind to 'vti0'
+set vpn ipsec site-to-site peer 203.0.113.2 vti esp-group 'ESP'</code></pre>
+
+</div>
+
+<div class="ipsec-tab-content">
+
+<h3>원격 액세스 VPN 개요</h3>
+<p>원격 액세스 VPN을 사용하면 원격 사용자가 IPsec 터널을 통해 기업 네트워크에 안전하게 연결할 수 있습니다. VyOS는 사전 공유 키, 인증서 및 EAP 기반 인증을 포함한 여러 원격 액세스 VPN 구성 방법을 지원합니다.</p>
+
+<h3>원격 액세스 VPN 유형</h3>
+
+<h4>사전 공유 키 기반 원격 액세스</h4>
+<p>가장 간단한 원격 액세스 구성 방법으로, 각 원격 사용자가 동일한 사전 공유 키를 사용하여 인증합니다. 소규모 배포 또는 테스트 환경에 적합합니다.</p>
+
+<h4>인증서 기반 원격 액세스</h4>
+<p>인증에 X.509 인증서를 사용하여 더 높은 보안을 제공합니다. 각 사용자는 자체 인증서를 가질 수 있어 관리 및 취소가 더 쉽습니다.</p>
+
+<h4>EAP 기반 원격 액세스</h4>
+<p>확장 가능한 인증 프로토콜(EAP)은 RADIUS 서버를 사용하여 사용자 인증을 허용합니다. EAP-MSCHAPv2, EAP-TLS 등 여러 EAP 방법을 지원합니다.</p>
+
+<h3>원격 액세스 VPN 구성</h3>
+
+<h4>기본 구성 단계</h4>
+
+<p><strong>1. IKE 및 ESP 그룹 구성</strong></p>
+<pre><code>set vpn ipsec ike-group IKE-RA lifetime '28800'
+set vpn ipsec ike-group IKE-RA proposal 1 encryption 'aes256'
+set vpn ipsec ike-group IKE-RA proposal 1 hash 'sha256'
+set vpn ipsec ike-group IKE-RA proposal 1 dh-group '14'
+
+set vpn ipsec esp-group ESP-RA lifetime '3600'
+set vpn ipsec esp-group ESP-RA proposal 1 encryption 'aes256'
+set vpn ipsec esp-group ESP-RA proposal 1 hash 'sha256'</code></pre>
+
+<p><strong>2. IP 주소 풀 구성</strong></p>
+<pre><code>set vpn ipsec remote-access connection RA pool 'RA-POOL'
+set vpn ipsec remote-access connection RA pool RA-POOL prefix '100.64.0.0/24'
+set vpn ipsec remote-access connection RA pool RA-POOL name-server '192.0.2.53'</code></pre>
+
+<p><strong>3. 원격 액세스 연결 구성</strong></p>
+<pre><code>set vpn ipsec remote-access connection RA authentication local-id '192.0.2.1'
+set vpn ipsec remote-access connection RA authentication server-mode 'x509'
+set vpn ipsec remote-access connection RA authentication x509 certificate 'ipsec-cert'
+
+set vpn ipsec remote-access connection RA remote-access-interface 'ppp0'
+set vpn ipsec remote-access connection RA ike-group 'IKE-RA'
+set vpn ipsec remote-access connection RA default-esp-group 'ESP-RA'</code></pre>
+
+<h4>EAP-RADIUS 기반 구성</h4>
+<p>RADIUS 서버를 사용하여 사용자 인증:</p>
+
+<pre><code>set vpn ipsec remote-access connection RA authentication client-mode 'eap-radius'
+set vpn ipsec remote-access connection RA eap-radius server 1 address '192.0.2.100'
+set vpn ipsec remote-access connection RA eap-radius server 1 key 'testing123'
+
+set vpn ipsec remote-access connection RA pool RA-POOL name-server '192.0.2.53'
+set vpn ipsec remote-access connection RA pool RA-POOL prefix '100.64.0.0/24'</code></pre>
+
+<h4>사전 공유 키 기반 구성</h4>
+<p>간단한 원격 액세스 시나리오에 적합:</p>
+
+<pre><code>set vpn ipsec remote-access connection RA authentication mode 'pre-shared-secret'
+set vpn ipsec remote-access connection RA authentication id '192.0.2.1'
+set vpn ipsec remote-access connection RA authentication local-id '192.0.2.1'
+
+set vpn ipsec remote-access connection RA remote-access-interface 'ppp0'
+set vpn ipsec remote-access connection RA ike-group 'IKE-RA'
+set vpn ipsec remote-access connection RA default-esp-group 'ESP-RA'
+
+set vpn ipsec remote-access connection RA pool RA-POOL prefix '100.64.0.0/24'</code></pre>
+
+<h3>원격 액세스 인터페이스 구성</h3>
+<p>원격 액세스 VPN은 가상 PPP 인터페이스를 사용합니다. 원격 액세스 인터페이스를 지정해야 합니다:</p>
+
+<pre><code>set interfaces ppp ppp0 description 'Remote Access VPN Interface'
+set vpn ipsec remote-access connection RA remote-access-interface 'ppp0'</code></pre>
+
+<h3>클라이언트 구성 예제</h3>
+
+<h4>Windows 클라이언트</h4>
+<p>Windows 내장 VPN 클라이언트는 IKEv2 및 L2TP/IPsec을 지원합니다. 구성 단계:</p>
+<ol>
+<li>"설정" > "네트워크 및 인터넷" > "VPN" 열기</li>
+<li>"VPN 연결 추가" 클릭</li>
+<li>VPN 공급자 이름, 서버 이름 또는 주소 입력</li>
+<li>VPN 유형 선택 (IKEv2 또는 L2TP/IPsec)</li>
+<li>인증 정보 입력 (사용자 이름/비밀번호 또는 인증서)</li>
+</ol>
+
+<h4>Linux 클라이언트</h4>
+<p>Linux 사용자는 NetworkManager 또는 명령줄 도구를 사용하여 IPsec VPN을 구성할 수 있습니다:</p>
+<pre><code># strongswan 클라이언트 사용
+sudo apt install strongswan strongswan-pki libcharon-extra-plugins
+
+# /etc/ipsec.conf 구성
+conn vyos-ra
+    right=192.0.2.1
+    rightid=@192.0.2.1
+    rightsubnet=0.0.0.0/0
+    left=%defaultroute
+    leftid=user@example.com
+    eap_identity=user@example.com
+    auto=start</code></pre>
+
+<h4>macOS 클라이언트</h4>
+<p>macOS는 IKEv2 VPN에 대한 내장 지원을 제공합니다:</p>
+<ol>
+<li>"시스템 환경설정" > "네트워크" 열기</li>
+<li>"+"를 클릭하여 새 연결 추가</li>
+<li>인터페이스를 "VPN"으로, 유형을 "IKEv2"로 선택</li>
+<li>서버 주소 및 원격 ID 입력</li>
+<li>인증 방법 구성</li>
+</ol>
+
+<h4>모바일 장치</h4>
+<p>iOS 및 Android 장치는 모두 IKEv2 VPN에 대한 내장 지원을 제공합니다:</p>
+<ul>
+<li><strong>iOS:</strong> 설정 > 일반 > VPN 및 네트워크 > VPN 구성 추가</li>
+<li><strong>Android:</strong> 설정 > 네트워크 및 인터넷 > VPN > VPN 프로필 추가</li>
+</ul>
+
+<h3>문제 해결</h3>
+
+<h4>일반적인 문제</h4>
+<ul>
+<li><strong>연결 실패:</strong> IKE 및 ESP 매개변수가 일치하는지 확인하고, 사전 공유 키 또는 인증서가 올바른지 확인하십시오.</li>
+<li><strong>인증 실패:</strong> RADIUS 서버 구성이 올바른지 확인하고, 사용자 자격 증명을 확인하십시오.</li>
+<li><strong>IP 주소를 가져올 수 없음:</strong> IP 주소 풀 구성을 확인하고, 사용 가능한 주소가 충분한지 확인하십시오.</li>
+<li><strong>불안정한 연결:</strong> DPD 설정을 확인하고, 수명 매개변수를 조정하십시오.</li>
+</ul>
+
+<h4>디버그 명령</h4>
+<pre><code># IPsec SA 상태 확인
+show vpn ipsec sa
+
+# IKE SA 상태 확인
+show vpn ike sa
+
+# IPsec 연결 상세 정보 확인
+show vpn ipsec sa detail
+
+# IPsec 로그 확인
+tail -f /var/log/charon.log</code></pre>
+
+</div>
+
+<div class="ipsec-tab-content">
+
+<p>이 문서는 일반적인 IPsec VPN 문제에 대한 문제 해결 방법 및 진단 단계를 제공합니다.</p>
+
+<h3>기본 진단 명령</h3>
+
+<p>VyOS는 IPsec 문제를 진단하는 데 도움이 되는 일련의 명령을 제공합니다:</p>
+
+<h4>IPsec 상태 확인</h4>
+
+<p>IPsec 터널 및 보안 연대의 현재 상태를 확인합니다:</p>
+
+<div class="command-block">show vpn ipsec status</div>
+
+<p>이 명령은 모든 IPsec 터널의 현재 상태를 표시합니다. 연결이 설정되었는지, SA(보안 연대)가 활성 상태인지 등이 포함됩니다.</p>
+
+<h4>보안 연대 확인</h4>
+
+<p>상세 IKE 및 Child SA 정보를 확인합니다:</p>
+
+<div class="command-block">show vpn ipsec sa</div>
+
+<p>출력에는 다음 정보가 포함됩니다:</p>
+<ul>
+  <li><strong>IKE SA</strong>: IKE 1단계 보안 연대</li>
+  <li><strong>Child SA</strong>: IKE 2단계 보안 연대 (데이터 터널)</li>
+  <li><strong>상태</strong>: ESTABLISHED, INSTALLED 등</li>
+  <li><strong>암호화 알고리즘</strong>: 사용된 암호화 및 인증 알고리즘</li>
+  <li><strong>트래픽 통계</strong>: 터널을 통한 패킷 및 바이트 수</li>
+</ul>
+
+<h4>IPsec 구성 확인</h4>
+
+<p>현재 실행 중인 IPsec 구성을 확인합니다:</p>
+
+<div class="command-block">show vpn ipsec detail</div>
+
+<h3>일반적인 문제 및 해결 방법</h3>
+
+<h4>터널이 설정되지 않음</h4>
+
+<p><strong>증상</strong>: IPsec 터널 상태가 "down" 또는 "connecting"으로 표시됩니다.</p>
+
+<p><strong>가능한 원인 및 해결 방법</strong>:</p>
+
+<ol>
+  <li>
+    <p><strong>사전 공유 키 불일치</strong></p>
+    <p>양쪽 끝의 사전 공유 키가 대소문자와 공백을 포함하여 정확히 동일한지 확인하십시오.</p>
+    <div class="command-block">show vpn ipsec site-to-site peer &lt;peer-address&gt;</div>
+  </li>
+  <li>
+    <p><strong>IKE 제안 불일치</strong></p>
+    <p>양쪽 끝의 IKE 그룹 구성이 호환되는지 확인하십시오. 암호화 알고리즘, 해시 알고리즘 및 Diffie-Hellman 그룹이 일치해야 합니다.</p>
+    <div class="command-block">show vpn ipsec ike-group</div>
+  </li>
+  <li>
+    <p><strong>ESP 제안 불일치</strong></p>
+    <p>ESP 그룹 구성이 일관된지 확인하십시오.</p>
+    <div class="command-block">show vpn ipsec esp-group</div>
+  </li>
+  <li>
+    <p><strong>방화벽 차단</strong></p>
+    <p>방화벽이 다음 포트를 통과하도록 허용하는지 확인하십시오:</p>
+    <ul>
+      <li>UDP 500 (IKE)</li>
+      <li>UDP 4500 (NAT-T)</li>
+      <li>프로토콜 50 (ESP)</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>로컬/원격 서브넷 구성 오류</strong></p>
+    <p>사이트 간 VPN에 대한 로컬 및 원격 서브넷 구성이 올바른지 확인하십시오.</p>
+  </li>
+</ol>
+
+<h4>터널은 올라가 있지만 데이터가 없음</h4>
+
+<p><strong>증상</strong>: IPsec 터널이 "up"으로 표시되지만, 터널을 통해 데이터를 전송할 수 없습니다.</p>
+
+<p><strong>가능한 원인 및 해결 방법</strong>:</p>
+
+<ol>
+  <li>
+    <p><strong>Child SA가 설치되지 않음</strong></p>
+    <p>Child SA가 성공적으로 설치되었는지 확인하십시오:</p>
+    <div class="command-block">show vpn ipsec sa</div>
+    <p>Child SA가 표시되지 않으면 ESP 제안 불일치 때문일 수 있습니다.</p>
+  </li>
+  <li>
+    <p><strong>라우팅 문제</strong></p>
+    <p>라우팅 테이블이 올바른지 확인하고, 트래픽이 터널 인터페이스를 통과할 수 있는지 확인하십시오:</p>
+    <div class="command-block">show ip route</div>
+  </li>
+  <li>
+    <p><strong>MTU 문제</strong></p>
+    <p>IPsec은 패킷 오버헤드를 추가합니다. 패킷이 너무 크면 삭제될 수 있습니다. MTU 조정을 시도하십시오:</p>
+    <div class="command-block">set interfaces ethernet &lt;interface&gt; mtu 1400</div>
+  </li>
+  <li>
+    <p><strong>비대칭 라우팅</strong></p>
+    <p>반환 트래픽도 IPsec 터널을 통과하는지 확인하고, 정책 라우팅 구성을 확인하십시오.</p>
+  </li>
+</ol>
+
+<h4>터널이 자주 끊김</h4>
+
+<p><strong>증상</strong>: IPsec 터널이 반복적으로 설정 및 연결이 끊어집니다.</p>
+
+<p><strong>가능한 원인 및 해결 방법</strong>:</p>
+
+<ol>
+  <li>
+    <p><strong>DPD (Dead Peer Detection) 구성</strong></p>
+    <p>DPD 설정이 너무 공격적인지 확인하십시오:</p>
+    <div class="command-block">show vpn ipsec site-to-site peer &lt;peer-address&gt; dead-peer-detection</div>
+    <p>권장 DPD 설정:</p>
+    <ul>
+      <li>interval: 15-30초</li>
+      <li>timeout: 30-60초</li>
+      <li>action: restart</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>IKE Rekey 실패</strong></p>
+    <p>IKE 수명 설정을 확인하고 양쪽 끝에서 호환되는지 확인하십시오.</p>
+  </li>
+  <li>
+    <p><strong>NAT 문제</strong></p>
+    <p>양쪽 끝 중 하나가 NAT 뒤에 있는 경우 NAT Traversal (NAT-T)이 활성화되어 있는지 확인하십시오.</p>
+  </li>
+</ol>
+
+<h4>인증 실패</h4>
+
+<p><strong>증상</strong>: 로그에 인증 오류가 표시됩니다.</p>
+
+<p><strong>가능한 원인 및 해결 방법</strong>:</p>
+
+<ol>
+  <li>
+    <p><strong>사전 공유 키 오류</strong></p>
+    <p>양쪽 끝에서 정확히 일치하도록 사전 공유 키를 재구성하십시오.</p>
+  </li>
+  <li>
+    <p><strong>인증서 문제</strong></p>
+    <p>인증서 인증을 사용하는 경우:</p>
+    <ul>
+      <li>인증서가 만료되지 않았는지 확인</li>
+      <li>인증서 체인이 완전한지 확인</li>
+      <li>인증서 주제 이름이 일치하는지 확인</li>
+      <li>CA 인증서가 올바르게 설치되어 있는지 확인</li>
+    </ul>
+  </li>
+</ol>
+
+<h3>로그 및 디버깅</h3>
+
+<h4>IPsec 로그 확인</h4>
+
+<p>시스템 로그에서 IPsec 관련 정보를 확인합니다:</p>
+
+<div class="command-block">show log | match charon</div>
+
+<p>또는 더 상세한 로그를 확인합니다:</p>
+
+<div class="command-block">tail -f /var/log/syslog | grep charon</div>
+
+<h4>상세 로깅 활성화</h4>
+
+<p>더 상세한 디버깅 정보를 위해 IPsec 디버그 로깅을 활성화할 수 있습니다:</p>
+
+<div class="command-block">set vpn ipsec logging log-level 3</div>
+
+<p>로그 수준 설명:</p>
+<ul>
+  <li><strong>0</strong>: 오류만</li>
+  <li><strong>1</strong>: 경고</li>
+  <li><strong>2</strong>: 정보 (기본값)</li>
+  <li><strong>3</strong>: 디버그</li>
+  <li><strong>4</strong>: 상세 디버그</li>
+</ul>
+
+<div class="warning">
+  <strong>경고:</strong> 높은 로그 수준은 대량의 로그 출력을 생성할 수 있으며 시스템 성능에 영향을 미칠 수 있습니다. 문제 해결 중에만 일시적으로 활성화하십시오.
+</div>
+
+<h4>일반적인 로그 메시지</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>로그 메시지</th>
+      <th>의미</th>
+      <th>해결 방법</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>received INVALID_ID_INFORMATION</code></td>
+      <td>ID 불일치</td>
+      <td>로컬 및 원격 ID 구성 확인</td>
+    </tr>
+    <tr>
+      <td><code>no matching proposal found</code></td>
+      <td>제안 불일치</td>
+      <td>IKE/ESP 그룹 구성 확인</td>
+    </tr>
+    <tr>
+      <td><code>authentication failed</code></td>
+      <td>인증 실패</td>
+      <td>사전 공유 키 또는 인증서 확인</td>
+    </tr>
+    <tr>
+      <td><code>peer not responding</code></td>
+      <td>피어 응답 없음</td>
+      <td>네트워크 연결 및 방화벽 확인</td>
+    </tr>
+    <tr>
+      <td><code>SA lifetime expired</code></td>
+      <td>SA 수명 만료</td>
+      <td>정상적인 현상, rekey 구성 확인</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>네트워크 패킷 캡처</h3>
+
+<p>다른 방법으로 문제를 해결할 수 없는 경우 tcpdump를 사용하여 네트워크 패킷 캡처를 수행할 수 있습니다:</p>
+
+<h4>IKE 트래픽 캡처</h4>
+
+<div class="command-block">tcpdump -i any -n port 500 or port 4500</div>
+
+<h4>ESP 트래픽 캡처</h4>
+
+<div class="command-block">tcpdump -i any -n proto 50</div>
+
+<h4>패킷 캡처 파일 저장</h4>
+
+<div class="command-block">tcpdump -i any -n -w /tmp/ipsec.pcap port 500 or port 4500 or proto 50</div>
+
+<p>저장된 pcap 파일을 분석하려면 Wireshark를 사용할 수 있습니다.</p>
+
+<h3>초기화 및 재시작</h3>
+
+<h4>IPsec 터널 초기화</h4>
+
+<p>특정 사이트에 대한 IPsec 터널을 초기화합니다:</p>
+
+<div class="command-block">reset vpn ipsec site-to-site peer &lt;peer-address&gt;</div>
+
+<h4>IPsec 서비스 재시작</h4>
+
+<p>전체 IPsec 서비스를 재시작하려면:</p>
+
+<div class="command-block">restart vpn ipsec</div>
+
+<div class="warning">
+  <strong>경고:</strong> IPsec 서비스를 재시작하면 모든 활성 VPN 연결이 중단됩니다.
+</div>
+
+<h3>성능 문제</h3>
+
+<h4>암호화 성능 테스트</h4>
+
+<p>시스템의 암호화 성능을 테스트합니다:</p>
+
+<div class="command-block">show vpn ipsec performance</div>
+
+<h4>하드웨어 가속</h4>
+
+<p>하드웨어 암호화 가속을 지원하는 경우 활성화되어 있는지 확인하십시오:</p>
+
+<div class="command-block">show vpn ipsec hardware-acceleration</div>
+
+<div class="tip">
+  <strong>팁:</strong> 일부 CPU는 AES-NI 명령어 세트를 지원하여 IPsec 성능을 크게 향상시킬 수 있습니다. <code>lscpu | grep aes</code>를 사용하여 지원 여부를 확인하십시오.
+</div>
+
+<h3>지원 문의</h3>
+
+<p>위 단계로 문제를 해결할 수 없는 경우 다음 정보를 수집하여 기술 지원에 문의하십시오:</p>
+
+<ol>
+  <li>전체 구성 내보내기: <code>show configuration commands | match vpn</code></li>
+  <li>IPsec 상태 출력: <code>show vpn ipsec status</code></li>
+  <li>보안 연대 정보: <code>show vpn ipsec sa</code></li>
+  <li>시스템 로그: <code>show log | match charon</code></li>
+  <li>네트워크 패킷 캡처 파일 (해당되는 경우)</li>
+</ol>
+
+</div>
+
+</div>
+
+</div>

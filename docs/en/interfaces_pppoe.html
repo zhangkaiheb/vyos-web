@@ -436,7 +436,7 @@ set interfaces pppoe &lt;interface&gt; ip source-validation &lt;strict | loose |
 <a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p><strong>Configure source IP address validation using</strong>
 <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>on this interface, as specified in</strong>
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
 <p>The following options are available:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate">strict</code>: Each incoming packet’s source IP address is checked against the
@@ -448,7 +448,7 @@ unreachable through any interface, validation fails.</p></li>
 <li><p><code class="docutils literal notranslate">disable</code>: No source IP address validation is performed. All incoming
 packets are accepted.</p></li>
 </ul>
-<p><a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> recommends enabling <code class="docutils literal notranslate">strict</code> mode to prevent IP spoofing, such as
+<p><a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> recommends enabling <code class="docutils literal notranslate">strict</code> mode to prevent IP spoofing, such as
 DDoS attacks. For asymmetric or other complex routing scenarios, use <code class="docutils literal notranslate">loose</code>
 mode.</p>
 </div>
@@ -497,7 +497,7 @@ disabled on it.</p>
 </div>
 </div>
 <p><strong>DHCPv6 Prefix Delegation (PD)</strong></p>
-<p>VyOS supports DHCPv6 Prefix Delegation (DHCPv6-PD) as described in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3633.html"><strong>RFC 3633</strong></a>.
+<p>VyOS supports DHCPv6 Prefix Delegation (DHCPv6-PD) as described in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3633.html"><strong>RFC 3633</strong></a>.
 DHCPv6-PD is supported by most ISPs that provide native IPv6 for consumers on
 fixed networks.</p>
 <div class="cmd cmd-cfg">

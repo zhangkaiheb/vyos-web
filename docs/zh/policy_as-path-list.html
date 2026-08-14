@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,9 +152,8 @@
 <div itemprop="articleBody">
              
   <section id="bgp-as-path-policy">
-<h1>BGP - AS 路径 策略</h1>
-<p>VyOS provides policies commands exclusively for BGP traffic filtering and
-manipulation: <strong>as-path-list</strong> is one of them.</p>
+<h1>BGP - AS 路径策略</h1>
+<p>VyOS 提供专用于 BGP 流量过滤和操作的策略命令：<strong>as-path-list</strong> 即为其中之一。</p>
 <section id="configuration">
 <h2>配置</h2>
 <section id="policy-as-path-list">
@@ -162,41 +161,41 @@ manipulation: <strong>as-path-list</strong> is one of them.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy as-path-list <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-as-path-list-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>创建 as-path-policy identified by name <code class="docutils literal notranslate"><text></code>.</p>
+set policy as-path-list &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-as-path-list-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>创建以名称 <code class="docutils literal notranslate">&lt;text&gt;</code> 标识的 as-path-policy。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy as-path-list <text> description <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-as-path-list-text-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 description for as-path-list policy.</p>
+set policy as-path-list &lt;text&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-as-path-list-text-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为 as-path-list 策略设置描述信息。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy as-path-list <text> rule <1-65535> action <permit|deny>
-<a class="cmdlink" href="#cfgcmd-set-policy-as-path-list-text-rule-1-65535-action-permit-deny" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 action to take on entries matching this rule.</p>
+set policy as-path-list &lt;text&gt; rule &lt;1-65535&gt; action &lt;permit|deny&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-as-path-list-text-rule-1-65535-action-permit-deny" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置对匹配此规则的条目所执行的操作。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy as-path-list <text> rule <1-65535> description <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-as-path-list-text-rule-1-65535-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 description for rule.</p>
+set policy as-path-list &lt;text&gt; rule &lt;1-65535&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-as-path-list-text-rule-1-65535-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为规则设置描述信息。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy as-path-list <text> rule <1-65535> regex <text>
-<a class="cmdlink" href="#cfgcmd-set-policy-as-path-list-text-rule-1-65535-regex-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Regular expression to match against an AS path. For example “64501 64502”.</p>
+set policy as-path-list &lt;text&gt; rule &lt;1-65535&gt; regex &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-as-path-list-text-rule-1-65535-regex-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>用于匹配 AS 路径的正则表达式。例如：“64501 64502”。</p>
 </div>
 </div>
 </section>

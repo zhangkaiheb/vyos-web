@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -155,128 +155,83 @@
 <h1>防火墙</h1>
 <div class="admonition warning">
 <p class="admonition-title">警告</p>
-<p>Due to a boot-time race condition, all interfaces initialize
-before the firewall. This temporarily leaves the system open to all traffic
-and poses a security risk.</p>
+<p>由于启动时存在竞态条件，所有接口均在防火墙初始化之前完成初始化。这会暂时使系统对所有流量开放，从而带来安全风险。</p>
 </div>
-<p>VyOS uses Netfilter. The Netfilter
-project developed <code class="docutils literal notranslate">iptables</code> and its successor <code class="docutils literal notranslate">nftables</code> for the Linux
-kernel to process packet data flows directly. This extends the concept of
-zone-based security to let you manipulate data at multiple stages after the
-network interface and driver accept it, and before sending it to its
-destination (for example, a web server or another device).</p>
-<p>The following is a simplified traffic flow diagram based on Netfilter
-packet flow.
-This diagram provides an overview of how packets are processed and the
-possible paths traffic can take.</p>
+<p>VyOS 使用 Netfilter。Netfilter 项目为 Linux 内核开发了 <code class="docutils literal notranslate">iptables</code> 及其后续版本 <code class="docutils literal notranslate">nftables</code>，以直接处理数据包流。该机制将基于区域的安全概念进行了扩展，允许您在网络接口和驱动程序接收数据包之后、将其发送至目标（例如 Web 服务器或其他设备）之前，在多个阶段对数据进行操作。</p>
+<p>以下是一个基于 Netfilter 数据包流向的简化流量流程图。
+该图概述了数据包的处理方式以及流量可能经过的路径。</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-gral-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-gral-packet-flow.webp"></img>
+<img alt="../../_images/firewall-gral-packet-flow.webp" src="https://docs.vyos.io/en/latest/_images/firewall-gral-packet-flow.webp" />
 </figure>
-<p>The main points regarding packet flow and terminology in VyOS firewall
-are:</p>
+<p>VyOS 防火墙中关于数据包流向和术语的主要要点如下：</p>
 <ul class="simple">
-<li><p><strong>Bridge 端口?</strong>: Choose the appropriate path based on whether the
-interface where the packet was received is part of a bridge.</p></li>
+<li><p><strong>是否为桥接端口？</strong>：根据接收数据包的接口是否属于桥接组，选择相应的处理路径。</p></li>
 </ul>
-<p>If the interface where the packet was received is not part of a bridge, the
-packet is processed at the <strong>IP 层</strong>:</p>
+<p>如果接收数据包的接口不属于桥接组，则数据包将在<strong>IP 层</strong>进行处理：</p>
 <blockquote>
 <div><ul>
-<li><p><strong>Prerouting</strong>: The router processes all packets in this stage,
-regardless of the destination. You can perform several actions in
-this stage, and these actions are also defined in different parts of the
-VyOS configuration. Order is important. The relevant configuration that
-applies in this stage includes:</p>
+<li><p><strong>预路由（Prerouting）</strong>：路由器在此阶段处理所有数据包，无论其目标地址为何。您可在此阶段执行多种操作，且这些操作也在 VyOS 配置的不同部分中定义。顺序至关重要。适用于此阶段的相关配置包括：</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><strong>防火墙 prerouting</strong>: 规则s you define under <code class="docutils literal notranslate">set firewall
-[ipv4 | ipv6] prerouting raw...</code>. The system processes all rules in
-this section before the connection tracking subsystem.</p></li>
-<li><p><strong>Conntrack Ignore</strong>: 规则s you define under <code class="docutils literal notranslate">set system conntrack
-ignore [ipv4 | ipv6] ...</code>. You can configure this section with
-<code class="docutils literal notranslate">firewall [ipv4 | ipv6] prerouting ...</code>. For compatibility reasons,
-this feature is supported, but 将 deprecated in the future.</p></li>
-<li><p><strong>策略 路由</strong>: 规则s you define under <code class="docutils literal notranslate">set policy [route |
-route6] ...</code>.</p></li>
-<li><p><strong>目的 NAT</strong>: 规则s you define under <code class="docutils literal notranslate">set [nat | nat66]
-destination...</code>.</p></li>
+<li><p><strong>防火墙预路由规则</strong>：在 <code class="docutils literal notranslate">set firewall [ipv4 | ipv6] prerouting raw...</code> 下定义的规则。系统在此部分处理所有规则，且优先于连接跟踪子系统。</p></li>
+<li><p><strong>连接跟踪忽略规则（Conntrack Ignore）</strong>：在 <code class="docutils literal notranslate">set system conntrack ignore [ipv4 | ipv6] ...</code> 下定义的规则。您也可通过 <code class="docutils literal notranslate">firewall [ipv4 | ipv6] prerouting ...</code> 配置此部分。出于兼容性考虑，该功能仍受支持，但未来将被弃用。</p></li>
+<li><p><strong>策略路由（Policy Route）</strong>：在 <code class="docutils literal notranslate">set policy [route | route6] ...</code> 下定义的规则。</p></li>
+<li><p><strong>目的地址转换（Destination NAT）</strong>：在 <code class="docutils literal notranslate">set [nat | nat66] destination...</code> 下定义的规则。</p></li>
 </ul>
 </div></blockquote>
 </li>
-<li><p><strong>目的 is the router?</strong>: Choose the appropriate path based on the
-destination IP address. Transit traffic continues to <strong>forward</strong>, while
-traffic destined for the router continues to <strong>input</strong>.</p></li>
-<li><p><strong>Input</strong>: The stage where you filter and control traffic destined for
-the router itself. This is where you enforce all rules for securing the
-router. This includes IPv4 and IPv6 filtering rules, defined in:</p>
+<li><p><strong>目标是否为路由器本身？</strong>：根据目标 IP 地址选择适当的路径。转发流量继续进入 <strong>forward</strong> 阶段，而发往路由器自身的流量则继续进入 <strong>input</strong> 阶段。</p></li>
+<li><p><strong>输入（Input）</strong>：在此阶段过滤和控制发往路由器自身的流量。这是强制执行所有保护路由器安全规则的位置。其中包括在以下位置定义的 IPv4 和 IPv6 过滤规则：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">set firewall ipv4 input filter ...</code>.</p></li>
-<li><p><code class="docutils literal notranslate">set firewall ipv6 input filter ...</code>.</p></li>
+<li><p><code class="docutils literal notranslate">set firewall ipv4 input filter ...</code>。</p></li>
+<li><p><code class="docutils literal notranslate">set firewall ipv6 input filter ...</code>。</p></li>
 </ul>
 </li>
-<li><p><strong>Forward</strong>: The stage where you filter and control transit traffic.
-This includes IPv4 and IPv6 filtering rules, defined in:</p>
+<li><p><strong>转发（Forward）</strong>：在此阶段过滤和控制转发流量。其中包括在以下位置定义的 IPv4 和 IPv6 过滤规则：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">set firewall ipv4 forward filter ...</code>.</p></li>
-<li><p><code class="docutils literal notranslate">set firewall ipv6 forward filter ...</code>.</p></li>
+<li><p><code class="docutils literal notranslate">set firewall ipv4 forward filter ...</code>。</p></li>
+<li><p><code class="docutils literal notranslate">set firewall ipv6 forward filter ...</code>。</p></li>
 </ul>
 </li>
-<li><p><strong>Output</strong>: The stage where you filter and control traffic that the
-router originates. 注意 that this traffic comes from either a new
-connection that an internal process on the VyOS router (such as NTP)
-originates or a response to traffic the router receives externally through
-<strong>input</strong> (for example, a response to an SSH login attempt). This includes
-IPv4 and IPv6 rules, and two different sections apply:</p>
+<li><p><strong>输出（Output）</strong>：在此阶段过滤和控制由路由器自身发起的流量。请注意，此类流量可能源自 VyOS 路由器内部进程（如 NTP）发起的新连接，或源自路由器通过 <strong>input</strong> 阶段从外部接收的流量所生成的响应（例如，对 SSH 登录尝试的响应）。其中包括 IPv4 和 IPv6 规则，且适用两个不同配置部分：</p>
 <ul class="simple">
-<li><p><strong>Output Prerouting</strong>: <code class="docutils literal notranslate">set firewall [ipv4 | ipv6] output
-raw ...</code>. As described in <strong>Prerouting</strong>, the system processes
-rules in this section before the connection tracking subsystem.</p></li>
-<li><p><strong>Output 过滤器</strong>: <code class="docutils literal notranslate">set firewall [ipv4 | ipv6] output filter ...</code>.</p></li>
+<li><p><strong>输出预路由（Output Prerouting）</strong>：<code class="docutils literal notranslate">set firewall [ipv4 | ipv6] output raw ...</code>。如 <strong>Prerouting</strong> 所述，系统在此部分处理规则，且优先于连接跟踪子系统。</p></li>
+<li><p><strong>输出过滤（Output Filter）</strong>：<code class="docutils literal notranslate">set firewall [ipv4 | ipv6] output filter ...</code>。</p></li>
 </ul>
 </li>
-<li><p><strong>Postrouting</strong>: As in <strong>Prerouting</strong>, you can perform several actions
-defined in different parts of VyOS configuration in this stage. This
-includes:</p>
+<li><p><strong>后路由（Postrouting）</strong>：与 <strong>Prerouting</strong> 类似，您可在本阶段执行多种操作，这些操作在 VyOS 配置的不同部分中定义。其中包括：</p>
 <ul class="simple">
-<li><p><strong>源 NAT</strong>: 规则s you define under <code class="docutils literal notranslate">set [nat | nat66]
-source...</code>.</p></li>
+<li><p><strong>源地址转换（Source NAT）</strong>：在 <code class="docutils literal notranslate">set [nat | nat66] source...</code> 下定义的规则。</p></li>
 </ul>
 </li>
 </ul>
 </div></blockquote>
-<p>If the interface where the packet was received is part of a bridge, the
-packet is processed at the <strong>Bridge 层</strong>:</p>
+<p>如果接收数据包的接口属于桥接组，则数据包将在<strong>桥接层（Bridge Layer）</strong>进行处理：</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><strong>Prerouting (Bridge)</strong>: The bridge processes all packets it receives in
-this stage, regardless of the destination. First, you can apply filters
-here, or you can configure rules that ignore the connection tracking
-system. The relevant configuration that applies:</p>
+<li><p><strong>预路由（桥接）（Prerouting (Bridge)）</strong>：桥接组在此阶段处理其接收到的所有数据包，无论其目标地址为何。首先，您可在此处应用过滤器，或配置忽略连接跟踪系统的规则。适用的相关配置如下：</p>
 <ul>
-<li><p><code class="docutils literal notranslate">set firewall bridge prerouting filter ...</code>.</p></li>
+<li><p><code class="docutils literal notranslate">set firewall bridge prerouting filter ...</code>。</p></li>
 </ul>
 </li>
-<li><p><strong>Forward (Bridge)</strong>: The stage where you filter and control traffic
-that passes through the bridge:</p>
+<li><p><strong>转发（桥接）（Forward (Bridge)）</strong>：在此阶段过滤和控制经桥接组转发的流量：</p>
 <ul>
-<li><p><code class="docutils literal notranslate">set firewall bridge forward filter ...</code>.</p></li>
+<li><p><code class="docutils literal notranslate">set firewall bridge forward filter ...</code>。</p></li>
 </ul>
 </li>
-<li><p><strong>Input (Bridge)</strong>: The stage where you filter and control traffic
-destined for the bridge itself:</p>
+<li><p><strong>输入（桥接）（Input (Bridge)）</strong>：在此阶段过滤和控制发往桥接组自身的流量：</p>
 <ul>
-<li><p><code class="docutils literal notranslate">set firewall bridge input filter ...</code>.</p></li>
+<li><p><code class="docutils literal notranslate">set firewall bridge input filter ...</code>。</p></li>
 </ul>
 </li>
-<li><p><strong>Output (Bridge)</strong>: The stage where you filter and control traffic that
-the bridge originates:</p>
+<li><p><strong>输出（桥接）（Output (Bridge)）</strong>：在此阶段过滤和控制由桥接组自身发起的流量：</p>
 <ul>
-<li><p><code class="docutils literal notranslate">set firewall bridge output filter ...</code>.</p></li>
+<li><p><code class="docutils literal notranslate">set firewall bridge output filter ...</code>。</p></li>
 </ul>
 </li>
 </ul>
 </div></blockquote>
-<p>The following is the overall structure of the VyOS firewall CLI:</p>
+<p>以下是 VyOS 防火墙 CLI 的整体结构：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
     * bridge
          - forward
@@ -334,15 +289,14 @@ the bridge originates:</p>
             + ...
 </pre></div>
 </div>
-<p>Here is a list of VyOS firewall CLI subcommands and their
-corresponding pages in the documentation:</p>
+<p>以下是 VyOS 防火墙 CLI 子命令及其对应文档页面的列表：</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set firewall bridge …
 <a class="cmdlink" href="#cfgcmd-set-firewall-bridge" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure bridge firewall rules for traffic at the bridge layer.
-See the Bridge 防火墙 配置 page for detailed information.</p>
+<p>配置桥接层流量的桥接防火墙规则。
+详细信息请参阅“桥接防火墙配置”页面。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
@@ -350,8 +304,8 @@ See the Bridge 防火墙 配置 page for detailed information.</p>
 
 set firewall flowtable …
 <a class="cmdlink" href="#cfgcmd-set-firewall-flowtable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure firewall flowtables for stateful connection tracking and rules.
-See the Flowtables 防火墙 配置 page for detailed information.</p>
+<p>配置防火墙流表（flowtables），用于有状态连接跟踪及相应规则。
+详细信息请参阅“流表防火墙配置”页面。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
@@ -359,9 +313,9 @@ See the Flowtables 防火墙 配置 page for detailed information.</p>
 
 set firewall global-options …
 <a class="cmdlink" href="#cfgcmd-set-firewall-global-options" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure global firewall options such as <code class="docutils literal notranslate">all-ping</code>, <code class="docutils literal notranslate">broadcast-ping</code>,
-<code class="docutils literal notranslate">syn-cookies</code>, and other system-wide firewall settings.
-See the Global 防火墙 选项 page for detailed information.</p>
+<p>配置全局防火墙选项，例如 <code class="docutils literal notranslate">all-ping</code>、<code class="docutils literal notranslate">broadcast-ping</code>、
+<code class="docutils literal notranslate">syn-cookies</code> 及其他系统级防火墙设置。
+详细信息请参阅“全局防火墙选项”页面。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
@@ -369,10 +323,8 @@ See the Global 防火墙 选项 page for detailed information.</p>
 
 set firewall group …
 <a class="cmdlink" href="#cfgcmd-set-firewall-group" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Organize firewall rules by creating reusable address, network, interface,
-MAC, port, and domain groups. Use groups in multiple rules to simplify
-configuration and maintenance.
-See the 防火墙 组s page for detailed information.</p>
+<p>通过创建可复用的地址组、网络组、接口组、MAC 地址组、端口组和域名组来组织防火墙规则。在多条规则中使用这些组，可简化配置与维护工作。
+详细信息请参阅“防火墙组”页面。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
@@ -380,8 +332,8 @@ See the 防火墙 组s page for detailed information.</p>
 
 set firewall ipv4 …
 <a class="cmdlink" href="#cfgcmd-set-firewall-ipv4" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure IPv4-specific firewall rules.
-See the IPv4 防火墙 配置 page for detailed information.</p>
+<p>配置 IPv4 专用防火墙规则。
+详细信息请参阅“IPv4 防火墙配置”页面。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
@@ -389,8 +341,8 @@ See the IPv4 防火墙 配置 page for detailed information.</p>
 
 set firewall ipv6 …
 <a class="cmdlink" href="#cfgcmd-set-firewall-ipv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure IPv6-specific firewall rules.
-See the IPv6 防火墙 配置 page for detailed information.</p>
+<p>配置 IPv6 专用防火墙规则。
+详细信息请参阅“IPv6 防火墙配置”页面。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
@@ -398,47 +350,39 @@ See the IPv6 防火墙 配置 page for detailed information.</p>
 
 set firewall zone …
 <a class="cmdlink" href="#cfgcmd-set-firewall-zone" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure zone-based firewall policies for controlling traffic between
-different network zones.
-See the 区域-Based 防火墙 配置 page for detailed information.</p>
+<p>配置基于区域的防火墙策略，以控制不同网络区域之间的流量。
+详细信息请参阅“基于区域的防火墙配置”页面。</p>
 </div>
 </div>
-<p>For more information on firewall configuration, see the following pages:</p>
+<p>有关防火墙配置的更多信息，请参阅以下页面：</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/global-options.html">Global 选项 防火墙 配置</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/groups.html">防火墙 groups</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/bridge.html">Bridge 防火墙 配置</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv4.html">IPv4 防火墙 配置</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv6.html">IPv6 防火墙 配置</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/flowtables.html">Flowtables 防火墙 配置</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/global-options.html">全局选项防火墙配置</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/groups.html">防火墙组</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/bridge.html">桥接防火墙配置</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/ipv4.html">IPv4 防火墙配置</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/ipv6.html">IPv6 防火墙配置</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/flowtables.html">流表防火墙配置</a></li>
 </ul>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>For more information on Netfilter hooks and Linux networking packet flows,
-see the <a class="reference external" href="https://wiki.nftables.org/wiki-nftables/index.php/Netfilter_hooks">Netfilter-Hooks</a>
-documentation.</p>
+<p>有关 Netfilter 钩子函数及 Linux 网络数据包流向的更多信息，请参阅 <a class="reference external" href="https://wiki.nftables.org/wiki-nftables/index.php/Netfilter_hooks">Netfilter-Hooks</a>
+文档。</p>
 </div>
 <section id="zone-based-firewall">
-<h2>区域-Based firewall</h2>
+<h2>基于区域的防火墙</h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/zone.html">区域-Based 防火墙</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/zone.html">基于区域的防火墙</a></li>
 </ul>
 </div>
-<p>With zone-based firewalls, a new concept applies. In addition to the standard
-in and out traffic flows, a local flow enables traffic originating from and
-destined to the router itself. This means you must configure additional rules to
-secure the firewall from the network, in addition to the existing inbound and
-outbound rules.</p>
-<p>To configure VyOS with zone-based firewall, see
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/zone.html">区域-Based 防火墙 配置</a>.</p>
-<p>As the following example image shows, you must configure rules to allow or block
-traffic to or from the services running on the device that have open
-connections on that interface.</p>
+<p>在基于区域的防火墙中，引入了一种新概念。除标准的入站和出站流量流之外，“本地流（local flow）”还支持源自并目的地为路由器自身的流量。这意味着您必须额外配置规则以保护防火墙免受网络攻击，而不仅限于已有的入站和出站规则。</p>
+<p>有关如何使用基于区域的防火墙配置 VyOS，请参阅
+<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/zone.html">基于区域的防火墙配置</a>。</p>
+<p>如以下示例图所示，您必须配置规则以允许或阻止通往或来自设备上运行的服务（这些服务在该接口上具有已打开的连接）的流量。</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-zonebased.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-zonebased.webp"></img>
+<img alt="../../_images/firewall-zonebased.webp" src="https://docs.vyos.io/en/latest/_images/firewall-zonebased.webp" />
 </figure>
 </section>
 </section>

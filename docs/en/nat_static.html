@@ -177,7 +177,7 @@ specifics of NAT behavior are not commonly documented by vendors of
 equipment containing NAT implementations.</p>
 <p>The computers on an internal network can use any of the addresses set
 aside by the <abbr title="Internet Assigned Numbers Authority">IANA</abbr> for
-private addressing (see <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a>). These reserved IP addresses are
+private addressing (see <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a>). These reserved IP addresses are
 not in use on the Internet, so an external machine will not directly
 route to them. The following addresses are reserved for private use:</p>
 <ul class="simple">
@@ -186,15 +186,15 @@ route to them. The following addresses are reserved for private use:</p>
 <li><p>192.168.0.0 to 192.168.255.255 (CIDR: 192.168.0.0/16)</p></li>
 </ul>
 <p>If an ISP deploys a <abbr title="Carrier-grade NAT">CGN</abbr>, and uses
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> address space to number customer gateways, the risk of
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> address space to number customer gateways, the risk of
 address collision, and therefore routing failures, arises when the
-customer network already uses an <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> address space.</p>
+customer network already uses an <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> address space.</p>
 <p>This prompted some ISPs to develop a policy within the <abbr title="American Registry for Internet Numbers">ARIN</abbr> to allocate new private
 address space for CGNs, but ARIN deferred to the IETF before
 implementing the policy indicating that the matter was not a typical
 allocation issue but a reservation of addresses for technical purposes
-(per <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2860.html"><strong>RFC 2860</strong></a>).</p>
-<p>IETF published <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6598.html"><strong>RFC 6598</strong></a>, detailing a shared address space for use in
+(per <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2860.html"><strong>RFC 2860</strong></a>).</p>
+<p>IETF published <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc6598.html"><strong>RFC 6598</strong></a>, detailing a shared address space for use in
 ISP CGN deployments that can handle the same network prefixes occurring
 both on inbound and outbound interfaces. ARIN returned address space to
 the <abbr title="Internet Assigned Numbers Authority">IANA</abbr> for this
@@ -755,7 +755,7 @@ The ASP requests that all connections from this company should come from
 172.29.41.89 - an address that is assigned by the ASP and not in use at
 the customer site.</p>
 <figure class="align-default" id="id5">
-<a class="reference internal image-reference" href="https://docs.vyos.io/en/rolling/_images/nat_before_vpn_topology.webp"><img alt="NAT before VPN Topology" src="https://docs.vyos.io/en/rolling/_images/nat_before_vpn_topology.webp" style="width: 899.0px; height: 271.0px;" /></a>
+<a class="reference internal image-reference" href="https://docs.vyos.io/en/latest/_images/nat_before_vpn_topology.webp"><img alt="NAT before VPN Topology" src="https://docs.vyos.io/en/latest/_images/nat_before_vpn_topology.webp" style="width: 899.0px; height: 271.0px;" /></a>
 <figcaption>
 <p>NAT before VPN Topology</p>
 </figcaption>

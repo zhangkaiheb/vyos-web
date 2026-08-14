@@ -1,9 +1,5 @@
-<!DOCTYPE html>
-<html lang="Fr">
-<head>
-<meta charset="UTF-8">
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; padding: 12px; }
   h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
   h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
   h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
@@ -29,77 +25,798 @@
   hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
   img { max-width: 100%; height: auto; }
   blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+  .command-block { background: #f8f9fa; border-left: 3px solid #fd7e14; border-radius: 0 4px 4px 0; padding: 10px 14px; margin: 10px 0; font-family: "SFMono-Regular", Consolas, monospace; font-size: 13px; }
+  .command-block::before { content: '$ '; color: #fd7e14; font-weight: bold; }
+  .ipsec-tabs { display: flex; border-bottom: 2px solid #4361ee; margin-bottom: 0; flex-wrap: wrap; }
+  .ipsec-tabs input[type="radio"] { display: none; }
+  .ipsec-tabs label { padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 600; color: #666; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .ipsec-tabs label:hover { color: #4361ee; background: #f0f4ff; }
+  .ipsec-tabs input[type="radio"]:checked + label { color: #4361ee; border-bottom-color: #4361ee; }
+  .ipsec-tab-content { display: none; padding: 16px 0; }
+  .ipsec-tabs input[type="radio"]:nth-of-type(1):checked ~ .ipsec-tab-content:nth-of-type(1),
+  .ipsec-tabs input[type="radio"]:nth-of-type(2):checked ~ .ipsec-tab-content:nth-of-type(2),
+  .ipsec-tabs input[type="radio"]:nth-of-type(3):checked ~ .ipsec-tab-content:nth-of-type(3),
+  .ipsec-tabs input[type="radio"]:nth-of-type(4):checked ~ .ipsec-tab-content:nth-of-type(4) { display: block; }
 </style>
-
-<style>
-  /* VyOS-style command blocks */
-  .vyos-cmd {
-    background: #f8f9fa;
-    border-left: 3px solid #e67e22;
-    border-radius: 0 4px 4px 0;
-    padding: 8px 12px;
-    margin: 8px 0;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-    font-size: 13px;
-    color: #333;
-    white-space: pre-wrap;
-    word-break: break-all;
-  }
-  .vyos-cmd::before {
-    content: "$ ";
-    color: #e67e22;
-    font-weight: bold;
-  }
-  /* Inline code */
-  code {
-    background: #f0f0f0;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-    font-size: 13px;
-    color: #c0392b;
-  }
-  /* Pre blocks for multi-line commands */
-  pre.vyos-cmd-block {
-    background: #f8f9fa;
-    border-left: 3px solid #e67e22;
-    border-radius: 0 4px 4px 0;
-    padding: 12px;
-    margin: 12px 0;
-    overflow-x: auto;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-    font-size: 13px;
-    line-height: 1.6;
-    color: #333;
-  }
-  pre.vyos-cmd-block code {
-    background: none;
-    padding: 0;
-    color: #333;
-  }
-  pre.vyos-cmd-block code::before {
-    content: "$ ";
-    color: #e67e22;
-    font-weight: bold;
-  }
-</style>
-</head>
-<body>
 <div itemprop="articleBody">
-             
-  <section id="ipsec">
-<h1>IPsec</h1>
-<div class="toctree-wrapper compound">
+
+<div class="ipsec-tabs">
+<input type="radio" name="ipsec-tab" id="tab-general" checked>
+<label for="tab-general">Général</label>
+<input type="radio" name="ipsec-tab" id="tab-site2site">
+<label for="tab-site2site">Site-à-Site</label>
+<input type="radio" name="ipsec-tab" id="tab-remoteaccess">
+<label for="tab-remoteaccess">Accès à distance</label>
+<input type="radio" name="ipsec-tab" id="tab-troubleshooting">
+<label for="tab-troubleshooting">Dépannage</label>
+
+<div class="ipsec-tab-content">
+
+<h3>Aperçu d'IPsec</h3>
+<p>IPsec est le framework utilisé pour sécuriser les données. IPsec y parvient en fournissant l'authentification, le chiffrement des paquets réseau IP, l'échange de clés et la gestion des clés. VyOS utilise le package Strongswan pour implémenter IPsec.</p>
+
+<p><strong>Authentication Header (AH)</strong> est défini dans <a href="https://datatracker.ietf.org/doc/html/rfc4302.html">RFC 4302</a>. Il utilise l'en-tête IP et la charge utile des données pour créer un hachage, qui est ensuite ajouté au paquet. Ce hachage est utilisé pour vérifier que les données n'ont pas été modifiées pendant la transmission réseau.</p>
+
+<p><strong>Encapsulating Security Payload (ESP)</strong> est défini dans <a href="https://datatracker.ietf.org/doc/html/rfc4303.html">RFC 4303</a>. Il fournit à la fois le chiffrement et l'authentification des données.</p>
+
+<p>Il existe deux modes IPsec :</p>
+<p><strong>Mode Transport IPsec :</strong> En mode transport, l'en-tête IPsec (AH ou ESP) est inséré entre l'en-tête IP et l'en-tête du protocole de couche supérieure.</p>
+<p><strong>Mode Tunnel IPsec :</strong> En mode tunnel, le paquet IP original est encapsulé dans un autre datagramme IP, avec l'en-tête IPsec (AH ou ESP) inséré entre les en-têtes externe et interne.</p>
+
+<h3>IKE (Internet Key Exchange)</h3>
+<p>Le protocole IKE est la méthode par défaut pour la négociation sécurisée des clés IPsec. IKE est conçu pour fournir l'authentification mutuelle des pairs IKE et établir des clés partagées pour créer des associations de sécurité IPsec (SA). Une association de sécurité (SA) inclut tous les attributs pertinents de la connexion, y compris les algorithmes de chiffrement utilisés, le mode IPsec, les clés de chiffrement et d'autres paramètres liés à la transmission des données via la connexion VPN.</p>
+
+<h4>IKEv1</h4>
+<p>IKEv1 est l'ancienne version, encore utilisée aujourd'hui. La plupart des fabricants recommandent désormais d'utiliser le protocole IKEv2.</p>
+<p>IKEv1 est décrit dans les RFC suivants : <a href="https://datatracker.ietf.org/doc/html/rfc2409.html">RFC 2409</a> (IKE), <a href="https://datatracker.ietf.org/doc/html/rfc3407.html">RFC 3407</a> (IPsec DOI), <a href="https://datatracker.ietf.org/doc/html/rfc3947.html">RFC 3947</a> (NAT-T), <a href="https://datatracker.ietf.org/doc/html/rfc3948.html">RFC 3948</a> (Encapsulation UDP des paquets ESP), <a href="https://datatracker.ietf.org/doc/html/rfc3706.html">RFC 3706</a> (DPD)</p>
+
+<p>IKEv1 fonctionne en deux phases pour établir les SA IKE et IPsec :</p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipsec_general.html">Informations générales sur IPsec</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/site2site_ipsec.html">VPN Site-to-Site IPsec</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/remoteaccess_ipsec.html">VPN d'accès à distance IPsec IKEv2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/troubleshooting_ipsec.html">Dépannage du VPN Site-to-Site IPsec</a></li>
+<li><strong>Phase 1</strong> fournit l'authentification mutuelle des pairs IKE et l'établissement des clés de session. Cette phase utilise l'échange DH, les cookies et l'échange d'ID pour créer la SA IKE. Une fois la SA IKE établie, toutes les communications IKE entre l'initiateur et le répondeur sont protégées par des vérifications d'intégrité de chiffrement et d'authentification. La phase 1 IKE fournit deux modes : Mode principal et Mode agressif.
+<ul>
+<li><strong>Mode Principal</strong> est utilisé pour les connexions VPN site-à-site.</li>
+<li><strong>Mode Agressif</strong> est utilisé pour les connexions VPN d'accès à distance.</li>
 </ul>
+</li>
+<li><strong>Phase 2</strong> fournit la négociation et l'établissement des SA IPsec qui sécurisent le trafic de données IP en utilisant ESP ou AH.</li>
+</ul>
+
+<h4>IKEv2</h4>
+<p>IKEv2 est décrit dans <a href="https://datatracker.ietf.org/doc/html/rfc7296.html">RFC 7296</a>. La plus grande différence entre IKEv1 et IKEv2 est qu'IKEv2 est plus simple et plus fiable qu'IKEv1, avec moins de messages échangés lors de l'établissement du VPN et des fonctionnalités de sécurité supplémentaires.</p>
+
+<h3>Authentification IKE</h3>
+<p>VyOS prend en charge 3 méthodes d'authentification :</p>
+<ul>
+<li><strong>Clé Pré-partagée</strong> : Dans cette méthode, les deux pairs du tunnel IPsec doivent avoir la même clé pré-partagée.</li>
+<li><strong>Certificats Numériques</strong> : PKI est utilisé dans cette méthode.</li>
+<li><strong>Clés RSA</strong> : Si la méthode de clé RSA est utilisée dans la politique IKE, assurez-vous que chaque pair possède la clé publique de l'autre pair.</li>
+</ul>
+
+<h3>DPD (Dead Peer Detection)</h3>
+<p>C'est un mécanisme utilisé pour détecter quand un pair VPN n'est plus actif. Ce mécanisme a différents algorithmes pour IKEv1 et IKEv2 dans VyOS. Les requêtes DPD sont envoyées sous forme de messages ISAKMP R-U-THERE, et les réponses DPD sont envoyées sous forme de messages ISAKMP R-U-THERE-ACK. Dans IKEv1, DPD envoie des messages à des intervalles configurés. Si aucune réponse à ces paquets n'est reçue dans le délai d'expiration DPD, le pair distant est considéré comme injoignable. Dans IKEv2, DPD envoie des messages à des intervalles configurés. Si une requête reste sans réponse, Strongswan exécutera son algorithme de retransmission avec ses temporisateurs.</p>
+
+<h3>Clé Pré-partagée Post-Quantique (PPK)</h3>
+<p>Les clés pré-partagées post-quantiques aident à fournir une certaine résistance quantique aux tunnels IPsec lorsque les algorithmes d'échange de clés post-quantiques comme ML-KEM ne sont pas disponibles. L'utilisation de PPK dans IKEv2 est décrite dans <a href="https://datatracker.ietf.org/doc/html/rfc8784.html">RFC 8784</a>.</p>
+<p>PPK peut être configuré dans VyOS sous <code>vpn ipsec authentication ppk</code>. PPK nécessite un ID et une valeur secrète. Si PPK est requis pour une connexion IPsec réussie, l'ID et le secret doivent correspondre. Le secret peut être en texte brut, une valeur hexadécimale ou une valeur Base64. La valeur par défaut est le texte brut. Si vous utilisez d'autres types de valeurs, le type de secret doit être défini.</p>
+
+<h3>Configuration IKE</h3>
+<h4>Attributs IKE</h4>
+<p>Les groupes IKE de VyOS ont les options suivantes :</p>
+<p><code>set vpn ipsec ike-group &lt;name&gt; close-action &lt;action&gt;</code></p>
+<p>Définit l'action à entreprendre lorsque le pair distant ferme de manière inattendue un CHILD_SA :</p>
+<ul>
+<li><strong>none</strong> - Définir sur none (par défaut)</li>
+<li><strong>trap</strong> - Installer une politique de trap pour le CHILD_SA ; le trafic correspondant à ces politiques déclenchera un événement d'acquisition, amenant le démon à établir la SA IKE/IPsec requise.</li>
+<li><strong>start</strong> - Tenter de recréer immédiatement le CHILD_SA.</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; ikev2-reauth</code></p>
+<p>Indique si le rekeying de l'IKE_SA doit également réauthentifier le pair. Dans IKEv1, la réauthentification est toujours effectuée. La définition de ce paramètre active la réauthentification de l'hôte distant lors du rekeying IKE.</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; key-exchange</code></p>
+<p>Quel protocole doit être utilisé pour initier la connexion. Si non défini, les deux protocoles sont gérés, et la connexion utilise IKEv2 lors de l'initiation mais accepte n'importe quelle version du protocole lors de la réponse :</p>
+<ul>
+<li><strong>ikev1</strong> - Utiliser IKEv1 pour l'échange de clés.</li>
+<li><strong>ikev2</strong> - Utiliser IKEv2 pour l'échange de clés.</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; lifetime</code></p>
+<p>Durée de vie IKE (secondes) &lt;0-86400&gt; (par défaut 28800).</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; mode</code></p>
+<p>Sélection du mode de phase 1 IKEv1 :</p>
+<ul>
+<li><strong>main</strong> - Utiliser le mode principal pour l'échange de clés dans le protocole IKEv1 (par défaut recommandé).</li>
+<li><strong>aggressive</strong> - Utiliser le mode agressif pour l'échange de clés dans le protocole IKEv1 ; le mode agressif est moins sécurisé que le mode principal.</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; dh-group &lt;dh-group number&gt;</code></p>
+<p>Groupe DH. La valeur par défaut est <strong>2</strong>.</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; encryption &lt;encryption&gt;</code></p>
+<p>Algorithme de chiffrement. La valeur par défaut est <strong>aes128</strong>.</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; hash &lt;hash&gt;</code></p>
+<p>Algorithme de hachage. La valeur par défaut est <strong>sha1</strong>.</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; prf &lt;prf&gt;</code></p>
+<p>Fonction pseudo-aléatoire.</p>
+
+<h4>Configuration DPD</h4>
+<p><code>set vpn ipsec ike-group &lt;name&gt; dead-peer-detection action &lt;action&gt;</code></p>
+<p>Action à effectuer sur ce CHILD_SA lorsque le DPD expire :</p>
+<ul>
+<li><strong>trap</strong> - Installer une politique de trap qui capturera le trafic correspondant et tentera de renégocier le tunnel à la demande.</li>
+<li><strong>clear</strong> - Fermer le CHILD_SA sans action supplémentaire (par défaut).</li>
+<li><strong>restart</strong> - Tenter immédiatement de renégocier le CHILD_SA sous une nouvelle IKE_SA.</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; dead-peer-detection interval &lt;interval&gt;</code></p>
+<p>Intervalle de keepalive (secondes) &lt;2-86400&gt; (par défaut 30).</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; dead-peer-detection timeout &lt;timeout&gt;</code></p>
+<p>Délai d'expiration du keepalive (secondes) &lt;2-86400&gt; (par défaut 120) <strong>IKEv1 uniquement</strong></p>
+
+<h3>Attributs ESP</h3>
+<p>Dans VyOS, les attributs ESP sont spécifiés via des groupes ESP. Plusieurs propositions peuvent être spécifiées dans un seul groupe.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; compression</code></p>
+<p>Activer le protocole IPComp (IP Payload Compression), permettant la compression du contenu des paquets IP.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; disable-rekey</code></p>
+<p>Ne pas initier le rekeying des SA localement ; le pair distant doit effectuer le rekeying avant l'expiration.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; life-bytes &lt;bytes&gt;</code></p>
+<p>Durée de vie ESP (octets) &lt;1024-26843545600000&gt;. Nombre d'octets transmis avant l'expiration de la SA IPsec.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; life-packets &lt;packets&gt;</code></p>
+<p>Durée de vie ESP (paquets) &lt;1000-26843545600000&gt;. Nombre de paquets transmis avant l'expiration de la SA IPsec.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; lifetime &lt;timeout&gt;</code></p>
+<p>Durée de vie ESP (secondes) &lt;30-86400&gt; (par défaut 3600). Durée pendant laquelle une instance spécifique de la connexion (l'ensemble des clés de chiffrement/authentification pour les paquets de données utilisateur) doit durer, de la négociation réussie à l'expiration.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; mode &lt;mode&gt;</code></p>
+<p>Type de connexion :</p>
+<ul>
+<li><strong>tunnel</strong> - Mode tunnel (par défaut).</li>
+<li><strong>transport</strong> - Mode transport.</li>
+</ul>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; pfs &lt;dh-group&gt;</code></p>
+<p>Indique si la confidentialité persistante parfaite (PFS) est requise sur le canal de clés de la connexion, et définit le groupe Diffie-Hellman pour PFS :</p>
+<ul>
+<li><strong>enable</strong> - Hériter du groupe Diffie-Hellman du groupe IKE (par défaut).</li>
+<li><strong>disable</strong> - Désactiver PFS.</li>
+<li><strong>&lt;dh-group&gt;</strong> - Définir le groupe Diffie-Hellman pour PFS.</li>
+</ul>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; proposal &lt;number&gt; encryption &lt;encryption&gt;</code></p>
+<p>Algorithme de chiffrement. La valeur par défaut est <strong>aes128</strong>.</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; proposal &lt;number&gt; hash &lt;hash&gt;</code></p>
+<p>Algorithme de hachage. La valeur par défaut est <strong>sha1</strong>.</p>
+
+<h3>Paramètres IPsec Globaux</h3>
+<p><code>set vpn ipsec interface &lt;name&gt;</code></p>
+<p>Nom de l'interface utilisé pour restreindre les politiques IPsec sortantes. Plusieurs interfaces peuvent être spécifiées. Si aucune interface n'est spécifiée, les politiques IPsec s'appliquent à toutes les interfaces.</p>
+
+<p><code>set vpn ipsec log level &lt;number&gt;</code></p>
+<p>Niveau de journalisation. La valeur par défaut est <strong>0</strong>.</p>
+
+<p><code>set vpn ipsec log subsystem &lt;name&gt;</code></p>
+<p>Sous-système du démon.</p>
+
+<h3>Options</h3>
+<p><code>set vpn ipsec options disable-route-autoinstall</code></p>
+<p>Ne pas installer automatiquement les routes vers les réseaux distants.</p>
+
+<p><code>set vpn ipsec options flexvpn</code></p>
+<p>Autoriser la charge utile d'ID vendeur FlexVPN (IKEv2 uniquement). Envoie la charge utile d'ID vendeur Cisco FlexVPN (IKEv2 uniquement), qui est requise pour permettre aux appareils de marque Cisco de négocier les sélecteurs de trafic local.</p>
+
+<p><code>set vpn ipsec options interface &lt;name&gt;</code></p>
+<p>Nom de l'interface à utiliser. Le nom de l'interface sur lequel les adresses IP virtuelles doivent être installées. Si non spécifié, les adresses sont installées sur l'interface sortante.</p>
+
+<p><code>set vpn ipsec options virtual-ip</code></p>
+<p>Autoriser l'installation d'adresses IP virtuelles.</p>
+
+<h3>Retransmission IKEv2</h3>
+<p>Si le pair ne répond pas aux paquets DPD, le routeur initiera une procédure de retransmission. Le délai d'expiration est calculé en utilisant la formule suivante :</p>
+<pre><code>relative timeout = timeout * base ^ (attempts-1)</code></pre>
+
+<p><code>set vpn ipsec options retransmission attempts</code></p>
+<p>Nombre de tentatives avant de considérer le pair comme hors service. La valeur par défaut est <strong>5</strong>.</p>
+
+<p><code>set vpn ipsec options retransmission base</code></p>
+<p>Base pour le backoff exponentiel. La valeur par défaut est <strong>1.8</strong>.</p>
+
+<p><code>set vpn ipsec options retransmission timeout</code></p>
+<p>Délai d'expiration avant la première retransmission (secondes). La valeur par défaut est <strong>4</strong>.</p>
+
+<p>En utilisant les valeurs par défaut, les paquets sont retransmis comme suit :</p>
+<table>
+<thead><tr><th>Tentative</th><th>Formule</th><th>Délai Relatif</th><th>Délai Absolu</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>4 * 1.8 ^ 0</td><td>4s</td><td>4s</td></tr>
+<tr><td>2</td><td>4 * 1.8 ^ 1</td><td>7s</td><td>11s</td></tr>
+<tr><td>3</td><td>4 * 1.8 ^ 2</td><td>13s</td><td>24s</td></tr>
+<tr><td>4</td><td>4 * 1.8 ^ 3</td><td>23s</td><td>47s</td></tr>
+<tr><td>5</td><td>4 * 1.8 ^ 4</td><td>42s</td><td>89s</td></tr>
+<tr><td>Pair Hors Service</td><td>4 * 1.8 ^ 5</td><td>76s</td><td>165s</td></tr>
+</tbody>
+</table>
+
 </div>
-</section>
 
+<div class="ipsec-tab-content">
 
-           </div>
-</body>
-</html>
+<h3>Types de VPN IPsec Site-à-Site</h3>
+<p>VyOS prend en charge deux types de VPN IPsec : le VPN IPsec basé sur des politiques et le VPN IPsec basé sur des routes.</p>
+
+<h4>VPN Basé sur des Politiques</h4>
+<p>Le VPN basé sur des politiques est basé sur des politiques configurées statiquement. Chaque politique crée une SA IPSec indépendante. Le trafic correspondant à ces SA sera chiffré et dirigé vers le pair distant.</p>
+
+<h4>VPN Basé sur des Routes</h4>
+<p>Le VPN basé sur des routes est basé sur le passage sécurisé du trafic via une interface de tunnel virtuel (VTI). Ce type de VPN IPsec permet l'utilisation de protocoles de routage.</p>
+
+<h3>Configuration VPN Site-à-Site</h3>
+
+<h4>Exigences et Prérequis pour le VPN Site-à-Site</h4>
+<p><strong>Paramètres de Négociation Qui Doivent Correspondre</strong></p>
+
+<h5>Phase 1</h5>
+<ul>
+<li>Version IKE</li>
+<li>Authentification</li>
+<li>Chiffrement</li>
+<li>Hachage</li>
+<li>PRF</li>
+<li>Durée de vie</li>
+</ul>
+
+<div class="note">
+<strong>Note :</strong> Strongswan recommande d'utiliser les mêmes valeurs de durée de vie sur les deux pairs
+</div>
+
+<h5>Phase 2</h5>
+<ul>
+<li>Chiffrement</li>
+<li>Hachage</li>
+<li>PFS</li>
+<li>Mode (tunnel ou transport)</li>
+<li>Durée de vie</li>
+</ul>
+
+<div class="note">
+<strong>Note :</strong> Strongswan recommande d'utiliser les mêmes valeurs de durée de vie sur les deux pairs
+</div>
+
+<ul>
+<li>Les réseaux distants et locaux dans la SA doivent être compatibles sur les deux pairs</li>
+</ul>
+
+<h4>Étapes de Configuration pour le VPN Site-à-Site</h4>
+<p>L'exemple suivant montre la configuration pour un routeur participant à un VPN IPsec.</p>
+
+<p><strong>Informations sur le Tunnel :</strong></p>
+<ul>
+<li>Phase 1 :
+<ul>
+<li>Chiffrement : AES256</li>
+<li>Hachage : SHA256</li>
+<li>PRF : SHA256</li>
+<li>DH : 14</li>
+<li>Durée de vie : 28800</li>
+</ul>
+</li>
+<li>Phase 2 :
+<ul>
+<li>Mode IPsec : Tunnel</li>
+<li>Chiffrement : AES256</li>
+<li>Hachage : SHA256</li>
+<li>PFS : Hérité du DH de la Phase 1</li>
+<li>Durée de vie : 3600</li>
+</ul>
+</li>
+<li>Si vous utilisez un VPN basé sur des politiques
+<ul>
+<li>Le réseau distant est 192.168.50.0/24. Le réseau local est 192.168.10.0/24</li>
+</ul>
+</li>
+<li>Si vous utilisez un VPN basé sur des routes
+<ul>
+<li>L'IP de l'interface VTI est 10.0.0.1/30</li>
+</ul>
+</li>
+</ul>
+
+<div class="note">
+<strong>Note :</strong> Nous ne recommandons pas d'utiliser simultanément des configurations VPN basées sur des politiques et basées sur des routes pour le même pair.
+</div>
+
+<p><strong>1. Configurer ike-group (Phase 1 IKE)</strong></p>
+<pre><code>set vpn ipsec ike-group IKE close-action 'start'
+set vpn ipsec ike-group IKE key-exchange 'ikev1'
+set vpn ipsec ike-group IKE lifetime '28800'
+set vpn ipsec ike-group IKE proposal 10 dh-group '14'
+set vpn ipsec ike-group IKE proposal 10 encryption 'aes256'
+set vpn ipsec ike-group IKE proposal 10 hash 'sha256'
+set vpn ipsec ike-group IKE proposal 10 prf 'prfsha256'</code></pre>
+
+<p><strong>2. Configurer ESP-group (Phase 2 IKE)</strong></p>
+<pre><code>set vpn ipsec esp-group ESP lifetime '3600'
+set vpn ipsec esp-group ESP mode 'tunnel'
+set vpn ipsec esp-group ESP pfs 'enable'
+set vpn ipsec esp-group ESP proposal 10 encryption 'aes256'
+set vpn ipsec esp-group ESP proposal 10 hash 'sha256'</code></pre>
+
+<p><strong>3. Spécifier l'adresse IP publique de l'interface eth0</strong></p>
+<pre><code>set vpn ipsec ipsec-interfaces interface eth0</code></pre>
+
+<p><strong>4. Configurer le pair site-à-site</strong></p>
+
+<p><em>Configuration VPN basée sur des politiques :</em></p>
+<pre><code>set vpn ipsec site-to-site peer 203.0.113.2 authentication mode 'pre-shared-secret'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication id '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication remote-id '203.0.113.2'
+set vpn ipsec site-to-site peer 203.0.113.2 connection-type 'respond'
+set vpn ipsec site-to-site peer 203.0.113.2 default-esp-group 'ESP'
+set vpn ipsec site-to-site peer 203.0.113.2 ike-group 'IKE'
+set vpn ipsec site-to-site peer 203.0.113.2 local-address '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 tunnel 1 local prefix '192.168.10.0/24'
+set vpn ipsec site-to-site peer 203.0.113.2 tunnel 1 remote prefix '192.168.50.0/24'</code></pre>
+
+<p><em>Configuration VPN basée sur des routes :</em></p>
+<pre><code>set interfaces vti vti0 address '10.0.0.1/30'
+set interfaces vti vti0 description 'VPN VTI interface'
+
+set vpn ipsec site-to-site peer 203.0.113.2 authentication mode 'pre-shared-secret'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication id '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication remote-id '203.0.113.2'
+set vpn ipsec site-to-site peer 203.0.113.2 connection-type 'respond'
+set vpn ipsec site-to-site peer 203.0.113.2 default-esp-group 'ESP'
+set vpn ipsec site-to-site peer 203.0.113.2 ike-group 'IKE'
+set vpn ipsec site-to-site peer 203.0.113.2 local-address '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 vti bind to 'vti0'
+set vpn ipsec site-to-site peer 203.0.113.2 vti esp-group 'ESP'</code></pre>
+
+</div>
+
+<div class="ipsec-tab-content">
+
+<h3>Aperçu du VPN d'Accès à Distance</h3>
+<p>Le VPN d'accès à distance permet aux utilisateurs distants de se connecter en toute sécurité à un réseau d'entreprise via un tunnel IPsec. VyOS prend en charge plusieurs méthodes de configuration de VPN d'accès à distance, y compris l'authentification par clé pré-partagée, par certificat et basée sur EAP.</p>
+
+<h3>Types de VPN d'Accès à Distance</h3>
+
+<h4>Accès à Distance Basé sur Clé Pré-partagée</h4>
+<p>La méthode de configuration d'accès à distance la plus simple, où chaque utilisateur distant s'authentifie en utilisant la même clé pré-partagée. Convient aux petits déploiements ou aux environnements de test.</p>
+
+<h4>Accès à Distance Basé sur Certificat</h4>
+<p>Utilise des certificats X.509 pour l'authentification, offrant une sécurité plus élevée. Chaque utilisateur peut avoir son propre certificat, ce qui facilite la gestion et la révocation.</p>
+
+<h4>Accès à Distance Basé sur EAP</h4>
+<p>Le protocole d'authentification extensible (EAP) permet l'authentification des utilisateurs en utilisant un serveur RADIUS. Prend en charge plusieurs méthodes EAP telles que EAP-MSCHAPv2, EAP-TLS, etc.</p>
+
+<h3>Configuration du VPN d'Accès à Distance</h3>
+
+<h4>Étapes de Configuration de Base</h4>
+
+<p><strong>1. Configurer les groupes IKE et ESP</strong></p>
+<pre><code>set vpn ipsec ike-group IKE-RA lifetime '28800'
+set vpn ipsec ike-group IKE-RA proposal 1 encryption 'aes256'
+set vpn ipsec ike-group IKE-RA proposal 1 hash 'sha256'
+set vpn ipsec ike-group IKE-RA proposal 1 dh-group '14'
+
+set vpn ipsec esp-group ESP-RA lifetime '3600'
+set vpn ipsec esp-group ESP-RA proposal 1 encryption 'aes256'
+set vpn ipsec esp-group ESP-RA proposal 1 hash 'sha256'</code></pre>
+
+<p><strong>2. Configurer le pool d'adresses IP</strong></p>
+<pre><code>set vpn ipsec remote-access connection RA pool 'RA-POOL'
+set vpn ipsec remote-access connection RA pool RA-POOL prefix '100.64.0.0/24'
+set vpn ipsec remote-access connection RA pool RA-POOL name-server '192.0.2.53'</code></pre>
+
+<p><strong>3. Configurer la connexion d'accès à distance</strong></p>
+<pre><code>set vpn ipsec remote-access connection RA authentication local-id '192.0.2.1'
+set vpn ipsec remote-access connection RA authentication server-mode 'x509'
+set vpn ipsec remote-access connection RA authentication x509 certificate 'ipsec-cert'
+
+set vpn ipsec remote-access connection RA remote-access-interface 'ppp0'
+set vpn ipsec remote-access connection RA ike-group 'IKE-RA'
+set vpn ipsec remote-access connection RA default-esp-group 'ESP-RA'</code></pre>
+
+<h4>Configuration Basée sur EAP-RADIUS</h4>
+<p>Utilisation d'un serveur RADIUS pour l'authentification des utilisateurs :</p>
+
+<pre><code>set vpn ipsec remote-access connection RA authentication client-mode 'eap-radius'
+set vpn ipsec remote-access connection RA eap-radius server 1 address '192.0.2.100'
+set vpn ipsec remote-access connection RA eap-radius server 1 key 'testing123'
+
+set vpn ipsec remote-access connection RA pool RA-POOL name-server '192.0.2.53'
+set vpn ipsec remote-access connection RA pool RA-POOL prefix '100.64.0.0/24'</code></pre>
+
+<h4>Configuration Basée sur Clé Pré-partagée</h4>
+<p>Convient aux scénarios d'accès à distance simples :</p>
+
+<pre><code>set vpn ipsec remote-access connection RA authentication mode 'pre-shared-secret'
+set vpn ipsec remote-access connection RA authentication id '192.0.2.1'
+set vpn ipsec remote-access connection RA authentication local-id '192.0.2.1'
+
+set vpn ipsec remote-access connection RA remote-access-interface 'ppp0'
+set vpn ipsec remote-access connection RA ike-group 'IKE-RA'
+set vpn ipsec remote-access connection RA default-esp-group 'ESP-RA'
+
+set vpn ipsec remote-access connection RA pool RA-POOL prefix '100.64.0.0/24'</code></pre>
+
+<h3>Configuration de l'Interface d'Accès à Distance</h3>
+<p>Le VPN d'accès à distance utilise des interfaces PPP virtuelles. L'interface d'accès à distance doit être spécifiée :</p>
+
+<pre><code>set interfaces ppp ppp0 description 'Remote Access VPN Interface'
+set vpn ipsec remote-access connection RA remote-access-interface 'ppp0'</code></pre>
+
+<h3>Exemples de Configuration Client</h3>
+
+<h4>Client Windows</h4>
+<p>Le client VPN intégré de Windows prend en charge IKEv2 et L2TP/IPsec. Étapes de configuration :</p>
+<ol>
+<li>Ouvrir "Paramètres" > "Réseau et Internet" > "VPN"</li>
+<li>Cliquer sur "Ajouter une connexion VPN"</li>
+<li>Remplir le nom du fournisseur VPN, le nom du serveur ou l'adresse</li>
+<li>Sélectionner le type de VPN (IKEv2 ou L2TP/IPsec)</li>
+<li>Entrer les informations d'authentification (nom d'utilisateur/mot de passe ou certificat)</li>
+</ol>
+
+<h4>Client Linux</h4>
+<p>Les utilisateurs Linux peuvent configurer le VPN IPsec en utilisant NetworkManager ou des outils en ligne de commande :</p>
+<pre><code># Utilisation du client strongswan
+sudo apt install strongswan strongswan-pki libcharon-extra-plugins
+
+# Configurer /etc/ipsec.conf
+conn vyos-ra
+    right=192.0.2.1
+    rightid=@192.0.2.1
+    rightsubnet=0.0.0.0/0
+    left=%defaultroute
+    leftid=user@example.com
+    eap_identity=user@example.com
+    auto=start</code></pre>
+
+<h4>Client macOS</h4>
+<p>macOS prend en charge nativement le VPN IKEv2 :</p>
+<ol>
+<li>Ouvrir "Préférences Système" > "Réseau"</li>
+<li>Cliquer sur "+" pour ajouter une nouvelle connexion</li>
+<li>Sélectionner l'interface comme "VPN", le type comme "IKEv2"</li>
+<li>Remplir l'adresse du serveur et l'ID distant</li>
+<li>Configurer la méthode d'authentification</li>
+</ol>
+
+<h4>Appareils Mobiles</h4>
+<p>Les appareils iOS et Android prennent tous deux en charge nativement le VPN IKEv2 :</p>
+<ul>
+<li><strong>iOS :</strong> Réglages > Général > VPN et réseau > Ajouter une configuration VPN</li>
+<li><strong>Android :</strong> Paramètres > Réseau et Internet > VPN > Ajouter un profil VPN</li>
+</ul>
+
+<h3>Dépannage</h3>
+
+<h4>Problèmes Courants</h4>
+<ul>
+<li><strong>Échec de connexion :</strong> Vérifier si les paramètres IKE et ESP correspondent, vérifier que la clé pré-partagée ou le certificat est correct</li>
+<li><strong>Échec d'authentification :</strong> Confirmer que la configuration du serveur RADIUS est correcte, vérifier les identifiants utilisateur</li>
+<li><strong>Impossible d'obtenir une adresse IP :</strong> Vérifier la configuration du pool d'adresses IP, s'assurer qu'il y a suffisamment d'adresses disponibles</li>
+<li><strong>Connexion instable :</strong> Vérifier les paramètres DPD, ajuster les paramètres de durée de vie</li>
+</ul>
+
+<h4>Commandes de Débogage</h4>
+<pre><code># Voir l'état des SA IPsec
+show vpn ipsec sa
+
+# Voir l'état des SA IKE
+show vpn ike sa
+
+# Voir les informations détaillées sur la connexion IPsec
+show vpn ipsec sa detail
+
+# Voir les journaux IPsec
+tail -f /var/log/charon.log</code></pre>
+
+</div>
+
+<div class="ipsec-tab-content">
+
+<p>Ce document fournit des méthodes de dépannage et des étapes de diagnostic pour les problèmes courants de VPN IPsec.</p>
+
+<h3>Commandes de Diagnostic de Base</h3>
+
+<p>VyOS fournit une série de commandes pour aider à diagnostiquer les problèmes IPsec :</p>
+
+<h4>Voir l'État IPsec</h4>
+
+<p>Voir l'état actuel des tunnels IPsec et des associations de sécurité :</p>
+
+<div class="command-block">show vpn ipsec status</div>
+
+<p>Cette commande affiche l'état actuel de tous les tunnels IPsec, y compris si les connexions sont établies, si les SA (Associations de Sécurité) sont actives, etc.</p>
+
+<h4>Voir les Associations de Sécurité</h4>
+
+<p>Voir les informations détaillées sur les SA IKE et Child :</p>
+
+<div class="command-block">show vpn ipsec sa</div>
+
+<p>La sortie inclut les informations suivantes :</p>
+<ul>
+  <li><strong>IKE SA</strong> : Associations de sécurité de la phase 1 IKE</li>
+  <li><strong>Child Sa</strong> : Associations de sécurité de la phase 2 IKE (tunnels de données)</li>
+  <li><strong>État</strong> : ESTABLISHED, INSTALLED, etc.</li>
+  <li><strong>Algorithmes de Chiffrement</strong> : Algorithmes de chiffrement et d'authentification utilisés</li>
+  <li><strong>Statistiques de Trafic</strong> : Nombre de paquets et d'octets transitant par le tunnel</li>
+</ul>
+
+<h4>Voir la Configuration IPsec</h4>
+
+<p>Voir la configuration IPsec actuellement en cours d'exécution :</p>
+
+<div class="command-block">show vpn ipsec detail</div>
+
+<h3>Problèmes Courants et Solutions</h3>
+
+<h4>Le Tunnel Ne S'établit Pas</h4>
+
+<p><strong>Symptômes</strong> : L'état du tunnel IPsec affiche "down" ou "connecting".</p>
+
+<p><strong>Causes Possibles et Solutions</strong> :</p>
+
+<ol>
+  <li>
+    <p><strong>Non-correspondance de Clé Pré-partagée</strong></p>
+    <p>S'assurer que les clés pré-partagées aux deux extrémités sont exactement identiques, y compris la casse et les espaces.</p>
+    <div class="command-block">show vpn ipsec site-to-site peer &lt;peer-address&gt;</div>
+  </li>
+  <li>
+    <p><strong>Non-correspondance de Proposition IKE</strong></p>
+    <p>Vérifier si les configurations de groupe IKE aux deux extrémités sont compatibles. L'algorithme de chiffrement, l'algorithme de hachage et le groupe Diffie-Hellman doivent correspondre.</p>
+    <div class="command-block">show vpn ipsec ike-group</div>
+  </li>
+  <li>
+    <p><strong>Non-correspondance de Proposition ESP</strong></p>
+    <p>Vérifier que les configurations de groupe ESP sont cohérentes.</p>
+    <div class="command-block">show vpn ipsec esp-group</div>
+  </li>
+  <li>
+    <p><strong>Blocage par Pare-feu</strong></p>
+    <p>S'assurer que le pare-feu autorise le passage des ports suivants :</p>
+    <ul>
+      <li>UDP 500 (IKE)</li>
+      <li>UDP 4500 (NAT-T)</li>
+      <li>Protocole 50 (ESP)</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Erreurs de Configuration de Sous-réseau Local/Distant</strong></p>
+    <p>Vérifier que les configurations de sous-réseau local et distant sont correctes pour le VPN site-à-site.</p>
+  </li>
+</ol>
+
+<h4>Tunnel Actif Mais Pas de Données</h4>
+
+<p><strong>Symptômes</strong> : Le tunnel IPsec affiche "up", mais les données ne peuvent pas être transmises via le tunnel.</p>
+
+<p><strong>Causes Possibles et Solutions</strong> :</p>
+
+<ol>
+  <li>
+    <p><strong>Child SA Non Installé</strong></p>
+    <p>Vérifier si le Child SA a été installé avec succès :</p>
+    <div class="command-block">show vpn ipsec sa</div>
+    <p>Si le Child SA n'est pas affiché, cela peut être dû à une non-correspondance de proposition ESP.</p>
+  </li>
+  <li>
+    <p><strong>Problèmes de Routage</strong></p>
+    <p>Vérifier que la table de routage est correcte, en s'assurant que le trafic peut passer par l'interface de tunnel :</p>
+    <div class="command-block">show ip route</div>
+  </li>
+  <li>
+    <p><strong>Problèmes de MTU</strong></p>
+    <p>IPsec ajoute une surcharge aux paquets. Si les paquets sont trop volumineux, ils peuvent être supprimés. Essayer d'ajuster le MTU :</p>
+    <div class="command-block">set interfaces ethernet &lt;interface&gt; mtu 1400</div>
+  </li>
+  <li>
+    <p><strong>Routage Asymétrique</strong></p>
+    <p>S'assurer que le trafic de retour passe également par le tunnel IPsec ; vérifier la configuration de routage stratégique.</p>
+  </li>
+</ol>
+
+<h4>Le Tunnel Se Déconnecte Fréquemment</h4>
+
+<p><strong>Symptômes</strong> : Le tunnel IPsec s'établit et se déconnecte de manière répétée.</p>
+
+<p><strong>Causes Possibles et Solutions</strong> :</p>
+
+<ol>
+  <li>
+    <p><strong>Configuration DPD (Dead Peer Detection)</strong></p>
+    <p>Vérifier si les paramètres DPD sont trop agressifs :</p>
+    <div class="command-block">show vpn ipsec site-to-site peer &lt;peer-address&gt; dead-peer-detection</div>
+    <p>Paramètres DPD recommandés :</p>
+    <ul>
+      <li>interval : 15-30 secondes</li>
+      <li>timeout : 30-60 secondes</li>
+      <li>action : restart</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Échec de Rekey IKE</strong></p>
+    <p>Vérifier les paramètres de durée de vie IKE pour s'assurer de la compatibilité aux deux extrémités.</p>
+  </li>
+  <li>
+    <p><strong>Problèmes NAT</strong></p>
+    <p>Si l'une des extrémités est derrière un NAT, s'assurer que NAT Traversal (NAT-T) est activé.</p>
+  </li>
+</ol>
+
+<h4>Échecs d'Authentification</h4>
+
+<p><strong>Symptômes</strong> : Les journaux affichent des erreurs d'authentification.</p>
+
+<p><strong>Causes Possibles et Solutions</strong> :</p>
+
+<ol>
+  <li>
+    <p><strong>Erreur de Clé Pré-partagée</strong></p>
+    <p>Reconfigurer la clé pré-partagée, en s'assurant d'une correspondance exacte aux deux extrémités.</p>
+  </li>
+  <li>
+    <p><strong>Problèmes de Certificat</strong></p>
+    <p>Si vous utilisez l'authentification par certificat :</p>
+    <ul>
+      <li>Vérifier que le certificat n'a pas expiré</li>
+      <li>Vérifier que la chaîne de certificats est complète</li>
+      <li>Confirmer que les noms de sujet du certificat correspondent</li>
+      <li>Vérifier que le certificat CA est correctement installé</li>
+    </ul>
+  </li>
+</ol>
+
+<h3>Journaux et Débogage</h3>
+
+<h4>Voir les Journaux IPsec</h4>
+
+<p>Voir les informations relatives à IPsec dans les journaux système :</p>
+
+<div class="command-block">show log | match charon</div>
+
+<p>Ou voir des journaux plus détaillés :</p>
+
+<div class="command-block">tail -f /var/log/syslog | grep charon</div>
+
+<h4>Activer la Journalisation Détaillée</h4>
+
+<p>Pour des informations de débogage plus détaillées, vous pouvez activer la journalisation de débogage IPsec :</p>
+
+<div class="command-block">set vpn ipsec logging log-level 3</div>
+
+<p>Descriptions des niveaux de journalisation :</p>
+<ul>
+  <li><strong>0</strong> : Erreurs uniquement</li>
+  <li><strong>1</strong> : Avertissements</li>
+  <li><strong>2</strong> : Informations (par défaut)</li>
+  <li><strong>3</strong> : Débogage</li>
+  <li><strong>4</strong> : Débogage verbeux</li>
+</ul>
+
+<div class="warning">
+  <strong>Avertissement :</strong> Des niveaux de journalisation élevés peuvent générer de grandes quantités de sorties de journal et peuvent affecter les performances du système. À activer temporairement uniquement pendant le dépannage.
+</div>
+
+<h4>Messages de Journal Courants</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Message de Journal</th>
+      <th>Signification</th>
+      <th>Solution</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>received INVALID_ID_INFORMATION</code></td>
+      <td>Non-correspondance d'identité</td>
+      <td>Vérifier la configuration d'identité locale et distante</td>
+    </tr>
+    <tr>
+      <td><code>no matching proposal found</code></td>
+      <td>Non-correspondance de proposition</td>
+      <td>Vérifier la configuration du groupe IKE/ESP</td>
+    </tr>
+    <tr>
+      <td><code>authentication failed</code></td>
+      <td>Échec d'authentification</td>
+      <td>Vérifier la clé pré-partagée ou le certificat</td>
+    </tr>
+    <tr>
+      <td><code>peer not responding</code></td>
+      <td>Le pair ne répond pas</td>
+      <td>Vérifier la connectivité réseau et le pare-feu</td>
+    </tr>
+    <tr>
+      <td><code>SA lifetime expired</code></td>
+      <td>Durée de vie SA expirée</td>
+      <td>Phénomène normal, vérifier la configuration de rekey</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Capture de Paquets Réseau</h3>
+
+<p>Lorsque d'autres méthodes ne peuvent pas résoudre le problème, vous pouvez utiliser tcpdump pour la capture de paquets réseau :</p>
+
+<h4>Capturer le Trafic IKE</h4>
+
+<div class="command-block">tcpdump -i any -n port 500 or port 4500</div>
+
+<h4>Capturer le Trafic ESP</h4>
+
+<div class="command-block">tcpdump -i any -n proto 50</div>
+
+<h4>Enregistrer le Fichier de Capture de Paquets</h4>
+
+<div class="command-block">tcpdump -i any -n -w /tmp/ipsec.pcap port 500 or port 4500 or proto 50</div>
+
+<p>Vous pouvez utiliser Wireshark pour analyser le fichier pcap enregistré.</p>
+
+<h3>Réinitialisation et Redémarrage</h3>
+
+<h4>Réinitialiser le Tunnel IPsec</h4>
+
+<p>Réinitialiser le tunnel IPsec pour un site spécifique :</p>
+
+<div class="command-block">reset vpn ipsec site-to-site peer &lt;peer-address&gt;</div>
+
+<h4>Redémarrer le Service IPsec</h4>
+
+<p>Pour redémarrer l'ensemble du service IPsec :</p>
+
+<div class="command-block">restart vpn ipsec</div>
+
+<div class="warning">
+  <strong>Avertissement :</strong> Le redémarrage du service IPsec interrompra toutes les connexions VPN actives.
+</div>
+
+<h3>Problèmes de Performance</h3>
+
+<h4>Test de Performance de Chiffrement</h4>
+
+<p>Tester les performances de chiffrement du système :</p>
+
+<div class="command-block">show vpn ipsec performance</div>
+
+<h4>Accélération Matérielle</h4>
+
+<p>Si l'accélération matérielle de chiffrement est prise en charge, s'assurer qu'elle est activée :</p>
+
+<div class="command-block">show vpn ipsec hardware-acceleration</div>
+
+<div class="tip">
+  <strong>Astuce :</strong> Certains processeurs prennent en charge le jeu d'instructions AES-NI, ce qui peut améliorer considérablement les performances IPsec. Utiliser <code>lscpu | grep aes</code> pour vérifier la prise en charge.
+</div>
+
+<h3>Contacter le Support</h3>
+
+<p>Si les étapes ci-dessus ne peuvent pas résoudre le problème, veuillez collecter les informations suivantes et contacter le support technique :</p>
+
+<ol>
+  <li>Exportation complète de la configuration : <code>show configuration commands | match vpn</code></li>
+  <li>Sortie de l'état IPsec : <code>show vpn ipsec status</code></li>
+  <li>Informations sur les associations de sécurité : <code>show vpn ipsec sa</code></li>
+  <li>Journaux système : <code>show log | match charon</code></li>
+  <li>Fichier de capture de paquets réseau (le cas échéant)</li>
+</ol>
+
+</div>
+
+</div>
+
+</div>

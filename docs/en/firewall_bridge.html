@@ -164,7 +164,7 @@ and related op-mode commands.</p>
 set firewall bridge &lt;options&gt;
 <a class="cmdlink" href="#cfgcmd-set-firewall-bridge-options" title="Permalink to this Command"></a></div></div>
 <p>From the main structure defined in
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Firewall Overview</a>
+<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">Firewall Overview</a>
 in this section you can find detailed information only for the next part
 of the general structure:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
@@ -193,22 +193,22 @@ The relevant configuration that acts in <strong>prerouting</strong> is:</p>
 chain is <strong>forward</strong>, and its base command for filtering is <code class="docutils literal notranslate">set firewall bridge forward filter ...</code>, which happens in stage 4, highlighted with red
 color.</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-bridge-forward.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-forward.webp" />
+<img alt="../../_images/firewall-bridge-forward.webp" src="https://docs.vyos.io/en/latest/_images/firewall-bridge-forward.webp" />
 </figure>
 <p>For traffic destined to the router itself or that needs to be routed
 (assuming a layer3 bridge is configured), the base chain is <strong>input</strong>, and the
 base command is <code class="docutils literal notranslate">set firewall bridge input filter ...</code> and the path is:</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-bridge-input.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-input.webp" />
+<img alt="../../_images/firewall-bridge-input.webp" src="https://docs.vyos.io/en/latest/_images/firewall-bridge-input.webp" />
 </figure>
 <p>If it’s not dropped, then the packet is sent to <strong>IP Layer</strong>, and will be
 processed by the <strong>IP Layer</strong> firewall: IPv4 or IPv6 ruleset. Check once again
-the <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">general packet flow diagram</a> if
+the <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">general packet flow diagram</a> if
 needed.</p>
 <p>For traffic that originates from the bridge itself, the base chain is
 <strong>output</strong>, and the base command is <code class="docutils literal notranslate">set firewall bridge output filter ...</code>, and the path is:</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-bridge-output.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-output.webp" />
+<img alt="../../_images/firewall-bridge-output.webp" src="https://docs.vyos.io/en/latest/_images/firewall-bridge-output.webp" />
 </figure>
 <p>Custom bridge firewall chains can be created with the command <code class="docutils literal notranslate">set firewall bridge name &lt;name&gt; ...</code>. To use such a custom chain, a rule with action jump
 and the appropriate target must be defined in a base chain.</p>
@@ -678,8 +678,8 @@ set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; disable
 <section id="matching-criteria">
 <h3>Matching criteria</h3>
 <p>There are many matching criteria against which a packet can be tested. Refer
-to <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv4.html">IPv4</a> and
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv6.html">IPv6</a> matching criteria for more details.</p>
+to <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/ipv4.html">IPv4</a> and
+<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/ipv6.html">IPv6</a> matching criteria for more details.</p>
 <p>Since bridges operate at layer 2, both matchers for IPv4 and IPv6 are
 supported in bridge firewall configuration. Same applies to firewall groups.</p>
 <p>Same specific matching criteria that can be used in bridge firewall are

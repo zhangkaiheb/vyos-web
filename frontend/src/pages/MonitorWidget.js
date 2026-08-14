@@ -129,6 +129,21 @@ function parseFixedTable(output) {
   return parseHeaderGaps(lines[headerIdx], headerIdx + 1);
 }
 
+function getConntrackColumns(t) {
+  return [
+    { key: 'id', title: t('monitor.conntrackColumns.id') },
+    { key: 'original_src', title: t('monitor.conntrackColumns.originalSrc') },
+    { key: 'original_dst', title: t('monitor.conntrackColumns.originalDst') },
+    { key: 'reply_src', title: t('monitor.conntrackColumns.replySrc') },
+    { key: 'reply_dst', title: t('monitor.conntrackColumns.replyDst') },
+    { key: 'protocol', title: t('monitor.conntrackColumns.protocol') },
+    { key: 'state', title: t('monitor.conntrackColumns.state') },
+    { key: 'timeout', title: t('monitor.conntrackColumns.timeout') },
+    { key: 'mark', title: t('monitor.conntrackColumns.mark') },
+    { key: 'zone', title: t('monitor.conntrackColumns.zone') },
+  ];
+}
+
 const CONNTRACK_COLUMNS = [
   { key: 'id', title: 'Id' },
   { key: 'original_src', title: 'Original src' },
@@ -266,19 +281,19 @@ export default defineComponent({
       ipv6Count,
       tableLoading,
       loadConntrack,
-      conntrackColumns: CONNTRACK_COLUMNS,
+      conntrackColumns: computed(() => getConntrackColumns(t)),
     };
   },
   components: { DataTable, TabGroup, ToolbarButton },
   template: `
     <div>
-      <div class="toolbar compact-toolbar">
+      <div v-if="!isConntrack" class="toolbar compact-toolbar">
         <div class="toolbar-left" style="gap:8px;">
           <span>{{ title }}</span>
           <select v-if="isInterface" v-model="selectedInterface">
             <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
           </select>
-          <select v-if="!isConntrack" v-model="duration" @change="load">
+          <select v-model="duration" @change="load">
             <option value="1h">1h</option>
             <option value="12h">12h</option>
             <option value="1d">1d</option>

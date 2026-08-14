@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -153,104 +153,70 @@
              
   <section id="ospf">
 <h1>OSPF</h1>
-<p><abbr title="Open Shortest Path First">OSPF</abbr> is a routing protocol for Internet
-协议 (IP) networks. It uses a link state routing (LSR) algorithm and falls
-into the group of interior gateway protocols (IGPs), operating within a single
-autonomous system (AS). It is defined as OSPF Version 2 in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2328.html"><strong>RFC 2328</strong></a> (1998)
-for IPv4. 更新s for IPv6 are specified as OSPF Version 3 in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5340.html"><strong>RFC 5340</strong></a>
-(2008). OSPF supports the <abbr title="Classless Inter-Domain Routing">CIDR</abbr>
-addressing model.</p>
-<p>OSPF is a widely used IGP in large enterprise networks.</p>
+<p><abbr title="开放最短路径优先">OSPF</abbr> 是一种用于 Internet 协议（IP）网络的路由协议。它采用链路状态路由（LSR）算法，属于内部网关协议（IGP）类别，运行于单个自治系统（AS）内。其 IPv4 版本定义为 OSPF 版本 2，见 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2328.html"><strong>RFC 2328</strong></a>（1998 年）。IPv6 的更新版本定义为 OSPF 版本 3，见 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc5340.html"><strong>RFC 5340</strong></a>（2008 年）。OSPF 支持 <abbr title="无类别域间路由">CIDR</abbr> 地址模型。</p>
+<p>OSPF 是大型企业网络中广泛使用的 IGP 协议。</p>
 <section id="ospfv2-ipv4">
-<h2>OSPFv2 (IPv4)</h2>
+<h2>OSPFv2（IPv4）</h2>
 <section id="configuration">
 <h3>配置</h3>
 <section id="general">
-<h4>General</h4>
-<p>VyOS does not have a special command to start the OSPF process. The OSPF process
-starts when the first ospf enabled interface is configured.</p>
+<h4>常规配置</h4>
+<p>VyOS 没有专门用于启动 OSPF 进程的命令。当配置第一个启用 OSPF 的接口时，OSPF 进程即自动启动。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> network <A.B.C.D/M>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-network-a-b-c-d-m" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies the OSPF enabled interface(s). If the interface has
-an address from defined range then the command enables OSPF on this
-interface so router can provide network information to the other ospf
-routers via this interface.</p>
-<p>This command is also used to enable the OSPF process. The area number 可以
-specified in decimal notation in the range from 0 to 4294967295. Or it
-可以 specified in dotted decimal notation similar to ip address.</p>
-<p>Prefix length in interface 必须 equal or bigger (i.e. smaller network)
-than prefix length in network statement. For example statement above doesn’t
-enable ospf on interface with address 192.168.1.1/23, but it does on
-interface with address 192.168.1.129/25.</p>
-<p>In some cases it 可能 more convenient to enable OSPF on a per
-interface/subnet
-basis <code class="docutils literal notranslate">set protocols ospf interface <interface> area <x.x.x.x | x></code></p>
+set protocols ospf area &lt;number&gt; network &lt;A.B.C.D/M&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-network-a-b-c-d-m" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令指定启用 OSPF 的接口。若接口地址位于所定义的网段范围内，则该命令将在该接口上启用 OSPF，使路由器可通过该接口向其他 OSPF 路由器通告网络信息。</p>
+<p>该命令也用于启用 OSPF 进程。区域编号可使用十进制表示法，取值范围为 0 至 4294967295；也可使用类似 IP 地址的点分十进制表示法。</p>
+<p>接口上的前缀长度必须等于或大于（即网络范围更小）network 语句中的前缀长度。例如，上述语句不会在地址为 192.168.1.1/23 的接口上启用 OSPF，但会在地址为 192.168.1.129/25 的接口上启用。</p>
+<p>在某些情况下，按接口/子网逐个启用 OSPF 可能更为便捷：<code class="docutils literal notranslate">set protocols ospf interface &lt;interface&gt; area &lt;x.x.x.x | x&gt;</code></p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf auto-cost reference-bandwidth <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-auto-cost-reference-bandwidth-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets the reference bandwidth for cost calculations, where
-bandwidth 可以 in range from 1 to 4294967, specified in Mbits/s. The
-default is 100Mbit/s (i.e. a link of bandwidth 100Mbit/s or higher will
-have a cost of 1. Cost of lower bandwidth links 将 scaled with
-reference to this cost).</p>
+set protocols ospf auto-cost reference-bandwidth &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-auto-cost-reference-bandwidth-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令设置成本计算的参考带宽，带宽取值范围为 1 至 4294967，单位为 Mbit/s。默认值为 100 Mbit/s（即带宽为 100 Mbit/s 或更高的链路成本为 1；较低带宽链路的成本将相对于该成本进行缩放）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf parameters router-id <rid>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-parameters-router-id-rid" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets the router-ID of the OSPF process. The router-ID 可能 an
-IP address of the router, but need not be – it 可以 any arbitrary 32bit
-number. However it MUST be unique within the entire OSPF domain to the OSPF
-speaker – bad things will happen if multiple OSPF speakers are configured
-with the same router-ID!</p>
+set protocols ospf parameters router-id &lt;rid&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-parameters-router-id-rid" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令设置 OSPF 进程的路由器 ID。路由器 ID 可以是路由器的 IP 地址，但并非必须如此——它可以是任意 32 位数字。然而，它在整个 OSPF 域内对 OSPF 发言者而言必须唯一！若多个 OSPF 发言者被配置了相同的路由器 ID，将导致严重问题！</p>
 </div>
 </div>
 </section>
 <section id="optional">
-<h4>可选</h4>
+<h4>可选配置</h4>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf default-information originate [always] [metric <number>] [metric-type <1|2>] [route-map <name>]
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-default-information-originate-always-metric-number-metric-type-1-2-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>源ate an AS-External (type-5) LSA describing a default route into all
-external-routing capable areas, of the specified metric and metric type.
-If the <code class="docutils literal notranslate">always</code> keyword is given then the default is always
-advertised, even when there is no default present in the routing table.
-The argument <code class="docutils literal notranslate">route-map</code> specifies to advertise the default route
-if the route map is satisfied.</p>
+set protocols ospf default-information originate [always] [metric &lt;number&gt;] [metric-type &lt;1|2&gt;] [route-map &lt;name&gt;]
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-default-information-originate-always-metric-number-metric-type-1-2-route-map-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>向所有支持外部路由功能的区域发起一个 AS-External（类型 5）LSA，用以描述一条默认路由，并指定其度量值和度量类型。若指定了 <code class="docutils literal notranslate">always</code> 关键字，则无论路由表中是否存在默认路由，都将始终通告该默认路由。参数 <code class="docutils literal notranslate">route-map</code> 表示仅当满足路由映射条件时才通告默认路由。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf distance global <distance>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-distance-global-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command change distance value of OSPF globally.
-The distance range is 1 to 255.</p>
+set protocols ospf distance global &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-distance-global-distance" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令全局更改 OSPF 的管理距离值。距离取值范围为 1 至 255。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf distance ospf <external|inter-area|intra-area> <distance>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-distance-ospf-external-inter-area-intra-area-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command change distance value of OSPF. The arguments are the distance
-values for external routes, inter-area routes and intra-area routes
-respectively. The distance range is 1 to 255.</p>
+set protocols ospf distance ospf &lt;external|inter-area|intra-area&gt; &lt;distance&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-distance-ospf-external-inter-area-intra-area-distance" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令更改 OSPF 的管理距离值。各参数分别对应外部路由、区域间路由和区域内路由的距离值。距离取值范围为 1 至 255。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>路由s with a distance of 255 are effectively disabled and not
-installed into the kernel.</p>
+<p>管理距离为 255 的路由将被实际禁用，且不会安装到内核中。</p>
 </div>
 </div>
 </div>
@@ -258,730 +224,543 @@ installed into the kernel.</p>
 <div class="cfgcmd-heading">
 
 set protocols ospf log-adjacency-changes [detail]
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-log-adjacency-changes-detail" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command allows to log changes in adjacency. With the optional
-<code class="docutils literal notranslate">detail</code> argument, all changes in adjacency status are shown.
-Without <code class="docutils literal notranslate">detail</code>, only changes to full or regressions are shown.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-log-adjacency-changes-detail" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令允许记录邻接关系的变化。若使用可选参数 <code class="docutils literal notranslate">detail</code>，则显示所有邻接状态变化；若不使用 <code class="docutils literal notranslate">detail</code>，则仅显示完全邻接状态（Full）或退化状态（regressions）的变化。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf max-metric router-lsa <administrative|on-shutdown <seconds>|on-startup <seconds>>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-max-metric-router-lsa-administrative-on-shutdown-seconds-on-startup-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This enables <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3137.html"><strong>RFC 3137</strong></a> support, where the OSPF process describes its
-transit links in its router-LSA as having infinite distance so that other
-routers will avoid calculating transit paths through the router while
-still being able to reach networks through the router.</p>
-<p>This support 可能 enabled administratively (and indefinitely) with the
-<code class="docutils literal notranslate">administrative</code> command. It may also be enabled conditionally.
-条件al enabling of max-metric router-lsas 可以 for a period of
-seconds after startup with the <code class="docutils literal notranslate">on-startup <seconds></code> command
-and/or for a period of seconds prior to shutdown with the
-<code class="docutils literal notranslate">on-shutdown <seconds></code> command. The time range is 5 to 86400.</p>
+set protocols ospf max-metric router-lsa &lt;administrative|on-shutdown &lt;seconds&gt;|on-startup &lt;seconds&gt;&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-max-metric-router-lsa-administrative-on-shutdown-seconds-on-startup-seconds" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令启用 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3137.html"><strong>RFC 3137</strong></a> 支持，此时 OSPF 进程在其路由器 LSA 中将其传输链路描述为具有无限距离，从而使其他路由器在仍能通过该路由器到达网络的同时，避免计算经过该路由器的传输路径。</p>
+<p>该支持可通过 <code class="docutils literal notranslate">administrative</code> 命令以管理方式（并无限期地）启用。也可有条件地启用：可在启动后若干秒内启用最大度量值路由器 LSA（使用 <code class="docutils literal notranslate">on-startup &lt;seconds&gt;</code> 命令），和/或在关闭前若干秒内启用（使用 <code class="docutils literal notranslate">on-shutdown &lt;seconds&gt;</code> 命令）。时间范围为 5 至 86400 秒。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf parameters abr-type <cisco|ibm|shortcut|standard>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-parameters-abr-type-cisco-ibm-shortcut-standard" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command selects ABR model. OSPF router supports four ABR models:</p>
-<p><strong>cisco</strong> – a router 将 considered as ABR if it has several configured
-links to the networks in different areas one of which is a backbone area.
-Moreover, the link to the backbone area 应该 active (working).
-<strong>ibm</strong> – identical to “cisco” model but in this case a backbone area link
-may not be active.
-<strong>standard</strong> – router has several active links to different areas.
-<strong>shortcut</strong> – identical to “standard” but in this model a router is
-allowed to use a connected areas topology without involving a backbone
-area for inter-area connections.</p>
-<p>Detailed information about “cisco” and “ibm” models differences 可以
-found in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3509.html"><strong>RFC 3509</strong></a>. A “shortcut” model allows ABR to create routes
-between areas based on the topology of the areas connected to this router
-but not using a backbone area in case if non-backbone route 将
-cheaper. For more information about “shortcut” model,
-see ospf-shortcut-abr-02.txt</p>
+set protocols ospf parameters abr-type &lt;cisco|ibm|shortcut|standard&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-parameters-abr-type-cisco-ibm-shortcut-standard" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令选择 ABR（区域边界路由器）模型。OSPF 路由器支持四种 ABR 模型：</p>
+<p><strong>cisco</strong> — 若路由器在不同区域（其中至少一个为骨干区域）拥有多个已配置的网络链路，则被视为 ABR。此外，通往骨干区域的链路必须处于活动（工作）状态。<br />
+<strong>ibm</strong> — 与“cisco”模型相同，但此处通往骨干区域的链路可不必处于活动状态。<br />
+<strong>standard</strong> — 路由器在不同区域拥有多个活动链路。<br />
+<strong>shortcut</strong> — 与“standard”模型相同，但在此模型中，路由器允许使用相连区域的拓扑结构进行区域间连接，而无需涉及骨干区域。</p>
+<p>有关“cisco”和“ibm”模型差异的详细信息，请参阅 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3509.html"><strong>RFC 3509</strong></a>。“shortcut”模型允许 ABR 基于连接至该路由器的区域拓扑创建区域间路由，但若非骨干区域路由成本更低，则无需使用骨干区域。有关“shortcut”模型的更多信息，请参阅 ospf-shortcut-abr-02.txt</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols ospf parameters rfc1583-compatibility
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-parameters-rfc1583-compatibility" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2328.html"><strong>RFC 2328</strong></a>, the successor to <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1583.html"><strong>RFC 1583</strong></a>, suggests according to section
-G.2 (changes) in section 16.4.1 a change to the path preference algorithm
-that prevents possible routing loops that were possible in the old version
-of OSPFv2. More specifically it demands that inter-area paths and
-intra-area backbone path are now of equal preference but still both
-preferred to external paths.</p>
-<p>This command should NOT be set normally.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-parameters-rfc1583-compatibility" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2328.html"><strong>RFC 2328</strong></a>（<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1583.html"><strong>RFC 1583</strong></a> 的后续版本）第 16.4.1 节 G.2 小节（变更）建议修改路径优选算法，以防止旧版 OSPFv2 中可能出现的路由环路。具体而言，它要求区域间路径和骨干区域内路径现在具有同等优先级，但两者均优先于外部路径。</p>
+<p>该命令通常不应设置。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> passive [disable]
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-passive-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies interface as passive. Passive interface advertises
-its address, but does not run the OSPF protocol (adjacencies are not formed
-and hello packets are not generated).</p>
-<p>The optional disable option allows to exclude interface from passive state.
-This command is used if the command <code class="docutils literal notranslate">passive-interface default</code> was
-configured.</p>
+set protocols ospf interface &lt;interface&gt; passive [disable]
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-passive-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令将接口指定为被动接口。被动接口会通告其地址，但不运行 OSPF 协议（不建立邻接关系，也不生成 Hello 数据包）。</p>
+<p>可选的 disable 参数允许将接口从被动状态中排除。若已配置 <code class="docutils literal notranslate">passive-interface default</code> 命令，则需使用此命令。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols ospf passive-interface default
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-passive-interface-default" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies all interfaces as passive by default. Because this
-command changes the configuration logic to a default passive; therefore,
-interfaces where router adjacencies are expected need to be configured
-with the <code class="docutils literal notranslate">passive-interface-exclude</code> command.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-passive-interface-default" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令默认将所有接口设为被动接口。由于该命令将配置逻辑更改为默认被动模式，因此预期需建立路由器邻接关系的接口必须使用 <code class="docutils literal notranslate">passive-interface-exclude</code> 命令进行配置。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf maximum-paths <1-64>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-maximum-paths-1-64" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to control the maximum number of equal cost paths to reach
-a specific destination. The upper limit may differ if you change the value
-of MULTIPATH_NUM during compilation. The default is MULTIPATH_NUM (64).</p>
+set protocols ospf maximum-paths &lt;1-64&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-maximum-paths-1-64" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>使用该命令控制到达特定目的地的等价路径的最大数量。若在编译期间更改 MULTIPATH_NUM 的值，则上限可能不同。默认值为 MULTIPATH_NUM（64）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf refresh timers <seconds>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-refresh-timers-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>The router automatically updates link-state information with its neighbors.
-Only an obsolete information is updated which age has exceeded a specific
-threshold. This parameter changes a threshold value, which by default is
-1800 seconds (half an hour). The value is applied to the whole OSPF router.
-The timer range is 10 to 1800.</p>
+set protocols ospf refresh timers &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-refresh-timers-seconds" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>路由器会自动与其邻居更新链路状态信息。仅更新过期信息（其年龄已超过特定阈值）。该参数更改阈值，默认值为 1800 秒（半小时）。该定时器值应用于整个 OSPF 路由器。定时器范围为 10 至 1800 秒。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf timers throttle spf <delay|initial-holdtime|max-holdtime> <seconds>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-timers-throttle-spf-delay-initial-holdtime-max-holdtime-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets the initial delay, the initial-holdtime and the
-maximum-holdtime between when SPF is calculated and the event which
-triggered the calculation. The times are specified in milliseconds and must
-be in the range of 0 to 600000 milliseconds. <code class="docutils literal notranslate">delay</code> sets the
-initial SPF schedule delay in milliseconds. The default value is 200 ms.
-<code class="docutils literal notranslate">initial-holdtime</code> sets the minimum hold time between two
-consecutive SPF calculations. The default value is 1000 ms.
-<code class="docutils literal notranslate">max-holdtime</code> sets the maximum wait time between two
-consecutive SPF calculations. The default value is 10000 ms.</p>
+set protocols ospf timers throttle spf &lt;delay|initial-holdtime|max-holdtime&gt; &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-timers-throttle-spf-delay-initial-holdtime-max-holdtime-seconds" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令设置 SPF 计算与触发该计算的事件之间的时间延迟、初始保持时间和最大保持时间。时间以毫秒为单位，取值范围为 0 至 600000 毫秒。<code class="docutils literal notranslate">delay</code> 设置初始 SPF 调度延迟（毫秒），默认值为 200 毫秒。<code class="docutils literal notranslate">initial-holdtime</code> 设置两次连续 SPF 计算之间的最小保持时间，默认值为 1000 毫秒。<code class="docutils literal notranslate">max-holdtime</code> 设置两次连续 SPF 计算之间的最大等待时间，默认值为 10000 毫秒。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols ospf ldp-sync
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-ldp-sync" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command will enable IGP-LDP synchronization globally for OSPF. This
-requires for LDP to be functional. This is described in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5443.html"><strong>RFC 5443</strong></a>. By
-default all interfaces operational in OSPF are enabled for synchronization.
-Loopbacks are exempt.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-ldp-sync" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令将全局启用 OSPF 的 IGP-LDP 同步功能。这要求 LDP 正常运行。详见 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc5443.html"><strong>RFC 5443</strong></a>。默认情况下，所有在 OSPF 中运行的接口均启用同步功能，环回接口除外。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf ldp-sync holddown <seconds>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-ldp-sync-holddown-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command will change the hold down value globally for IGP-LDP
-synchronization during convergence/interface flap events.</p>
+set protocols ospf ldp-sync holddown &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-ldp-sync-holddown-seconds" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令将在收敛/接口抖动事件期间全局更改 IGP-LDP 同步的保持时间值。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols ospf capability opaque
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-capability-opaque" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>ospfd supports Opaque LSA <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2370.html"><strong>RFC 2370</strong></a> as partial support for MPLS 流量
-Engineering LSAs. The opaque-lsa capability 必须 enabled in the
-configuration.</p>
-<p>An alternate command 可能 “mpls-te on” (流量 Engineering)</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-capability-opaque" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>ospfd 支持不透明 LSA <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2370.html"><strong>RFC 2370</strong></a>，作为 MPLS 流量工程 LSA 的部分支持。必须在配置中启用不透明 LSA 功能。</p>
+<p>另一替代命令为 “mpls-te on”（流量工程）</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>FRR offers only partial support for some of the routing
-protocol extensions that are used with MPLS-TE; it does not
-support a complete RSVP-TE solution.</p>
+<p>FRR 对部分与 MPLS-TE 配合使用的路由协议扩展仅提供部分支持；它不支持完整的 RSVP-TE 解决方案。</p>
 </div>
 </div>
 </div>
 </section>
 <section id="area-configuration">
-<h4>Area 配置</h4>
+<h4>区域配置</h4>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> area-type stub
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-stub" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies the area to be a Stub Area. That is, an area where
-no router originates routes external to OSPF and hence an area where all
-external routes are via the ABR(s). Hence, ABRs for such an area do not
-need to pass AS-External LSAs (type-5) or ASBR-Summary LSAs (type-4) into
-the area. They need only pass 网络-Summary (type-3) LSAs into such an
-area, along with a default-route summary.</p>
+set protocols ospf area &lt;number&gt; area-type stub
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-stub" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令将区域指定为存根区域（Stub Area）。即：区域内无路由器发起 OSPF 外部路由，因此所有外部路由均经由 ABR（区域边界路由器）实现。因此，此类区域的 ABR 无需向该区域传递 AS-External LSA（类型 5）或 ASBR-Summary LSA（类型 4）。它们只需向该区域传递 Network-Summary（类型 3）LSA 和一条默认路由摘要即可。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> area-type stub no-summary
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-stub-no-summary" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies the area to be a Totally Stub Area. In addition to
-stub area limitations this area type prevents an ABR from injecting
-网络-Summary (type-3) LSAs into the specified stub area. Only default
-summary route is allowed.</p>
+set protocols ospf area &lt;number&gt; area-type stub no-summary
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-stub-no-summary" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令将区域指定为完全存根区域（Totally Stub Area）。除存根区域限制外，该区域类型还阻止 ABR 向指定存根区域注入 Network-Summary（类型 3）LSA。仅允许默认摘要路由。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> area-type stub default-cost <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-stub-default-cost-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets the cost of default-summary LSAs announced to stubby
-areas. The cost range is 0 to 16777215.</p>
+set protocols ospf area &lt;number&gt; area-type stub default-cost &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-stub-default-cost-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令设置通告至存根区域的默认摘要 LSA 的成本。成本取值范围为 0 至 16777215。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> area-type nssa
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-nssa" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies the area to be a Not So Stubby Area. External
-routing information is imported into an NSSA in 类型-7 LSAs. 类型-7 LSAs
-are similar to 类型-5 AS-external LSAs, except that they can only be
-flooded into the NSSA. In order to further propagate the NSSA external
-information, the 类型-7 LSA 必须 translated to a 类型-5 AS-external-LSA
-by the NSSA ABR.</p>
+set protocols ospf area &lt;number&gt; area-type nssa
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-nssa" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令将区域指定为非纯存根区域（Not So Stubby Area，NSSA）。外部路由信息以类型 7 LSA 导入 NSSA。类型 7 LSA 类似于类型 5 AS-external LSA，但只能泛洪至 NSSA 内。为将 NSSA 外部信息进一步传播，类型 7 LSA 必须由 NSSA ABR 转换为类型 5 AS-external LSA。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> area-type nssa no-summary
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-nssa-no-summary" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies the area to be a NSSA Totally Stub Area. ABRs for
-such an area do not need to pass 网络-Summary (type-3) LSAs (except the
-default summary route), ASBR-Summary LSAs (type-4) and AS-External LSAs
-(type-5) into the area. But 类型-7 LSAs that convert to 类型-5 at the NSSA
-ABR are allowed.</p>
+set protocols ospf area &lt;number&gt; area-type nssa no-summary
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-nssa-no-summary" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令将区域指定为 NSSA 完全存根区域。此类区域的 ABR 无需向该区域传递 Network-Summary（类型 3）LSA（默认摘要路由除外）、ASBR-Summary LSA（类型 4）和 AS-External LSA（类型 5）。但允许在 NSSA ABR 处转换为类型 5 的类型 7 LSA。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> area-type nssa default-cost <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-nssa-default-cost-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets the default cost of LSAs announced to NSSA areas.
-The cost range is 0 to 16777215.</p>
+set protocols ospf area &lt;number&gt; area-type nssa default-cost &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-nssa-default-cost-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令设置通告至 NSSA 区域的 LSA 的默认成本。成本取值范围为 0 至 16777215。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> area-type nssa translate <always|candidate|never>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-nssa-translate-always-candidate-never" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specifies whether this NSSA border router will unconditionally translate
-类型-7 LSAs into 类型-5 LSAs. When role is Always, 类型-7 LSAs are
-translated into 类型-5 LSAs regardless of the translator state of other
-NSSA border routers. When role is Candidate, this router participates in
-the translator election to determine if it will perform the translations
-duties. When role is Never, this router will never translate 类型-7 LSAs
-into 类型-5 LSAs.</p>
+set protocols ospf area &lt;number&gt; area-type nssa translate &lt;always|candidate|never&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-area-type-nssa-translate-always-candidate-never" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定此 NSSA 边界路由器是否无条件地将类型 7 LSA 转换为类型 5 LSA。当角色为 Always 时，无论其它 NSSA 边界路由器的转换器状态如何，类型 7 LSA 均将被转换为类型 5 LSA。当角色为 Candidate 时，该路由器参与转换器选举以确定是否执行转换任务。当角色为 Never 时，该路由器永远不会将类型 7 LSA 转换为类型 5 LSA。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> authentication plaintext-password
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-authentication-plaintext-password" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies that simple password authentication 应该 used
-for the given area. The password must also be configured on a per-interface
-basis.</p>
+set protocols ospf area &lt;number&gt; authentication plaintext-password
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-authentication-plaintext-password" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令指定对给定区域使用简单密码认证。密码还必须在每个接口基础上进行配置。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> authentication md5
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-authentication-md5" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specify that OSPF packets 必须 authenticated with MD5 HMACs
-within the given area. 密钥ing material must also be configured on a
-per-interface basis.</p>
+set protocols ospf area &lt;number&gt; authentication md5
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-authentication-md5" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令指定在给定区域内，OSPF 数据包必须使用 MD5 HMAC 进行认证。密钥材料也必须在每个接口基础上进行配置。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> range <A.B.C.D/M> [cost <number>]
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-range-a-b-c-d-m-cost-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command summarizes intra area paths from specified area into one
-summary-LSA (类型-3) announced to other areas. This command 可以 used
-only in ABR and ONLY router-LSAs (类型-1) and network-LSAs (类型-2)
-(i.e. LSAs with scope area) 可以 summarized. AS-external-LSAs (类型-5)
-can’t be summarized - their scope is AS. The optional argument
-<code class="docutils literal notranslate">cost</code> specifies the aggregated link metric. The metric range is 0
-to 16777215.</p>
+set protocols ospf area &lt;number&gt; range &lt;A.B.C.D/M&gt; [cost &lt;number&gt;]
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-range-a-b-c-d-m-cost-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令将指定区域内的区域内路径汇总为一条摘要 LSA（类型 3），并通告至其它区域。该命令仅可用于 ABR，且仅可汇总路由器 LSA（类型 1）和网络 LSA（类型 2）（即作用域为区域的 LSA）。AS-external LSA（类型 5）不可汇总——其作用域为 AS。可选参数 <code class="docutils literal notranslate">cost</code> 指定聚合链路度量值。度量值范围为 0 至 16777215。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> range <A.B.C.D/M> not-advertise
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-range-a-b-c-d-m-not-advertise" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command instead of summarizing intra area paths filter them - i.e.
-intra area paths from this range are not advertised into other areas.
-This command makes sense in ABR only.</p>
+set protocols ospf area &lt;number&gt; range &lt;A.B.C.D/M&gt; not-advertise
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-range-a-b-c-d-m-not-advertise" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令不汇总区域内路径，而是过滤它们——即，来自该网段的区域内路径不会通告至其它区域。该命令仅在 ABR 上有意义。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> export-list <acl_number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-export-list-acl-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>过滤器 类型-3 summary-LSAs announced to other areas originated from
-intra- area paths from specified area.
-This command makes sense in ABR only.</p>
+set protocols ospf area &lt;number&gt; export-list &lt;acl_number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-export-list-acl-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>过滤从指定区域发起、通告至其它区域的类型 3 摘要 LSA（源自区域内路径）。该命令仅在 ABR 上有意义。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> import-list <acl_number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-import-list-acl-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Same as export-list, but it applies to paths announced into specified
-area as 类型-3 summary-LSAs.
-This command makes sense in ABR only.</p>
+set protocols ospf area &lt;number&gt; import-list &lt;acl_number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-import-list-acl-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>与 export-list 相同，但适用于作为类型 3 摘要 LSA 通告至指定区域的路径。该命令仅在 ABR 上有意义。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> range <A.B.C.D/M> substitute <E.F.G.H/M>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-range-a-b-c-d-m-substitute-e-f-g-h-m" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>One 类型-3 summary-LSA with routing info <E.F.G.H/M> is announced into
-backbone area if defined area contains at least one intra-area network
-(i.e. described with router-LSA or network-LSA) from range <A.B.C.D/M>.
-This command makes sense in ABR only.</p>
+set protocols ospf area &lt;number&gt; range &lt;A.B.C.D/M&gt; substitute &lt;E.F.G.H/M&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-range-a-b-c-d-m-substitute-e-f-g-h-m" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>若定义的区域内至少包含一个来自网段 &lt;A.B.C.D/M&gt; 的区域内网络（即由路由器 LSA 或网络 LSA 描述），则向骨干区域通告一条带有路由信息 &lt;E.F.G.H/M&gt; 的类型 3 摘要 LSA。该命令仅在 ABR 上有意义。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> shortcut <default|disable|enable>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-shortcut-default-disable-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This parameter allows to “shortcut” routes (non-backbone) for inter-area
-routes. There are three modes available for routes shortcutting:</p>
-<p><strong>default</strong> –  this area 将 used for shortcutting only if ABR does not
-have a link to the backbone area or this link was lost.
-<strong>enable</strong> – the area 将 used for shortcutting every time the route
-that goes through it is cheaper.
-<strong>disable</strong> – this area is never used by ABR for routes shortcutting.</p>
+set protocols ospf area &lt;number&gt; shortcut &lt;default|disable|enable&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-shortcut-default-disable-enable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该参数允许对区域间路由（非骨干区域）进行“快捷”路由。路由快捷化有三种模式：</p>
+<p><strong>default</strong> —— 仅当 ABR 没有通往骨干区域的链路或该链路丢失时，才使用此区域进行快捷路由。<br />
+<strong>enable</strong> —— 每当经由此区域的路由成本更低时，均使用该区域进行快捷路由。<br />
+<strong>disable</strong> —— ABR 永不使用此区域进行路由快捷化。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf area <number> virtual-link <A.B.C.D>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-virtual-link-a-b-c-d" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Provides a backbone area coherence by virtual link establishment.</p>
-<p>In general, OSPF protocol requires a backbone area (area 0) to be coherent
-and fully connected. I.e. any backbone area router must have a route to any
-other backbone area router. Moreover, every ABR must have a link to
-backbone area. However, it is not always possible to have a physical link
-to a backbone area. In this case between two ABR (one of them has a link to
-the backbone area) in the area (not stub area) a virtual link is organized.</p>
-<p><number> – area identifier through which a virtual link goes.
-<A.B.C.D> – ABR router-id with which a virtual link is established. Virtual
-link 必须 configured on both routers.</p>
-<p>Formally, a virtual link looks like a point-to-point network connecting two
-ABR from one area one of which physically connected to a backbone area.
-This pseudo-network is considered to belong to a backbone area.</p>
+set protocols ospf area &lt;number&gt; virtual-link &lt;A.B.C.D&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-area-number-virtual-link-a-b-c-d" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>通过建立虚拟链路来保证骨干区域的一致性。</p>
+<p>通常，OSPF 协议要求骨干区域（区域 0）具有一致性和完全连通性。即，任何骨干区域路由器都必须能够到达其它骨干区域路由器。此外，每个 ABR 都必须具有通往骨干区域的链路。然而，并非总能建立通往骨干区域的物理链路。此时，在两个 ABR（其中一个具有通往骨干区域的链路）之间（在非存根区域内）建立虚拟链路。</p>
+<p>&lt;number&gt; —— 虚拟链路所经区域的标识符。<br />
+&lt;A.B.C.D&gt; —— 建立虚拟链路的 ABR 路由器 ID。虚拟链路必须在两台路由器上均进行配置。</p>
+<p>形式上，虚拟链路看起来像一条连接同一区域内两个 ABR 的点对点网络，其中一端物理连接至骨干区域。该伪网络被视为属于骨干区域。</p>
 </div>
 </div>
 </section>
 <section id="interface-configuration">
-<h4>接口 配置</h4>
+<h4>接口配置</h4>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> area <x.x.x.x | x>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-area-x-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Enable ospf on an interface and set associated area.</p>
-<p>If you have a lot of interfaces, and/or a lot of subnets, then enabling
-OSPF via this command may result in a slight performance improvement.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospf interface <interface> authentication plaintext-password <text>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-authentication-plaintext-password-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets OSPF authentication key to a simple password. After
-setting, all OSPF packets are authenticated. 密钥 has length up to 8 chars.</p>
-<p>Simple text password authentication is insecure and deprecated in favour of
-MD5 HMAC authentication.</p>
+set protocols ospf interface &lt;interface&gt; area &lt;x.x.x.x | x&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-area-x-x-x-x-x" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>在接口上启用 OSPF 并设置关联区域。</p>
+<p>若存在大量接口和/或子网，则通过此命令启用 OSPF 可能带来轻微的性能提升。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> authentication md5 key-id <id> md5-key <text>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-authentication-md5-key-id-id-md5-key-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifys that MD5 HMAC authentication 必须 used on this
-interface. It sets OSPF authentication key to a cryptographic password.
-密钥-id identifies secret key used to create the message digest. This ID
-is part of the protocol and 必须 consistent across routers on a link.
-The key 可以 long up to 16 chars (larger strings 将 truncated),
-and is associated with the given key-id.</p>
+set protocols ospf interface &lt;interface&gt; authentication plaintext-password &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-authentication-plaintext-password-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令将 OSPF 认证密钥设置为简单密码。设置后，所有 OSPF 数据包均需认证。密钥长度最多为 8 个字符。</p>
+<p>简单文本密码认证不安全，已弃用，推荐使用 MD5 HMAC 认证。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> bandwidth <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-bandwidth-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets the interface bandwidth for cost calculations, where
-bandwidth 可以 in range from 1 to 100000, specified in Mbits/s.</p>
+set protocols ospf interface &lt;interface&gt; authentication md5 key-id &lt;id&gt; md5-key &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-authentication-md5-key-id-id-md5-key-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令指定在此接口上使用 MD5 HMAC 认证。它将 OSPF 认证密钥设置为加密密码。key-id 标识用于创建消息摘要的密钥。该 ID 是协议的一部分，必须在链路上的路由器之间保持一致。密钥长度最多为 16 个字符（更长的字符串将被截断），并与给定的 key-id 关联。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> cost <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-cost-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets link cost for the specified interface. The cost value is
-set to router-LSA’s metric field and used for SPF calculation. The cost
-range is 1 to 65535.</p>
+set protocols ospf interface &lt;interface&gt; bandwidth &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-bandwidth-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令为成本计算设置接口带宽，带宽取值范围为 1 至 100000，单位为 Mbit/s。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> dead-interval <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-dead-interval-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 number of seconds for router Dead Interval timer value used for Wait
-Timer and Inactivity Timer. This value 必须 the same for all routers
-attached to a common network. The default value is 40 seconds. The
-interval range is 1 to 65535.</p>
+set protocols ospf interface &lt;interface&gt; cost &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-cost-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令为指定接口设置链路成本。成本值被设置为路由器 LSA 的度量字段，并用于 SPF 计算。成本范围为 1 至 65535。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> hello-multiplier <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-hello-multiplier-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>The hello-multiplier specifies how many Hellos to send per second, from 1
-(every second) to 10 (every 100ms). Thus one can have 1s convergence time
-for OSPF. If this form is specified, then the hello-interval advertised in
-Hello packets is set to 0 and the hello-interval on received Hello packets
-is not checked, thus the hello-multiplier need NOT be the same across
-multiple routers on a common link.</p>
+set protocols ospf interface &lt;interface&gt; dead-interval &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-dead-interval-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置路由器死亡间隔计时器值（用于等待计时器和非活动计时器）的秒数。该值对于连接至同一网络的所有路由器必须相同。默认值为 40 秒。间隔范围为 1 至 65535。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> hello-interval <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-hello-interval-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 number of seconds for Hello Interval timer value. 设置ting this value,
-Hello packet 将 sent every timer value seconds on the specified
-interface. This value 必须 the same for all routers attached to a
-common network. The default value is 10 seconds. The interval range is 1
-to 65535.</p>
+set protocols ospf interface &lt;interface&gt; hello-multiplier &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-hello-multiplier-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>hello-multiplier 指定每秒发送多少个 Hello 数据包，取值范围为 1（每秒一次）至 10（每 100 毫秒一次）。因此，OSPF 可实现 1 秒的收敛时间。若指定此格式，则 Hello 数据包中通告的 hello-interval 将设为 0，且接收的 Hello 数据包中的 hello-interval 不再检查，因此 hello-multiplier 在同一链路上的多台路由器之间无需一致。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> bfd
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command enables <abbr title="Bidirectional Forwarding Detection">BFD</abbr> on
-this OSPF link interface.</p>
+set protocols ospf interface &lt;interface&gt; hello-interval &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-hello-interval-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置 Hello 间隔计时器值的秒数。设置该值后，Hello 数据包将在指定接口上每隔该计时器值的秒数发送一次。该值对于连接至同一网络的所有路由器必须相同。默认值为 10 秒。间隔范围为 1 至 65535。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> mtu-ignore
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-mtu-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command disables check of the MTU value in the OSPF DBD packets. Thus,
-use of this command allows the OSPF adjacency to reach the FULL state even
-though there is an interface MTU mismatch between two OSPF routers.</p>
+set protocols ospf interface &lt;interface&gt; bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-bfd" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令在该 OSPF 链路接口上启用 <abbr title="双向转发检测">BFD</abbr>。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> network <type>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-network-type" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command allows to specify the distribution type for the network
-connected to this interface:</p>
-<p><strong>broadcast</strong> – broadcast IP addresses distribution.
-<strong>non-broadcast</strong> – address distribution in NBMA networks topology.
-<strong>point-to-multipoint</strong> – address distribution in point-to-multipoint
-networks.
-<strong>point-to-point</strong> – address distribution in point-to-point networks.</p>
+set protocols ospf interface &lt;interface&gt; mtu-ignore
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-mtu-ignore" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令禁用对 OSPF DBD 数据包中 MTU 值的检查。因此，使用该命令可使 OSPF 邻接关系达到 FULL 状态，即使两台 OSPF 路由器之间的接口 MTU 不匹配。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> priority <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-priority-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets 路由r 优先级 integer value. The router with the
-highest priority 将 more eligible to become Designated 路由r.
-设置ting the value to 0, makes the router ineligible to become
-Designated 路由r. The default value is 1. The interval range is 0 to 255.</p>
+set protocols ospf interface &lt;interface&gt; network &lt;type&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-network-type" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令允许指定连接至该接口的网络的分发类型：</p>
+<p><strong>broadcast</strong> —— 广播 IP 地址分发。<br />
+<strong>non-broadcast</strong> —— NBMA 网络拓扑中的地址分发。<br />
+<strong>point-to-multipoint</strong> —— 点对多点网络中的地址分发。<br />
+<strong>point-to-point</strong> —— 点对点网络中的地址分发。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> retransmit-interval <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-retransmit-interval-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets number of seconds for RxmtInterval timer value. This
-value is used when retransmitting 数据base 描述 and Link State
-Request packets if acknowledge was not received. The default value is 5
-seconds. The interval range is 3 to 65535.</p>
+set protocols ospf interface &lt;interface&gt; priority &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-priority-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令设置路由器优先级整数值。具有最高优先级的路由器更有可能成为指定路由器（DR）。将该值设为 0 会使路由器不具备成为指定路由器的资格。默认值为 1。取值范围为 0 至 255。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> transmit-delay <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-transmit-delay-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets number of seconds for InfTransDelay value. It allows to
-set and adjust for each interface the delay interval before starting the
-synchronizing process of the router’s database with all neighbors. The
-default value is 1 seconds. The interval range is 3 to 65535.</p>
+set protocols ospf interface &lt;interface&gt; retransmit-interval &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-retransmit-interval-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令设置重传间隔（RxmtInterval）计时器值的秒数。当未收到确认时，该值用于重传数据库描述（Database Description）和链路状态请求（Link State Request）数据包。默认值为 5 秒。间隔范围为 3 至 65535。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> ldp-sync disable
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-ldp-sync-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command disables IGP-LDP sync for this specific interface.</p>
+set protocols ospf interface &lt;interface&gt; transmit-delay &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-transmit-delay-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令设置 InfTransDelay 值的秒数。它允许为每个接口设置和调整路由器数据库与所有邻居同步过程开始前的延迟间隔。默认值为 1 秒。间隔范围为 3 至 65535。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf interface <interface> ldp-sync holddown <seconds>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-ldp-sync-holddown-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command will change the hold down value for IGP-LDP synchronization
-during convergence/interface flap events, but for this interface only.</p>
+set protocols ospf interface &lt;interface&gt; ldp-sync disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-ldp-sync-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令为此特定接口禁用 IGP-LDP 同步功能。</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf interface &lt;interface&gt; ldp-sync holddown &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-interface-interface-ldp-sync-holddown-seconds" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令将在收敛/接口抖动事件期间更改 IGP-LDP 同步的保持时间值，但仅针对此接口。</p>
 </div>
 </div>
 </section>
 <section id="external-route-summarisation">
-<h4>External 路由 Summarisation</h4>
-<p>This feature summarises originated external LSAs (类型-5 and 类型-7). Summary
-路由 将 originated on-behalf of all matched external LSAs.</p>
+<h4>外部路由汇总</h4>
+<p>该功能汇总发起的外部 LSA（类型 5 和类型 7）。汇总路由将代表所有匹配的外部 LSA 发起。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf aggregation timer <seconds>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-aggregation-timer-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure aggregation delay timer interval.</p>
-<p>Summarisation starts only after this delay timer expiry.</p>
+set protocols ospf aggregation timer &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-aggregation-timer-seconds" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>配置汇总延迟定时器间隔。</p>
+<p>仅在该延迟定时器到期后才开始汇总。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols ospf summary-address x.x.x.x/y [tag (1-4294967295)]
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-summary-address-x-x-x-x-y-tag-1-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command enable/disables summarisation for the configured address range.</p>
-<p>标签 is the optional parameter. If tag configured Summary route 将
-originated with the configured tag.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-summary-address-x-x-x-x-y-tag-1-4294967295" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令启用/禁用对已配置地址范围的汇总功能。</p>
+<p>tag 是可选参数。若配置了 tag，则汇总路由将使用配置的 tag 发起。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols ospf summary-address x.x.x.x/y no-advertise
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-summary-address-x-x-x-x-y-no-advertise" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command to ensure not advertise the summary lsa for the matched
-external LSAs.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-summary-address-x-x-x-x-y-no-advertise" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令确保不为匹配的外部 LSA 通告汇总 LSA。</p>
 </div>
 </div>
 </section>
 <section id="graceful-restart">
-<h4>Graceful Restart</h4>
+<h4>平滑重启</h4>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols ospf graceful-restart [grace-period (1-1800)]
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-graceful-restart-grace-period-1-1800" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure Graceful Restart <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3623.html"><strong>RFC 3623</strong></a> restarting support. When enabled,
-the default grace period is 120 seconds.</p>
-<p>To perform a graceful shutdown, the FRR <code class="docutils literal notranslate">graceful-restart prepare ip ospf</code> EXEC-level command needs to be issued before restarting the
-ospfd daemon.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-graceful-restart-grace-period-1-1800" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>配置平滑重启 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3623.html"><strong>RFC 3623</strong></a> 重启支持。启用后，默认平滑重启时间为 120 秒。</p>
+<p>执行平滑关机时，需在重启 ospfd 守护进程前发出 FRR <code class="docutils literal notranslate">graceful-restart prepare ip ospf</code> EXEC 级命令。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols ospf graceful-restart helper enable [router-id A.B.C.D]
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-graceful-restart-helper-enable-router-id-a-b-c-d" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure Graceful Restart <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3623.html"><strong>RFC 3623</strong></a> helper support. By default, helper support
-is disabled for all neighbours. This config enables/disables helper support
-on this router for all neighbours.</p>
-<p>To enable/disable helper support for a specific neighbour, the router-id
-(A.B.C.D) has to be specified.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-graceful-restart-helper-enable-router-id-a-b-c-d" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>配置平滑重启 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3623.html"><strong>RFC 3623</strong></a> 协助支持。默认情况下，对所有邻居禁用协助支持。此配置启用/禁用该路由器对所有邻居的协助支持。</p>
+<p>若要为特定邻居启用/禁用协助支持，必须指定路由器 ID（A.B.C.D）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols ospf graceful-restart helper no-strict-lsa-checking
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-graceful-restart-helper-no-strict-lsa-checking" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>By default strict-lsa-checking is configured then the helper will abort
-the Graceful Restart when a LSA change occurs which affects the restarting
-router.</p>
-<p>This command disables it.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-graceful-restart-helper-no-strict-lsa-checking" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>默认情况下配置了严格 LSA 检查，当影响重启路由器的 LSA 发生变化时，协助者将中止平滑重启。</p>
+<p>该命令禁用严格 LSA 检查。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols ospf graceful-restart helper supported-grace-time
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-graceful-restart-helper-supported-grace-time" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Supports as HELPER for configured grace period.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-graceful-restart-helper-supported-grace-time" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>作为 HELPER 支持所配置的平滑重启时间。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols ospf graceful-restart helper planned-only
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-graceful-restart-helper-planned-only" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>It helps to support as HELPER only for planned restarts.</p>
-<p>By default, it supports both planned and unplanned outages.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-graceful-restart-helper-planned-only" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>它仅帮助支持计划内的重启作为 HELPER。</p>
+<p>默认情况下，它同时支持计划内和非计划内的中断。</p>
 </div>
 </div>
 </section>
 <section id="manual-neighbor-configuration">
-<h4>Manual Neighbor 配置</h4>
-<p>OSPF routing devices normally discover their neighbors dynamically by
-listening to the broadcast or multicast hello packets on the network.
-Because an NBMA network does not support broadcast (or multicast), the
-device cannot discover its neighbors dynamically, so you must configure all
-the neighbors statically.</p>
+<h4>手动邻居配置</h4>
+<p>OSPF 路由设备通常通过监听网络上的广播或组播 Hello 数据包来动态发现其邻居。由于 NBMA 网络不支持广播（或组播），设备无法动态发现其邻居，因此必须静态配置所有邻居。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf neighbor <A.B.C.D>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-neighbor-a-b-c-d" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies the IP address of the neighboring device.</p>
+set protocols ospf neighbor &lt;A.B.C.D&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-neighbor-a-b-c-d" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令指定邻居设备的 IP 地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf neighbor <A.B.C.D> poll-interval <seconds>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-neighbor-a-b-c-d-poll-interval-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies the length of time, in seconds, before the routing
-device sends hello packets out of the interface before it establishes
-adjacency with a neighbor. The range is 1 to 65535 seconds. The default
-value is 60 seconds.</p>
+set protocols ospf neighbor &lt;A.B.C.D&gt; poll-interval &lt;seconds&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-neighbor-a-b-c-d-poll-interval-seconds" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令指定路由设备在与邻居建立邻接关系之前，向接口发送 Hello 数据包的时间间隔（秒）。取值范围为 1 至 65535 秒。默认值为 60 秒。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf neighbor <A.B.C.D> priority <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-neighbor-a-b-c-d-priority-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies the router priority value of the nonbroadcast
-neighbor associated with the IP address specified. The default is 0.
-This keyword does not apply to point-to-multipoint interfaces.</p>
+set protocols ospf neighbor &lt;A.B.C.D&gt; priority &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-neighbor-a-b-c-d-priority-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令指定与指定 IP 地址关联的非广播邻居的路由器优先级值。默认值为 0。该关键字不适用于点对多点接口。</p>
 </div>
 </div>
 </section>
 <section id="redistribution-configuration">
-<h4>Redistribution 配置</h4>
+<h4>重分发配置</h4>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf redistribute <route source>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-redistribute-route-source" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command redistributes routing information from the given route source
-to the OSPF process. There are five modes available for route source: bgp,
-connected, kernel, rip, static.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospf default-metric <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-default-metric-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies the default metric value of redistributed routes.
-The metric range is 0 to 16777214.</p>
+set protocols ospf redistribute &lt;route source&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-redistribute-route-source" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令将来自指定路由源的路由信息重分发至 OSPF 进程。路由源有五种模式：bgp、connected、kernel、rip、static。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf redistribute <route source> metric <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-redistribute-route-source-metric-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies metric for redistributed routes from the given
-route source. There are five modes available for route source: bgp,
-connected, kernel, rip, static. The metric range is 1 to 16777214.</p>
+set protocols ospf default-metric &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-default-metric-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令指定重分发路由的默认度量值。度量值范围为 0 至 16777214。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf redistribute <route source> metric-type <1|2>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-redistribute-route-source-metric-type-1-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies metric type for redistributed routes. Difference
-between two metric types that metric type 1 is a metric which is
-“commensurable” with inner OSPF links. When calculating a metric to the
-external destination, the full path metric is calculated as a metric sum
-path of a router which had advertised this link plus the link metric.
-Thus, a route with the least summary metric 将 selected. If external
-link is advertised with metric type 2 the path is selected which lies
-through the router which advertised this link with the least metric
-despite of the fact that internal path to this router is longer (with more
-cost). However, if two routers advertised an external link and with metric
-type 2 the preference is given to the path which lies through the router
-with a shorter internal path. If two different routers advertised two
-links to the same external destimation but with different metric type,
-metric type 1 is preferred. If type of a metric left undefined the router
-will consider these external links to have a default metric type 2.</p>
+set protocols ospf redistribute &lt;route source&gt; metric &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-redistribute-route-source-metric-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令为来自指定路由源的重分发路由指定度量值。路由源有五种模式：bgp、connected、kernel、rip、static。度量值范围为 1 至 16777214。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols ospf redistribute <route source> route-map <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-redistribute-route-source-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command allows to use route map to filter redistributed routes from
-the given route source. There are five modes available for route source:
-bgp, connected, kernel, rip, static.</p>
+set protocols ospf redistribute &lt;route source&gt; metric-type &lt;1|2&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-redistribute-route-source-metric-type-1-2" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令为重分发路由指定度量类型。两种度量类型的区别在于：度量类型 1 是一种与 OSPF 内部链路“可比”的度量。在计算到外部目的地的度量时，完整路径度量被计算为通告该链路的路由器路径度量之和加上链路度量。因此，将选择总度量最小的路由。若外部链路以度量类型 2 发布，则选择经由通告该链路且度量最小的路由器的路径，尽管到该路由器的内部路径更长（成本更高）。然而，若两台路由器均以度量类型 2 发布外部链路，则优先选择经由内部路径更短的路由器的路径。若两台不同的路由器向同一外部目的地发布两条链路但度量类型不同，则优先选择度量类型 1。若未指定度量类型，路由器将认为这些外部链路具有默认度量类型 2。</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set protocols ospf redistribute &lt;route source&gt; route-map &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-redistribute-route-source-route-map-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>该命令允许使用路由映射来过滤来自指定路由源的重分发路由。路由源有五种模式：bgp、connected、kernel、rip、static。</p>
 </div>
 </div>
 </section>
 <section id="operational-mode-commands">
-<h4>Operational 模式 Commands</h4>
+<h4>操作模式命令</h4>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show ip ospf neighbor
-<a class="cmdlink" href="#opcmd-show-ip-ospf-neighbor" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays the neighbors status.</p>
+<a class="cmdlink" href="#opcmd-show-ip-ospf-neighbor" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>该命令显示邻居状态。</p>
 </div>
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre>Neighbor ID     Pri State           Dead Time Address         Interface                        RXmtL RqstL DBsmL
@@ -993,9 +772,8 @@ show ip ospf neighbor
 <div class="opcmd-heading">
 
 show ip ospf neighbor detail
-<a class="cmdlink" href="#opcmd-show-ip-ospf-neighbor-detail" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays the neighbors information in a detailed form, not
-just a summary table.</p>
+<a class="cmdlink" href="#opcmd-show-ip-ospf-neighbor-detail" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>该命令以详细形式而非仅摘要表格形式显示邻居信息。</p>
 </div>
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre> Neighbor 10.0.13.1, interface address 10.0.13.1
@@ -1063,32 +841,29 @@ Neighbor 10.0.23.2, interface address 10.0.23.2
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show ip ospf neighbor <A.B.C.D>
-<a class="cmdlink" href="#opcmd-show-ip-ospf-neighbor-a-b-c-d" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays the neighbors information in a detailed form for a
-neighbor whose IP address is specified.</p>
+show ip ospf neighbor &lt;A.B.C.D&gt;
+<a class="cmdlink" href="#opcmd-show-ip-ospf-neighbor-a-b-c-d" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>该命令以详细形式显示指定 IP 地址的邻居的信息。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show ip ospf neighbor <interface>
-<a class="cmdlink" href="#opcmd-show-ip-ospf-neighbor-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays the neighbors status for a neighbor on the specified
-interface.</p>
+show ip ospf neighbor &lt;interface&gt;
+<a class="cmdlink" href="#opcmd-show-ip-ospf-neighbor-interface" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>该命令显示指定接口上邻居的状态。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show ip ospf interface [<interface>]
-<a class="cmdlink" href="#opcmd-show-ip-ospf-interface-interface" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays state and configuration of OSPF for the specified
-interface, or all interfaces if no interface is given.</p>
+show ip ospf interface [&lt;interface&gt;]
+<a class="cmdlink" href="#opcmd-show-ip-ospf-interface-interface" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>该命令显示指定接口的 OSPF 状态和配置；若未指定接口，则显示所有接口的状态和配置。</p>
 </div>
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre>eth0 is up
-  ifindex 2, MTU 1500 bytes, BW 4294967295 Mbit <UP,BROADCAST,RUNNING,MULTICAST>
+  ifindex 2, MTU 1500 bytes, BW 4294967295 Mbit &lt;UP,BROADCAST,RUNNING,MULTICAST&gt;
   Internet Address 10.0.13.3/24, Broadcast 10.0.13.255, Area 0.0.0.0
   MTU mismatch detection: enabled
   Router ID 10.0.23.3, Network Type BROADCAST, Cost: 1
@@ -1099,7 +874,7 @@ interface, or all interfaces if no interface is given.</p>
     Hello due in 4.470s
   Neighbor Count is 1, Adjacent neighbor count is 1
 eth1 is up
-  ifindex 3, MTU 1500 bytes, BW 4294967295 Mbit <UP,BROADCAST,RUNNING,MULTICAST>
+  ifindex 3, MTU 1500 bytes, BW 4294967295 Mbit &lt;UP,BROADCAST,RUNNING,MULTICAST&gt;
   Internet Address 10.0.23.3/24, Broadcast 10.0.23.255, Area 0.0.0.1
   MTU mismatch detection: enabled
   Router ID 10.0.23.3, Network Type BROADCAST, Cost: 1
@@ -1116,10 +891,8 @@ eth1 is up
 <div class="opcmd-heading">
 
 show ip ospf route [detail]
-<a class="cmdlink" href="#opcmd-show-ip-ospf-route-detail" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays the OSPF routing table, as determined by the most
-recent SPF calculation. With the optional <code class="docutils literal notranslate">detail</code> argument,
-each route item’s advertiser router and network attribute 将 shown.</p>
+<a class="cmdlink" href="#opcmd-show-ip-ospf-route-detail" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>该命令显示由最近一次 SPF 计算确定的 OSPF 路由表。使用可选的 <code class="docutils literal notranslate">detail</code> 参数时，将显示每条路由项的通告路由器和网络属性。</p>
 </div>
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre>============ OSPF network routing table ============
@@ -1143,711 +916,28 @@ N E2 172.16.0.0/24         [2/20] tag: 0
                            via 10.0.13.3, eth0
 </pre></div>
 </div>
-<p>The table consists of following data:</p>
-<p><strong>OSPF network routing table</strong> – includes a list of acquired routes for all
-accessible networks (or aggregated area ranges) of OSPF system. “IA” flag
-means that route destination is in the area to which the router is not
-connected, i.e. it’s an inter-area path. In square brackets a summary metric
-for all links through which a path lies to this network is specified. “via”
-prefix defines a router-gateway, i.e. the first router on the way to the
-destination (next hop).
-<strong>OSPF router routing table</strong> – includes a list of acquired routes to all
-accessible ABRs and ASBRs.
-<strong>OSPF external routing table</strong> – includes a list of acquired routes that are
-external to the OSPF process. “E” flag points to the external link metric type
-(E1 – metric type 1, E2 – metric type 2). External link metric is printed in
-the “<metric of the router which advertised the link>/<link metric>” format.</p>
+<p>该表包含以下数据：</p>
+<p><strong>OSPF 网络路由表</strong> —— 包含 OSPF 系统所有可达网络（或聚合的区域范围）获取的路由列表。“IA”标志表示路由目的地位于路由器未直接连接的区域，即为区域间路径。方括号内指定的是通往该网络的所有链路的汇总度量。“via”前缀定义路由器网关，即通往目的地路径上的第一台路由器（下一跳）。<br />
+<strong>OSPF 路由器路由表</strong> —— 包含通往所有可达 ABR 和 ASBR 的路由列表。<br />
+<strong>OSPF 外部路由表</strong> —— 包含 OSPF 进程外部获取的路由列表。“E”标志指向外部链路度量类型（E1 — 度量类型 1，E2 — 度量类型 2）。外部链路度量以“&lt;通告该链路的路由器的度量&gt;/&lt;链路度量&gt;”格式打印。</p>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show ip ospf border-routers
-<a class="cmdlink" href="#opcmd-show-ip-ospf-border-routers" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays a table of paths to area boundary and autonomous
-system boundary routers.</p>
+<a class="cmdlink" href="#opcmd-show-ip-ospf-border-routers" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>该命令显示通往区域边界路由器和自治系统边界路由器的路径表。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show ip ospf database
-<a class="cmdlink" href="#opcmd-show-ip-ospf-database" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays a summary table with a database contents (LSA).</p>
+<a class="cmdlink" href="#opcmd-show-ip-ospf-database" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>该命令显示数据库内容（LSA）的摘要表。</p>
 </div>
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre>       OSPF Router with ID (10.0.13.1)
 
                 Router Link States (Area 0.0.0.0)
 
-Link ID         ADV Router      Age  Seq#       CkSum  Link count
-10.0.13.1       10.0.13.1        984 0x80000005 0xd915 1
-10.0.23.3       10.0.23.3       1186 0x80000008 0xfe62 2
-10.0.34.4       10.0.34.4       1063 0x80000004 0x4e3f 1
-
-                Net Link States (Area 0.0.0.0)
-
-Link ID         ADV Router      Age  Seq#       CkSum
-10.0.13.1       10.0.13.1        994 0x80000003 0x30bb
-10.0.34.4       10.0.34.4       1188 0x80000001 0x9411
-
-                Summary Link States (Area 0.0.0.0)
-
-Link ID         ADV Router      Age  Seq#       CkSum  Route
-10.0.12.0       10.0.23.3       1608 0x80000001 0x6ab6 10.0.12.0/24
-10.0.23.0       10.0.23.3        981 0x80000003 0xe232 10.0.23.0/24
-
-                AS External Link States
-
-Link ID         ADV Router      Age  Seq#       CkSum  Route
-172.16.0.0      10.0.34.4       1063 0x80000001 0xc40d E2 172.16.0.0/24 [0x0]
-</pre></div>
-</div>
-<div class="cmd cmd-op">
-<div class="opcmd-heading">
-
-show ip ospf database <type> [A.B.C.D] [adv-router <A.B.C.D>|self-originate]
-<a class="cmdlink" href="#opcmd-show-ip-ospf-database-type-a-b-c-d-adv-router-a-b-c-d-self-originate" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays a database contents for a specific link advertisement
-type.</p>
-<p>The type 可以 the following:
-asbr-summary, external, network, nssa-external, opaque-area, opaque-as,
-opaque-link, router, summary.</p>
-<p>[A.B.C.D] – link-state-id. With this specified the command displays portion
-of the network environment that is being described by the advertisement.
-The value entered depends on the advertisement’s LS type. It 必须
-entered in the form of an IP address.</p>
-<p><code class="docutils literal notranslate">adv-router <A.B.C.D></code> – router id, which link advertisements need
-to be reviewed.</p>
-<p><code class="docutils literal notranslate">self-originate</code> displays only self-originated LSAs from the local
-router.</p>
-</div>
-</div>
-<div class="highlight-none notranslate"><div class="highlight"><pre>        OSPF Router with ID (10.0.13.1)
-
-              Router Link States (Area 0.0.0.0)
-
-LS age: 1213
-Options: 0x2  : *|-|-|-|-|-|E|-
-LS Flags: 0x3
-Flags: 0x0
-LS Type: router-LSA
-Link State ID: 10.0.13.1
-Advertising Router: 10.0.13.1
-LS Seq Number: 80000009
-Checksum: 0xd119
-Length: 36
-
- Number of Links: 1
-
-  Link connected to: a Transit Network
-   (Link ID) Designated Router address: 10.0.13.1
-   (Link Data) Router Interface address: 10.0.13.1
-   Number of TOS metrics: 0
-     TOS 0 Metric: 1
-</pre></div>
-</div>
-<div class="cmd cmd-op">
-<div class="opcmd-heading">
-
-show ip ospf database max-age
-<a class="cmdlink" href="#opcmd-show-ip-ospf-database-max-age" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays LSAs in MaxAge list.</p>
-</div>
-</div>
-</section>
-<section id="examples">
-<h4>示例</h4>
-</section>
-</section>
-<section id="enable-ospf">
-<h3>Enable OSPF</h3>
-<p><strong>Node 1</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address 10.1.1.1/32
-set interfaces ethernet eth0 address 192.168.0.1/24
-set protocols ospf area 0 network 192.168.0.0/24
-set protocols ospf area 0 network 10.1.1.1/32
-set protocols ospf parameters router-id 10.1.1.1
-</pre></div>
-</div>
-<p><strong>Node 2</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address 10.1.1.2/32
-set interfaces ethernet eth0 address 192.168.0.2/24
-set protocols ospf area 0 network 192.168.0.0/24
-set protocols ospf area 0 network 10.1.1.2/32
-set protocols ospf parameters router-id 10.1.1.2
-</pre></div>
-</div>
-<p>Here’s the neighbors up:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show ip ospf neighbor
-
-Neighbor ID     Pri State           Up Time         Dead Time Address         Interface                        RXmtL RqstL DBsmL
-10.1.1.2          1 Full/DR         3m43s             36.094s 192.168.0.2     eth0:192.168.0.1                     0     0     0
-
-
-Node-2@vyos:~$ show ip ospf neighbor
-
-Neighbor ID     Pri State           Up Time         Dead Time Address         Interface                        RXmtL RqstL DBsmL
-10.1.1.1          1 Full/Backup     3m47s             31.736s 192.168.0.1     eth0:192.168.0.2                     0     0     0
-</pre></div>
-</div>
-<p>Here’s the routes:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show ip route ospf
-Codes: K - kernel route, C - connected, S - static, R - RIP,
-       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
-       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
-       f - OpenFabric,
-       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
-       t - trapped, o - offload failure
-
-O   10.1.1.1/32 [110/0] is directly connected, lo, weight 1, 00:00:14
-O>* 10.1.1.2/32 [110/1] via 192.168.0.2, eth0, weight 1, 00:00:07
-O   192.168.0.0/24 [110/1] is directly connected, eth0, weight 1, 00:03:32
-
-Node-2@vyos:~$ show ip route ospf
-Codes: K - kernel route, C - connected, S - static, R - RIP,
-       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
-       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
-       f - OpenFabric,
-       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
-       t - trapped, o - offload failure
-
-O>* 10.1.1.1/32 [110/1] via 192.168.0.1, eth0, weight 1, 00:00:11
-O   10.1.1.2/32 [110/0] is directly connected, lo, weight 1, 00:00:04
-O   192.168.0.0/24 [110/1] is directly connected, eth0, weight 1, 00:03:18
-</pre></div>
-</div>
-</section>
-<section id="enable-ospf-with-route-redistribution-of-the-loopback-and-default-originate">
-<h3>Enable OSPF with route redistribution of the loopback and default originate:</h3>
-<p><strong>Node 1</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address 10.1.1.1/32
-set protocols ospf area 0 network 192.168.0.0/24
-set protocols ospf default-information originate always
-set protocols ospf default-information originate metric 10
-set protocols ospf default-information originate metric-type 2
-set protocols ospf log-adjacency-changes
-set protocols ospf parameters router-id 10.1.1.1
-set protocols ospf redistribute connected metric-type 2
-set protocols ospf redistribute connected route-map CONNECT
-
-set policy route-map CONNECT rule 10 action permit
-set policy route-map CONNECT rule 10 match interface lo
-</pre></div>
-</div>
-<p><strong>Node 2</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address 10.2.2.2/32
-set protocols ospf area 0 network 192.168.0.0/24
-set protocols ospf log-adjacency-changes
-set protocols ospf parameters router-id 10.2.2.2
-set protocols ospf redistribute connected metric-type 2
-set protocols ospf redistribute connected route-map CONNECT
-
-set policy route-map CONNECT rule 10 action permit
-set policy route-map CONNECT rule 10 match interface lo
-</pre></div>
-</div>
-</section>
-<section id="enable-ospf-and-igp-ldp-synchronization">
-<h3>Enable OSPF and IGP-LDP synchronization:</h3>
-<p><strong>Node 1:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address 10.1.1.1/32
-set interfaces ethernet eth0 address 192.168.0.1/24
-
-set protocols ospf area 0 network '192.168.0.0/24'
-set protocols ospf area 0 network '10.1.1.1/32'
-set protocols ospf parameters router-id '10.1.1.1'
-set protocols ospf ldp-sync
-
-set protocols mpls interface eth0
-set protocols mpls ldp discovery transport-ipv4-address 10.1.1.1
-set protocols mpls ldp interface lo
-set protocols mpls ldp interface eth0
-set protocols mpls ldp parameters transport-prefer-ipv4
-set protocols mpls ldp router-id 10.1.1.1
-</pre></div>
-</div>
-<p>This gives us IGP-LDP synchronization for all non-loopback interfaces with
-a holddown timer of zero seconds:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show ip ospf mpls ldp-sync
-  eth0
-  LDP-IGP Synchronization enabled: yes
-  Holddown timer in seconds: 0
-  State: Sync achieved
-</pre></div>
-</div>
-</section>
-<section id="enable-ospf-with-segment-routing-experimental">
-<h3>Enable OSPF with Segment 路由 (Experimental):</h3>
-<p><strong>Node 1</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address 10.1.1.1/32
-set interfaces ethernet eth0 address 192.168.0.1/24
-
-set protocols ospf area 0 network '192.168.0.0/24'
-set protocols ospf area 0 network '10.1.1.1/32'
-set protocols ospf parameters opaque-lsa
-set protocols ospf parameters router-id '10.1.1.1'
-set protocols ospf segment-routing global-block high-label-value '1100'
-set protocols ospf segment-routing global-block low-label-value '1000'
-set protocols ospf segment-routing prefix 10.1.1.1/32 index explicit-null
-set protocols ospf segment-routing prefix 10.1.1.1/32 index value '1'
-</pre></div>
-</div>
-<p><strong>Node 2</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address 10.1.1.2/32
-set interfaces ethernet eth0 address 192.168.0.2/24
-
-set protocols ospf area 0 network '192.168.0.0/24'
-set protocols ospf area 0 network '10.1.1.2/32'
-set protocols ospf parameters opaque-lsa
-set protocols ospf parameters router-id '10.1.1.2'
-set protocols ospf segment-routing global-block high-label-value '1100'
-set protocols ospf segment-routing global-block low-label-value '1000'
-set protocols ospf segment-routing prefix 10.1.1.2/32 index explicit-null
-set protocols ospf segment-routing prefix 10.1.1.2/32 index value '2'
-</pre></div>
-</div>
-<p>This gives us MPLS segment routing enabled and labels for far end loopbacks:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show mpls table
- Inbound Label  Type       Nexthop      Outbound Label
- -----------------------------------------------------------
- 1002           SR (OSPF)  192.168.0.2  IPv4 Explicit Null  <-- Node-2 loopback learned on Node-1
- 15000          SR (OSPF)  192.168.0.2  implicit-null
- 15001          SR (OSPF)  192.168.0.2  implicit-null
-
-Node-2@vyos:~$ show mpls table
- Inbound Label  Type       Nexthop      Outbound Label
- -----------------------------------------------------------
- 1001           SR (OSPF)  192.168.0.1  IPv4 Explicit Null  <-- Node-1 loopback learned on Node-2
- 15000          SR (OSPF)  192.168.0.1  implicit-null
- 15001          SR (OSPF)  192.168.0.1  implicit-null
-</pre></div>
-</div>
-<p>Here is the routing tables showing the MPLS segment routing label operations:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show ip route ospf
-Codes: K - kernel route, C - connected, S - static, R - RIP,
-       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
-       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
-       f - OpenFabric,
-       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
-       t - trapped, o - offload failure
-
-O   10.1.1.1/32 [110/0] is directly connected, lo, weight 1, 00:03:43
-O>* 10.1.1.2/32 [110/1] via 192.168.0.2, eth0, label IPv4 Explicit Null, weight 1, 00:03:32
-O   192.168.0.0/24 [110/1] is directly connected, eth0, weight 1, 00:03:43
-
-Node-2@vyos:~$ show ip route ospf
-Codes: K - kernel route, C - connected, S - static, R - RIP,
-       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
-       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
-       f - OpenFabric,
-       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
-       t - trapped, o - offload failure
-
-O>* 10.1.1.1/32 [110/1] via 192.168.0.1, eth0, label IPv4 Explicit Null, weight 1, 00:03:36
-O   10.1.1.2/32 [110/0] is directly connected, lo, weight 1, 00:03:51
-O   192.168.0.0/24 [110/1] is directly connected, eth0, weight 1, 00:03:51
-</pre></div>
-</div>
-</section>
-</section>
-<section id="ospfv3-ipv6">
-<h2>OSPFv3 (IPv6)</h2>
-<section id="ospf-v3-configuration">
-<h3>配置</h3>
-<section id="ospf-v3-general">
-<h4>General</h4>
-<p>VyOS does not have a special command to start the OSPFv3 process. The OSPFv3
-process starts when the first ospf enabled interface is configured.</p>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 interface <interface> area <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-interface-interface-area-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies the OSPFv3 enabled interface. This command is also
-used to enable the OSPF process. The area number 可以 specified in
-decimal notation in the range from 0 to 4294967295. Or it 可以 specified
-in dotted decimal notation similar to ip address.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 parameters router-id <rid>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-parameters-router-id-rid" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets the router-ID of the OSPFv3 process. The router-ID 可能
-an IP address of the router, but need not be – it 可以 any arbitrary
-32bit number. However it MUST be unique within the entire OSPFv3 domain to
-the OSPFv3 speaker – bad things will happen if multiple OSPFv3 speakers are
-configured with the same router-ID!</p>
-</div>
-</div>
-</section>
-<section id="ospf-v3-optional">
-<h4>可选</h4>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 distance global <distance>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-distance-global-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command change distance value of OSPFv3 globally.
-The distance range is 1 to 255.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 distance ospfv3 <external|inter-area|intra-area> <distance>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-distance-ospfv3-external-inter-area-intra-area-distance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command change distance value of OSPFv3. The arguments are the
-distance values for external routes, inter-area routes and intra-area
-routes respectively. The distance range is 1 to 255.</p>
-</div>
-</div>
-</section>
-<section id="ospf-v3-area-configuration">
-<h4>Area 配置</h4>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 area <number> range <prefix>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-area-number-range-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command summarizes intra area paths from specified area into one
-类型-3 Inter-Area Prefix LSA announced to other areas. This command 可以
-used only in ABR.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 area <number> range <prefix> not-advertise
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-area-number-range-prefix-not-advertise" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command instead of summarizing intra area paths filter them - i.e.
-intra area paths from this range are not advertised into other areas. This
-command makes sense in ABR only.</p>
-</div>
-</div>
-</section>
-<section id="ospf-v3-interface-config">
-<h4>接口 配置</h4>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 interface <interface> ipv6 cost <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-interface-interface-ipv6-cost-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets link cost for the specified interface. The cost value is
-set to router-LSA’s metric field and used for SPF calculation. The cost
-range is 1 to 65535.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 interface <interface> dead-interval <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-interface-interface-dead-interval-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 number of seconds for router Dead Interval timer value used for Wait
-Timer and Inactivity Timer. This value 必须 the same for all routers
-attached to a common network. The default value is 40 seconds. The
-interval range is 1 to 65535.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 interface <interface> hello-interval <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-interface-interface-hello-interval-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 number of seconds for Hello Interval timer value. 设置ting this value,
-Hello packet 将 sent every timer value seconds on the specified
-interface. This value 必须 the same for all routers attached to a
-common network. The default value is 10 seconds. The interval range is 1
-to 65535.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 interface <interface> mtu-ignore
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-interface-interface-mtu-ignore" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command disables check of the MTU value in the OSPF DBD packets.
-Thus, use of this command allows the OSPF adjacency to reach the FULL
-state even though there is an interface MTU mismatch between two OSPF
-routers.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 interface <interface> network <type>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-interface-interface-network-type" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command allows to specify the distribution type for the network
-connected to this interface:</p>
-<p><strong>broadcast</strong> – broadcast IP addresses distribution.
-<strong>point-to-point</strong> – address distribution in point-to-point networks.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 interface <interface> priority <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-interface-interface-priority-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets 路由r 优先级 integer value. The router with the
-highest priority 将 more eligible to become Designated 路由r.
-设置ting the value to 0, makes the router ineligible to become Designated
-路由r. The default value is 1. The interval range is 0 to 255.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 interface <interface> passive
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-interface-interface-passive" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command specifies interface as passive. Passive interface advertises
-its address, but does not run the OSPF protocol (adjacencies are not formed
-and hello packets are not generated).</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 interface <interface> retransmit-interval <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-interface-interface-retransmit-interval-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets number of seconds for RxmtInterval timer value. This
-value is used when retransmitting 数据base 描述 and Link State
-Request packets if acknowledge was not received. The default value is 5
-seconds. The interval range is 3 to 65535.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 interface <interface> transmit-delay <number>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-interface-interface-transmit-delay-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command sets number of seconds for InfTransDelay value. It allows to
-set and adjust for each interface the delay interval before starting the
-synchronizing process of the router’s database with all neighbors. The
-default value is 1 seconds. The interval range is 3 to 65535.</p>
-</div>
-</div>
-</section>
-<section id="ospf-v3-graceful-restart">
-<h4>Graceful Restart</h4>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 graceful-restart [grace-period (1-1800)]
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-graceful-restart-grace-period-1-1800" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure Graceful Restart <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3623.html"><strong>RFC 3623</strong></a> restarting support. When enabled,
-the default grace period is 120 seconds.</p>
-<p>To perform a graceful shutdown, the FRR <code class="docutils literal notranslate">graceful-restart prepare ip ospf</code> EXEC-level command needs to be issued before restarting the
-ospfd daemon.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 graceful-restart helper enable [router-id A.B.C.D]
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-graceful-restart-helper-enable-router-id-a-b-c-d" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure Graceful Restart <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3623.html"><strong>RFC 3623</strong></a> helper support. By default, helper support
-is disabled for all neighbours. This config enables/disables helper support
-on this router for all neighbours.</p>
-<p>To enable/disable helper support for a specific neighbour, the router-id
-(A.B.C.D) has to be specified.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 graceful-restart helper lsa-check-disable
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-graceful-restart-helper-lsa-check-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>By default strict-lsa-checking is configured then the helper will abort
-the Graceful Restart when a LSA change occurs which affects the restarting
-router.</p>
-<p>This command disables it.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 graceful-restart helper supported-grace-time
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-graceful-restart-helper-supported-grace-time" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Supports as HELPER for configured grace period.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 graceful-restart helper planned-only
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-graceful-restart-helper-planned-only" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>It helps to support as HELPER only for planned restarts.
-By default, it supports both planned and unplanned outages.</p>
-</div>
-</div>
-</section>
-<section id="ospf-v3-redistribution-config">
-<h4>Redistribution 配置</h4>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospfv3 redistribute <route source>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-redistribute-route-source" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command redistributes routing information from the given route source
-to the OSPFv3 process. There are five modes available for route source:
-bgp, connected, kernel, ripng, static.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols ospf redistribute <route source> route-map <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-ospf-redistribute-route-source-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command allows to use route map to filter redistributed routes from
-given route source. There are five modes available for route source: bgp,
-connected, kernel, ripng, static.</p>
-</div>
-</div>
-</section>
-<section id="ospf-v3-op-cmd">
-<h4>Operational 模式 Commands</h4>
-<div class="cmd cmd-op">
-<div class="opcmd-heading">
-
-show ipv6 ospfv3 neighbor
-<a class="cmdlink" href="#opcmd-show-ipv6-ospfv3-neighbor" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays the neighbors status.</p>
-</div>
-</div>
-<div class="cmd cmd-op">
-<div class="opcmd-heading">
-
-show ipv6 ospfv3 neighbor detail
-<a class="cmdlink" href="#opcmd-show-ipv6-ospfv3-neighbor-detail" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays the neighbors information in a detailed form, not
-just a summary table.</p>
-</div>
-</div>
-<div class="cmd cmd-op">
-<div class="opcmd-heading">
-
-show ipv6 ospfv3 neighbor drchoice
-<a class="cmdlink" href="#opcmd-show-ipv6-ospfv3-neighbor-drchoice" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays the neighbor DR choice information.</p>
-</div>
-</div>
-<div class="cmd cmd-op">
-<div class="opcmd-heading">
-
-show ipv6 ospfv3 interface [prefix]|[<interface> [prefix]]
-<a class="cmdlink" href="#opcmd-show-ipv6-ospfv3-interface-prefix-interface-prefix" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays state and configuration of OSPF for the specified
-interface, or all interfaces if no interface is given. With the argument
-<code class="docutils literal notranslate">prefix</code> this command shows connected prefixes to advertise.</p>
-</div>
-</div>
-<div class="cmd cmd-op">
-<div class="opcmd-heading">
-
-show ipv6 ospfv3 route
-<a class="cmdlink" href="#opcmd-show-ipv6-ospfv3-route" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays the OSPF routing table, as determined by the most
-recent SPF calculation.</p>
-</div>
-</div>
-<div class="cmd cmd-op">
-<div class="opcmd-heading">
-
-show ipv6 ospfv3 border-routers
-<a class="cmdlink" href="#opcmd-show-ipv6-ospfv3-border-routers" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays a table of paths to area boundary and autonomous
-system boundary routers.</p>
-</div>
-</div>
-<div class="cmd cmd-op">
-<div class="opcmd-heading">
-
-show ipv6 ospfv3 database
-<a class="cmdlink" href="#opcmd-show-ipv6-ospfv3-database" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays a summary table with a database contents (LSA).</p>
-</div>
-</div>
-<div class="cmd cmd-op">
-<div class="opcmd-heading">
-
-show ipv6 ospfv3 database <type> [A.B.C.D] [adv-router <A.B.C.D>|self-originate]
-<a class="cmdlink" href="#opcmd-show-ipv6-ospfv3-database-type-a-b-c-d-adv-router-a-b-c-d-self-originate" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays a database contents for a specific link
-advertisement type.</p>
-</div>
-</div>
-<div class="cmd cmd-op">
-<div class="opcmd-heading">
-
-show ipv6 ospfv3 redistribute
-<a class="cmdlink" href="#opcmd-show-ipv6-ospfv3-redistribute" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>This command displays external information redistributed into OSPFv3</p>
-</div>
-</div>
-</section>
-<section id="configuration-example">
-<h4>配置 示例</h4>
-<p>A typical configuration using 2 nodes.</p>
-<p><strong>Node 1:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospfv3 interface eth1 area 0.0.0.0
-set protocols ospfv3 area 0.0.0.0 range 2001:db8:1::/64
-set protocols ospfv3 parameters router-id 192.168.1.1
-set protocols ospfv3 redistribute connected
-</pre></div>
-</div>
-<p><strong>Node 2:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols ospfv3 interface eth1 area 0.0.0.0
-set protocols ospfv3 area 0.0.0.0 range 2001:db8:2::/64
-set protocols ospfv3 parameters router-id 192.168.2.1
-set protocols ospfv3 redistribute connected
-</pre></div>
-</div>
-<p><strong>To see the redistributed routes:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>show ipv6 ospfv3 redistribute
-</pre></div>
-</div>
-<p>Cost calculation for WireGuard interfaces is unreliable as ospfv3 uses the
-link speed to calculate the link cost. You might therefore want to set the
-link cost to a fixed value on WireGuard tunnels.</p>
-<p>示例 configuration for WireGuard interfaces:</p>
-<p><strong>Node 1</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces wireguard wg01 peer ospf02 allowed-ips '::/0'
-set interfaces wireguard wg01 peer ospf02 endpoint '10.1.1.101:12345'
-set interfaces wireguard wg01 peer ospf02 pubkey 'ie3...='
-set interfaces wireguard wg01 port '12345'
-set protocols ospfv3 parameters router-id 192.168.1.1
-set protocols ospfv3 interface 'wg01' area 0.0.0.0
-set protocols ospfv3 interface 'wg01' cost 10
-set protocols ospfv3 interface 'lo' area 0.0.0.0
-</pre></div>
-</div>
-<p><strong>Node 2</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces wireguard wg01 peer ospf01 allowed-ips '::/0'
-set interfaces wireguard wg01 peer ospf01 endpoint '10.1.1.100:12345'
-set interfaces wireguard wg01 peer ospf01 pubkey 'NHI...='
-set interfaces wireguard wg01 port '12345'
-set protocols ospfv3 parameters router-id 192.168.1.2
-set protocols ospfv3 interface 'wg01' area 0.0.0.0
-set protocols ospfv3 interface 'wg01' cost 10
-set protocols ospfv3 interface 'lo' area 0.0.0.0
-</pre></div>
-</div>
-<p><strong>Status</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@ospf01:~$ sh ipv6 ospfv3 neighbor
-Neighbor ID     Pri    DeadTime    State/IfState         Duration I/F[State]
-192.168.0.2       1    00:00:37     Full/PointToPoint    00:18:03 wg01[PointToPoint]
-
-vyos@ospf02# run sh ipv6 ospfv3 neighbor
-Neighbor ID     Pri    DeadTime    State/IfState         Duration I/F[State]
-192.168.0.1       1    00:00:39     Full/PointToPoint    00:19:44 wg01[PointToPoint]
-</pre></div>
-</div>
-</section>
-</section>
-</section>
-</section>
-
-
-           </div>
-</body>
-</html>
+Link ID         ADV Router      Age  Seq#

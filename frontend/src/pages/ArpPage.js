@@ -129,15 +129,6 @@ export default defineComponent({
   components: { DataTable, ToolbarButton },
   template: `
     <div class="page-container">
-      <div class="toolbar toolbar-compact">
-        <div class="toolbar-left">
-          <select v-model="selectedInterface" @change="load" :title="t('arp.filterByInterface')">
-            <option value="">{{ t('arp.allInterfaces') }}</option>
-            <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
-          </select>
-          <ToolbarButton icon="refresh" @click="load">{{ t('app.refresh') }}</ToolbarButton>
-        </div>
-      </div>
       <DataTable
         :columns="columns"
         :data="rows"
@@ -145,7 +136,15 @@ export default defineComponent({
         :selectable="false"
         :actions="[]"
         rowKey="address"
-      />
+      >
+        <template #toolbar-left-extra>
+          <select v-model="selectedInterface" @change="load" :title="t('arp.filterByInterface')">
+            <option value="">{{ t('arp.allInterfaces') }}</option>
+            <option v-for="iface in interfaces" :key="iface" :value="iface">{{ iface }}</option>
+          </select>
+          <ToolbarButton icon="refresh" @click="load">{{ t('app.refresh') }}</ToolbarButton>
+        </template>
+      </DataTable>
     </div>
   `,
 });

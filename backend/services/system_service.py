@@ -21,13 +21,21 @@ BACKUP_DIR = os.path.join(BASE_DIR, 'backups')
 def _run_command(cmd, input_text=None, timeout=30):
     try:
         result = subprocess.run(cmd, input=input_text, capture_output=True, text=True, timeout=timeout)
-        return {
-            'success': result.returncode == 0,
-            'output': result.stdout + result.stderr,
-            'returncode': result.returncode
-        }
+        if result.returncode == 0:
+            return {
+                'success': True,
+                'output': result.stdout,
+                'returncode': result.returncode
+            }
+        else:
+            return {
+                'success': False,
+                'message': result.stderr.strip() or f'Command failed with return code {result.returncode}',
+                'output': result.stdout + result.stderr,
+                'returncode': result.returncode
+            }
     except Exception as e:
-        return {'success': False, 'output': str(e), 'returncode': -1}
+        return {'success': False, 'message': str(e), 'output': str(e), 'returncode': -1}
 
 
 def _write_webapp_history(version, build, commit, action, source='', backup_path='', success=True, error_message=''):

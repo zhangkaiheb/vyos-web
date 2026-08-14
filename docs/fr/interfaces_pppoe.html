@@ -429,14 +429,14 @@ set interfaces pppoe &lt;interface&gt; ip source-validation &lt;strict | loose |
 <a class="cmdlink" href="#cfgcmd-set-interfaces-pppoe-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p><strong>Configurer la validation de l'adresse IP source à l'aide de</strong>
 <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>sur cette interface, comme spécifié dans</strong>
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
 <p>Les options suivantes sont disponibles :</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate">strict</code> : Chaque paquet entrant est vérifié contre la <abbr title="Forwarding Information Base">FIB</abbr>. Si l'interface n'est pas le meilleur chemin vers la source, la validation échoue et le paquet est supprimé.</p></li>
 <li><p><code class="docutils literal notranslate">loose</code> : Chaque paquet entrant est vérifié contre la <abbr title="Forwarding Information Base">FIB</abbr>. Si l'adresse IP source est inaccessible via n'importe quelle interface, la validation échoue.</p></li>
 <li><p><code class="docutils literal notranslate">disable</code> : Aucune validation de l'adresse IP source n'est effectuée. Tous les paquets entrants sont acceptés.</p></li>
 </ul>
-<p><a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> recommande d'activer le mode <code class="docutils literal notranslate">strict</code> pour empêcher le spoofing d'IP, comme les attaques DDoS. Pour les scénarios de routage asynchrones ou autres complexes, utilisez le mode <code class="docutils literal notranslate">loose</code>.</p>
+<p><a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> recommande d'activer le mode <code class="docutils literal notranslate">strict</code> pour empêcher le spoofing d'IP, comme les attaques DDoS. Pour les scénarios de routage asynchrones ou autres complexes, utilisez le mode <code class="docutils literal notranslate">loose</code>.</p>
 </div>
 </div>
 <section id="ipv6">
@@ -482,7 +482,7 @@ set interfaces pppoe &lt;interface&gt; ipv6 disable-forwarding
 </div>
 </div>
 <p><strong>DHCPv6 Prefix Delegation (PD)</strong></p>
-<p>VyOS prend en charge DHCPv6 Prefix Delegation (DHCPv6-PD) tel que décrit dans <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3633.html"><strong>RFC 3633</strong></a>.
+<p>VyOS prend en charge DHCPv6 Prefix Delegation (DHCPv6-PD) tel que décrit dans <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3633.html"><strong>RFC 3633</strong></a>.
 DHCPv6-PD est pris en charge par la plupart des FAIs qui fournissent IPv6 natif pour les consommateurs sur
 des réseaux fixes.</p>
 <div class="cmd cmd-cfg">

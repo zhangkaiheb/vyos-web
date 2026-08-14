@@ -333,7 +333,8 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/wireguard",
-            "component": "WireGuardPage"
+            "component": "WireGuardPage",
+            "featureKey": "wireguard"
           },
           {
             "id": "openvpn",
@@ -351,7 +352,8 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/vxlan",
-            "component": "VxlanPage"
+            "component": "VxlanPage",
+            "featureKey": "vxlan"
           },
           {
             "id": "geneve",
@@ -361,7 +363,7 @@
             "children": [],
             "route": "/system/interfaces/geneve",
             "component": "GenevePage",
-            "hidden": true
+            "featureKey": "geneve"
           },
           {
             "id": "l2tpv3",
@@ -370,7 +372,8 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/l2tpv3",
-            "component": "L2tpv3Page"
+            "component": "L2tpv3Page",
+            "featureKey": "l2tpv3"
           },
           {
             "id": "virtual-ethernet",
@@ -397,7 +400,8 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/macsec",
-            "component": "MacSecPage"
+            "component": "MacSecPage",
+            "featureKey": "macsec"
           },
           {
             "id": "pseudo-ethernet",
@@ -444,7 +448,8 @@
             "icon": "",
             "children": [],
             "route": "/system/interfaces/loopback",
-            "component": "LoopbackPage"
+            "component": "LoopbackPage",
+            "featureKey": "loopback"
           },
           {
             "id": "input",
@@ -454,7 +459,7 @@
             "children": [],
             "route": "/system/interfaces/input",
             "component": "InputPage",
-            "hidden": true
+            "featureKey": "input"
           }
         ],
         "route": null,
@@ -482,7 +487,8 @@
             "icon": "",
             "children": [],
             "route": "/system/settings/ntp",
-            "component": "ConfigPage"
+            "component": "ConfigPage",
+            "featureKey": "ntp"
           },
           {
             "id": "login",
@@ -593,6 +599,7 @@
         "label": "容器",
         "label_en": "Container",
         "icon": "",
+        "featureKey": "container",
         "children": [
           {
             "id": "name",
@@ -724,6 +731,15 @@
         "children": [],
         "route": "/system/import-export",
         "component": "ImportExportPage"
+      },
+      {
+        "id": "feature-visibility",
+        "label": "功能可见性",
+        "label_en": "Feature Visibility",
+        "icon": "",
+        "children": [],
+        "route": "/system/feature-visibility",
+        "component": "FeatureVisibilityPage"
       }
     ],
     "route": null,
@@ -884,7 +900,8 @@
             "icon": "",
             "children": [],
             "route": "/policy/protocols/babel",
-            "component": "BabelPage"
+            "component": "BabelPage",
+            "featureKey": "babel"
           },
           {
             "id": "bfd",
@@ -911,7 +928,8 @@
             "icon": "",
             "children": [],
             "route": "/policy/protocols/failover",
-            "component": "FailoverPage"
+            "component": "FailoverPage",
+            "featureKey": "failover"
           },
           {
             "id": "igmp-proxy",
@@ -920,7 +938,8 @@
             "icon": "",
             "children": [],
             "route": "/policy/protocols/igmp-proxy",
-            "component": "IgmpProxyPage"
+            "component": "IgmpProxyPage",
+            "featureKey": "igmp-proxy"
           },
           {
             "id": "isis",
@@ -938,7 +957,8 @@
             "icon": "",
             "children": [],
             "route": "/policy/protocols/mpls",
-            "component": "MplsPage"
+            "component": "MplsPage",
+            "featureKey": "mpls"
           },
           {
             "id": "nhrp",
@@ -947,7 +967,8 @@
             "icon": "",
             "children": [],
             "route": "/policy/protocols/nhrp",
-            "component": "NhrpPage"
+            "component": "NhrpPage",
+            "featureKey": "nhrp"
           },
           {
             "id": "ospf",
@@ -1010,7 +1031,8 @@
             "icon": "",
             "children": [],
             "route": "/policy/protocols/rpki",
-            "component": "RpkiPage"
+            "component": "RpkiPage",
+            "featureKey": "rpki"
           },
           {
             "id": "segment-routing",
@@ -1019,7 +1041,8 @@
             "icon": "",
             "children": [],
             "route": "/policy/protocols/segment-routing",
-            "component": "SegmentRoutingPage"
+            "component": "SegmentRoutingPage",
+            "featureKey": "segment-routing"
           }
         ],
         "route": null,
@@ -1511,7 +1534,8 @@
         "icon": "",
         "children": [],
         "route": "/service/lldp",
-        "component": "LldpPage"
+        "component": "LldpPage",
+        "featureKey": "lldp"
       },
       {
         "id": "ids-ddos-protection",
@@ -1520,7 +1544,8 @@
         "icon": "",
         "children": [],
         "route": "/service/ids-ddos-protection",
-        "component": "IdsDdosPage"
+        "component": "IdsDdosPage",
+        "featureKey": "ids-ddos"
       },
       {
         "id": "webproxy",
@@ -1659,7 +1684,8 @@
         "icon": "",
         "children": [],
         "route": "/vpn/l2tp",
-        "component": "L2tpPage"
+        "component": "L2tpPage",
+        "featureKey": "vpn-l2tp"
       },
       {
         "id": "pptp",
@@ -1686,7 +1712,8 @@
         "icon": "",
         "children": [],
         "route": "/vpn/sstp",
-        "component": "SstpPage"
+        "component": "SstpPage",
+        "featureKey": "vpn-sstp"
       },
       {
         "id": "wireguard",
@@ -1717,6 +1744,7 @@
     "label": "VPP",
     "label_en": "VPP",
     "icon": "ThunderboltOutlined",
+    "featureKey": "vpp",
     "children": [
       { "id": "acl", "label": "ACL", "label_en": "ACL", "icon": "", "children": [], "route": "/vpp/acl", "component": "VppAclPage" },
       { "id": "interfaces", "label": "接口", "label_en": "Interfaces", "icon": "", "children": [], "route": "/vpp/interfaces", "component": "VppInterfacesPage" },

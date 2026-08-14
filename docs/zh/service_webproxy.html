@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,28 +152,19 @@
 <div itemprop="articleBody">
              
   <section id="webproxy">
-<h1>Webproxy</h1>
-<p>The proxy service in VyOS is based on <a class="reference external" href="http://www.squid-cache.org/">Squid</a> and some related modules.</p>
-<p><a class="reference external" href="http://www.squid-cache.org/">Squid</a> is a caching and forwarding HTTP web proxy. It has a wide variety of
-uses, including speeding up a web server by caching repeated requests, caching
-web, DNS and other computer network lookups for a group of people sharing
-network resources, and aiding security by filtering traffic. Although primarily
-used for HTTP and FTP, Squid includes limited support for several other
-protocols including Internet Gopher, SSL,[6] TLS and HTTPS. Squid does not
-support the SOCKS protocol.</p>
-<p>URL 过滤器ing is provided by <a class="reference external" href="http://www.squidguard.org/">SquidGuard</a>.</p>
+<h1>Webproxy（网络代理）</h1>
+<p>VyOS 中的代理服务基于 <a class="reference external" href="http://www.squid-cache.org/">Squid</a> 及其相关模块。</p>
+<p><a class="reference external" href="http://www.squid-cache.org/">Squid</a> 是一种缓存和转发 HTTP 的 Web 代理。它具有多种用途，包括通过缓存重复请求来加速 Web 服务器、为共享网络资源的一组用户缓存 Web、DNS 和其他计算机网络查询，以及通过流量过滤增强安全性。尽管 Squid 主要用于 HTTP 和 FTP，但它也对若干其他协议提供有限支持，包括 Internet Gopher、SSL、[6] TLS 和 HTTPS。Squid 不支持 SOCKS 协议。</p>
+<p>URL 过滤功能由 <a class="reference external" href="http://www.squidguard.org/">SquidGuard</a> 提供。</p>
 <section id="configuration">
 <h2>配置</h2>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy append-domain <domain>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-append-domain-domain" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to specify a domain name to be appended to domain-names
-within URLs that do not include a dot <code class="docutils literal notranslate">.</code> the domain is appended.</p>
-<p>示例: to be appended is set to <code class="docutils literal notranslate">vyos.net</code> and the URL received is
-<code class="docutils literal notranslate">www/foo.html</code>, the system will use the generated, final URL of
-<code class="docutils literal notranslate">www.vyos.net/foo.html</code>.</p>
+set service webproxy append-domain &lt;domain&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-append-domain-domain" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>使用该命令指定一个域名，当 URL 中的域名不包含点号 <code class="docutils literal notranslate">.</code> 时，将该域名追加到域名之后。</p>
+<p>示例：若设置追加域名为 <code class="docutils literal notranslate">vyos.net</code>，且接收到的 URL 为 <code class="docutils literal notranslate">www/foo.html</code>，系统将使用生成的最终 URL：<code class="docutils literal notranslate">www.vyos.net/foo.html</code>。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy append-domain vyos.net
 </pre></div>
 </div>
@@ -182,11 +173,10 @@ within URLs that do not include a dot <code class="docutils literal notranslate"
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy cache-size <size>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-cache-size-size" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>The size of the on-disk Proxy cache is user configurable. The Proxies default
-cache-size is configured to 100 MB.</p>
-<p>Unit of this command is MB.</p>
+set service webproxy cache-size &lt;size&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-cache-size-size" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>磁盘上代理缓存的大小可由用户配置。代理的默认缓存大小为 100 MB。</p>
+<p>该命令的单位为 MB。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy cache-size 1024
 </pre></div>
 </div>
@@ -195,11 +185,10 @@ cache-size is configured to 100 MB.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy default-port <port>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-default-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specify the port used on which the proxy service is listening for requests.
-This port is the default port used for the specified listen-address.</p>
-<p>默认 port is 3128.</p>
+set service webproxy default-port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-default-port-port" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定代理服务监听请求所使用的端口。该端口是为指定监听地址所使用的默认端口。</p>
+<p>默认端口为 3128。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy default-port 8080
 </pre></div>
 </div>
@@ -208,11 +197,9 @@ This port is the default port used for the specified listen-address.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy domain-block <domain>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-domain-block-domain" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Used to block specific domains by the Proxy. Specifying “vyos.net” will block
-all access to vyos.net, and specifying “.xxx” will block all access to URLs
-having an URL ending on .xxx.</p>
+set service webproxy domain-block &lt;domain&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-domain-block-domain" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>用于通过代理阻止特定域名。指定 “vyos.net” 将阻止对 vyos.net 的所有访问；指定 “.xxx” 将阻止所有以 .xxx 结尾的 URL 的访问。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy domain-block vyos.net
 </pre></div>
 </div>
@@ -221,12 +208,9 @@ having an URL ending on .xxx.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy domain-noncache <domain>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-domain-noncache-domain" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>允许 access to sites in a domain without retrieving them from the Proxy
-cache. Specifying “vyos.net” will allow access to vyos.net but the pages
-accessed will not be cached. It useful for working around problems with
-“If-Modified-Since” checking at certain sites.</p>
+set service webproxy domain-noncache &lt;domain&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-domain-noncache-domain" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>允许访问某域名下的站点，但不从代理缓存中检索这些站点内容。指定 “vyos.net” 将允许访问 vyos.net，但访问的页面不会被缓存。这有助于解决某些网站上 “If-Modified-Since” 检查引发的问题。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy domain-noncache vyos.net
 </pre></div>
 </div>
@@ -235,12 +219,10 @@ accessed will not be cached. It useful for working around problems with
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy listen-address <address>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-listen-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specifies proxy service listening address. The listen address is the IP
-address on which the web proxy service listens for client requests.</p>
-<p>For security, the listen address should only be used on internal/trusted
-networks!</p>
+set service webproxy listen-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-listen-address-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定代理服务的监听地址。监听地址即 Web 代理服务监听客户端请求的 IP 地址。</p>
+<p>出于安全考虑，监听地址应仅在内部/可信网络中使用！</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy listen-address 192.0.2.1
 </pre></div>
 </div>
@@ -249,17 +231,11 @@ networks!</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy listen-address <address> disable-transparent
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-listen-address-address-disable-transparent" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Disables web proxy transparent mode at a listening address.</p>
-<p>In transparent proxy mode, all traffic arriving on port 80 and destined for
-the Internet is automatically forwarded through the proxy. This allows
-immediate proxy forwarding without configuring client browsers.</p>
-<p>Non-transparent proxying requires that the client browsers be configured with
-the proxy settings before requests are redirected. The advantage of this is
-that the client web browser can detect that a proxy is in use and 可以have
-accordingly. In addition, web-transmitted malware can sometimes be blocked by
-a non-transparent web proxy, since they are not aware of the proxy settings.</p>
+set service webproxy listen-address &lt;address&gt; disable-transparent
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-listen-address-address-disable-transparent" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>在监听地址上禁用 Web 代理的透明模式。</p>
+<p>在透明代理模式下，所有到达端口 80 并发往互联网的流量会自动通过代理转发。这使得无需配置客户端浏览器即可立即实现代理转发。</p>
+<p>非透明代理要求客户端浏览器预先配置代理设置，然后请求才会被重定向。这种方式的优点在于客户端 Web 浏览器能够检测到正在使用代理，并据此采取相应行为。此外，由于恶意软件通常不了解代理设置，因此非透明 Web 代理有时可以阻止通过 Web 传输的恶意软件。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy listen-address 192.0.2.1 disable-transparent
 </pre></div>
 </div>
@@ -268,10 +244,9 @@ a non-transparent web proxy, since they are not aware of the proxy settings.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy listen-address <address> port <port>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-listen-address-address-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置s the listening port for a listening address. This overrides the default
-port of 3128 on the specific listen address.</p>
+set service webproxy listen-address &lt;address&gt; port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-listen-address-address-port-port" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为监听地址设置监听端口。该设置将覆盖该监听地址上的默认端口 3128。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy listen-address 192.0.2.1 port 8080
 </pre></div>
 </div>
@@ -280,10 +255,10 @@ port of 3128 on the specific listen address.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy reply-block-mime <mime>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-reply-block-mime-mime" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Used to block a specific mime-type.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre># block all PDFs
+set service webproxy reply-block-mime &lt;mime&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-reply-block-mime-mime" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>用于阻止特定 MIME 类型。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># 阻止所有 PDF 文件
 set service webproxy reply-block-mime application/pdf
 </pre></div>
 </div>
@@ -292,11 +267,10 @@ set service webproxy reply-block-mime application/pdf
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy reply-body-max-size <size>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-reply-body-max-size-size" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specifies the maximum size of a reply body in KB, used to limit the reply
-size.</p>
-<p>All reply sizes are accepted by default.</p>
+set service webproxy reply-body-max-size &lt;size&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-reply-body-max-size-size" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定响应正文的最大大小（单位 KB），用于限制响应大小。</p>
+<p>默认情况下接受所有响应大小。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy reply-body-max-size 2048
 </pre></div>
 </div>
@@ -305,36 +279,29 @@ size.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy safe-ports <port>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-safe-ports-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>添加 new port to Safe-ports acl. 端口s included by default in Safe-ports acl:
-21, 70, 80, 210, 280, 443, 488, 591, 777, 873, 1025-65535</p>
+set service webproxy safe-ports &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-safe-ports-port" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>向 Safe-ports 访问控制列表（ACL）中添加新端口。Safe-ports ACL 默认包含以下端口：21、70、80、210、280、443、488、591、777、873、1025–65535</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy ssl-safe-ports <port>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-ssl-safe-ports-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>添加 new port to SSL-ports acl. 端口s included by default in SSL-ports acl:
-443</p>
+set service webproxy ssl-safe-ports &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-ssl-safe-ports-port" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>向 SSL-ports 访问控制列表（ACL）中添加新端口。SSL-ports ACL 默认包含以下端口：443</p>
 </div>
 </div>
 <section id="authentication">
 <h3>认证</h3>
-<p>The embedded Squid proxy can use LDAP to authenticate users against a company
-wide directory. The following configuration is an example of how to use 活动
-目录 as authentication backend. Queries are done via LDAP.</p>
+<p>内嵌的 Squid 代理可通过 LDAP 对用户进行公司级目录认证。以下配置展示了如何将 Active Directory 用作认证后端。查询通过 LDAP 执行。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy authentication children <number>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-children-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Maximum number of authenticator processes to spawn. If you start too few
-Squid will have to wait for them to process a backlog of credential
-verifications, slowing it down. When password verifications are done via a
-(slow) network you are likely to need lots of authenticator processes.</p>
-<p>This defaults to 5.</p>
+set service webproxy authentication children &lt;number&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-children-number" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>启动的认证进程最大数量。如果启动过少，Squid 将不得不等待这些进程处理积压的凭据验证任务，从而降低性能。当密码验证通过（较慢的）网络执行时，您可能需要大量认证进程。</p>
+<p>该值默认为 5。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication children 10
 </pre></div>
 </div>
@@ -343,12 +310,10 @@ verifications, slowing it down. When password verifications are done via a
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy authentication credentials-ttl <time>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-credentials-ttl-time" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specifies how long squid assumes an externally validated username:password
-pair is valid for - in other words how often the helper program is called for
-that user. 设置 this low to force revalidation with short lived passwords.</p>
-<p>Time is in minutes and defaults to 60.</p>
+set service webproxy authentication credentials-ttl &lt;time&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-credentials-ttl-time" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定 Squid 假定外部验证的用户名:密码对有效的持续时间——即辅助程序对该用户的调用频率。对于有效期较短的密码，应将此值设为较低值以强制重新验证。</p>
+<p>时间单位为分钟，默认值为 60。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication credentials-ttl 120
 </pre></div>
 </div>
@@ -357,9 +322,9 @@ that user. 设置 this low to force revalidation with short lived passwords.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy authentication method <ldap>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-method-ldap" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Proxy authentication method, currently only LDAP is supported.</p>
+set service webproxy authentication method &lt;ldap&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-method-ldap" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>代理认证方法，当前仅支持 LDAP。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication method ldap
 </pre></div>
 </div>
@@ -369,11 +334,9 @@ set service webproxy authentication method <ldap>
 <div class="cfgcmd-heading">
 
 set service webproxy authentication realm
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-realm" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specifies the protection scope (aka realm name) which is to be reported to
-the client for the authentication scheme. It is commonly part of the text
-the user will see when prompted for their username and password.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication realm "VyOS proxy auth"
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-realm" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定认证方案向客户端报告的保护范围（即领域名称）。它通常是用户输入用户名和密码时看到的提示文本的一部分。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication realm &quot;VyOS proxy auth&quot;
 </pre></div>
 </div>
 </div>
@@ -383,9 +346,9 @@ the user will see when prompted for their username and password.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy authentication ldap base-dn <base-dn>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-base-dn-base-dn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specifies the base DN under which the users are located.</p>
+set service webproxy authentication ldap base-dn &lt;base-dn&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-base-dn-base-dn" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定用户所在的基础 DN（Distinguished Name）。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap base-dn DC=vyos,DC=net
 </pre></div>
 </div>
@@ -394,9 +357,9 @@ set service webproxy authentication ldap base-dn <base-dn>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy authentication ldap bind-dn <bind-dn>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-bind-dn-bind-dn" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>The DN and password to bind as while performing searches.</p>
+set service webproxy authentication ldap bind-dn &lt;bind-dn&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-bind-dn-bind-dn" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>执行搜索操作时用于绑定的 DN 和密码。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap bind-dn CN=proxyuser,CN=Users,DC=vyos,DC=net
 </pre></div>
 </div>
@@ -405,14 +368,10 @@ set service webproxy authentication ldap bind-dn <bind-dn>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy authentication ldap filter-expression <expr>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-filter-expression-expr" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>LDAP search filter to locate the user DN. 必需 if the users are in a
-hierarchy below the base DN, or if the login name is not what builds the user
-specific part of the users DN.</p>
-<p>The search filter can contain up to 15 occurrences of %s which 将
-replaced by the username, as in “uid=%s” for <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2037.html"><strong>RFC 2037</strong></a> directories. For a
-detailed description of LDAP search filter syntax see <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2254.html"><strong>RFC 2254</strong></a>.</p>
+set service webproxy authentication ldap filter-expression &lt;expr&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-filter-expression-expr" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>用于定位用户 DN 的 LDAP 搜索过滤器。如果用户位于基础 DN 下的层级结构中，或登录名并非构成用户 DN 特定部分的名称，则必须指定该过滤器。</p>
+<p>搜索过滤器最多可包含 15 个 %s 占位符，它们将被用户名替换，例如针对 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2037.html"><strong>RFC 2037</strong></a> 目录的 “uid=%s”。有关 LDAP 搜索过滤器语法的详细说明，请参阅 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2254.html"><strong>RFC 2254</strong></a>。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap filter-expression (cn=%s)
 </pre></div>
 </div>
@@ -421,13 +380,9 @@ detailed description of LDAP search filter syntax see <a class="rfc reference ex
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy authentication ldap password <password>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-password-password" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>The DN and password to bind as while performing searches. As the password
-needs to be printed in plain text in your Squid configuration it is strongly
-recommended to use a account with minimal associated privileges. This to limit
-the damage in case someone could get hold of a copy of your Squid
-configuration file.</p>
+set service webproxy authentication ldap password &lt;password&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-password-password" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>执行搜索操作时用于绑定的 DN 和密码。由于密码需以明文形式出现在您的 Squid 配置文件中，强烈建议使用权限最小化的账户，以最大限度地减少因 Squid 配置文件泄露而造成的潜在损害。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap password vyos
 </pre></div>
 </div>
@@ -437,12 +392,9 @@ configuration file.</p>
 <div class="cfgcmd-heading">
 
 set service webproxy authentication ldap persistent-connection
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-persistent-connection" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use a persistent LDAP connection. Normally the LDAP connection is only open
-while validating a username to preserve resources at the LDAP server. This
-option causes the LDAP connection to be kept open, allowing it to be reused
-for further user validations.</p>
-<p>Recommended for larger installations.</p>
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-persistent-connection" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>使用持久性 LDAP 连接。通常，LDAP 连接仅在验证用户名期间打开，以节省 LDAP 服务器资源。启用此选项后，LDAP 连接将保持打开状态，以便复用于后续的用户验证。</p>
+<p>推荐用于大型部署。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap persistent-connection
 </pre></div>
 </div>
@@ -451,10 +403,9 @@ for further user validations.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy authentication ldap port <port>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specify an alternate TCP port where the ldap server is listening if other than
-the default LDAP port 389.</p>
+set service webproxy authentication ldap port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-port-port" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>若 LDAP 服务器监听的 TCP 端口不是默认的 LDAP 端口 389，则指定替代端口。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap port 389
 </pre></div>
 </div>
@@ -463,9 +414,9 @@ the default LDAP port 389.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy authentication ldap server <server>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-server-server" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specify the LDAP server to connect to.</p>
+set service webproxy authentication ldap server &lt;server&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-server-server" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定要连接的 LDAP 服务器。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap server ldap.vyos.net
 </pre></div>
 </div>
@@ -475,8 +426,8 @@ set service webproxy authentication ldap server <server>
 <div class="cfgcmd-heading">
 
 set service webproxy authentication ldap use-ssl
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-use-ssl" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use TLS encryption.</p>
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-use-ssl" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>使用 TLS 加密。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap use-ssl
 </pre></div>
 </div>
@@ -485,19 +436,13 @@ set service webproxy authentication ldap use-ssl
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy authentication ldap username-attribute <attr>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-username-attribute-attr" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specifies the name of the DN attribute that contains the username/login.
-Combined with the base DN to construct the users DN when no search filter is
-specified (filter-expression).</p>
-<p>默认s to ‘uid’</p>
+set service webproxy authentication ldap username-attribute &lt;attr&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-username-attribute-attr" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定包含用户名/登录名的 DN 属性名称。当未指定搜索过滤器（filter-expression）时，该属性与基础 DN 组合用于构建用户的 DN。</p>
+<p>默认值为 ‘uid’</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This can only be done if all your users are located directly under
-the same position in the LDAP tree and the login name is used for naming
-each user object. If your LDAP tree does not match these criteria or if you
-want to filter who are valid users then you need to use a search filter to
-search for your users DN (filter-expression).</p>
+<p>仅当所有用户均直接位于 LDAP 树中的同一位置，且登录名用于命名每个用户对象时，才能使用此方式。如果您的 LDAP 树不符合这些条件，或者您希望筛选有效用户，则需要使用搜索过滤器（filter-expression）来查找用户的 DN。</p>
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap username-attribute uid
 </pre></div>
@@ -507,9 +452,9 @@ search for your users DN (filter-expression).</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service webproxy authentication ldap version <2 | 3>
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-version-2-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>LDAP protocol version. 默认s to 3 if not specified.</p>
+set service webproxy authentication ldap version &lt;2 | 3&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-authentication-ldap-version-2-3" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>LDAP 协议版本。若未指定，则默认为 3。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy authentication ldap version 2
 </pre></div>
 </div>
@@ -518,18 +463,18 @@ set service webproxy authentication ldap version <2 | 3>
 </section>
 </section>
 <section id="url-filtering">
-<h3>URL filtering</h3>
+<h3>URL 过滤</h3>
 <div class="error admonition">
-<p class="admonition-title">Call for Contributions</p>
-<p>Help improve this section with additional content, examples, and explanations.</p>
-<p>For contribution guidelines, see <a class="reference internal" href="../../documentation.html#documentation">写入 Documentation</a>.</p>
+<p class="admonition-title">诚邀贡献</p>
+<p>欢迎通过补充内容、示例和说明来帮助完善本节。</p>
+<p>贡献指南请参见 <a class="reference internal" href="../../documentation.html#documentation">编写文档</a>。</p>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set service webproxy url-filtering disable
-<a class="cmdlink" href="#cfgcmd-set-service-webproxy-url-filtering-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Disables web filtering without discarding configuration.</p>
+<a class="cmdlink" href="#cfgcmd-set-service-webproxy-url-filtering-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>在不丢弃配置的情况下禁用 Web 过滤。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service webproxy url-filtering disable
 </pre></div>
 </div>
@@ -538,24 +483,23 @@ set service webproxy url-filtering disable
 </section>
 </section>
 <section id="operation">
-<h2>Operation</h2>
+<h2>运行</h2>
 <div class="error admonition">
-<p class="admonition-title">Call for Contributions</p>
-<p>Help improve this section with additional content, examples, and explanations.</p>
-<p>For contribution guidelines, see <a class="reference internal" href="../../documentation.html#documentation">写入 Documentation</a>.</p>
+<p class="admonition-title">诚邀贡献</p>
+<p>欢迎通过补充内容、示例和说明来帮助完善本节。</p>
+<p>贡献指南请参见 <a class="reference internal" href="../../documentation.html#documentation">编写文档</a>。</p>
 </div>
 <section id="filtering">
-<h3>过滤器ing</h3>
+<h3>过滤</h3>
 <section id="update">
 <h4>更新</h4>
-<p>If you want to use existing blacklists you have to create/download a database
-first. Otherwise you will not be able to commit the config changes.</p>
+<p>若要使用现有黑名单，您必须首先创建或下载数据库。否则，您将无法提交配置更改。</p>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 update webproxy blacklists
-<a class="cmdlink" href="#opcmd-update-webproxy-blacklists" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>Download/更新 complete blacklist</p>
+<a class="cmdlink" href="#opcmd-update-webproxy-blacklists" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>下载/更新完整黑名单</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ update webproxy blacklists
 Warning: No url-filtering blacklist installed
 Would you like to download a default blacklist? [confirm][y]
@@ -563,10 +507,10 @@ Connecting to ftp.example.com (192.0.2.249:21)
 blacklists.gz        100% |*************************************************************************************************************| 17.0M  0:00:00 ETA
 Uncompressing blacklist...
 Checking permissions...
-Skip link for   [ads] -> [publicite]
+Skip link for   [ads] -&gt; [publicite]
 Building DB for [adult/domains] - 2467177 entries
 Building DB for [adult/urls] - 67798 entries
-Skip link for   [aggressive] -> [agressif]
+Skip link for   [aggressive] -&gt; [agressif]
 Building DB for [agressif/domains] - 348 entries
 Building DB for [agressif/urls] - 36 entries
 Building DB for [arjel/domains] - 69 entries
@@ -584,42 +528,39 @@ vyos@vyos:~$
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-update webproxy blacklists category <category>
-<a class="cmdlink" href="#opcmd-update-webproxy-blacklists-category-category" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>Download/更新 partial blacklist.</p>
-<p>Use tab completion to get a list of categories.</p>
+update webproxy blacklists category &lt;category&gt;
+<a class="cmdlink" href="#opcmd-update-webproxy-blacklists-category-category" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>下载/更新部分黑名单。</p>
+<p>使用 Tab 键补全功能获取类别列表。</p>
 </div>
 </div>
 <ul>
-<li><p>To auto update the blacklist files</p>
+<li><p>自动更新黑名单文件：</p>
 <p><code class="docutils literal notranslate">set service webproxy url-filtering squidguard auto-update update-hour 23</code></p>
 </li>
-<li><p>To configure blocking add the following to the configuration</p>
+<li><p>配置阻止规则，请在配置中添加以下内容：</p>
 <p><code class="docutils literal notranslate">set service webproxy url-filtering squidguard block-category ads</code></p>
 <p><code class="docutils literal notranslate">set service webproxy url-filtering squidguard block-category malware</code></p>
 </li>
 </ul>
 </section>
 <section id="bypassing-the-webproxy">
-<h4>Bypassing the webproxy</h4>
+<h4>绕过 Web 代理</h4>
 <div class="error admonition">
-<p class="admonition-title">Call for Contributions</p>
-<p>Help improve this section with additional content, examples, and explanations.</p>
-<p>For contribution guidelines, see <a class="reference internal" href="../../documentation.html#documentation">写入 Documentation</a>.</p>
+<p class="admonition-title">诚邀贡献</p>
+<p>欢迎通过补充内容、示例和说明来帮助完善本节。</p>
+<p>贡献指南请参见 <a class="reference internal" href="../../documentation.html#documentation">编写文档</a>。</p>
 </div>
-<p>Some services don’t work correctly when being handled via a web proxy.
-So sometimes it is useful to bypass a transparent proxy:</p>
+<p>某些服务在经 Web 代理处理时无法正常工作。因此，有时绕过透明代理很有用：</p>
 <ul>
-<li><p>To bypass the proxy for every request that is directed to a specific
-destination:</p>
+<li><p>绕过针对特定目标地址的所有请求的代理：</p>
 <p><code class="docutils literal notranslate">set service webproxy whitelist destination-address 198.51.100.33</code></p>
 <p><code class="docutils literal notranslate">set service webproxy whitelist destination-address 192.0.2.0/24</code></p>
 </li>
-<li><p>To bypass the proxy for every request that is coming from a specific source:</p>
+<li><p>绕过来自特定源地址的所有请求的代理：</p>
 <p><code class="docutils literal notranslate">set service webproxy whitelist source-address 192.168.1.2</code></p>
 <p><code class="docutils literal notranslate">set service webproxy whitelist source-address 192.168.2.0/24</code></p>
-<p>(This 可以 useful when a called service has many and/or often changing
-destination addresses - e.g. Netflix.)</p>
+<p>（当被调用的服务具有大量和/或经常变化的目标地址时——例如 Netflix——此方法非常有用）</p>
 </li>
 </ul>
 </section>
@@ -640,7 +581,7 @@ destination addresses - e.g. Netflix.)</p>
          username-attribute cn
      }
      method ldap
-     realm "VyOS Webproxy"
+     realm &quot;VyOS Webproxy&quot;
  }
  cache-size 100
  default-port 3128

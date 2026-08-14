@@ -164,7 +164,7 @@
 set firewall bridge &lt;options&gt;
 <a class="cmdlink" href="#cfgcmd-set-firewall-bridge-options" title="Постоянная ссылка на эту команду"></a></div></div>
 <p>Из основной структуры, определенной в
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Обзоре файрвола</a>
+<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">Обзоре файрвола</a>
 в этом разделе вы можете найти подробную информацию только для следующей части общей структуры:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
     * bridge
@@ -188,21 +188,21 @@ set firewall bridge &lt;options&gt;
 </ul>
 <p>Для трафика, который должен быть переключен внутренне мостом, базовая цепочка — <strong>forward</strong>, и базовая команда для фильтрации — <code class="docutils literal notranslate">set firewall bridge forward filter ...</code>, которая происходит на этапе 4, выделенном красным цветом.</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-bridge-forward.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-forward.webp" />
+<img alt="../../_images/firewall-bridge-forward.webp" src="https://docs.vyos.io/en/latest/_images/firewall-bridge-forward.webp" />
 </figure>
 <p>Для трафика, направленного на сам роутер или требующего маршрутизации
 (предполагается, что настроен мост уровня 3), базовая цепочка — <strong>input</strong>, и
 базовая команда — <code class="docutils literal notranslate">set firewall bridge input filter ...</code>, и путь:</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-bridge-input.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-input.webp" />
+<img alt="../../_images/firewall-bridge-input.webp" src="https://docs.vyos.io/en/latest/_images/firewall-bridge-input.webp" />
 </figure>
 <p>Если пакет не удален, он отправляется на <strong>IP-слой</strong>, и будет
 обрабатываться <strong>файрволом IP-слоя</strong>: набор правил IPv4 или IPv6. Проверьте еще раз
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">диаграмму общего потока пакетов</a>, если необходимо.</p>
+<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">диаграмму общего потока пакетов</a>, если необходимо.</p>
 <p>Для трафика, исходящего из самого моста, базовая цепочка —
 <strong>output</strong>, и базовая команда — <code class="docutils literal notranslate">set firewall bridge output filter ...</code>, и путь:</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-bridge-output.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-output.webp" />
+<img alt="../../_images/firewall-bridge-output.webp" src="https://docs.vyos.io/en/latest/_images/firewall-bridge-output.webp" />
 </figure>
 <p>Нестандартные цепочки файрвола моста можно создать с помощью команды <code class="docutils literal notranslate">set firewall bridge name &lt;name&gt; ...</code>. Чтобы использовать такую пользовательскую цепочку, необходимо определить правило с действием jump и соответствующим целевым адресом в базовой цепочке.</p>
 </section>
@@ -648,8 +648,8 @@ set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; disable
 <section id="matching-criteria">
 <h3>Критерии совпадения</h3>
 <p>Существует множество критериев совпадения, по которым можно протестировать пакет. Ознакомьтесь с
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv4.html">IPv4</a> и
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv6.html">IPv6</a> критериями совпадения для получения дополнительной информации.</p>
+<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/ipv4.html">IPv4</a> и
+<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/ipv6.html">IPv6</a> критериями совпадения для получения дополнительной информации.</p>
 <p>Поскольку мосты работают на уровне 2, в конфигурации бридж-файрвола поддерживаются как matcher для IPv4, так и для IPv6. То же относится и к группам файрвола.</p>
 <p>Те же специфические критерии совпадения, которые можно использовать в бридж-файрволе, описаны в этом разделе:</p>
 <div class="cmd cmd-cfg">

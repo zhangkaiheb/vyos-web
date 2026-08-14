@@ -243,7 +243,9 @@ export default defineComponent({
     }
 
     function create() {
-      editingItem.value = {};
+      const existingIds = data.value.map(r => parseInt(r.rule)).filter(n => !isNaN(n));
+      const nextId = existingIds.length ? Math.max(...existingIds) + 1 : 1;
+      editingItem.value = { rule: nextId };
       editingOriginalId.value = null;
       modalVisible.value = true;
     }

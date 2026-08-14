@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -153,145 +153,122 @@
              
   <section id="is-is">
 <h1>IS-IS</h1>
-<p>Intermediate 系统-to-Intermediate 系统 (IS-IS) is a link-state
-<abbr title="Interior Gateway Protocol">IGP</abbr> described in ISO/IEC 10589,
-<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc1195">RFC 1195</a>, and
-<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5308">RFC 5308</a>. It uses
-Dijkstra’s <abbr title="Shortest Path First">SPF</abbr> algorithm to build a network
-topology database (<abbr title="Link State Database">LSDB</abbr>) and compute the
-shortest path to each destination.</p>
-<p>In an IS-IS network, routers are called Intermediate 系统s (ISs). They
-exchange topology information with directly connected neighbors via the
-IS-IS protocol, whose PDUs are carried directly in 层 2 frames rather
-than over IP. IS-IS routers are identified by a
-<abbr title="Network Entity Title">NET</abbr>, which ranges from 8 to 20 bytes
-(typically 10 bytes).</p>
+<p>中间系统到中间系统（IS-IS）是一种链路状态
+<abbr title="内部网关协议">IGP</abbr>，定义于 ISO/IEC 10589、
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc1195">RFC 1195</a> 和
+<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5308">RFC 5308</a>。它使用 Dijkstra 的
+<abbr title="最短路径优先">SPF</abbr> 算法构建网络拓扑数据库（<abbr title="链路状态数据库">LSDB</abbr>），并计算到达每个目的地的最短路径。</p>
+<p>在 IS-IS 网络中，路由器被称为中间系统（IS）。它们通过 IS-IS 协议与直接相连的邻居交换拓扑信息；该协议的 PDU 直接承载于第 2 层帧中，而非基于 IP 传输。IS-IS 路由器通过一个
+<abbr title="网络实体标题">NET</abbr> 进行标识，其长度为 8 至 20 字节（通常为 10 字节）。</p>
 <section id="is-is-vs-ospf">
-<h2>IS-IS vs OSPF</h2>
-<p>IS-IS builds an LSDB from link-state information flooded by other routers
-and computes routing paths using Dijkstra’s algorithm, just like OSPF.
-Because both protocols share the same link-state architecture, they make
-nearly identical path-selection decisions. Given the similarities between
-IS-IS and OSPF, comparing their routing behaviors is an effective way to
-understand how a network will respond with either IGP.</p>
+<h2>IS-IS 与 OSPF 对比</h2>
+<p>IS-IS 从其他路由器泛洪的链路状态信息中构建 LSDB，并使用 Dijkstra 算法计算路由路径，这与 OSPF 完全相同。
+由于两种协议共享相同的链路状态架构，因此它们在路径选择决策上几乎完全一致。鉴于 IS-IS 与 OSPF 的相似性，对比二者路由行为是理解网络在任一 IGP 下响应方式的有效方法。</p>
 </section>
 <section id="configuration">
 <h2>配置</h2>
 <section id="mandatory-settings">
-<h3>Mandatory settings</h3>
-<p>Each IS-IS router 必须 configured with a unique NET, the
-<abbr title="Connectionless Network Service">CLNS</abbr> equivalent of a 路由r ID.
-The 6-byte system identifier portion of the NET 必须 unique across the
-IS-IS routing domain.</p>
+<h3>必需设置</h3>
+<p>每个 IS-IS 路由器必须配置唯一的 NET，即 CLNS（无连接网络服务）环境下的路由器 ID。
+NET 中的 6 字节系统标识符部分必须在整个 IS-IS 路由域内唯一。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis net <network-entity-title>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-net-network-entity-title" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the 网络 Entity 标题 (NET) for the router.</strong></p>
-<p>A typical NET looks like <code class="docutils literal notranslate">49.0001.1921.6800.1002.00</code>.</p>
-<p>The NET consists of the following parts:</p>
+set protocols isis net &lt;network-entity-title&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-net-network-entity-title" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为路由器配置网络实体标题（NET）。</strong></p>
+<p>典型的 NET 格式如 <code class="docutils literal notranslate">49.0001.1921.6800.1002.00</code>。</p>
+<p>NET 由以下几部分组成：</p>
 <ul class="simple">
-<li><p><abbr title="Authority and Format Identifier">AFI</abbr> (<code class="docutils literal notranslate">49</code>): IS-IS
-conventionally uses AFI value 49 for private addressing.</p></li>
-<li><p>Area identifier (<code class="docutils literal notranslate">0001</code>): The area number within the IS-IS routing
-domain (in this example, Area 1).</p></li>
-<li><p>系统 identifier (<code class="docutils literal notranslate">1921.6800.1002</code>): Uniquely identifies the router
-within the IS-IS routing domain. We recommend deriving this value from
-the router IP address or MAC address. To construct the system identifier
-from an IPv4 address (for example, <code class="docutils literal notranslate">192.168.1.2</code>):</p>
+<li><p><abbr title="授权和格式标识符">AFI</abbr>（<code class="docutils literal notranslate">49</code>）：IS-IS 通常使用 AFI 值 49 表示私有地址。</p></li>
+<li><p>区域标识符（<code class="docutils literal notranslate">0001</code>）：IS-IS 路由域内的区域编号（本例中为区域 1）。</p></li>
+<li><p>系统标识符（<code class="docutils literal notranslate">1921.6800.1002</code>）：在 IS-IS 路由域内唯一标识该路由器。我们建议从此路由器的 IP 地址或 MAC 地址派生该值。若从 IPv4 地址（例如 <code class="docutils literal notranslate">192.168.1.2</code>）构造系统标识符：</p>
 <ul>
-<li><p>Pad each octet with leading zeros: <code class="docutils literal notranslate">192.168.1.2</code> → <code class="docutils literal notranslate">192.168.001.002</code>.</p></li>
-<li><p>Regroup the digits into three 4-digit blocks: <code class="docutils literal notranslate">192.168.001.002</code> →
-<code class="docutils literal notranslate">1921.6800.1002</code>.</p></li>
+<li><p>为每个八位组补前导零：<code class="docutils literal notranslate">192.168.1.2</code> → <code class="docutils literal notranslate">192.168.001.002</code>。</p></li>
+<li><p>将数字重新分组为三个 4 位数字块：<code class="docutils literal notranslate">192.168.001.002</code> →
+<code class="docutils literal notranslate">1921.6800.1002</code>。</p></li>
 </ul>
 </li>
-<li><p>NET selector (<code class="docutils literal notranslate">00</code>): Must always be <code class="docutils literal notranslate">00</code> to indicate the local system.</p></li>
+<li><p>NET 选择器（<code class="docutils literal notranslate">00</code>）：必须始终为 <code class="docutils literal notranslate">00</code>，以表示本地系统。</p></li>
 </ul>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis net 49.0001.1921.6800.1002.00
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable IS-IS on the specified interface.</strong></p>
-<p>This enables the router to form adjacencies with directly connected peers.</p>
+set protocols isis interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上启用 IS-IS。</strong></p>
+<p>这使路由器能够与直接相连的对等体建立邻接关系。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth0
 </pre></div>
 </div>
 </section>
 <section id="is-is-global-configuration">
-<h3>IS-IS global configuration</h3>
+<h3>IS-IS 全局配置</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols isis dynamic-hostname
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-dynamic-hostname" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable Dynamic 主机名 <abbr title="Type-Length-Value">TLV</abbr> support on the
-router (<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5301">RFC 5301</a>).</strong></p>
-<p>This enables the router to include its human-readable system name
-alongside its 系统 ID in IS-IS advertisements for easier peer
-identification.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-dynamic-hostname" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在路由器上启用动态主机名 <abbr title="类型-长度-值">TLV</abbr> 支持（<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5301">RFC 5301</a>）。</strong></p>
+<p>这使路由器能够在 IS-IS 广播中包含其可读性强的系统名称，与其系统 ID 一同发送，以便更轻松地识别对等体。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis dynamic-hostname
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis level <level-1 | level-1-2 | level-2>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-level-level-1-level-1-2-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IS-IS level at which the router operates:</strong></p>
+set protocols isis level &lt;level-1 | level-1-2 | level-2&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-level-level-1-level-1-2-level-2" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器运行的 IS-IS 等级：</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">level-1</code>: Participates exclusively in 级别-1 (intra-area) routing.</p></li>
-<li><p><code class="docutils literal notranslate">level-1-2</code>: Participates in both 级别-1 (intra-area) and 级别-2
-(inter-area) routing.</p></li>
-<li><p><code class="docutils literal notranslate">level-2</code>: Participates exclusively in 级别-2 (inter-area) routing.</p></li>
+<li><p><code class="docutils literal notranslate">level-1</code>：仅参与 Level-1（区域内）路由。</p></li>
+<li><p><code class="docutils literal notranslate">level-1-2</code>：同时参与 Level-1（区域内）和 Level-2（区域间）路由。</p></li>
+<li><p><code class="docutils literal notranslate">level-2</code>：仅参与 Level-2（区域间）路由。</p></li>
 </ul>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis level level-1
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis lsp-mtu <128-4352>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-lsp-mtu-128-4352" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the <abbr title="Maximum Transmission Unit">MTU</abbr> size, in bytes,
-for originating or receiving IS-IS <abbr title="Link State PDUs">LSPs</abbr>.</strong></p>
+set protocols isis lsp-mtu &lt;128-4352&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-lsp-mtu-128-4352" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置用于生成或接收 IS-IS <abbr title="链路状态 PDU">LSP</abbr> 的 <abbr title="最大传输单元">MTU</abbr> 大小（字节）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis lsp-mtu 1400
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis metric-style <narrow | transition | wide>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-metric-style-narrow-transition-wide" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the TLV format (metric style) the router uses when originating
-or processing IS-IS LSPs:</strong></p>
+set protocols isis metric-style &lt;narrow | transition | wide&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-metric-style-narrow-transition-wide" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器在生成或处理 IS-IS LSP 时使用的 TLV 格式（度量风格）：</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">narrow</code>: 源ates and processes only the original ISO/IEC 10589 TLVs.</p></li>
-<li><p><code class="docutils literal notranslate">transition</code>: 源ates and processes both narrow and wide TLV formats.</p></li>
-<li><p><code class="docutils literal notranslate">wide</code>: 源ates and processes only extended TLVs.</p></li>
+<li><p><code class="docutils literal notranslate">narrow</code>：仅生成和处理原始 ISO/IEC 10589 TLV。</p></li>
+<li><p><code class="docutils literal notranslate">transition</code>：生成和处理窄型与宽型 TLV 格式。</p></li>
+<li><p><code class="docutils literal notranslate">wide</code>：仅生成和处理扩展 TLV。</p></li>
 </ul>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis metric-style wide
 </pre></div>
 </div>
@@ -299,16 +276,14 @@ or processing IS-IS LSPs:</strong></p>
 <div class="cfgcmd-heading">
 
 set protocols isis purge-originator
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-purge-originator" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable <abbr title="Purge Originator Identification">POI</abbr>
-(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6232">RFC 6232</a>) for IS-IS
-purges triggered by the router.</strong></p>
-<p>When enabled, the router includes the POI TLV with its 系统 ID in each
-purge it triggers. This identifies which
-<abbr title="Intermediate System">IS</abbr> triggered the purge.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-purge-originator" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为路由器触发的 IS-IS 清除操作启用 <abbr title="清除发起者标识">POI</abbr>
+（<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6232">RFC 6232</a>）。</strong></p>
+<p>启用后，路由器在每次触发的清除操作中均包含带有其系统 ID 的 POI TLV。这可标识出触发清除操作的
+<abbr title="中间系统">IS</abbr>。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis purge-originator
 </pre></div>
 </div>
@@ -316,15 +291,13 @@ purge it triggers. This identifies which
 <div class="cfgcmd-heading">
 
 set protocols isis set-attached-bit
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-set-attached-bit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the L1/L2 IS-IS router to set the ATT (附加ed) bit in the
-级别-1 LSPs it originates
-(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc3787">RFC 3787</a>).</strong></p>
-<p>This signals to pure 级别-1 routers that this L1/L2 router has 级别-2
-reachability.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-set-attached-bit" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 L1/L2 IS-IS 路由器在其生成的 Level-1 LSP 中设置 ATT（已连接）位
+（<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc3787">RFC 3787</a>）。</strong></p>
+<p>这向纯 Level-1 路由器发出信号，表明该 L1/L2 路由器具备 Level-2 可达性。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis set-attached-bit
 </pre></div>
 </div>
@@ -332,14 +305,13 @@ reachability.</p>
 <div class="cfgcmd-heading">
 
 set protocols isis set-overload-bit
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-set-overload-bit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to set the OL (LSP 数据base Overload) bit in LSPs
-it originates (<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc3787">RFC 3787</a>).</strong></p>
-<p>When configured, other IS-IS routers stop sending transit traffic through
-this router but can still reach its directly connected networks.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-set-overload-bit" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器在其生成的 LSP 中设置 OL（LSP 数据库过载）位
+（<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc3787">RFC 3787</a>）。</strong></p>
+<p>配置后，其他 IS-IS 路由器将停止通过该路由器转发中转流量，但仍可访问其直连网络。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis set-overload-bit
 </pre></div>
 </div>
@@ -347,14 +319,13 @@ this router but can still reach its directly connected networks.</p>
 <div class="cfgcmd-heading">
 
 set protocols isis advertise-high-metrics
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-advertise-high-metrics" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to advertise a high metric value on all of its IS-IS
-interfaces, regardless of the metric configured on each interface.</strong></p>
-<p>The advertised value depends on the metric style: 63 for <code class="docutils literal notranslate">narrow</code>, 16777215
-for <code class="docutils literal notranslate">wide</code>, and 62 for <code class="docutils literal notranslate">transition</code>.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-advertise-high-metrics" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器在其所有 IS-IS 接口上通告高指标值，而忽略各接口上配置的具体指标值。</strong></p>
+<p>通告值取决于指标风格：<code class="docutils literal notranslate">narrow</code> 为 63，<code class="docutils literal notranslate">wide</code> 为 16777215，
+<code class="docutils literal notranslate">transition</code> 为 62。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis advertise-high-metrics
 </pre></div>
 </div>
@@ -362,14 +333,12 @@ for <code class="docutils literal notranslate">wide</code>, and 62 for <code cla
 <div class="cfgcmd-heading">
 
 set protocols isis advertise-passive-only
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-advertise-passive-only" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to advertise in its LSPs only the IP prefixes of
-passive interfaces.</strong></p>
-<p>Prefixes of non-passive interfaces are not advertised, but those interfaces
-are still used to form adjacencies and participate in SPF.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-advertise-passive-only" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器仅在其 LSP 中通告被动接口的 IP 前缀。</strong></p>
+<p>非被动接口的前缀不会被通告，但这些接口仍可用于建立邻接关系并参与 SPF 计算。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis advertise-passive-only
 </pre></div>
 </div>
@@ -377,132 +346,119 @@ are still used to form adjacencies and participate in SPF.</p>
 <div class="cfgcmd-heading">
 
 set protocols isis log-adjacency-changes
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-log-adjacency-changes" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to log IS-IS adjacency state changes to syslog.</strong></p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-log-adjacency-changes" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器将 IS-IS 邻接状态变更记录到 syslog。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis log-adjacency-changes
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis topology <ipv4-multicast | ipv4-mgmt | ipv6-unicast | ipv6-multicast | ipv6-mgmt | ipv6-dstsrc>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-topology-ipv4-multicast-ipv4-mgmt-ipv6-unicast-ipv6-multicast-ipv6-mgmt-ipv6-dstsrc" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable an additional IS-IS Multi-Topology for the router:</strong></p>
+set protocols isis topology &lt;ipv4-multicast | ipv4-mgmt | ipv6-unicast | ipv6-multicast | ipv6-mgmt | ipv6-dstsrc&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-topology-ipv4-multicast-ipv4-mgmt-ipv6-unicast-ipv6-multicast-ipv6-mgmt-ipv6-dstsrc" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为路由器启用额外的 IS-IS 多拓扑功能：</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">ipv4-multicast</code>: IPv4 multicast topology (MT 3).</p></li>
-<li><p><code class="docutils literal notranslate">ipv4-mgmt</code>: IPv4 management topology (MT 1).</p></li>
-<li><p><code class="docutils literal notranslate">ipv6-unicast</code>: IPv6 unicast topology (MT 2).</p></li>
-<li><p><code class="docutils literal notranslate">ipv6-multicast</code>: IPv6 multicast topology (MT 4).</p></li>
-<li><p><code class="docutils literal notranslate">ipv6-mgmt</code>: IPv6 management topology (MT 5).</p></li>
-<li><p><code class="docutils literal notranslate">ipv6-dstsrc</code>: IPv6 destination/source routing topology.</p></li>
+<li><p><code class="docutils literal notranslate">ipv4-multicast</code>：IPv4 组播拓扑（MT 3）。</p></li>
+<li><p><code class="docutils literal notranslate">ipv4-mgmt</code>：IPv4 管理拓扑（MT 1）。</p></li>
+<li><p><code class="docutils literal notranslate">ipv6-unicast</code>：IPv6 单播拓扑（MT 2）。</p></li>
+<li><p><code class="docutils literal notranslate">ipv6-multicast</code>：IPv6 组播拓扑（MT 4）。</p></li>
+<li><p><code class="docutils literal notranslate">ipv6-mgmt</code>：IPv6 管理拓扑（MT 5）。</p></li>
+<li><p><code class="docutils literal notranslate">ipv6-dstsrc</code>：IPv6 目的地址/源地址路由拓扑。</p></li>
 </ul>
-<p>The default IPv4-unicast topology (MT 0) is always present and does not
-need to be explicitly configured.</p>
+<p>默认的 IPv4 单播拓扑（MT 0）始终存在，无需显式配置。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis topology ipv6-unicast
 </pre></div>
 </div>
 <section id="authentication">
 <h4>认证</h4>
-<p>IS-IS supports two protocol-wide passwords:</p>
+<p>IS-IS 支持两种全协议范围的密码：</p>
 <ul class="simple">
-<li><p><strong>area-password</strong>: applied to 级别-1 LSPs/SNPs (within the area).</p></li>
-<li><p><strong>domain-password</strong>: applied to 级别-2 LSPs/SNPs (across the 级别-2
-backbone).</p></li>
+<li><p><strong>area-password</strong>：应用于 Level-1 LSP/SNP（在区域内）。</p></li>
+<li><p><strong>domain-password</strong>：应用于 Level-2 LSP/SNP（跨 Level-2 骨干网）。</p></li>
 </ul>
-<p>These are distinct from the per-interface <code class="docutils literal notranslate">password</code> command (see
-<a class="reference internal" href="#interface-configuration">接口 configuration</a>). That command
-authenticates only the Hello (IIH) PDUs exchanged with the neighbor on the
-interface where it is configured.</p>
+<p>这些密码与每个接口的 <code class="docutils literal notranslate">password</code> 命令（参见
+<a class="reference internal" href="#interface-configuration">接口配置</a>）不同。该命令仅对在配置接口上与邻居交换的 Hello（IIH）PDU 进行认证。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis area-password plaintext-password <text>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-area-password-plaintext-password-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a plaintext password used to authenticate 级别-1 LSPs and
-SNPs originated and received by this router.</strong></p>
-<p>All 级别-1 routers in the area 必须 configured with the same
-password.</p>
+set protocols isis area-password plaintext-password &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-area-password-plaintext-password-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置用于认证本路由器生成和接收的 Level-1 LSP 和 SNP 的明文密码。</strong></p>
+<p>该区域内的所有 Level-1 路由器必须配置相同的密码。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis area-password plaintext-password mysharedsecret
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis area-password md5 <text>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-area-password-md5-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure an HMAC-MD5 key used to authenticate 级别-1 LSPs and SNPs
-originated and received by this router.</strong></p>
-<p>All 级别-1 routers in the area 必须 configured with the same key.</p>
+set protocols isis area-password md5 &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-area-password-md5-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置用于认证本路由器生成和接收的 Level-1 LSP 和 SNP 的 HMAC-MD5 密钥。</strong></p>
+<p>该区域内的所有 Level-1 路由器必须配置相同的密钥。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>For each of <code class="docutils literal notranslate">area-password</code> and <code class="docutils literal notranslate">domain-password</code>, configure either
-<code class="docutils literal notranslate">plaintext-password</code> or <code class="docutils literal notranslate">md5</code>, but not both.</p>
+<p>对于 <code class="docutils literal notranslate">area-password</code> 和 <code class="docutils literal notranslate">domain-password</code>，应配置 <code class="docutils literal notranslate">plaintext-password</code> 或 <code class="docutils literal notranslate">md5</code> 之一，但不可同时配置两者。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis area-password md5 mysharedsecret
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis domain-password plaintext-password <text>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-domain-password-plaintext-password-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a plaintext password used to authenticate 级别-2 LSPs and
-SNPs originated and received by this router.</strong></p>
-<p>All 级别-2 routers in the routing domain 必须 configured with the
-same password.</p>
+set protocols isis domain-password plaintext-password &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-domain-password-plaintext-password-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置用于认证本路由器生成和接收的 Level-2 LSP 和 SNP 的明文密码。</strong></p>
+<p>路由域内的所有 Level-2 路由器必须配置相同的密码。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis domain-password plaintext-password mysharedsecret
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis domain-password md5 <text>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-domain-password-md5-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure an HMAC-MD5 key used to authenticate 级别-2 LSPs and SNPs
-originated and received by this router.</strong></p>
-<p>All 级别-2 routers in the routing domain 必须 configured with the
-same key.</p>
+set protocols isis domain-password md5 &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-domain-password-md5-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置用于认证本路由器生成和接收的 Level-2 LSP 和 SNP 的 HMAC-MD5 密钥。</strong></p>
+<p>路由域内的所有 Level-2 路由器必须配置相同的密钥。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis domain-password md5 mysharedsecret
 </pre></div>
 </div>
 </section>
 <section id="default-route-advertisement">
-<h4>默认 route advertisement</h4>
+<h4>默认路由通告</h4>
 <section id="level-1-ipv4">
-<h5>级别-1 IPv4</h5>
+<h5>Level-1 IPv4</h5>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols isis default-information originate ipv4 level-1
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to originate the IPv4 default route (<code class="docutils literal notranslate">0.0.0.0/0</code>)
-and advertise it in locally generated LSPs throughout the 级别-1 area.</strong></p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-1" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器生成 IPv4 默认路由（<code class="docutils literal notranslate">0.0.0.0/0</code>）并在整个 Level-1 区域内本地生成的 LSP 中通告该路由。</strong></p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-1</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-1
 </pre></div>
 </div>
@@ -510,76 +466,71 @@ and advertise it in locally generated LSPs throughout the 级别-1 area.</strong
 <div class="cfgcmd-heading">
 
 set protocols isis default-information originate ipv4 level-1 always
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-1-always" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to unconditionally originate the IPv4 default route
-and advertise it throughout the 级别-1 area, even if the router lacks a
-default route in its <abbr title="Routing Information Base">RIB</abbr>.</strong></p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-1-always" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器无条件生成 IPv4 默认路由并在整个 Level-1 区域内通告该路由，即使路由器在其 <abbr title="路由信息库">RIB</abbr> 中没有默认路由。</strong></p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-1</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-1 always
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis default-information originate ipv4 level-1 metric <0-16777215>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-1-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IS-IS metric for the IPv4 default route advertised at
-级别 1.</strong></p>
+set protocols isis default-information originate ipv4 level-1 metric &lt;0-16777215&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-1-metric-0-16777215" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 Level-1 通告的 IPv4 默认路由的 IS-IS 指标值。</strong></p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-1</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-1 metric 100
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis default-information originate ipv4 level-1 route-map <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-1-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 a route-map to the IPv4 default route advertised at 级别 1.</strong></p>
-<p>The route-map can permit or deny the advertisement and, if permitted,
-modify the route’s metric.</p>
+set protocols isis default-information originate ipv4 level-1 route-map &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-1-route-map-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>将路由映射应用于 Level-1 通告的 IPv4 默认路由。</strong></p>
+<p>该路由映射可允许或拒绝通告；若允许，则可修改该路由的指标值。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-1</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-1 route-map ISIS-DEFAULT
 </pre></div>
 </div>
 </section>
 <section id="level-1-ipv6">
-<h5>级别-1 IPv6</h5>
+<h5>Level-1 IPv6</h5>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols isis default-information originate ipv6 level-1
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to originate the IPv6 default route (<code class="docutils literal notranslate">::/0</code>) and
-advertise it in locally generated LSPs throughout the 级别-1 area.</strong></p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-1" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器生成 IPv6 默认路由（<code class="docutils literal notranslate">::/0</code>）并在整个 Level-1 区域内本地生成的 LSP 中通告该路由。</strong></p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-1</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-1
 </pre></div>
 </div>
@@ -587,77 +538,71 @@ advertise it in locally generated LSPs throughout the 级别-1 area.</strong></p
 <div class="cfgcmd-heading">
 
 set protocols isis default-information originate ipv6 level-1 always
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-1-always" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to unconditionally originate the IPv6 default route
-and advertise it throughout the 级别-1 area, even if the router lacks a
-default route in its RIB.</strong></p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-1-always" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器无条件生成 IPv6 默认路由并在整个 Level-1 区域内通告该路由，即使路由器在其 RIB 中没有默认路由。</strong></p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-1</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-1 always
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis default-information originate ipv6 level-1 metric <0-16777215>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-1-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IS-IS metric for the IPv6 default route advertised at
-级别 1.</strong></p>
+set protocols isis default-information originate ipv6 level-1 metric &lt;0-16777215&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-1-metric-0-16777215" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 Level-1 通告的 IPv6 默认路由的 IS-IS 指标值。</strong></p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-1</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-1 metric 100
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis default-information originate ipv6 level-1 route-map <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-1-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 a route-map to the IPv6 default route advertised at 级别 1.</strong></p>
-<p>The route-map can permit or deny the advertisement and, if permitted,
-modify the route’s metric.</p>
+set protocols isis default-information originate ipv6 level-1 route-map &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-1-route-map-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>将路由映射应用于 Level-1 通告的 IPv6 默认路由。</strong></p>
+<p>该路由映射可允许或拒绝通告；若允许，则可修改该路由的指标值。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-1</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-1 route-map ISIS-DEFAULT
 </pre></div>
 </div>
 </section>
 <section id="level-2-ipv4">
-<h5>级别-2 IPv4</h5>
+<h5>Level-2 IPv4</h5>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols isis default-information originate ipv4 level-2
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to originate the IPv4 default route (<code class="docutils literal notranslate">0.0.0.0/0</code>)
-and advertise it in locally generated LSPs throughout the 级别-2
-backbone.</strong></p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-2" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器生成 IPv4 默认路由（<code class="docutils literal notranslate">0.0.0.0/0</code>）并在整个 Level-2 骨干网内本地生成的 LSP 中通告该路由。</strong></p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-2</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-2
 </pre></div>
 </div>
@@ -665,77 +610,71 @@ backbone.</strong></p>
 <div class="cfgcmd-heading">
 
 set protocols isis default-information originate ipv4 level-2 always
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-2-always" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to unconditionally originate the IPv4 default route
-and advertise it throughout the 级别-2 backbone, even if the router lacks
-a default route in its RIB.</strong></p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-2-always" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器无条件生成 IPv4 默认路由并在整个 Level-2 骨干网内通告该路由，即使路由器在其 RIB 中没有默认路由。</strong></p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-2</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-2 always
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis default-information originate ipv4 level-2 metric <0-16777215>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-2-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IS-IS metric for the IPv4 default route advertised into
-the 级别-2 backbone.</strong></p>
+set protocols isis default-information originate ipv4 level-2 metric &lt;0-16777215&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-2-metric-0-16777215" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置通告至 Level-2 骨干网的 IPv4 默认路由的 IS-IS 指标值。</strong></p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-2</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-2 metric 100
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis default-information originate ipv4 level-2 route-map <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-2-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 a route-map to the IPv4 default route advertised into the 级别-2
-backbone.</strong></p>
-<p>The route-map can permit or deny the advertisement and, if permitted,
-modify the route’s metric.</p>
+set protocols isis default-information originate ipv4 level-2 route-map &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv4-level-2-route-map-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>将路由映射应用于通告至 Level-2 骨干网的 IPv4 默认路由。</strong></p>
+<p>该路由映射可允许或拒绝通告；若允许，则可修改该路由的指标值。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-2</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv4 level-2 route-map ISIS-DEFAULT
 </pre></div>
 </div>
 </section>
 <section id="level-2-ipv6">
-<h5>级别-2 IPv6</h5>
+<h5>Level-2 IPv6</h5>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols isis default-information originate ipv6 level-2
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to originate the IPv6 default route (<code class="docutils literal notranslate">::/0</code>) and
-advertise it in locally generated LSPs throughout the 级别-2 backbone.</strong></p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-2" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器生成 IPv6 默认路由（<code class="docutils literal notranslate">::/0</code>）并在整个 Level-2 骨干网内本地生成的 LSP 中通告该路由。</strong></p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-2</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-2
 </pre></div>
 </div>
@@ -743,1624 +682,382 @@ advertise it in locally generated LSPs throughout the 级别-2 backbone.</strong
 <div class="cfgcmd-heading">
 
 set protocols isis default-information originate ipv6 level-2 always
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-2-always" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the router to unconditionally originate the IPv6 default route
-and advertise it throughout the 级别-2 backbone, even if the router lacks
-a default route in its RIB.</strong></p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-2-always" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器无条件生成 IPv6 默认路由并在整个 Level-2 骨干网内通告该路由，即使路由器在其 RIB 中没有默认路由。</strong></p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-2</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-2 always
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis default-information originate ipv6 level-2 metric <0-16777215>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-2-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IS-IS metric for the IPv6 default route advertised into
-the 级别-2 backbone.</strong></p>
+set protocols isis default-information originate ipv6 level-2 metric &lt;0-16777215&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-2-metric-0-16777215" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置通告至 Level-2 骨干网的 IPv6 默认路由的 IS-IS 指标值。</strong></p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-2</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-2 metric 100
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis default-information originate ipv6 level-2 route-map <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-2-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 a route-map to the IPv6 default route advertised into the 级别-2
-backbone.</strong></p>
-<p>The route-map can permit or deny the advertisement and, if permitted,
-modify the route’s metric.</p>
+set protocols isis default-information originate ipv6 level-2 route-map &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-default-information-originate-ipv6-level-2-route-map-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>将路由映射应用于通告至 Level-2 骨干网的 IPv6 默认路由。</strong></p>
+<p>该路由映射可允许或拒绝通告；若允许，则可修改该路由的指标值。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
+<p>此命令要求路由器的 IS-IS 等级设置为 <code class="docutils literal notranslate">level-2</code> 或
+<code class="docutils literal notranslate">level-1-2</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis default-information originate ipv6 level-2 route-map ISIS-DEFAULT
 </pre></div>
 </div>
 </section>
 </section>
 <section id="ldp-synchronization">
-<h4>LDP synchronization</h4>
+<h4>LDP 同步</h4>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set protocols isis ldp-sync
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-ldp-sync" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable LDP IGP synchronization
-(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5443">RFC 5443</a>) for the IS-IS
-routing process.</strong></p>
-<p>When enabled, all operational IS-IS interfaces automatically participate
-in synchronization, except for loopback interfaces.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-ldp-sync" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为 IS-IS 路由进程启用 LDP IGP 同步
+（<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5443">RFC 5443</a>）。</strong></p>
+<p>启用后，所有运行中的 IS-IS 接口自动参与同步，环回接口除外。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>LDP 必须 configured and functional on the router for synchronization
-to operate.</p>
+<p>要使同步正常工作，路由器上必须已配置并启用 LDP。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis ldp-sync
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis ldp-sync holddown <0-10000>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-ldp-sync-holddown-0-10000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the time, in seconds, that IS-IS keeps any of its interfaces
-at max-metric while waiting for LDP-IGP synchronization to complete.</strong></p>
-<p>When this time expires on an interface, IS-IS restores the configured
-interface metric even if LDP-IGP synchronization has not completed.</p>
-<p>The default value is 0, which causes IS-IS to wait indefinitely.</p>
+set protocols isis ldp-sync holddown &lt;0-10000&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-ldp-sync-holddown-0-10000" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 IS-IS 在等待 LDP-IGP 同步完成期间，将其任一接口保持在最大指标状态的时间（秒）。</strong></p>
+<p>当此时间在某一接口上超时时，即使 LDP-IGP 同步尚未完成，IS-IS 也会恢复该接口的配置指标值。</p>
+<p>默认值为 0，表示 IS-IS 将无限期等待。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis ldp-sync holddown 60
 </pre></div>
 </div>
 </section>
 </section>
 <section id="interface-configuration">
-<h3>接口 configuration</h3>
+<h3>接口配置</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> circuit-type <level-1 | level-1-2 | level-2-only>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-circuit-type-level-1-level-1-2-level-2-only" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IS-IS level at which the router can form adjacencies on
-the specified interface:</strong></p>
+set protocols isis interface &lt;interface&gt; circuit-type &lt;level-1 | level-1-2 | level-2-only&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-circuit-type-level-1-level-1-2-level-2-only" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置路由器可在指定接口上建立邻接关系的 IS-IS 等级：</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">level-1</code>: Permits only 级别-1 (intra-area) adjacencies.</p></li>
-<li><p><code class="docutils literal notranslate">level-2-only</code>: Permits only 级别-2 (inter-area) adjacencies.</p></li>
-<li><p><code class="docutils literal notranslate">level-1-2</code>: Permits both 级别-1 (intra-area) and 级别-2 (inter-area)
-adjacencies.</p></li>
+<li><p><code class="docutils literal notranslate">level-1</code>：仅允许 Level-1（区域内）邻接关系。</p></li>
+<li><p><code class="docutils literal notranslate">level-2-only</code>：仅允许 Level-2（区域间）邻接关系。</p></li>
+<li><p><code class="docutils literal notranslate">level-1-2</code>：允许 Level-1（区域内）和 Level-2（区域间）邻接关系。</p></li>
 </ul>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>The selected level 必须 supported by the router’s IS-IS process.</p>
+<p>所选等级必须受路由器 IS-IS 进程支持。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth0 circuit-type level-1
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> hello-interval <1-600>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-hello-interval-1-600" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interval, in seconds, between successive IS-IS Hello PDUs
-(IIH) sent on the specified interface.</strong></p>
+set protocols isis interface &lt;interface&gt; hello-interval &lt;1-600&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-hello-interval-1-600" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置在指定接口上连续发送 IS-IS Hello PDU（IIH）的时间间隔（秒）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 hello-interval 5
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> hello-multiplier <2-100>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-hello-multiplier-2-100" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the multiplier applied to the Hello interval to derive the
-Holding Time advertised in IS-IS Hello PDUs (IIH) sent on the specified
-interface.</strong></p>
-<p>The receiving neighbor uses the advertised Holding Time as its adjacency
-timeout. If no IIH arrives within that period, the adjacency is declared
-down.</p>
+set protocols isis interface &lt;interface&gt; hello-multiplier &lt;2-100&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-hello-multiplier-2-100" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置应用于 Hello 间隔的乘数，以推导在指定接口上发送的 IS-IS Hello PDU（IIH）中通告的保持时间（Holding Time）。</strong></p>
+<p>接收邻居使用通告的保持时间作为其邻接超时时间。若在此时间段内未收到 IIH，则宣告邻接关系失效。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 hello-multiplier 5
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> hello-padding
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-hello-padding" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable padding of IS-IS Hello PDUs (IIH) sent on the specified interface
-to that interface’s full MTU
-(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc3719">RFC 3719</a>).</strong></p>
-<p>This ensures that neighbors with asymmetric MTUs cannot establish an
-adjacency. Without padding, asymmetric MTUs bypass detection during
-adjacency setup.</p>
+set protocols isis interface &lt;interface&gt; hello-padding
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-hello-padding" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上启用 IS-IS Hello PDU（IIH）填充，使其达到该接口的完整 MTU
+（<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc3719">RFC 3719</a>）。</strong></p>
+<p>这确保具有不对称 MTU 的邻居无法建立邻接关系。若不启用填充，不对称 MTU 将在邻接建立过程中绕过检测。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth0 hello-padding
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> metric <0-16777215>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IS-IS metric (cost) advertised for the specified
-interface.</strong></p>
-<p>The SPF algorithm uses this value to calculate the optimal routing path
-to destinations.</p>
-<p>The valid range depends on the configured metric style: <code class="docutils literal notranslate">narrow</code> limits
-the metric to 0-63, while <code class="docutils literal notranslate">wide</code> extends it to 0-16777215.</p>
-<p>The default value is 10.</p>
+set protocols isis interface &lt;interface&gt; metric &lt;0-16777215&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-metric-0-16777215" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置指定接口通告的 IS-IS 指标值（开销）。</strong></p>
+<p>SPF 算法使用该值计算到达目的地的最佳路由路径。</p>
+<p>有效取值范围取决于配置的指标风格：<code class="docutils literal notranslate">narrow</code> 将指标限制在 0–63，而 <code class="docutils literal notranslate">wide</code> 将其扩展至 0–16777215。</p>
+<p>默认值为 10。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 metric 100
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> network point-to-point
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-network-point-to-point" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IS-IS network type for the specified interface as
-point-to-point.</strong></p>
-<p>The default network type is broadcast.</p>
+set protocols isis interface &lt;interface&gt; network point-to-point
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-network-point-to-point" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>将指定接口的 IS-IS 网络类型配置为点对点。</strong></p>
+<p>默认网络类型为广播。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>The neighboring interface 必须 configured with the same network type;
-otherwise, the adjacency does not form.</p>
+<p>相邻接口必须配置为相同的网络类型；否则，邻接关系无法建立。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 network point-to-point
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> passive
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-passive" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable passive mode for the specified interface.</strong></p>
-<p>On a passive interface, the router neither sends nor processes IS-IS Hello
-PDUs (IIH), so no adjacency forms. The interface’s IP prefix is still
-advertised in this router’s LSP.</p>
+set protocols isis interface &lt;interface&gt; passive
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-passive" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定接口启用被动模式。</strong></p>
+<p>在被动接口上，路由器既不发送也不处理 IS-IS Hello PDU（IIH），因此不会建立邻接关系。但该接口的 IP 前缀仍会在本路由器的 LSP 中通告。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface lo passive
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> password plaintext-password <text>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-password-plaintext-password-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the plaintext authentication password for the specified
-interface.</strong></p>
-<p>This password is included in IS-IS Hello (IIH) PDUs sent on the interface
-and validated on IIH PDUs received from neighbors.</p>
-<p>A mismatch prevents adjacency formation and tears down an established
-adjacency.</p>
+set protocols isis interface &lt;interface&gt; password plaintext-password &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-password-plaintext-password-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定接口配置明文认证密码。</strong></p>
+<p>该密码包含在接口上发送的 IS-IS Hello（IIH）PDU 中，并在从邻居接收的 IIH PDU 中进行验证。</p>
+<p>密码不匹配将阻止邻接关系建立，并拆除已建立的邻接关系。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 password plaintext-password mysharedsecret
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> password md5 <text>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-password-md5-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the MD5 authentication key for the specified interface.</strong></p>
-<p>This key 用于 generate a cryptographic hash that is included in
-IS-IS Hello (IIH) PDUs sent on the interface and validated in IIH PDUs
-received from neighbors.</p>
-<p>A mismatch prevents adjacency formation and tears down an established
-adjacency.</p>
+set protocols isis interface &lt;interface&gt; password md5 &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-password-md5-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定接口配置 MD5 认证密钥。</strong></p>
+<p>该密钥用于生成加密哈希值，该哈希值包含在接口上发送的 IS-IS Hello（IIH）PDU 中，并在从邻居接收的 IIH PDU 中进行验证。</p>
+<p>密钥不匹配将阻止邻接关系建立，并拆除已建立的邻接关系。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 password md5 mysharedsecret
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> priority <0-127>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-priority-0-127" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IS-IS <abbr title="Designated Intermediate System">DIS</abbr>
-election priority for the specified interface.</strong></p>
-<p>The priority is used in DIS election on the broadcast (LAN) segment. The
-router whose interface advertises the highest priority wins.</p>
-<p>The default priority is 64.</p>
+set protocols isis interface &lt;interface&gt; priority &lt;0-127&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-priority-0-127" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置指定接口的 IS-IS <abbr title="指定中间系统">DIS</abbr>
+选举优先级。</strong></p>
+<p>该优先级用于广播（LAN）网段上的 DIS 选举。通告最高优先级的路由器获胜。</p>
+<p>默认优先级为 64。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>The configured value applies only to broadcast interfaces and has no
-effect on point-to-point interfaces.</p>
+<p>配置的值仅适用于广播接口，对点对点接口无影响。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 priority 100
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> psnp-interval <0-127>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-psnp-interval-0-127" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interval, in seconds, between successive IS-IS
-<abbr title="Partial Sequence Number PDU">PSNP</abbr> transmissions on the
-specified interface.</strong></p>
+set protocols isis interface &lt;interface&gt; psnp-interval &lt;0-127&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-psnp-interval-0-127" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置在指定接口上连续发送 IS-IS
+<abbr title="部分序列号 PDU">PSNP</abbr> 的时间间隔（秒）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 psnp-interval 2
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> no-three-way-handshake
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-no-three-way-handshake" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable the Three-Way Handshake for Point-to-Point (P2P) adjacencies
-(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5303">RFC 5303</a>).</strong></p>
-<p>The three-way handshake is enabled by default.</p>
+set protocols isis interface &lt;interface&gt; no-three-way-handshake
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-no-three-way-handshake" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>禁用点对点（P2P）邻接关系的三次握手
+（<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc5303">RFC 5303</a>）。</strong></p>
+<p>三次握手默认启用。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command applies only to point-to-point interfaces and has no effect
-on broadcast interfaces.</p>
+<p>此命令仅适用于点对点接口，对广播接口无影响。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 no-three-way-handshake
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> ldp-sync disable
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-ldp-sync-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable LDP-IGP synchronization on the specified IS-IS interface.</strong></p>
-<p>With LDP-IGP synchronization enabled, IS-IS advertises a maximum metric
-on the interface while LDP is not yet synchronized on it.</p>
-<p>Disabling it on this interface causes IS-IS to advertise the configured
-metric regardless of LDP synchronization state.</p>
+set protocols isis interface &lt;interface&gt; ldp-sync disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-ldp-sync-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定 IS-IS 接口上禁用 LDP-IGP 同步。</strong></p>
+<p>启用 LDP-IGP 同步后，IS-IS 在 LDP 尚未同步完成时，将在该接口上通告最大指标值。</p>
+<p>在该接口上禁用此功能后，IS-IS 将无论 LDP 同步状态如何，均通告配置的指标值。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command applies only if LDP-IGP synchronization is enabled for the
-IS-IS routing process.</p>
+<p>此命令仅在 IS-IS 路由进程已启用 LDP-IGP 同步时适用。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 ldp-sync disable
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> ldp-sync holddown <0-10000>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-ldp-sync-holddown-0-10000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the time, in seconds, that IS-IS keeps the specified interface
-at max-metric while waiting for LDP-IGP synchronization to complete.</strong></p>
-<p>When this time expires, IS-IS restores the configured interface metric
-even if LDP-IGP synchronization has not completed.</p>
-<p>The default value is 0, which causes IS-IS to wait indefinitely.</p>
+set protocols isis interface &lt;interface&gt; ldp-sync holddown &lt;0-10000&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-ldp-sync-holddown-0-10000" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 IS-IS 在等待 LDP-IGP 同步完成期间，将指定接口保持在最大指标状态的时间（秒）。</strong></p>
+<p>当此时间超时时，IS-IS 将恢复该接口的配置指标值，即使 LDP-IGP 同步尚未完成。</p>
+<p>默认值为 0，表示 IS-IS 将无限期等待。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This setting overrides the LDP-IGP synchronization hold-down time
-configured for the IS-IS routing process.</p>
+<p>此设置将覆盖为 IS-IS 路由进程配置的 LDP-IGP 同步保持时间。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 ldp-sync holddown 60
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> bfd profile <profile-name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-bfd-profile-profile-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>附加 a BFD profile to the IS-IS adjacency on the specified
-interface.</strong></p>
-<p>When configured, IS-IS uses the BFD session described by the named
-profile to detect adjacency failure. If BFD reports the session down,
-the IS-IS adjacency is torn down immediately rather than waiting for
-the Hello holding time to expire.</p>
-<p>The profile itself is configured under
-<code class="docutils literal notranslate">set protocols bfd profile <profile-name></code>.</p>
+set protocols isis interface &lt;interface&gt; bfd profile &lt;profile-name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-bfd-profile-profile-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>将 BFD 配置文件附加到指定接口上的 IS-IS 邻接关系。</strong></p>
+<p>配置后，IS-IS 使用命名配置文件描述的 BFD 会话来检测邻接故障。若 BFD 报告会话中断，IS-IS 邻接关系将立即拆除，而非等待 Hello 保持时间超时。</p>
+<p>该配置文件本身在
+<code class="docutils literal notranslate">set protocols bfd profile &lt;profile-name&gt;</code> 下配置。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 bfd profile ISIS-FAST
 </pre></div>
 </div>
 <section id="level-1-fast-reroute">
-<h4>级别-1 fast-reroute</h4>
+<h4>Level-1 快速重路由</h4>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> fast-reroute lfa level-1 enable
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-lfa-level-1-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable 级别-1 <abbr title="Loop-Free Alternate">LFA</abbr> computation on the
-specified interface.</strong></p>
-<p>When enabled, IS-IS precomputes a backup next-hop for each 级别-1
-destination reached through this interface. If the primary next-hop
-fails, the router uses the precomputed backup instead.</p>
+set protocols isis interface &lt;interface&gt; fast-reroute lfa level-1 enable
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-lfa-level-1-enable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上启用 Level-1 <abbr title="无环备用">LFA</abbr> 计算。</strong></p>
+<p>启用后，IS-IS 为通过该接口到达的每个 Level-1 目的地预先计算备份下一跳。若主下一跳失效，路由器将使用预先计算的备份路径。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute lfa level-1 enable
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface-1> fast-reroute lfa level-1 exclude interface <interface-2>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-1-fast-reroute-lfa-level-1-exclude-interface-interface-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Exclude an interface from being selected as a 级别-1 LFA backup
-next-hop on the specified interface.</strong></p>
-<p>In the command syntax, <code class="docutils literal notranslate"><interface-1></code> identifies the protected interface,
-and <code class="docutils literal notranslate"><interface-2></code> identifies the interface that must not be used as an
-LFA backup next-hop.</p>
+set protocols isis interface &lt;interface-1&gt; fast-reroute lfa level-1 exclude interface &lt;interface-2&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-1-fast-reroute-lfa-level-1-exclude-interface-interface-2" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>从指定接口的 Level-1 LFA 备份下一跳选择中排除某接口。</strong></p>
+<p>在命令语法中，<code class="docutils literal notranslate">&lt;interface-1&gt;</code> 标识受保护接口，
+<code class="docutils literal notranslate">&lt;interface-2&gt;</code> 标识不得用作 LFA 备份下一跳的接口。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute lfa level-1 exclude interface eth2
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> fast-reroute remote-lfa level-1 tunnel mpls-ldp
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-remote-lfa-level-1-tunnel-mpls-ldp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable 级别-1 remote LFA computation using MPLS-LDP tunnels on the
-specified interface.</strong></p>
-<p>Remote LFA provides backup paths when local LFA cannot find a loop-free
-alternate neighbor.</p>
-<p>If the primary next-hop fails, the router sends traffic into an MPLS-LDP
-tunnel to a precomputed remote LFA node. From there, normal IS-IS
-forwarding delivers it to the destination.</p>
+set protocols isis interface &lt;interface&gt; fast-reroute remote-lfa level-1 tunnel mpls-ldp
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-remote-lfa-level-1-tunnel-mpls-ldp" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上启用基于 MPLS-LDP 隧道的 Level-1 远程 LFA 计算。</strong></p>
+<p>当本地 LFA 无法找到无环备用邻居时，远程 LFA 提供备份路径。</p>
+<p>若主下一跳失效，路由器将流量发送至 MPLS-LDP 隧道，转发至预先计算的远程 LFA 节点。随后，通过正常的 IS-IS 转发将流量送达目的地。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>Remote LFA requires the corresponding local LFA to be configured on this
-interface.</p>
+<p>远程 LFA 要求在同一接口上已配置对应的本地 LFA。</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>Remote LFA requires all potential remote LFA endpoints in the IS-IS
-routing instance to accept targeted LDP Hello messages.</p>
+<p>远程 LFA 要求 IS-IS 路由实例中所有潜在的远程 LFA 端点均接受定向 LDP Hello 消息。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute remote-lfa level-1 tunnel mpls-ldp
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols isis interface <interface> fast-reroute remote-lfa level-1 maximum-metric <1-16777215>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-remote-lfa-level-1-maximum-metric-1-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the maximum metric for 级别-1 remote LFA node selection on
-the specified interface.</strong></p>
-<p>Remote LFA nodes with a metric exceeding this value are excluded from
-selection.</p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>The maximum metric applies only when the corresponding remote LFA is
-enabled on this interface.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute remote-lfa level-1 maximum-metric 100
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis interface <interface> fast-reroute ti-lfa level-1
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-ti-lfa-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable 级别-1 <abbr title="Topology Independent Loop-Free Alternate">TI-LFA</abbr>
-computation on the specified interface.</strong></p>
-<p>By default, TI-LFA operates in link protection mode, computing backup
-paths that protect against the failure of this interface’s link.</p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>LFA and TI-LFA cannot be configured at the same level on the same
-interface.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute ti-lfa level-1
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis interface <interface> fast-reroute ti-lfa level-1 node-protection
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-ti-lfa-level-1-node-protection" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable node protection mode for 级别-1 TI-LFA on the specified
-interface.</strong></p>
-<p>In node protection mode, TI-LFA computes backup paths that protect
-against the failure of the next-hop node.</p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>LFA and TI-LFA cannot be configured at the same level on the same
-interface.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth0 fast-reroute ti-lfa level-1 node-protection
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis interface <interface> fast-reroute ti-lfa level-1 node-protection link-fallback
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-ti-lfa-level-1-node-protection-link-fallback" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable link-protection fallback for 级别-1 TI-LFA on the specified
-interface.</strong></p>
-<p>When node protection cannot compute a backup path, the computation falls
-back to link protection.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute ti-lfa level-1 node-protection link-fallback
-</pre></div>
-</div>
-</section>
-<section id="level-2-fast-reroute">
-<h4>级别-2 fast-reroute</h4>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis interface <interface> fast-reroute lfa level-2 enable
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-lfa-level-2-enable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable 级别-2 LFA computation on the specified interface.</strong></p>
-<p>When enabled, IS-IS precomputes a backup next-hop for each 级别-2
-destination reached through this interface. If the primary next-hop
-fails, the router uses the precomputed backup instead.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute lfa level-2 enable
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis interface <interface-1> fast-reroute lfa level-2 exclude interface <interface-2>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-1-fast-reroute-lfa-level-2-exclude-interface-interface-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Exclude an interface from being selected as a 级别-2 LFA backup
-next-hop on the specified interface.</strong></p>
-<p>In the command syntax, <code class="docutils literal notranslate"><interface-1></code> identifies the protected interface,
-and <code class="docutils literal notranslate"><interface-2></code> identifies the interface that must not be used as an
-LFA backup next-hop.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute lfa level-2 exclude interface eth2
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis interface <interface> fast-reroute remote-lfa level-2 tunnel mpls-ldp
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-remote-lfa-level-2-tunnel-mpls-ldp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable 级别-2 remote LFA computation using MPLS-LDP tunnels on the
-specified interface.</strong></p>
-<p>Remote LFA provides backup paths when local LFA cannot find a loop-free
-alternate neighbor.</p>
-<p>If the primary next-hop fails, the router sends traffic into an MPLS-LDP
-tunnel to a precomputed remote LFA node. From there, normal IS-IS
-forwarding delivers it to the destination.</p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>Remote LFA requires the corresponding local LFA to be configured on this
-interface.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>Remote LFA requires all potential remote LFA endpoints in the IS-IS
-routing instance to accept targeted LDP Hello messages.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute remote-lfa level-2 tunnel mpls-ldp
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis interface <interface> fast-reroute remote-lfa level-2 maximum-metric <1-16777215>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-remote-lfa-level-2-maximum-metric-1-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the maximum metric for 级别-2 remote LFA node selection on
-the specified interface.</strong></p>
-<p>Remote LFA nodes with a metric exceeding this value are excluded from
-selection.</p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>The maximum metric applies only when the corresponding remote LFA is
-enabled on this interface.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute remote-lfa level-2 maximum-metric 100
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis interface <interface> fast-reroute ti-lfa level-2
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-ti-lfa-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable 级别-2 TI-LFA computation on the specified interface.</strong></p>
-<p>By default, TI-LFA operates in link protection mode, computing backup
-paths that protect against the failure of this interface’s link.</p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>LFA and TI-LFA cannot be configured at the same level on the same
-interface.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute ti-lfa level-2
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis interface <interface> fast-reroute ti-lfa level-2 node-protection
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-ti-lfa-level-2-node-protection" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable node protection mode for 级别-2 TI-LFA on the specified
-interface.</strong></p>
-<p>In node protection mode, TI-LFA computes backup paths that protect
-against the failure of the next-hop node.</p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>LFA and TI-LFA cannot be configured at the same level on the same
-interface.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth0 fast-reroute ti-lfa level-2 node-protection
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis interface <interface> fast-reroute ti-lfa level-2 node-protection link-fallback
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-ti-lfa-level-2-node-protection-link-fallback" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable link-protection fallback for 级别-2 TI-LFA on the specified
-interface.</strong></p>
-<p>When node protection cannot compute a backup path, the computation falls
-back to link protection.</p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>LFA and TI-LFA cannot be configured at the same level on the same
-interface.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis interface eth1 fast-reroute ti-lfa level-2 node-protection link-fallback
-</pre></div>
-</div>
-</section>
-</section>
-<section id="route-redistribution">
-<h3>路由 redistribution</h3>
-<section id="id1">
-<h4>级别-1 IPv4</h4>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis redistribute ipv4 <bgp | connected | kernel | nhrp | ospf | rip | babel | static> level-1
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv4-bgp-connected-kernel-nhrp-ospf-rip-babel-static-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the redistribution of IPv4 routing information from the
-specified route source into IS-IS 级别-1.</strong></p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv4 bgp level-1
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis redistribute ipv4 <bgp | connected | kernel | nhrp | ospf | rip | babel | static> level-1 metric <0-16777215>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv4-bgp-connected-kernel-nhrp-ospf-rip-babel-static-level-1-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IS-IS metric for IPv4 routes redistributed from the
-specified route source into IS-IS 级别-1.</strong></p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv4 bgp level-1 metric 50
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis redistribute ipv4 <bgp | connected | kernel | nhrp | ospf | rip | babel | static> level-1 route-map <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv4-bgp-connected-kernel-nhrp-ospf-rip-babel-static-level-1-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 a route-map to IPv4 routes redistributed from the specified route
-source into IS-IS 级别-1.</strong></p>
-<p>Only routes permitted by the route-map are redistributed. The route-map
-can modify the metric and tag of permitted routes.</p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv4 bgp level-1 route-map BGP-TO-ISIS
-</pre></div>
-</div>
-</section>
-<section id="id2">
-<h4>级别-1 IPv6</h4>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis redistribute ipv6 <bgp | connected | kernel | ospf6 | ripng | babel | static> level-1
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv6-bgp-connected-kernel-ospf6-ripng-babel-static-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the redistribution of IPv6 routing information from the
-specified route source into IS-IS 级别-1.</strong></p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv6 bgp level-1
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis redistribute ipv6 <bgp | connected | kernel | ospf6 | ripng | babel | static> level-1 metric <0-16777215>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv6-bgp-connected-kernel-ospf6-ripng-babel-static-level-1-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IS-IS metric for IPv6 routes redistributed from the
-specified route source into IS-IS 级别-1.</strong></p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv6 bgp level-1 metric 50
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis redistribute ipv6 <bgp | connected | kernel | ospf6 | ripng | babel | static> level-1 route-map <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv6-bgp-connected-kernel-ospf6-ripng-babel-static-level-1-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 a route-map to IPv6 routes redistributed from the specified route
-source into IS-IS 级别-1.</strong></p>
-<p>Only routes permitted by the route-map are redistributed. The route-map
-can modify the metric and tag of permitted routes.</p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-1</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv6 bgp level-1 route-map BGP-TO-ISIS
-</pre></div>
-</div>
-</section>
-<section id="id3">
-<h4>级别-2 IPv4</h4>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis redistribute ipv4 <bgp | connected | kernel | nhrp | ospf | rip | babel | static> level-2
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv4-bgp-connected-kernel-nhrp-ospf-rip-babel-static-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the redistribution of IPv4 routing information from the
-specified route source into IS-IS 级别-2.</strong></p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv4 bgp level-2
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis redistribute ipv4 <bgp | connected | kernel | nhrp | ospf | rip | babel | static> level-2 metric <0-16777215>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv4-bgp-connected-kernel-nhrp-ospf-rip-babel-static-level-2-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IS-IS metric for IPv4 routes redistributed from the
-specified route source into IS-IS 级别-2.</strong></p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv4 bgp level-2 metric 50
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis redistribute ipv4 <bgp | connected | kernel | nhrp | ospf | rip | babel | static> level-2 route-map <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv4-bgp-connected-kernel-nhrp-ospf-rip-babel-static-level-2-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 a route-map to IPv4 routes redistributed from the specified route
-source into IS-IS 级别-2.</strong></p>
-<p>Only routes permitted by the route-map are redistributed. The route-map
-can modify the metric and tag of permitted routes.</p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv4 bgp level-2 route-map BGP-TO-ISIS
-</pre></div>
-</div>
-</section>
-<section id="id4">
-<h4>级别-2 IPv6</h4>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis redistribute ipv6 <bgp | connected | kernel | ospf6 | ripng | babel | static> level-2
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv6-bgp-connected-kernel-ospf6-ripng-babel-static-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the redistribution of IPv6 routing information from the
-specified route source into IS-IS 级别-2.</strong></p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv6 bgp level-2
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis redistribute ipv6 <bgp | connected | kernel | ospf6 | ripng | babel | static> level-2 metric <0-16777215>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv6-bgp-connected-kernel-ospf6-ripng-babel-static-level-2-metric-0-16777215" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IS-IS metric for IPv6 routes redistributed from the
-specified route source into IS-IS 级别-2.</strong></p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv6 bgp level-2 metric 50
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis redistribute ipv6 <bgp | connected | kernel | ospf6 | ripng | babel | static> level-2 route-map <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-redistribute-ipv6-bgp-connected-kernel-ospf6-ripng-babel-static-level-2-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 a route-map to IPv6 routes redistributed from the specified route
-source into IS-IS 级别-2.</strong></p>
-<p>Only routes permitted by the route-map are redistributed. The route-map
-can modify the metric and tag of permitted routes.</p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>This command requires the router’s IS-IS level to be set to <code class="docutils literal notranslate">level-2</code> or
-<code class="docutils literal notranslate">level-1-2</code>.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis redistribute ipv6 bgp level-2 route-map BGP-TO-ISIS
-</pre></div>
-</div>
-</section>
-</section>
-<section id="timers">
-<h3>Timers</h3>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis lsp-gen-interval <1-120>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-lsp-gen-interval-1-120" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the minimum interval, in seconds, between consecutive
-regenerations of this router’s own LSP.</strong></p>
-<p>Regenerations triggered by events, such as network topology changes, are
-postponed until the specified interval has elapsed since the previous
-regeneration.</p>
-<p>The default interval is 30 seconds.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis lsp-gen-interval 5
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis lsp-refresh-interval <2-65235>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-lsp-refresh-interval-2-65235" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the maximum interval, in seconds, between consecutive
-regenerations of this router’s own LSP.</strong></p>
-<p>When this interval elapses, the router regenerates its LSP even if no
-event has triggered a regeneration.</p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>The value 必须 less than the configured <code class="docutils literal notranslate">max-lsp-lifetime</code> so that the
-LSP is refreshed before its remaining lifetime expires.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis lsp-refresh-interval 600
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis max-lsp-lifetime <350-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-max-lsp-lifetime-350-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the lifetime, in seconds, of LSPs originated by this router.</strong></p>
-<p>The default is 1200 seconds.</p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>This value 必须 greater than <code class="docutils literal notranslate">lsp-refresh-interval</code> so that LSPs are
-refreshed before their lifetime expires.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis max-lsp-lifetime 1500
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis spf-interval <1-120>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-spf-interval-1-120" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interval, in seconds, between consecutive SPF calculations
-on this router.</strong></p>
-<p>SPF calculations triggered by events, such as network topology changes,
-are postponed until the specified interval has elapsed since the previous
-calculation.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis spf-interval 5
-</pre></div>
-</div>
-<p>The following commands implement the IETF SPF delay algorithm for IS-IS
-described in <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc8405">RFC 8405</a>.
-They control how quickly the router runs the SPF calculation after topology
-changes are detected.</p>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>All five <code class="docutils literal notranslate">spf-delay-ietf</code> parameters 必须 configured; setting only some
-of them causes a commit failure.</p>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis spf-delay-ietf holddown <0-60000>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-spf-delay-ietf-holddown-0-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interval, in milliseconds, that must elapse without
-topology changes before the router considers the network stable.</strong></p>
-<p>Once this time passes, the router returns to its initial response state
-and applies <code class="docutils literal notranslate">init-delay</code> to the next SPF calculation.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis spf-delay-ietf holddown 10000
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis spf-delay-ietf init-delay <0-60000>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-spf-delay-ietf-init-delay-0-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interval, in milliseconds, that the router waits before
-running the first SPF calculation when a new topology change arrives
-after the network is considered stable.</strong></p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis spf-delay-ietf init-delay 500
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis spf-delay-ietf time-to-learn <0-60000>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-spf-delay-ietf-time-to-learn-0-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the learning interval, in milliseconds, that begins when the
-first topology change is received.</strong></p>
-<p>Within this window, the router applies the <code class="docutils literal notranslate">short-delay</code> before performing
-SPF recalculations triggered by additional topology changes.</p>
-<p>If topology changes continue to arrive after this window expires, the
-router considers the network unstable and delays subsequent SPF
-recalculations by the configured <code class="docutils literal notranslate">long-delay</code>.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis spf-delay-ietf time-to-learn 5000
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis spf-delay-ietf long-delay <0-60000>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-spf-delay-ietf-long-delay-0-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interval, in milliseconds, the router applies before
-running an SPF calculation when topology changes arrive after the
-<code class="docutils literal notranslate">time-to-learn</code> window expires.</strong></p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis spf-delay-ietf long-delay 10000
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis spf-delay-ietf short-delay <0-60000>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-spf-delay-ietf-short-delay-0-60000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interval, in milliseconds, the router applies before
-running subsequent SPF calculations triggered by additional topology
-changes within the <code class="docutils literal notranslate">time-to-learn</code> window.</strong></p>
-<p>The first SPF in the window is delayed by <code class="docutils literal notranslate">init-delay</code>.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis spf-delay-ietf short-delay 1000
-</pre></div>
-</div>
-</section>
-<section id="loop-free-alternate-lfa">
-<h3>Loop-Free Alternate (LFA)</h3>
-<section id="level-1">
-<h4>级别-1</h4>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis fast-reroute lfa remote prefix-list <name> level-1
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-remote-prefix-list-name-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>过滤器 which PQ nodes the router evaluates as Remote LFA tunnel
-endpoints for IS-IS 级别-1 using the specified prefix-list.</strong></p>
-<p>Only PQ nodes permitted by the prefix-list are evaluated as potential
-backup routers.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa remote prefix-list CRITICAL-ROUTES level-1
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis fast-reroute lfa local load-sharing disable level-1
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-local-load-sharing-disable-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable load sharing across multiple local LFAs for IS-IS 级别-1.</strong></p>
-<p>When multiple LFAs are available to back up a given destination, the
-router uses only one LFA instead of distributing rerouted traffic across
-all of them.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa local load-sharing disable level-1
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis fast-reroute lfa local tiebreaker <downstream | lowest-backup-metric | node-protecting> index <1-255> level-1
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-local-tiebreaker-downstream-lowest-backup-metric-node-protecting-index-1-255-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a tiebreaker rule for selecting a single LFA when multiple
-local LFAs exist for an IS-IS 级别-1 prefix.</strong></p>
-<p>Tiebreaker rules with lower index numbers are evaluated first. You can
-choose one of the following tiebreaker behaviors:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate">downstream</code>: Prefers an alternate that is closer to the destination
-than this router.</p></li>
-<li><p><code class="docutils literal notranslate">lowest-backup-metric</code>: Prefers the alternate with the shortest path to
-the destination.</p></li>
-<li><p><code class="docutils literal notranslate">node-protecting</code>: Prefers an alternate that bypasses the primary
-next-hop router, protecting against a complete node failure rather than
-just link failure.</p></li>
-</ul>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa local tiebreaker node-protecting index 10 level-1
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis fast-reroute lfa local priority-limit <critical | high | medium> level-1
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-local-priority-limit-critical-high-medium-level-1" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the priority limit for calculating local LFAs in IS-IS
-级别-1.</strong></p>
-<p>The router calculates LFAs only for prefixes with a priority greater than
-or equal to the specified limit. For example, setting the limit to <code class="docutils literal notranslate">high</code>
-protects both <code class="docutils literal notranslate">high</code> and <code class="docutils literal notranslate">critical</code> prefixes.</p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>Prefixes carry one of the following priorities: <code class="docutils literal notranslate">low</code>, <code class="docutils literal notranslate">medium</code>, <code class="docutils literal notranslate">high</code>,
-or <code class="docutils literal notranslate">critical</code>. By default, the router assigns <code class="docutils literal notranslate">medium</code> priority to
-loopbacks and <code class="docutils literal notranslate">low</code> priority to all other prefixes. The limit itself
-accepts only <code class="docutils literal notranslate">medium</code>, <code class="docutils literal notranslate">high</code>, or <code class="docutils literal notranslate">critical</code>.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa local priority-limit critical level-1
-</pre></div>
-</div>
-</section>
-<section id="level-2">
-<h4>级别-2</h4>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis fast-reroute lfa remote prefix-list <name> level-2
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-remote-prefix-list-name-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>过滤器 which PQ nodes the router evaluates as Remote LFA tunnel
-endpoints for IS-IS 级别-2 using the specified prefix-list.</strong></p>
-<p>Only PQ nodes permitted by the prefix-list are evaluated as potential
-backup routers.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa remote prefix-list CRITICAL-ROUTES level-2
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis fast-reroute lfa local load-sharing disable level-2
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-local-load-sharing-disable-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable load sharing across multiple local LFAs for IS-IS 级别-2.</strong></p>
-<p>When multiple LFAs are available to back up a given destination, the
-router uses only one LFA instead of distributing rerouted traffic across
-all of them.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa local load-sharing disable level-2
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis fast-reroute lfa local tiebreaker <downstream | lowest-backup-metric | node-protecting> index <1-255> level-2
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-local-tiebreaker-downstream-lowest-backup-metric-node-protecting-index-1-255-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a tiebreaker rule for selecting a single LFA when multiple
-local LFAs exist for an IS-IS 级别-2 prefix.</strong></p>
-<p>Tiebreaker rules with lower index numbers are evaluated first. You can
-choose one of the following tiebreaker behaviors:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate">downstream</code>: Prefers an alternate that is closer to the destination
-than this router.</p></li>
-<li><p><code class="docutils literal notranslate">lowest-backup-metric</code>: Prefers the alternate with the shortest path to
-the destination.</p></li>
-<li><p><code class="docutils literal notranslate">node-protecting</code>: Prefers an alternate that bypasses the primary
-next-hop router, protecting against a complete node failure rather than
-just link failure.</p></li>
-</ul>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa local tiebreaker node-protecting index 10 level-2
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis fast-reroute lfa local priority-limit <critical | high | medium> level-2
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-fast-reroute-lfa-local-priority-limit-critical-high-medium-level-2" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the priority limit for calculating local LFAs in IS-IS
-级别-2.</strong></p>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>Prefixes carry one of the following priorities: <code class="docutils literal notranslate">low</code>, <code class="docutils literal notranslate">medium</code>, <code class="docutils literal notranslate">high</code>,
-or <code class="docutils literal notranslate">critical</code>. By default, the router assigns <code class="docutils literal notranslate">medium</code> priority to
-loopbacks and <code class="docutils literal notranslate">low</code> priority to all other prefixes. The limit itself
-accepts only <code class="docutils literal notranslate">medium</code>, <code class="docutils literal notranslate">high</code>, or <code class="docutils literal notranslate">critical</code>.</p>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis fast-reroute lfa local priority-limit critical level-2
-</pre></div>
-</div>
-</section>
-</section>
-<section id="segment-routing-over-ipv6-srv6">
-<h3>Segment 路由 over IPv6 (SRv6)</h3>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis segment-routing srv6 interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-srv6-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable IS-IS Segment 路由 over IPv6 (SRv6) on the specified
-interface.</strong></p>
-<p>Once enabled, IS-IS allocates and advertises an adjacency SID for each
-IS-IS neighbor reached through this interface, so other routers can steer
-SRv6 traffic over it.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing srv6 interface eth1
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis segment-routing srv6 locator <locator>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-srv6-locator-locator" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure IS-IS to use a globally defined SRv6 locator.</strong></p>
-<p>The locator itself 必须 configured separately using
-<code class="docutils literal notranslate">set protocols segment-routing srv6 locator <name> prefix <ipv6-prefix></code>.</p>
-<p>Once you attach the locator to IS-IS, the routing process automatically:</p>
-<ul class="simple">
-<li><p>Allocates a node SID for the router and an adjacency SID for each of
-its IS-IS neighbors.</p></li>
-<li><p>Advertises the locator and these SIDs to the network so other routers
-can route SRv6 traffic through this node.</p></li>
-</ul>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing srv6 locator MAIN-LOCATOR
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis segment-routing srv6 node-msd max-end-d <0-255>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-srv6-node-msd-max-end-d-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the Maximum End D MSD value advertised by the router
-(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc9352">RFC 9352</a>).</strong></p>
-<p>This value indicates the maximum number of SIDs in the SRH that this
-router can handle when performing a decapsulation behavior (e.g.,
-<code class="docutils literal notranslate">End.DX6</code>, <code class="docutils literal notranslate">End.DT4</code>, <code class="docutils literal notranslate">End.DT46</code>, <code class="docutils literal notranslate">End with USD</code>, <code class="docutils literal notranslate">End.X with USD</code>)
-defined in <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc8986">RFC 8986</a>.</p>
-<p>If this value is set to 0 or left unconfigured, the router advertises
-that it cannot decapsulate and forward packets when an SRH is present.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing srv6 node-msd max-end-d 8
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis segment-routing srv6 node-msd max-end-pop <0-255>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-srv6-node-msd-max-end-pop-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the Maximum End Pop MSD value advertised by the router
-(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc9352">RFC 9352</a>).</strong></p>
-<p>This value indicates the maximum number of SIDs in the received SRH to
-which this router can apply the PSP (Penultimate Segment Pop) or USP
-(Ultimate Segment Pop) flavors defined in
-<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc8986#section-4.16">RFC 8986, §4.16</a>.</p>
-<p>If this value is set to 0 or left unconfigured, the router advertises
-that it cannot apply the PSP or USP flavors.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing srv6 node-msd max-end-pop 16
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis segment-routing srv6 node-msd max-h-encaps <0-255>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-srv6-node-msd-max-h-encaps-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the Maximum H.Encaps MSD value advertised by the router
-(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc9352">RFC 9352</a>).</strong></p>
-<p>This value indicates the maximum number of SIDs that this router can
-insert into a new <abbr title="Segment Routing Header">SRH</abbr> when encapsulating
-traffic (the H.Encaps behavior), as defined in
-<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc8986">RFC 8986</a>.</p>
-<p>If set to 0 or left unconfigured, the router advertises that it can only
-apply an SR 策略 containing a single segment, without inserting an SRH.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing srv6 node-msd max-h-encaps 8
-</pre></div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set protocols isis segment-routing srv6 node-msd max-segs-left <0-255>
-<a class="cmdlink" href="#cfgcmd-set-protocols-isis-segment-routing-srv6-node-msd-max-segs-left-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the Maximum Segments Left MSD value advertised by the router
-(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc9352">RFC 9352</a>).</strong></p>
-<p>This value indicates the maximum Segments Left value
-(<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc8754">RFC 8754</a>) in the SRH of
-a received packet that this router can process before applying the
-Endpoint behavior associated with a SID.</p>
-<p>If set to 0 or left unconfigured, the router advertises that it can only
-be the last segment of an SRv6 path. 设置 a value greater than 0 to also
-allow the router to be used as a segment in the middle of a path.</p>
-</div>
-</div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols isis segment-routing srv6 node-msd max-segs-left 8
-</pre></div>
-</div>
-</section>
-</section>
-<section id="examples">
-<h2>示例</h2>
-<section id="enable-is-is">
-<h3>Enable IS-IS</h3>
-<p>The following example demonstrates a basic IS-IS routing protocol setup between
-two VyOS routers.</p>
-<p><strong>Node 1:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address '198.51.100.1/32'
-set interfaces ethernet eth1 address '192.0.2.1/24'
-
-set protocols isis interface eth1
-set protocols isis interface lo
-set protocols isis net '49.0001.1980.5110.0001.00'
-</pre></div>
-</div>
-<p><strong>Node 2:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address '198.51.100.2/32'
-set interfaces ethernet eth1 address '192.0.2.2/24'
-
-set protocols isis interface eth1
-set protocols isis interface lo
-set protocols isis net '49.0001.1980.5110.0002.00'
-</pre></div>
-</div>
-<p>This gives us the following neighborships, 级别 1 and 级别 2:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show isis neighbor
-Area VyOS:
- System Id           Interface   L  State        Holdtime SNPA
- vyos                eth1        1  Up            28       0c87.6c09.0001
- vyos                eth1        2  Up            28       0c87.6c09.0001
-
-Node-2@vyos:~$ show isis neighbor
-Area VyOS:
- System Id           Interface   L  State        Holdtime SNPA
- vyos                eth1        1  Up            29       0c33.0280.0001
- vyos                eth1        2  Up            28       0c33.0280.0001
-</pre></div>
-</div>
-<p>Here’s the IP routes that are populated. Just the loopback:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show ip route isis
-Codes: K - kernel route, C - connected, S - static, R - RIP,
-       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
-       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
-       f - OpenFabric,
-       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
-       t - trapped, o - offload failure
-
-I   192.0.2.0/24 [115/20] via 192.0.2.2, eth1 inactive, weight 1, 00:02:22
-I>* 198.51.100.2/32 [115/20] via 192.0.2.2, eth1, weight 1, 00:02:22
-
-Node-2@vyos:~$ show ip route isis
-Codes: K - kernel route, C - connected, S - static, R - RIP,
-       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
-       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
-       f - OpenFabric,
-       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
-       t - trapped, o - offload failure
-
-I   192.0.2.0/24 [115/20] via 192.0.2.1, eth1 inactive, weight 1, 00:02:21
-I>* 198.51.100.1/32 [115/20] via 192.0.2.1, eth1, weight 1, 00:02:21
-</pre></div>
-</div>
-</section>
-<section id="enable-is-is-and-redistribute-routes-not-natively-in-is-is">
-<h3>Enable IS-IS and redistribute routes not natively in IS-IS</h3>
-<p>The following example demonstrates a basic IS-IS setup between two VyOS
-routers, with Node 1 also redistributing a connected network that isn’t running
-IS-IS.</p>
-<p><strong>Node 1:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum0 address '203.0.113.1/24'
-set interfaces ethernet eth1 address '192.0.2.1/24'
-
-set policy prefix-list EXPORT-ISIS rule 10 action 'permit'
-set policy prefix-list EXPORT-ISIS rule 10 prefix '203.0.113.0/24'
-set policy route-map EXPORT-ISIS rule 10 action 'permit'
-set policy route-map EXPORT-ISIS rule 10 match ip address prefix-list 'EXPORT-ISIS'
-
-set protocols isis interface eth1
-set protocols isis net '49.0001.2030.0011.3001.00'
-set protocols isis redistribute ipv4 connected level-2 route-map 'EXPORT-ISIS'
-</pre></div>
-</div>
-<p><strong>Node 2:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address '192.0.2.2/24'
-
-set protocols isis interface eth1
-set protocols isis net '49.0001.1920.0000.2002.00'
-</pre></div>
-</div>
-<p>路由s on Node 2:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>Node-2@r2:~$ show ip route isis
-Codes: K - kernel route, C - connected, S - static, R - RIP,
-       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
-       T - Table, v - VNC, V - VNC-Direct, A - Babel, D - SHARP,
-       F - PBR, f - OpenFabric,
-       > - selected route, * - FIB route, q - queued route, r - rejected route
-
-I   203.0.113.0/24 [115/10] via 192.0.2.1, eth1, 00:03:42
-</pre></div>
-</div>
-</section>
-<section id="enable-is-is-and-igp-ldp-synchronization">
-<h3>Enable IS-IS and IGP-LDP synchronization</h3>
-<p>The following example demonstrates an IS-IS setup with IGP-LDP synchronization
-enabled on Node 1.</p>
-<p><strong>Node 1:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address 198.51.100.1/32
-set interfaces ethernet eth0 address 192.0.2.1/24
-
-set protocols isis interface eth0
-set protocols isis interface lo passive
-set protocols isis ldp-sync
-set protocols isis net 49.0001.1980.5110.0001.00
-
-set protocols mpls interface eth0
-set protocols mpls ldp discovery transport-ipv4-address 198.51.100.1
-set protocols mpls ldp interface lo
-set protocols mpls ldp interface eth0
-set protocols mpls ldp parameters transport-prefer-ipv4
-set protocols mpls ldp router-id 198.51.100.1
-</pre></div>
-</div>
-<p>This gives us IGP-LDP synchronization for all non-loopback interfaces with
-a holddown timer of zero seconds:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$  show isis mpls ldp-sync
-eth0
-  LDP-IGP Synchronization enabled: yes
-  holddown timer in seconds: 0
-  State: Sync achieved
-</pre></div>
-</div>
-</section>
-<section id="enable-is-is-with-segment-routing-experimental">
-<h3>Enable IS-IS with Segment 路由 (experimental)</h3>
-<p>The following example demonstrates IS-IS with segment routing between two VyOS
-routers.</p>
-<p><strong>Node 1:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address '198.51.100.1/32'
-set interfaces ethernet eth1 address '192.0.2.1/24'
-
-set protocols isis interface eth1
-set protocols isis interface lo
-set protocols isis net '49.0001.1980.5110.0001.00'
-set protocols isis segment-routing global-block high-label-value '599'
-set protocols isis segment-routing global-block low-label-value '550'
-set protocols isis segment-routing prefix 198.51.100.1/32 index value '1'
-set protocols isis segment-routing prefix 198.51.100.1/32 index explicit-null
-set protocols mpls interface 'eth1'
-</pre></div>
-</div>
-<p><strong>Node 2:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address '198.51.100.2/32'
-set interfaces ethernet eth1 address '192.0.2.2/24'
-
-set protocols isis interface eth1
-set protocols isis interface lo
-set protocols isis net '49.0001.1980.5110.0002.00'
-set protocols isis segment-routing global-block high-label-value '599'
-set protocols isis segment-routing global-block low-label-value '550'
-set protocols isis segment-routing prefix 198.51.100.2/32 index value '2'
-set protocols isis segment-routing prefix 198.51.100.2/32 index explicit-null
-set protocols mpls interface 'eth1'
-</pre></div>
-</div>
-<p>This gives us MPLS segment routing enabled and labels for far end loopbacks:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show mpls table
- Inbound Label  Type        Nexthop                Outbound Label
- ----------------------------------------------------------------------
- 552            SR (IS-IS)  192.0.2.2              IPv4 Explicit Null <-- Node-2 loopback learned on Node-1
- 15000          SR (IS-IS)  192.0.2.2              implicit-null
- 15001          SR (IS-IS)  fe80::e87:6cff:fe09:1  implicit-null
- 15002          SR (IS-IS)  192.0.2.2              implicit-null
- 15003          SR (IS-IS)  fe80::e87:6cff:fe09:1  implicit-null
-
-Node-2@vyos:~$ show mpls table
- Inbound Label  Type        Nexthop               Outbound Label
- ---------------------------------------------------------------------
- 551            SR (IS-IS)  192.0.2.1             IPv4 Explicit Null <-- Node-1 loopback learned on Node-2
- 15000          SR (IS-IS)  192.0.2.1             implicit-null
- 15001          SR (IS-IS)  fe80::e33:2ff:fe80:1  implicit-null
- 15002          SR (IS-IS)  192.0.2.1             implicit-null
- 15003          SR (IS-IS)  fe80::e33:2ff:fe80:1  implicit-null
-</pre></div>
-</div>
-<p>Here is the routing tables showing the MPLS segment routing label operations:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>Node-1@vyos:~$ show ip route isis
-Codes: K - kernel route, C - connected, S - static, R - RIP,
-       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
-       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
-       f - OpenFabric,
-       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
-       t - trapped, o - offload failure
-
-I   192.0.2.0/24 [115/20] via 192.0.2.2, eth1 inactive, weight 1, 00:07:48
-I>* 198.51.100.2/32 [115/20] via 192.0.2.2, eth1, label IPv4 Explicit Null, weight 1, 00:03:39
-
-Node-2@vyos:~$ show ip route isis
-Codes: K - kernel route, C - connected, S - static, R - RIP,
-       O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
-       T - Table, v - VNC, V - VNC-Direct, A - Babel, F - PBR,
-       f - OpenFabric,
-       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
-       t - trapped, o - offload failure
-
-I   192.0.2.0/24 [115/20] via 192.0.2.1, eth1 inactive, weight 1, 00:07:46
-I>* 198.51.100.1/32 [115/20] via 192.0.2.1, eth1, label IPv4 Explicit Null, weight 1, 00:03:43
-</pre></div>
-</div>
-</section>
-<section id="enable-is-is-with-segment-routing-over-ipv6-experimental">
-<h3>Enable IS-IS with Segment 路由 over IPv6 (experimental)</h3>
-<p>The following example demonstrates IS-IS with Segment 路由 over IPv6
-between two VyOS routers.</p>
-<p><strong>Node 1:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum6 description "SRv6 IS-IS"
-set interfaces ethernet eth1 address '192.0.2.1/24'
-set interfaces loopback lo address '198.51.100.1/32'
-
-set protocols segment-routing srv6 locator MAIN prefix 2001:db8:1::/64
-set protocols segment-routing interface eth1
-
-set protocols isis interface eth1
-set protocols isis interface lo
-set protocols isis net '49.0001.1980.5110.0001.00'
-set protocols isis segment-routing srv6 locator MAIN
-set protocols isis segment-routing srv6 interface dum6
-</pre></div>
-</div>
-<p><strong>Node 2:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum6 description "SRv6 IS-IS"
-set interfaces ethernet eth1 address '192.0.2.2/24'
-set interfaces loopback lo address '198.51.100.2/32'
-
-set protocols segment-routing srv6 locator MAIN prefix 2001:db8:2::/64
-set protocols segment-routing interface eth1
-
-set protocols isis interface eth1
-set protocols isis interface lo
-set protocols isis net '49.0001.1980.5110.0002.00'
-set protocols isis segment-routing srv6 locator MAIN
-set protocols isis segment-routing srv6 interface dum6
-</pre></div>
-</div>
-</section>
-<section id="enable-is-is-with-segment-routing-over-ipv6-usid-experimental">
-<h3>Enable IS-IS with Segment 路由 over IPv6 (uSID) (experimental)</h3>
-<p>The following example demonstrates IS-IS with SRv6 uSID (micro-SID) between two
-VyOS routers.</p>
-<p><strong>Node 1:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum6 description "SRv6 IS-IS"
-set interfaces ethernet eth1 address '192.0.2.1/24'
-set interfaces loopback lo address '198.51.100.1/32'
-
-set protocols segment-routing interface eth1
-set protocols segment-routing srv6 locator MAIN prefix 2001:db8:1::/48
-set protocols segment-routing srv6 locator MAIN behavior-usid
-set protocols segment-routing srv6 locator MAIN block-len 32
-set protocols segment-routing srv6 locator MAIN format usid-f3216
-set protocols segment-routing srv6 locator MAIN func-bits 16
-set protocols segment-routing srv6 locator MAIN node-len 16
-
-set protocols isis interface eth1
-set protocols isis interface lo
-set protocols isis net '49.0001.1980.5110.0001.00'
-set protocols isis segment-routing srv6 interface dum6
-set protocols isis segment-routing srv6 locator MAIN
-</pre></div>
-</div>
-<p><strong>Node 2:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum6 description "SRv6 IS-IS"
-set interfaces ethernet eth1 address '192.0.2.2/24'
-set interfaces loopback lo address '198.51.100.2/32'
-
-set protocols segment-routing interface eth1
-set protocols segment-routing srv6 locator MAIN prefix 2001:db8:2::/48
-set protocols segment-routing srv6 locator MAIN behavior-usid
-set protocols segment-routing srv6 locator MAIN block-len 32
-set protocols segment-routing srv6 locator MAIN format usid-f3216
-set protocols segment-routing srv6 locator MAIN func-bits 16
-set protocols segment-routing srv6 locator MAIN node-len 16
-
-set protocols isis interface eth1
-set protocols isis interface lo
-set protocols isis net '49.0001.1980.5110.0002.00'
-set protocols isis segment-routing srv6 interface dum6
-set protocols isis segment-routing srv6 locator MAIN
-</pre></div>
-</div>
-</section>
-</section>
-</section>
-
-
-           </div>
-</body>
-</html>
+set protocols isis interface &lt;interface&gt; fast-reroute remote-lfa level-1 maximum-metric &lt;1-16777215&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-isis-interface-interface-fast-reroute-remote-lfa-level-1-maximum-metric-1-16777215" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p

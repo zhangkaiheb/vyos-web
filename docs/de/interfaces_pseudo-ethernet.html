@@ -342,7 +342,7 @@ set interfaces pseudo-ethernet &lt;interface&gt; ip enable-directed-broadcast
 <a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ip-enable-directed-broadcast" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p><strong>Konfigurieren Sie, ob IP-gerichtete Broadcast-Pakete, die auf dieser Schnittstelle empfangen werden, weitergeleitet werden.</strong></p>
 <p><strong>Standardverhalten:</strong> IP-gerichtete Broadcast-Pakete werden abgeworfen.</p>
-<p><strong>Wenn konfiguriert:</strong> IP-gerichtete Broadcast-Pakete werden an alle Hosts im Ziel-Subnetz weitergeleitet, wie in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> und <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a> definiert.</p>
+<p><strong>Wenn konfiguriert:</strong> IP-gerichtete Broadcast-Pakete werden an alle Hosts im Ziel-Subnetz weitergeleitet, wie in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> und <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a> definiert.</p>
 <p>Beispiel:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces pseudo-ethernet peth0 ip enable-directed-broadcast
 </pre></div>
@@ -422,7 +422,7 @@ set interfaces pseudo-ethernet &lt;interface&gt; ip proxy-arp-pvlan
 </div>
 <p>Lokales Proxy-ARP wird auch bezeichnet als:</p>
 <ul class="simple">
-<li><p>VLAN-Aggregation (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>VLAN-Aggregation (<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
 <li><p>Private VLAN (Cisco, Allied Telesyn).</p></li>
 <li><p>Source-port filtering oder Port-Isolation (Hewlett-Packard).</p></li>
 <li><p>MAC-Forced Forwarding (Ericsson).</p></li>
@@ -434,7 +434,7 @@ set interfaces pseudo-ethernet &lt;interface&gt; ip proxy-arp-pvlan
 
 set interfaces pseudo-ethernet &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
 <a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Konfigurieren Sie die Quell-IP-Adressen-Überprüfung mit</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>auf dieser Schnittstelle, wie in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> <strong>spezifiziert.</strong></p>
+<p><strong>Konfigurieren Sie die Quell-IP-Adressen-Überprüfung mit</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>auf dieser Schnittstelle, wie in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> <strong>spezifiziert.</strong></p>
 <p>Die folgenden Optionen sind verfügbar:</p>
 <ul class="simple">
 <li><p><strong>strict:</strong> Jedes eingehende Paket wird anhand der Forwarding Information Base (FIB) überprüft. Wenn die Schnittstelle nicht der beste Weg zurück zur Quelle ist, schlägt die Überprüfung fehl und das Paket wird gelöscht.</p></li>
@@ -449,7 +449,7 @@ set interfaces pseudo-ethernet &lt;interface&gt; ip source-validation &lt;strict
 
 set interfaces pseudo-ethernet &lt;interface&gt; ipv6 address autoconf
 <a class="cmdlink" href="#cfgcmd-set-interfaces-pseudo-ethernet-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Konfigurieren Sie die Schnittstelle, um eine IPv6-Adresse automatisch unter Verwendung von</strong> <abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>wie in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a> <strong>spezifiziert, zu erhalten.</strong></p>
+<p><strong>Konfigurieren Sie die Schnittstelle, um eine IPv6-Adresse automatisch unter Verwendung von</strong> <abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>wie in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a> <strong>spezifiziert, zu erhalten.</strong></p>
 <p>IPv6-Hosts können sich automatisch konfigurieren, wenn sie sich einem IPv6-Netzwerk anschließen, indem sie den Neighbor Discovery Protocol via ICMPv6 Router Discovery Nachrichten verwenden. Bei der ersten Verbindung zu einem Netzwerk sendet ein Host eine link-local Router Solicitation Multicast Anfrage für seine Konfigurationsparameter. Der Router antwortet mit einer Router Advertisement Packet, das Internet Layer Konfigurationsparameter enthält.</p>
 <div class="admonition note">
 <p class="admonition-title">Hinweis</p>

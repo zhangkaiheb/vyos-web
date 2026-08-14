@@ -164,7 +164,7 @@ dans un autre espace d'adresses, généralement public. Les adresses cachées so
 changées en une seule (publique) adresse IP comme adresse source des paquets IP sortants afin qu'ils semblent provenir non pas de la machine cachée mais du dispositif de routage lui-même. En raison de la popularité de cette technique pour économiser l'espace d'adresses IPv4, le terme NAT est devenu presque synonyme de masquarade IP.</p>
 <p>Comme la traduction d'adresses réseau modifie les informations d'adresse IP dans les paquets, les implémentations NAT peuvent varier dans leur comportement spécifique dans différents cas d'adressage et leur effet sur le trafic réseau. Les spécificités du comportement NAT ne sont pas souvent documentées par les fournisseurs d'équipements contenant des implémentations NAT.</p>
 <p>Les ordinateurs d'un réseau interne peuvent utiliser n'importe quelle adresse définie par l'<abbr title="Autorité des numéros attribués à l'Internet">IANA</abbr> pour
-l'adressage privé (voir <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a>). Ces adresses IP réservées ne sont
+l'adressage privé (voir <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a>). Ces adresses IP réservées ne sont
 pas utilisées sur Internet, donc une machine externe ne les routera pas directement. Les adresses suivantes sont réservées pour une utilisation privée :</p>
 <ul class="simple">
 <li><p>10.0.0.0 à 10.255.255.255 (CIDR : 10.0.0.0/8)</p></li>
@@ -172,13 +172,13 @@ pas utilisées sur Internet, donc une machine externe ne les routera pas directe
 <li><p>192.168.0.0 à 192.168.255.255 (CIDR : 192.168.0.0/16)</p></li>
 </ul>
 <p>Si un FAI déploie un <abbr title="NAT de niveau opérateur">CGN</abbr>, et utilise
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> espace d'adressage pour numéroter les passerelles clients, le risque de
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> espace d'adressage pour numéroter les passerelles clients, le risque de
 collision d'adresses, et donc d'échec de routage, survient lorsque le
-réseau client utilise déjà un <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> espace d'adressage.</p>
+réseau client utilise déjà un <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> espace d'adressage.</p>
 <p>Cela a poussé certains FAIs à développer une politique au sein de l'<abbr title="Réserve américaine des numéros d'internet">ARIN</abbr> pour allouer un nouvel espace d'adressage privé
 pour les CGN, mais ARIN s'est reporté à l'IETF avant d'implémenter la politique indiquant que la question n'était pas un problème d'allocation typique mais une réserve d'adresses pour des raisons techniques
-(voir <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2860.html"><strong>RFC 2860</strong></a>).</p>
-<p>L'IETF a publié <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6598.html"><strong>RFC 6598</strong></a>, détaillant un espace d'adresses partagé pour une utilisation dans
+(voir <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2860.html"><strong>RFC 2860</strong></a>).</p>
+<p>L'IETF a publié <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc6598.html"><strong>RFC 6598</strong></a>, détaillant un espace d'adresses partagé pour une utilisation dans
 les déploiements de CGN des fournisseurs d'accès, capable de gérer les mêmes préfixes réseau se produisant à la fois sur les interfaces entrantes et sortantes. ARIN a rendu l'espace d'adresses à l'<abbr title="Autorité des numéros attribués à l'Internet">IANA</abbr> pour cette allocation.</p>
 <p>Le bloc d'adresses alloué est 100.64.0.0/10.</p>
 <p>Les appareils évaluant si une adresse IPv4 est publique doivent être mis à jour pour reconnaître l'espace d'adresses nouveau. Allouer plus d'espace d'adresses IPv4 privé pour les dispositifs NAT pourrait prolonger la transition vers IPv6.</p>
@@ -610,7 +610,7 @@ set nat source rule 10 load-balance backend 192.0.2.253 weight 34
 L'ASP exige que toutes les connexions de cette entreprise proviennent de
 172.29.41.89 - une adresse assignée par l'ASP et non utilisée sur le site client.</p>
 <figure class="align-default" id="id5">
-<a class="reference internal image-reference" href="https://docs.vyos.io/en/rolling/_images/nat_before_vpn_topology.webp"><img alt="Topologie NAT avant VPN" src="https://docs.vyos.io/en/rolling/_images/nat_before_vpn_topology.webp" style="width: 899.0px; height: 271.0px;" /></a>
+<a class="reference internal image-reference" href="https://docs.vyos.io/en/latest/_images/nat_before_vpn_topology.webp"><img alt="Topologie NAT avant VPN" src="https://docs.vyos.io/en/latest/_images/nat_before_vpn_topology.webp" style="width: 899.0px; height: 271.0px;" /></a>
 <figcaption>
 <p>Topologie NAT avant VPN</p>
 </figcaption>

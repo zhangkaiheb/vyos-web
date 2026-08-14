@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,21 +152,17 @@
 <div itemprop="articleBody">
              
   <section id="bridge-firewall-configuration">
-<h1>Bridge 防火墙 配置</h1>
+<h1>桥接防火墙配置</h1>
 <section id="overview">
-<h2>Overview</h2>
-<p>Learn more about bridge firewall configuration
-and related op-mode commands.</p>
-<p>The following commands are covered in this section:</p>
+<h2>概述</h2>
+<p>了解有关桥接防火墙配置以及相关操作模式命令的更多信息。</p>
+<p>本节涵盖以下命令：</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge <options>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-options" title="Permalink to this Command"></a></div></div>
-<p>From the main structure defined in
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">防火墙 Overview</a>
-in this section you can find detailed information only for the next part
-of the general structure:</p>
+set firewall bridge &lt;options&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-options" title="此命令的永久链接"></a></div></div>
+<p>从本节中定义的主结构——<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">防火墙概述</a>——出发，您只能在此处找到通用结构下一节的详细信息：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
     * bridge
          - forward
@@ -181,874 +177,776 @@ of the general structure:</p>
             + custom_name
 </pre></div>
 </div>
-<p>流量 that is received by the router on an interface that is a member of a
-bridge is processed on the <strong>Bridge 层</strong>. Before the bridge decision is
-made, all packets are analyzed at <strong>Prerouting</strong>. First filters 可以 applied
-here, and also rules for ignoring connection tracking system 可以 configured.
-The relevant configuration that acts in <strong>prerouting</strong> is:</p>
+<p>路由器在属于桥接的接口上接收的流量将在<strong>桥接层</strong>进行处理。在做出桥接决策之前，所有数据包均在<strong>预路由（Prerouting）</strong>阶段进行分析。此处可应用初始过滤器，也可配置忽略连接跟踪系统的规则。在<strong>prerouting</strong>阶段生效的相关配置为：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">set firewall bridge prerouting filter ...</code>.</p></li>
+<li><p><code class="docutils literal notranslate">set firewall bridge prerouting filter ...</code>。</p></li>
 </ul>
-<p>For traffic that needs to be switched internally by the bridge, the base
-chain is <strong>forward</strong>, and its base command for filtering is <code class="docutils literal notranslate">set firewall bridge forward filter ...</code>, which happens in stage 4, highlighted with red
-color.</p>
+<p>对于需要由桥接内部交换的流量，基础链为<strong>forward</strong>，其用于过滤的基础命令为 <code class="docutils literal notranslate">set firewall bridge forward filter ...</code>，该过程发生在第4阶段，并以红色高亮显示。</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-bridge-forward.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-forward.webp"></img>
+<img alt="../../_images/firewall-bridge-forward.webp" src="https://docs.vyos.io/en/latest/_images/firewall-bridge-forward.webp" />
 </figure>
-<p>For traffic destined to the router itself or that needs to be routed
-(assuming a layer3 bridge is configured), the base chain is <strong>input</strong>, and the
-base command is <code class="docutils literal notranslate">set firewall bridge input filter ...</code> and the path is:</p>
+<p>对于目标为路由器自身或需要被路由（假设已配置三层桥接）的流量，基础链为<strong>input</strong>，其基础命令为 <code class="docutils literal notranslate">set firewall bridge input filter ...</code>，路径如下：</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-bridge-input.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-input.webp"></img>
+<img alt="../../_images/firewall-bridge-input.webp" src="https://docs.vyos.io/en/latest/_images/firewall-bridge-input.webp" />
 </figure>
-<p>If it’s not dropped, then the packet is sent to <strong>IP 层</strong>, and 将
-processed by the <strong>IP 层</strong> firewall: IPv4 or IPv6 ruleset. 检查 once again
-the <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">general packet flow diagram</a> if
-needed.</p>
-<p>For traffic that originates from the bridge itself, the base chain is
-<strong>output</strong>, and the base command is <code class="docutils literal notranslate">set firewall bridge output filter ...</code>, and the path is:</p>
+<p>如果未被丢弃，则数据包将被发送至<strong>IP层</strong>，并由<strong>IP层</strong>防火墙（IPv4 或 IPv6 规则集）进行处理。如有需要，请再次查阅<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">通用数据包流向图</a>。</p>
+<p>对于源自桥接本身的流量，基础链为<strong>output</strong>，其基础命令为 <code class="docutils literal notranslate">set firewall bridge output filter ...</code>，路径如下：</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-bridge-output.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-output.webp"></img>
+<img alt="../../_images/firewall-bridge-output.webp" src="https://docs.vyos.io/en/latest/_images/firewall-bridge-output.webp" />
 </figure>
-<p>Custom bridge firewall chains 可以 created with the command <code class="docutils literal notranslate">set firewall bridge name <name> ...</code>. To use such a custom chain, a rule with action jump
-and the appropriate target 必须 defined in a base chain.</p>
+<p>可通过命令 <code class="docutils literal notranslate">set firewall bridge name &lt;name&gt; ...</code> 创建自定义桥接防火墙链。要使用此类自定义链，必须在基础链中定义一条动作为 jump 并具有相应目标的动作规则。</p>
 </section>
 <section id="bridge-rules">
-<h2>Bridge 规则s</h2>
-<p>For firewall filtering, firewall rules need to be created. Each rule is
-numbered, has an action to apply if the rule is matched, and the ability
-to specify multiple matching criteria. 数据 packets go through the rules
-from 1 - 999999, so order is crucial. At the first match the action of the
-rule 将 executed.</p>
+<h2>桥接规则</h2>
+<p>为实现防火墙过滤，需创建防火墙规则。每条规则均编号，具备匹配时执行的动作，并支持指定多个匹配条件。数据包按编号顺序（1 至 999999）遍历规则，因此顺序至关重要。一旦匹配成功，即执行该规则的动作。</p>
 <section id="actions">
 <h3>动作</h3>
-<p>If a rule is defined, an action must also be defined for it. This tells the
-firewall what to do if all matching criteria in the rule are met.</p>
-<p>In firewall bridge rules, the action 可以:</p>
+<p>若定义了一条规则，则必须同时为其定义一个动作。该动作指示防火墙：当规则的所有匹配条件均满足时应采取何种操作。</p>
+<p>在桥接防火墙规则中，动作可以是：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">accept</code>: accept the packet.</p></li>
-<li><p><code class="docutils literal notranslate">continue</code>: continue parsing next rule.</p></li>
-<li><p><code class="docutils literal notranslate">drop</code>: drop the packet.</p></li>
-<li><p><code class="docutils literal notranslate">jump</code>: jump to another custom chain.</p></li>
-<li><p><code class="docutils literal notranslate">return</code>: Return from the current chain and continue at the next rule
-of the last chain.</p></li>
-<li><p><code class="docutils literal notranslate">queue</code>: Enqueue packet to userspace.</p></li>
-<li><p><code class="docutils literal notranslate">notrack</code>: ignore connection tracking system. This action is only
-available in prerouting chain.</p></li>
+<li><p><code class="docutils literal notranslate">accept</code>：接受该数据包。</p></li>
+<li><p><code class="docutils literal notranslate">continue</code>：继续解析下一条规则。</p></li>
+<li><p><code class="docutils literal notranslate">drop</code>：丢弃该数据包。</p></li>
+<li><p><code class="docutils literal notranslate">jump</code>：跳转至另一条自定义链。</p></li>
+<li><p><code class="docutils literal notranslate">return</code>：从当前链返回，并继续执行上一条链中的下一条规则。</p></li>
+<li><p><code class="docutils literal notranslate">queue</code>：将数据包入队至用户空间。</p></li>
+<li><p><code class="docutils literal notranslate">notrack</code>：忽略连接跟踪系统。此动作仅在 prerouting 链中可用。</p></li>
 </ul>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> action [accept | continue | drop | jump | queue | return]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-action-accept-continue-drop-jump-queue-return" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; action [accept | continue | drop | jump | queue | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-action-accept-continue-drop-jump-queue-return" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> action [accept | continue | drop | jump | queue | return]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-action-accept-continue-drop-jump-queue-return" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; action [accept | continue | drop | jump | queue | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-action-accept-continue-drop-jump-queue-return" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> action [accept | continue | drop | jump | queue | return]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-action-accept-continue-drop-jump-queue-return" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; action [accept | continue | drop | jump | queue | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-action-accept-continue-drop-jump-queue-return" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> action [accept | continue | drop | jump | notrack | queue | return]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-action-accept-continue-drop-jump-notrack-queue-return" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; action [accept | continue | drop | jump | queue | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-action-accept-continue-drop-jump-queue-return" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> action [accept | continue | drop | jump | queue | return]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-action-accept-continue-drop-jump-queue-return" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This required setting defines the action of the current rule. If action is
-set to jump, then jump-target is also needed.</p>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; action [accept | continue | drop | jump | queue | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-action-accept-continue-drop-jump-queue-return" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>此必需设置用于定义当前规则的动作。若动作设为 jump，则还需指定 jump-target。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> jump-target <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-jump-target-text" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-jump-target-text" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> jump-target <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-jump-target-text" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-jump-target-text" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> jump-target <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-jump-target-text" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-jump-target-text" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> jump-target <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-jump-target-text" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-jump-target-text" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> jump-target <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-jump-target-text" title="Permalink to this Command"></a></div></div>
-<p>If action is set to <code class="docutils literal notranslate">queue</code>, use next command to specify the queue
-target. 范围 is also supported:</p>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-jump-target-text" title="此命令的永久链接"></a></div></div>
+<p>若动作设为 <code class="docutils literal notranslate">queue</code>，请使用以下命令指定队列目标。也支持范围：</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> queue <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-queue-0-65535" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; queue &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-queue-0-65535" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> queue <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-queue-0-65535" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; queue &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-queue-0-65535" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> queue <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-queue-0-65535" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; queue &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-queue-0-65535" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> queue <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-queue-0-65535" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; queue &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-queue-0-65535" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> queue <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-queue-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Also, if action is set to <code class="docutils literal notranslate">queue</code>, use next command to specify the queue
-options. Possible options are <code class="docutils literal notranslate">bypass</code> and <code class="docutils literal notranslate">fanout</code>:</p>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; queue &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-queue-0-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>此外，若动作设为 <code class="docutils literal notranslate">queue</code>，请使用以下命令指定队列选项。可能的选项包括 <code class="docutils literal notranslate">bypass</code> 和 <code class="docutils literal notranslate">fanout</code>：</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> queue-options bypass
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-queue-options-bypass" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-queue-options-bypass" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> queue-options bypass
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-queue-options-bypass" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-queue-options-bypass" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> queue-options bypass
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-queue-options-bypass" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-queue-options-bypass" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> queue-options bypass
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-queue-options-bypass" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-queue-options-bypass" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> queue-options bypass
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-queue-options-bypass" title="Permalink to this Command"></a></div></div>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; queue-options bypass
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-queue-options-bypass" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> queue-options fanout
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-queue-options-fanout" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-queue-options-fanout" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> queue-options fanout
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-queue-options-fanout" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-queue-options-fanout" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> queue-options fanout
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-queue-options-fanout" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-queue-options-fanout" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> queue-options fanout
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-queue-options-fanout" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-queue-options-fanout" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> queue-options fanout
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-queue-options-fanout" title="Permalink to this Command"></a></div></div>
-<p>Also, <strong>default-action</strong> is an action that takes place whenever a packet does
-not match any rule in its chain. For base chains, possible options for
-<strong>default-action</strong> are <strong>accept</strong> or <strong>drop</strong>.</p>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; queue-options fanout
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-queue-options-fanout" title="此命令的永久链接"></a></div></div>
+<p>此外，<strong>default-action</strong> 是当数据包与其所在链中任何规则均不匹配时所执行的动作。对于基础链，<strong>default-action</strong> 的可选值为 <strong>accept</strong> 或 <strong>drop</strong>。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set firewall bridge forward filter default-action [accept | drop]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-default-action-accept-drop" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-default-action-accept-drop" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set firewall bridge input filter default-action [accept | drop]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-default-action-accept-drop" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-default-action-accept-drop" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set firewall bridge output filter default-action [accept | drop]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-default-action-accept-drop" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-default-action-accept-drop" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set firewall bridge prerouting filter default-action [accept | drop]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-default-action-accept-drop" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-default-action-accept-drop" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> default-action [accept | continue | drop | jump | reject | return]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-default-action-accept-continue-drop-jump-reject-return" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This sets the default action of the rule-set if a packet does not match
-any of the rules in that chain. If default-action is set to <code class="docutils literal notranslate">jump</code>, then
-<code class="docutils literal notranslate">default-jump-target</code> is also needed. 注意 that for base chains, default
-action can only be set to <code class="docutils literal notranslate">accept</code> or <code class="docutils literal notranslate">drop</code>, while on custom chains
-more actions are available.</p>
+set firewall bridge name &lt;name&gt; default-action [accept | continue | drop | jump | reject | return]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-default-action-accept-continue-drop-jump-reject-return" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>若数据包与该链中的任何规则均不匹配，则此设置将定义规则集的默认动作。若 default-action 设为 <code class="docutils literal notranslate">jump</code>，则还需指定 <code class="docutils literal notranslate">default-jump-target</code>。请注意，对于基础链，默认动作仅能设为 <code class="docutils literal notranslate">accept</code> 或 <code class="docutils literal notranslate">drop</code>；而对于自定义链，则支持更多动作。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> default-jump-target <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-default-jump-target-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>To be used only when <code class="docutils literal notranslate">default-action</code> is set to <code class="docutils literal notranslate">jump</code>. Use this
-command to specify jump target for default rule.</p>
+set firewall bridge name &lt;name&gt; default-jump-target &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-default-jump-target-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>仅当 <code class="docutils literal notranslate">default-action</code> 设为 <code class="docutils literal notranslate">jump</code> 时使用。使用此命令为默认规则指定跳转目标。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p><strong>重要 note about default-actions:</strong>
-If the default action for any base chain is not defined, then the default
-action is set to <strong>accept</strong> for that chain. For custom chains, if the
-default action is not defined, then the default-action is set to <strong>drop</strong>.</p>
+<p><strong>关于默认动作的重要说明：</strong>
+若任一基础链的默认动作未定义，则该链的默认动作为<strong>accept</strong>。对于自定义链，若默认动作未定义，则默认动作为<strong>drop</strong>。</p>
 </div>
 </section>
 <section id="firewall-logs">
-<h3>防火墙 日志s</h3>
-<p>You can enable logging for every firewall rule. If enabled, other log options
-可以 configured.</p>
+<h3>防火墙日志</h3>
+<p>您可以为每个防火墙规则启用日志记录。启用后，还可配置其他日志选项。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> log
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-log" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-log" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> log
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-log" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-log" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> log
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-log" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-log" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> log
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-log" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-log" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> log
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-log" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Enable logging for the matched packet. If this configuration command is not
-present, then the log is not enabled.</p>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-log" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为匹配的数据包启用日志记录。若未配置此命令，则不会启用日志记录。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set firewall bridge forward filter default-log
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-default-log" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-default-log" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set firewall bridge input filter default-log
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-default-log" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-default-log" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set firewall bridge output filter default-log
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-default-log" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-default-log" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set firewall bridge prerouting filter default-log
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-default-log" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-default-log" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> default-log
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-default-log" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to enable the logging of the default action on
-the specified chain.</p>
+set firewall bridge name &lt;name&gt; default-log
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-default-log" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>使用此命令在指定链上启用默认动作的日志记录功能。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> log-options level [emerg | alert | crit | err | warn | notice | info | debug]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> log-options level [emerg | alert | crit | err | warn | notice | info | debug]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> log-options level [emerg | alert | crit | err | warn | notice | info | debug]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> log-options level [emerg | alert | crit | err | warn | notice | info | debug]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> log-options level [emerg | alert | crit | err | warn | notice | info | debug]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Define log-level. Only applicable if rule log is enabled.</p>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; log-options level [emerg | alert | crit | err | warn | notice | info | debug]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-log-options-level-emerg-alert-crit-err-warn-notice-info-debug" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>定义日志级别。仅在启用规则日志时适用。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> log-options group <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-log-options-group-0-65535" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; log-options group &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-log-options-group-0-65535" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> log-options group <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-log-options-group-0-65535" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; log-options group &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-log-options-group-0-65535" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> log-options group <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-log-options-group-0-65535" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; log-options group &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-log-options-group-0-65535" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> log-options group <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-log-options-group-0-65535" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; log-options group &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-log-options-group-0-65535" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> log-options group <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-log-options-group-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Define the log group to send messages to. Only applicable if rule log is
-enabled.</p>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; log-options group &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-log-options-group-0-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>定义用于发送消息的日志组。仅在启用规则日志时适用。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> log-options snapshot-length <0-9000>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; log-options snapshot-length &lt;0-9000&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> log-options snapshot-length <0-9000>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; log-options snapshot-length &lt;0-9000&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> log-options snapshot-length <0-9000>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; log-options snapshot-length &lt;0-9000&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> log-options snapshot-length <0-9000>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; log-options snapshot-length &lt;0-9000&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-log-options-snapshot-length-0-9000" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> log-options snapshot-length <0-9000>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-log-options-snapshot-length-0-9000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Define length of packet payload to include in netlink message. Only
-applicable if rule log is enabled and the log group is defined.</p>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; log-options snapshot-length &lt;0-9000&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-log-options-snapshot-length-0-9000" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>定义包含在 netlink 消息中的数据包有效载荷长度。仅在启用规则日志且已定义日志组时适用。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> log-options queue-threshold <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; log-options queue-threshold &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> log-options queue-threshold <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; log-options queue-threshold &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> log-options queue-threshold <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; log-options queue-threshold &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> log-options queue-threshold <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; log-options queue-threshold &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-log-options-queue-threshold-0-65535" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> log-options queue-threshold <0-65535>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-log-options-queue-threshold-0-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Define the number of packets to queue inside the kernel before sending them
-to userspace. Only applicable if rule log is enabled and the log group is
-defined.</p>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; log-options queue-threshold &lt;0-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-log-options-queue-threshold-0-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>定义内核中排队等待发送至用户空间的数据包数量。仅在启用规则日志且已定义日志组时适用。</p>
 </div>
 </div>
 </section>
 <section id="firewall-description">
-<h3>防火墙 描述</h3>
-<p>You can define a description for reference for every custom chain.</p>
+<h3>防火墙描述</h3>
+<p>您可以为每个自定义链定义描述性文字以便参考。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Provide a rule-set description to a custom firewall chain.</p>
+set firewall bridge name &lt;name&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为自定义防火墙链提供规则集描述。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-description-text" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-description-text" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-description-text" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-description-text" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-description-text" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-description-text" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-description-text" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-description-text" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> description <text>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-description-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Provide a description for each rule.</p>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; description &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-description-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为每条规则提供描述性文字。</p>
 </div>
 </div>
 </section>
 <section id="rule-status">
-<h3>规则 Status</h3>
-<p>By default, when you define a rule, it is enabled. In some cases, it is
-useful to disable the rule instead of removing it.</p>
+<h3>规则状态</h3>
+<p>默认情况下，定义规则时即启用该规则。在某些情况下，禁用规则比删除规则更为实用。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> disable
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-disable" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-disable" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> disable
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-disable" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-disable" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> disable
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-disable" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-disable" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> disable
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-disable" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-disable" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> disable
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Command for disabling a rule but keep it in the configuration.</p>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; disable
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>禁用某条规则但保留在配置中使用的命令。</p>
 </div>
 </div>
 </section>
 <section id="matching-criteria">
-<h3>匹配ing criteria</h3>
-<p>There are many matching criteria against which a packet 可以 tested. Refer
-to <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv4.html">IPv4</a> and
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv6.html">IPv6</a> matching criteria for more details.</p>
-<p>Since bridges operate at layer 2, both matchers for IPv4 and IPv6 are
-supported in bridge firewall configuration. Same applies to firewall groups.</p>
-<p>Same specific matching criteria that 可以 used in bridge firewall are
-described in this section:</p>
+<h3>匹配条件</h3>
+<p>存在多种可用于测试数据包的匹配条件。更多详情请参阅<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/ipv4.html">IPv4</a>和<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/ipv6.html">IPv6</a>匹配条件。</p>
+<p>由于桥接工作于第二层，因此桥接防火墙配置中既支持 IPv4 匹配器，也支持 IPv6 匹配器。防火墙组亦同理。</p>
+<p>本节将介绍桥接防火墙中可用的具体匹配条件：</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 based on the Ethernet type of the packet.</p>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于数据包的以太网类型进行匹配。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> vlan ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-vlan-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; vlan ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-vlan-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> vlan ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-vlan-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; vlan ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-vlan-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> vlan ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-vlan-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; vlan ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-vlan-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> vlan ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-vlan-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; vlan ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-vlan-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> vlan ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-vlan-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 based on the Ethernet type of the packet when it is VLAN tagged.</p>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; vlan ethernet-type [802.1q | 802.1ad | arp | ipv4 | ipv6]
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-vlan-ethernet-type-802-1q-802-1ad-arp-ipv4-ipv6" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>当数据包带有 VLAN 标签时，基于其以太网类型进行匹配。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> vlan id <0-4096>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-vlan-id-0-4096" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; vlan id &lt;0-4096&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-vlan-id-0-4096" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> vlan id <0-4096>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-vlan-id-0-4096" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; vlan id &lt;0-4096&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-vlan-id-0-4096" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> vlan id <0-4096>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-vlan-id-0-4096" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; vlan id &lt;0-4096&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-vlan-id-0-4096" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> vlan id <0-4096>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-vlan-id-0-4096" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; vlan id &lt;0-4096&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-vlan-id-0-4096" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> vlan id <0-4096>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-vlan-id-0-4096" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 based on VLAN identifier. 范围 is also supported.</p>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; vlan id &lt;0-4096&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-vlan-id-0-4096" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于 VLAN 标识符进行匹配。也支持范围。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge forward filter rule <1-999999> vlan priority <0-7>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-vlan-priority-0-7" title="Permalink to this Command"></a></div></div>
+set firewall bridge forward filter rule &lt;1-999999&gt; vlan priority &lt;0-7&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-filter-rule-1-999999-vlan-priority-0-7" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge input filter rule <1-999999> vlan priority <0-7>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-vlan-priority-0-7" title="Permalink to this Command"></a></div></div>
+set firewall bridge input filter rule &lt;1-999999&gt; vlan priority &lt;0-7&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-input-filter-rule-1-999999-vlan-priority-0-7" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge output filter rule <1-999999> vlan priority <0-7>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-vlan-priority-0-7" title="Permalink to this Command"></a></div></div>
+set firewall bridge output filter rule &lt;1-999999&gt; vlan priority &lt;0-7&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-output-filter-rule-1-999999-vlan-priority-0-7" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge prerouting filter rule <1-999999> vlan priority <0-7>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-vlan-priority-0-7" title="Permalink to this Command"></a></div></div>
+set firewall bridge prerouting filter rule &lt;1-999999&gt; vlan priority &lt;0-7&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-filter-rule-1-999999-vlan-priority-0-7" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge name <name> rule <1-999999> vlan priority <0-7>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-vlan-priority-0-7" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 based on VLAN priority (优先级 Code Point - PCP). 范围 is also
-supported.</p>
+set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; vlan priority &lt;0-7&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-name-name-rule-1-999999-vlan-priority-0-7" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>基于 VLAN 优先级（优先级代码点 - PCP）进行匹配。也支持范围。</p>
 </div>
 </div>
 </section>
 <section id="packet-modifications">
-<h3>数据包 Modifications</h3>
-<p>Starting from <strong>VyOS-1.5-rolling-202410060007</strong>, the firewall can modify
-packets before they are sent out. This feature provides more flexibility in
-packet handling.</p>
+<h3>数据包修改</h3>
+<p>自<strong>VyOS-1.5-rolling-202410060007</strong>起，防火墙可在数据包发出前对其进行修改。此功能为数据包处理提供了更大的灵活性。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge [prerouting | forward | output] filter rule <1-999999> set dscp <0-63>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-forward-output-filter-rule-1-999999-set-dscp-0-63" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 a specific value of Differentiated 服务s Codepoint (DSCP).</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set firewall bridge [prerouting | forward | output] filter rule <1-999999> set mark <1-2147483647>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-forward-output-filter-rule-1-999999-set-mark-1-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 a specific packet mark value.</p>
+set firewall bridge [prerouting | forward | output] filter rule &lt;1-999999&gt; set dscp &lt;0-63&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-forward-output-filter-rule-1-999999-set-dscp-0-63" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置特定的区分服务码点（DSCP）值。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge [prerouting | forward | output] filter rule <1-999999> set tcp-mss <500-1460>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-forward-output-filter-rule-1-999999-set-tcp-mss-500-1460" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the TCP-MSS (TCP maximum segment size) for the connection.</p>
+set firewall bridge [prerouting | forward | output] filter rule &lt;1-999999&gt; set mark &lt;1-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-forward-output-filter-rule-1-999999-set-mark-1-2147483647" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置特定的数据包标记值。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge [prerouting | forward | output] filter rule <1-999999> set ttl <0-255>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-forward-output-filter-rule-1-999999-set-ttl-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the TTL (Time to Live) value.</p>
+set firewall bridge [prerouting | forward | output] filter rule &lt;1-999999&gt; set tcp-mss &lt;500-1460&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-forward-output-filter-rule-1-999999-set-tcp-mss-500-1460" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为连接设置 TCP-MSS（TCP 最大段大小）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge [prerouting | forward | output] filter rule <1-999999> set hop-limit <0-255>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-forward-output-filter-rule-1-999999-set-hop-limit-0-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 hop limit value.</p>
+set firewall bridge [prerouting | forward | output] filter rule &lt;1-999999&gt; set ttl &lt;0-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-forward-output-filter-rule-1-999999-set-ttl-0-255" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置 TTL（生存时间）值。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set firewall bridge [forward | output] filter rule <1-999999> set connection-mark <0-2147483647>
-<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-output-filter-rule-1-999999-set-connection-mark-0-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 connection mark value.</p>
+set firewall bridge [prerouting | forward | output] filter rule &lt;1-999999&gt; set hop-limit &lt;0-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-prerouting-forward-output-filter-rule-1-999999-set-hop-limit-0-255" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置跳数限制值。</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set firewall bridge [forward | output] filter rule &lt;1-999999&gt; set connection-mark &lt;0-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-firewall-bridge-forward-output-filter-rule-1-999999-set-connection-mark-0-2147483647" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置连接标记值。</p>
 </div>
 </div>
 </section>
 <section id="use-ip-firewall">
-<h3>Use IP firewall</h3>
-<p>By default, for switched traffic, only the rules defined under <code class="docutils literal notranslate">set firewall bridge</code> are applied. There are two global-options that 可以 configured in
-order to force deeper analysis of the packet on the IP layer. These options
-are:</p>
+<h3>使用 IP 防火墙</h3>
+<p>默认情况下，对于交换流量，仅应用 <code class="docutils literal notranslate">set firewall bridge</code> 下定义的规则。可通过配置两个全局选项，强制在 IP 层对数据包进行更深入的分析。这些选项为：</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set firewall global-options apply-to-bridged-traffic ipv4
-<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-apply-to-bridged-traffic-ipv4" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command enables the IPv4 firewall for bridged traffic. If this option
-is used, packets are also parsed by rules defined in <code class="docutils literal notranslate">set firewall ipv4 ...</code></p>
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-apply-to-bridged-traffic-ipv4" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>此命令为桥接流量启用 IPv4 防火墙。若启用此选项，数据包还将由 <code class="docutils literal notranslate">set firewall ipv4 ...</code> 中定义的规则进行解析。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set firewall global-options apply-to-bridged-traffic ipv6
-<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-apply-to-bridged-traffic-ipv6" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command enables the IPv6 firewall for bridged traffic. If this option
-is used, packets are also parsed by rules defined in <code class="docutils literal notranslate">set firewall ipv6 ...</code></p>
+<a class="cmdlink" href="#cfgcmd-set-firewall-global-options-apply-to-bridged-traffic-ipv6" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>此命令为桥接流量启用 IPv6 防火墙。若启用此选项，数据包还将由 <code class="docutils literal notranslate">set firewall ipv6 ...</code> 中定义的规则进行解析。</p>
 </div>
 </div>
 </section>
 </section>
 <section id="operation-mode-firewall">
-<h2>Operation-mode 防火墙</h2>
+<h2>操作模式防火墙</h2>
 <section id="rule-set-overview">
-<h3>规则-set overview</h3>
-<p>In this section you can find all useful firewall op-mode commands.
-General commands for firewall configuration, counter and statistics:</p>
+<h3>规则集概览</h3>
+<p>本节列出所有有用的防火墙操作模式命令。防火墙配置、计数器及统计信息的一般命令：</p>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show firewall
-<a class="cmdlink" href="#opcmd-show-firewall" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#opcmd-show-firewall" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show firewall summary
-<a class="cmdlink" href="#opcmd-show-firewall-summary" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#opcmd-show-firewall-summary" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show firewall statistics
-<a class="cmdlink" href="#opcmd-show-firewall-statistics" title="Permalink to this Command"></a></div></div>
-<p>And, to print only bridge firewall information:</p>
+<a class="cmdlink" href="#opcmd-show-firewall-statistics" title="此命令的永久链接"></a></div></div>
+<p>此外，仅打印桥接防火墙信息的命令：</p>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show firewall bridge
-<a class="cmdlink" href="#opcmd-show-firewall-bridge" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#opcmd-show-firewall-bridge" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show firewall bridge forward filter
-<a class="cmdlink" href="#opcmd-show-firewall-bridge-forward-filter" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#opcmd-show-firewall-bridge-forward-filter" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show firewall bridge forward filter rule <rule>
-<a class="cmdlink" href="#opcmd-show-firewall-bridge-forward-filter-rule-rule" title="Permalink to this Command"></a></div></div>
+show firewall bridge forward filter rule &lt;rule&gt;
+<a class="cmdlink" href="#opcmd-show-firewall-bridge-forward-filter-rule-rule" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show firewall bridge name <name>
-<a class="cmdlink" href="#opcmd-show-firewall-bridge-name-name" title="Permalink to this Command"></a></div></div>
+show firewall bridge name &lt;name&gt;
+<a class="cmdlink" href="#opcmd-show-firewall-bridge-name-name" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show firewall bridge name <name> rule <rule>
-<a class="cmdlink" href="#opcmd-show-firewall-bridge-name-name-rule-rule" title="Permalink to this Command"></a></div></div>
+show firewall bridge name &lt;name&gt; rule &lt;rule&gt;
+<a class="cmdlink" href="#opcmd-show-firewall-bridge-name-name-rule-rule" title="此命令的永久链接"></a></div></div>
 </section>
 <section id="show-firewall-log">
-<h3>显示 防火墙 log</h3>
+<h3>显示防火墙日志</h3>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show log firewall
-<a class="cmdlink" href="#opcmd-show-log-firewall" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#opcmd-show-log-firewall" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show log firewall bridge
-<a class="cmdlink" href="#opcmd-show-log-firewall-bridge" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#opcmd-show-log-firewall-bridge" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show log firewall bridge forward
-<a class="cmdlink" href="#opcmd-show-log-firewall-bridge-forward" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#opcmd-show-log-firewall-bridge-forward" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show log firewall bridge forward filter
-<a class="cmdlink" href="#opcmd-show-log-firewall-bridge-forward-filter" title="Permalink to this Command"></a></div></div>
+<a class="cmdlink" href="#opcmd-show-log-firewall-bridge-forward-filter" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show log firewall bridge name <name>
-<a class="cmdlink" href="#opcmd-show-log-firewall-bridge-name-name" title="Permalink to this Command"></a></div></div>
+show log firewall bridge name &lt;name&gt;
+<a class="cmdlink" href="#opcmd-show-log-firewall-bridge-name-name" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show log firewall bridge forward filter rule <rule>
-<a class="cmdlink" href="#opcmd-show-log-firewall-bridge-forward-filter-rule-rule" title="Permalink to this Command"></a></div></div>
+show log firewall bridge forward filter rule &lt;rule&gt;
+<a class="cmdlink" href="#opcmd-show-log-firewall-bridge-forward-filter-rule-rule" title="此命令的永久链接"></a></div></div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show log firewall bridge name <name> rule <rule>
-<a class="cmdlink" href="#opcmd-show-log-firewall-bridge-name-name-rule-rule" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 the logs of all firewall; show all bridge firewall logs; show all logs
-for forward hook; show all logs for forward hook and priority filter; show
-all logs for particular custom chain; show logs for specific 规则-设置.</p>
+show log firewall bridge name &lt;name&gt; rule &lt;rule&gt;
+<a class="cmdlink" href="#opcmd-show-log-firewall-bridge-name-name-rule-rule" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示所有防火墙日志；显示所有桥接防火墙日志；显示 forward hook 的所有日志；显示 forward hook 和优先级过滤器的所有日志；显示特定自定义链的所有日志；显示特定规则集的日志。</p>
 </div>
 </div>
 </section>
 <section id="example">
 <h3>示例</h3>
-<p>配置 example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall bridge forward filter default-action 'drop'
+<p>配置示例：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set firewall bridge forward filter default-action &#39;drop&#39;
 set firewall bridge forward filter default-log
-set firewall bridge forward filter rule 10 action 'continue'
-set firewall bridge forward filter rule 10 inbound-interface name 'eth2'
-set firewall bridge forward filter rule 10 vlan id '22'
-set firewall bridge forward filter rule 20 action 'drop'
-set firewall bridge forward filter rule 20 inbound-interface group 'TRUNK-RIGHT'
-set firewall bridge forward filter rule 20 vlan id '60'
-set firewall bridge forward filter rule 30 action 'jump'
-set firewall bridge forward filter rule 30 jump-target 'TEST'
-set firewall bridge forward filter rule 30 outbound-interface name '!eth1'
-set firewall bridge forward filter rule 35 action 'accept'
-set firewall bridge forward filter rule 35 vlan id '11'
-set firewall bridge forward filter rule 40 action 'continue'
-set firewall bridge forward filter rule 40 destination mac-address '66:55:44:33:22:11'
-set firewall bridge forward filter rule 40 source mac-address '11:22:33:44:55:66'
-set firewall bridge name TEST default-action 'accept'
+set firewall bridge forward filter rule 10 action &#39;continue&#39;
+set firewall bridge forward filter rule 10 inbound-interface name &#39;eth2&#39;
+set firewall bridge forward filter rule 10 vlan id &#39;22&#39;
+set firewall bridge forward filter rule 20 action &#39;drop&#39;
+set firewall bridge forward filter rule 20 inbound-interface group &#39;TRUNK-RIGHT&#39;
+set firewall bridge forward filter rule 20 vlan id &#39;60&#39;
+set firewall bridge forward filter rule 30 action &#39;jump&#39;
+set firewall bridge forward filter rule 30 jump-target &#39;TEST&#39;
+set firewall bridge forward filter rule 30 outbound-interface name &#39;!eth1&#39;
+set firewall bridge forward filter rule 35 action &#39;accept&#39;
+set firewall bridge forward filter rule 35 vlan id &#39;11&#39;
+set firewall bridge forward filter rule 40 action &#39;continue&#39;
+set firewall bridge forward filter rule 40 destination mac-address &#39;66:55:44:33:22:11&#39;
+set firewall bridge forward filter rule 40 source mac-address &#39;11:22:33:44:55:66&#39;
+set firewall bridge name TEST default-action &#39;accept&#39;
 set firewall bridge name TEST default-log
-set firewall bridge name TEST rule 10 action 'continue'
+set firewall bridge name TEST rule 10 action &#39;continue&#39;
 set firewall bridge name TEST rule 10 log
-set firewall bridge name TEST rule 10 vlan priority '0'
+set firewall bridge name TEST rule 10 vlan priority &#39;0&#39;
 </pre></div>
 </div>
-<p>And op-mode commands:</p>
+<p>以及操作模式命令：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@BRI:~$ show firewall bridge
-Rulesets bridge Information
+桥接防火墙信息
 
 ---------------------------------
-bridge Firewall "forward filter"
+桥接防火墙 “forward filter”
 
-Rule     Action    Protocol      Packets    Bytes  Conditions
+规则     动作      协议        数据包数    字节数   条件
 -------  --------  ----------  ---------  -------  ---------------------------------------------------------------------
-10       continue  all                 0        0  iifname "eth2" vlan id 22  continue
+10       continue  all                 0        0  iifname &quot;eth2&quot; vlan id 22  continue
 20       drop      all                 0        0  iifname @I_TRUNK-RIGHT vlan id 60
-30       jump      all              2130   170688  oifname != "eth1"  jump NAME_TEST
+30       jump      all              2130   170688  oifname != &quot;eth1&quot;  jump NAME_TEST
 35       accept    all              2080   168616  vlan id 11  accept
-40       continue  all                 0        0  ether daddr 66:55:44:33:22:11 ether saddr 11:22:33:44:55:66  continue
-default  drop      all                 0        0
-
----------------------------------
-bridge Firewall "name TEST"
-
-Rule     Action    Protocol      Packets    Bytes  Conditions
--------  --------  ----------  ---------  -------  --------------------------------------------------
-10       continue  all              2130   170688  vlan pcp 0  prefix "[bri-NAM-TEST-10-C]"  continue
-default  accept    all              2130   170688
-
-vyos@BRI:~$
-vyos@BRI:~$ show firewall bridge name TEST
-Ruleset Information
-
----------------------------------
-bridge Firewall "name TEST"
-
-Rule     Action    Protocol      Packets    Bytes  Conditions
--------  --------  ----------  ---------  -------  --------------------------------------------------
-10       continue  all              2130   170688  vlan pcp 0  prefix "[bri-NAM-TEST-10-C]"  continue
-default  accept    all              2130   170688
-
-vyos@BRI:~$
-</pre></div>
-</div>
-<p>Inspect logs:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@BRI:~$ show log firewall bridge
-Dec 05 14:37:47 kernel: [bri-NAM-TEST-10-C]IN=eth1 OUT=eth2 ARP HTYPE=1 PTYPE=0x0800 OPCODE=1 MACSRC=50:00:00:04:00:00 IPSRC=10.11.11.101 MACDST=00:00:00:00:00:00 IPDST=10.11.11.102
-Dec 05 14:37:48 kernel: [bri-NAM-TEST-10-C]IN=eth1 OUT=eth2 ARP HTYPE=1 PTYPE=0x0800 OPCODE=1 MACSRC=50:00:00:04:00:00 IPSRC=10.11.11.101 MACDST=00:00:00:00:00:00 IPDST=10.11.11.102
-Dec 05 14:37:49 kernel: [bri-NAM-TEST-10-C]IN=eth1 OUT=eth2 ARP HTYPE=1 PTYPE=0x0800 OPCODE=1 MACSRC=50:00:00:04:00:00 IPSRC=10.11.11.101 MACDST=00:00:00:00:00:00 IPDST=10.11.11.102
-...
-vyos@BRI:~$ show log firewall bridge forward filter
-Dec 05 14:42:22 kernel: [bri-FWD-filter-default-D]IN=eth2 OUT=eth1 MAC=33:33:00:00:00:16:50:00:00:06:00:00:86:dd SRC=0000:0000:0000:0000:0000:0000:0000:0000 DST=ff02:0000:0000:0000:0000:0000:0000:0016 LEN=96 TC=0 HOPLIMIT=1 FLOWLBL=0 PROTO=ICMPv6 TYPE=143 CODE=0
-Dec 05 14:42:22 kernel: [bri-FWD-filter-default-D]IN=eth2 OUT=eth1 MAC=33:33:00:00:00:16:50:00:00:06:00:00:86:dd SRC=0000:0000:0000:0000:0000:0000:0000:0000 DST=ff02:0000:0000:0000:0000:0000:0000:0016 LEN=96 TC=0 HOPLIMIT=1 FLOWLBL=0 PROTO=ICMPv6 TYPE=143 CODE=0
-</pre></div>
-</div>
-</section>
-</section>
-</section>
-
-
-           </div>
-</body>
-</html>
+40       continue  all                 0        0  ether daddr 66:55:44:33:22:11 ether saddr 11:2

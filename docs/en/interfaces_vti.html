@@ -286,7 +286,7 @@ set interfaces vti &lt;interface&gt; ip enable-directed-broadcast
 interface.</strong></p>
 <p><strong>Default behavior:</strong> IP-directed broadcast packets are dropped.</p>
 <p><strong>If configured:</strong> IP-directed broadcast packets are forwarded to all hosts
-on the destination subnet, as defined in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> and <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+on the destination subnet, as defined in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> and <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
 <p>Example:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ip enable-directed-broadcast
 </pre></div>
@@ -387,7 +387,7 @@ the standard proxy ARP on the interface.</p>
 </div>
 <p>Local proxy ARP is also known as:</p>
 <ul class="simple">
-<li><p>VLAN aggregation (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>VLAN aggregation (<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
 <li><p>Private VLAN  (Cisco, Allied Telesyn).</p></li>
 <li><p>Source-port filtering or port isolation (Hewlett-Packard).</p></li>
 <li><p>MAC-Forced Forwarding (Ericsson).</p></li>
@@ -399,7 +399,7 @@ the standard proxy ARP on the interface.</p>
 
 set interfaces vti &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
 <a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure source IP address validation using</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>on this interface, as specified in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p><strong>Configure source IP address validation using</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>on this interface, as specified in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
 <p>The following options are available:</p>
 <ul class="simple">
 <li><p><strong>strict:</strong> Each incoming packet’s source IP address is checked against the
@@ -423,7 +423,7 @@ set interfaces vti &lt;interface&gt; ipv6 address autoconf
 <a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p><strong>Configure the interface to automatically obtain an IPv6 address using</strong>
 <abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>as specified in</strong>
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
 <p>IPv6 hosts can configure themselves automatically when connected to an
 IPv6 network using the Neighbor Discovery Protocol via ICMPv6 router
 discovery messages. When first connected to a network, a host sends a
@@ -448,7 +448,7 @@ set interfaces vti &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
 <a class="cmdlink" href="#cfgcmd-set-interfaces-vti-interface-ipv6-address-eui64-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p><strong>Configure the interface to assign itself an IPv6 address using the</strong>
 <abbr title="64-Bit Extended Unique Identifier">EUI-64</abbr> <strong>method, as
-specified</strong> in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+specified</strong> in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
 <p>Example:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vti vti0 ipv6 address eui64 2001:db8:beef::/64
 </pre></div>

@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,265 +152,216 @@
 <div itemprop="articleBody">
              
   <section id="traffic-policy">
-<h1>流量 策略</h1>
+<h1>流量策略</h1>
 <section id="id1">
-<h2>QoS</h2>
-<p>The generic name of Quality of 服务 or 流量 Control involves
-things like shaping traffic, scheduling or dropping packets, which
-are the kind of things you may want to play with when you have, for
-instance, a bandwidth bottleneck in a link and you want to somehow
-prioritize some type of traffic over another.</p>
-<p><a class="reference external" href="https://en.wikipedia.org/wiki/Tc_(Linux)">tc</a> is a powerful tool for 流量 Control found at the Linux kernel.
-However, its configuration is often considered a cumbersome task.
-Fortunately, VyOS eases the job through its CLI, while using <code class="docutils literal notranslate">tc</code> as
-backend.</p>
+<h2>服务质量（QoS）</h2>
+<p>服务质量（Quality of Service，简称 QoS）或流量控制的通用名称涵盖了诸如流量整形、数据包调度或丢弃等操作。当链路存在带宽瓶颈时，您可能希望对不同类型的流量进行优先级划分，这类操作正是 QoS 的典型应用场景。</p>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Tc_(Linux)">tc</a> 是 Linux 内核中一个功能强大的流量控制工具。然而，其配置通常被认为是一项繁琐的任务。幸运的是，VyOS 通过其 CLI 简化了这项工作，同时仍以 <code class="docutils literal notranslate">tc</code> 作为后端实现。</p>
 <section id="how-to-make-it-work">
-<h3>How to make it work</h3>
-<p>In order to have VyOS 流量 Control working you need to follow 2
-steps:</p>
+<h3>如何使其生效</h3>
+<p>要使 VyOS 流量控制正常工作，您需要遵循两个步骤：</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li><p><strong>创建 a traffic policy</strong>.</p></li>
-<li><p><strong>应用 the traffic policy to an interface ingress or egress</strong>.</p></li>
+<li><p><strong>创建一个流量策略</strong>。</p></li>
+<li><p><strong>将该流量策略应用到某个接口的入方向（ingress）或出方向（egress）</strong>。</p></li>
 </ol>
 </div></blockquote>
-<p>But before learning to configure your policy, we will warn you
-about the different units you can use and also show you what <em>classes</em>
-are and how they work, as some policies may require you to configure
-them.</p>
+<p>但在学习如何配置您的策略之前，我们将提醒您注意可使用的不同单位，并向您介绍什么是 <em>类别（classes）</em> 及其工作原理，因为某些策略可能要求您对其进行配置。</p>
 </section>
 <section id="units">
-<h3>Units</h3>
-<p>When configuring your traffic policy, you will have to set data rate
-values, watch out the units you are managing, it is easy to get confused
-with the different prefixes and suffixes you can use. VyOS will always
-show you the different units you can use.</p>
+<h3>单位</h3>
+<p>在配置流量策略时，您需要设置数据速率值，请务必留意所管理的单位，不同前缀和后缀容易造成混淆。VyOS 始终会向您显示所有可用的单位选项。</p>
 <section id="prefixes">
-<h4>Prefixes</h4>
-<p>They 可以 <strong>decimal</strong> prefixes.</p>
+<h4>前缀</h4>
+<p>它们可以是 <strong>十进制</strong> 前缀。</p>
 <blockquote>
-<div><div class="highlight-none notranslate"><div class="highlight"><pre>kbit  (10^3)    kilobit per second
-mbit  (10^6)    megabit per second
-gbit  (10^9)    gigabit per second
-tbit  (10^12)   terabit per second
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kbit  (10^3)    千比特每秒
+mbit  (10^6)    兆比特每秒
+gbit  (10^9)    吉比特每秒
+tbit  (10^12)   太比特每秒
 
-kbps  (8*10^3)  kilobyte per second
-mbps  (8*10^6)  megabyte per second
-gbps  (8*10^9)  gigabyte per second
-tbps  (8*10^12) terabyte per second
+kbps  (8*10^3)  千字节每秒
+mbps  (8*10^6)  兆字节每秒
+gbps  (8*10^9)  吉字节每秒
+tbps  (8*10^12) 太字节每秒
 </pre></div>
 </div>
 </div></blockquote>
-<p>Or <strong>binary</strong> prefixes.</p>
+<p>或者 <strong>二进制</strong> 前缀。</p>
 <blockquote>
-<div><div class="highlight-none notranslate"><div class="highlight"><pre>kibit (2^10 = 1024)    kibibit per second
-mibit (2^20 = 1024^2)  mebibit per second
-gibit (2^30 = 1024^3)  gibibit per second
-tbit  (2^40 = 1024^4)  tebibit per second
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kibit (2^10 = 1024)    二进制千比特每秒（kibibit per second）
+mibit (2^20 = 1024^2)  二进制兆比特每秒（mebibit per second）
+gibit (2^30 = 1024^3)  二进制吉比特每秒（gibibit per second）
+tbit  (2^40 = 1024^4)  二进制太比特每秒（tebibit per second）
 
-kibps (1024*8)         kibibyte (KiB) per second
-mibps (1024^2*8)       mebibyte (MiB) per second
-gibps (1024^3*8)       gibibyte (GiB) per second
-tibps (1024^4*8)       tebibyte (TiB) per second
+kibps (1024*8)         二进制千字节（KiB）每秒
+mibps (1024^2*8)       二进制兆字节（MiB）每秒
+gibps (1024^3*8)       二进制吉字节（GiB）每秒
+tibps (1024^4*8)       二进制太字节（TiB）每秒
 </pre></div>
 </div>
 </div></blockquote>
 </section>
 <section id="suffixes">
-<h4>Suffixes</h4>
-<p>A <em>bit</em> is written as <strong>bit</strong>,</p>
+<h4>后缀</h4>
+<p><em>比特（bit）</em> 写作 <strong>bit</strong>，</p>
 <blockquote>
-<div><div class="highlight-none notranslate"><div class="highlight"><pre>kbit (kilobits per second)
-mbit (megabits per second)
-gbit (gigabits per second)
-tbit (terabits per second)
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kbit (千比特每秒)
+mbit (兆比特每秒)
+gbit (吉比特每秒)
+tbit (太比特每秒)
 </pre></div>
 </div>
 </div></blockquote>
-<p>while a <em>byte</em> is written as a single <strong>b</strong>.</p>
+<p>而 <em>字节（byte）</em> 则写作单个 <strong>b</strong>。</p>
 <blockquote>
-<div><div class="highlight-none notranslate"><div class="highlight"><pre>kbps (kilobytes per second)
-mbps (megabytes per second)
-gbps (gigabytes per second)
+<div><div class="highlight-none notranslate"><div class="highlight"><pre>kbps (千字节每秒)
+mbps (兆字节每秒)
+gbps (吉字节每秒)
 </pre></div>
 </div>
 </div></blockquote>
 </section>
 </section>
 <section id="classes">
-<h3>类es</h3>
-<p>In the <a class="reference internal" href="#creating-a-traffic-policy">Creating a traffic policy</a> section you will see that
-some of the policies use <em>classes</em>. Those policies let you distribute
-traffic into different classes according to different parameters you can
-choose. So, a class is just a specific type of traffic you select.</p>
-<p>The ultimate goal of classifying traffic is to give each class a
-different treatment.</p>
+<h3>类别（Classes）</h3>
+<p>在<a class="reference internal" href="#creating-a-traffic-policy">创建流量策略</a>一节中，您将看到某些策略使用 <em>类别（classes）</em>。这些策略允许您根据您可选择的不同参数，将流量分配到不同的类别中。因此，一个类别只是您选定的一种特定类型的流量。</p>
+<p>对流量进行分类的最终目标是为每个类别提供不同的处理方式。</p>
 <section id="matching-traffic">
-<h4>匹配ing traffic</h4>
-<p>In order to define which traffic goes into which class, you define
-filters (that is, the matching criteria). 数据包s go through these matching
-rules (as in the rules of a firewall) and, if a packet matches the filter, it
-is assigned to that class.</p>
-<p>In VyOS, a class is identified by a number you can choose when
-configuring it.</p>
+<h4>匹配流量</h4>
+<p>为了定义哪些流量进入哪个类别，您需定义过滤器（即匹配条件）。数据包依次经过这些匹配规则（类似于防火墙规则），如果某个数据包匹配了某个过滤器，则被分配至对应类别。</p>
+<p>在 VyOS 中，类别由您在配置时指定的一个数字来标识。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>The meaning of the 类 ID is not the same for every type of
-policy. Normally policies just need a meaningless number to identify
-a class (类 ID), but that does not apply to every policy.
-The number of a class in a 优先级 Queue it does not only
-identify it, it also defines its priority.</p>
+<p>类别 ID（Class ID）的含义并非对所有类型的策略都相同。通常情况下，策略仅需一个无意义的数字来标识一个类别（Class ID），但并非所有策略均如此。例如，在优先级队列（Priority Queue）中，类别的编号不仅用于标识该类别，还定义了其优先级。</p>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy <policy> <policy-name> class <class-ID> match <class-matching-rule-name>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy &lt;policy&gt; &lt;policy-name&gt; class &lt;class-ID&gt; match &lt;class-matching-rule-name&gt;
 </pre></div>
 </div>
-<p>In the command above, we set the type of policy we are going to
-work with and the name we choose for it; a class (so that we can
-differentiate some traffic) and an identifiable number for that class;
-then we configure a matching rule (or filter) and a name for it.</p>
-<p>A class can have multiple match filters:</p>
+<p>在上述命令中，我们设置了要使用的策略类型及其名称；定义了一个类别（以便区分某些流量）及其可识别的编号；然后配置了一个匹配规则（或过滤器）及其名称。</p>
+<p>一个类别可以拥有多个匹配过滤器：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper MY-SHAPER class 30 match HTTP
 set qos policy shaper MY-SHAPER class 30 match HTTPs
 </pre></div>
 </div>
-<p>A match filter can contain multiple criteria and will match traffic if
-all those criteria are true.</p>
-<p>For example:</p>
+<p>一个匹配过滤器可包含多个条件，只有当所有条件均满足时，才会匹配相应流量。</p>
+<p>例如：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper MY-SHAPER class 30 match HTTP ip protocol tcp
 set qos policy shaper MY-SHAPER class 30 match HTTP ip source port 80
 </pre></div>
 </div>
-<p>This will match TCP traffic with source port 80.</p>
-<p>There are many parameters you 将 able to use in order to match the
-traffic you want for a class:</p>
+<p>这将匹配源端口为 80 的 TCP 流量。</p>
+<p>您可以使用许多参数来匹配某一类别所需的流量：</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><strong>Ethernet (protocol, destination address or source address)</strong></p></li>
-<li><p><strong>接口 name</strong></p></li>
-<li><p><strong>IPv4 (DSCP value, maximum packet length, protocol, source address,</strong>
-<strong>destination address, source port, destination port or TCP flags)</strong></p></li>
-<li><p><strong>IPv6 (DSCP value, maximum payload length, protocol, source address,</strong>
-<strong>destination address, source port, destination port or TCP flags)</strong></p></li>
-<li><p><strong>防火墙 mark</strong></p></li>
+<li><p><strong>以太网（协议、目的地址或源地址）</strong></p></li>
+<li><p><strong>接口名称</strong></p></li>
+<li><p><strong>IPv4（DSCP 值、最大数据包长度、协议、源地址、目的地址、源端口、目的端口或 TCP 标志位）</strong></p></li>
+<li><p><strong>IPv6（DSCP 值、最大有效载荷长度、协议、源地址、目的地址、源端口、目的端口或 TCP 标志位）</strong></p></li>
+<li><p><strong>防火墙标记（Firewall mark）</strong></p></li>
 <li><p><strong>VLAN ID</strong></p></li>
 </ul>
 </div></blockquote>
-<p>When configuring your filter, you can use the <code class="docutils literal notranslate">Tab</code> key to see the many
-different parameters you can configure.</p>
+<p>在配置过滤器时，您可以使用 <code class="docutils literal notranslate">Tab</code> 键查看所有可配置的不同参数。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# set qos policy shaper MY-SHAPER class 30 match MY-FIRST-FILTER 
 Possible completions:
-   description  Description
- > ether        Ethernet header match
-   interface    Interface to use
- > ip           Match IP protocol header
- > ipv6         Match IPV6 protocol header
-   mark         Match on mark applied by firewall
-   vif          Virtual Local Area Network (VLAN) ID for this match
+   description  描述
+ &gt; ether        以太网头部匹配
+   interface    要使用的接口
+ &gt; ip           匹配 IP 协议头部
+ &gt; ipv6         匹配 IPv6 协议头部
+   mark         匹配防火墙施加的标记
+   vif          此匹配的虚拟局域网（VLAN）ID
 </pre></div>
 </div>
-<p>As shown in the example above, one of the possibilities to match packets
-is based on marks done by the firewall,
-<a class="reference external" href="https://blog.vyos.io/using-the-policy-route-and-packet-marking-for-custom-qos-matches">that can give you a great deal of flexibility</a>.</p>
-<p>You can also write a description for a filter:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper MY-SHAPER class 30 match MY-FIRST-FILTER description "My filter description"
+<p>如上例所示，匹配数据包的一种可能性是基于防火墙所做的标记，
+<a class="reference external" href="https://blog.vyos.io/using-the-policy-route-and-packet-marking-for-custom-qos-matches">这能为您带来极大的灵活性</a>。</p>
+<p>您还可以为过滤器编写描述信息：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper MY-SHAPER class 30 match MY-FIRST-FILTER description &quot;我的过滤器描述&quot;
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>An IPv4 TCP filter will only match packets with an IPv4 header
-length of 20 bytes (which is the majority of IPv4 packets anyway).</p>
+<p>一个 IPv4 TCP 过滤器仅匹配 IPv4 头部长度为 20 字节的数据包（这已是绝大多数 IPv4 数据包的情况）。</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>IPv6 TCP filters will only match IPv6 packets with no header
-extension, see <a class="reference external" href="https://en.wikipedia.org/wiki/IPv6_packet#Extension_headers">https://en.wikipedia.org/wiki/IPv6_packet#Extension_headers</a></p>
+<p>IPv6 TCP 过滤器仅匹配不带扩展头部的 IPv6 数据包，请参见 <a class="reference external" href="https://en.wikipedia.org/wiki/IPv6_packet#Extension_headers">https://en.wikipedia.org/wiki/IPv6_packet#Extension_headers</a></p>
 </div>
 </section>
 <section id="traffic-match-group">
-<h4>流量 匹配 组</h4>
-<p>In some case where we need to have an organization of our matching selection,
-in order to be more flexible and organize with our filter definition. We can
-apply traffic match groups, allowing us to create distinct filter groups within
-our policy and define various parameters for each group:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set qos traffic-match-group <group_name> match <match_name>
+<h4>流量匹配组（Traffic Match Group）</h4>
+<p>在某些情况下，我们需要对匹配选择进行组织，以提高灵活性并更好地组织过滤器定义。此时，我们可以应用流量匹配组，从而在策略内创建不同的过滤器组，并为每个组定义各种参数：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos traffic-match-group &lt;group_name&gt; match &lt;match_name&gt;
 Possible completions:
-   description          Description
- > ip                   Match IP protocol header
- > ipv6                 Match IPv6 protocol header
-   mark                 Match on mark applied by firewall
-   vif                  Virtual Local Area Network (VLAN) ID for this match
+   description          描述
+ &gt; ip                   匹配 IP 协议头部
+ &gt; ipv6                 匹配 IPv6 协议头部
+   mark                 匹配防火墙施加的标记
+   vif                  此匹配的虚拟局域网（VLAN）ID
 </pre></div>
 </div>
-<p>inherit matches from another group</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set qos traffic-match-group <group_name> match-group <match_group_name>
+<p>从另一个组继承匹配项</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos traffic-match-group &lt;group_name&gt; match-group &lt;match_group_name&gt;
 </pre></div>
 </div>
-<p>A match group can contain multiple criteria and inherit them in the same policy.</p>
-<p>For example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set qos traffic-match-group Mission-Critical match AF31 ip dscp 'AF31'
-set qos traffic-match-group Mission-Critical match AF32 ip dscp 'AF42'
-set qos traffic-match-group Mission-Critical match CS3 ip dscp 'CS3'
-set qos traffic-match-group Streaming-Video match AF11 ip dscp 'AF11'
-set qos traffic-match-group Streaming-Video match AF41 ip dscp 'AF41'
-set qos traffic-match-group Streaming-Video match AF43 ip dscp 'AF43'
-set qos policy shaper VyOS-HTB class 10 bandwidth '30%'
-set qos policy shaper VyOS-HTB class 10 description 'Multimedia'
-set qos policy shaper VyOS-HTB class 10 match CS4 ip dscp 'CS4'
-set qos policy shaper VyOS-HTB class 10 match-group 'Streaming-Video'
-set qos policy shaper VyOS-HTB class 10 priority '1'
-set qos policy shaper VyOS-HTB class 10 queue-type 'fair-queue'
-set qos policy shaper VyOS-HTB class 20 description 'MC'
-set qos policy shaper VyOS-HTB class 20 match-group 'Mission-Critical'
-set qos policy shaper VyOS-HTB class 20 priority '2'
-set qos policy shaper VyOS-HTB class 20 queue-type 'fair-queue'
-set qos policy shaper VyOS-HTB default bandwidth '20%'
-set qos policy shaper VyOS-HTB default queue-type 'fq-codel'
+<p>一个匹配组可以包含多个条件，并在同一策略中继承这些条件。</p>
+<p>例如：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set qos traffic-match-group Mission-Critical match AF31 ip dscp &#39;AF31&#39;
+set qos traffic-match-group Mission-Critical match AF32 ip dscp &#39;AF42&#39;
+set qos traffic-match-group Mission-Critical match CS3 ip dscp &#39;CS3&#39;
+set qos traffic-match-group Streaming-Video match AF11 ip dscp &#39;AF11&#39;
+set qos traffic-match-group Streaming-Video match AF41 ip dscp &#39;AF41&#39;
+set qos traffic-match-group Streaming-Video match AF43 ip dscp &#39;AF43&#39;
+set qos policy shaper VyOS-HTB class 10 bandwidth &#39;30%&#39;
+set qos policy shaper VyOS-HTB class 10 description &#39;多媒体&#39;
+set qos policy shaper VyOS-HTB class 10 match CS4 ip dscp &#39;CS4&#39;
+set qos policy shaper VyOS-HTB class 10 match-group &#39;Streaming-Video&#39;
+set qos policy shaper VyOS-HTB class 10 priority &#39;1&#39;
+set qos policy shaper VyOS-HTB class 10 queue-type &#39;fair-queue&#39;
+set qos policy shaper VyOS-HTB class 20 description &#39;关键业务&#39;
+set qos policy shaper VyOS-HTB class 20 match-group &#39;Mission-Critical&#39;
+set qos policy shaper VyOS-HTB class 20 priority &#39;2&#39;
+set qos policy shaper VyOS-HTB class 20 queue-type &#39;fair-queue&#39;
+set qos policy shaper VyOS-HTB default bandwidth &#39;20%&#39;
+set qos policy shaper VyOS-HTB default queue-type &#39;fq-codel&#39;
 </pre></div>
 </div>
-<p>In this example, we can observe that different DSCP criteria are defined based
-on our QoS configuration within the same policy group.</p>
+<p>在此示例中，我们可以观察到，基于同一策略组内的 QoS 配置，定义了不同的 DSCP 条件。</p>
 </section>
 <section id="default">
-<h4>默认</h4>
-<p>Often you will also have to configure your <em>default</em> traffic in the same
-way you do with a class. <em>默认</em> 可以 considered a class as it
-behaves like that. It contains any traffic that did not match any
-of the defined classes, so it is like an open class, a class without
-matching filters.</p>
+<h4>默认（Default）</h4>
+<p>通常，您还需要以与配置类别相同的方式配置 <em>默认</em> 流量。<em>默认</em> 可被视为一个类别，因为它具有类似的行为。它包含所有未匹配任何已定义类别的流量，因此就像一个开放类别，即一个没有匹配过滤器的类别。</p>
 </section>
 <section id="class-treatment">
-<h4>类 treatment</h4>
-<p>Once a class has a filter configured, you will also have to define what
-you want to do with the traffic of that class, what specific
-流量-Control treatment you want to give it. You will have different
-possibilities depending on the 流量 策略 you are configuring.</p>
+<h4>类别处理（Class treatment）</h4>
+<p>一旦为某个类别配置了过滤器，您还需定义对该类别流量的具体处理方式，即为其指定特定的流量控制处理方法。具体可选方案取决于您正在配置的流量策略类型。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# set qos policy shaper MY-SHAPER class 30
 Possible completions:
-   bandwidth    Available bandwidth for this policy (default: auto)
-   burst        Burst size for this class (default: 15k)
-   ceiling      Bandwidth limit for this class
+   bandwidth    此策略的可用带宽（默认：auto）
+   burst        此类别的突发大小（默认：15k）
+   ceiling      此类别的带宽限制
    codel-quantum
-                Deficit in the fair queuing algorithm (default 1514)
-   description  Description
-   flows        Number of flows into which the incoming packets are classified(default 1024)
-   interval     Interval used to measure the delay (default 100)
-+> match        Class matching rule name
-   priority     Priority for rule evaluation
-   queue-limit  Maximum queue size
-   queue-type   Queue type for default traffic (default: fq-codel)
-   set-dscp     Change the Differentiated Services (DiffServ) field in the IP header
-   target       Acceptable minimum standing/persistent queue delay (default: 5)
+                公平队列算法中的赤字（默认 1514）
+   description  描述
+   flows        将传入数据包分类的流数量（默认 1024）
+   interval     用于测量延迟的时间间隔（默认 100）
++&gt; match        类别匹配规则名称
+   priority     规则评估的优先级
+   queue-limit  最大队列大小
+   queue-type   默认流量的队列类型（默认：fq-codel）
+   set-dscp     更改 IP 头部中的差异化服务（DiffServ）字段
+   target       可接受的最小持续/持久队列延迟（默认：5）
 </pre></div>
 </div>
-<p>For instance, with <code class="code docutils literal notranslate">set qos policy shaper MY-SHAPER class 30 set-dscp EF</code> you 将 modifying the DSCP field value of packets in
-that class to Expedite Forwarding.</p>
+<p>例如，使用 <code class="code docutils literal notranslate">set qos policy shaper MY-SHAPER class 30 set-dscp EF</code> 命令，您将修改该类别中数据包的 DSCP 字段值为“加速转发（Expedited Forwarding）”。</p>
 <blockquote>
-<div><p>DSCP values as per <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2474.html"><strong>RFC 2474</strong></a> and <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4595.html"><strong>RFC 4595</strong></a>:</p>
+<div><p>DSCP 值依据 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2474.html"><strong>RFC 2474</strong></a> 和 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4595.html"><strong>RFC 4595</strong></a>：</p>
 <table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head"><p>Binary value</p></th>
-<th class="head"><p>Configured value</p></th>
-<th class="head"><p>丢弃 rate</p></th>
+<tr class="row-odd"><th class="head"><p>二进制值</p></th>
+<th class="head"><p>配置值</p></th>
+<th class="head"><p>丢弃率</p></th>
 <th class="head"><p>描述</p></th>
 </tr>
 </thead>
@@ -418,317 +369,229 @@ that class to Expedite Forwarding.</p>
 <tr class="row-even"><td><p>101110</p></td>
 <td><p>46</p></td>
 <td><p>-</p></td>
-<td><p>Expedited forwarding (EF)</p></td>
+<td><p>加速转发（EF）</p></td>
 </tr>
 <tr class="row-odd"><td><p>000000</p></td>
 <td><p>0</p></td>
 <td><p>-</p></td>
-<td><p>Best effort traffic, default</p></td>
+<td><p>尽力而为（Best effort）流量，默认值</p></td>
 </tr>
 <tr class="row-even"><td><p>001010</p></td>
 <td><p>10</p></td>
-<td><p>Low</p></td>
-<td><p>Assured Forwarding(AF) 11</p></td>
+<td><p>低</p></td>
+<td><p>确保转发（AF）11</p></td>
 </tr>
 <tr class="row-odd"><td><p>001100</p></td>
 <td><p>12</p></td>
-<td><p>Medium</p></td>
-<td><p>Assured Forwarding(AF) 12</p></td>
+<td><p>中</p></td>
+<td><p>确保转发（AF）12</p></td>
 </tr>
 <tr class="row-even"><td><p>001110</p></td>
 <td><p>14</p></td>
-<td><p>High</p></td>
-<td><p>Assured Forwarding(AF) 13</p></td>
+<td><p>高</p></td>
+<td><p>确保转发（AF）13</p></td>
 </tr>
 <tr class="row-odd"><td><p>010010</p></td>
 <td><p>18</p></td>
-<td><p>Low</p></td>
-<td><p>Assured Forwarding(AF) 21</p></td>
+<td><p>低</p></td>
+<td><p>确保转发（AF）21</p></td>
 </tr>
 <tr class="row-even"><td><p>010100</p></td>
 <td><p>20</p></td>
-<td><p>Medium</p></td>
-<td><p>Assured Forwarding(AF) 22</p></td>
+<td><p>中</p></td>
+<td><p>确保转发（AF）22</p></td>
 </tr>
 <tr class="row-odd"><td><p>010110</p></td>
 <td><p>22</p></td>
-<td><p>High</p></td>
-<td><p>Assured Forwarding(AF) 23</p></td>
+<td><p>高</p></td>
+<td><p>确保转发（AF）23</p></td>
 </tr>
 <tr class="row-even"><td><p>011010</p></td>
 <td><p>26</p></td>
-<td><p>Low</p></td>
-<td><p>Assured Forwarding(AF) 31</p></td>
+<td><p>低</p></td>
+<td><p>确保转发（AF）31</p></td>
 </tr>
 <tr class="row-odd"><td><p>011100</p></td>
 <td><p>28</p></td>
-<td><p>Medium</p></td>
-<td><p>Assured Forwarding(AF) 32</p></td>
+<td><p>中</p></td>
+<td><p>确保转发（AF）32</p></td>
 </tr>
 <tr class="row-even"><td><p>011110</p></td>
 <td><p>30</p></td>
-<td><p>High</p></td>
-<td><p>Assured Forwarding(AF) 33</p></td>
+<td><p>高</p></td>
+<td><p>确保转发（AF）33</p></td>
 </tr>
 <tr class="row-odd"><td><p>100010</p></td>
 <td><p>34</p></td>
-<td><p>Low</p></td>
-<td><p>Assured Forwarding(AF) 41</p></td>
+<td><p>低</p></td>
+<td><p>确保转发（AF）41</p></td>
 </tr>
 <tr class="row-even"><td><p>100100</p></td>
 <td><p>36</p></td>
-<td><p>Medium</p></td>
-<td><p>Assured Forwarding(AF) 42</p></td>
+<td><p>中</p></td>
+<td><p>确保转发（AF）42</p></td>
 </tr>
 <tr class="row-odd"><td><p>100110</p></td>
 <td><p>38</p></td>
-<td><p>High</p></td>
-<td><p>Assured Forwarding(AF) 43</p></td>
+<td><p>高</p></td>
+<td><p>确保转发（AF）43</p></td>
 </tr>
 </tbody>
 </table>
 </div></blockquote>
 </section>
 <section id="embedding-one-policy-into-another-one">
-<h4>Embedding one policy into another one</h4>
-<p>Often we need to embed one policy into another one. It is possible to do
-so on classful policies, by attaching a new policy into a class. For
-instance, you might want to apply different policies to the different
-classes of a Round-Robin policy you have configured.</p>
-<p>A common example is the case of some policies which, in order to be
-effective, they need to be applied to an interface that is directly
-connected where the bottleneck is. If your router is not
-directly connected to the bottleneck, but some hop before it, you can
-emulate the bottleneck by embedding your non-shaping policy into a
-classful shaping one so that it takes effect.</p>
-<p>You can configure a policy into a class through the <code class="docutils literal notranslate">queue-type</code>
-setting.</p>
+<h4>将一个策略嵌入另一个策略</h4>
+<p>我们经常需要将一个策略嵌入另一个策略中。对于分层策略（classful policies），可通过将新策略附加到某个类别上来实现。例如，您可能希望对已配置的轮询（Round-Robin）策略的不同类别应用不同的策略。</p>
+<p>一个常见例子是：某些策略若要生效，必须应用到瓶颈直接相连的接口上。如果您的路由器并未直接连接到瓶颈处，而是位于瓶颈之前的某跳位置，则可以通过将非整形策略嵌入一个分层整形策略的类别中，来模拟瓶颈效果，从而使该策略生效。</p>
+<p>您可通过 <code class="docutils literal notranslate">queue-type</code>
+设置将策略配置到某个类别中。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper FQ-SHAPER bandwidth 4gbit
 set qos policy shaper FQ-SHAPER default bandwidth 100%
 set qos policy shaper FQ-SHAPER default queue-type fq-codel
 </pre></div>
 </div>
-<p>As shown in the last command of the example above, the <code class="docutils literal notranslate">queue-type</code>
-setting allows these combinations. You 将 able to use it
-in many policies.</p>
+<p>如上例最后一行命令所示，<code class="docutils literal notranslate">queue-type</code>
+设置支持这些组合。您可在多种策略中使用它。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>Some policies already include other embedded policies inside.
-That is the case of Shaper: each of its classes use fair-queue
-unless you change it.</p>
+<p>某些策略内部已包含其他嵌入式策略。
+例如整形器（Shaper）策略：其每个类别默认使用公平队列（fair-queue），除非您另行更改。</p>
 </div>
 </section>
 </section>
 <section id="creating-a-traffic-policy">
-<h3>Creating a traffic policy</h3>
-<p>VyOS lets you control traffic in many different ways, here we will cover
-every possibility. You can configure as many policies as you want, but
-you will only be able to apply one policy per interface and direction
-(inbound or outbound).</p>
-<p>Some policies 可以 combined, you 将 able to embed a different
-policy that 将 applied to a class of the main policy.</p>
+<h3>创建流量策略</h3>
+<p>VyOS 提供多种方式来控制流量，此处将涵盖所有可能性。您可以配置任意数量的策略，但每个接口及每个方向（入站或出站）最多只能应用一个策略。</p>
+<p>某些策略可以组合使用，您可将一个不同的策略嵌入主策略的某个类别中。</p>
 <div class="admonition hint">
-<p class="admonition-title">Hint</p>
-<p><strong>If you are looking for a policy for your outbound traffic</strong>
-but you don’t know which one you need and you don’t want to go
-through every possible policy shown here, <strong>our bet is that highly
-likely you are looking for a</strong> Shaper <strong>policy and you want to</strong>
-<a class="reference internal" href="#embed">set its queues</a> <strong>as FQ-CoDel</strong>.</p>
+<p class="admonition-title">提示</p>
+<p><strong>如果您正在寻找适用于出站流量的策略</strong>
+但不确定应选择哪一种，且不想逐一查阅此处列出的所有策略，<strong>我们建议您很可能需要的是一个</strong> 整形器（Shaper） <strong>策略，并希望将其队列</strong>
+<a class="reference internal" href="#embed">设置为 FQ-CoDel</a> <strong>类型</strong>。</p>
 </div>
 <section id="drop-tail">
-<h4>丢弃 Tail</h4>
+<h4>尾部丢弃（Drop Tail）</h4>
 <div class="line-block">
-<div class="line"><strong>Queueing discipline:</strong> PFIFO (数据包 First In First Out).</div>
-<div class="line"><strong>Applies to:</strong> Outbound traffic.</div>
+<div class="line"><strong>排队机制：</strong> PFIFO（数据包先进先出）。</div>
+<div class="line"><strong>适用对象：</strong> 出站流量。</div>
 </div>
-<p>This the simplest queue possible you can apply to your traffic. 流量
-must go through a finite queue before it is actually sent. You must
-define how many packets that queue can contain.</p>
-<p>When a packet is to be sent, it will have to go through that queue, so
-the packet 将 placed at the tail of it. When the packet completely
-goes through it, it 将 dequeued emptying its place in the queue and
-being eventually handed to the NIC to be actually sent out.</p>
-<p>Despite the 丢弃-Tail policy does not slow down packets, if many packets
-are to be sent, they could get dropped when trying to get enqueued at
-the tail. This can happen if the queue has still not been able to
-release enough packets from its head.</p>
-<p>This is the policy that requires the lowest resources for the same
-amount of traffic. But <strong>very likely you do not need it as you cannot
-get much from it. Sometimes it is used just to enable logging.</strong></p>
+<p>这是您可应用于流量的最简单队列。流量在实际发送前必须经过一个有限长度的队列。您必须定义该队列所能容纳的数据包数量。</p>
+<p>当一个数据包准备发送时，它必须经过该队列，因此该数据包将被放置在队列尾部。当该数据包完全通过队列后，它将被出队，腾出其在队列中的位置，并最终交由网卡（NIC）实际发出。</p>
+<p>尽管尾部丢弃策略本身不会减慢数据包传输速度，但如果大量数据包需要发送，它们在尝试加入队列尾部时可能会被丢弃。这种情况可能发生在队列头部尚未释放足够多数据包时。</p>
+<p>此策略在处理相同流量时所需资源最少。但<strong>您很可能并不需要它，因为其作用非常有限。有时仅用于启用日志记录。</strong></p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy drop-tail <policy-name> queue-limit <number-of-packets>
+set qos policy drop-tail &lt;policy-name&gt; queue-limit &lt;number-of-packets&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-drop-tail-policy-name-queue-limit-number-of-packets" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a drop-tail policy (PFIFO). Choose a
-unique name for this policy and the size of the queue by setting the
-number of packets it can contain (maximum 4294967295).</p>
+<p>使用此命令配置尾部丢弃策略（PFIFO）。为此策略选择一个唯一名称，并通过设置其可容纳的数据包数量（最大值为 4294967295）来设定队列大小。</p>
 </div>
 </div>
 </section>
 <section id="fair-queue">
-<h4>Fair Queue</h4>
+<h4>公平队列（Fair Queue）</h4>
 <div class="line-block">
-<div class="line"><strong>Queueing discipline:</strong> SFQ (Stochastic Fairness Queuing).</div>
-<div class="line"><strong>Applies to:</strong> Outbound traffic.</div>
+<div class="line"><strong>排队机制：</strong> SFQ（随机公平队列）。</div>
+<div class="line"><strong>适用对象：</strong> 出站流量。</div>
 </div>
-<p>Fair Queue is a work-conserving scheduler which schedules the
-transmission of packets based on flows, that is, it balances traffic
-distributing it through different sub-queues in order to ensure
-fairness so that each flow 能够 send data in turn, preventing any
-single one from drowning out the rest.</p>
+<p>公平队列是一种工作守恒型调度器，它基于数据流（flows）调度数据包的发送，即通过将流量分配到不同的子队列中来平衡流量，以确保公平性，使每个数据流都能轮流发送数据，防止任一单一数据流淹没其余数据流。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy fair-queue <policy-name>
+set qos policy fair-queue &lt;policy-name&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-fair-queue-policy-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to create a Fair-Queue policy and give it a name.
-It is based on the Stochastic Fairness Queueing and 可以 applied to
-outbound traffic.</p>
+<p>使用此命令创建一个公平队列策略并为其命名。
+该策略基于随机公平队列（Stochastic Fairness Queueing），可应用于出站流量。</p>
 </div>
 </div>
-<p>In order to separate traffic, Fair Queue uses a classifier based on
-source address, destination address and source port. The algorithm
-enqueues packets to hash buckets based on those tree parameters.
-Each of these buckets should represent a unique flow. Because multiple
-flows may get hashed to the same bucket, the hashing algorithm is
-perturbed at configurable intervals so that the unfairness lasts only
-for a short while. Perturbation may however cause some inadvertent
-packet reordering to occur. An advisable value 可能 10 seconds.</p>
-<p>One of the uses of Fair Queue 可能 the mitigation of Denial of
-服务 attacks.</p>
+<p>为分离流量，公平队列使用一种基于源地址、目的地址和源端口的分类器。该算法根据这三个参数将数据包入队到哈希桶（hash buckets）中。
+每个哈希桶应代表一个唯一的流。由于多个流可能被哈希到同一个桶中，哈希算法会在可配置的时间间隔内扰动，以确保不公平性仅持续很短时间。不过，扰动可能导致一些意外的数据包重排序。建议的扰动间隔为 10 秒。</p>
+<p>公平队列的一种用途可能是缓解拒绝服务（DoS）攻击。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy fair-queue <policy-name> hash-interval <seconds>
+set qos policy fair-queue &lt;policy-name&gt; hash-interval &lt;seconds&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-fair-queue-policy-name-hash-interval-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to define a Fair-Queue policy, based on the
-Stochastic Fairness Queueing, and set the number of seconds at which
-a new queue algorithm perturbation will occur (maximum 4294967295).</p>
+<p>使用此命令定义一个基于随机公平队列（Stochastic Fairness Queueing）的公平队列策略，并设置新队列算法扰动发生的秒数（最大值为 4294967295）。</p>
 </div>
 </div>
-<p>When dequeuing, each hash-bucket with data is queried in a round robin
-fashion. You can configure the length of the queue.</p>
+<p>在出队时，每个有数据的哈希桶将以轮询方式被查询。您可以配置队列长度。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy fair-queue <policy-name> queue-limit <limit>
+set qos policy fair-queue &lt;policy-name&gt; queue-limit &lt;limit&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-fair-queue-policy-name-queue-limit-limit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to define a Fair-Queue policy, based on the
-Stochastic Fairness Queueing, and set the number of maximum packets
-allowed to wait in the queue. Any other packet 将 dropped.</p>
+<p>使用此命令定义一个基于随机公平队列（Stochastic Fairness Queueing）的公平队列策略，并设置队列中允许等待的最大数据包数量。任何超出此限制的数据包都将被丢弃。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>Fair Queue is a non-shaping (work-conserving) policy, so it
-will only be useful if your outgoing interface is really full. If it
-is not, VyOS will not own the queue and Fair Queue will have no
-effect. If there is bandwidth available on the physical link, you can
-embed Fair-Queue into a classful shaping policy to make sure it owns
-the queue.</p>
+<p>公平队列是一种非整形（工作守恒）策略，因此仅当您的出站接口真正满载时才有效。如果接口未满载，VyOS 将无法控制该队列，公平队列也将无效。如果物理链路上尚有带宽可用，您可以将公平队列嵌入一个分层整形策略中，以确保其获得队列控制权。</p>
 </div>
 </section>
 <section id="fq-codel">
 <h4>FQ-CoDel</h4>
 <div class="line-block">
-<div class="line"><strong>Queueing discipline:</strong> Fair/Flow Queue CoDel.</div>
-<div class="line"><strong>Applies to:</strong> Outbound 流量.</div>
+<div class="line"><strong>排队机制：</strong> 公平/流队列 CoDel。</div>
+<div class="line"><strong>适用对象：</strong> 出站流量。</div>
 </div>
-<p>The FQ-CoDel policy distributes the traffic into 1024 FIFO queues and
-tries to provide good service between all of them. It also tries to keep
-the length of all the queues short.</p>
-<p>FQ-CoDel fights bufferbloat and reduces latency without the need of
-complex configurations. It has become the new default Queueing
-Discipline for the interfaces of some GNU/Linux distributions.</p>
-<p>It uses a stochastic model to classify incoming packets into
-different flows and 用于 provide a fair share of the bandwidth to
-all the flows using the queue. Each flow is managed by the CoDel
-queuing discipline. Reordering within a flow is avoided since Codel
-internally uses a FIFO queue.</p>
-<p>FQ-CoDel is based on a modified Deficit Round Robin (DRR) queue
-scheduler with the CoDel 活动 Queue Management (AQM) algorithm
-operating on each queue.</p>
+<p>FQ-CoDel 策略将流量分配到 1024 个 FIFO 队列中，并力求在所有队列之间提供良好的服务。它还力求保持所有队列的长度较短。</p>
+<p>FQ-CoDel 抵御缓冲区膨胀（bufferbloat）并降低延迟，无需复杂的配置。它已成为某些 GNU/Linux 发行版接口的新默认排队机制（Queueing Discipline）。</p>
+<p>它使用随机模型将传入数据包分类到不同的数据流中，并用于为所有使用该队列的数据流公平地分配带宽。每个数据流均由 CoDel 排队机制管理。由于 CoDel 内部使用 FIFO 队列，因此可避免同一数据流内的数据包重排序。</p>
+<p>FQ-CoDel 基于一种改进的缺陷轮询（Deficit Round Robin, DRR）队列调度器，每个队列上运行着 CoDel 主动队列管理（AQM）算法。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>FQ-Codel is a non-shaping (work-conserving) policy, so it
-will only be useful if your outgoing interface is really full. If it
-is not, VyOS will not own the queue and FQ-Codel will have no
-effect. If there is bandwidth available on the physical link, you can
-embed FQ-Codel into a classful shaping policy to make sure it owns
-the queue. If you are not sure if you need to embed your FQ-CoDel
-policy into a Shaper, do it.</p>
+<p>FQ-CoDel 是一种非整形（工作守恒）策略，因此仅当您的出站接口真正满载时才有效。如果接口未满载，VyOS 将无法控制该队列，FQ-CoDel 也将无效。如果物理链路上尚有带宽可用，您可以将 FQ-CoDel 嵌入一个分层整形策略中，以确保其获得队列控制权。如果您不确定是否需要将 FQ-CoDel 策略嵌入整形器（Shaper）中，请执行嵌入操作。</p>
 </div>
-<p>FQ-CoDel is tuned to run ok with its default parameters at 10Gbit
-speeds. It might work ok too at other speeds without configuring
-anything, but here we will explain some cases when you might want to
-tune its parameters.</p>
-<p>When running it at 1Gbit and lower, you may want to reduce the
-<code class="docutils literal notranslate">queue-limit</code> to 1000 packets or less. In rates like 10Mbit, you may
-want to set it to 600 packets.</p>
-<p>If you are using FQ-CoDel embedded into Shaper and you have large rates
-(100Mbit and above), you may consider increasing <code class="docutils literal notranslate">quantum</code> to 8000 or
-higher so that the scheduler saves CPU.</p>
-<p>On low rates (below 40Mbit) you may want to tune <code class="docutils literal notranslate">quantum</code> down to
-something like 300 bytes.</p>
-<p>At very low rates (below 3Mbit), besides tuning <code class="docutils literal notranslate">quantum</code> (300 keeps
-being ok) you may also want to increase <code class="docutils literal notranslate">target</code> to something like 15ms
-and increase <code class="docutils literal notranslate">interval</code> to something around 150 ms.</p>
+<p>FQ-CoDel 经过调优，可在 10Gbit 速率下使用其默认参数正常运行。在其他速率下，即使不进行任何配置也可能正常工作，但此处我们将解释一些您可能需要调整其参数的情形。</p>
+<p>在 1Gbit 及更低速率下运行时，您可能希望将 <code class="docutils literal notranslate">queue-limit</code> 减小至 1000 个数据包或更少。在 10Mbit 这样的速率下，您可能希望将其设为 600 个数据包。</p>
+<p>如果您将 FQ-CoDel 嵌入整形器（Shaper）中，并且速率较高（100Mbit 及以上），您可考虑将 <code class="docutils literal notranslate">quantum</code> 增加至 8000 或更高，以节省 CPU 资源。</p>
+<p>在较低速率（低于 40Mbit）下，您可能希望将 <code class="docutils literal notranslate">quantum</code> 调整至约 300 字节。</p>
+<p>在极低速率（低于 3Mbit）下，除了调整 <code class="docutils literal notranslate">quantum</code>（300 字节仍适用）外，您还可将 <code class="docutils literal notranslate">target</code> 增加至约 15 毫秒，并将 <code class="docutils literal notranslate">interval</code> 增加至约 150 毫秒。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy fq-codel <policy name> codel-quantum <bytes>
+set qos policy fq-codel &lt;policy name&gt; codel-quantum &lt;bytes&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-codel-quantum-bytes" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure an fq-codel policy, set its name and
-the maximum number of bytes (default: 1514) to be dequeued from a
-queue at once.</p>
+<p>使用此命令配置一个 fq-codel 策略，设置其名称以及每次从一个队列中出队的最大字节数（默认值：1514）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy fq-codel <policy name> flows <number-of-flows>
+set qos policy fq-codel &lt;policy name&gt; flows &lt;number-of-flows&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-flows-number-of-flows" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure an fq-codel policy, set its name and
-the number of sub-queues (default: 1024) into which packets are
-classified.</p>
+<p>使用此命令配置一个 fq-codel 策略，设置其名称以及数据包被分类到的子队列数量（默认值：1024）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy fq-codel <policy name> interval <milliseconds>
+set qos policy fq-codel &lt;policy name&gt; interval &lt;milliseconds&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-interval-milliseconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure an fq-codel policy, set its name and
-the time period used by the control loop of CoDel to detect when a
-persistent queue is developing, ensuring that the measured minimum
-delay does not become too stale (default: 100ms).</p>
+<p>使用此命令配置一个 fq-codel 策略，设置其名称以及 CoDel 控制循环用于检测持久队列形成的时间周期，确保所测得的最小延迟不会变得过于陈旧（默认值：100 毫秒）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy fq-codel <policy-name> queue-limit <number-of-packets>
+set qos policy fq-codel &lt;policy-name&gt; queue-limit &lt;number-of-packets&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-queue-limit-number-of-packets" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure an fq-codel policy, set its name, and
-define a hard limit on the real queue size. When this limit is
-reached, new packets are dropped (default: 10240 packets).</p>
+<p>使用此命令配置一个 fq-codel 策略，设置其名称，并定义真实队列大小的硬性上限。当达到此上限时，新数据包将被丢弃（默认值：10240 个数据包）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy fq-codel <policy-name> target <milliseconds>
+set qos policy fq-codel &lt;policy-name&gt; target &lt;milliseconds&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-fq-codel-policy-name-target-milliseconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure an fq-codel policy, set its name, and
-define the acceptable minimum standing/persistent queue delay. This
-minimum delay is identified by tracking the local minimum queue delay
-that packets experience (default: 5ms).</p>
+<p>使用此命令配置一个 fq-codel 策略，设置其名称，并定义可接受的最小持续/持久队列延迟。该最小延迟通过跟踪数据包经历的本地最小队列延迟来识别（默认值：5 毫秒）。</p>
 </div>
 </div>
 <section id="example">
 <h5>示例</h5>
-<p>A simple example of an FQ-CoDel policy working inside a Shaper one.</p>
+<p>一个简单的 FQ-CoDel 策略嵌入整形器（Shaper）策略中的示例。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper FQ-CODEL-SHAPER bandwidth 2gbit
 set qos policy shaper FQ-CODEL-SHAPER default bandwidth 100%
 set qos policy shaper FQ-CODEL-SHAPER default queue-type fq-codel
@@ -737,371 +600,278 @@ set qos policy shaper FQ-CODEL-SHAPER default queue-type fq-codel
 </section>
 </section>
 <section id="limiter">
-<h4>Limiter</h4>
+<h4>限速器（Limiter）</h4>
 <div class="line-block">
-<div class="line"><strong>Queueing discipline:</strong> Ingress policer.</div>
-<div class="line"><strong>Applies to:</strong> Inbound traffic.</div>
+<div class="line"><strong>排队机制：</strong> 入站流量整形器（Ingress policer）。</div>
+<div class="line"><strong>适用对象：</strong> 入站流量。</div>
 </div>
-<p>Limiter is one of those policies that uses classes (Ingress qdisc is
-actually a classless policy but filters do work in it).</p>
-<p>The limiter performs basic ingress policing of traffic flows. Multiple
-classes of traffic 可以 defined and traffic limits 可以 applied to
-each class. Although the policer uses a token bucket mechanism
-internally, it does not have the capability to delay a packet as a
-shaping mechanism does. 流量 exceeding the defined bandwidth limits
-is directly dropped. A maximum allowed burst 可以 configured too.</p>
-<p>You can configure classes (up to 4090) with different settings and a
-default policy which 将 applied to any traffic not matching any of
-the configured classes.</p>
+<p>限速器是使用类别的策略之一（入站 qdisc 实际上是一个无类别策略，但过滤器在其内部有效）。</p>
+<p>限速器对流量流执行基本的入站流量监管。可以定义多个流量类别，并为每个类别应用流量限制。尽管该整形器内部使用令牌桶机制，但它不具备像整形机制那样延迟数据包的能力。超出定义带宽限制的流量将被直接丢弃。最大允许突发量也可进行配置。</p>
+<p>您可以配置多达 4090 个具有不同设置的类别，以及一个默认策略，该策略将应用于任何未匹配任何已配置类别的流量。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>In the case you want to apply some kind of <strong>shaping</strong> to your
-<strong>inbound</strong> traffic, check the ingress-shaping section.</p>
+<p>如果您希望对<strong>入站</strong>流量应用某种<strong>整形</strong>，请参阅入站整形（ingress-shaping）部分。</p>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy limiter <policy-name> class <class ID> match <match-name> description <description>
+set qos policy limiter &lt;policy-name&gt; class &lt;class ID&gt; match &lt;match-name&gt; description &lt;description&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-limiter-policy-name-class-class-id-match-match-name-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure an Ingress Policer, defining its name,
-a class identifier (1-4090), a class matching rule name and its
-description.</p>
+<p>使用此命令配置入站整形器（Ingress Policer），定义其名称、类别标识符（1-4090）、类别匹配规则名称及其描述。</p>
 </div>
 </div>
-<p>Once the matching rules are set for a class, you can start configuring
-how you want matching traffic to behave.</p>
+<p>为类别设置匹配规则后，您即可开始配置匹配流量的行为方式。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy limiter <policy-name> class <class-ID> bandwidth <rate>
+set qos policy limiter &lt;policy-name&gt; class &lt;class-ID&gt; bandwidth &lt;rate&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-limiter-policy-name-class-class-id-bandwidth-rate" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure an Ingress Policer, defining its name,
-a class identifier (1-4090) and the maximum allowed bandwidth for
-this class.</p>
+<p>使用此命令配置入站整形器（Ingress Policer），定义其名称、类别标识符（1-4090）以及该类别的最大允许带宽。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy limiter <policy-name> class <class-ID> burst <burst-size>
+set qos policy limiter &lt;policy-name&gt; class &lt;class-ID&gt; burst &lt;burst-size&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-limiter-policy-name-class-class-id-burst-burst-size" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure an Ingress Policer, defining its name,
-a class identifier (1-4090) and the burst size in bytes for this
-class (default: 15).</p>
+<p>使用此命令配置入站整形器（Ingress Policer），定义其名称、类别标识符（1-4090）以及该类别的突发大小（字节）（默认值：15）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy limiter <policy-name> default bandwidth <rate>
+set qos policy limiter &lt;policy-name&gt; default bandwidth &lt;rate&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-limiter-policy-name-default-bandwidth-rate" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure an Ingress Policer, defining its name
-and the maximum allowed bandwidth for its default policy.</p>
+<p>使用此命令配置入站整形器（Ingress Policer），定义其名称以及默认策略的最大允许带宽。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy limiter <policy-name> default burst <burst-size>
+set qos policy limiter &lt;policy-name&gt; default burst &lt;burst-size&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-limiter-policy-name-default-burst-burst-size" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure an Ingress Policer, defining its name
-and the burst size in bytes (default: 15) for its default policy.</p>
+<p>使用此命令配置入站整形器（Ingress Policer），定义其名称以及默认策略的突发大小（字节）（默认值：15）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy limiter <policy-name> class <class ID> priority <value>
+set qos policy limiter &lt;policy-name&gt; class &lt;class ID&gt; priority &lt;value&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-limiter-policy-name-class-class-id-priority-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure an Ingress Policer, defining its name,
-a class identifier (1-4090), and the priority (0-20, default 20) in
-which the rule is evaluated (the lower the number, the higher the
-priority).</p>
+<p>使用此命令配置入站整形器（Ingress Policer），定义其名称、类别标识符（1-4090）以及规则评估的优先级（0-20，默认值：20）（数值越小，优先级越高）。</p>
 </div>
 </div>
 </section>
 <section id="network-emulator">
-<h4>网络 Emulator</h4>
+<h4>网络仿真器（Network Emulator）</h4>
 <div class="line-block">
-<div class="line"><strong>Queueing discipline:</strong> netem (网络 Emulator) + TBF (Token Bucket 过滤器).</div>
-<div class="line"><strong>Applies to:</strong> Outbound traffic.</div>
+<div class="line"><strong>排队机制：</strong> netem（网络仿真器） + TBF（令牌桶过滤器）。</div>
+<div class="line"><strong>适用对象：</strong> 出站流量。</div>
 </div>
-<p>VyOS 网络 Emulator policy emulates the conditions you can suffer in a
-real network. You 将 able to configure things like rate, burst,
-delay, packet loss, packet corruption or packet reordering.</p>
-<p>This 可能 helpful if you want to test how an application behaves
-under certain network conditions.</p>
+<p>VyOS 网络仿真器策略可模拟真实网络中可能遇到的各种条件。您可配置诸如速率、突发、延迟、数据包丢失、数据包损坏或数据包重排序等参数。</p>
+<p>如果您希望测试应用程序在特定网络条件下的行为，此功能将非常有用。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy network-emulator <policy-name> bandwidth <rate>
+set qos policy network-emulator &lt;policy-name&gt; bandwidth &lt;rate&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-network-emulator-policy-name-bandwidth-rate" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure the maximum rate at which traffic will
-be shaped in a 网络 Emulator policy. Define the name of the policy
-and the rate.</p>
+<p>使用此命令配置网络仿真器策略中流量整形的最大速率。定义策略名称及速率。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy network-emulator <policy-name> burst <burst-size>
+set qos policy network-emulator &lt;policy-name&gt; burst &lt;burst-size&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-network-emulator-policy-name-burst-burst-size" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure the burst size of the traffic in a
-网络 Emulator policy. Define the name of the 网络 Emulator
-policy and its traffic burst size (it 将 configured through the
-Token Bucket 过滤器 qdisc). 默认:15kb. It will only take effect if
-you have configured its bandwidth too.</p>
+<p>使用此命令配置网络仿真器策略中流量的突发大小。定义网络仿真器策略名称及其流量突发大小（将通过令牌桶过滤器 qdisc 进行配置）。默认值：15kb。仅当您同时配置了其带宽时，该设置才生效。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy network-emulator <policy-name> delay <delay>
+set qos policy network-emulator &lt;policy-name&gt; delay &lt;delay&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-network-emulator-policy-name-delay-delay" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a 网络 Emulator policy defining its
-name and the fixed amount of time you want to add to all packet going
-out of the interface. The latency 将 added through the
-Token Bucket 过滤器 qdisc. It will only take effect if you have
-configured its bandwidth too. You can use secs, ms and us. 默认:
-50ms.</p>
+<p>使用此命令配置网络仿真器策略，定义其名称以及希望添加到所有从接口发出的数据包上的固定延迟时间。延迟将通过令牌桶过滤器 qdisc 添加。仅当您同时配置了其带宽时，该设置才生效。您可以使用秒（secs）、毫秒（ms）和微秒（us）。默认值：50ms。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy network-emulator <policy-name> corruption <percent>
+set qos policy network-emulator &lt;policy-name&gt; corruption &lt;percent&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-network-emulator-policy-name-corruption-percent" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to emulate noise in a 网络 Emulator policy. 设置
-the policy name and the percentage of corrupted packets you want. A
-random error 将 introduced in a random position for the chosen
-percent of packets.</p>
+<p>使用此命令在 网络仿真器策略中模拟噪声。设置策略名称以及您希望损坏的数据包百分比。对于所选百分比的数据包，将在随机位置引入随机错误。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy network-emulator <policy-name> loss <percent>
+set qos policy network-emulator &lt;policy-name&gt; loss &lt;percent&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-network-emulator-policy-name-loss-percent" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to emulate packet-loss conditions in a 网络
-Emulator policy. 设置 the policy name and the percentage of loss
-packets your traffic will suffer.</p>
+<p>使用此命令在 网络仿真器策略中模拟数据包丢失情况。设置策略名称以及您的流量将遭受的数据包丢失百分比。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set traffic-policy network-emulator <policy-name> reordering <percent>
+set traffic-policy network-emulator &lt;policy-name&gt; reordering &lt;percent&gt;
 <a class="cmdlink" href="#cfgcmd-set-traffic-policy-network-emulator-policy-name-reordering-percent" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to emulate packet-reordering conditions in a 网络
-Emulator policy. 设置 the policy name and the percentage of reordered
-packets your traffic will suffer.</p>
+<p>使用此命令在 网络仿真器策略中模拟数据包重排序情况。设置策略名称以及您的流量将遭受的数据包重排序百分比。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set traffic-policy network-emulator <policy-name> queue-limit <limit>
+set traffic-policy network-emulator &lt;policy-name&gt; queue-limit &lt;limit&gt;
 <a class="cmdlink" href="#cfgcmd-set-traffic-policy-network-emulator-policy-name-queue-limit-limit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to define the length of the queue of your 网络
-Emulator policy. 设置 the policy name and the maximum number of
-packets (1-4294967295) the queue may hold queued at a time.</p>
+<p>使用此命令定义您的网络仿真器策略的队列长度。设置策略名称以及队列一次可容纳的最大数据包数量（1-4294967295）。</p>
 </div>
 </div>
 </section>
 <section id="priority-queue">
-<h4>优先级 Queue</h4>
+<h4>优先级队列（Priority Queue）</h4>
 <div class="line-block">
-<div class="line"><strong>Queueing discipline:</strong> PRIO.</div>
-<div class="line"><strong>Applies to:</strong> Outbound traffic.</div>
+<div class="line"><strong>排队机制：</strong> PRIO。</div>
+<div class="line"><strong>适用对象：</strong> 出站流量。</div>
 </div>
-<p>The 优先级 Queue is a classful scheduling policy. It does not delay
-packets (优先级 Queue is not a shaping policy), it simply dequeues
-packets according to their priority.</p>
+<p>优先级队列是一种分层调度策略。它不会延迟数据包（优先级队列不是一种整形策略），而是根据数据包的优先级顺序进行出队。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>优先级 Queue, as other non-shaping policies, is only useful
-if your outgoing interface is really full. If it is not, VyOS will
-not own the queue and 优先级 Queue will have no effect. If there is
-bandwidth available on the physical link, you can embed 优先级
-Queue into a classful shaping policy to make sure it owns the queue.
-In that case packets 可以 prioritized based on DSCP.</p>
+<p>与其他非整形策略一样，优先级队列仅在您的出站接口真正满载时才有效。如果接口未满载，VyOS 将无法控制该队列，优先级队列也将无效。如果物理链路上尚有带宽可用，您可以将优先级队列嵌入一个分层整形策略中，以确保其获得队列控制权。在这种情况下，数据包可根据 DSCP 进行优先级排序。</p>
 </div>
-<p>Up to seven queues -defined as classes with different priorities- can
-be configured. 数据包s are placed into queues based on associated match
-criteria. 数据包s are transmitted from the queues in priority order. If
-classes with a higher priority are being filled with packets
-continuously, packets from lower priority classes will only be
-transmitted after traffic volume from higher priority classes decreases.</p>
+<p>最多可配置七个队列——定义为具有不同优先级的类别。数据包根据关联的匹配条件被放入队列。数据包按优先级顺序从队列中传输。如果高优先级类别持续接收数据包，则低优先级类别的数据包仅在高优先级类别流量减少后才能被传输。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>In 优先级 Queue we do not define classes with a meaningless
-class ID number but with a class priority number (1-7). The lower the
-number, the higher the priority.</p>
+<p>在优先级队列中，我们不使用无意义的类别 ID 编号，而是使用类别优先级编号（1-7）。数值越小，优先级越高。</p>
 </div>
-<p>As with other policies, you can define different type of matching rules
-for your classes:</p>
+<p>与其他策略一样，您可以为类别定义不同类型的匹配规则：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# set qos policy priority-queue MY-PRIO class 3 match MY-MATCH-RULE 
 Possible completions:
-   description  Description
- > ether        Ethernet header match
-   interface    Interface to use
- > ip           Match IP protocol header
- > ipv6         Match IPV6 protocol header
-   mark         Match on mark applied by firewall
-   vif          Virtual Local Area Network (VLAN) ID for this match
+   description  描述
+ &gt; ether        以太网头部匹配
+   interface    要使用的接口
+ &gt; ip           匹配 IP 协议头部
+ &gt; ipv6         匹配 IPv6 协议头部
+   mark         匹配防火墙施加的标记
+   vif          此匹配的虚拟局域网（VLAN）ID
 </pre></div>
 </div>
-<p>As with other policies, you can embed other policies into the classes
-(and default) of your 优先级 Queue policy through the <code class="docutils literal notranslate">queue-type</code>
-setting:</p>
+<p>与其他策略一样，您可通过 <code class="docutils literal notranslate">queue-type</code>
+设置将其他策略嵌入优先级队列策略的类别（及默认类别）中：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# set qos policy priority-queue MY-PRIO class 3 queue-type 
 Possible completions:
-   drop-tail    First-In-First-Out (FIFO) (default)
-   fq-codel     Fair Queue Codel
-   fair-queue   Stochastic Fair Queue (SFQ)
-   priority     Priority queueing
+   drop-tail    先进先出（FIFO）（默认）
+   fq-codel     公平队列 CoDel
+   fair-queue   随机公平队列（SFQ）
+   priority     优先级队列
    random-detect
-                Random Early Detection (RED)
+                随机早期检测（RED）
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy priority-queue <policy-name> class <class-ID> queue-limit <limit>
+set qos policy priority-queue &lt;policy-name&gt; class &lt;class-ID&gt; queue-limit &lt;limit&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-priority-queue-policy-name-class-class-id-queue-limit-limit" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Priority Queue policy, set its name,
-set a class with a priority from 1 to 7 and define a hard limit on
-the real queue size. When this limit is reached, new packets are
-dropped.</p>
+<p>使用此命令配置优先级队列策略，设置其名称、设置一个优先级为 1 至 7 的类别，并定义真实队列大小的硬性上限。当达到此上限时，新数据包将被丢弃。</p>
 </div>
 </div>
 </section>
 <section id="random-detect">
-<h4>Random-Detect</h4>
+<h4>随机检测（Random-Detect）</h4>
 <div class="line-block">
-<div class="line"><strong>Queueing discipline:</strong> Generalized Random Early 丢弃.</div>
-<div class="line"><strong>Applies to:</strong> Outbound traffic.</div>
+<div class="line"><strong>排队机制：</strong> 广义随机早期丢弃（Generalized Random Early Drop）。</div>
+<div class="line"><strong>适用对象：</strong> 出站流量。</div>
 </div>
-<p>A simple Random Early Detection (RED) policy would start randomly
-dropping packets from a queue before it reaches its queue limit thus
-avoiding congestion. That is good for TCP connections as the gradual
-dropping of packets acts as a signal for the sender to decrease its
-transmission rate.</p>
-<p>In contrast to simple RED, VyOS’ Random-Detect uses a Generalized Random
-Early Detect policy that provides different virtual queues based on the
-IP Precedence value so that some virtual queues can drop more packets
-than others.</p>
-<p>This is achieved by using the first three bits of the ToS (类型 of
-服务) field to categorize data streams and, in accordance with the
-defined precedence parameters, a decision is made.</p>
-<p>IP precedence as defined in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc791.html"><strong>RFC 791</strong></a>:</p>
+<p>一个简单的随机早期检测（RED）策略会在队列达到其上限之前就开始随机丢弃数据包，从而避免拥塞。这对 TCP 连接是有益的，因为逐步丢弃数据包可作为信号，促使发送方降低其传输速率。</p>
+<p>与简单的 RED 相比，VyOS 的随机检测（Random-Detect）使用广义随机早期检测（Generalized Random Early Detect）策略，该策略根据 IP 优先级值提供不同的虚拟队列，使得某些虚拟队列可以比其他队列丢弃更多的数据包。</p>
+<p>这是通过使用服务类型（ToS）字段的前三位来对数据流进行分类，并根据定义的优先级参数做出决策来实现的。</p>
+<p>IP 优先级定义见 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc791.html"><strong>RFC 791</strong></a>：</p>
 <blockquote>
 <div><table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head"><p>Precedence</p></th>
-<th class="head"><p>优先级</p></th>
+<tr class="row-odd"><th class="head"><p>优先级</p></th>
+<th class="head"><p>优先级说明</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>7</p></td>
-<td><p>网络 Control</p></td>
+<td><p>网络控制</p></td>
 </tr>
 <tr class="row-odd"><td><p>6</p></td>
-<td><p>Internetwork Control</p></td>
+<td><p>网间控制</p></td>
 </tr>
 <tr class="row-even"><td><p>5</p></td>
-<td><p>CRITIC/ECP</p></td>
+<td><p>关键/紧急（CRITIC/ECP）</p></td>
 </tr>
 <tr class="row-odd"><td><p>4</p></td>
-<td><p>Flash 覆盖</p></td>
+<td><p>闪断覆盖（Flash Override）</p></td>
 </tr>
 <tr class="row-even"><td><p>3</p></td>
-<td><p>Flash</p></td>
+<td><p>闪断（Flash）</p></td>
 </tr>
 <tr class="row-odd"><td><p>2</p></td>
-<td><p>Immediate</p></td>
+<td><p>立即（Immediate）</p></td>
 </tr>
 <tr class="row-even"><td><p>1</p></td>
-<td><p>优先级</p></td>
+<td><p>优先（Priority）</p></td>
 </tr>
 <tr class="row-odd"><td><p>0</p></td>
-<td><p>Routine</p></td>
+<td><p>常规（Routine）</p></td>
 </tr>
 </tbody>
 </table>
 </div></blockquote>
-<p>Random-Detect 可能 useful for heavy traffic. One use of this
-algorithm 可能 to prevent a backbone overload. But only for TCP
-(because dropped packets 可能 retransmitted), not for UDP.</p>
+<p>随机检测（Random-Detect）可能对高流量场景有用。该算法的一种用途可能是防止骨干网过载。但仅适用于 TCP（因为丢弃的数据包可被重传），不适用于 UDP。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy random-detect <policy-name> bandwidth <bandwidth>
+set qos policy random-detect &lt;policy-name&gt; bandwidth &lt;bandwidth&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-random-detect-policy-name-bandwidth-bandwidth" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Random-Detect policy, set its name
-and set the available bandwidth for this policy. It is used for
-calculating the average queue size after some idle time. It should be
-set to the bandwidth of your interface. Random Detect is not a
-shaping policy, this command will not shape.</p>
+<p>使用此命令配置随机检测（Random-Detect）策略，设置其名称并设置该策略的可用带宽。该参数用于在空闲一段时间后计算平均队列大小。应将其设置为接口的带宽。随机检测不是一种整形策略，此命令不会进行整形。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy random-detect <policy-name> precedence <IP-precedence-value> average-packet <bytes>
+set qos policy random-detect &lt;policy-name&gt; precedence &lt;IP-precedence-value&gt; average-packet &lt;bytes&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-random-detect-policy-name-precedence-ip-precedence-value-average-packet-bytes" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Random-Detect policy and set its
-name, then state the IP Precedence for the virtual queue you are
-configuring and what the size of its average-packet 应该
-(in bytes, default: 1024).</p>
+<p>使用此命令配置随机检测（Random-Detect）策略并设置其名称，然后声明您正在配置的虚拟队列的 IP 优先级以及其平均数据包大小（字节，默认值：1024）。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>When configuring a Random-Detect policy: <strong>the higher the
-precedence number, the higher the priority</strong>.</p>
+<p>配置随机检测（Random-Detect）策略时：<strong>优先级数值越大，优先级越高</strong>。</p>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy random-detect <policy-name> precedence <IP-precedence-value> mark-probability <value>
+set qos policy random-detect &lt;policy-name&gt; precedence &lt;IP-precedence-value&gt; mark-probability &lt;value&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-random-detect-policy-name-precedence-ip-precedence-value-mark-probability-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Random-Detect policy and set its
-name, then state the IP Precedence for the virtual queue you are
-configuring and what its mark (drop) probability 将. 设置 the
-probability by giving the N value of the fraction 1/N (default: 10).</p>
+<p>使用此命令配置随机检测（Random-Detect）策略并设置其名称，然后声明您正在配置的虚拟队列的 IP 优先级以及其标记（丢弃）概率。通过给出分数 1/N 中的 N 值来设置概率（默认值：10）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy random-detect <policy-name> precedence <IP-precedence-value> maximum-threshold <packets>
+set qos policy random-detect &lt;policy-name&gt; precedence &lt;IP-precedence-value&gt; maximum-threshold &lt;packets&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-random-detect-policy-name-precedence-ip-precedence-value-maximum-threshold-packets" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Random-Detect policy and set its
-name, then state the IP Precedence for the virtual queue you are
-configuring and what its maximum threshold for random detection will
-be (from 0 to 4096 packets, default: 18). At this size, the marking
-(drop) probability is maximal.</p>
+<p>使用此命令配置随机检测（Random-Detect）策略并设置其名称，然后声明您正在配置的虚拟队列的 IP 优先级以及其随机检测的最大阈值（0 至 4096 个数据包，默认值：18）。在此大小时，标记（丢弃）概率达到最大值。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy random-detect <policy-name> precedence <IP-precedence-value> minimum-threshold <packets>
+set qos policy random-detect &lt;policy-name&gt; precedence &lt;IP-precedence-value&gt; minimum-threshold &lt;packets&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-random-detect-policy-name-precedence-ip-precedence-value-minimum-threshold-packets" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Random-Detect policy and set its
-name, then state the IP Precedence for the virtual queue you are
-configuring and what its minimum threshold for random detection will
-be (from 0 to 4096 packets).  If this value is exceeded, packets
-start being eligible for being dropped.</p>
+<p>使用此命令配置随机检测（Random-Detect）策略并设置其名称，然后声明您正在配置的虚拟队列的 IP 优先级以及其随机检测的最小阈值（0 至 4096 个数据包）。如果超过此值，数据包将开始有资格被丢弃。</p>
 </div>
 </div>
-<p>The default values for the minimum-threshold depend on IP precedence:</p>
+<p>最小阈值（minimum-threshold）的默认值取决于 IP 优先级：</p>
 <blockquote>
 <div><table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head"><p>Precedence</p></th>
-<th class="head"><p>default min-threshold</p></th>
+<tr class="row-odd"><th class="head"><p>优先级</p></th>
+<th class="head"><p>默认最小阈值</p></th>
 </tr>
 </thead>
 <tbody>
@@ -1135,436 +905,50 @@ start being eligible for being dropped.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy random-detect <policy-name> precedence <IP-precedence-value> queue-limit <packets>
+set qos policy random-detect &lt;policy-name&gt; precedence &lt;IP-precedence-value&gt; queue-limit &lt;packets&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-random-detect-policy-name-precedence-ip-precedence-value-queue-limit-packets" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Random-Detect policy and set its
-name, then name the IP Precedence for the virtual queue you are
-configuring and what the maximum size of its queue 将 (from 1 to
-1-4294967295 packets). 数据包s are dropped when the current queue
-length reaches this value.</p>
+<p>使用此命令配置随机检测（Random-Detect）策略并设置其名称，然后声明您正在配置的虚拟队列的 IP 优先级以及其队列的最大大小（1 至 4294967295 个数据包）。当当前队列长度达到此值时，数据包将被丢弃。</p>
 </div>
 </div>
-<p>If the average queue size is lower than the <strong>min-threshold</strong>, an
-arriving packet 将 placed in the queue.</p>
-<p>In the case the average queue size is between <strong>min-threshold</strong> and
-<strong>max-threshold</strong>, then an arriving packet 将 either dropped or
-placed in the queue, it will depend on the defined <strong>mark-probability</strong>.</p>
-<p>If the current queue size is larger than <strong>queue-limit</strong>,
-then packets 将 dropped. The average queue size depends on its
-former average size and its current one.</p>
-<p>If <strong>max-threshold</strong> is set but <strong>min-threshold is not, then
-**min-threshold</strong> is scaled to 50% of <strong>max-threshold</strong>.</p>
-<p>In principle, values 必须
-<code class="code docutils literal notranslate">min-threshold</code> < <code class="code docutils literal notranslate">max-threshold</code> < <code class="code docutils literal notranslate">queue-limit</code>.</p>
+<p>如果平均队列大小低于 <strong>最小阈值（min-threshold）</strong>，则到达的数据包将被放入队列中。</p>
+<p>如果平均队列大小介于 <strong>最小阈值（min-threshold）</strong> 和 <strong>最大阈值（max-threshold）</strong> 之间，则到达的数据包将根据定义的 <strong>标记概率（mark-probability）</strong> 被丢弃或放入队列中。</p>
+<p>如果当前队列大小大于 <strong>队列上限（queue-limit）</strong>，则数据包将被丢弃。平均队列大小取决于其先前的平均大小和当前大小。</p>
+<p>如果设置了 <strong>最大阈值（max-threshold）</strong> 但未设置 <strong>最小阈值（min-threshold）</strong>，则 <strong>最小阈值（min-threshold）</strong> 将按 <strong>最大阈值（max-threshold）</strong> 的 50% 进行缩放。</p>
+<p>原则上，数值必须满足：
+<code class="code docutils literal notranslate">min-threshold</code> &lt; <code class="code docutils literal notranslate">max-threshold</code> &lt; <code class="code docutils literal notranslate">queue-limit</code>。</p>
 </section>
 <section id="rate-control">
-<h4>Rate Control</h4>
+<h4>速率控制（Rate Control）</h4>
 <div class="line-block">
-<div class="line"><strong>Queueing discipline:</strong> Token Bucket 过滤器.</div>
-<div class="line"><strong>Applies to:</strong> Outbound traffic.</div>
+<div class="line"><strong>排队机制：</strong> 令牌桶过滤器（Token Bucket Filter）。</div>
+<div class="line"><strong>适用对象：</strong> 出站流量。</div>
 </div>
-<p>Rate-Control is a classless policy that limits the packet flow to a set
-rate. It is a pure shaper, it does not schedule traffic. 流量 is
-filtered based on the expenditure of tokens. Tokens roughly correspond
-to bytes.</p>
-<p>Short bursts 可以 allowed to exceed the limit. On creation, the
-Rate-Control traffic is stocked with tokens which correspond to the
-amount of traffic that 可以 burst in one go. Tokens arrive at a steady
-rate, until the bucket is full.</p>
+<p>速率控制是一种无类别策略，它将数据包流限制在设定的速率。它是一种纯粹的整形器，不进行流量调度。流量基于令牌的消耗进行过滤。令牌大致对应于字节。</p>
+<p>短时间突发可允许超过限制。在创建时，速率控制流量被赋予一定数量的令牌，这些令牌对应于一次性可突发的流量数量。令牌以稳定速率到达，直至令牌桶满为止。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy rate-control <policy-name> bandwidth <rate>
+set qos policy rate-control &lt;policy-name&gt; bandwidth &lt;rate&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-rate-control-policy-name-bandwidth-rate" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Rate-Control policy, set its name
-and the rate limit you want to have.</p>
+<p>使用此命令配置速率控制（Rate-Control）策略，设置其名称及您希望设定的速率限制。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy rate-control <policy-name> burst <burst-size>
+set qos policy rate-control &lt;policy-name&gt; burst &lt;burst-size&gt;
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-rate-control-policy-name-burst-burst-size" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Rate-Control policy, set its name
-and the size of the bucket in bytes which 将 available for
-burst.</p>
+<p>使用此命令配置速率控制（Rate-Control）策略，设置其名称及可用于突发的令牌桶大小（字节）。</p>
 </div>
 </div>
-<p>As a reference: for 10mbit/s on Intel, you might need at least 10kbyte
-buffer if you want to reach your configured rate.</p>
-<p>A very small buffer will soon start dropping packets.</p>
+<p>参考值：在 Intel 平台上，若要达到 10mbit/s 的配置速率，您可能至少需要 10k 字节的缓冲区。</p>
+<p>缓冲区过小将很快开始丢弃数据包。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set qos policy rate-control <policy-name> latency
+set qos policy rate-control &lt;policy-name&gt; latency
 <a class="cmdlink" href="#cfgcmd-set-qos-policy-rate-control-policy-name-latency" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Rate-Control policy, set its name
-and the maximum amount of time a packet 可以 queued (default: 50
-ms).</p>
+<p>使用此命令配置速率控制（Rate-Control）策略，设置其名称及数据包在队列中可等待的最大时间（默认值：50 毫秒）。</p>
 </div>
 </div>
-<p>Rate-Control is a CPU-friendly policy. You might consider using it when
-you just simply want to slow traffic down.</p>
-</section>
-<section id="round-robin">
-<h4>Round Robin</h4>
-<p><strong>Queueing discipline:</strong>
-Deficit Round Robin.
-<strong>Applies to:</strong>
-Outbound traffic.</p>
-<p>The round-robin policy is a classful scheduler that divides traffic in
-different classes you can configure (up to 4096). You can embed a
-new policy into each of those classes (default included).</p>
-<p>Each class is assigned a deficit counter (the number of bytes that a
-flow is allowed to transmit when it is its turn) initialized to quantum.
-Quantum is a parameter you configure which acts like a credit of fix
-bytes the counter receives on each round. Then the Round-Robin policy
-starts moving its Round Robin pointer through the queues. If the deficit
-counter is greater than the packet’s size at the head of the queue, this
-packet 将 sent and the value of the counter 将 decremented by
-the packet size. Then, the size of the next packet 将 compared to
-the counter value again, repeating the process. Once the queue is empty
-or the value of the counter is insufficient, the Round-Robin pointer
-will move to the next queue. If the queue is empty, the value of the
-deficit counter is reset to 0.</p>
-<p>At every round, the deficit counter adds the quantum so that even large
-packets will have their opportunity to be dequeued.</p>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy round-robin <policy name> class <class-ID> quantum <packets>
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-round-robin-policy-name-class-class-id-quantum-packets" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Round-Robin policy, set its name, set
-a class ID, and the quantum for that class. The deficit counter will
-add that value each round.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy round-robin <policy name> class <class id> queue-limit <packets>
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-round-robin-policy-name-class-class-id-queue-limit-packets" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Round-Robin policy, set its name, set
-a class ID, and the queue size in packets.</p>
-</div>
-</div>
-<p>As with other policies, Round-Robin can embed another policy into a
-class through the <code class="docutils literal notranslate">queue-type</code> setting.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# set qos policy round-robin DRR class 10 queue-type 
-Possible completions:
-   drop-tail    First-In-First-Out (FIFO) (default)
-   fq-codel     Fair Queue Codel
-   fair-queue   Stochastic Fair Queue (SFQ)
-   priority     Priority queueing based
-   random-detect
-                Random Early Detection (RED)
-</pre></div>
-</div>
-</section>
-<section id="shaper">
-<h4>Shaper</h4>
-<div class="line-block">
-<div class="line"><strong>Queueing discipline:</strong> Hierarchical Token Bucket.</div>
-<div class="line"><strong>Applies to:</strong> Outbound traffic.</div>
-</div>
-<p>The Shaper policy does not guarantee a low delay, but it does guarantee
-bandwidth to different traffic classes and also lets you decide how to
-allocate more traffic once the guarantees are met.</p>
-<p>Each class can have a guaranteed part of the total bandwidth defined for
-the whole policy, so all those shares together should not be higher
-than the policy’s whole bandwidth.</p>
-<p>If guaranteed traffic for a class is met and there is room for more
-traffic, the ceiling parameter 可以用于 set how much more
-bandwidth 可能 used. If guaranteed traffic is met and there are
-several classes willing to use their ceilings, the priority parameter
-will establish the order in which that additional traffic 将
-allocated. 优先级 可以 any number from 0 to 7. The lower the number,
-the higher the priority.</p>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy shaper <policy-name> bandwidth <rate>
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-shaper-policy-name-bandwidth-rate" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Shaper policy, set its name
-and the maximum bandwidth for all combined traffic.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy shaper <policy-name> class <class-ID> bandwidth <rate>
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-shaper-policy-name-class-class-id-bandwidth-rate" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Shaper policy, set its name, define
-a class and set the guaranteed traffic you want to allocate to that
-class.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy shaper <policy-name> class <class-ID> burst <bytes>
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-shaper-policy-name-class-class-id-burst-bytes" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Shaper policy, set its name, define
-a class and set the size of the token bucket in bytes, which will
-be available to be sent at ceiling speed (default: 15Kb).</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy shaper <policy-name> class <class-ID> ceiling <bandwidth>
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-shaper-policy-name-class-class-id-ceiling-bandwidth" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Shaper policy, set its name, define
-a class and set the maximum speed possible for this class. The
-default ceiling value is the bandwidth value.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy shaper <policy-name> class <class-ID> priority <0-7>
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-shaper-policy-name-class-class-id-priority-0-7" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Use this command to configure a Shaper policy, set its name, define
-a class and set the priority for usage of available bandwidth once
-guarantees have been met. The lower the priority number, the higher
-the priority. The default priority value is 0, the highest priority.</p>
-</div>
-</div>
-<p>As with other policies, Shaper can embed other policies into its
-classes through the <code class="docutils literal notranslate">queue-type</code> setting and then configure their
-parameters.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# set qos policy shaper HTB class 10 queue-type 
-Possible completions:
-   fq-codel     Fair Queue Codel (default)
-   fair-queue   Stochastic Fair Queue (SFQ)
-   drop-tail    First-In-First-Out (FIFO)
-   priority     Priority queueing
-   random-detect
-                Random Early Detection (RED)
-</pre></div>
-</div>
-<div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# set qos policy shaper HTB class 10
-Possible completions:
-   bandwidth    Available bandwidth for this policy (default: auto)
-   burst        Burst size for this class (default: 15k)
-   ceiling      Bandwidth limit for this class
-   codel-quantum
-                Deficit in the fair queuing algorithm (default 1514)
-   description  Description
-   flows        Number of flows into which the incoming packets are classified (default 1024)
-   interval     Interval used to measure the delay (default 100)
-+> match        Class matching rule name
-   priority     Priority for rule evaluation
-   queue-limit  Maximum queue size (packets)
-   queue-type   Queue type for default traffic (default: fq-codel)
-   set-dscp     Change the Differentiated Services (DiffServ) field in the IP header
-   target       Acceptable minimum standing/persistent queue delay (default: 5)
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">注意</p>
-<p>If you configure a class for <strong>VoIP traffic</strong>, don’t give it any
-<em>ceiling</em>, otherwise new VoIP calls could start when the link is
-available and get suddenly dropped when other classes start using
-their assigned <em>bandwidth</em> share.</p>
-</div>
-<section id="traffic-policy-shaper-example">
-<h5>示例</h5>
-<p>A simple example of Shaper using priorities.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper MY-HTB bandwidth '50mbit'
-set qos policy shaper MY-HTB class 10 bandwidth '20%'
-set qos policy shaper MY-HTB class 10 match DSCP ip dscp 'EF'
-set qos policy shaper MY-HTB class 10 queue-type 'fq-codel'
-set qos policy shaper MY-HTB class 20 bandwidth '10%'
-set qos policy shaper MY-HTB class 20 ceiling '50%'
-set qos policy shaper MY-HTB class 20 match PORT666 ip destination port '666'
-set qos policy shaper MY-HTB class 20 priority '3'
-set qos policy shaper MY-HTB class 20 queue-type 'fair-queue'
-set qos policy shaper MY-HTB class 30 bandwidth '10%'
-set qos policy shaper MY-HTB class 30 ceiling '50%'
-set qos policy shaper MY-HTB class 30 match ADDRESS30 ip source address '192.168.30.0/24'
-set qos policy shaper MY-HTB class 30 priority '5'
-set qos policy shaper MY-HTB class 30 queue-type 'fair-queue'
-set qos policy shaper MY-HTB default bandwidth '10%'
-set qos policy shaper MY-HTB default ceiling '100%'
-set qos policy shaper MY-HTB default priority '7'
-set qos policy shaper MY-HTB default queue-type 'fair-queue'
-</pre></div>
-</div>
-</section>
-</section>
-<section id="cake">
-<h4>CAKE</h4>
-<div class="line-block">
-<div class="line"><strong>Queueing discipline:</strong> Deficit mode.</div>
-<div class="line"><strong>Applies to:</strong> Outbound traffic.</div>
-</div>
-<p>Common Applications Kept Enhanced (CAKE) is a comprehensive queue management
-system, implemented as a queue discipline (qdisc) for the Linux kernel. It is
-designed to replace and improve upon the complex hierarchy of simple qdiscs
-presently required to effectively tackle the bufferbloat problem at the network
-edge.</p>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy cake <text> bandwidth <value>
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-cake-text-bandwidth-value" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the shaper bandwidth, either as an explicit bitrate or a percentage
-of the interface bandwidth.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy cake <text> description
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-cake-text-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 a description for the shaper.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy cake <text> flow-isolation blind
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-cake-text-flow-isolation-blind" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Disables flow isolation, all traffic passes through a single queue.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy cake <text> flow-isolation dst-host
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-cake-text-flow-isolation-dst-host" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Flows are defined only by destination address.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy cake <text> flow-isolation dual-dst-host
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-cake-text-flow-isolation-dual-dst-host" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Flows are defined by the 5-tuple. Fairness is applied first over destination
-addresses, then over individual flows.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy cake <text> flow-isolation dual-src-host
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-cake-text-flow-isolation-dual-src-host" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Flows are defined by the 5-tuple. Fairness is applied first over source
-addresses, then over individual flows.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy cake <text> flow-isolation flow
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-cake-text-flow-isolation-flow" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Flows are defined by the entire 5-tuple (source IP address, source port,
-destination IP address, destination port, transport protocol).</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy cake <text> flow-isolation host
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-cake-text-flow-isolation-host" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Flows are defined by source-destination host pairs.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy cake <text> flow-isolation nat
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-cake-text-flow-isolation-nat" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Perform NAT lookup before applying flow-isolation rules.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy cake <text> flow-isolation src-host
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-cake-text-flow-isolation-src-host" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Flows are defined only by source address.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy cake <text> flow-isolation triple-isolate
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-cake-text-flow-isolation-triple-isolate" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>(默认)</strong> Flows are defined by the 5-tuple, fairness is applied
-over source and destination addresses and also over individual flows.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set qos policy cake <text> rtt
-<a class="cmdlink" href="#cfgcmd-set-qos-policy-cake-text-rtt" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Defines the round-trip time used for active queue management (AQM) in
-milliseconds. The default value is 100.</p>
-</div>
-</div>
-</section>
-</section>
-<section id="applying-a-traffic-policy">
-<h3>应用ing a traffic policy</h3>
-<p>Once a traffic-policy is created, you can apply it to an interface:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set qos interface eth0 egress WAN-OUT
-</pre></div>
-</div>
-<p>You can only apply one policy per interface and direction, but you could
-reuse a policy on different interfaces and directions:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set qos interface eth0 ingress WAN-IN
-set qos interface eth0 egress WAN-OUT
-set qos interface eth1 ingress LAN-IN
-set qos interface eth1 egress LAN-OUT
-set qos interface eth2 ingress LAN-IN
-set qos interface eth2 egress LAN-OUT
-set qos interface eth3 ingress TWO-WAY-POLICY
-set qos interface eth3 egress TWO-WAY-POLICY
-set qos interface eth4 ingress TWO-WAY-POLICY
-set qos interface eth4 egress TWO-WAY-POLICY
-</pre></div>
-</div>
-</section>
-<section id="the-case-of-ingress-shaping">
-<h3>The case of ingress shaping</h3>
-<p><strong>Applies to:</strong>
-Inbound traffic.</p>
-<p>For the ingress traffic of an interface, there is only one policy you
-can directly apply, a <strong>Limiter</strong> policy. You cannot apply a shaping
-policy directly to the ingress traffic of any interface because shaping
-only works for outbound traffic.</p>
-<p>This workaround lets you apply a shaping policy to the ingress traffic
-by first redirecting it to an in-between virtual interface
-(<a class="reference external" href="https://www.linuxfoundation.org/collaborate/workgroups/networking/ifb">Intermediate 函数al Block</a>). There, in that virtual interface,
-you 将 able to apply any of the policies that work for outbound
-traffic, for instance, a shaping one.</p>
-<p>That is how it is possible to do the so-called “ingress shaping”.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set qos policy shaper MY-INGRESS-SHAPING bandwidth 1000kbit
-set qos policy shaper MY-INGRESS-SHAPING default bandwidth 1000kbit
-set qos policy shaper MY-INGRESS-SHAPING default queue-type fair-queue
-
-set qos interface ifb0 egress MY-INGRESS-SHAPING
-set interfaces ethernet eth0 redirect ifb0
-
-set interfaces input ifb0
-</pre></div>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">警告</p>
-<p>Do not configure IFB as the first step. First create everything else
-of your traffic-policy, and then you can configure IFB.
-Otherwise you might get the <code class="docutils literal notranslate">RTNETLINK answer: File exists</code> error,
-which 可以 solved with <code class="docutils literal notranslate">sudo ip link delete ifb0</code>.</p>
-</div>
-</section>
-</section>
-</section>
-
-
-           </div>
-</body>
-</html>
+<p>速率控制（Rate-Control）是一种对 CPU 友好的策略

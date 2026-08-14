@@ -130,12 +130,6 @@ export default defineComponent({
   components: { DataTable, ToolbarButton, HelpButton, TabGroup },
   template: `
     <div class="page-container memory-cache-page">
-      <div class="toolbar toolbar-compact">
-        <div class="toolbar-left">
-          <ToolbarButton icon="refresh" @click="load">{{ t('memoryCache.buttons.refresh') }}</ToolbarButton>
-          <HelpButton routePath="/monitor/system-status/memory-cache" />
-        </div>
-      </div>
       <TabGroup v-model="activeTab" :tabs="tabs">
         <template #summary>
           <DataTable :columns="infoColumns" :data="summaryRows" :selectable="false" :actions="[]" rowKey="key" />

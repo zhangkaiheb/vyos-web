@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,24 +152,19 @@
 <div itemprop="articleBody">
              
   <section id="failover">
-<h1>Failover</h1>
-<p>Failover routes are manually configured network paths used only while their
-health-check targets are reachable. If the target stops responding, VyOS
-removes the route from the routing table and reinstalls it once the target
-recovers.</p>
+<h1>故障切换（Failover）</h1>
+<p>故障切换路由是手动配置的网络路径，仅在其健康检查目标可达时才启用。如果目标停止响应，VyOS 将从路由表中删除该路由，并在目标恢复后重新安装该路由。</p>
 <section id="configuration">
 <h2>配置</h2>
-<p>Use the following commands to configure failover routes for a specific remote
-<code class="docutils literal notranslate"><subnet></code> reachable via next-hop <code class="docutils literal notranslate"><address></code>.</p>
+<p>使用以下命令为通过下一跳 <code class="docutils literal notranslate">&lt;address&gt;</code> 可达的特定远程子网 <code class="docutils literal notranslate">&lt;subnet&gt;</code> 配置故障切换路由。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols failover route <subnet> next-hop <address> check target <target-address>
-<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-target-target-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the health check target IP address.</strong></p>
-<p>This is typically a highly available host, either within the destination
-subnet or on the public internet.</p>
-<p>示例:</p>
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; check target &lt;target-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-target-target-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置健康检查目标 IP 地址。</strong></p>
+<p>该地址通常是一个高可用主机，位于目标子网内或位于公共互联网上。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 check target 8.8.8.8
 </pre></div>
 </div>
@@ -178,11 +173,11 @@ subnet or on the public internet.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols failover route <subnet> next-hop <address> check timeout <timeout>
-<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-timeout-timeout" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the timeout interval, in seconds, between target health checks.</strong></p>
-<p>The valid range is 1 to 300 seconds. The default is 10 seconds.</p>
-<p>示例:</p>
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; check timeout &lt;timeout&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-timeout-timeout" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置目标健康检查之间的超时间隔（单位：秒）。</strong></p>
+<p>有效取值范围为 1 至 300 秒，默认值为 10 秒。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 check timeout 2
 </pre></div>
 </div>
@@ -191,27 +186,21 @@ set protocols failover route <subnet> next-hop <address> check timeout <timeout>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols failover route <subnet> next-hop <address> check type <protocol>
-<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-type-protocol" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the protocol to use for health checks.</strong></p>
-<p>The following protocols are available:</p>
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; check type &lt;protocol&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-type-protocol" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置用于健康检查的协议。</strong></p>
+<p>支持以下协议：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">icmp</code>: VyOS sends two ICMP echo request packets with a 1-second
-response timeout. The health check is successful if at least one response
-is received.</p></li>
-<li><p><code class="docutils literal notranslate">arp</code>: VyOS sends two ARP requests with a 1-second response timeout.
-The health check is successful if at least one response is received.</p></li>
-<li><p><code class="docutils literal notranslate">tcp</code>: VyOS verifies whether the destination TCP port is open. The
-health check is successful if a TCP connection is successfully
-established with the target port.</p></li>
+<li><p><code class="docutils literal notranslate">icmp</code>：VyOS 发送两个 ICMP 回显请求数据包，响应超时时间为 1 秒。只要至少收到一个响应，即视为健康检查成功。</p></li>
+<li><p><code class="docutils literal notranslate">arp</code>：VyOS 发送两个 ARP 请求，响应超时时间为 1 秒。只要至少收到一个响应，即视为健康检查成功。</p></li>
+<li><p><code class="docutils literal notranslate">tcp</code>：VyOS 验证目标 TCP 端口是否处于开放状态。只要能与目标端口成功建立 TCP 连接，即视为健康检查成功。</p></li>
 </ul>
-<p>The default protocol is <code class="docutils literal notranslate">icmp</code>.</p>
+<p>默认协议为 <code class="docutils literal notranslate">icmp</code>。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>When the check type is set to <code class="docutils literal notranslate">tcp</code>, you must also define the target
-TCP port.</p>
+<p>当检查类型设置为 <code class="docutils literal notranslate">tcp</code> 时，还必须定义目标 TCP 端口。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 check type tcp
 </pre></div>
 </div>
@@ -220,12 +209,12 @@ TCP port.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols failover route <subnet> next-hop <address> check port <port>
-<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the destination TCP port on the health check target.</strong></p>
-<p>This parameter applies only when the check type is configured as <code class="docutils literal notranslate">tcp</code>.</p>
-<p>The valid port range is 1 to 65535.</p>
-<p>示例:</p>
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; check port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-port-port" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置健康检查目标上的目标 TCP 端口。</strong></p>
+<p>该参数仅在检查类型配置为 <code class="docutils literal notranslate">tcp</code> 时生效。</p>
+<p>有效端口范围为 1 至 65535。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 check port 443
 </pre></div>
 </div>
@@ -234,18 +223,16 @@ set protocols failover route <subnet> next-hop <address> check port <port>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols failover route <subnet> next-hop <address> check policy <policy>
-<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-policy-policy" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the health check success policy for multiple targets.</strong></p>
-<p>The following policies are available:</p>
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; check policy &lt;policy&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-check-policy-policy" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为多个目标配置健康检查的成功策略。</strong></p>
+<p>支持以下策略：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">any-available</code>: The health check succeeds if at least one of the
-configured targets responds successfully.</p></li>
-<li><p><code class="docutils literal notranslate">all-available</code>: The health check succeeds only if every configured
-target responds successfully.</p></li>
+<li><p><code class="docutils literal notranslate">any-available</code>：只要至少一个已配置的目标成功响应，即视为健康检查成功。</p></li>
+<li><p><code class="docutils literal notranslate">all-available</code>：仅当所有已配置的目标均成功响应时，才视为健康检查成功。</p></li>
 </ul>
-<p>The default policy is <code class="docutils literal notranslate">any-available</code>.</p>
-<p>示例:</p>
+<p>默认策略为 <code class="docutils literal notranslate">any-available</code>。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 check policy all-available
 </pre></div>
 </div>
@@ -254,11 +241,11 @@ target responds successfully.</p></li>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols failover route <subnet> next-hop <address> interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the local interface used to reach the next-hop address.</strong></p>
-<p>This parameter is mandatory.</p>
-<p>示例:</p>
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-interface-interface" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置用于到达下一跳地址的本地接口。</strong></p>
+<p>该参数为必需项。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 interface eth0
 </pre></div>
 </div>
@@ -267,13 +254,12 @@ set protocols failover route <subnet> next-hop <address> interface <interface>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols failover route <subnet> next-hop <address> metric <1-255>
-<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-metric-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the metric (cost) for the failover route.</strong></p>
-<p>The metric defines the route priority. A lower metric value indicates a
-more preferred route.</p>
-<p>The default value is 1.</p>
-<p>示例:</p>
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; metric &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-metric-1-255" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置故障切换路由的度量值（开销）。</strong></p>
+<p>度量值定义了路由优先级；度量值越小，表示该路由越受优先选择。</p>
+<p>默认值为 1。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 metric 50
 </pre></div>
 </div>
@@ -282,11 +268,10 @@ more preferred route.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols failover route <subnet> next-hop <address> onlink
-<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-onlink" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure the next-hop to be reachable via the assigned interface, even
-when <code class="docutils literal notranslate"><address></code> is outside any subnet configured on that interface.</p>
-<p>示例:</p>
+set protocols failover route &lt;subnet&gt; next-hop &lt;address&gt; onlink
+<a class="cmdlink" href="#cfgcmd-set-protocols-failover-route-subnet-next-hop-address-onlink" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>配置下一跳可通过指定接口访问，即使 <code class="docutils literal notranslate">&lt;address&gt;</code> 不在该接口配置的任何子网范围内。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 10.217.37.254 onlink
 </pre></div>
 </div>
@@ -296,22 +281,19 @@ when <code class="docutils literal notranslate"><address></code> is outside any 
 <section id="examples">
 <h2>示例</h2>
 <section id="failover-route-with-a-single-next-hop-and-icmp-health-check">
-<h3>Failover route with a single next-hop and ICMP health check</h3>
-<p>The following example configures a failover route to <code class="docutils literal notranslate">203.0.113.1/32</code>
-through next-hop <code class="docutils literal notranslate">192.0.2.1</code> on <code class="docutils literal notranslate">eth0</code>. The next-hop is monitored with
-ICMP probes to <code class="docutils literal notranslate">192.0.2.1</code> every 5 seconds, and the route is installed with
-a metric of 10.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check target '192.0.2.1'
-set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check timeout '5'
-set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check type 'icmp'
-set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 interface 'eth0'
-set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 metric '10'
+<h3>单一下一跳且采用 ICMP 健康检查的故障切换路由</h3>
+<p>以下示例配置了一条通往 <code class="docutils literal notranslate">203.0.113.1/32</code> 的故障切换路由，其下一跳为 <code class="docutils literal notranslate">192.0.2.1</code>，出接口为 <code class="docutils literal notranslate">eth0</code>。下一跳通过向 <code class="docutils literal notranslate">192.0.2.1</code> 发送 ICMP 探测包进行监控，探测间隔为每 5 秒一次，且该路由以度量值 10 安装。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check target &#39;192.0.2.1&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check timeout &#39;5&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check type &#39;icmp&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 interface &#39;eth0&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 metric &#39;10&#39;
 </pre></div>
 </div>
-<p>验证 the route:</p>
+<p>验证该路由：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show ip route 203.0.113.1
 Routing entry for 203.0.113.1/32
-  Known via "kernel", distance 0, metric 10, best
+  Known via &quot;kernel&quot;, distance 0, metric 10, best
   Last update 00:00:39 ago
   Flags: Selected
   Status: Installed
@@ -320,39 +302,33 @@ Routing entry for 203.0.113.1/32
 </div>
 </section>
 <section id="two-failover-routes-with-different-metrics">
-<h3>Two failover routes with different metrics</h3>
-<p>The following example configures two failover routes to <code class="docutils literal notranslate">203.0.113.1/32</code>,
-each through a different next-hop. The primary next-hop <code class="docutils literal notranslate">192.0.2.1</code> is
-reached on <code class="docutils literal notranslate">eth0</code> with metric 10, and the backup next-hop <code class="docutils literal notranslate">198.51.100.1</code>
-is reached on <code class="docutils literal notranslate">eth2</code> with metric 20. Both next-hops are monitored with ICMP
-probes every 5 seconds.</p>
-<p>While both health checks succeed, the lower-metric route through <code class="docutils literal notranslate">eth0</code> is
-preferred. If the primary target stops responding, its route is removed from
-the routing table, and traffic falls over to <code class="docutils literal notranslate">198.51.100.1</code> via <code class="docutils literal notranslate">eth2</code>.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check target '192.0.2.1'
-set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check timeout '5'
-set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check type 'icmp'
-set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 interface 'eth0'
-set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 metric '10'
+<h3>两条具有不同度量值的故障切换路由</h3>
+<p>以下示例为 <code class="docutils literal notranslate">203.0.113.1/32</code> 配置了两条故障切换路由，分别经由不同的下一跳。主下一跳 <code class="docutils literal notranslate">192.0.2.1</code> 经 <code class="docutils literal notranslate">eth0</code> 到达，度量值为 10；备用下一跳 <code class="docutils literal notranslate">198.51.100.1</code> 经 <code class="docutils literal notranslate">eth2</code> 到达，度量值为 20。两个下一跳均通过每 5 秒一次的 ICMP 探测进行监控。</p>
+<p>当两个健康检查均成功时，优先选择度量值较低、经由 <code class="docutils literal notranslate">eth0</code> 的路由。若主目标停止响应，其对应路由将从路由表中移除，流量将自动切换至经 <code class="docutils literal notranslate">eth2</code> 到达的 <code class="docutils literal notranslate">198.51.100.1</code>。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check target &#39;192.0.2.1&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check timeout &#39;5&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 check type &#39;icmp&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 interface &#39;eth0&#39;
+set protocols failover route 203.0.113.1/32 next-hop 192.0.2.1 metric &#39;10&#39;
 
-set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 check target '198.51.100.99'
-set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 check timeout '5'
-set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 check type 'icmp'
-set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 interface 'eth2'
-set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 metric '20'
+set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 check target &#39;198.51.100.99&#39;
+set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 check timeout &#39;5&#39;
+set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 check type &#39;icmp&#39;
+set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 interface &#39;eth2&#39;
+set protocols failover route 203.0.113.1/32 next-hop 198.51.100.1 metric &#39;20&#39;
 </pre></div>
 </div>
-<p>验证 routes:</p>
+<p>验证路由：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show ip route 203.0.113.1
 Routing entry for 203.0.113.1/32
-  Known via "kernel", distance 0, metric 10, best
+  Known via &quot;kernel&quot;, distance 0, metric 10, best
   Last update 00:08:06 ago
   Flags: Selected
   Status: Installed
   * 192.0.2.1, via eth0, weight 1
 
 Routing entry for 203.0.113.1/32
-  Known via "kernel", distance 0, metric 20
+  Known via &quot;kernel&quot;, distance 0, metric 20
   Last update 00:08:14 ago
   Flags: None
   Status: Installed

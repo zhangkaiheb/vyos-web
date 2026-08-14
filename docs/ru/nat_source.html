@@ -170,7 +170,7 @@ IP-адрес интернет-маршрутизатора может испо�
 <p>Поскольку преобразование сетевых адресов изменяет информацию о IP-адресах в пакетах, реализации NAT могут различаться по своему поведению в различных случаях адресации
 и их влиянии на сетевой трафик. Конкретные особенности поведения NAT обычно не документируются производителями оборудования, содержащего реализации NAT.</p>
 <p>Компьютеры на внутренней сети могут использовать любые из адресов, выделенных <abbr title="Агентство по назначению номеров интернета">IANA</abbr> для
-частного адресирования (см. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a>). Эти зарезервированные IP-адреса
+частного адресирования (см. <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a>). Эти зарезервированные IP-адреса
 не используются в Интернете, поэтому внешняя машина не будет напрямую направлять их. Следующие адреса зарезервированы для частного использования:</p>
 <ul class="simple">
 <li><p>10.0.0.0 до 10.255.255.255 (CIDR: 10.0.0.0/8)</p></li>
@@ -178,12 +178,12 @@ IP-адрес интернет-маршрутизатора может испо�
 <li><p>192.168.0.0 до 192.168.255.255 (CIDR: 192.168.0.0/16)</p></li>
 </ul>
 <p>Если провайдер внедряет <abbr title="Нативный широкополосный доступ">CGN</abbr>, и использует
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> адресное пространство для нумерации шлюзов клиентов, риск
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> адресное пространство для нумерации шлюзов клиентов, риск
 коллизии адресов, а значит, и сбоев маршрутизации возникает, когда
-сети клиента уже используют <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> адресное пространство.</p>
+сети клиента уже используют <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> адресное пространство.</p>
 <p>Это побудило некоторых провайдеров разработать политику внутри <abbr title="Американский регистр номеров интернета">ARIN</abbr> для выделения нового частного
-адресного пространства для CGN, но ARIN отложил реализацию политики, указав, что вопрос не является типичной проблемой распределения, а резервированием адресов для технических целей (по <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2860.html"><strong>RFC 2860</strong></a>).</p>
-<p>IETF опубликовал <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6598.html"><strong>RFC 6598</strong></a>, подробно описывающий общее адресное пространство для использования в
+адресного пространства для CGN, но ARIN отложил реализацию политики, указав, что вопрос не является типичной проблемой распределения, а резервированием адресов для технических целей (по <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2860.html"><strong>RFC 2860</strong></a>).</p>
+<p>IETF опубликовал <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc6598.html"><strong>RFC 6598</strong></a>, подробно описывающий общее адресное пространство для использования в
 деплоях CGN провайдера, которое может обрабатывать те же префиксы сетей, которые встречаются как на входных, так и на выходных интерфейсах. ARIN вернул адресное пространство в
 <abbr title="Агентство по назначению номеров интернета">IANA</abbr> для этого распределения.</p>
 <p>Выделенный блок адресов — 100.64.0.0/10.</p>
@@ -619,7 +619,7 @@ set nat source rule 10 load-balance backend 192.0.2.253 weight 34
 <p>Вот один пример сети для ASP.
 ASP просит, чтобы все соединения от этой компании приходили с 172.29.41.89 — адреса, назначенного ASP и не используемого на стороне клиента.</p>
 <figure class="align-default" id="id5">
-<a class="reference internal image-reference" href="https://docs.vyos.io/en/rolling/_images/nat_before_vpn_topology.webp"><img alt="NAT before VPN Topology" src="https://docs.vyos.io/en/rolling/_images/nat_before_vpn_topology.webp" style="width: 899.0px; height: 271.0px;" /></a>
+<a class="reference internal image-reference" href="https://docs.vyos.io/en/latest/_images/nat_before_vpn_topology.webp"><img alt="NAT before VPN Topology" src="https://docs.vyos.io/en/latest/_images/nat_before_vpn_topology.webp" style="width: 899.0px; height: 271.0px;" /></a>
 <figcaption>
 <p>NAT before VPN Topology</p>
 </figcaption>

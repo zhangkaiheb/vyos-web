@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,28 +152,27 @@
 <div itemprop="articleBody">
              
   <section id="loopback">
-<h1>Loopback</h1>
-<p>The loopback interface is a virtual, software-based network interface. All
-traffic sent to it loops back and only targets services on the local host.</p>
+<h1>环回接口（Loopback）</h1>
+<p>环回接口是一种虚拟的、基于软件的网络接口。所有发送到该接口的流量都会被环回，且仅用于本地主机上的服务。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>Only one loopback <code class="docutils literal notranslate">lo</code> interface is allowed per operating system.
-If you require multiple virtual interfaces, use the <a class="reference internal" href="dummy.html#dummy-interface">Dummy</a>
-interface type.</p>
+<p>每个操作系统仅允许一个环回 <code class="docutils literal notranslate">lo</code> 接口。
+如果需要多个虚拟接口，请使用 <a class="reference internal" href="dummy.html#dummy-interface">哑接口（Dummy）</a>
+类型。</p>
 </div>
 <section id="configuration">
 <h2>配置</h2>
 <section id="common-interface-configuration">
-<h3>Common interface configuration</h3>
+<h3>通用接口配置</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces loopback <interface> address <address>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-loopback-interface-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure one or more interface IP addresses.</strong></p>
-<p><code class="docutils literal notranslate"><address></code> supports IPv4 and IPv6 in CIDR notation. For example, use
-<code class="docutils literal notranslate">192.0.2.1/24</code> for IPv4 or <code class="docutils literal notranslate">2001:db8::1/64</code> for IPv6.</p>
-<p>示例:</p>
+set interfaces loopback &lt;interface&gt; address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-loopback-interface-address-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置一个或多个接口 IP 地址。</strong></p>
+<p><code class="docutils literal notranslate">&lt;address&gt;</code> 支持 CIDR 表示法的 IPv4 和 IPv6 地址。例如，IPv4 使用
+<code class="docutils literal notranslate">192.0.2.1/24</code>，IPv6 使用 <code class="docutils literal notranslate">2001:db8::1/64</code>。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo address 192.0.2.1/24
 set interfaces loopback lo address 2001:db8::1/64
 </pre></div>
@@ -183,13 +182,12 @@ set interfaces loopback lo address 2001:db8::1/64
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set interfaces loopback <interface> description <description>
-<a class="cmdlink" href="#cfgcmd-set-interfaces-loopback-interface-description-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a clear, descriptive alias for the interface.</strong></p>
-<p>This alias appears in the <code class="docutils literal notranslate">show interfaces</code> command and SNMP-based
-monitoring tools.</p>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo description 'This is an interface running on VyOS.'
+set interfaces loopback &lt;interface&gt; description &lt;description&gt;
+<a class="cmdlink" href="#cfgcmd-set-interfaces-loopback-interface-description-description" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为接口配置清晰、描述性的别名。</strong></p>
+<p>该别名会显示在 <code class="docutils literal notranslate">show interfaces</code> 命令以及基于 SNMP 的监控工具中。</p>
+<p>示例：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces loopback lo description &#39;这是一个运行在 VyOS 上的接口。&#39;
 </pre></div>
 </div>
 </div>
@@ -197,16 +195,16 @@ monitoring tools.</p>
 </section>
 </section>
 <section id="operation">
-<h2>Operation</h2>
+<h2>操作</h2>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show interfaces loopback
-<a class="cmdlink" href="#opcmd-show-interfaces-loopback" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 brief interface information.</p>
+<a class="cmdlink" href="#opcmd-show-interfaces-loopback" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示接口的简要信息。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show interfaces loopback
-Codes: S - State, L - Link, u - Up, D - Down, A - Admin Down
-Interface        IP Address                        S/L  Description
+代码：S - 状态，L - 链路，u - 启用，D - 关闭，A - 管理关闭
+接口             IP 地址                          S/L  描述
 ---------        ----------                        ---  -----------
 lo               127.0.0.1/8                       u/u
                  ::1/128
@@ -218,19 +216,19 @@ lo               127.0.0.1/8                       u/u
 <div class="opcmd-heading">
 
 show interfaces loopback lo
-<a class="cmdlink" href="#opcmd-show-interfaces-loopback-lo" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 detailed interface information.</p>
+<a class="cmdlink" href="#opcmd-show-interfaces-loopback-lo" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示接口的详细信息。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show interfaces loopback lo
-lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
   link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
   inet 127.0.0.1/8 scope host lo
        valid_lft forever preferred_lft forever
   inet6 ::1/128 scope host
        valid_lft forever preferred_lft forever
 
-  RX:  bytes    packets     errors    dropped    overrun      mcast
+  RX:  字节     数据包      错误      丢弃      溢出       多播
            300          6          0          0          0          0
-  TX:  bytes    packets     errors    dropped    carrier collisions
+  TX:  字节     数据包      错误      丢弃      载波     冲突
            300          6          0          0          0          0
 </pre></div>
 </div>

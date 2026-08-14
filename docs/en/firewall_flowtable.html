@@ -167,7 +167,7 @@
 set firewall flowtable …
 <a class="cmdlink" href="#cfgcmd-set-firewall-flowtable" title="Permalink to this Command"></a></div></div>
 <p>To learn about the general traffic flow in VyOS firewalls,
-see <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Firewall</a>.</p>
+see <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">Firewall</a>.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
     * flowtable
          - custom_flow_table
@@ -178,7 +178,7 @@ see <a class="reference internal" href="https://docs.vyos.io/en/rolling/configur
 Flowtables support layer 3 (IPv4 and IPv6) and layer 4 (TCP and UDP)
 protocols.</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-flowtable-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-flowtable-packet-flow.webp" />
+<img alt="../../_images/firewall-flowtable-packet-flow.webp" src="https://docs.vyos.io/en/latest/_images/firewall-flowtable-packet-flow.webp" />
 </figure>
 <p>After the first packet successfully traverses the IP forwarding path (black
 circles path), you can offload subsequent packets to the flowtable through your
@@ -193,7 +193,7 @@ packet traverses the classic IP forwarding path.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><strong>Flowtable Reference:</strong>
-<a class="reference external" href="https://docs.vyos.io/en/rolling/configuration/https://docs.kernel.org/networking/nf_flowtable.html">https://docs.kernel.org/networking/nf_flowtable.html</a></p>
+<a class="reference external" href="https://docs.vyos.io/en/latest/configuration/https://docs.kernel.org/networking/nf_flowtable.html">https://docs.kernel.org/networking/nf_flowtable.html</a></p>
 </div>
 </section>
 <section id="flowtable-configuration">
@@ -396,7 +396,7 @@ both directions, and the flowtable manages offload symmetrically once the
 flow is established.
 To confirm the ingress and egress interfaces, enable <code class="docutils literal notranslate">log</code> on a rule in the
 forward hook and check the firewall logs — see the
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Firewall</a> section for configuration.</p>
+<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">Firewall</a> section for configuration.</p>
 </div>
 </section>
 <section id="checks">

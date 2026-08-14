@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -153,130 +153,61 @@
              
   <section id="nat44">
 <h1>NAT44</h1>
-<p><abbr title="Network Address Translation">NAT</abbr> is a common method of
-remapping one IP address space into another by modifying network address
-information in the IP header of packets while they are in transit across
-a traffic routing device. The technique was originally used as a
-shortcut to avoid the need to readdress every host when a network was
-moved. It has become a popular and essential tool in conserving global
-address space in the face of IPv4 address exhaustion. One
-Internet-routable IP address of a NAT gateway 可以 used for an entire
-private network.</p>
-<p>IP masquerading is a technique that hides an entire IP address space,
-usually consisting of private IP addresses, behind a single IP address
-in another, usually public address space. The hidden addresses are
-changed into a single (public) IP address as the source address of the
-outgoing IP packets so they appear as originating not from the hidden
-host but from the routing device itself. Because of the popularity of
-this technique to conserve IPv4 address space, the term NAT has become
-virtually synonymous with IP masquerading.</p>
-<p>As network address translation modifies the IP address information in
-packets, NAT implementations may vary in their specific behavior in
-various addressing cases and their effect on network traffic. The
-specifics of NAT behavior are not commonly documented by vendors of
-equipment containing NAT implementations.</p>
-<p>The computers on an internal network can use any of the addresses set
-aside by the <abbr title="Internet Assigned Numbers Authority">IANA</abbr> for
-private addressing (see <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a>). These reserved IP addresses are
-not in use on the Internet, so an external machine will not directly
-route to them. The following addresses are reserved for private use:</p>
+<p><abbr title="网络地址转换">NAT</abbr> 是一种常见方法，通过在数据包穿越流量路由设备时修改其 IP 报头中的网络地址信息，将一个 IP 地址空间重新映射到另一个 IP 地址空间。该技术最初被用作一种快捷方式，以避免在网络迁移时重新为每台主机配置地址。随着 IPv4 地址枯竭问题日益严峻，NAT 已成为节约全球 IPv4 地址空间的一种流行且必不可少的工具。NAT 网关的一个可全局路由的 Internet IP 地址即可供整个私有网络使用。</p>
+<p>IP 伪装（IP masquerading）是一种隐藏整个 IP 地址空间（通常由私有 IP 地址组成）的技术，将其隐藏在一个单一 IP 地址（通常为公有地址空间）之后。隐藏的地址在出站 IP 数据包中被更改为单一（公有）IP 地址作为源地址，从而使这些数据包看起来并非源自隐藏主机，而是源自路由设备本身。由于该技术在节约 IPv4 地址空间方面广受欢迎，“NAT”一词实际上已几乎等同于“IP 伪装”。</p>
+<p>由于网络地址转换会修改数据包中的 IP 地址信息，不同 NAT 实现方案在各种寻址场景下的具体行为及其对网络流量的影响可能各不相同。NAT 行为的具体细节通常未被包含 NAT 实现的设备厂商所记录。</p>
+<p>内部网络中的计算机可以使用 <abbr title="互联网编号分配机构">IANA</abbr> 为私有寻址预留的任意地址（参见 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a>）。这些保留的 IP 地址并未在 Internet 上使用，因此外部设备无法直接路由至这些地址。以下地址范围被保留用于私有用途：</p>
 <ul class="simple">
-<li><p>10.0.0.0 to 10.255.255.255 (CIDR: 10.0.0.0/8)</p></li>
-<li><p>172.16.0.0 to 172.31.255.255 (CIDR: 172.16.0.0/12)</p></li>
-<li><p>192.168.0.0 to 192.168.255.255 (CIDR: 192.168.0.0/16)</p></li>
+<li><p>10.0.0.0 至 10.255.255.255（CIDR：10.0.0.0/8）</p></li>
+<li><p>172.16.0.0 至 172.31.255.255（CIDR：172.16.0.0/12）</p></li>
+<li><p>192.168.0.0 至 192.168.255.255（CIDR：192.168.0.0/16）</p></li>
 </ul>
-<p>If an ISP deploys a <abbr title="Carrier-grade NAT">CGN</abbr>, and uses
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> address space to number customer gateways, the risk of
-address collision, and therefore routing failures, arises when the
-customer network already uses an <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> address space.</p>
-<p>This prompted some ISPs to develop a policy within the <abbr title="American Registry for Internet Numbers">ARIN</abbr> to allocate new private
-address space for CGNs, but ARIN deferred to the IETF before
-implementing the policy indicating that the matter was not a typical
-allocation issue but a reservation of addresses for technical purposes
-(per <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2860.html"><strong>RFC 2860</strong></a>).</p>
-<p>IETF published <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6598.html"><strong>RFC 6598</strong></a>, detailing a shared address space for use in
-ISP CGN deployments that can handle the same network prefixes occurring
-both on inbound and outbound interfaces. ARIN returned address space to
-the <abbr title="Internet Assigned Numbers Authority">IANA</abbr> for this
-allocation.</p>
-<p>The allocated address block is 100.64.0.0/10.</p>
-<p>Devices evaluating whether an IPv4 address is public 必须 updated to
-recognize the new address space. Allocating more private IPv4 address
-space for NAT devices might prolong the transition to IPv6.</p>
+<p>如果 ISP 部署了 <abbr title="运营商级 NAT">CGN</abbr>，并使用 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> 地址空间为用户网关编址，则当客户网络本身已使用 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1918.html"><strong>RFC 1918</strong></a> 地址空间时，就会出现地址冲突风险，进而导致路由故障。</p>
+<p>这促使部分 ISP 在 <abbr title="美国互联网号码注册管理机构">ARIN</abbr> 内制定一项政策，为 CGN 分配新的私有地址空间；但 ARIN 在实施该政策前将此事移交 IETF 处理，指出该事项并非典型的地址分配问题，而是出于技术目的而进行的地址保留（依据 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2860.html"><strong>RFC 2860</strong></a>）。</p>
+<p>IETF 发布了 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc6598.html"><strong>RFC 6598</strong></a>，详细说明了一种专用于 ISP CGN 部署的共享地址空间，可同时处理入站和出站接口上出现的相同网络前缀。ARIN 将该地址空间返还给 <abbr title="互联网编号分配机构">IANA</abbr> 以供此次分配之用。</p>
+<p>所分配的地址块为 100.64.0.0/10。</p>
+<p>评估 IPv4 地址是否为公有地址的设备必须更新，以识别这一新地址空间。为 NAT 设备分配更多私有 IPv4 地址空间可能会延长向 IPv6 过渡的时间。</p>
 <section id="overview">
-<h2>Overview</h2>
+<h2>概述</h2>
 <section id="different-nat-types">
-<h3>Different NAT 类型</h3>
+<h3>不同类型的 NAT</h3>
 <section id="snat">
-<h4>SNAT</h4>
-<p><abbr title="Source Network Address Translation">SNAT</abbr> is the most common
-form of <abbr title="Network Address Translation">NAT</abbr> and is typically
-referred to simply as NAT. To be more correct, what most people refer
-to as <abbr title="Network Address Translation">NAT</abbr> is actually the process
-of <abbr title="Port Address Translation">PAT</abbr>, or NAT overload. SNAT is
-typically used by internal users/private hosts to access the Internet
-- the source address is translated and thus kept private.</p>
+<h4>源地址 NAT（SNAT）</h4>
+<p><abbr title="源网络地址转换">SNAT</abbr> 是最常见形式的 <abbr title="网络地址转换">NAT</abbr>，通常简称为 NAT。更准确地说，大多数人所指的 <abbr title="网络地址转换">NAT</abbr> 实际上是 <abbr title="端口地址转换">PAT</abbr>（即 NAT 过载）过程。SNAT 通常由内部用户/私有主机用于访问 Internet——源地址被转换，从而保持私密性。</p>
 </section>
 <section id="dnat">
-<h4>DNAT</h4>
-<p><abbr title="Destination Network Address Translation">DNAT</abbr> changes the
-destination address of packets passing through the router, while
-<a class="reference internal" href="#source-nat">SNAT</a> changes the source address of packets. DNAT is
-typically used when an external (public) host needs to initiate a
-session with an internal (private) host. A customer needs to access a
-private service behind the routers public IP. A connection is
-established with the routers public IP address on a well known port and
-thus all traffic for this port is rewritten to address the internal
-(private) host.</p>
+<h4>目的地址 NAT（DNAT）</h4>
+<p><abbr title="目的网络地址转换">DNAT</abbr> 会更改经过路由器的数据包的目的地址，而 <a class="reference internal" href="#source-nat">SNAT</a> 则更改数据包的源地址。DNAT 通常用于外部（公有）主机需要主动与内部（私有）主机建立会话的场景。例如，客户需访问位于路由器公有 IP 后方的私有服务。此时，客户端连接至路由器公有 IP 的知名端口，所有发往该端口的流量均被重写，指向内部（私有）主机。</p>
 </section>
 <section id="bidirectional-nat">
-<h4>Bidirectional NAT</h4>
-<p>This is a common scenario where both <a class="reference internal" href="#source-nat">SNAT</a> and
-<a class="reference internal" href="#destination-nat">DNAT</a> are configured at the same time. It’s commonly
-used when internal (private) hosts need to establish a connection with
-external resources and external systems need to access internal
-(private) resources.</p>
+<h4>双向 NAT</h4>
+<p>这是一种常见场景，即同时配置 <a class="reference internal" href="#source-nat">SNAT</a> 和 <a class="reference internal" href="#destination-nat">DNAT</a>。它常用于内部（私有）主机需要与外部资源建立连接，且外部系统也需要访问内部（私有）资源的情况。</p>
 </section>
 </section>
 <section id="nat-routing-firewall-interaction">
-<h3>NAT, 路由, 防火墙 Interaction</h3>
-<p>There is a very nice picture/explanation in the Vyatta documentation
-which 应该 rewritten here.</p>
+<h3>NAT、路由与防火墙的交互关系</h3>
+<p>Vyatta 文档中有一张非常清晰的图示/说明，此处应予以重写。</p>
 </section>
 <section id="nat-ruleset">
-<h3>NAT 规则set</h3>
-<p><abbr title="Network Address Translation">NAT</abbr> is configured entirely on a
-series of so called <em>rules</em>. 规则s are numbered and evaluated by the
-underlying OS in numerical order! The rule numbers 可以 changes by
-utilizing the <code class="docutils literal notranslate">rename</code> and <code class="docutils literal notranslate">copy</code> commands.</p>
+<h3>NAT 规则集</h3>
+<p><abbr title="网络地址转换">NAT</abbr> 完全通过一系列所谓的 <em>规则</em> 进行配置。规则按编号顺序排列，并由底层操作系统按数值顺序依次评估！可通过 <code class="docutils literal notranslate">rename</code> 和 <code class="docutils literal notranslate">copy</code> 命令修改规则编号。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>Changes to the NAT system only affect newly established
-connections. Already established connections are not affected.</p>
+<p>NAT 系统的更改仅影响新建立的连接。已建立的连接不受影响。</p>
 </div>
 <div class="admonition hint">
-<p class="admonition-title">Hint</p>
-<p>When designing your NAT ruleset leave some space between
-consecutive rules for later extension. Your ruleset could start with
-numbers 10, 20, 30. You thus can later extend the ruleset and place
-new rules between existing ones.</p>
+<p class="admonition-title">提示</p>
+<p>设计 NAT 规则集时，请在连续规则之间预留一些编号空间以便后续扩展。您的规则集可从编号 10、20、30 开始。这样您便可在现有规则之间插入新的规则。</p>
 </div>
-<p>规则s 将 created for both <a class="reference internal" href="#source-nat">SNAT</a> and
-<a class="reference internal" href="#destination-nat">DNAT</a>.</p>
-<p>For <a class="reference internal" href="#bidirectional-nat">Bidirectional NAT</a> a rule for both <a class="reference internal" href="#source-nat">SNAT</a> and
-<a class="reference internal" href="#destination-nat">DNAT</a> needs to be created.</p>
+<p>将分别为 <a class="reference internal" href="#source-nat">SNAT</a> 和 <a class="reference internal" href="#destination-nat">DNAT</a> 创建规则。</p>
+<p>对于 <a class="reference internal" href="#bidirectional-nat">双向 NAT</a>，需同时为 <a class="reference internal" href="#source-nat">SNAT</a> 和 <a class="reference internal" href="#destination-nat">DNAT</a> 创建规则。</p>
 </section>
 <section id="traffic-filters">
-<h3>流量 过滤器</h3>
-<p>流量 过滤器 are used to control which packets will have the defined
-NAT rules applied. Five different filters 可以 applied within a NAT
-rule.</p>
+<h3>流量过滤器</h3>
+<p>流量过滤器用于控制哪些数据包将应用已定义的 NAT 规则。可在单条 NAT 规则中应用五种不同的过滤器。</p>
 <ul>
-<li><p><strong>outbound-interface</strong> - applicable only to <a class="reference internal" href="#source-nat">SNAT</a>. It
-configures the interface which is used for the outside traffic that
-this translation rule applies to. 接口 groups, inverted
-selection and wildcard, are also supported.</p>
-<p>示例:</p>
+<li><p><strong>出站接口（outbound-interface）</strong> —— 仅适用于 <a class="reference internal" href="#source-nat">SNAT</a>。它配置此转换规则所适用的外部流量使用的接口。支持接口组、反向选择及通配符。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set nat source rule 20 outbound-interface name eth0
 set nat source rule 30 outbound-interface name bond1*
 set nat source rule 20 outbound-interface name !vtun2
@@ -285,11 +216,8 @@ set nat source rule 20 outbound-interface group !GROUP2
 </pre></div>
 </div>
 </li>
-<li><p><strong>inbound-interface</strong> - applicable only to <a class="reference internal" href="#destination-nat">DNAT</a>. It
-configures the interface which is used for the inside traffic the
-translation rule applies to. 接口 groups, inverted
-selection and wildcard, are also supported.</p>
-<p>示例:</p>
+<li><p><strong>入站接口（inbound-interface）</strong> —— 仅适用于 <a class="reference internal" href="#destination-nat">DNAT</a>。它配置此转换规则所适用的内部流量使用的接口。支持接口组、反向选择及通配符。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set nat destination rule 20 inbound-interface name eth0
 set nat destination rule 30 inbound-interface name bond1*
 set nat destination rule 20 inbound-interface name !vtun2
@@ -298,28 +226,22 @@ set nat destination rule 20 inbound-interface group !GROUP2
 </pre></div>
 </div>
 </li>
-<li><p><strong>protocol</strong> - specify which types of protocols this translation rule
-applies to. Only packets matching the specified protocol are NATed.
-By default this applies to <em>all</em> protocols.</p>
-<p>示例:</p>
+<li><p><strong>协议（protocol）</strong> —— 指定此转换规则适用于哪些协议类型。仅匹配指定协议的数据包才会被执行 NAT。默认情况下，该规则适用于 <em>所有</em> 协议。</p>
+<p>示例：</p>
 <ul class="simple">
-<li><p>设置 SNAT rule 20 to only NAT TCP and UDP packets</p></li>
-<li><p>设置 DNAT rule 20 to only NAT UDP packets</p></li>
+<li><p>设置 SNAT 规则 20，使其仅对 TCP 和 UDP 数据包执行 NAT</p></li>
+<li><p>设置 DNAT 规则 20，使其仅对 UDP 数据包执行 NAT</p></li>
 </ul>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set nat source rule 20 protocol tcp_udp
 set nat destination rule 20 protocol udp
 </pre></div>
 </div>
 </li>
-<li><p><strong>source</strong> - specifies which packets the NAT translation rule applies
-to based on the packets source IP address and/or source port. Only
-matching packets are considered for NAT.</p>
-<p>示例:</p>
+<li><p><strong>源地址（source）</strong> —— 根据数据包的源 IP 地址和/或源端口指定 NAT 转换规则适用的数据包。仅匹配的数据包才考虑执行 NAT。</p>
+<p>示例：</p>
 <ul class="simple">
-<li><p>设置 SNAT rule 20 to only NAT packets arriving from the 192.0.2.0/24
-network</p></li>
-<li><p>设置 SNAT rule 30 to only NAT packets arriving from the 203.0.113.0/24
-network with a source port of 80 and 443</p></li>
+<li><p>设置 SNAT 规则 20，使其仅对来自 192.0.2.0/24 网络的数据包执行 NAT</p></li>
+<li><p>设置 SNAT 规则 30，使其仅对来自 203.0.113.0/24 网络且源端口为 80 和 443 的数据包执行 NAT</p></li>
 </ul>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set nat source rule 20 source address 192.0.2.0/24
 set nat source rule 30 source address 203.0.113.0/24
@@ -327,18 +249,14 @@ set nat source rule 30 source port 80,443
 </pre></div>
 </div>
 </li>
-<li><p><strong>destination</strong> - specify which packets the translation 将
-applied to, only based on the destination address and/or port number
-configured.</p>
+<li><p><strong>目的地址（destination）</strong> —— 仅基于配置的目的地址和/或端口号，指定将对哪些数据包应用转换。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>If no destination is specified the rule will match on any
-destination address and port.</p>
+<p>若未指定目的地址，则该规则将匹配任意目的地址和端口。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <ul class="simple">
-<li><p>Configure SNAT rule (40) to only NAT packets with a destination
-address of 192.0.2.1.</p></li>
+<li><p>配置 SNAT 规则（40），使其仅对目的地址为 192.0.2.1 的数据包执行 NAT</p></li>
 </ul>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set nat source rule 40 destination address 192.0.2.1
 </pre></div>
@@ -347,109 +265,80 @@ address of 192.0.2.1.</p></li>
 </ul>
 </section>
 <section id="address-conversion">
-<h3>地址 Conversion</h3>
-<p>Every NAT rule has a translation command defined. The address defined
-for the translation is the address used when the address information in
-a packet is replaced.</p>
+<h3>地址转换</h3>
+<p>每条 NAT 规则均定义了一个转换命令。转换命令中指定的地址即为数据包地址信息被替换时所使用的地址。</p>
 <section id="source-address">
-<h4>源 地址</h4>
-<p>For <a class="reference internal" href="#source-nat">SNAT</a> rules the packets source address 将 replaced
-with the address specified in the translation command. A port
-translation can also be specified and is part of the translation
-address.</p>
+<h4>源地址</h4>
+<p>对于 <a class="reference internal" href="#source-nat">SNAT</a> 规则，数据包的源地址将被转换命令中指定的地址所替代。也可指定端口转换，该端口转换属于转换地址的一部分。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>The translation address 必须 set to one of the available
-addresses on the configured <em>outbound-interface</em> or it 必须 set to
-<em>masquerade</em> which will use the primary IP address of the
-<em>outbound-interface</em> as its translation address.</p>
+<p>转换地址必须设置为已配置的 <em>outbound-interface</em> 上可用的地址之一，或者设置为 <em>masquerade</em>（伪装），后者将使用 <em>outbound-interface</em> 的主 IP 地址作为其转换地址。</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>When using NAT for a large number of host systems it
-recommended that a minimum of 1 IP address 用于 NAT every 256
-private host systems. This is due to the limit of 65,000 port numbers
-available for unique translations and a reserving an average of
-200-300 sessions per host system.</p>
+<p>当为大量主机系统使用 NAT 时，建议至少使用 1 个 IP 地址来转换每 256 台私有主机系统。这是因为可用于唯一转换的端口号上限为 65,000 个，且平均每台主机系统需预留约 200–300 个会话。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <ul class="simple">
-<li><p>Define a discrete source IP address of 100.64.0.1 for SNAT rule 20</p></li>
-<li><p>Use address <em>masquerade</em> (the interfaces primary address) on rule 30</p></li>
-<li><p>For a large amount of private machines behind the NAT your address
-pool might to be bigger. Use any address in the range 100.64.0.10 -
-100.64.0.20 on SNAT rule 40 when doing the translation</p></li>
+<li><p>为 SNAT 规则 20 定义离散的源 IP 地址 100.64.0.1</p></li>
+<li><p>在规则 30 上使用地址 <em>masquerade</em>（即接口的主地址）</p></li>
+<li><p>当大量私有机器位于 NAT 后方时，您的地址池可能需要更大。在执行转换时，SNAT 规则 40 可使用 100.64.0.10 至 100.64.0.20 范围内的任一地址</p></li>
 </ul>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set nat source rule 20 translation address 100.64.0.1
-set nat source rule 30 translation address 'masquerade'
+set nat source rule 30 translation address &#39;masquerade&#39;
 set nat source rule 40 translation address 100.64.0.10-100.64.0.20
 </pre></div>
 </div>
 </section>
 <section id="destination-address">
-<h4>目的 地址</h4>
-<p>For <a class="reference internal" href="#destination-nat">DNAT</a> rules the packets destination address 将
-replaced by the specified address in the <em>translation address</em> command.</p>
-<p>示例:</p>
+<h4>目的地址</h4>
+<p>对于 <a class="reference internal" href="#destination-nat">DNAT</a> 规则，数据包的目的地址将被 <em>translation address</em> 命令中指定的地址所替代。</p>
+<p>示例：</p>
 <ul class="simple">
-<li><p>DNAT rule 10 replaces the destination address of an inbound packet
-with 192.0.2.10</p></li>
+<li><p>DNAT 规则 10 将入站数据包的目的地址替换为 192.0.2.10</p></li>
 </ul>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set nat destination rule 10 translation address 192.0.2.10
 </pre></div>
 </div>
-<p>Also, in <a class="reference internal" href="#destination-nat">DNAT</a>, redirection to localhost is supported.
-The redirect statement is a special form of dnat which always translates
-the destination address to the local host’s one.</p>
-<p>示例 of redirection:</p>
+<p>此外，在 <a class="reference internal" href="#destination-nat">DNAT</a> 中还支持重定向至本地回环地址（localhost）。重定向语句是一种特殊的 DNAT 形式，始终将目的地址转换为本地主机的地址。</p>
+<p>重定向示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set nat destination rule 10 translation redirect port 22
 </pre></div>
 </div>
 </section>
 </section>
 <section id="nat-load-balance">
-<h3>NAT 加载 Balance</h3>
-<p>Advanced configuration 可以 used in order to apply source or destination NAT,
-and within a single rule, be able to define multiple translated addresses,
-so NAT balances the translations among them.</p>
-<p>NAT 加载 Balance uses an algorithm that generates a hash and based on it, then
-it applies corresponding translation. This hash 可以 generated randomly, or
-can use data from the ip header: source-address, destination-address,
-source-port and/or destination-port. By default, it will generate the hash
-randomly.</p>
-<p>When defining the translated address, called <code class="docutils literal notranslate">backends</code>, a <code class="docutils literal notranslate">weight</code> must
-be configured. This lets the user define load balance distribution according
-to their needs. The sum of all the weights defined for the backends should
-be equal to 100. In other words, the weight defined for the backend is the
-percentage of the connections that will receive such backend.</p>
+<h3>NAT 负载均衡</h3>
+<p>高级配置可用于应用源地址或目的地址 NAT，并在单条规则内定义多个转换后的地址，使 NAT 在这些地址之间均衡分配转换任务。</p>
+<p>NAT 负载均衡采用一种生成哈希值的算法，并基于该哈希值应用相应的转换。该哈希值可随机生成，也可利用 IP 报头中的数据生成：源地址、目的地址、源端口和/或目的端口。默认情况下，哈希值将随机生成。</p>
+<p>在定义转换后的地址（称为 <code class="docutils literal notranslate">backends</code>）时，必须配置 <code class="docutils literal notranslate">weight</code>（权重）。这使用户能够根据自身需求定义负载均衡分布。所有后端权重之和应等于 100。换言之，为后端配置的权重即为该后端将接收的连接所占百分比。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set nat [source | destination] rule <rule> load-balance hash [source-address | destination-address | source-port | destination-port | random]
+set nat [source | destination] rule &lt;rule&gt; load-balance hash [source-address | destination-address | source-port | destination-port | random]
 <a class="cmdlink" href="#cfgcmd-set-nat-source-destination-rule-rule-load-balance-hash-source-address-destination-address-source-port-destination-port-random" title="Permalink to this Command"></a></div></div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set nat [source | destination] rule <rule> load-balance backend <x.x.x.x> weight <1-100>
+set nat [source | destination] rule &lt;rule&gt; load-balance backend &lt;x.x.x.x&gt; weight &lt;1-100&gt;
 <a class="cmdlink" href="#cfgcmd-set-nat-source-destination-rule-rule-load-balance-backend-x-x-x-x-weight-1-100" title="Permalink to this Command"></a></div></div>
 </section>
 </section>
 <section id="configuration-examples">
-<h2>配置 示例</h2>
-<p>To setup SNAT, we need to know:</p>
+<h2>配置示例</h2>
+<p>要配置 SNAT，我们需要了解以下信息：</p>
 <ul class="simple">
-<li><p>The internal IP addresses we want to translate</p></li>
-<li><p>The outgoing interface to perform the translation on</p></li>
-<li><p>The external IP address to translate to</p></li>
+<li><p>需要转换的内部 IP 地址</p></li>
+<li><p>执行转换的出站接口</p></li>
+<li><p>转换至的外部 IP 地址</p></li>
 </ul>
-<p>In the example used for the Quick Start configuration above, we
-demonstrate the following configuration:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set nat source rule 100 outbound-interface name 'eth0'
-set nat source rule 100 source address '192.168.0.0/24'
-set nat source rule 100 translation address 'masquerade'
+<p>在上述快速入门配置示例中，我们演示了如下配置：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat source rule 100 outbound-interface name &#39;eth0&#39;
+set nat source rule 100 source address &#39;192.168.0.0/24&#39;
+set nat source rule 100 translation address &#39;masquerade&#39;
 </pre></div>
 </div>
-<p>Which generates the following configuration:</p>
+<p>该配置生成如下结果：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>rule 100 {
     outbound-interface {
         name eth0
@@ -463,93 +352,54 @@ set nat source rule 100 translation address 'masquerade'
 }
 </pre></div>
 </div>
-<p>In this example, we use <strong>masquerade</strong> as the translation address
-instead of an IP address. The <strong>masquerade</strong> target is effectively an
-alias to say “use whatever IP address is on the outgoing interface”,
-rather than a statically configured IP address. This is useful if you
-use DHCP for your outgoing interface and do not know what the external
-address 将.</p>
-<p>When using NAT for a large number of host systems it recommended that a
-minimum of 1 IP address 用于 NAT every 256 host systems. This is
-due to the limit of 65,000 port numbers available for unique
-translations and a reserving an average of 200-300 sessions per host
-system.</p>
-<p>示例: For an ~8,000 host network a source NAT pool of 32 IP addresses
-is recommended.</p>
-<p>A pool of addresses 可以 defined by using a hyphen between two IP
-addresses:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set nat source rule 100 translation address '203.0.113.32-203.0.113.63'
+<p>在此示例中，我们使用 <strong>masquerade</strong>（伪装）作为转换地址，而非具体的 IP 地址。<strong>masquerade</strong> 目标实质上是一个别名，表示“使用出站接口上的任意 IP 地址”，而非静态配置的 IP 地址。当出站接口使用 DHCP 获取地址且外部地址未知时，此功能尤为有用。</p>
+<p>当为大量主机系统使用 NAT 时，建议至少使用 1 个 IP 地址来转换每 256 台主机系统。这是因为可用于唯一转换的端口号上限为 65,000 个，且平均每台主机系统需预留约 200–300 个会话。</p>
+<p>示例：对于约 8,000 台主机的网络，建议使用包含 32 个 IP 地址的源地址 NAT 地址池。</p>
+<p>可通过在两个 IP 地址之间使用短横线（-）来定义地址池：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat source rule 100 translation address &#39;203.0.113.32-203.0.113.63&#39;
 </pre></div>
 </div>
 <section id="avoiding-leaky-nat">
-<h3>Avoiding “leaky” NAT</h3>
-<p>Linux netfilter will not NAT traffic marked as INVALID. This often
-confuses people into thinking that Linux (or specifically VyOS) has a
-broken NAT implementation because non-NATed traffic is seen leaving an
-external interface. This is actually working as intended, and a packet
-capture of the “leaky” traffic should reveal that the traffic is either
-an additional TCP “RST”, “FIN,ACK”, or “RST,ACK” sent by client systems
-after Linux netfilter considers the connection closed. The most common
-is the additional TCP RST some host implementations send after
-terminating a connection (which is implementation-specific).</p>
-<p>In other words, connection tracking has already observed the connection
-be closed and has transition the flow to INVALID to prevent attacks from
-attempting to reuse the connection.</p>
-<p>You can avoid the “leaky” behavior by using a firewall policy that drops
-“invalid” state packets.</p>
-<p>Having control over the matching of INVALID state traffic, e.g. the
-ability to selectively log, is an important troubleshooting tool for
-observing broken protocol behavior. For this reason, VyOS does not
-globally drop invalid state traffic, instead allowing the operator to
-make the determination on how the traffic is handled.</p>
+<h3>避免“泄漏型”NAT</h3>
+<p>Linux netfilter 不会对标记为 INVALID（无效）的数据包执行 NAT。这常常使人们误以为 Linux（或特指 VyOS）的 NAT 实现存在缺陷，因为未执行 NAT 的数据包会被观察到从外部接口发出。实际上这是预期行为，对“泄漏型”流量进行数据包捕获可揭示这些流量通常是客户端系统在 Linux netfilter 认为连接已关闭后发送的额外 TCP “RST”、“FIN,ACK” 或 “RST,ACK”。最常见的现象是某些主机实现终止连接后发送的额外 TCP RST（该行为因实现而异）。</p>
+<p>换言之，连接跟踪机制已观测到连接已关闭，并将该流状态转换为 INVALID，以防止攻击者尝试复用该连接。</p>
+<p>您可通过使用防火墙策略丢弃“invalid”（无效）状态的数据包来避免“泄漏型”行为。</p>
+<p>对 INVALID 状态流量的匹配进行控制（例如，有选择地记录日志）是一项重要的故障排除工具，有助于观测协议行为异常。因此，VyOS 并不会全局丢弃 INVALID 状态的流量，而是允许操作员自行决定如何处理此类流量。</p>
 </section>
 <section id="hairpin-nat-nat-reflection">
-<h3>Hairpin NAT/NAT Reflection</h3>
-<p>A typical problem with using NAT and hosting public servers is the
-ability for internal systems to reach an internal server using it’s
-external IP address. The solution to this is usually the use of
-split-DNS to correctly point host systems to the internal address when
-requests are made internally. Because many smaller networks lack DNS
-infrastructure, a work-around is commonly deployed to facilitate the
-traffic by NATing the request from internal hosts to the source address
-of the internal interface on the firewall.</p>
-<p>This technique is commonly referred to as NAT Reflection or Hairpin NAT.</p>
-<p>示例:</p>
+<h3>发夹式 NAT / NAT 反射</h3>
+<p>使用 NAT 并托管公有服务器时的一个典型问题是：内部系统能否使用其外部 IP 地址访问内部服务器？该问题的常规解决方案通常是使用拆分 DNS（split-DNS），在内部请求时正确将主机系统指向内部地址。由于许多小型网络缺乏 DNS 基础设施，通常会部署一种变通方案，通过对来自内部主机的请求执行 NAT，将其转换为防火墙内部接口的源地址，从而实现流量转发。</p>
+<p>该技术通常被称为 NAT 反射（NAT Reflection）或发夹式 NAT（Hairpin NAT）。</p>
+<p>示例：</p>
 <ul class="simple">
-<li><p>Redirect Microsoft RDP traffic from the outside (WAN, external) world
-via <a class="reference internal" href="#destination-nat">DNAT</a> in rule 100 to the internal, private host
-192.0.2.40.</p></li>
-<li><p>Redirect Microsoft RDP traffic from the internal (LAN, private)
-network via <a class="reference internal" href="#destination-nat">DNAT</a> in rule 110 to the internal,
-private host 192.0.2.40. We also need a <a class="reference internal" href="#source-nat">SNAT</a> rule 110 for
-the reverse path of the traffic. The internal network 192.0.2.0/24 is
-reachable via interface <em>eth0.10</em>.</p></li>
+<li><p>通过 <a class="reference internal" href="#destination-nat">DNAT</a> 规则 100，将来自外部（WAN，外部）世界的 Microsoft RDP 流量重定向至内部私有主机 192.0.2.40。</p></li>
+<li><p>通过 <a class="reference internal" href="#destination-nat">DNAT</a> 规则 110，将来自内部（LAN，私有）网络的 Microsoft RDP 流量重定向至内部私有主机 192.0.2.40。我们还需要为流量的反向路径配置一条 <a class="reference internal" href="#source-nat">SNAT</a> 规则 110。内部网络 192.0.2.0/24 通过接口 <em>eth0.10</em> 可达。</p></li>
 </ul>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set nat destination rule 100 description 'Regular destination NAT from external'
-set nat destination rule 100 destination port '3389'
-set nat destination rule 100 inbound-interface name 'pppoe0'
-set nat destination rule 100 protocol 'tcp'
-set nat destination rule 100 translation address '192.0.2.40'
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat destination rule 100 description &#39;Regular destination NAT from external&#39;
+set nat destination rule 100 destination port &#39;3389&#39;
+set nat destination rule 100 inbound-interface name &#39;pppoe0&#39;
+set nat destination rule 100 protocol &#39;tcp&#39;
+set nat destination rule 100 translation address &#39;192.0.2.40&#39;
 
-set nat destination rule 110 description 'NAT Reflection: INSIDE'
-set nat destination rule 110 destination port '3389'
-set nat destination rule 110 inbound-interface name 'eth0.10'
-set nat destination rule 110 protocol 'tcp'
-set nat destination rule 110 translation address '192.0.2.40'
+set nat destination rule 110 description &#39;NAT Reflection: INSIDE&#39;
+set nat destination rule 110 destination port &#39;3389&#39;
+set nat destination rule 110 inbound-interface name &#39;eth0.10&#39;
+set nat destination rule 110 protocol &#39;tcp&#39;
+set nat destination rule 110 translation address &#39;192.0.2.40&#39;
 
-set nat source rule 110 description 'NAT Reflection: INSIDE'
-set nat source rule 110 destination address '192.0.2.0/24'
-set nat source rule 110 outbound-interface name 'eth0.10'
-set nat source rule 110 protocol 'tcp'
-set nat source rule 110 source address '192.0.2.0/24'
-set nat source rule 110 translation address 'masquerade'
+set nat source rule 110 description &#39;NAT Reflection: INSIDE&#39;
+set nat source rule 110 destination address &#39;192.0.2.0/24&#39;
+set nat source rule 110 outbound-interface name &#39;eth0.10&#39;
+set nat source rule 110 protocol &#39;tcp&#39;
+set nat source rule 110 source address &#39;192.0.2.0/24&#39;
+set nat source rule 110 translation address &#39;masquerade&#39;
 </pre></div>
 </div>
-<p>Which results in a configuration of:</p>
+<p>该配置最终生成如下结果：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# show nat
  destination {
      rule 100 {
-         description "Regular destination NAT from external"
+         description &quot;Regular destination NAT from external&quot;
          destination {
              port 3389
          }
@@ -562,7 +412,7 @@ set nat source rule 110 translation address 'masquerade'
          }
      }
      rule 110 {
-         description "NAT Reflection: INSIDE"
+         description &quot;NAT Reflection: INSIDE&quot;
          destination {
              port 3389
          }
@@ -577,7 +427,7 @@ set nat source rule 110 translation address 'masquerade'
  }
  source {
      rule 110 {
-         description "NAT Reflection: INSIDE"
+         description &quot;NAT Reflection: INSIDE&quot;
          destination {
              address 192.0.2.0/24
          }
@@ -597,35 +447,29 @@ set nat source rule 110 translation address 'masquerade'
 </div>
 </section>
 <section id="id4">
-<h3>目的 NAT</h3>
-<p>DNAT is typically referred to as a <strong>端口 Forward</strong>. When using VyOS as
-a NAT router and firewall, a common configuration task is to redirect
-incoming traffic to a system behind the firewall.</p>
-<p>In this example, we 将 using the example Quick Start configuration
-above as a starting point.</p>
-<p>To setup a destination NAT rule we need to gather:</p>
+<h3>目的地址 NAT（DNAT）</h3>
+<p>DNAT 通常被称为 <strong>端口转发（Port Forward）</strong>。当使用 VyOS 作为 NAT 路由器和防火墙时，一项常见的配置任务是将入站流量重定向至防火墙后方的系统。</p>
+<p>在本示例中，我们将以上述快速入门配置为基础展开说明。</p>
+<p>要配置目的地址 NAT 规则，我们需要收集以下信息：</p>
 <ul class="simple">
-<li><p>The interface traffic 将 coming in on;</p></li>
-<li><p>The protocol and port we wish to forward;</p></li>
-<li><p>The IP address of the internal system we wish to forward traffic to.</p></li>
+<li><p>流量进入的接口；</p></li>
+<li><p>希望转发的协议和端口；</p></li>
+<li><p>希望转发流量至的内部系统的 IP 地址。</p></li>
 </ul>
-<p>In our example, we 将 forwarding web server traffic to an internal
-web server on 192.168.0.100. HTTP traffic makes use of the TCP protocol
-on port 80. For other common port numbers, see:
-<a class="reference external" href="https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers">https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers</a></p>
-<p>Our configuration commands 将:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set nat destination rule 10 description 'Port Forward: HTTP to 192.168.0.100'
-set nat destination rule 10 destination port '80'
-set nat destination rule 10 inbound-interface name 'eth0'
-set nat destination rule 10 protocol 'tcp'
-set nat destination rule 10 translation address '192.168.0.100'
+<p>在我们的示例中，我们将把 Web 服务器流量转发至内部 Web 服务器 192.168.0.100。HTTP 流量使用 TCP 协议的 80 端口。有关其他常用端口号，请参阅：<a class="reference external" href="https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers">https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers</a></p>
+<p>我们的配置命令如下：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat destination rule 10 description &#39;Port Forward: HTTP to 192.168.0.100&#39;
+set nat destination rule 10 destination port &#39;80&#39;
+set nat destination rule 10 inbound-interface name &#39;eth0&#39;
+set nat destination rule 10 protocol &#39;tcp&#39;
+set nat destination rule 10 translation address &#39;192.168.0.100&#39;
 </pre></div>
 </div>
-<p>Which would generate the following NAT destination configuration:</p>
+<p>该配置将生成如下 NAT 目的地址配置：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>nat {
     destination {
         rule 10 {
-            description "Port Forward: HTTP to 192.168.0.100"
+            description &quot;Port Forward: HTTP to 192.168.0.100&quot;
             destination {
                 port 80
             }
@@ -643,28 +487,19 @@ set nat destination rule 10 translation address '192.168.0.100'
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>If forwarding traffic to a different port than it is arriving
-on, you may also configure the translation port using
-<em>set nat destination rule [n] translation port</em>.</p>
+<p>若需将流量转发至与入站端口不同的端口，还可使用 <em>set nat destination rule [n] translation port</em> 配置转换端口。</p>
 </div>
-<p>This establishes our 端口 Forward rule, but if we created a firewall
-policy it will likely block the traffic.</p>
+<p>该配置建立了我们的端口转发规则，但如果创建了防火墙策略，则该策略很可能会阻止该流量。</p>
 <section id="firewall-rules-for-destination-nat">
-<h4>防火墙 rules for 目的 NAT</h4>
-<p>It is important to note that when creating firewall rules, the DNAT
-translation occurs <strong>before</strong> traffic traverses the firewall. In other
-words, the destination address has already been translated to
-192.168.0.100.</p>
-<p>So in our firewall ruleset, we want to allow traffic which previously matched
-a destination nat rule. In order to avoid creating many rules, one for each
-destination nat rule, we can accept all <strong>‘dnat’</strong> connections with one simple
-rule, using <code class="docutils literal notranslate">connection-status</code> matcher:</p>
+<h4>目的地址 NAT 的防火墙规则</h4>
+<p>需要注意的是，在创建防火墙规则时，DNAT 转换会在流量穿越防火墙 <strong>之前</strong> 执行。换言之，目的地址已被转换为 192.168.0.100。</p>
+<p>因此，在我们的防火墙规则集中，我们希望允许先前已匹配目的地址 NAT 规则的流量。为避免为每个目的地址 NAT 规则创建多条规则，我们可以使用 <code class="docutils literal notranslate">connection-status</code> 匹配器，通过一条简单规则接受所有 <strong>‘dnat’</strong> 连接：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set firewall ipv4 forward filter rule 10 action accept
 set firewall ipv4 forward filter rule 10 connection-status nat destination
 set firewall ipv4 forward filter rule 10 state new
 </pre></div>
 </div>
-<p>This would generate the following configuration:</p>
+<p>该配置将生成如下结果：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>ipv4 {
     forward {
         filter {
@@ -683,49 +518,35 @@ set firewall ipv4 forward filter rule 10 state new
 </section>
 </section>
 <section id="to-1-nat">
-<h3>1-to-1 NAT</h3>
-<p>Another term often used for DNAT is <strong>1-to-1 NAT</strong>. For a 1-to-1 NAT
-configuration, both DNAT and SNAT are used to NAT all traffic from an
-external IP address to an internal IP address and vice-versa.</p>
-<p>Typically, a 1-to-1 NAT rule omits the destination port (all ports) and
-replaces the protocol with either <strong>all</strong> or <strong>ip</strong>.</p>
-<p>Then a corresponding SNAT rule is created to NAT outgoing traffic for
-the internal IP to a reserved external IP. This dedicates an external IP
-address to an internal IP address and is useful for protocols which
-don’t have the notion of ports, such as GRE.</p>
-<p>Here’s an extract of a simple 1-to-1 NAT configuration with one internal
-and one external interface:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address '192.168.1.1/24'
-set interfaces ethernet eth0 description 'Inside interface'
-set interfaces ethernet eth1 address '192.0.2.30/24'
-set interfaces ethernet eth1 description 'Outside interface'
-set nat destination rule 2000 description '1-to-1 NAT example'
-set nat destination rule 2000 destination address '192.0.2.30'
-set nat destination rule 2000 inbound-interface name 'eth1'
-set nat destination rule 2000 translation address '192.168.1.10'
-set nat source rule 2000 description '1-to-1 NAT example'
-set nat source rule 2000 outbound-interface name 'eth1'
-set nat source rule 2000 source address '192.168.1.10'
-set nat source rule 2000 translation address '192.0.2.30'
+<h3>一对一 NAT（1-to-1 NAT）</h3>
+<p>DNAT 的另一种常用术语是 <strong>一对一 NAT（1-to-1 NAT）</strong>。在一对一 NAT 配置中，同时使用 DNAT 和 SNAT，将所有来自外部 IP 地址的流量转换至内部 IP 地址，反之亦然。</p>
+<p>通常，一对一 NAT 规则会省略目的端口（即所有端口），并将协议替换为 <strong>all</strong> 或 <strong>ip</strong>。</p>
+<p>然后创建对应的 SNAT 规则，将内部 IP 的出站流量转换为预留的外部 IP。此举将一个外部 IP 地址专门分配给一个内部 IP 地址，对于无端口概念的协议（如 GRE）尤为有用。</p>
+<p>以下是一个简单的、含一个内部接口和一个外部接口的一对一 NAT 配置摘录：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address &#39;192.168.1.1/24&#39;
+set interfaces ethernet eth0 description &#39;Inside interface&#39;
+set interfaces ethernet eth1 address &#39;192.0.2.30/24&#39;
+set interfaces ethernet eth1 description &#39;Outside interface&#39;
+set nat destination rule 2000 description &#39;1-to-1 NAT example&#39;
+set nat destination rule 2000 destination address &#39;192.0.2.30&#39;
+set nat destination rule 2000 inbound-interface name &#39;eth1&#39;
+set nat destination rule 2000 translation address &#39;192.168.1.10&#39;
+set nat source rule 2000 description &#39;1-to-1 NAT example&#39;
+set nat source rule 2000 outbound-interface name &#39;eth1&#39;
+set nat source rule 2000 source address &#39;192.168.1.10&#39;
+set nat source rule 2000 translation address &#39;192.0.2.30&#39;
 </pre></div>
 </div>
-<p>防火墙 rules are written as normal, using the internal IP address as
-the source of outbound rules and the destination of inbound rules.</p>
+<p>防火墙规则按常规编写，使用内部 IP 地址作为出站规则的源地址以及入站规则的目的地址。</p>
 </section>
 <section id="nat-before-vpn">
-<h3>NAT before VPN</h3>
-<p>Some application service providers (ASPs) operate a VPN gateway to
-provide access to their internal resources, and require that a
-connecting organisation translate all traffic to the service provider
-network to a source address provided by the ASP.</p>
+<h3>VPN 前的 NAT</h3>
+<p>某些应用服务提供商（ASP）运营 VPN 网关以提供对其内部资源的访问，并要求连接组织将所有发往服务提供商网络的流量转换为 ASP 提供的源地址。</p>
 </section>
 <section id="load-balance">
-<h3>加载 Balance</h3>
-<p>Here we provide two examples on how to apply NAT 加载 Balance.</p>
-<p>First scenario: apply destination NAT for all HTTP traffic coming through
-interface eth0, and user 4 backends. First backend should received 30% of
-the request, second backend should get 20%, third 15% and the fourth 35%
-We will use source and destination address for hash generation.</p>
+<h3>负载均衡</h3>
+<p>此处提供两个应用 NAT 负载均衡的示例。</p>
+<p>第一种场景：对所有经由接口 eth0 进入的 HTTP 流量应用目的地址 NAT，并使用 4 个后端。第一个后端应接收 30% 的请求，第二个后端接收 20%，第三个后端接收 15%，第四个后端接收 35%。我们将使用源地址和目的地址生成哈希值。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set nat destination rule 10 inbound-interface name eth0
 set nat destination rule 10 protocol tcp
 set nat destination rule 10 destination port 80
@@ -737,9 +558,7 @@ set nat destination rule 10 load-balance backend 198.51.100.103 weight 15
 set nat destination rule 10 load-balance backend 198.51.100.104 weight 35
 </pre></div>
 </div>
-<p>Second scenario: apply source NAT for all outgoing connections from
-LAN 10.0.0.0/8, using 3 public addresses and equal distribution.
-We will generate the hash randomly.</p>
+<p>第二种场景：对来自 LAN 10.0.0.0/8 的所有出站连接应用源地址 NAT，使用 3 个公有地址并平均分配流量。我们将随机生成哈希值。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set nat source rule 10 outbound-interface name eth0
 set nat source rule 10 source address 10.0.0.0/8
 set nat source rule 10 load-balance hash random
@@ -749,118 +568,106 @@ set nat source rule 10 load-balance backend 192.0.2.253 weight 34
 </pre></div>
 </div>
 <section id="example-network">
-<h4>示例 网络</h4>
-<p>Here’s one example of a network environment for an ASP.
-The ASP requests that all connections from this company should come from
-172.29.41.89 - an address that is assigned by the ASP and not in use at
-the customer site.</p>
+<h4>示例网络</h4>
+<p>以下是一个 ASP 网络环境的示例。ASP 要求该公司所有连接均须源自 172.29.41.89 —— 此地址由 ASP 分配，客户现场并未使用。</p>
 <figure class="align-default" id="id5">
-<a class="reference internal image-reference" href="https://docs.vyos.io/en/rolling/_images/nat_before_vpn_topology.webp"><img alt="NAT before VPN Topology" src="https://docs.vyos.io/en/rolling/_images/nat_before_vpn_topology.webp" style="width: 899.0px; height: 271.0px;"></img></a>
+<a class="reference internal image-reference" href="https://docs.vyos.io/en/latest/_images/nat_before_vpn_topology.webp"><img alt="NAT before VPN 拓扑结构" src="https://docs.vyos.io/en/latest/_images/nat_before_vpn_topology.webp" style="width: 899.0px; height: 271.0px;" /></a>
 <figcaption>
-<p>NAT before VPN Topology</p>
+<p>NAT before VPN 拓扑结构</p>
 </figcaption>
 </figure>
 </section>
 <section id="configuration">
 <h4>配置</h4>
-<p>The required configuration 可以 broken down into 4 major pieces:</p>
+<p>所需配置可分为四大主要部分：</p>
 <ul class="simple">
-<li><p>A dummy interface for the provider-assigned IP;</p></li>
-<li><p>NAT (specifically, 源 NAT);</p></li>
-<li><p>IPSec IKE and ESP 组s;</p></li>
-<li><p>IPSec VPN tunnels.</p></li>
+<li><p>用于提供商分配 IP 的虚拟接口；</p></li>
+<li><p>NAT（特指源地址 NAT）；</p></li>
+<li><p>IPSec IKE 组和 ESP 组；</p></li>
+<li><p>IPSec VPN 隧道。</p></li>
 </ul>
 <section id="dummy-interface">
-<h5>Dummy interface</h5>
-<p>The dummy interface allows us to have an equivalent of the Cisco IOS
-Loopback interface - a router-internal interface we can use for IP
-addresses the router must know about, but which are not actually
-assigned to a real network.</p>
-<p>We only need a single step for this interface:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum0 address '172.29.41.89/32'
+<h5>虚拟接口</h5>
+<p>虚拟接口使我们能够拥有类似于 Cisco IOS Loopback 接口的功能——一种路由器内部接口，可用于承载路由器必须知晓但实际并未分配给真实网络的 IP 地址。</p>
+<p>该接口仅需执行一个步骤：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum0 address &#39;172.29.41.89/32&#39;
 </pre></div>
 </div>
 </section>
 <section id="nat-configuration">
 <h5>NAT 配置</h5>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set nat source rule 110 description 'Internal to ASP'
-set nat source rule 110 destination address '172.27.1.0/24'
-set nat source rule 110 source address '192.168.43.0/24'
-set nat source rule 110 translation address '172.29.41.89'
-set nat source rule 120 description 'Internal to ASP'
-set nat source rule 120 destination address '10.125.0.0/16'
-set nat source rule 120 source address '192.168.43.0/24'
-set nat source rule 120 translation address '172.29.41.89'
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat source rule 110 description &#39;Internal to ASP&#39;
+set nat source rule 110 destination address &#39;172.27.1.0/24&#39;
+set nat source rule 110 source address &#39;192.168.43.0/24&#39;
+set nat source rule 110 translation address &#39;172.29.41.89&#39;
+set nat source rule 120 description &#39;Internal to ASP&#39;
+set nat source rule 120 destination address &#39;10.125.0.0/16&#39;
+set nat source rule 120 source address &#39;192.168.43.0/24&#39;
+set nat source rule 120 translation address &#39;172.29.41.89&#39;
 </pre></div>
 </div>
 </section>
 <section id="ipsec-ike-and-esp">
-<h5>IPSec IKE and ESP</h5>
-<p>The ASP has documented their IPSec requirements:</p>
+<h5>IPSec IKE 和 ESP</h5>
+<p>ASP 已在其文档中明确了 IPSec 的要求：</p>
 <ul class="simple">
-<li><p>IKE 阶段:</p>
+<li><p>IKE 阶段：</p>
 <ul>
-<li><p>aes256 Encryption</p></li>
-<li><p>sha256 Hashes</p></li>
+<li><p>aes256 加密</p></li>
+<li><p>sha256 哈希</p></li>
 </ul>
 </li>
-<li><p>ESP 阶段:</p>
+<li><p>ESP 阶段：</p>
 <ul>
-<li><p>aes256 Encryption</p></li>
-<li><p>sha256 Hashes</p></li>
-<li><p>DH 组 14</p></li>
+<li><p>aes256 加密</p></li>
+<li><p>sha256 哈希</p></li>
+<li><p>DH 第 14 组</p></li>
 </ul>
 </li>
 </ul>
-<p>添加itionally, we want to use VPNs only on our eth1 interface (the
-external interface in the image above)</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn ipsec ike-group my-ike key-exchange 'ikev1'
-set vpn ipsec ike-group my-ike lifetime '7800'
-set vpn ipsec ike-group my-ike proposal 1 dh-group '14'
-set vpn ipsec ike-group my-ike proposal 1 encryption 'aes256'
-set vpn ipsec ike-group my-ike proposal 1 hash 'sha256'
+<p>此外，我们希望仅在 eth1 接口（即上图中的外部接口）上使用 VPN</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn ipsec ike-group my-ike key-exchange &#39;ikev1&#39;
+set vpn ipsec ike-group my-ike lifetime &#39;7800&#39;
+set vpn ipsec ike-group my-ike proposal 1 dh-group &#39;14&#39;
+set vpn ipsec ike-group my-ike proposal 1 encryption &#39;aes256&#39;
+set vpn ipsec ike-group my-ike proposal 1 hash &#39;sha256&#39;
 
-set vpn ipsec esp-group my-esp lifetime '3600'
-set vpn ipsec esp-group my-esp mode 'tunnel'
-set vpn ipsec esp-group my-esp pfs 'disable'
-set vpn ipsec esp-group my-esp proposal 1 encryption 'aes256'
-set vpn ipsec esp-group my-esp proposal 1 hash 'sha256'
+set vpn ipsec esp-group my-esp lifetime &#39;3600&#39;
+set vpn ipsec esp-group my-esp mode &#39;tunnel&#39;
+set vpn ipsec esp-group my-esp pfs &#39;disable&#39;
+set vpn ipsec esp-group my-esp proposal 1 encryption &#39;aes256&#39;
+set vpn ipsec esp-group my-esp proposal 1 hash &#39;sha256&#39;
 
-set vpn ipsec interface 'eth1'
+set vpn ipsec interface &#39;eth1&#39;
 </pre></div>
 </div>
 </section>
 <section id="ipsec-vpn-tunnels">
-<h5>IPSec VPN Tunnels</h5>
-<p>We’ll use the IKE and ESP groups created above for this VPN. Because we
-need access to 2 different subnets on the far side, we will need two
-different tunnels. If you changed the names of the ESP group and IKE
-group in the previous step, make sure you use the correct names here
-too.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn ipsec authentication psk vyos id '203.0.113.46'
-set vpn ipsec authentication psk vyos id '198.51.100.243'
-set vpn ipsec authentication psk vyos secret 'MYSECRETPASSWORD'
-set vpn ipsec site-to-site peer branch authentication local-id '203.0.113.46'
-set vpn ipsec site-to-site peer branch authentication mode 'pre-shared-secret'
-set vpn ipsec site-to-site peer branch authentication remote-id '198.51.100.243'
-set vpn ipsec site-to-site peer branch connection-type 'initiate'
-set vpn ipsec site-to-site peer branch default-esp-group 'my-esp'
-set vpn ipsec site-to-site peer branch ike-group 'my-ike'
-set vpn ipsec site-to-site peer branch ikev2-reauth 'inherit'
-set vpn ipsec site-to-site peer branch local-address '203.0.113.46'
-set vpn ipsec site-to-site peer branch remote-address '198.51.100.243'
-set vpn ipsec site-to-site peer branch tunnel 0 local prefix '172.29.41.89/32'
-set vpn ipsec site-to-site peer branch tunnel 0 remote prefix '172.27.1.0/24'
-set vpn ipsec site-to-site peer branch tunnel 1 local prefix '172.29.41.89/32'
-set vpn ipsec site-to-site peer branch tunnel 1 remote prefix '10.125.0.0/16'
+<h5>IPSec VPN 隧道</h5>
+<p>我们将为该 VPN 使用上述创建的 IKE 和 ESP 组。由于我们需要访问远端的两个不同子网，因此需要建立两条不同的隧道。如果您在上一步中更改了 ESP 组和 IKE 组的名称，请确保此处也使用正确的名称。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set vpn ipsec authentication psk vyos id &#39;203.0.113.46&#39;
+set vpn ipsec authentication psk vyos id &#39;198.51.100.243&#39;
+set vpn ipsec authentication psk vyos secret &#39;MYSECRETPASSWORD&#39;
+set vpn ipsec site-to-site peer branch authentication local-id &#39;203.0.113.46&#39;
+set vpn ipsec site-to-site peer branch authentication mode &#39;pre-shared-secret&#39;
+set vpn ipsec site-to-site peer branch authentication remote-id &#39;198.51.100.243&#39;
+set vpn ipsec site-to-site peer branch connection-type &#39;initiate&#39;
+set vpn ipsec site-to-site peer branch default-esp-group &#39;my-esp&#39;
+set vpn ipsec site-to-site peer branch ike-group &#39;my-ike&#39;
+set vpn ipsec site-to-site peer branch ikev2-reauth &#39;inherit&#39;
+set vpn ipsec site-to-site peer branch local-address &#39;203.0.113.46&#39;
+set vpn ipsec site-to-site peer branch remote-address &#39;198.51.100.243&#39;
+set vpn ipsec site-to-site peer branch tunnel 0 local prefix &#39;172.29.41.89/32&#39;
+set vpn ipsec site-to-site peer branch tunnel 0 remote prefix &#39;172.27.1.0/24&#39;
+set vpn ipsec site-to-site peer branch tunnel 1 local prefix &#39;172.29.41.89/32&#39;
+set vpn ipsec site-to-site peer branch tunnel 1 remote prefix &#39;10.125.0.0/16&#39;
 </pre></div>
 </div>
 </section>
 <section id="testing-and-validation">
-<h5>测试ing and 有效ation</h5>
-<p>If you’ve completed all the above steps you no doubt want to see if it’s
-all working.</p>
-<p>Start by checking for IPSec SAs (Security Associations) with:</p>
+<h5>测试与验证</h5>
+<p>若您已完成上述所有步骤，无疑希望确认其是否正常工作。</p>
+<p>首先，使用以下命令检查 IPSec SA（安全关联）：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>$ show vpn ipsec sa
 
 Peer ID / IP                            Local ID / IP
@@ -873,14 +680,12 @@ Peer ID / IP                            Local ID / IP
     1       up     0.0/0.0        aes256   sha256  no     865     3600    all
 </pre></div>
 </div>
-<p>That looks good - we defined 2 tunnels and they’re both up and running.</p>
+<p>结果看起来不错——我们定义了两条隧道，且均已成功建立并运行。</p>
 </section>
 </section>
 </section>
 </section>
 </section>
-
-
-           </div>
+</div>
 </body>
 </html>

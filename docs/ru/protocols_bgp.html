@@ -155,7 +155,7 @@
 <h1>BGP</h1>
 <p><abbr title="Граница шлюза протокол">BGP</abbr> является одним из внешних шлюзовых протоколов
 и де-факто стандартным междоменным маршрутизационным протоколом. Последняя версия BGP
-— это 4. BGP-4 описан в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1771.html"><strong>RFC 1771</strong></a> и обновлено <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4271.html"><strong>RFC 4271</strong></a>. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2858.html"><strong>RFC 2858</strong></a>
+— это 4. BGP-4 описан в <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1771.html"><strong>RFC 1771</strong></a> и обновлено <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4271.html"><strong>RFC 4271</strong></a>. <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2858.html"><strong>RFC 2858</strong></a>
 добавляет многоадресную поддержку к BGP.</p>
 <p>VyOS использует <abbr title="Free Range Routing">FRR</abbr> и хотим поблагодарить
 их за их усилия!</p>
@@ -163,7 +163,7 @@
 <h2>Основные понятия</h2>
 <section id="autonomous-systems">
 <h3>Автономные системы</h3>
-<p>Согласно <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1930.html"><strong>RFC 1930</strong></a>:</p>
+<p>Согласно <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1930.html"><strong>RFC 1930</strong></a>:</p>
 <blockquote>
 <div><p>AS — это связанный набор одного или более IP префиксов, управляемых одним или несколькими
 сетевыми операторами, которые имеют ЕДИНЫЙ и ЧЕТКО ОПРЕДЕЛЕННЫЙ маршрутный политика.</p>
@@ -173,7 +173,7 @@
 в диапазоне от 1 до 65535. Номера AS 64512 через 65535 определены
 как частные номера AS. Частные номера AS не должны быть объявлены на глобальной
 Интернет. Двухбайтовый диапазон номеров AS исчерпан. 4-байтовые номера AS указаны
-в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6793.html"><strong>RFC 6793</strong></a>, и предоставляют набор из 4294967296 номеров AS.</p>
+в <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc6793.html"><strong>RFC 6793</strong></a>, и предоставляют набор из 4294967296 номеров AS.</p>
 <p><abbr title="Номер автономной системы">ASN</abbr> является одним из основных элементов
 BGP. BGP — это протокол расстояния-вектора, и фреймворк AS-Path
 предоставляет метрику расстояния-вектора и обнаружение циклов для BGP.</p>
@@ -250,7 +250,7 @@ IPv4 и IPv6.</p>
 <p>При добавлении функции обмена информацией о маршрутизации IPv6 в BGP. Были некоторые
 предложения. <abbr title="Инженерная группа интернета">IETF</abbr>
 <abbr title="Межсетевой маршрутизации">IDR</abbr> приняла предложение, называемое Многоадресным
-расширением для BGP. Спецификация описана в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2283.html"><strong>RFC 2283</strong></a>. Протокол
+расширением для BGP. Спецификация описана в <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2283.html"><strong>RFC 2283</strong></a>. Протокол
 не определяет новых протоколов. Он определяет новые атрибуты для существующего BGP. Когда
 он используется для обмена информацией о маршрутизации IPv6, он называется BGP-4+. Когда он используется
 для обмена информацией о multicast-маршрутизации, он называется MBGP.</p>
@@ -259,7 +259,7 @@ IPv4 и IPv6.</p>
 <p>Традиционный BGP не имел функции для обнаружения возможностей удаленного пира,
 например, может ли он обрабатывать типы префиксов, отличные от маршрутов IPv4 unicast.
 Это было большой проблемой при использовании Многоадресного расширения для BGP в
-операционной сети. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2842.html"><strong>RFC 2842</strong></a> приняло функцию, называемую Согласование возможностей.
+операционной сети. <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2842.html"><strong>RFC 2842</strong></a> приняло функцию, называемую Согласование возможностей.
 <em>bgpd</em> использует это Согласование возможностей для обнаружения возможностей удаленного пира.
 Если пир настроен только как пир IPv4 unicast, <em>bgpd</em> не отправляет эти пакеты согласования возможностей (по крайней мере, не если другие
 необязательные возможности BGP требуют согласования возможностей).</p>
@@ -331,7 +331,7 @@ set protocols bgp neighbor &lt;address|interface&gt; remote-as auto
 
 set protocols bgp neighbor &lt;address|interface&gt; local-role &lt;role&gt; [strict]
 <a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-local-role-role-strict" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
-<p>Роли BGP определены в RFC <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> и обеспечивают простой способ
+<p>Роли BGP определены в RFC <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> и обеспечивают простой способ
 добавления предотвращения, обнаружения и смягчения маршрутизации. Значение локальной роли
 согласуется с новой возможностью BGP Role, которая имеет
 встроенную проверку соответствующего значения. В случае несоответствия
@@ -342,7 +342,7 @@ set protocols bgp neighbor &lt;address|interface&gt; local-role &lt;role&gt; [st
 <p>RS-Server - RS-Client</p>
 <p>Если задано <code class="docutils literal notranslate">strict</code>, сеанс BGP не будет установлен
 до тех пор, пока BGP-пир не установит локальную роль на своей стороне. Этот
-параметр конфигурации определен в RFC <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> и используется для
+параметр конфигурации определен в RFC <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> и используется для
 обязательного выполнения соответствующей конфигурации на стороне ваших контрагентов.</p>
 <p>Маршруты, отправляемые провайдером, rs-server или пиром локальной роли
 (или если получены клиентом, rs-client или пиром локальной роли), будут

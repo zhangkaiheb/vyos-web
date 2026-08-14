@@ -170,7 +170,7 @@
 Эта диаграмма предоставляет обзор того, как обрабатываются пакеты и
 возможные пути, которые может принять трафик.</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-gral-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-gral-packet-flow.webp" />
+<img alt="../../_images/firewall-gral-packet-flow.webp" src="https://docs.vyos.io/en/latest/_images/firewall-gral-packet-flow.webp" />
 </figure>
 <p>Основные моменты относительно потока пакетов и терминологии в брандмауэре VyOS
 следующие:</p>
@@ -398,12 +398,12 @@ set firewall zone …
 <p>Для получения дополнительной информации о настройке брандмауэра, см. следующие страницы:</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/global-options.html">Глобальная конфигурация параметров брандмауэра</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/groups.html">Группы брандмауэра</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/bridge.html">Конфигурация брандмауэра моста</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv4.html">Конфигурация брандмауэра IPv4</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv6.html">Конфигурация брандмауэра IPv6</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/flowtables.html">Конфигурация брандмауэра Flowtables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/global-options.html">Глобальная конфигурация параметров брандмауэра</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/groups.html">Группы брандмауэра</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/bridge.html">Конфигурация брандмауэра моста</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/ipv4.html">Конфигурация брандмауэра IPv4</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/ipv6.html">Конфигурация брандмауэра IPv6</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/flowtables.html">Конфигурация брандмауэра Flowtables</a></li>
 </ul>
 </div>
 <div class="admonition note">
@@ -415,15 +415,15 @@ set firewall zone …
 <h2>Зонный брандмауэр</h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/zone.html">Зонный брандмауэр</a></li>
+<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/zone.html">Зонный брандмауэр</a></li>
 </ul>
 </div>
 <p>С зонным брандмауэром применяется новая концепция. Помимо стандартных потоков входящего и исходящего трафика, существует локальный поток, который позволяет трафику, исходящему из и предназначенным для самого роутера. Это означает, что вам нужно настроить дополнительные правила, чтобы защитить брандмауэр от сети, помимо существующих входящих и исходящих правил.</p>
 <p>Чтобы настроить VyOS с зонным брандмауэром, см.
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/zone.html">Конфигурация зонного брандмауэра</a>.</p>
+<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/zone.html">Конфигурация зонного брандмауэра</a>.</p>
 <p>Как показывает следующее примерное изображение, необходимо настроить правила, чтобы разрешить или заблокировать трафик, идущий к или от служб, работающих на устройстве, имеющих открытые соединения на этом интерфейсе.</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-zonebased.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-zonebased.webp" />
+<img alt="../../_images/firewall-zonebased.webp" src="https://docs.vyos.io/en/latest/_images/firewall-zonebased.webp" />
 </figure>
 </section>
 </section>

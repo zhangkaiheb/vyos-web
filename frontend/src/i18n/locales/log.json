@@ -2,25 +2,26 @@
   "zh-CN": {
     "log": {
       "columns": {
-        "actionMessage": "actionMessage",
-        "details": "details",
-        "level": "level",
-        "timestamp": "timestamp",
-        "userUnit": "userUnit"
+        "actionMessage": "操作消息",
+        "details": "详情",
+        "level": "级别",
+        "timestamp": "时间戳",
+        "userUnit": "用户"
       },
       "filters": {
-        "keyword": "密钥word"
+        "keyword": "关键词"
       },
       "messages": {
-        "noLogs": "noLogs"
+        "noLogs": "暂无日志"
       },
       "pagination": {
-        "first": "first",
-        "items": "items",
-        "last": "last",
-        "next": "next",
-        "perPage": "perPage",
-        "previous": "previous"
+        "first": "首页",
+        "items": "条",
+        "last": "末页",
+        "next": "下一页",
+        "perPage": "每页",
+        "previous": "上一页",
+        "total": "共 {total} 条"
       }
     }
   },

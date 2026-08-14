@@ -16,6 +16,7 @@ function getDefaultLang() {
   if (locale.startsWith('ru')) return 'ru';
   if (locale.startsWith('fr')) return 'fr';
   if (locale.startsWith('de')) return 'de';
+  if (locale.startsWith('ko')) return 'ko';
   return 'en';
 }
 

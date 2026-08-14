@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -153,73 +153,63 @@
              
   <section id="rip">
 <h1>RIP</h1>
-<p>Developed in the 1970s at Xerox Labs, RIP is a distance-vector routing
-protocol based on the Bellman-Ford algorithm.</p>
-<p>RIP determines the best route based on hop count (number of routers
-traversed). RIP-enabled routers periodically advertise their entire routing
-table to neighbors, along with the metric (hop count) for each destination.</p>
-<p>Supported versions:</p>
+<p>RIP 协议于 20 世纪 70 年代在施乐实验室（Xerox Labs）开发，是一种基于贝尔曼-福特（Bellman-Ford）算法的距离向量路由协议。</p>
+<p>RIP 根据跳数（即经过的路由器数量）确定最佳路由。启用 RIP 的路由器会周期性地向邻居通告其完整的路由表以及每个目的地址对应的度量值（跳数）。</p>
+<p>支持的版本：</p>
 <ul class="simple">
-<li><p>RIPv1: As described in
-<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc1058">RFC 1058</a></p></li>
-<li><p>RIPv2: As described in
-<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc2453">RFC 2453</a></p></li>
+<li><p>RIPv1：详见 <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc1058">RFC 1058</a></p></li>
+<li><p>RIPv2：详见 <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc2453">RFC 2453</a></p></li>
 </ul>
 <section id="general-configuration">
-<h2>General configuration</h2>
+<h2>常规配置</h2>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip network <A.B.C.D/M>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-network-a-b-c-d-m" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable RIP on all interfaces whose IP addresses fall within the specified
-network.</strong></p>
+set protocols rip network &lt;A.B.C.D/M&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-network-a-b-c-d-m" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在所有 IP 地址属于指定网络范围内的接口上启用 RIP。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip network 192.0.2.0/24
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable RIP on the specified interface.</strong></p>
-<p>Once applied, the interface sends and receives RIP packets.</p>
+set protocols rip interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-interface-interface" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上启用 RIP。</strong></p>
+<p>应用后，该接口将发送和接收 RIP 数据包。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip interface eth0
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip neighbor <A.B.C.D>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-neighbor-a-b-c-d" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a RIP neighbor using its IP address.</strong></p>
-<p>Use this command when a neighbor cannot process multicast RIP updates. Once
-configured, the local router sends updates directly to the specified
-neighbor as unicast packets.</p>
+set protocols rip neighbor &lt;A.B.C.D&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-neighbor-a-b-c-d" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>使用邻居的 IP 地址配置 RIP 邻居。</strong></p>
+<p>当邻居无法处理多播 RIP 更新时，请使用此命令。配置完成后，本地路由器将以单播数据包形式直接向指定邻居发送更新。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip neighbor 192.0.2.2
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip passive-interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-passive-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable passive mode for the specified interface.</strong></p>
-<p>This prevents the router from sending outgoing RIP updates on the
-interface, except to explicitly configured neighbors. Incoming RIP updates
-are still accepted and processed.</p>
+set protocols rip passive-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-passive-interface-interface" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定接口启用被动模式。</strong></p>
+<p>这将阻止路由器在此接口上发送出站 RIP 更新，但显式配置的邻居除外。入站 RIP 更新仍会被接受并处理。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip passive-interface eth0
 </pre></div>
 </div>
@@ -227,64 +217,56 @@ are still accepted and processed.</p>
 <div class="cfgcmd-heading">
 
 set protocols rip passive-interface default
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-passive-interface-default" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable passive mode for all interfaces.</strong></p>
-<p>This prevents the router from sending outgoing RIP updates on all
-interfaces, except to explicitly configured neighbors. The router still
-receives and processes incoming RIP updates normally.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-passive-interface-default" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为所有接口启用被动模式。</strong></p>
+<p>这将阻止路由器在所有接口上发送出站 RIP 更新，但显式配置的邻居除外。路由器仍可正常接收并处理入站 RIP 更新。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip passive-interface default
 </pre></div>
 </div>
 </section>
 <section id="optional-configuration">
-<h2>可选 configuration</h2>
+<h2>可选配置</h2>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip default-distance <1-255>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-default-distance-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the administrative distance for all RIP-learned routes.</strong></p>
-<p>The administrative distance determines how RIP-learned routes are
-prioritized against routes learned from other sources (such as BGP, OSPF,
-or static routes) when multiple paths to the same destination exist.</p>
+set protocols rip default-distance &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-default-distance-1-255" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为所有通过 RIP 学习到的路由配置管理距离。</strong></p>
+<p>管理距离决定了当存在通往同一目的地的多条路径时，RIP 学习到的路由相对于其他来源（如 BGP、OSPF 或静态路由）学习到的路由的优先级。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>路由s assigned a distance of 255 are disabled and will not be installed
-in the kernel forwarding table.</p>
+<p>分配了距离值 255 的路由将被禁用，且不会安装到内核转发表中。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip default-distance 100
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip network-distance <A.B.C.D/M> distance <1-255>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-network-distance-a-b-c-d-m-distance-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure an administrative distance for RIP routes whose source IP
-address falls within the specified network.</strong></p>
+set protocols rip network-distance &lt;A.B.C.D/M&gt; distance &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-network-distance-a-b-c-d-m-distance-1-255" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为源 IP 地址位于指定网络范围内的 RIP 路由配置管理距离。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip network-distance 192.0.2.0/24 distance 80
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip network-distance <A.B.C.D/M> access-list <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-network-distance-a-b-c-d-m-access-list-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Restrict administrative distance assignments to RIP routes whose source
-IP address matches the specified network and the route itself matches the
-specified access-list.</strong></p>
+set protocols rip network-distance &lt;A.B.C.D/M&gt; access-list &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-network-distance-a-b-c-d-m-access-list-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>将管理距离的分配限制为源 IP 地址匹配指定网络且路由本身匹配指定访问控制列表（access-list）的 RIP 路由。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip network-distance 192.0.2.0/24 distance 80
 set protocols rip network-distance 192.0.2.0/24 access-list 10
 </pre></div>
@@ -293,293 +275,267 @@ set protocols rip network-distance 192.0.2.0/24 access-list 10
 <div class="cfgcmd-heading">
 
 set protocols rip default-information originate
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-default-information-originate" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Generate and advertise a default route (<code class="docutils literal notranslate">0.0.0.0/0</code>) to all RIP
-neighbors.</strong></p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-default-information-originate" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>生成并向所有 RIP 邻居通告默认路由（<code class="docutils literal notranslate">0.0.0.0/0</code>）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip default-information originate
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip distribute-list access-list <in|out> <0-4294967295>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-distribute-list-access-list-in-out-0-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 an access-list to filter RIP routes in the inbound or outbound
-direction.</strong></p>
+set protocols rip distribute-list access-list &lt;in|out&gt; &lt;0-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-distribute-list-access-list-in-out-0-4294967295" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>应用访问控制列表（access-list）以过滤入站或出站方向的 RIP 路由。</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">in</code>: 过滤器 routes received from RIP neighbors.</p></li>
-<li><p><code class="docutils literal notranslate">out</code>: 过滤器 routes advertised to RIP neighbors.</p></li>
+<li><p><code class="docutils literal notranslate">in</code>：过滤从 RIP 邻居接收的路由。</p></li>
+<li><p><code class="docutils literal notranslate">out</code>：过滤向 RIP 邻居通告的路由。</p></li>
 </ul>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip distribute-list access-list in 20
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip distribute-list interface <interface> access-list <in|out> <0-4294967295>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-distribute-list-interface-interface-access-list-in-out-0-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 an access-list to filter RIP routes in the inbound or outbound
-direction on the specified interface.</strong></p>
+set protocols rip distribute-list interface &lt;interface&gt; access-list &lt;in|out&gt; &lt;0-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-distribute-list-interface-interface-access-list-in-out-0-4294967295" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上应用访问控制列表（access-list）以过滤入站或出站方向的 RIP 路由。</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">in</code>: 过滤器 routes received from RIP neighbors on this interface.</p></li>
-<li><p><code class="docutils literal notranslate">out</code>: 过滤器 routes advertised to RIP neighbors on this interface.</p></li>
+<li><p><code class="docutils literal notranslate">in</code>：过滤从此接口上的 RIP 邻居接收的路由。</p></li>
+<li><p><code class="docutils literal notranslate">out</code>：过滤向此接口上的 RIP 邻居通告的路由。</p></li>
 </ul>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip distribute-list interface eth0 access-list in 20
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip distribute-list prefix-list <in|out> <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-distribute-list-prefix-list-in-out-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 a prefix-list to filter RIP routes in the inbound or outbound
-direction.</strong></p>
+set protocols rip distribute-list prefix-list &lt;in|out&gt; &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-distribute-list-prefix-list-in-out-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>应用前缀列表（prefix-list）以过滤入站或出站方向的 RIP 路由。</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">in</code>: 过滤器 routes received from RIP neighbors.</p></li>
-<li><p><code class="docutils literal notranslate">out</code>: 过滤器 routes advertised to RIP neighbors.</p></li>
+<li><p><code class="docutils literal notranslate">in</code>：过滤从 RIP 邻居接收的路由。</p></li>
+<li><p><code class="docutils literal notranslate">out</code>：过滤向 RIP 邻居通告的路由。</p></li>
 </ul>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip distribute-list prefix-list in INBOUND-FILTER
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip distribute-list interface <interface> prefix-list <in|out> <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-distribute-list-interface-interface-prefix-list-in-out-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 a prefix-list to filter RIP routes on the specified interface in
-the inbound or outbound direction.</strong></p>
+set protocols rip distribute-list interface &lt;interface&gt; prefix-list &lt;in|out&gt; &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-distribute-list-interface-interface-prefix-list-in-out-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上应用前缀列表（prefix-list）以过滤入站或出站方向的 RIP 路由。</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">in</code>: 过滤器 routes received from RIP neighbors on this interface.</p></li>
-<li><p><code class="docutils literal notranslate">out</code>: 过滤器 routes advertised to RIP neighbors on this interface.</p></li>
+<li><p><code class="docutils literal notranslate">in</code>：过滤从此接口上的 RIP 邻居接收的路由。</p></li>
+<li><p><code class="docutils literal notranslate">out</code>：过滤向此接口上的 RIP 邻居通告的路由。</p></li>
 </ul>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip distribute-list interface eth0 prefix-list in RIP-IN
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip route <A.B.C.D/M>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-route-a-b-c-d-m" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>添加 a static route to the RIP routing process.</strong></p>
-<p>The route is created only inside RIP.</p>
-<p>This command is specific to FRR and VyOS and should only be used by
-advanced users with a strong understanding of the RIP protocol.</p>
-<p>For most deployments, the recommended approach is to create a standard
-static route and redistribute it into RIP using
-<code class="docutils literal notranslate">set protocols rip redistribute static</code>.</p>
+set protocols rip route &lt;A.B.C.D/M&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-route-a-b-c-d-m" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>向 RIP 路由进程添加一条静态路由。</strong></p>
+<p>该路由仅在 RIP 内部创建。</p>
+<p>此命令专用于 FRR 和 VyOS，仅应由对 RIP 协议有深入理解的高级用户使用。</p>
+<p>对于大多数部署场景，推荐的方法是创建一条标准静态路由，并使用 <code class="docutils literal notranslate">set protocols rip redistribute static</code> 命令将其重分发进 RIP。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip route 192.0.2.0/24
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip timers update <5-2147483647>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-timers-update-5-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the RIP update timer, （以秒为单位）。</strong></p>
-<p>The update timer defines how often the router sends unsolicited Response
-messages to its RIP neighbors. Each Response contains the complete RIP
-routing table.</p>
-<p>The default value is 30 seconds.</p>
+set protocols rip timers update &lt;5-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-timers-update-5-2147483647" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 RIP 更新定时器（单位：秒）。</strong></p>
+<p>更新定时器定义了路由器向其 RIP 邻居发送非请求响应（Response）消息的频率。每个响应消息均包含完整的 RIP 路由表。</p>
+<p>默认值为 30 秒。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip timers update 60
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip timers timeout <5-2147483647>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-timers-timeout-5-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the RIP route timeout, （以秒为单位）。</strong></p>
-<p>If a route is not refreshed by an incoming update within this interval, it
-becomes invalid. The router temporarily retains the invalid route in the
-RIP routing table so that neighbors learn the route has been dropped.</p>
-<p>The default value is 180 seconds.</p>
+set protocols rip timers timeout &lt;5-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-timers-timeout-5-2147483647" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 RIP 路由超时时间（单位：秒）。</strong></p>
+<p>如果某条路由在该时间间隔内未被入站更新刷新，则该路由变为无效。路由器会在 RIP 路由表中暂时保留该无效路由，以便邻居获知该路由已被删除。</p>
+<p>默认值为 180 秒。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip timers timeout 300
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip timers garbage-collection <5-2147483647>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-timers-garbage-collection-5-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the RIP garbage-collection timer, （以秒为单位）。</strong></p>
-<p>This timer starts when a route becomes invalid. When the timer expires,
-the route is removed from the routing table.</p>
-<p>The default value is 120 seconds.</p>
+set protocols rip timers garbage-collection &lt;5-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-timers-garbage-collection-5-2147483647" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 RIP 垃圾回收定时器（单位：秒）。</strong></p>
+<p>当一条路由变为无效时，该定时器开始计时。定时器到期后，该路由将从路由表中移除。</p>
+<p>默认值为 120 秒。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip timers garbage-collection 60
 </pre></div>
 </div>
 </section>
 <section id="redistribution-configuration">
-<h2>Redistribution configuration</h2>
+<h2>重分发配置</h2>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip redistribute <babel|bgp|connected|isis|kernel|nhrp|ospf|static>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-redistribute-babel-bgp-connected-isis-kernel-nhrp-ospf-static" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Redistribute routes from the specified source into RIP.</strong></p>
-<p>路由s learned from the chosen source are imported into the RIP routing
-table and advertised to RIP neighbors as if they had been learned through
-RIP itself.</p>
-<p>The supported sources are:</p>
+set protocols rip redistribute &lt;babel|bgp|connected|isis|kernel|nhrp|ospf|static&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-redistribute-babel-bgp-connected-isis-kernel-nhrp-ospf-static" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>将来自指定源的路由重分发进 RIP。</strong></p>
+<p>从所选源学习到的路由将被导入 RIP 路由表，并作为 RIP 自身学习到的路由通告给 RIP 邻居。</p>
+<p>支持的源包括：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">babel</code>: 路由s learned via Babel.</p></li>
-<li><p><code class="docutils literal notranslate">bgp</code>: 路由s learned via BGP.</p></li>
-<li><p><code class="docutils literal notranslate">connected</code>: Directly connected routes.</p></li>
-<li><p><code class="docutils literal notranslate">isis</code>: 路由s learned via IS-IS.</p></li>
-<li><p><code class="docutils literal notranslate">kernel</code>: 路由s installed in the kernel routing table.</p></li>
-<li><p><code class="docutils literal notranslate">nhrp</code>: 路由s learned via NHRP.</p></li>
-<li><p><code class="docutils literal notranslate">ospf</code>: 路由s learned via OSPF.</p></li>
-<li><p><code class="docutils literal notranslate">static</code>: 路由s configured statically.</p></li>
+<li><p><code class="docutils literal notranslate">babel</code>：通过 Babel 协议学习到的路由。</p></li>
+<li><p><code class="docutils literal notranslate">bgp</code>：通过 BGP 协议学习到的路由。</p></li>
+<li><p><code class="docutils literal notranslate">connected</code>：直连路由。</p></li>
+<li><p><code class="docutils literal notranslate">isis</code>：通过 IS-IS 协议学习到的路由。</p></li>
+<li><p><code class="docutils literal notranslate">kernel</code>：安装在内核路由表中的路由。</p></li>
+<li><p><code class="docutils literal notranslate">nhrp</code>：通过 NHRP 协议学习到的路由。</p></li>
+<li><p><code class="docutils literal notranslate">ospf</code>：通过 OSPF 协议学习到的路由。</p></li>
+<li><p><code class="docutils literal notranslate">static</code>：静态配置的路由。</p></li>
 </ul>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip redistribute static
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip redistribute <babel|bgp|connected|isis|kernel|nhrp|ospf|static> metric <1-16>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-redistribute-babel-bgp-connected-isis-kernel-nhrp-ospf-static-metric-1-16" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the metric for routes redistributed from the specified
-source.</strong></p>
+set protocols rip redistribute &lt;babel|bgp|connected|isis|kernel|nhrp|ospf|static&gt; metric &lt;1-16&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-redistribute-babel-bgp-connected-isis-kernel-nhrp-ospf-static-metric-1-16" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为从指定源重分发的路由配置度量值（metric）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip redistribute static metric 5
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip redistribute <babel|bgp|connected|isis|kernel|nhrp|ospf|static> route-map <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-redistribute-babel-bgp-connected-isis-kernel-nhrp-ospf-static-route-map-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 a route-map to filter routes redistributed from the specified
-source.</strong></p>
+set protocols rip redistribute &lt;babel|bgp|connected|isis|kernel|nhrp|ospf|static&gt; route-map &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-redistribute-babel-bgp-connected-isis-kernel-nhrp-ospf-static-route-map-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>应用路由映射（route-map）以过滤从指定源重分发的路由。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip redistribute static route-map RIP-REDISTRIBUTE
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip default-metric <1-16>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-default-metric-1-16" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the default metric (hop count) applied to redistributed
-routes.</strong></p>
-<p>The default value is 1.</p>
+set protocols rip default-metric &lt;1-16&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-default-metric-1-16" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置应用于重分发路由的默认度量值（跳数）。</strong></p>
+<p>默认值为 1。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>This command does not affect connected routes redistributed via
-<code class="docutils literal notranslate">set protocols rip redistribute connected</code>. To configure the metric for
-connected routes, use <code class="docutils literal notranslate">set protocols rip redistribute connected metric</code>
-explicitly.</p>
+<p>此命令不影响通过 <code class="docutils literal notranslate">set protocols rip redistribute connected</code> 重分发的直连路由。若要为直连路由配置度量值，请显式使用 <code class="docutils literal notranslate">set protocols rip redistribute connected metric</code> 命令。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip default-metric 5
 </pre></div>
 </div>
 </section>
 <section id="interfaces-configuration">
-<h2>接口 configuration</h2>
+<h2>接口配置</h2>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip interface <interface> authentication plaintext-password <text>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-interface-interface-authentication-plaintext-password-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable simple password authentication for RIPv2 on the specified
-interface and set a password.</strong></p>
-<p>The password must not exceed 16 characters.</p>
+set protocols rip interface &lt;interface&gt; authentication plaintext-password &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-interface-interface-authentication-plaintext-password-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上为 RIPv2 启用简单密码认证并设置密码。</strong></p>
+<p>密码长度不得超过 16 个字符。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip interface eth0 authentication plaintext-password vyos-secret
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip interface <interface> authentication md5 <id> password <text>
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-interface-interface-authentication-md5-id-password-text" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable <abbr title="Message-Digest Algorithm 5">MD5</abbr> authentication for RIPv2
-on the specified interface and set the MD5 key.</strong></p>
-<p>The MD5 key must not exceed 16 characters.</p>
+set protocols rip interface &lt;interface&gt; authentication md5 &lt;id&gt; password &lt;text&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-interface-interface-authentication-md5-id-password-text" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上为 RIPv2 启用 <abbr title="Message-Digest Algorithm 5">MD5</abbr> 认证并设置 MD5 密钥。</strong></p>
+<p>MD5 密钥长度不得超过 16 个字符。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip interface eth0 authentication md5 1 password vyos-secret
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip interface <interface> split-horizon disable
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-interface-interface-split-horizon-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable split-horizon on the specified interface.</strong></p>
-<p>By default, VyOS does not advertise RIP routes back through the interface
-on which they were learned (split horizon). This command turns off that
-default.</p>
+set protocols rip interface &lt;interface&gt; split-horizon disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-interface-interface-split-horizon-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上禁用水平分割（split horizon）。</strong></p>
+<p>默认情况下，VyOS 不会通过学习到该路由的接口再次通告该 RIP 路由（即水平分割）。此命令将关闭该默认行为。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip interface eth0 split-horizon disable
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols rip interface <interface> split-horizon poison-reverse
-<a class="cmdlink" href="#cfgcmd-set-protocols-rip-interface-interface-split-horizon-poison-reverse" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable split horizon with poison reverse on the specified interface.</strong></p>
-<p>If enabled, the router advertises the learned routes as unreachable on the
-interface where they were learned.</p>
+set protocols rip interface &lt;interface&gt; split-horizon poison-reverse
+<a class="cmdlink" href="#cfgcmd-set-protocols-rip-interface-interface-split-horizon-poison-reverse" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上启用带毒化反转（poison reverse）的水平分割。</strong></p>
+<p>启用后，路由器将在学习到这些路由的接口上将它们通告为不可达。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols rip interface eth0 split-horizon poison-reverse
 </pre></div>
 </div>
 </section>
 <section id="operational-mode-commands">
-<h2>Operational mode commands</h2>
+<h2>操作模式命令</h2>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show ip rip
-<a class="cmdlink" href="#opcmd-show-ip-rip" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p><strong>显示 all RIP routes.</strong></p>
+<a class="cmdlink" href="#opcmd-show-ip-rip" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p><strong>显示所有 RIP 路由。</strong></p>
 </div>
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos-1:~$ show ip rip
@@ -601,11 +557,11 @@ R(n) 203.0.113.0/24     192.0.2.2             2 192.0.2.2         0 02:53
 <div class="opcmd-heading">
 
 show ip rip status
-<a class="cmdlink" href="#opcmd-show-ip-rip-status" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p><strong>显示 the current RIP status.</strong></p>
+<a class="cmdlink" href="#opcmd-show-ip-rip-status" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p><strong>显示当前 RIP 状态。</strong></p>
 </div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre>Routing Protocol is "rip"
+<div class="highlight-none notranslate"><div class="highlight"><pre>Routing Protocol is &quot;rip&quot;
   Sending updates every 30 seconds with +/-50%, next due in 11 seconds
   Timeout after 180 seconds, garbage collect after 120 seconds
   Outgoing update filter list for all interface is not set
@@ -628,18 +584,17 @@ show ip rip status
 </section>
 <section id="example">
 <h2>示例</h2>
-<p>The following example demonstrates a basic RIP configuration between two
-routers, where directly connected networks are redistributed into RIP.</p>
-<p><strong>Node 1:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address '198.51.100.1/24'
-set interfaces loopback lo address '192.0.2.1/32'
+<p>以下示例演示了两个路由器之间的基本 RIP 配置，其中直连网络被重分发进 RIP。</p>
+<p><strong>节点 1：</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address &#39;198.51.100.1/24&#39;
+set interfaces loopback lo address &#39;192.0.2.1/32&#39;
 set protocols rip network 198.51.100.0/24
 set protocols rip redistribute connected
 </pre></div>
 </div>
-<p><strong>Node 2:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address '198.51.100.2/24'
-set interfaces loopback lo address '192.0.2.2/32'
+<p><strong>节点 2：</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth0 address &#39;198.51.100.2/24&#39;
+set interfaces loopback lo address &#39;192.0.2.2/32&#39;
 set protocols rip network 198.51.100.0/24
 set protocols rip redistribute connected
 </pre></div>

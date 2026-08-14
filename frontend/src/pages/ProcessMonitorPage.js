@@ -135,12 +135,6 @@ export default defineComponent({
   components: { DataTable, ToolbarButton, HelpButton, TabGroup },
   template: `
     <div class="page-container process-monitor-page">
-      <div class="toolbar toolbar-compact">
-        <div class="toolbar-left">
-          <ToolbarButton icon="refresh" @click="load">{{ t('processMonitor.buttons.refresh') }}</ToolbarButton>
-          <HelpButton routePath="/monitor/system-status/process-monitor" />
-        </div>
-      </div>
       <TabGroup v-model="activeTab" :tabs="tabs">
         <template #summary>
           <DataTable :columns="infoColumns" :data="summaryRows" :selectable="false" :actions="[]" rowKey="key" />

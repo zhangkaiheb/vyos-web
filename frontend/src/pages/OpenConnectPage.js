@@ -70,6 +70,7 @@ export default defineComponent({
     });
 
     const activeTab = ref('basic');
+    const networkSubTab = ref('clientIp');
 
     const userColumns = [
       { key: 'username', title: t('openconnect.columns.username'), dataIndex: 'username', width: 150 },
@@ -481,34 +482,52 @@ export default defineComponent({
           </DataTable>
         </div>
 
-        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('openconnect.sections.identityBasedConfig') }}</div>
-        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.defaultConfig') }}</label><input class="form-control" v-model="config.authentication.identity_based_config.default_config" :title="t('openconnect.tips.defaultConfig')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.configDirectory') }}</label><input class="form-control" v-model="config.authentication.identity_based_config.directory" :title="t('openconnect.tips.configDirectory')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.mode') }}</label>
-          <select class="form-control" v-model="config.authentication.identity_based_config.mode" :title="t('openconnect.tips.mode')">
-            <option value="">{{ t('openconnect.options.none') }}</option>
-            <option value="user">{{ t('openconnect.options.matchByUsername') }}</option>
-            <option value="group">{{ t('openconnect.options.matchByRadiusGroup') }}</option>
-          </select>
+        <div class="form-group" style="margin-top:24px;">
+          <div class="form-group-title">{{ t('openconnect.sections.identityBasedConfig') }}</div>
+          <div class="form-group-content">
+            <div class="form-row"><label class="form-label">{{ t('openconnect.labels.defaultConfig') }}</label><input class="form-control" v-model="config.authentication.identity_based_config.default_config" :title="t('openconnect.tips.defaultConfig')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('openconnect.labels.configDirectory') }}</label><input class="form-control" v-model="config.authentication.identity_based_config.directory" :title="t('openconnect.tips.configDirectory')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('openconnect.labels.mode') }}</label>
+              <select class="form-control" v-model="config.authentication.identity_based_config.mode" :title="t('openconnect.tips.mode')">
+                <option value="">{{ t('openconnect.options.none') }}</option>
+                <option value="user">{{ t('openconnect.options.matchByUsername') }}</option>
+                <option value="group">{{ t('openconnect.options.matchByRadiusGroup') }}</option>
+              </select>
+            </div>
+            <div class="form-row"><label class="form-label">{{ t('openconnect.labels.disable') }}</label><input type="checkbox" v-model="config.authentication.identity_based_config.disable" :title="t('openconnect.tips.disableIdentityBasedConfig')" /></div>
+          </div>
         </div>
-        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.disable') }}</label><input type="checkbox" v-model="config.authentication.identity_based_config.disable" :title="t('openconnect.tips.disableIdentityBasedConfig')" /></div>
       </template>
 
       <template #network>
-        <div style="font-weight:bold;margin-bottom:8px;">{{ t('openconnect.sections.clientIpSettings') }}</div>
-        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.subnet') }}</label><input class="form-control" v-model="config.network_settings.client_ip_subnet" placeholder="x.x.x.x/x" :title="t('openconnect.tips.subnet')" /></div>
-
-        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('openconnect.sections.clientIpv6Pool') }}</div>
-        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.prefix') }}</label><input class="form-control" v-model="config.network_settings.client_ipv6_pool.prefix" placeholder="h:h:h:h:h:h:h:h/x" :title="t('openconnect.tips.prefix')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.maskLength') }}</label><input class="form-control" type="number" min="48" max="128" v-model="config.network_settings.client_ipv6_pool.mask" :title="t('openconnect.tips.maskLength')" /></div>
-
-        <div style="font-weight:bold;margin:16px 0 8px;">{{ t('openconnect.sections.dnsSettings') }}</div>
-        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.dnsServer') }}</label><textarea class="form-control" v-model="config.network_settings.name_servers" rows="3" :placeholder="t('openconnect.placeholders.dnsServer')" :title="t('openconnect.tips.dnsServer')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.pushRoutes') }}</label><textarea class="form-control" v-model="config.network_settings.push_routes" rows="3" :placeholder="t('openconnect.placeholders.pushRoutes')" :title="t('openconnect.tips.pushRoutes')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.splitDns') }}</label><textarea class="form-control" v-model="config.network_settings.split_dns" rows="3" :placeholder="t('openconnect.placeholders.splitDns')" :title="t('openconnect.tips.splitDns')" /></div>
-        <div class="form-row"><label class="form-label">{{ t('openconnect.labels.tunnelAllDns') }}</label><input type="checkbox" v-model="config.network_settings.tunnel_all_dns" :title="t('openconnect.tips.tunnelAllDns')" /></div>
+        <div class="form-group">
+          <div class="form-group-title">{{ t('openconnect.sections.clientIpSettings') }}</div>
+          <div class="form-group-content">
+            <div class="form-row"><label class="form-label">{{ t('openconnect.labels.subnet') }}</label><input class="form-control" v-model="config.network_settings.client_ip_subnet" placeholder="x.x.x.x/x" :title="t('openconnect.tips.subnet')" /></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-group-title">{{ t('openconnect.sections.clientIpv6Pool') }}</div>
+          <div class="form-group-content">
+            <div class="form-row"><label class="form-label">{{ t('openconnect.labels.prefix') }}</label><input class="form-control" v-model="config.network_settings.client_ipv6_pool.prefix" placeholder="h:h:h:h:h:h:h:h/x" :title="t('openconnect.tips.prefix')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('openconnect.labels.maskLength') }}</label><input class="form-control" type="number" min="48" max="128" v-model="config.network_settings.client_ipv6_pool.mask" :title="t('openconnect.tips.maskLength')" /></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-group-title">{{ t('openconnect.sections.dnsSettings') }}</div>
+          <div class="form-group-content">
+            <div class="form-row"><label class="form-label">{{ t('openconnect.labels.dnsServer') }}</label><textarea class="form-control" v-model="config.network_settings.name_servers" rows="3" :placeholder="t('openconnect.placeholders.dnsServer')" :title="t('openconnect.tips.dnsServer')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('openconnect.labels.pushRoutes') }}</label><textarea class="form-control" v-model="config.network_settings.push_routes" rows="3" :placeholder="t('openconnect.placeholders.pushRoutes')" :title="t('openconnect.tips.pushRoutes')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('openconnect.labels.splitDns') }}</label><textarea class="form-control" v-model="config.network_settings.split_dns" rows="3" :placeholder="t('openconnect.placeholders.splitDns')" :title="t('openconnect.tips.splitDns')" /></div>
+            <div class="form-row"><label class="form-label">{{ t('openconnect.labels.tunnelAllDns') }}</label><input type="checkbox" v-model="config.network_settings.tunnel_all_dns" :title="t('openconnect.tips.tunnelAllDns')" /></div>
+          </div>
+        </div>
       </template>
       </TabGroup>
+
+      <div style="text-align:right;padding:16px 0;">
+        <ToolbarButton icon="save" primary :disabled="saving" @click="save">{{ saving ? t('app.loading') : t('app.confirm') }}</ToolbarButton>
+      </div>
 
       <DraggableModal v-model:visible="showUserModal" :title="editingUser && editingUser._username ? t('openconnect.modals.editUser') : t('openconnect.modals.createUser')" @confirm="saveUser" @close="showUserModal = false" width="600px">
         <div class="form-row"><label class="form-label">{{ t('openconnect.labels.username') }}</label><input class="form-control" v-model="editingUser.username" :disabled="editingUser._username" :title="t('openconnect.tips.username')" /></div>

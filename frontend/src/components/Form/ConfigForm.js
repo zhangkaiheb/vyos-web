@@ -1,4 +1,4 @@
-import { defineComponent, ref, watch, h, onMounted, inject } from '/src/utils/vue-import.js';
+import { defineComponent, ref, watch, h, onMounted, inject, toRef } from '/src/utils/vue-import.js';
 import { validateField } from '/src/utils/validators.js';
 import { configApi } from '/src/api/index.js';
 import DualListSelector from '/src/components/Form/DualListSelector.js';
@@ -13,6 +13,10 @@ function defaultValue(field) {
   if (field.type === 'number' || field.type === 'port') return null;
   if (field.type === 'group') return {};
   if (field.type === 'textarea' && field.multi) return [];
+  if (field.type === 'select' && field.options && field.options.length) {
+    const first = field.options[0];
+    return typeof first === 'object' ? first.value : first;
+  }
   return '';
 }
 
@@ -40,6 +44,15 @@ export default defineComponent({
       return path.length ? `${prefix}${path.join('.')}.${key}` : `${prefix}${key}`;
     }
 
+    function getFormObj(path) {
+      let obj = form.value;
+      for (const p of path) {
+        if (obj && obj[p] !== undefined) obj = obj[p];
+        else return null;
+      }
+      return obj;
+    }
+
     async function loadSuggestions(path, field) {
       const key = suggestionKey(path, field.key);
       if (suggestionsCache.value[key]) return suggestionsCache.value[key];
@@ -51,6 +64,11 @@ export default defineComponent({
         const staticSuggestions = field.suggestions || [];
         const combined = Array.from(new Set([...staticSuggestions, ...list]));
         suggestionsCache.value[key] = combined;
+        // Auto-select first option if field value is empty and noAutoFill is not set
+        const formObj = getFormObj(path);
+        if (formObj && combined.length && !formObj[field.key] && !field.noAutoFill) {
+          formObj[field.key] = combined[0];
+        }
         return combined;
       } catch (e) {
         return field.suggestions || [];
@@ -103,7 +121,8 @@ export default defineComponent({
       form.value = walk(props.schema, props.modelValue);
     }
 
-    watch(() => props.modelValue, initForm, { immediate: true, deep: true });
+    const modelValueRef = toRef(props, 'modelValue');
+    watch(modelValueRef, initForm, { immediate: true });
 
     function deepMerge(target, source) {
       for (const key of Object.keys(source)) {

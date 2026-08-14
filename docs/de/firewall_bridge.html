@@ -164,7 +164,7 @@ und zu den zugehörigen Op-Modus-Befehlen.</p>
 set firewall bridge &lt;options&gt;
 <a class="cmdlink" href="#cfgcmd-set-firewall-bridge-options" title="Permalink to this Command"></a></div></div>
 <p>Aus der Hauptstruktur, die in
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Firewall-Übersicht</a>
+<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">Firewall-Übersicht</a>
 in diesem Abschnitt können Sie detaillierte Informationen nur für den nächsten Teil
 der allgemeinen Struktur finden:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
@@ -187,18 +187,18 @@ der allgemeinen Struktur finden:</p>
 </ul>
 <p>Für den Datenverkehr, der intern von der Brücke weitergeleitet werden muss, ist die Basiskette <strong>forward</strong>, und ihr Basisbefehl für die Filterung ist <code class="docutils literal notranslate">set firewall bridge forward filter ...</code>, der im Stadium 4 stattfindet, rot markiert.</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-bridge-forward.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-forward.webp" />
+<img alt="../../_images/firewall-bridge-forward.webp" src="https://docs.vyos.io/en/latest/_images/firewall-bridge-forward.webp" />
 </figure>
 <p>Für den Datenverkehr, der an den Router selbst oder der weitergeleitet werden muss
 (vorausgesetzt, eine Layer3-Brücke ist konfiguriert), ist die Basiskette <strong>input</strong>, und der
 Basisbefehl ist <code class="docutils literal notranslate">set firewall bridge input filter ...</code> und der Pfad ist:</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-bridge-input.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-input.webp" />
+<img alt="../../_images/firewall-bridge-input.webp" src="https://docs.vyos.io/en/latest/_images/firewall-bridge-input.webp" />
 </figure>
-<p>Wenn das Paket nicht abgewiesen wird, wird es an die <strong>IP-Ebene</strong> gesendet und dort vom <strong>IP-Ebenen-Firewall</strong>: IPv4 oder IPv6-Regelset verarbeitet. Prüfen Sie bei Bedarf erneut das <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">allgemeine Paketflussdiagramm</a>.</p>
+<p>Wenn das Paket nicht abgewiesen wird, wird es an die <strong>IP-Ebene</strong> gesendet und dort vom <strong>IP-Ebenen-Firewall</strong>: IPv4 oder IPv6-Regelset verarbeitet. Prüfen Sie bei Bedarf erneut das <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">allgemeine Paketflussdiagramm</a>.</p>
 <p>Für den Datenverkehr, der von der Brücke selbst stammt, ist die Basiskette <strong>output</strong>, und der Basisbefehl ist <code class="docutils literal notranslate">set firewall bridge output filter ...</code>, und der Pfad ist:</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-bridge-output.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-bridge-output.webp" />
+<img alt="../../_images/firewall-bridge-output.webp" src="https://docs.vyos.io/en/latest/_images/firewall-bridge-output.webp" />
 </figure>
 <p>Benutzerdefinierte Brücken-Firewall-Ketten können mit dem Befehl <code class="docutils literal notranslate">set firewall bridge name &lt;name&gt; ...</code> erstellt werden. Um eine solche benutzerdefinierte Kette zu verwenden, muss in einer Basiskette eine Regel mit Aktion jump und dem entsprechenden Ziel definiert werden.</p>
 </section>
@@ -644,8 +644,8 @@ set firewall bridge name &lt;name&gt; rule &lt;1-999999&gt; disable
 </section>
 <section id="matching-criteria">
 <h3>Übereinstimmungskriterien</h3>
-<p>Es gibt viele Übereinstimmungskriterien, anhand derer ein Paket getestet werden kann. Siehe <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv4.html">IPv4</a> und
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipv6.html">IPv6</a> Übereinstimmungskriterien für weitere Details.</p>
+<p>Es gibt viele Übereinstimmungskriterien, anhand derer ein Paket getestet werden kann. Siehe <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/ipv4.html">IPv4</a> und
+<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/ipv6.html">IPv6</a> Übereinstimmungskriterien für weitere Details.</p>
 <p>Da Brücken auf Ebene 2 arbeiten, werden sowohl Matcher für IPv4 als auch IPv6 in der Brücken-Firewall-Konfiguration unterstützt. Das gleiche gilt für Firewall-Gruppen.</p>
 <p>Die gleichen spezifischen Übereinstimmungskriterien, die in der Brücken-Firewall verwendet werden können, sind in diesem Abschnitt beschrieben:</p>
 <div class="cmd cmd-cfg">

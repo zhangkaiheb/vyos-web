@@ -2,53 +2,53 @@
   "zh-CN": {
     "bfd": {
       "alerts": {
-        "saved": "保存d"
+        "saved": "已保存"
       },
       "columns": {
-        "address": "添加ress",
-        "multiplier": "multiplier",
+        "address": "地址",
+        "multiplier": "乘数",
         "name": "名称",
-        "profile": "profile",
-        "receiveInterval": "receiveInterval",
-        "sourceAddress": "source 添加ress",
-        "transmitInterval": "transmitInterval"
+        "profile": "配置文件",
+        "receiveInterval": "接收间隔",
+        "sourceAddress": "源地址",
+        "transmitInterval": "发送间隔"
       },
       "errors": {
-        "peerAddressRequired": "peer 添加ress 为必填项",
-        "profileNameRequired": "profile 名称 为必填项"
+        "peerAddressRequired": "对等地址为必填项",
+        "profileNameRequired": "配置文件名称为必填项"
       },
       "labels": {
-        "multiplier": "multiplier",
-        "nameRequired": "名称 为必填项",
-        "peerAddressRequired": "peer 添加ress 为必填项",
-        "profile": "profile",
-        "receiveInterval": "receiveInterval",
-        "sourceAddress": "source 添加ress",
-        "transmitInterval": "transmitInterval"
+        "multiplier": "乘数",
+        "nameRequired": "名称为必填项",
+        "peerAddressRequired": "对等地址为必填项",
+        "profile": "配置文件",
+        "receiveInterval": "接收间隔",
+        "sourceAddress": "源地址",
+        "transmitInterval": "发送间隔"
       },
       "messages": {
-        "confirmDeletePeer": "确定 删除 peer",
-        "confirmDeleteProfile": "确定 删除 profile"
+        "confirmDeletePeer": "确定删除对等体？",
+        "confirmDeleteProfile": "确定删除配置文件？"
       },
       "modals": {
-        "addPeer": "添加 peer",
-        "addProfile": "添加 profile",
-        "confirmDelete": "确定 删除",
-        "editPeer": "编辑 peer",
-        "editProfile": "编辑 profile"
+        "addPeer": "添加对等体",
+        "addProfile": "添加配置文件",
+        "confirmDelete": "确定删除",
+        "editPeer": "编辑对等体",
+        "editProfile": "编辑配置文件"
       },
       "placeholders": {
-        "intervalMs": "intervalMs",
-        "ipv4": "ipv4",
-        "multiplier": "multiplier",
-        "profileName": "profile 名称"
+        "intervalMs": "间隔（毫秒）",
+        "ipv4": "IPv4 地址",
+        "multiplier": "乘数",
+        "profileName": "配置文件名称"
       },
       "tabs": {
-        "peer": "peer",
-        "profile": "profile"
+        "peer": "对等体",
+        "profile": "配置文件"
       },
       "validation": {
-        "ipv4": "ipv4"
+        "ipv4": "IPv4 地址"
       }
     }
   },

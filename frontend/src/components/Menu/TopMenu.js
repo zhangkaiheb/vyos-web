@@ -3,60 +3,89 @@ import { useRoute, useRouter } from '/src/utils/vue-router-import.js';
 import { useAuthStore } from '/src/stores/auth.js';
 import { useNotificationStore } from '/src/stores/notifications.js';
 import { useConfigStore } from '/src/stores/config.js';
+import { useVisibilityStore } from '/src/stores/visibility.js';
 import { emitMenuRefresh } from '/src/utils/eventBus.js';
 import PendingChanges from '/src/components/Layout/PendingChanges.js';
 import { locale, localeNames, LOCALES } from '/src/i18n/index.js';
 
-const CLOSE_DELAY = 600;
+const CLOSE_DELAY = 5000;
 
 function getLabel(item) {
   return locale.value === 'en' ? (item.label_en || item.label) : item.label;
 }
 
-function renderSubmenu(items, state, keepParentOpen, clearParent, setOpen, clearOpen, toggleOpen, closeAll, router, route, level = 0, fixedStyle = null) {
+function renderSubmenu(items, state, keepParentOpen, clearParent, setOpen, clearOpen, toggleOpen, closeAll, router, route, level = 0, fixedStyle = null, visibility = null) {
   const style = fixedStyle || undefined;
   return h('div', {
     class: 'top-submenu',
     style,
     onMouseenter: keepParentOpen,
     onMouseleave: clearParent,
-  }, items.filter(item => !item.hidden).map(item => {
-    const hasChildren = item.children?.length;
+  }, items.filter(item => {
+    if (item.hidden) return false;
+    if (visibility && !visibility.isMenuItemVisible(item)) return false;
+    const visibleChildren = item.children?.filter(c => !c.hidden && (!visibility || visibility.isMenuItemVisible(c)));
+    // Hide parent items with no visible children and no route
+    if (item.children?.length && !visibleChildren?.length && !item.route) return false;
+    return true;
+  }).map(item => {
+    const visibleChildren = item.children?.filter(c => !c.hidden && (!visibility || visibility.isMenuItemVisible(c)));
+    const hasChildren = visibleChildren?.length;
     const isActive = item.route && (route.path === item.route || route.path.startsWith(item.route + '/'));
     const isOpen = state.openId === item.id && hasChildren;
     return h('div', {
-      class: ['top-submenu-item', { active: isActive }],
-      onMouseenter: () => {
-        if (hasChildren || level === 0) {
-          setOpen(item.id);
-        } else {
-          keepParentOpen();
-        }
-      },
-      onMouseleave: clearOpen,
+      class: ['top-submenu-item-wrapper'],
+      style: { position: 'relative' },
     }, [
-      item.route && !hasChildren
-        ? h('a', {
-            class: 'menu-leaf',
-            href: 'javascript:;',
-            onClick: (e) => {
-              e.stopPropagation();
-              if (route.path === item.route) {
-                emitMenuRefresh(route.path);
-              } else {
-                router.push(item.route);
+      h('div', {
+        class: ['top-submenu-item', { active: isActive }],
+        onMouseenter: () => {
+          if (hasChildren || level === 0) {
+            setOpen(item.id);
+          } else {
+            keepParentOpen();
+          }
+        },
+        onMouseleave: clearOpen,
+      }, [
+        item.route && !hasChildren
+          ? h('a', {
+              class: 'menu-leaf',
+              href: 'javascript:;',
+              onClick: (e) => {
+                e.stopPropagation();
+                if (route.path === item.route) {
+                  emitMenuRefresh(route.path);
+                } else {
+                  router.push(item.route);
+                }
+                closeAll();
               }
-              closeAll();
-            }
-          }, getLabel(item))
-        : h('span', {
-            style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-            onClick: (e) => { e.stopPropagation(); if (hasChildren) toggleOpen(item.id); }
-          }, [
-            getLabel(item),
-            hasChildren ? h('span', { class: 'arrow' }, '▸') : null
-          ]),
-      isOpen ? renderSubmenu(item.children, state, () => setOpen(item.id), clearOpen, setOpen, clearOpen, toggleOpen, closeAll, router, route, level + 1) : null,
+            }, getLabel(item))
+          : h('span', {
+              style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+              onClick: (e) => { e.stopPropagation(); if (hasChildren) toggleOpen(item.id); }
+            }, [
+              getLabel(item),
+              hasChildren ? h('span', { class: 'arrow' }, '▸') : null
+            ]),
+      ]),
+      // Bridge element to prevent menu from closing when moving mouse to submenu
+      hasChildren ? h('div', {
+        class: 'submenu-bridge',
+        style: {
+          position: 'absolute',
+          top: 0,
+          right: '-200px',
+          width: '200px',
+          height: '100%',
+          background: 'transparent',
+          zIndex: 1001,
+        },
+        onMouseenter: () => setOpen(item.id),
+        onMouseleave: clearOpen,
+      }) : null,
+      isOpen ? renderSubmenu(visibleChildren, state, () => setOpen(item.id), clearOpen, setOpen, clearOpen, toggleOpen, closeAll, router, route, level + 1, null, visibility) : null,
     ]);
   }));
 }
@@ -68,9 +97,13 @@ export default defineComponent({
     const auth = useAuthStore();
     const config = useConfigStore();
     const notifications = useNotificationStore();
+    const visibility = useVisibilityStore();
     const route = useRoute();
     const router = useRouter();
-    const topItems = computed(() => auth.menu);
+    const topItems = computed(() => {
+      const menu = auth.menu;
+      return menu.filter(item => visibility.isMenuItemVisible(item));
+    });
     const activeL1 = computed(() => {
       const target = route.path;
       function findL1(items) {
@@ -237,8 +270,14 @@ export default defineComponent({
         : null;
 
       return h('div', { class: 'top-menu-outer' }, [
-        h('nav', { class: 'top-menu' }, topItems.value.map(l1 => {
-          const hasChildren = l1.children?.length;
+        h('nav', { class: 'top-menu' }, topItems.value.filter(l1 => {
+          if (l1.hidden) return false;
+          const visibleChildren = l1.children?.filter(c => !c.hidden && visibility.isMenuItemVisible(c));
+          if (l1.children?.length && !visibleChildren?.length && !l1.route) return false;
+          return true;
+        }).map(l1 => {
+          const visibleChildren = l1.children?.filter(c => !c.hidden && visibility.isMenuItemVisible(c));
+          const hasChildren = visibleChildren?.length;
           return h('div', {
             class: ['top-menu-item', { active: activeL1.value === l1.id }],
             ref: (el) => { if (el) itemRefs[l1.id] = el; },
@@ -252,8 +291,8 @@ export default defineComponent({
             ]),
           ]);
         })),
-        (openItem && openItem.children?.length)
-          ? renderSubmenu(openItem.children, openChild.value, () => setL1(openL1.value), clearL1, setChild, clearChild, toggleChild, closeAll, router, route, 0, fixedStyle)
+        (openItem && openItem.children?.filter(c => !c.hidden && visibility.isMenuItemVisible(c)).length)
+          ? renderSubmenu(openItem.children, openChild.value, () => setL1(openL1.value), clearL1, setChild, clearChild, toggleChild, closeAll, router, route, 0, fixedStyle, visibility)
           : null,
         h('div', { class: 'header-actions' }, [
           h(PendingChanges),

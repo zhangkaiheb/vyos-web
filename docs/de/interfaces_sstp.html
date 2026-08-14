@@ -306,7 +306,7 @@ set interfaces sstpc &lt;interface&gt; ip source-validation &lt;strict | loose |
 <a class="cmdlink" href="#cfgcmd-set-interfaces-sstpc-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p><strong>Konfigurieren Sie die Quell-IP-Adressenprüfung mithilfe von</strong>
 <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>auf dieser Schnittstelle gemäß</strong>
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
 <p>Die folgenden Optionen sind verfügbar:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate">strict</code>: Die Quell-IP-Adresse jedes eingehenden Pakets wird gegen die
@@ -315,7 +315,7 @@ set interfaces sstpc &lt;interface&gt; ip source-validation &lt;strict | loose |
 <abbr title="Forwarding Information Base">FIB</abbr> überprüft. Wenn die Quell-IP-Adresse durch irgendeine Schnittstelle nicht erreichbar ist, schlägt die Validierung fehl.</p></li>
 <li><p><code class="docutils literal notranslate">disable</code>: Es wird keine Quell-IP-Adressenprüfung durchgeführt. Alle eingehenden Pakete werden akzeptiert.</p></li>
 </ul>
-<p><a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> empfiehlt, den <code class="docutils literal notranslate">strict</code>-Modus zu aktivieren, um IP-Spoofing, wie z. B. DDoS-Angriffe, zu verhindern. Für asynchrone oder andere komplexe Routing-Szenarien verwenden Sie den <code class="docutils literal notranslate">loose</code>-Modus.</p>
+<p><a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> empfiehlt, den <code class="docutils literal notranslate">strict</code>-Modus zu aktivieren, um IP-Spoofing, wie z. B. DDoS-Angriffe, zu verhindern. Für asynchrone oder andere komplexe Routing-Szenarien verwenden Sie den <code class="docutils literal notranslate">loose</code>-Modus.</p>
 </div>
 </div>
 </section>

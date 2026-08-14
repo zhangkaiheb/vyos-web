@@ -1,9 +1,5 @@
-
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; margin: 0; padding: 12px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; padding: 12px; }
   h1 { font-size: 20px; color: #1a1a2e; border-bottom: 2px solid #4361ee; padding-bottom: 8px; margin-top: 0; }
   h2 { font-size: 17px; color: #16213e; margin-top: 20px; border-left: 3px solid #4361ee; padding-left: 10px; }
   h3 { font-size: 15px; color: #0f3460; margin-top: 16px; }
@@ -29,77 +25,798 @@
   hr { border: none; border-top: 1px solid #e9ecef; margin: 16px 0; }
   img { max-width: 100%; height: auto; }
   blockquote { border-left: 3px solid #4361ee; margin: 12px 0; padding: 8px 16px; background: #f8f9fa; }
+  .command-block { background: #f8f9fa; border-left: 3px solid #fd7e14; border-radius: 0 4px 4px 0; padding: 10px 14px; margin: 10px 0; font-family: "SFMono-Regular", Consolas, monospace; font-size: 13px; }
+  .command-block::before { content: '$ '; color: #fd7e14; font-weight: bold; }
+  .ipsec-tabs { display: flex; border-bottom: 2px solid #4361ee; margin-bottom: 0; flex-wrap: wrap; }
+  .ipsec-tabs input[type="radio"] { display: none; }
+  .ipsec-tabs label { padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 600; color: #666; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .ipsec-tabs label:hover { color: #4361ee; background: #f0f4ff; }
+  .ipsec-tabs input[type="radio"]:checked + label { color: #4361ee; border-bottom-color: #4361ee; }
+  .ipsec-tab-content { display: none; padding: 16px 0; }
+  .ipsec-tabs input[type="radio"]:nth-of-type(1):checked ~ .ipsec-tab-content:nth-of-type(1),
+  .ipsec-tabs input[type="radio"]:nth-of-type(2):checked ~ .ipsec-tab-content:nth-of-type(2),
+  .ipsec-tabs input[type="radio"]:nth-of-type(3):checked ~ .ipsec-tab-content:nth-of-type(3),
+  .ipsec-tabs input[type="radio"]:nth-of-type(4):checked ~ .ipsec-tab-content:nth-of-type(4) { display: block; }
 </style>
-
-<style>
-  /* VyOS-style command blocks */
-  .vyos-cmd {
-    background: #f8f9fa;
-    border-left: 3px solid #e67e22;
-    border-radius: 0 4px 4px 0;
-    padding: 8px 12px;
-    margin: 8px 0;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-    font-size: 13px;
-    color: #333;
-    white-space: pre-wrap;
-    word-break: break-all;
-  }
-  .vyos-cmd::before {
-    content: "$ ";
-    color: #e67e22;
-    font-weight: bold;
-  }
-  /* Inline code */
-  code {
-    background: #f0f0f0;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-    font-size: 13px;
-    color: #c0392b;
-  }
-  /* Pre blocks for multi-line commands */
-  pre.vyos-cmd-block {
-    background: #f8f9fa;
-    border-left: 3px solid #e67e22;
-    border-radius: 0 4px 4px 0;
-    padding: 12px;
-    margin: 12px 0;
-    overflow-x: auto;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-    font-size: 13px;
-    line-height: 1.6;
-    color: #333;
-  }
-  pre.vyos-cmd-block code {
-    background: none;
-    padding: 0;
-    color: #333;
-  }
-  pre.vyos-cmd-block code::before {
-    content: "$ ";
-    color: #e67e22;
-    font-weight: bold;
-  }
-</style>
-</head>
-<body>
 <div itemprop="articleBody">
-             
-  <section id="ipsec">
-<h1>IPsec</h1>
-<div class="toctree-wrapper compound">
+
+<div class="ipsec-tabs">
+<input type="radio" name="ipsec-tab" id="tab-general" checked>
+<label for="tab-general">常规信息</label>
+<input type="radio" name="ipsec-tab" id="tab-site2site">
+<label for="tab-site2site">站点到站点</label>
+<input type="radio" name="ipsec-tab" id="tab-remoteaccess">
+<label for="tab-remoteaccess">远程访问</label>
+<input type="radio" name="ipsec-tab" id="tab-troubleshooting">
+<label for="tab-troubleshooting">故障排除</label>
+
+<div class="ipsec-tab-content">
+
+<h3>IPsec 概述</h3>
+<p>IPsec 是用于保护数据的框架。IPsec 通过提供身份验证、IP 网络数据包加密、密钥交换和密钥管理来实现这些目标。VyOS 使用 Strongswan 软件包来实现 IPsec。</p>
+
+<p><strong>认证头 (AH)</strong> 定义于 <a href="https://datatracker.ietf.org/doc/html/rfc4302.html">RFC 4302</a>。它使用 IP 头和数据负载创建哈希，并将其附加到数据包前面。此哈希用于验证数据在网络传输过程中未被更改。</p>
+
+<p><strong>封装安全载荷 (ESP)</strong> 定义于 <a href="https://datatracker.ietf.org/doc/html/rfc4303.html">RFC 4303</a>。它提供数据的加密和身份验证。</p>
+
+<p>有两种 IPsec 模式：</p>
+<p><strong>IPsec 传输模式：</strong>在传输模式下，IPSec 头（AH 或 ESP）插入在 IP 头和上层协议头之间。</p>
+<p><strong>IPsec 隧道模式：</strong>在隧道模式下，原始 IP 数据包被封装在另一个 IP 数据报中，IPsec 头（AH 或 ESP）插入在外层和内层头之间。</p>
+
+<h3>IKE（互联网密钥交换）</h3>
+<p>IKE 协议是 IPsec 安全密钥协商的默认方法。IKE 旨在提供系统的相互身份验证，以及建立共享密钥以创建 IPsec 安全关联 (SA)。安全关联 (SA) 包括连接的所有相关属性，包括使用的加密算法、IPsec 模式、加密密钥以及与通过 VPN 连接传输数据相关的其他参数。</p>
+
+<h4>IKEv1</h4>
+<p>IKEv1 是较旧的版本，至今仍在使用。如今，大多数制造商建议使用 IKEv2 协议。</p>
+<p>IKEv1 在以下 RFC 中描述：<a href="https://datatracker.ietf.org/doc/html/rfc2409.html">RFC 2409</a>（IKE）、<a href="https://datatracker.ietf.org/doc/html/rfc3407.html">RFC 3407</a>（IPsec DOI）、<a href="https://datatracker.ietf.org/doc/html/rfc3947.html">RFC 3947</a>（NAT-T）、<a href="https://datatracker.ietf.org/doc/html/rfc3948.html">RFC 3948</a>（ESP 数据包的 UDP 封装）、<a href="https://datatracker.ietf.org/doc/html/rfc3706.html">RFC 3706</a>（DPD）</p>
+
+<p>IKEv1 分两个阶段运行以建立 IKE 和 IPsec SA：</p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/ipsec_general.html">IPsec General 信息rmation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/site2site_ipsec.html">IPsec Site-to-Site VPN</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/remoteaccess_ipsec.html">IPSec IKEv2 Remote Access VPN</a></li>
-<li class="toctree-l1"><a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/troubleshooting_ipsec.html">Troubleshooting Site-to-Site VPN IPsec</a></li>
+<li><strong>阶段 1</strong> 提供 IKE 对等体的相互身份验证和会话密钥的建立。此阶段使用 DH 交换、cookies 和 ID 交换创建 IKE SA。一旦建立 IKE SA，发起者和响应者之间的所有 IKE 通信都受到加密和身份验证完整性检查的保护。IKE 阶段 1 提供两种模式：主模式和激进模式。
+<ul>
+<li><strong>主模式</strong> 用于站点到站点 VPN 连接。</li>
+<li><strong>激进模式</strong> 用于远程访问 VPN 连接。</li>
 </ul>
+</li>
+<li><strong>阶段 2</strong> 提供使用 ESP 或 AH 保护 IP 数据流量的 IPsec SA 的协商和建立。</li>
+</ul>
+
+<h4>IKEv2</h4>
+<p>IKEv2 在 <a href="https://datatracker.ietf.org/doc/html/rfc7296.html">RFC 7296</a> 中描述。IKEv1 和 IKEv2 之间最大的区别是 IKEv2 比 IKEv1 更简单、更可靠，因为在 VPN 建立期间交换的消息更少，并且具有额外的安全功能。</p>
+
+<h3>IKE 身份验证</h3>
+<p>VyOS 支持 3 种身份验证方法：</p>
+<ul>
+<li><strong>预共享密钥</strong>：在此方法中，IPsec 隧道的两个对等体必须具有相同的预共享密钥。</li>
+<li><strong>数字证书</strong>：在此方法中使用 PKI。</li>
+<li><strong>RSA 密钥</strong>：如果在 IKE 策略中使用 RSA 密钥方法，需要确保每个对等体拥有另一个对等体的公钥。</li>
+</ul>
+
+<h3>DPD（死对等体检测）</h3>
+<p>这是一种用于检测 VPN 对等体是否不再活跃的机制。此机制在 VyOS 中的 IKEv1 和 IKEv2 中有不同的算法。DPD 请求作为 ISAKMP R-U-THERE 消息发送，DPD 响应作为 ISAKMP R-U-THERE-ACK 消息发送。在 IKEv1 中，DPD 每隔配置的间隔发送消息。如果在 DPD 超时内未收到对这些数据包的响应，则认为远程对等体不可达。在 IKEv2 中，DPD 每隔配置的间隔发送消息。如果一个请求未得到响应，Strongswan 将执行其重传算法及其定时器。</p>
+
+<h3>后量子预共享密钥 (PPK)</h3>
+<p>后量子预共享密钥有助于在 ML-KEM 等后量子密钥交换算法不可用时为 IPSec 隧道提供一些量子抗性。IKEv2 中 PPK 的使用在 <a href="https://datatracker.ietf.org/doc/html/rfc8784.html">RFC 8784</a> 中描述。</p>
+<p>PPK 可以在 VyOS 的 <code>vpn ipsec authentication ppk</code> 配置下进行配置。PPK 需要一个 ID 和一个秘密值。如果 PPK 是成功 IPsec 连接所必需的，则 ID 和秘密必须匹配。秘密可以是纯文本、十六进制值或 Base64 值。默认为纯文本。如果使用其他类型的值，则必须定义秘密类型。</p>
+
+<h3>IKE 配置</h3>
+<h4>IKE 属性</h4>
+<p>VyOS IKE 组有以下选项：</p>
+<p><code>set vpn ipsec ike-group &lt;name&gt; close-action &lt;action&gt;</code></p>
+<p>定义远程对等体意外关闭 CHILD_SA 时要采取的操作：</p>
+<ul>
+<li><strong>none</strong> - 设置为无（默认）</li>
+<li><strong>trap</strong> - 为 CHILD_SA 安装陷阱策略，匹配这些策略的流量将触发获取事件，使守护进程建立所需的 IKE/IPsec SA。</li>
+<li><strong>start</strong> - 尝试立即重新创建 CHILD_SA。</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; ikev2-reauth</code></p>
+<p>IKE_SA 的重新密钥是否也应重新身份验证对等体。在 IKEv1 中，始终进行重新身份验证。设置此参数可在 IKE 重新密钥期间启用远程主机重新身份验证。</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; key-exchange</code></p>
+<p>应使用哪个协议来初始化连接。如果未设置，则处理两种协议，连接在发起时使用 IKEv2，但在响应时接受任何协议版本：</p>
+<ul>
+<li><strong>ikev1</strong> - 使用 IKEv1 进行密钥交换。</li>
+<li><strong>ikev2</strong> - 使用 IKEv2 进行密钥交换。</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; lifetime</code></p>
+<p>IKE 生命周期（秒）&lt;0-86400&gt;（默认 28800）。</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; mode</code></p>
+<p>IKEv1 阶段 1 模式选择：</p>
+<ul>
+<li><strong>main</strong> - 在 IKEv1 协议中使用主模式进行密钥交换（推荐的默认值）。</li>
+<li><strong>aggressive</strong> - 在 IKEv1 协议中使用激进模式进行密钥交换，激进模式比主模式更不安全。</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; dh-group &lt;dh-group number&gt;</code></p>
+<p>DH 组。默认值为 <strong>2</strong>。</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; encryption &lt;encryption&gt;</code></p>
+<p>加密算法。默认值为 <strong>aes128</strong>。</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; hash &lt;hash&gt;</code></p>
+<p>哈希算法。默认值为 <strong>sha1</strong>。</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; proposal &lt;number&gt; prf &lt;prf&gt;</code></p>
+<p>伪随机函数。</p>
+
+<h4>DPD 配置</h4>
+<p><code>set vpn ipsec ike-group &lt;name&gt; dead-peer-detection action &lt;action&gt;</code></p>
+<p>DPD 超时时对此 CHILD_SA 执行的操作：</p>
+<ul>
+<li><strong>trap</strong> - 安装陷阱策略，将捕获匹配的流量并尝试按需重新协商隧道。</li>
+<li><strong>clear</strong> - 关闭 CHILD_SA 且不采取进一步操作（默认）。</li>
+<li><strong>restart</strong> - 立即尝试在新的 IKE_SA 下重新协商 CHILD_SA。</li>
+</ul>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; dead-peer-detection interval &lt;interval&gt;</code></p>
+<p>保活间隔（秒）&lt;2-86400&gt;（默认 30）。</p>
+
+<p><code>set vpn ipsec ike-group &lt;name&gt; dead-peer-detection timeout &lt;timeout&gt;</code></p>
+<p>保活超时（秒）&lt;2-86400&gt;（默认 120）<strong>仅 IKEv1</strong></p>
+
+<h3>ESP 属性</h3>
+<p>在 VyOS 中，ESP 属性通过 ESP 组指定。可以在单个组中指定多个提案。</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; compression</code></p>
+<p>启用 IPComp（IP 载荷压缩）协议，允许压缩 IP 数据包的内容。</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; disable-rekey</code></p>
+<p>不在本地发起 SA 的重新密钥，远程对等体必须在到期前重新密钥。</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; life-bytes &lt;bytes&gt;</code></p>
+<p>ESP 生命周期（字节）&lt;1024-26843545600000&gt;。IPsec SA 过期前传输的字节数。</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; life-packets &lt;packets&gt;</code></p>
+<p>ESP 生命周期（数据包）&lt;1000-26843545600000&gt;。IPsec SA 过期前传输的数据包数。</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; lifetime &lt;timeout&gt;</code></p>
+<p>ESP 生命周期（秒）&lt;30-86400&gt;（默认 3600）。连接的特定实例（用户数据包的加密/身份验证密钥集）应持续多长时间，从成功协商到到期。</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; mode &lt;mode&gt;</code></p>
+<p>连接类型：</p>
+<ul>
+<li><strong>tunnel</strong> - 隧道模式（默认）。</li>
+<li><strong>transport</strong> - 传输模式。</li>
+</ul>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; pfs &lt;dh-group&gt;</code></p>
+<p>是否需要在连接的密钥通道上实现完美前向保密，并定义 PFS 的 Diffie-Hellman 组：</p>
+<ul>
+<li><strong>enable</strong> - 从 IKE 组继承 Diffie-Hellman 组（默认）。</li>
+<li><strong>disable</strong> - 禁用 PFS。</li>
+<li><strong>&lt;dh-group&gt;</strong> - 定义 PFS 的 Diffie-Hellman 组。</li>
+</ul>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; proposal &lt;number&gt; encryption &lt;encryption&gt;</code></p>
+<p>加密算法。默认值为 <strong>aes128</strong>。</p>
+
+<p><code>set vpn ipsec esp-group &lt;name&gt; proposal &lt;number&gt; hash &lt;hash&gt;</code></p>
+<p>哈希算法。默认值为 <strong>sha1</strong>。</p>
+
+<h3>全局 IPsec 设置</h3>
+<p><code>set vpn ipsec interface &lt;name&gt;</code></p>
+<p>用于限制出站 IPsec 策略的接口名称。可以指定多个接口。如果未指定接口，IPsec 策略适用于所有接口。</p>
+
+<p><code>set vpn ipsec log level &lt;number&gt;</code></p>
+<p>日志级别。默认值为 <strong>0</strong>。</p>
+
+<p><code>set vpn ipsec log subsystem &lt;name&gt;</code></p>
+<p>守护进程的子系统。</p>
+
+<h3>选项</h3>
+<p><code>set vpn ipsec options disable-route-autoinstall</code></p>
+<p>不自动安装到远程网络的路由。</p>
+
+<p><code>set vpn ipsec options flexvpn</code></p>
+<p>允许 FlexVPN 供应商 ID 载荷（仅 IKEv2）。发送 Cisco FlexVPN 供应商 ID 载荷（仅 IKEv2），这是使 Cisco 品牌设备允许协商本地流量选择器所必需的。</p>
+
+<p><code>set vpn ipsec options interface &lt;name&gt;</code></p>
+<p>要使用的接口名称。应在其上安装虚拟 IP 地址的接口名称。如果未指定，地址将安装在出站接口上。</p>
+
+<p><code>set vpn ipsec options virtual-ip</code></p>
+<p>允许安装虚拟 IP 地址。</p>
+
+<h3>IKEv2 重传</h3>
+<p>如果对等体未响应 DPD 数据包，路由器将启动重传程序。使用以下公式计算超时：</p>
+<pre><code>relative timeout = timeout * base ^ (attempts-1)</code></pre>
+
+<p><code>set vpn ipsec options retransmission attempts</code></p>
+<p>在认为对等体处于关闭状态之前的尝试次数。默认值为 <strong>5</strong>。</p>
+
+<p><code>set vpn ipsec options retransmission base</code></p>
+<p>指数退避的基数。默认值为 <strong>1.8</strong>。</p>
+
+<p><code>set vpn ipsec options retransmission timeout</code></p>
+<p>第一次重传之前的超时时间（秒）。默认值为 <strong>4</strong>。</p>
+
+<p>使用默认值，数据包按以下方式重传：</p>
+<table>
+<thead><tr><th>尝试次数</th><th>公式</th><th>相对超时</th><th>绝对超时</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>4 * 1.8 ^ 0</td><td>4s</td><td>4s</td></tr>
+<tr><td>2</td><td>4 * 1.8 ^ 1</td><td>7s</td><td>11s</td></tr>
+<tr><td>3</td><td>4 * 1.8 ^ 2</td><td>13s</td><td>24s</td></tr>
+<tr><td>4</td><td>4 * 1.8 ^ 3</td><td>23s</td><td>47s</td></tr>
+<tr><td>5</td><td>4 * 1.8 ^ 4</td><td>42s</td><td>89s</td></tr>
+<tr><td>对等体关闭</td><td>4 * 1.8 ^ 5</td><td>76s</td><td>165s</td></tr>
+</tbody>
+</table>
+
 </div>
-</section>
 
+<div class="ipsec-tab-content">
 
-           </div>
-</body>
-</html>
+<h3>IPsec 站点到站点 VPN 类型</h3>
+<p>VyOS 支持两种类型的 IPsec VPN：基于策略的 IPsec VPN 和基于路由的 IPsec VPN。</p>
+
+<h4>基于策略的 VPN</h4>
+<p>基于策略的 VPN 基于静态配置的策略。每个策略创建独立的 IPSec SA。匹配这些 SA 的流量将被加密并定向到远程对等体。</p>
+
+<h4>基于路由的 VPN</h4>
+<p>基于路由的 VPN 基于通过虚拟隧道接口 (VTI) 传递的安全流量。这种类型的 IPsec VPN 允许使用路由协议。</p>
+
+<h3>站点到站点 VPN 配置</h3>
+
+<h4>站点到站点 VPN 的要求和先决条件</h4>
+<p><strong>需要匹配的协商参数</strong></p>
+
+<h5>阶段 1</h5>
+<ul>
+<li>IKE 版本</li>
+<li>身份验证</li>
+<li>加密</li>
+<li>哈希</li>
+<li>PRF</li>
+<li>生命周期</li>
+</ul>
+
+<div class="note">
+<strong>注意：</strong>Strongswan 建议在两个对等体上使用相同的生命周期值
+</div>
+
+<h5>阶段 2</h5>
+<ul>
+<li>加密</li>
+<li>哈希</li>
+<li>PFS</li>
+<li>模式（隧道或传输）</li>
+<li>生命周期</li>
+</ul>
+
+<div class="note">
+<strong>注意：</strong>Strongswan 建议在两个对等体上使用相同的生命周期值
+</div>
+
+<ul>
+<li>SA 中的远程和本地网络必须在两个对等体上兼容</li>
+</ul>
+
+<h4>站点到站点 VPN 的配置步骤</h4>
+<p>以下示例显示了参与 IPsec VPN 的一台路由器的配置。</p>
+
+<p><strong>隧道信息：</strong></p>
+<ul>
+<li>阶段 1：
+<ul>
+<li>加密：AES256</li>
+<li>哈希：SHA256</li>
+<li>PRF：SHA256</li>
+<li>DH：14</li>
+<li>生命周期：28800</li>
+</ul>
+</li>
+<li>阶段 2：
+<ul>
+<li>IPsec 模式：隧道</li>
+<li>加密：AES256</li>
+<li>哈希：SHA256</li>
+<li>PFS：继承自 DH 阶段 1</li>
+<li>生命周期：3600</li>
+</ul>
+</li>
+<li>如果使用基于策略的 VPN
+<ul>
+<li>远程网络为 192.168.50.0/24。本地网络为 192.168.10.0/24</li>
+</ul>
+</li>
+<li>如果使用基于路由的 VPN
+<ul>
+<li>VTI 接口的 IP 为 10.0.0.1/30</li>
+</ul>
+</li>
+</ul>
+
+<div class="note">
+<strong>注意：</strong>我们不建议对同一对等体同时使用基于策略的 VPN 和基于路由的 VPN 配置。
+</div>
+
+<p><strong>1. 配置 ike-group（IKE 阶段 1）</strong></p>
+<pre><code>set vpn ipsec ike-group IKE close-action 'start'
+set vpn ipsec ike-group IKE key-exchange 'ikev1'
+set vpn ipsec ike-group IKE lifetime '28800'
+set vpn ipsec ike-group IKE proposal 10 dh-group '14'
+set vpn ipsec ike-group IKE proposal 10 encryption 'aes256'
+set vpn ipsec ike-group IKE proposal 10 hash 'sha256'
+set vpn ipsec ike-group IKE proposal 10 prf 'prfsha256'</code></pre>
+
+<p><strong>2. 配置 ESP-group（IKE 阶段 2）</strong></p>
+<pre><code>set vpn ipsec esp-group ESP lifetime '3600'
+set vpn ipsec esp-group ESP mode 'tunnel'
+set vpn ipsec esp-group ESP pfs 'enable'
+set vpn ipsec esp-group ESP proposal 10 encryption 'aes256'
+set vpn ipsec esp-group ESP proposal 10 hash 'sha256'</code></pre>
+
+<p><strong>3. 指定接口 eth0 的公共 IP 地址</strong></p>
+<pre><code>set vpn ipsec ipsec-interfaces interface eth0</code></pre>
+
+<p><strong>4. 配置站点到站点对等体</strong></p>
+
+<p><em>基于策略的 VPN 配置：</em></p>
+<pre><code>set vpn ipsec site-to-site peer 203.0.113.2 authentication mode 'pre-shared-secret'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication id '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication remote-id '203.0.113.2'
+set vpn ipsec site-to-site peer 203.0.113.2 connection-type 'respond'
+set vpn ipsec site-to-site peer 203.0.113.2 default-esp-group 'ESP'
+set vpn ipsec site-to-site peer 203.0.113.2 ike-group 'IKE'
+set vpn ipsec site-to-site peer 203.0.113.2 local-address '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 tunnel 1 local prefix '192.168.10.0/24'
+set vpn ipsec site-to-site peer 203.0.113.2 tunnel 1 remote prefix '192.168.50.0/24'</code></pre>
+
+<p><em>基于路由的 VPN 配置：</em></p>
+<pre><code>set interfaces vti vti0 address '10.0.0.1/30'
+set interfaces vti vti0 description 'VPN VTI interface'
+
+set vpn ipsec site-to-site peer 203.0.113.2 authentication mode 'pre-shared-secret'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication id '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 authentication remote-id '203.0.113.2'
+set vpn ipsec site-to-site peer 203.0.113.2 connection-type 'respond'
+set vpn ipsec site-to-site peer 203.0.113.2 default-esp-group 'ESP'
+set vpn ipsec site-to-site peer 203.0.113.2 ike-group 'IKE'
+set vpn ipsec site-to-site peer 203.0.113.2 local-address '192.0.2.1'
+set vpn ipsec site-to-site peer 203.0.113.2 vti bind to 'vti0'
+set vpn ipsec site-to-site peer 203.0.113.2 vti esp-group 'ESP'</code></pre>
+
+</div>
+
+<div class="ipsec-tab-content">
+
+<h3>远程访问 VPN 概述</h3>
+<p>远程访问 VPN 允许远程用户通过 IPsec 隧道安全地连接到公司网络。VyOS 支持多种远程访问 VPN 配置方式，包括基于预共享密钥、证书和 EAP 的身份验证。</p>
+
+<h3>远程访问 VPN 类型</h3>
+
+<h4>基于预共享密钥的远程访问</h4>
+<p>最简单的远程访问配置方式，每个远程用户使用相同的预共享密钥进行身份验证。适用于小型部署或测试环境。</p>
+
+<h4>基于证书的远程访问</h4>
+<p>使用 X.509 证书进行身份验证，提供更高的安全性。每个用户可以拥有自己的证书，便于管理和撤销。</p>
+
+<h4>基于 EAP 的远程访问</h4>
+<p>可扩展身份验证协议 (EAP) 允许使用 RADIUS 服务器进行用户身份验证。支持多种 EAP 方法，如 EAP-MSCHAPv2、EAP-TLS 等。</p>
+
+<h3>配置远程访问 VPN</h3>
+
+<h4>基本配置步骤</h4>
+
+<p><strong>1. 配置 IKE 和 ESP 组</strong></p>
+<pre><code>set vpn ipsec ike-group IKE-RA lifetime '28800'
+set vpn ipsec ike-group IKE-RA proposal 1 encryption 'aes256'
+set vpn ipsec ike-group IKE-RA proposal 1 hash 'sha256'
+set vpn ipsec ike-group IKE-RA proposal 1 dh-group '14'
+
+set vpn ipsec esp-group ESP-RA lifetime '3600'
+set vpn ipsec esp-group ESP-RA proposal 1 encryption 'aes256'
+set vpn ipsec esp-group ESP-RA proposal 1 hash 'sha256'</code></pre>
+
+<p><strong>2. 配置 IP 地址池</strong></p>
+<pre><code>set vpn ipsec remote-access connection RA pool 'RA-POOL'
+set vpn ipsec remote-access connection RA pool RA-POOL prefix '100.64.0.0/24'
+set vpn ipsec remote-access connection RA pool RA-POOL name-server '192.0.2.53'</code></pre>
+
+<p><strong>3. 配置远程访问连接</strong></p>
+<pre><code>set vpn ipsec remote-access connection RA authentication local-id '192.0.2.1'
+set vpn ipsec remote-access connection RA authentication server-mode 'x509'
+set vpn ipsec remote-access connection RA authentication x509 certificate 'ipsec-cert'
+
+set vpn ipsec remote-access connection RA remote-access-interface 'ppp0'
+set vpn ipsec remote-access connection RA ike-group 'IKE-RA'
+set vpn ipsec remote-access connection RA default-esp-group 'ESP-RA'</code></pre>
+
+<h4>基于 EAP-RADIUS 的配置</h4>
+<p>使用 RADIUS 服务器进行用户身份验证：</p>
+
+<pre><code>set vpn ipsec remote-access connection RA authentication client-mode 'eap-radius'
+set vpn ipsec remote-access connection RA eap-radius server 1 address '192.0.2.100'
+set vpn ipsec remote-access connection RA eap-radius server 1 key 'testing123'
+
+set vpn ipsec remote-access connection RA pool RA-POOL name-server '192.0.2.53'
+set vpn ipsec remote-access connection RA pool RA-POOL prefix '100.64.0.0/24'</code></pre>
+
+<h4>基于预共享密钥的配置</h4>
+<p>适用于简单的远程访问场景：</p>
+
+<pre><code>set vpn ipsec remote-access connection RA authentication mode 'pre-shared-secret'
+set vpn ipsec remote-access connection RA authentication id '192.0.2.1'
+set vpn ipsec remote-access connection RA authentication local-id '192.0.2.1'
+
+set vpn ipsec remote-access connection RA remote-access-interface 'ppp0'
+set vpn ipsec remote-access connection RA ike-group 'IKE-RA'
+set vpn ipsec remote-access connection RA default-esp-group 'ESP-RA'
+
+set vpn ipsec remote-access connection RA pool RA-POOL prefix '100.64.0.0/24'</code></pre>
+
+<h3>远程访问接口配置</h3>
+<p>远程访问 VPN 使用虚拟 PPP 接口。需要指定远程访问接口：</p>
+
+<pre><code>set interfaces ppp ppp0 description 'Remote Access VPN Interface'
+set vpn ipsec remote-access connection RA remote-access-interface 'ppp0'</code></pre>
+
+<h3>客户端配置示例</h3>
+
+<h4>Windows 客户端</h4>
+<p>Windows 内置的 VPN 客户端支持 IKEv2 和 L2TP/IPsec。配置步骤：</p>
+<ol>
+<li>打开"设置" > "网络和 Internet" > "VPN"</li>
+<li>点击"添加 VPN 连接"</li>
+<li>填写 VPN 提供程序名称、服务器名称或地址</li>
+<li>选择 VPN 类型（IKEv2 或 L2TP/IPsec）</li>
+<li>输入身份验证信息（用户名/密码或证书）</li>
+</ol>
+
+<h4>Linux 客户端</h4>
+<p>Linux 用户可以使用 NetworkManager 或命令行工具配置 IPsec VPN：</p>
+<pre><code># 使用 strongswan 客户端
+sudo apt install strongswan strongswan-pki libcharon-extra-plugins
+
+# 配置 /etc/ipsec.conf
+conn vyos-ra
+    right=192.0.2.1
+    rightid=@192.0.2.1
+    rightsubnet=0.0.0.0/0
+    left=%defaultroute
+    leftid=user@example.com
+    eap_identity=user@example.com
+    auto=start</code></pre>
+
+<h4>macOS 客户端</h4>
+<p>macOS 内置支持 IKEv2 VPN：</p>
+<ol>
+<li>打开"系统偏好设置" > "网络"</li>
+<li>点击"+"添加新连接</li>
+<li>选择接口为"VPN"，类型为"IKEv2"</li>
+<li>填写服务器地址和远程 ID</li>
+<li>配置身份验证方法</li>
+</ol>
+
+<h4>移动设备</h4>
+<p>iOS 和 Android 设备都内置支持 IKEv2 VPN：</p>
+<ul>
+<li><strong>iOS:</strong> 设置 > 通用 > VPN 与网络 > 添加 VPN 配置</li>
+<li><strong>Android:</strong> 设置 > 网络与互联网 > VPN > 添加 VPN 配置文件</li>
+</ul>
+
+<h3>故障排除</h3>
+
+<h4>常见问题</h4>
+<ul>
+<li><strong>连接失败：</strong>检查 IKE 和 ESP 参数是否匹配，验证预共享密钥或证书是否正确</li>
+<li><strong>身份验证失败：</strong>确认 RADIUS 服务器配置正确，检查用户凭据</li>
+<li><strong>无法获取 IP 地址：</strong>验证 IP 地址池配置，确保有足够的可用地址</li>
+<li><strong>连接不稳定：</strong>检查 DPD 设置，调整生命周期参数</li>
+</ul>
+
+<h4>调试命令</h4>
+<pre><code># 查看 IPsec SA 状态
+show vpn ipsec sa
+
+# 查看 IKE SA 状态
+show vpn ike sa
+
+# 查看详细的 IPsec 连接信息
+show vpn ipsec sa detail
+
+# 查看 IPsec 日志
+tail -f /var/log/charon.log</code></pre>
+
+</div>
+
+<div class="ipsec-tab-content">
+
+<p>本文档提供 IPsec VPN 常见问题的故障排除方法和诊断步骤。</p>
+
+<h3>基本诊断命令</h3>
+
+<p>VyOS 提供了一系列命令来帮助诊断 IPsec 问题：</p>
+
+<h4>查看 IPsec 状态</h4>
+
+<p>查看当前 IPsec 隧道和安全关联的状态：</p>
+
+<div class="command-block">show vpn ipsec status</div>
+
+<p>此命令显示所有 IPsec 隧道的当前状态，包括连接是否建立、SA（安全关联）是否活动等。</p>
+
+<h4>查看安全关联</h4>
+
+<p>查看详细的 IKE 和 Child Sa 信息：</p>
+
+<div class="command-block">show vpn ipsec sa</div>
+
+<p>输出包含以下信息：</p>
+<ul>
+  <li><strong>IKE SA</strong>：IKE 阶段 1 安全关联</li>
+  <li><strong>Child SA</strong>：IKE 阶段 2 安全关联（数据隧道）</li>
+  <li><strong>状态</strong>：ESTABLISHED（已建立）、INSTALLED（已安装）等</li>
+  <li><strong>加密算法</strong>：使用的加密和认证算法</li>
+  <li><strong>流量统计</strong>：通过隧道的数据包和字节数</li>
+</ul>
+
+<h4>查看 IPsec 配置</h4>
+
+<p>查看当前运行的 IPsec 配置：</p>
+
+<div class="command-block">show vpn ipsec detail</div>
+
+<h3>常见问题及解决方案</h3>
+
+<h4>隧道无法建立</h4>
+
+<p><strong>症状</strong>：IPsec 隧道状态显示为 "down" 或 "connecting"。</p>
+
+<p><strong>可能原因和解决方案</strong>：</p>
+
+<ol>
+  <li>
+    <p><strong>预共享密钥不匹配</strong></p>
+    <p>确保两端的预共享密钥完全相同，包括大小写和空格。</p>
+    <div class="command-block">show vpn ipsec site-to-site peer &lt;peer-address&gt;</div>
+  </li>
+  <li>
+    <p><strong>IKE 提议不匹配</strong></p>
+    <p>检查两端的 IKE 组配置是否兼容。加密算法、哈希算法和 Diffie-Hellman 组必须匹配。</p>
+    <div class="command-block">show vpn ipsec ike-group</div>
+  </li>
+  <li>
+    <p><strong>ESP 提议不匹配</strong></p>
+    <p>验证 ESP 组配置是否一致。</p>
+    <div class="command-block">show vpn ipsec esp-group</div>
+  </li>
+  <li>
+    <p><strong>防火墙阻止</strong></p>
+    <p>确保防火墙允许以下端口通过：</p>
+    <ul>
+      <li>UDP 500（IKE）</li>
+      <li>UDP 4500（NAT-T）</li>
+      <li>协议 50（ESP）</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>本地/远端子网配置错误</strong></p>
+    <p>检查站点到站点 VPN 的本地子网和远端子网配置是否正确。</p>
+  </li>
+</ol>
+
+<h4>隧道建立但不传输数据</h4>
+
+<p><strong>症状</strong>：IPsec 隧道显示为 "up"，但无法通过隧道传输数据。</p>
+
+<p><strong>可能原因和解决方案</strong>：</p>
+
+<ol>
+  <li>
+    <p><strong>Child SA 未安装</strong></p>
+    <p>检查 Child SA 是否成功安装：</p>
+    <div class="command-block">show vpn ipsec sa</div>
+    <p>如果 Child SA 未显示，可能是 ESP 提议不匹配。</p>
+  </li>
+  <li>
+    <p><strong>路由问题</strong></p>
+    <p>验证路由表是否正确，确保流量能够通过隧道接口：</p>
+    <div class="command-block">show ip route</div>
+  </li>
+  <li>
+    <p><strong>MTU 问题</strong></p>
+    <p>IPsec 会增加数据包开销。如果数据包过大，可能会被丢弃。尝试调整 MTU：</p>
+    <div class="command-block">set interfaces ethernet &lt;interface&gt; mtu 1400</div>
+  </li>
+  <li>
+    <p><strong>非对称路由</strong></p>
+    <p>确保返回流量也通过 IPsec 隧道，检查策略路由配置。</p>
+  </li>
+</ol>
+
+<h4>隧道频繁断开</h4>
+
+<p><strong>症状</strong>：IPsec 隧道反复建立和断开。</p>
+
+<p><strong>可能原因和解决方案</strong>：</p>
+
+<ol>
+  <li>
+    <p><strong>DPD（Dead Peer Detection）配置</strong></p>
+    <p>检查 DPD 设置是否过于激进：</p>
+    <div class="command-block">show vpn ipsec site-to-site peer &lt;peer-address&gt; dead-peer-detection</div>
+    <p>建议的 DPD 设置：</p>
+    <ul>
+      <li>interval: 15-30 秒</li>
+      <li>timeout: 30-60 秒</li>
+      <li>action: restart</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>IKE 重协商失败</strong></p>
+    <p>检查 IKE 生命周期设置，确保两端兼容。</p>
+  </li>
+  <li>
+    <p><strong>NAT 问题</strong></p>
+    <p>如果任一端位于 NAT 之后，确保启用了 NAT 穿透（NAT-T）。</p>
+  </li>
+</ol>
+
+<h4>认证失败</h4>
+
+<p><strong>症状</strong>：日志显示认证错误。</p>
+
+<p><strong>可能原因和解决方案</strong>：</p>
+
+<ol>
+  <li>
+    <p><strong>预共享密钥错误</strong></p>
+    <p>重新配置预共享密钥，确保两端完全匹配。</p>
+  </li>
+  <li>
+    <p><strong>证书问题</strong></p>
+    <p>如果使用证书认证：</p>
+    <ul>
+      <li>验证证书是否过期</li>
+      <li>检查证书链是否完整</li>
+      <li>确认证书主题名称匹配</li>
+      <li>验证 CA 证书已正确安装</li>
+    </ul>
+  </li>
+</ol>
+
+<h3>日志和调试</h3>
+
+<h4>查看 IPsec 日志</h4>
+
+<p>查看系统日志中的 IPsec 相关信息：</p>
+
+<div class="command-block">show log | match charon</div>
+
+<p>或者查看更详细的日志：</p>
+
+<div class="command-block">tail -f /var/log/syslog | grep charon</div>
+
+<h4>启用详细日志</h4>
+
+<p>如需更详细的调试信息，可以启用 IPsec 调试日志：</p>
+
+<div class="command-block">set vpn ipsec logging log-level 3</div>
+
+<p>日志级别说明：</p>
+<ul>
+  <li><strong>0</strong>：仅错误</li>
+  <li><strong>1</strong>：警告</li>
+  <li><strong>2</strong>：信息（默认）</li>
+  <li><strong>3</strong>：调试</li>
+  <li><strong>4</strong>：详细调试</li>
+</ul>
+
+<div class="warning">
+  <strong>警告：</strong>高日志级别会产生大量日志输出，可能影响系统性能。仅在故障排除时临时启用。
+</div>
+
+<h4>常见日志消息</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>日志消息</th>
+      <th>含义</th>
+      <th>解决方案</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>received INVALID_ID_INFORMATION</code></td>
+      <td>身份标识不匹配</td>
+      <td>检查本地和远端身份配置</td>
+    </tr>
+    <tr>
+      <td><code>no matching proposal found</code></td>
+      <td>提议不匹配</td>
+      <td>检查 IKE/ESP 组配置</td>
+    </tr>
+    <tr>
+      <td><code>authentication failed</code></td>
+      <td>认证失败</td>
+      <td>验证预共享密钥或证书</td>
+    </tr>
+    <tr>
+      <td><code>peer not responding</code></td>
+      <td>对等体无响应</td>
+      <td>检查网络连接和防火墙</td>
+    </tr>
+    <tr>
+      <td><code>SA lifetime expired</code></td>
+      <td>SA 生命周期到期</td>
+      <td>正常现象，检查重协商配置</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>网络抓包</h3>
+
+<p>当其他方法无法解决问题时，可以使用 tcpdump 进行网络抓包：</p>
+
+<h4>捕获 IKE 流量</h4>
+
+<div class="command-block">tcpdump -i any -n port 500 or port 4500</div>
+
+<h4>捕获 ESP 流量</h4>
+
+<div class="command-block">tcpdump -i any -n proto 50</div>
+
+<h4>保存抓包文件</h4>
+
+<div class="command-block">tcpdump -i any -n -w /tmp/ipsec.pcap port 500 or port 4500 or proto 50</div>
+
+<p>可以使用 Wireshark 分析保存的 pcap 文件。</p>
+
+<h3>重置和重启</h3>
+
+<h4>重置 IPsec 隧道</h4>
+
+<p>重置特定站点的 IPsec 隧道：</p>
+
+<div class="command-block">reset vpn ipsec site-to-site peer &lt;peer-address&gt;</div>
+
+<h4>重启 IPsec 服务</h4>
+
+<p>如需重启整个 IPsec 服务：</p>
+
+<div class="command-block">restart vpn ipsec</div>
+
+<div class="warning">
+  <strong>警告：</strong>重启 IPsec 服务会中断所有活动的 VPN 连接。
+</div>
+
+<h3>性能问题</h3>
+
+<h4>加密性能测试</h4>
+
+<p>测试系统的加密性能：</p>
+
+<div class="command-block">show vpn ipsec performance</div>
+
+<h4>硬件加速</h4>
+
+<p>如果支持硬件加密加速，确保已启用：</p>
+
+<div class="command-block">show vpn ipsec hardware-acceleration</div>
+
+<div class="tip">
+  <strong>提示：</strong>某些 CPU 支持 AES-NI 指令集，可以显著提高 IPsec 性能。使用 <code>lscpu | grep aes</code> 检查是否支持。
+</div>
+
+<h3>联系支持</h3>
+
+<p>如果以上步骤无法解决问题，请收集以下信息并联系技术支持：</p>
+
+<ol>
+  <li>完整的配置导出：<code>show configuration commands | match vpn</code></li>
+  <li>IPsec 状态输出：<code>show vpn ipsec status</code></li>
+  <li>安全关联信息：<code>show vpn ipsec sa</code></li>
+  <li>系统日志：<code>show log | match charon</code></li>
+  <li>网络抓包文件（如适用）</li>
+</ol>
+
+</div>
+
+</div>
+
+</div>

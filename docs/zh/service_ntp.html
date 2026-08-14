@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -153,45 +153,24 @@
              
   <section id="ntp">
 <h1>NTP</h1>
-<p><abbr>NTP (网络 Time 协议</abbr>) is a networking protocol for clock
-synchronization between computer systems over packet-switched, variable-latency
-data networks. In operation since before 1985, NTP is one of the oldest Internet
-protocols in current use.</p>
-<p>NTP 旨在 synchronize all participating computers to within a few
-milliseconds of <abbr title="Coordinated Universal Time">UTC</abbr>. It uses the
-intersection algorithm, a modified version of Marzullo’s algorithm, to select
-accurate time servers and 旨在 mitigate the effects of variable
-network latency. NTP can usually maintain time to within tens of milliseconds
-over the public Internet, and can achieve better than one millisecond accuracy
-in local area networks under ideal conditions. Asymmetric routes and network
-congestion can cause errors of 100 ms or more.</p>
-<p>The protocol is usually described in terms of a client-server model, but can as
-easily be used in peer-to-peer relationships where both peers consider the other
-to be a potential time source. Implementations send and receive timestamps using
-<abbr title="User Datagram Protocol">UDP</abbr> on port number 123.</p>
-<p>NTP supplies a warning of any impending leap second adjustment, but no
-information about local time zones or daylight saving time is transmitted.</p>
-<p>The current protocol is version 4 (NTPv4), which is a proposed standard as
-documented in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5905.html"><strong>RFC 5905</strong></a>. It is backward compatible with version 3, specified
-in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1305.html"><strong>RFC 1305</strong></a>.</p>
+<p><abbr>NTP（网络时间协议）</abbr>是一种用于在分组交换、延迟可变的数据网络上实现计算机系统之间时钟同步的网络协议。自1985年以前开始运行以来，NTP是当前仍在使用的最古老的互联网协议之一。</p>
+<p>NTP旨在将所有参与的计算机同步到与<abbr title="协调世界时">UTC</abbr>相差几毫秒以内。它采用交集算法（Marzullo算法的一种改进版本）来选择准确的时间服务器，并专门设计用于缓解可变网络延迟的影响。NTP通常可在公共互联网上将时间维持在几十毫秒精度内，在局域网中理想条件下甚至可达到优于1毫秒的精度。非对称路由和网络拥塞可能导致100毫秒或更大的误差。</p>
+<p>该协议通常以客户端-服务器模型描述，但同样适用于对等体（peer-to-peer）关系，其中双方均将对方视为潜在的时间源。实现通过<abbr title="用户数据报协议">UDP</abbr>在端口123上发送和接收时间戳。</p>
+<p>NTP会发出任何即将发生的闰秒调整警告，但不传输有关本地时区或夏令时的任何信息。</p>
+<p>当前协议为第4版（NTPv4），其作为建议标准记录在<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc5905.html"><strong>RFC 5905</strong></a>中。它向后兼容第3版，后者在<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1305.html"><strong>RFC 1305</strong></a>中定义。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>VyOS 1.4 uses chrony instead of ntpd (see <a class="reference external" href="https://vyos.dev/T3008">T3008</a>) which will
-no longer accept anonymous NTP requests as in VyOS 1.3. All configurations
-将 migrated to keep the anonymous functionality. For new setups if you
-have clients using your VyOS installation as NTP server, you must specify
-the <code class="docutils literal notranslate">allow-client</code> directive.</p>
+<p>VyOS 1.4使用chrony替代ntpd（参见<a class="reference external" href="https://vyos.dev/T3008">T3008</a>），因此将不再接受如VyOS 1.3中那样的匿名NTP请求。所有现有配置将被迁移以保留匿名功能。对于新部署，若您有客户端将您的VyOS设备用作NTP服务器，则必须指定<code class="docutils literal notranslate">allow-client</code>指令。</p>
 </div>
 <section id="configuration">
 <h2>配置</h2>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ntp server <address>
-<a class="cmdlink" href="#cfgcmd-set-service-ntp-server-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure one or more servers for synchronisation. 服务器 name 可以 either
-an IP address or <abbr title="Fully Qualified Domain Name">FQDN</abbr>.</p>
-<p>There are 3 default NTP server set. You are able to change them.</p>
+set service ntp server &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-server-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>配置一个或多个用于同步的服务器。服务器名称可以是IP地址或<abbr title="完全限定域名">FQDN</abbr>。</p>
+<p>默认预置了3个NTP服务器。您可以修改它们。</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate">time1.vyos.net</code></p></li>
 <li><p><code class="docutils literal notranslate">time2.vyos.net</code></p></li>
@@ -202,157 +181,102 @@ an IP address or <abbr title="Fully Qualified Domain Name">FQDN</abbr>.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ntp server <address> <noselect | nts | pool | prefer | ptp | interleave>
-<a class="cmdlink" href="#cfgcmd-set-service-ntp-server-address-noselect-nts-pool-prefer-ptp-interleave" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure one or more attributes to the given NTP server.</p>
+set service ntp server &lt;address&gt; &lt;noselect | nts | pool | prefer | ptp | interleave&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-server-address-noselect-nts-pool-prefer-ptp-interleave" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为指定的NTP服务器配置一个或多个属性。</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">noselect</code> marks the server as unused, except for display purposes. The
-server is discarded by the selection algorithm.</p></li>
-<li><p><code class="docutils literal notranslate">nts</code> enables 网络 Time Security (NTS) for the server as specified
-in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc8915.html"><strong>RFC 8915</strong></a></p></li>
-<li><p><code class="docutils literal notranslate">pool</code> mobilizes persistent client mode association with a number of
-remote servers.</p></li>
-<li><p><code class="docutils literal notranslate">prefer</code> marks the server as preferred. All other things being equal,
-this host 将 chosen for synchronization among a set of correctly
-operating hosts.</p></li>
-<li><p><code class="docutils literal notranslate">ptp</code> enables the PTP transport for this server (see <a class="reference internal" href="#ptp-transport">PTP Transport of NTP 数据包s</a>).</p></li>
-<li><p><code class="docutils literal notranslate">interleave</code> enables NTP interleaved mode (see <a class="reference external" href="https://datatracker.ietf.org/doc/draft-ietf-ntp-interleaved-modes/07/">draft-ntp-interleaved-modes</a>), which can improve
-synchronization accuracy and stability when supported by both parties.</p></li>
+<li><p><code class="docutils literal notranslate">noselect</code>将服务器标记为未使用（仅用于显示目的）。该服务器将被选择算法丢弃。</p></li>
+<li><p><code class="docutils literal notranslate">nts</code>为该服务器启用网络时间安全（NTS），具体规范见<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc8915.html"><strong>RFC 8915</strong></a>。</p></li>
+<li><p><code class="docutils literal notranslate">pool</code>激活与多个远程服务器的持久客户端模式关联。</p></li>
+<li><p><code class="docutils literal notranslate">prefer</code>将服务器标记为首选。在其他条件相同的情况下，该主机将在一组正常运行的主机中被选为同步源。</p></li>
+<li><p><code class="docutils literal notranslate">ptp</code>为此服务器启用PTP传输（参见<a class="reference internal" href="#ptp-transport">NTP数据包的PTP传输</a>）。</p></li>
+<li><p><code class="docutils literal notranslate">interleave</code>启用NTP交错模式（参见<a class="reference external" href="https://datatracker.ietf.org/doc/draft-ietf-ntp-interleaved-modes/07/">draft-ntp-interleaved-modes</a>），当通信双方均支持该模式时，可提升同步精度和稳定性。</p></li>
 </ul>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ntp listen-address <address>
-<a class="cmdlink" href="#cfgcmd-set-service-ntp-listen-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>NTP process will only listen on the specified IP address. You must specify
-the <code class="docutils literal notranslate"><address></code> and optionally the permitted clients. Multiple listen
-addresses for same IP family is no longer supported. Only one IPv4 and one
-IPv6 address 可以 configured, using separate commands for each.</p>
+set service ntp listen-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-listen-address-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>NTP进程仅监听指定的IP地址。您必须指定<code class="docutils literal notranslate">&lt;address&gt;</code>，并可选地指定允许的客户端。同一IP族的多个监听地址已不再支持。IPv4和IPv6地址各只能配置一个，需分别使用独立命令进行配置。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ntp allow-client address <address>
-<a class="cmdlink" href="#cfgcmd-set-service-ntp-allow-client-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>List of networks or client addresses permitted to contact this NTP server.</p>
-<p>Multiple networks/client IP addresses 可以 configured.</p>
+set service ntp allow-client address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-allow-client-address-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>允许访问本NTP服务器的网络或客户端地址列表。</p>
+<p>可配置多个网络/客户端IP地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ntp vrf <name>
-<a class="cmdlink" href="#cfgcmd-set-service-ntp-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specify name of the <abbr title="Virtual Routing and Forwarding">VRF</abbr> instance.</p>
+set service ntp vrf &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-vrf-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定<abbr title="虚拟路由与转发">VRF</abbr>实例的名称。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set service ntp leap-second [ignore|smear|system|timezone]
-<a class="cmdlink" href="#cfgcmd-set-service-ntp-leap-second-ignore-smear-system-timezone" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Define how to handle leap-seconds.</p>
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-leap-second-ignore-smear-system-timezone" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>定义如何处理闰秒。</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">ignore</code>: No correction is applied to the clock for the leap second. The
-clock 将 corrected later in normal operation when new measurements are
-made and the estimated offset includes the one second error.</p></li>
-<li><p><code class="docutils literal notranslate">smear</code>: When smearing a leap second, the leap status is suppressed on the
-server and the served time is corrected slowly by slewing instead of
-stepping. The clients do not need any special configuration as they do not
-know there is any leap second and they follow the server time which
-eventually brings them back to UTC. Care 必须 taken to ensure they use
-only NTP servers which smear the leap second in exactly the same way for
-synchronisation.</p></li>
-<li><p><code class="docutils literal notranslate">system</code>: When inserting a leap second, the kernel steps the system clock
-backwards by one second when the clock gets to 00:00:00 UTC. When deleting
-a leap second, it steps forward by one second when the clock gets to
-23:59:59 UTC.</p></li>
-<li><p><code class="docutils literal notranslate">timezone</code>: This directive specifies a timezone in the system timezone
-database which chronyd can use to determine when will the next leap second
-occur and what is the current offset between TAI and UTC. It will
-periodically check if 23:59:59 and 23:59:60 are valid times in the
-timezone. This normally works with the right/UTC timezone which is the
-default</p></li>
+<li><p><code class="docutils literal notranslate">ignore</code>：不对时钟应用闰秒校正。时钟将在后续常规运行中通过新的测量值进行校正，此时估计的偏移量将包含这一秒的误差。</p></li>
+<li><p><code class="docutils literal notranslate">smear</code>：在“涂抹”闰秒时，服务器将抑制闰秒状态，并通过缓慢调整（slewing）而非跳变（stepping）方式逐步校正所提供的时间。客户端无需特殊配置，因为它们并不知晓存在闰秒，而是跟随服务器时间，最终自动回归UTC。必须确保客户端仅使用以完全相同方式“涂抹”闰秒的NTP服务器进行同步。</p></li>
+<li><p><code class="docutils literal notranslate">system</code>：插入闰秒时，当系统时钟到达00:00:00 UTC时，内核将系统时钟向后拨动一秒；删除闰秒时，当系统时钟到达23:59:59 UTC时，内核将系统时钟向前拨动一秒。</p></li>
+<li><p><code class="docutils literal notranslate">timezone</code>：该指令指定系统时区数据库中的一个时区，chronyd可利用该时区确定下一次闰秒发生的时间以及当前TAI与UTC之间的偏移量。它将周期性检查23:59:59和23:59:60在该时区是否为有效时间。此功能通常与right/UTC时区配合工作，而right/UTC时区即为默认时区。</p></li>
 </ul>
 </div>
 </div>
 </section>
 <section id="hardware-timestamping-of-ntp-packets">
-<h2>Hardware Timestamping of NTP 数据包s</h2>
-<p>The chrony daemon on VyOS can leverage NIC hardware capabilities to record the
-exact time packets are received on the interface, as well as when packets were
-actually transmitted. This provides improved accuracy and stability when the
-system is under load, as queuing and OS context switching can introduce a
-variable delay between when the packet is received on the network and when it
-is actually processed by the NTP daemon.</p>
-<p>Hardware timestamping depends on NIC support. Some NICs 可以 configured to
-apply timestamps to any incoming packet, while others only support applying
-timestamps to specific protocols (e.g. PTP).</p>
-<p>When timestamping is enabled on an interface, chrony’s default behavior is to
-try to configure the interface to only timestamp NTP packets. If this mode is
-not supported, chrony will attempt to set it to timestamp all packets. If
-neither option is supported (e.g. the NIC can only timestamp received PTP
-packets), chrony will leverage timestamping on transmitted packets only, which
-still provides some benefit.</p>
+<h2>NTP数据包的硬件时间戳</h2>
+<p>VyOS上的chrony守护进程可利用网卡（NIC）的硬件能力，精确记录数据包在接口上接收的确切时间，以及数据包实际发送的时间。当系统负载较高时，这能显著提升精度和稳定性，因为排队和操作系统上下文切换可能在网络数据包到达与NTP守护进程实际处理之间引入可变延迟。</p>
+<p>硬件时间戳依赖于网卡的支持能力。部分网卡可配置为对任意入站数据包打时间戳，而另一些网卡则仅支持对特定协议（例如PTP）的数据包打时间戳。</p>
+<p>当在某个接口上启用时间戳功能时，chrony的默认行为是尝试将该接口配置为仅对NTP数据包打时间戳。若该模式不受支持，chrony将尝试设置为对所有数据包打时间戳。若两种选项均不被支持（例如网卡仅支持对接收的PTP数据包打时间戳），chrony将仅利用发送数据包的时间戳，这仍能带来一定益处。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ntp timestamp interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-service-ntp-timestamp-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configures hardware timestamping on the interface <interface>. The special
-value <code class="docutils literal notranslate">all</code> can also be specified to enable timestamping on all interfaces
-that support it.</p>
-<p>Configure the timestamping behavior with the following option:</p>
+set service ntp timestamp interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-timestamp-interface-interface" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>在接口&lt;interface&gt;上配置硬件时间戳。特殊值<code class="docutils literal notranslate">all</code>也可指定，以在所有支持该功能的接口上启用时间戳。</p>
+<p>使用以下选项配置时间戳行为：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">receive-filter [all|ntp|ptp|none]</code> selects the receive filter mode,
-which controls which inbound packets the NIC applies timestamps to. The
-selected mode 必须 supported by the NIC, or timestamping 将
-disabled for the interface.</p></li>
+<li><p><code class="docutils literal notranslate">receive-filter [all|ntp|ptp|none]</code>选择接收过滤器模式，该模式控制网卡对哪些入站数据包打时间戳。所选模式必须受网卡支持，否则该接口的时间戳功能将被禁用。</p></li>
 </ul>
 </div>
 </div>
-<p>The following <code class="docutils literal notranslate">receive-filter</code> modes 可以 selected:</p>
+<p>以下<code class="docutils literal notranslate">receive-filter</code>模式可供选择：</p>
 <ul class="simple">
-<li><p><em>all</em>: All received packets 将 timestamped.</p></li>
-<li><p><em>ntp</em>: Only received NTP protocol packets 将 timestamped.</p></li>
-<li><p><em>ptp</em>: Only received PTP protocol packets 将 timestamped. Combined with
-the PTP transport for NTP packets, this 可以 leveraged to take advantage of
-hardware timestamping on NICs that only support the ptp filter mode.</p></li>
-<li><p><em>none</em>: No received packets 将 timestamped. Hardware timestamping of
-transmitted packets will still be leveraged, if supported by the NIC.</p></li>
+<li><p><em>all</em>：对所有接收到的数据包打时间戳。</p></li>
+<li><p><em>ntp</em>：仅对收到的NTP协议数据包打时间戳。</p></li>
+<li><p><em>ptp</em>：仅对收到的PTP协议数据包打时间戳。结合NTP数据包的PTP传输，此模式可用于充分利用仅支持ptp过滤模式的网卡的硬件时间戳能力。</p></li>
+<li><p><em>none</em>：不对任何接收到的数据包打时间戳。若网卡支持，仍将利用发送数据包的硬件时间戳。</p></li>
 </ul>
 </section>
 <section id="ptp-transport-of-ntp-packets">
-<h2>PTP Transport of NTP 数据包s</h2>
-<p>The Precision Time 协议 (IEEE 1588) is a local network time synchronization
-protocol that provides high precision time synchronization by leveraging
-hardware clocks in NICs and other network elements. VyOS does not currently
-support standards-based PTP, which 可以 deployed independently of
-NTP.</p>
-<p>For networks consisting of VyOS and other Linux systems running relatively
-recent versions of the chrony daemon, NTP packets 可以 “tunneled” over
-PTP. NTP over PTP provides the best of both worlds, leveraging hardware support
-for timestamping PTP packets while retaining the configuration flexibility and
-fault tolerance of NTP.</p>
+<h2>NTP数据包的PTP传输</h2>
+<p>精密时间协议（IEEE 1588）是一种局域网时间同步协议，通过利用网卡及其他网络设备中的硬件时钟，提供高精度时间同步。VyOS目前不支持基于标准的PTP，而标准PTP可独立于NTP单独部署。</p>
+<p>对于由VyOS及运行较新版本chrony守护进程的其他Linux系统组成的网络，NTP数据包可通过PTP进行“隧道传输”。NTP over PTP兼具两者优势：既利用了网卡对PTP数据包的硬件时间戳支持，又保留了NTP的配置灵活性和容错能力。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set service ntp ptp
-<a class="cmdlink" href="#cfgcmd-set-service-ntp-ptp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Enables the NTP daemon PTP transport. The NTP daemon will listen on the
-configured PTP port. 注意 that one or more servers 必须 individually
-enabled for PTP before the daemon will synchronize over the transport.</p>
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-ptp" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>启用NTP守护进程的PTP传输功能。NTP守护进程将在配置的PTP端口上监听。请注意，在守护进程通过该传输方式进行同步前，必须单独为一个或多个服务器启用PTP。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ntp ptp port <port>
-<a class="cmdlink" href="#cfgcmd-set-service-ntp-ptp-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configures the PTP port. By default, the standard port 319 is used.</p>
+set service ntp ptp port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ntp-ptp-port-port" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>配置PTP端口。默认情况下使用标准端口319。</p>
 </div>
 </div>
 </section>

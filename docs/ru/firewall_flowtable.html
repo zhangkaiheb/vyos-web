@@ -167,7 +167,7 @@
 set firewall flowtable …
 <a class="cmdlink" href="#cfgcmd-set-firewall-flowtable" title="Постоянная ссылка на эту команду"></a></div></div>
 <p>Чтобы узнать о общем потоке трафика в брандмауэрах VyOS,
-см. <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Брандмауэр</a>.</p>
+см. <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">Брандмауэр</a>.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
     * flowtable
          - custom_flow_table
@@ -178,7 +178,7 @@ set firewall flowtable …
 Flowtables поддерживают уровни 3 (IPv4 и IPv6) и уровень 4 (TCP и UDP)
 протоколы.</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-flowtable-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-flowtable-packet-flow.webp" />
+<img alt="../../_images/firewall-flowtable-packet-flow.webp" src="https://docs.vyos.io/en/latest/_images/firewall-flowtable-packet-flow.webp" />
 </figure>
 <p>После того как первый пакет успешно проходит путь IP-пересылки (черный
 путь), вы можете перенаправить последующие пакеты на flowtable через ваш
@@ -192,7 +192,7 @@ Flowtables поддерживают уровни 3 (IPv4 и IPv6) и урове�
 <div class="admonition note">
 <p class="admonition-title">Примечание</p>
 <p><strong>Справочник по flowtable:</strong>
-<a class="reference external" href="https://docs.vyos.io/en/rolling/configuration/https://docs.kernel.org/networking/nf_flowtable.html">https://docs.kernel.org/networking/nf_flowtable.html</a></p>
+<a class="reference external" href="https://docs.vyos.io/en/latest/configuration/https://docs.kernel.org/networking/nf_flowtable.html">https://docs.kernel.org/networking/nf_flowtable.html</a></p>
 </div>
 </section>
 <section id="flowtable-configuration">
@@ -385,7 +385,7 @@ set firewall ipv4 forward filter rule 200 inbound-interface name &#39;bond*&#39;
 <p class="admonition-title">Примечание</p>
 <p>Направления интерфейсов в этом примере с точки зрения клиент-серверного трафика. На практике каждый интерфейс обрабатывает трафик в обоих направлениях, и flowtable управляет отключением симметрично, как только поток установлен.
 Чтобы подтвердить входящие и исходящие интерфейсы, включите <code class="docutils literal notranslate">log</code> в правило в forward hook и проверьте журналы брандмауэра — см. раздел
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Брандмауэр</a> для настройки.</p>
+<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">Брандмауэр</a> для настройки.</p>
 </div>
 </section>
 <section id="checks">

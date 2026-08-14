@@ -280,7 +280,7 @@ const WIDGET_META = {
   storageSmart: { titleKey: 'controlPanel.widgets.storageSmart', category: 'hardware', wide: false },
   usb: { titleKey: 'controlPanel.widgets.usb', category: 'hardware', wide: false },
   image: { titleKey: 'controlPanel.widgets.image', category: 'system', wide: false },
-  systemLoginUsers: { titleKey: 'controlPanel.widgets.systemLoginUsers', category: 'users', wide: true },
+  systemLoginUsers: { titleKey: 'controlPanel.widgets.systemLoginUsers', category: 'users', wide: false },
   webshell: { titleKey: 'controlPanel.widgets.webshell', category: 'tools', wide: false },
 };
 

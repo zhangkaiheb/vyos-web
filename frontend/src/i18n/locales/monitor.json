@@ -15,7 +15,19 @@
       "refresh": "刷新",
       "interface": "接口",
       "value": "当前值",
-      "history": "历史数据"
+      "history": "历史数据",
+      "conntrackColumns": {
+        "id": "ID",
+        "originalSrc": "原始源地址",
+        "originalDst": "原始目的地址",
+        "replySrc": "回复源地址",
+        "replyDst": "回复目的地址",
+        "protocol": "协议",
+        "state": "状态",
+        "timeout": "超时",
+        "mark": "标记",
+        "zone": "区域"
+      }
     }
   },
   "zh-TW": {
@@ -34,7 +46,19 @@
       "refresh": "重新整理",
       "interface": "介面",
       "value": "目前值",
-      "history": "歷史資料"
+      "history": "歷史資料",
+      "conntrackColumns": {
+        "id": "ID",
+        "originalSrc": "原始來源位址",
+        "originalDst": "原始目的位址",
+        "replySrc": "回覆來源位址",
+        "replyDst": "回覆目的位址",
+        "protocol": "協定",
+        "state": "狀態",
+        "timeout": "逾時",
+        "mark": "標記",
+        "zone": "區域"
+      }
     }
   },
   "en": {
@@ -53,7 +77,19 @@
       "refresh": "Refresh",
       "interface": "Interface",
       "value": "Current Value",
-      "history": "History"
+      "history": "History",
+      "conntrackColumns": {
+        "id": "ID",
+        "originalSrc": "Original Source",
+        "originalDst": "Original Destination",
+        "replySrc": "Reply Source",
+        "replyDst": "Reply Destination",
+        "protocol": "Protocol",
+        "state": "State",
+        "timeout": "Timeout",
+        "mark": "Mark",
+        "zone": "Zone"
+      }
     }
   },
   "ru": {
@@ -72,7 +108,19 @@
       "refresh": "Обновить",
       "interface": "Интерфейс",
       "value": "Текущее значение",
-      "history": "История"
+      "history": "История",
+      "conntrackColumns": {
+        "id": "ID",
+        "originalSrc": "Исходный адрес",
+        "originalDst": "Адрес назначения",
+        "replySrc": "Ответный адрес",
+        "replyDst": "Ответный адрес назначения",
+        "protocol": "Протокол",
+        "state": "Состояние",
+        "timeout": "Таймаут",
+        "mark": "Метка",
+        "zone": "Зона"
+      }
     }
   },
   "de": {
@@ -91,7 +139,19 @@
       "refresh": "Aktualisieren",
       "interface": "Schnittstelle",
       "value": "Aktueller Wert",
-      "history": "Verlauf"
+      "history": "Verlauf",
+      "conntrackColumns": {
+        "id": "ID",
+        "originalSrc": "Originalquelle",
+        "originalDst": "Originalziel",
+        "replySrc": "Antwortquelle",
+        "replyDst": "Antwortziel",
+        "protocol": "Protokoll",
+        "state": "Zustand",
+        "timeout": "Zeitüberschreitung",
+        "mark": "Markierung",
+        "zone": "Zone"
+      }
     }
   },
   "fr": {
@@ -110,7 +170,19 @@
       "refresh": "Actualiser",
       "interface": "Interface",
       "value": "Valeur actuelle",
-      "history": "Historique"
+      "history": "Historique",
+      "conntrackColumns": {
+        "id": "ID",
+        "originalSrc": "Source originale",
+        "originalDst": "Destination originale",
+        "replySrc": "Source de réponse",
+        "replyDst": "Destination de réponse",
+        "protocol": "Protocole",
+        "state": "État",
+        "timeout": "Délai d'attente",
+        "mark": "Marque",
+        "zone": "Zone"
+      }
     }
   },
   "ko": {
@@ -129,7 +201,19 @@
       "refresh": "새로고침",
       "interface": "인터페이스",
       "value": "현재 값",
-      "history": "기록"
+      "history": "기록",
+      "conntrackColumns": {
+        "id": "ID",
+        "originalSrc": "원본 소스",
+        "originalDst": "원본 대상",
+        "replySrc": "응답 소스",
+        "replyDst": "응답 대상",
+        "protocol": "프로토콜",
+        "state": "상태",
+        "timeout": "타임아웃",
+        "mark": "마크",
+        "zone": "영역"
+      }
     }
   }
 }

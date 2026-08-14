@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -153,19 +153,13 @@
              
   <section id="pim">
 <h1>PIM</h1>
-<p><abbr title="Protocol Independent Multicast">PIM</abbr> routes multicast traffic between
-routers using the existing unicast routing table for path decisions. VyOS
-supports PIM Sparse 模式 (PIM-SM) and IGMP versions 2 and 3.</p>
-<p>In PIM-SM, traffic from multicast sources is forwarded toward the
-<abbr title="Rendezvous Point">RP</abbr>. Multicast receivers use IGMP to signal their
-local router which groups they want to receive, and the router uses PIM to
-pull that traffic from the RP via a shared tree.</p>
-<p>A working PIM-SM deployment requires:</p>
+<p><abbr title="协议无关组播">PIM</abbr> 利用现有的单播路由表进行路径决策，在路由器之间转发组播流量。VyOS 支持 PIM 稀疏模式（PIM-SM）以及 IGMP 第 2 版和第 3 版。</p>
+<p>在 PIM-SM 中，来自组播源的流量被转发至<abbr title="汇聚点">RP</abbr>。组播接收器使用 IGMP 向其本地路由器通告希望接收的组，然后该路由器使用 PIM 通过共享树从 RP 拉取该流量。</p>
+<p>一个正常运行的 PIM-SM 部署需要满足以下条件：</p>
 <ul class="simple">
-<li><p>PIM enabled on every interface along the multicast path.</p></li>
-<li><p>The location of the RP declared identically on every router in the PIM
-domain.</p></li>
-<li><p>IGMP enabled on interfaces facing multicast receivers.</p></li>
+<li><p>在组播路径上的每个接口上启用 PIM。</p></li>
+<li><p>在 PIM 域内的每台路由器上以完全相同的方式声明 RP 的位置。</p></li>
+<li><p>在面向组播接收器的接口上启用 IGMP。</p></li>
 </ul>
 <section id="configuration">
 <h2>配置</h2>
@@ -175,16 +169,13 @@ domain.</p></li>
 <div class="cfgcmd-heading">
 
 set protocols pim ecmp
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-ecmp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable <abbr title="Equal-Cost Multipath">ECMP</abbr> routing for multicast traffic.</strong></p>
-<p>When a specific <abbr title="Reverse Path Forwarding">RPF</abbr> lookup returns
-multiple equal-cost next-hops, enabling this feature distributes (S,G)
-multicast flows across all of them.</p>
-<p>If ECMP is not enabled, PIM defaults to using only the first next-hop
-returned by the RPF lookup.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-ecmp" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为组播流量启用<abbr title="等价多路径">ECMP</abbr> 路由。</strong></p>
+<p>当特定的<abbr title="反向路径转发">RPF</abbr> 查找返回多个等代价下一跳时，启用此功能可将 (S,G) 组播流分布在所有这些下一跳上。</p>
+<p>如果未启用 ECMP，PIM 默认仅使用 RPF 查找返回的第一个下一跳。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim ecmp
 </pre></div>
 </div>
@@ -192,141 +183,115 @@ returned by the RPF lookup.</p>
 <div class="cfgcmd-heading">
 
 set protocols pim ecmp rebalance
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-ecmp-rebalance" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable automatic rebalancing of all PIM (S,G) multicast flows when an
-ECMP next-hop interface fails.</strong></p>
-<p>When ECMP is enabled, and one of the interfaces used by PIM goes down,
-this feature forces PIM to redistribute all existing (S,G) flows across
-the remaining equal-cost interfaces.</p>
-<p>If rebalancing is not configured, PIM only reroutes the specific flows
-that were actively using the failed interface.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-ecmp-rebalance" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>当 ECMP 下一跳接口发生故障时，自动重新均衡所有 PIM (S,G) 组播流。</strong></p>
+<p>当启用 ECMP 后，若 PIM 使用的某个接口发生故障，此功能将强制 PIM 将所有现有 (S,G) 流重新分布到其余等代价接口上。</p>
+<p>如果未配置重新均衡，PIM 仅会重新路由那些原本正在使用故障接口的特定流。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim ecmp rebalance
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim join-prune-interval <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-join-prune-interval-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interval, in seconds, at which PIM sends 加入/Prune
-messages to upstream neighbors.</strong></p>
-<p>The default interval is 60 seconds. 设置ting a value below 60 seconds can
-negatively impact convergence at scale.</p>
+set protocols pim join-prune-interval &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-join-prune-interval-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 PIM 向上游邻居发送 Join/Prune 消息的时间间隔（单位：秒）。</strong></p>
+<p>默认间隔为 60 秒。将值设置为低于 60 秒可能对大规模部署的收敛性产生负面影响。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim join-prune-interval 120
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim keep-alive-timer <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-keep-alive-timer-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the keep-alive timeout interval, in seconds, for (S,G)
-multicast flow state.</strong></p>
+set protocols pim keep-alive-timer &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-keep-alive-timer-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 (S,G) 组播流状态的保活超时间隔（单位：秒）。</strong></p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>Some hardware cannot detect traffic flowing in intervals shorter than 30
-seconds. For such hardware, ensure the value is set to 31 seconds or
-higher.</p>
+<p>某些硬件无法检测间隔短于 30 秒的流量。对于此类硬件，请确保将该值设置为 31 秒或更高。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim keep-alive-timer 60
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim packets <1-255>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-packets-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the number of incoming PIM packets processed consecutively
-from a neighbor before the system moves to the next task.</strong></p>
-<p>The default value is 3 packets. This command is only useful in
-deployments with a high number of PIM control packets.</p>
+set protocols pim packets &lt;1-255&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-packets-1-255" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置系统在切换至下一任务前，连续处理来自邻居的入站 PIM 数据包的数量。</strong></p>
+<p>默认值为 3 个数据包。该命令仅在 PIM 控制数据包数量较多的部署中才有用。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim packets 10
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim register-accept-list prefix-list <prefix-list>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-register-accept-list-prefix-list-prefix-list" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a prefix-list to filter incoming PIM Register messages.</strong></p>
-<p>When PIM receives a Register packet, the multicast source IP address is
-evaluated against the specified prefix-list. If the source IP address is
-permitted, normal PIM processing continues. If the source IP address is
-denied, a Register-Stop message is sent to the sender.</p>
+set protocols pim register-accept-list prefix-list &lt;prefix-list&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-register-accept-list-prefix-list-prefix-list" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置前缀列表以过滤入站 PIM Register 消息。</strong></p>
+<p>当 PIM 接收到 Register 数据包时，组播源 IP 地址将与指定的前缀列表进行匹配。若源 IP 地址被允许，则继续执行正常的 PIM 处理；若源 IP 地址被拒绝，则向发送方发送 Register-Stop 消息。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim register-accept-list prefix-list MULTICAST-SOURCES
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim register-suppress-time <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-register-suppress-time-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the duration, in seconds, during which a
-<abbr title="First-Hop Router">FHR</abbr> suppresses sending PIM Register messages.</strong></p>
+set protocols pim register-suppress-time &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-register-suppress-time-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置第一跳路由器（FHR）抑制发送 PIM Register 消息的持续时间（单位：秒）。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim register-suppress-time 60
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim rp address <ip-address> group <prefix>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-rp-address-ip-address-group-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a Rendezvous Point (RP) for the specified multicast group
-range.</strong></p>
-<p>To use PIM, you must configure an RP to receive 加入 messages. VyOS
-currently supports only static RP configuration.</p>
-<p>The <code class="docutils literal notranslate"><address></code> parameter defines the RP’s IP address, and the <code class="docutils literal notranslate"><group></code>
-parameter defines the prefix of the multicast group range served by this
-RP.</p>
-<p>A single RP can serve multiple group ranges. Repeat the command with
-different <code class="docutils literal notranslate"><group></code> prefixes to map several ranges to the same RP.</p>
+set protocols pim rp address &lt;ip-address&gt; group &lt;prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-rp-address-ip-address-group-prefix" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定的组播组范围配置汇聚点（RP）。</strong></p>
+<p>要使用 PIM，必须配置一个 RP 来接收 Join 消息。VyOS 当前仅支持静态 RP 配置。</p>
+<p><code class="docutils literal notranslate">&lt;address&gt;</code> 参数定义 RP 的 IP 地址，而 <code class="docutils literal notranslate">&lt;group&gt;</code> 参数定义该 RP 所服务的组播组范围的前缀。</p>
+<p>单个 RP 可以服务多个组范围。重复执行该命令并指定不同的 <code class="docutils literal notranslate">&lt;group&gt;</code> 前缀，即可将多个范围映射到同一 RP。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim rp address 192.0.2.1 group 239.0.0.0/8
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim rp keep-alive-timer <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-rp-keep-alive-timer-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the keep-alive timeout interval, in seconds, for (S,G)
-multicast flow state at the Rendezvous Point (RP).</strong></p>
-<p>This value 必须 at least equal to the register-suppression-time;
-otherwise, the RP may time out the (S,G) state before the next
-Null-Register message arrives from the FHR.</p>
-<p>When a Register-Stop is sent, the KAT(S,G) at the RP is set to the maximum
-of the global Keepalive_Period and the RP_Keepalive_Period.</p>
-<p>The default value is 210 seconds.</p>
-<p>See <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7761#section-4.1">RFC 7761, Section 4.1</a>
-for details.</p>
+set protocols pim rp keep-alive-timer &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-rp-keep-alive-timer-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置汇聚点（RP）上 (S,G) 组播流状态的保活超时间隔（单位：秒）。</strong></p>
+<p>该值必须至少等于 register-suppression-time；否则，RP 可能在 FHR 发送下一个 Null-Register 消息之前就已超时释放 (S,G) 状态。</p>
+<p>当发送 Register-Stop 时，RP 上的 KAT(S,G) 被设置为全局 Keepalive_Period 和 RP_Keepalive_Period 中的最大值。</p>
+<p>默认值为 210 秒。</p>
+<p>详情请参见<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7761#section-4.1">RFC 7761 第 4.1 节</a>。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>As some hardware platforms cannot detect data flowing in intervals shorter
-than 30 seconds, ensure the value is set to 31 seconds or higher.</p>
+<p>由于某些硬件平台无法检测间隔短于 30 秒的数据流，请确保该值设置为 31 秒或更高。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim rp keep-alive-timer 300
 </pre></div>
 </div>
@@ -334,32 +299,25 @@ than 30 seconds, ensure the value is set to 31 seconds or higher.</p>
 <div class="cfgcmd-heading">
 
 set protocols pim no-v6-secondary
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-no-v6-secondary" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable sending IPv6 secondary addresses in PIM Hello messages.</strong></p>
-<p>By default, PIM Hello messages include all IPv6 secondary addresses
-configured on the interface, allowing PIM neighbors to use them as IPv6
-next-hops for RPF lookups.</p>
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-no-v6-secondary" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>禁用在 PIM Hello 消息中发送 IPv6 次要地址。</strong></p>
+<p>默认情况下，PIM Hello 消息包含接口上配置的所有 IPv6 次要地址，以便 PIM 邻居可在 RPF 查找中将其用作 IPv6 下一跳。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim no-v6-secondary
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim spt-switchover infinity-and-beyond prefix-list <list>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-spt-switchover-infinity-and-beyond-prefix-list-list" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>On the <abbr title="Last-Hop Router">LHR</abbr>, suppress the switchover from the
-shared (*,G) tree to the source-specific (S,G)
-<abbr title="Shortest-Path Tree">SPT</abbr>.</strong></p>
-<p>The optional <code class="docutils literal notranslate">prefix-list</code> controls which groups are affected: groups
-matched by a <em>permit</em> entry stay on the shared tree, groups matched by a
-<em>deny</em> entry switch over normally. Without a prefix-list, the suppression
-applies to all groups.</p>
+set protocols pim spt-switchover infinity-and-beyond prefix-list &lt;list&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-spt-switchover-infinity-and-beyond-prefix-list-list" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在<abbr title="最后一跳路由器">LHR</abbr> 上，禁止从共享 (*,G) 树切换至源特定 (S,G) <abbr title="最短路径树">SPT</abbr>。</strong></p>
+<p>可选的 <code class="docutils literal notranslate">prefix-list</code> 控制受影响的组：由 <em>permit</em> 条目匹配的组保留在共享树上，由 <em>deny</em> 条目匹配的组则按常规方式切换。若未指定前缀列表，则该抑制适用于所有组。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim spt-switchover infinity-and-beyond
 set protocols pim spt-switchover infinity-and-beyond prefix-list SHARED-TREE-GROUPS
 </pre></div>
@@ -367,126 +325,114 @@ set protocols pim spt-switchover infinity-and-beyond prefix-list SHARED-TREE-GRO
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim ssm prefix-list <list>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-ssm-prefix-list-list" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a prefix-list with the range of multicast group IP addresses
-that operate in <abbr title="Source-Specific Multicast">SSM</abbr> mode.</strong></p>
+set protocols pim ssm prefix-list &lt;list&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-ssm-prefix-list-list" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置一个前缀列表，其中包含以<abbr title="源特定组播">SSM</abbr> 模式运行的组播组 IP 地址范围。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim ssm prefix-list SSM-RANGE
 </pre></div>
 </div>
 <section id="interface-specific-commands">
-<h4>接口-specific commands</h4>
+<h4>接口特定命令</h4>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim interface <interface> bfd
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-bfd" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable <abbr title="Bidirectional Forwarding Detection">BFD</abbr> for each PIM
-neighbor discovered on the specified interface.</strong></p>
-<p>When BFD detects a link failure, the PIM neighbor relationship is torn
-down, and all associated multicast (S,G) entries are removed.</p>
+set protocols pim interface &lt;interface&gt; bfd
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-bfd" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为在指定接口上发现的每个 PIM 邻居启用<abbr title="双向转发检测">BFD</abbr>。</strong></p>
+<p>当 BFD 检测到链路故障时，PIM 邻居关系将被拆除，并移除所有关联的组播 (S,G) 条目。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 bfd
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim interface <interface> bfd profile <name>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-bfd-profile-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>应用 the specified BFD profile to BFD sessions on this PIM interface.</strong></p>
+set protocols pim interface &lt;interface&gt; bfd profile &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-bfd-profile-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>将指定的 BFD 配置文件应用于此 PIM 接口上的 BFD 会话。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 bfd profile fast-failover
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim interface <interface> dr-priority <1-4294967295>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-dr-priority-1-4294967295" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the <abbr title="Designated Router">DR</abbr> priority for the specified
-interface.</strong></p>
-<p>The router with the highest interface priority is elected as the DR for a
-LAN segment.</p>
+set protocols pim interface &lt;interface&gt; dr-priority &lt;1-4294967295&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-dr-priority-1-4294967295" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定接口配置<abbr title="指定路由器">DR</abbr> 优先级。</strong></p>
+<p>具有最高接口优先级的路由器将被选举为局域网（LAN）网段的 DR。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 dr-priority 100
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim interface <interface> hello <1-180>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-hello-1-180" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the PIM Hello interval, in seconds, for the specified
-interface.</strong></p>
-<p>PIM Hello messages are sent periodically on the interface to discover and
-maintain PIM neighbor relationships. The hold time (the duration after
-which a neighbor is considered dead if no Hello is received) is calculated
-based on the Hello interval.</p>
+set protocols pim interface &lt;interface&gt; hello &lt;1-180&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-hello-1-180" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>为指定接口配置 PIM Hello 时间间隔（单位：秒）。</strong></p>
+<p>PIM Hello 消息周期性地在接口上发送，用于发现并维护 PIM 邻居关系。保持时间（即在未收到 Hello 消息的情况下判定邻居失效的持续时间）根据 Hello 时间间隔计算得出。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 hello 10
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim interface <interface> no-bsm
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-no-bsm" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable processing of PIM <abbr title="Bootstrap Messages">BSMs</abbr> on the
-specified interface.</strong></p>
+set protocols pim interface &lt;interface&gt; no-bsm
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-no-bsm" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>禁用在指定接口上处理 PIM <abbr title="引导消息">BSM</abbr>。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 no-bsm
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim interface <interface> no-unicast-bsm
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-no-unicast-bsm" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable processing of unicast PIM BSMs on this interface.</strong></p>
+set protocols pim interface &lt;interface&gt; no-unicast-bsm
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-no-unicast-bsm" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>禁用在此接口上处理单播 PIM BSM。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 no-unicast-bsm
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim interface <interface> passive
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-passive" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Disable sending and receiving PIM control packets on this interface.</strong></p>
+set protocols pim interface &lt;interface&gt; passive
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-passive" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>禁用在此接口上发送和接收 PIM 控制数据包。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 passive
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim interface <interface> source-address <ip-address>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-source-address-ip-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the source IP address PIM uses for control messages sent on
-the specified interface.</strong></p>
-<p>This command is useful when multiple IP addresses are configured on a
-single interface.</p>
+set protocols pim interface &lt;interface&gt; source-address &lt;ip-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-source-address-ip-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置 PIM 在指定接口上发送控制消息时所使用的源 IP 地址。</strong></p>
+<p>当单个接口上配置了多个 IP 地址时，此命令非常有用。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 source-address 192.0.2.10
 </pre></div>
 </div>
@@ -497,57 +443,52 @@ single interface.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim igmp watermark-warning <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-igmp-watermark-warning-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure watermark warning generation based on the number of joined
-IGMP groups.</strong></p>
-<p>When the total number of joined IGMP groups reaches this specified limit,
-the router generates a warning.</p>
+set protocols pim igmp watermark-warning &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-igmp-watermark-warning-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>基于已加入的 IGMP 组数量配置水位线警告生成机制。</strong></p>
+<p>当已加入的 IGMP 组总数达到此指定限制时，路由器将生成一条警告。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim igmp watermark-warning 500
 </pre></div>
 </div>
 <section id="id2">
-<h4>接口-specific commands</h4>
+<h4>接口特定命令</h4>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim interface <interface> igmp
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable IGMP on the specified interface.</strong></p>
+set protocols pim interface &lt;interface&gt; igmp
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上启用 IGMP。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 igmp
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim interface <interface> igmp disable
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Administratively disable IGMP on the specified interface without removing
-the existing IGMP configuration.</strong></p>
+set protocols pim interface &lt;interface&gt; igmp disable
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-disable" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在不删除现有 IGMP 配置的情况下，管理性地禁用指定接口上的 IGMP。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 igmp disable
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim interface <interface> igmp join <multicast-address> source-address <IP-address>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-join-multicast-address-source-address-ip-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the interface to join a specific (S,G) channel.</strong></p>
-<p>Specify both the multicast IP address (G) and the source IP address (S).
-Each command joins one (S,G) channel. To join multiple channels sharing
-the same group, repeat the command with different <code class="docutils literal notranslate">source-address</code> values.</p>
+set protocols pim interface &lt;interface&gt; igmp join &lt;multicast-address&gt; source-address &lt;IP-address&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-join-multicast-address-source-address-ip-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>配置接口加入特定的 (S,G) 信道。</strong></p>
+<p>需同时指定组播 IP 地址（G）和源 IP 地址（S）。每条命令加入一个 (S,G) 信道。若要加入多个共享同一组的信道，请使用不同的 <code class="docutils literal notranslate">source-address</code> 值重复执行该命令。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 igmp join 232.1.1.100 source-address 192.0.2.50
 set protocols pim interface eth0 igmp join 232.1.1.100 source-address 192.0.2.51
 </pre></div>
@@ -555,47 +496,39 @@ set protocols pim interface eth0 igmp join 232.1.1.100 source-address 192.0.2.51
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim interface <interface> igmp query-interval <1-1800>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-query-interval-1-1800" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IGMP 主机 Query Interval, in seconds, on the specified
-interface.</strong></p>
-<p>This setting determines the interval between IGMP queries sent by the
-router to discover which multicast groups have active listeners on the
-attached network.</p>
+set protocols pim interface &lt;interface&gt; igmp query-interval &lt;1-1800&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-query-interval-1-1800" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上配置 IGMP 主机查询间隔（单位：秒）。</strong></p>
+<p>此设置决定了路由器发送 IGMP 查询的时间间隔，以发现连接网络上哪些组播组存在活跃监听器。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth1 igmp query-interval 125
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim interface <interface> igmp query-max-response-time <10-250>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-query-max-response-time-10-250" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IGMP maximum query response time, in deciseconds, on the
-specified interface.</strong></p>
-<p>This value is inserted in IGMP queries and specifies the maximum time
-hosts have to respond with a membership report. If no report is received
-within the specified window, PIM assumes there are no longer any active
-local receivers and may time out the associated (*,G) or (S,G) state
-(see <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7761#section-4.1">RFC 7761, Section 4.1</a>).</p>
+set protocols pim interface &lt;interface&gt; igmp query-max-response-time &lt;10-250&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-query-max-response-time-10-250" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上配置 IGMP 最大查询响应时间（单位：十分之一秒）。</strong></p>
+<p>该值插入到 IGMP 查询中，指定了主机响应成员报告的最大时限。若在指定窗口内未收到报告，PIM 将假定不再有任何活跃的本地接收器，并可能使关联的 (*,G) 或 (S,G) 状态超时（参见<a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7761#section-4.1">RFC 7761 第 4.1 节</a>）。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 igmp query-max-response-time 50
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set protocols pim interface <interface> igmp version <2-3>
-<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-version-2-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IGMP version on the specified interface.</strong></p>
-<p>The default version is 3.</p>
+set protocols pim interface &lt;interface&gt; igmp version &lt;2-3&gt;
+<a class="cmdlink" href="#cfgcmd-set-protocols-pim-interface-interface-igmp-version-2-3" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p><strong>在指定接口上配置 IGMP 版本。</strong></p>
+<p>默认版本为 3。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set protocols pim interface eth0 igmp version 2
 </pre></div>
 </div>
@@ -604,50 +537,46 @@ set protocols pim interface <interface> igmp version <2-3>
 </section>
 <section id="example">
 <h2>示例</h2>
-<p>The following example demonstrates a basic PIM Sparse 模式 (PIM-SM) multicast
-deployment across three routers, showing how to configure each router’s role
-within a multicast domain. Together, the three routers form a complete
-multicast distribution path from sources to receivers, with one router acting
-as the Rendezvous Point (RP).</p>
+<p>以下示例演示了一个跨越三台路由器的基本 PIM 稀疏模式（PIM-SM）组播部署，展示了如何在组播域内配置每台路由器的角色。这三台路由器共同构成了一条完整的组播分发路径，从源端到接收端，其中一台路由器充当汇聚点（RP）。</p>
 <section id="topology-and-roles">
-<h3>Topology and roles</h3>
+<h3>拓扑结构与角色</h3>
 <ul class="simple">
-<li><p>路由r 1 is the <abbr title="Last-Hop Router">LHR</abbr>.</p></li>
-<li><p>路由r 3 is the <abbr title="Rendezvous Point">RP</abbr>.</p></li>
-<li><p>路由r 2 is the <abbr title="First-Hop Router">FHR</abbr>.</p></li>
+<li><p>路由器 1 是<abbr title="最后一跳路由器">LHR</abbr>。</p></li>
+<li><p>路由器 3 是<abbr title="汇聚点">RP</abbr>。</p></li>
+<li><p>路由器 2 是<abbr title="第一跳路由器">FHR</abbr>。</p></li>
 </ul>
-<p><strong>路由r 1:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth2 address '198.51.100.1/30'
-set interfaces ethernet eth1 address '192.0.2.1/24'
-set protocols ospf area 0 network '198.51.100.0/30'
-set protocols ospf area 0 network '192.0.2.0/24'
+<p><strong>路由器 1：</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth2 address &#39;198.51.100.1/30&#39;
+set interfaces ethernet eth1 address &#39;192.0.2.1/24&#39;
+set protocols ospf area 0 network &#39;198.51.100.0/30&#39;
+set protocols ospf area 0 network &#39;192.0.2.0/24&#39;
 set protocols pim interface eth1
 set protocols pim interface eth1 igmp
 set protocols pim interface eth2
-set protocols pim rp address 203.0.113.1 group '224.0.0.0/4'
+set protocols pim rp address 203.0.113.1 group &#39;224.0.0.0/4&#39;
 </pre></div>
 </div>
-<p><strong>路由r 3:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum0 address '203.0.113.1/32'
-set interfaces ethernet eth0 address '198.51.100.2/30'
-set interfaces ethernet eth1 address '198.51.100.5/30'
-set protocols ospf area 0 network '198.51.100.0/30'
-set protocols ospf area 0 network '203.0.113.1/32'
-set protocols ospf area 0 network '198.51.100.4/30'
+<p><strong>路由器 3：</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces dummy dum0 address &#39;203.0.113.1/32&#39;
+set interfaces ethernet eth0 address &#39;198.51.100.2/30&#39;
+set interfaces ethernet eth1 address &#39;198.51.100.5/30&#39;
+set protocols ospf area 0 network &#39;198.51.100.0/30&#39;
+set protocols ospf area 0 network &#39;203.0.113.1/32&#39;
+set protocols ospf area 0 network &#39;198.51.100.4/30&#39;
 set protocols pim interface dum0
 set protocols pim interface eth0
 set protocols pim interface eth1
-set protocols pim rp address 203.0.113.1 group '224.0.0.0/4'
+set protocols pim rp address 203.0.113.1 group &#39;224.0.0.0/4&#39;
 </pre></div>
 </div>
-<p><strong>路由r 2:</strong></p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address '203.0.113.129/25'
-set interfaces ethernet eth2 address '198.51.100.6/30'
-set protocols ospf area 0 network '203.0.113.128/25'
-set protocols ospf area 0 network '198.51.100.4/30'
+<p><strong>路由器 2：</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address &#39;203.0.113.129/25&#39;
+set interfaces ethernet eth2 address &#39;198.51.100.6/30&#39;
+set protocols ospf area 0 network &#39;203.0.113.128/25&#39;
+set protocols ospf area 0 network &#39;198.51.100.4/30&#39;
 set protocols pim interface eth1
 set protocols pim interface eth2
-set protocols pim rp address 203.0.113.1 group '224.0.0.0/4'
+set protocols pim rp address 203.0.113.1 group &#39;224.0.0.0/4&#39;
 </pre></div>
 </div>
 </section>

@@ -356,7 +356,7 @@ set interfaces macsec &lt;interface&gt; ip enable-directed-broadcast
 Schnittstelle empfangen werden, weitergeleitet werden.</strong></p>
 <p><strong>Standardverhalten:</strong> IP-gerichtete Broadcast-Pakete werden abgelehnt.</p>
 <p><strong>Wenn konfiguriert:</strong> IP-gerichtete Broadcast-Pakete werden an alle Hosts
-auf dem Ziel-Subnetz weitergeleitet, wie in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> und <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a> definiert.</p>
+auf dem Ziel-Subnetz weitergeleitet, wie in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> und <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a> definiert.</p>
 <p>Beispiel:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ip enable-directed-broadcast
 </pre></div>
@@ -445,7 +445,7 @@ der Standard-Proxy ARP auf der Schnittstelle aktiviert ist.</p>
 </div>
 <p>Lokaler Proxy ARP ist auch bekannt als:</p>
 <ul class="simple">
-<li><p>VLAN Aggregation (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>VLAN Aggregation (<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
 <li><p>Private VLAN (Cisco, Allied Telesyn).</p></li>
 <li><p>Source-port filtering oder Port-Isolation (Hewlett-Packard).</p></li>
 <li><p>MAC-Forced Forwarding (Ericsson).</p></li>
@@ -457,7 +457,7 @@ der Standard-Proxy ARP auf der Schnittstelle aktiviert ist.</p>
 
 set interfaces macsec &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
 <a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ip-source-validation-strict-loose-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Konfigurieren Sie die Quell-IP-Adressen-Validierung mit</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>auf dieser Schnittstelle, wie in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> <strong>beschrieben.</strong></p>
+<p><strong>Konfigurieren Sie die Quell-IP-Adressen-Validierung mit</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>auf dieser Schnittstelle, wie in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a> <strong>beschrieben.</strong></p>
 <p>Die folgenden Optionen sind verfügbar:</p>
 <ul class="simple">
 <li><p><strong>strict:</strong> Jedes eingehende Paket wird auf seine Quell-IP-Adresse gegen den
@@ -478,7 +478,7 @@ set interfaces macsec &lt;interface&gt; ipv6 address autoconf
 <a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-address-autoconf" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p><strong>Konfigurieren Sie die Schnittstelle, um eine IPv6-Adresse automatisch mit</strong>
 <abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>zu erhalten, wie in</strong>
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a> <strong>beschrieben.</strong></p>
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a> <strong>beschrieben.</strong></p>
 <p>IPv6-Hosts können sich automatisch konfigurieren, wenn sie sich einem
 IPv6-Netzwerk anschließen, indem sie den Neighbor Discovery Protocol über ICMPv6 Router Discovery Nachrichten verwenden. Bei erstmaliger Verbindung zu einem Netzwerk sendet ein Host eine link-local Router Solicitation Multicast Anfrage für seine Konfigurationsparameter. Der Router antwortet mit einer Router Advertisement Packet, das Internet Layer Konfigurationsparameter enthält.</p>
 <div class="admonition note">
@@ -498,7 +498,7 @@ auf der Schnittstelle.</p>
 set interfaces macsec &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
 <a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-ipv6-address-eui64-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p><strong>Konfigurieren Sie die Schnittstelle, um eine IPv6-Adresse mit dem</strong>
-<abbr title="64-Bit Extended Unique Identifier">EUI-64</abbr> <strong>Verfahren zu vergeben, wie in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a> <strong>beschrieben.</strong></p>
+<abbr title="64-Bit Extended Unique Identifier">EUI-64</abbr> <strong>Verfahren zu vergeben, wie in</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a> <strong>beschrieben.</strong></p>
 <p>Beispiel:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 ipv6 address eui64 2001:db8:beef::/64
 </pre></div>
@@ -608,7 +608,7 @@ set interfaces macsec &lt;interface&gt; vrf &lt;vrf&gt;
 set interfaces macsec &lt;interface&gt; dhcp-options client-id &lt;description&gt;
 <a class="cmdlink" href="#cfgcmd-set-interfaces-macsec-interface-dhcp-options-client-id-description" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p><strong>Konfigurieren Sie einen DHCP-Clientschlüssel für die Schnittstelle, wie in</strong>
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2131.html"><strong>RFC 2131</strong></a> <strong>beschrieben.</strong></p>
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2131.html"><strong>RFC 2131</strong></a> <strong>beschrieben.</strong></p>
 <p>Der <code class="docutils literal notranslate">client-id</code> ist ein Identifikator, den der DHCP-Client an den DHCP-Server sendet, um sich eindeutig für die IP-Adresszuweisung zu identifizieren. Standardmäßig verwendet der Client seine MAC-Adresse. Der <code class="docutils literal notranslate">&lt;description&gt;</code> ist eine vom Benutzer definierte Zeichenkette, die an den DHCP-Server als DHCP-Clientschlüssel gesendet wird.</p>
 <p>Beispiel:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces macsec macsec0 dhcp-options client-id &#39;foo-bar&#39;
@@ -774,7 +774,7 @@ Non-temporary Addresses (IA_NA) Partnerschaft. Folglich erhält er nur eine temp
 </div>
 </div>
 <p><strong>DHCPv6 Prefix Delegation (PD)</strong></p>
-<p>VyOS unterstützt DHCPv6 Prefix Delegation (DHCPv6-PD) gemäß <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3633.html"><strong>RFC 3633</strong></a>.
+<p>VyOS unterstützt DHCPv6 Prefix Delegation (DHCPv6-PD) gemäß <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3633.html"><strong>RFC 3633</strong></a>.
 DHCPv6-PD wird von den meisten ISPs unterstützt, die native IPv6 für Verbraucher auf festen Netzwerken bieten.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">

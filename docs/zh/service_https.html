@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -153,34 +153,27 @@
              
   <section id="http-api">
 <h1>HTTP API</h1>
-<p>VyOS provides an HTTP API. You can use it to run operational-mode
-commands or to change or delete configuration. The API is available as
-both a REST API and a GraphQL API.</p>
-<p>For REST API request examples, endpoints, and authentication details,
-see <a class="reference internal" href="../../automation/vyos-api.html#vyosapi">VyOS API</a>.</p>
+<p>VyOS 提供 HTTP API。您可以使用该 API 执行操作模式命令，或更改、删除配置。该 API 同时支持 REST API 和 GraphQL API。</p>
+<p>有关 REST API 请求示例、端点及身份验证详情，请参阅 <a class="reference internal" href="../../automation/vyos-api.html#vyosapi">VyOS API</a>。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>If no PKI certificate is configured for the service, VyOS automatically
-generates a self-signed certificate. This is not recommended for production use.</p>
+<p>如果未为该服务配置 PKI 证书，VyOS 将自动创建一个自签名证书。此方式不建议用于生产环境。</p>
 </div>
 <section id="configuration">
 <h2>配置</h2>
 <section id="https-listener">
-<h3>HTTPS listener</h3>
+<h3>HTTPS 监听器</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service https listen-address <address>
+set service https listen-address &lt;address&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-https-listen-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a local IPv4 or IPv6 address on which the HTTPS listener
-accepts incoming connections.</strong></p>
-<p>The IP address must already be assigned to a local interface. Repeat
-the command to configure multiple IP addresses.</p>
-<p>When unset, the listener accepts incoming connections on all local IP
-addresses.</p>
+<p><strong>配置 HTTPS 监听器接受入站连接的本地 IPv4 或 IPv6 地址。</strong></p>
+<p>该 IP 地址必须已分配给本地接口。重复执行该命令可配置多个 IP 地址。</p>
+<p>当未设置该参数时，监听器将在所有本地 IP 地址上接受入站连接。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https listen-address 192.0.2.1
 set service https listen-address 2001:db8::1
 </pre></div>
@@ -188,48 +181,44 @@ set service https listen-address 2001:db8::1
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service https port <1-65535>
+set service https port &lt;1-65535&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-https-port-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the TCP port on which the HTTPS listener accepts incoming
-connections.</strong></p>
-<p>The default is 443.</p>
+<p><strong>配置 HTTPS 监听器接受入站连接的 TCP 端口。</strong></p>
+<p>默认值为 443。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>If the chosen port is already in use by another service, the commit
-fails.</p>
+<p>若所选端口已被其他服务占用，则提交配置将失败。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https port 8443
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service https vrf <name>
+set service https vrf &lt;name&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-https-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>绑定 the HTTPS listener to the specified
-<abbr title="Virtual Routing and Forwarding">VRF</abbr> instance.</strong></p>
-<p>The VRF must already be configured under <code class="docutils literal notranslate">set vrf name <name></code>.</p>
+<p><strong>将 HTTPS 监听器绑定到指定的 <abbr title="Virtual Routing and Forwarding">VRF</abbr> 实例。</strong></p>
+<p>该 VRF 必须已在 <code class="docutils literal notranslate">set vrf name &lt;name&gt;</code> 下完成配置。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https vrf mgmt
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service https allow-client address <address>
+set service https allow-client address &lt;address&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-https-allow-client-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Restrict access to the HTTPS API endpoints to the specified IPv4 or
-IPv6 address or prefix.</strong></p>
-<p>Repeat the command to allow multiple IP addresses or prefixes.</p>
-<p>When unset, the API accepts connections from any IP address.</p>
+<p><strong>将 HTTPS API 端点的访问权限限制为指定的 IPv4 或 IPv6 地址或前缀。</strong></p>
+<p>重复执行该命令可允许多个 IP 地址或前缀。</p>
+<p>当未设置该参数时，API 将接受来自任意 IP 地址的连接。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https allow-client address 192.0.2.0/24
 set service https allow-client address 2001:db8::/32
 </pre></div>
@@ -239,27 +228,25 @@ set service https allow-client address 2001:db8::/32
 
 set service https enable-http-redirect
 <a class="cmdlink" href="#cfgcmd-set-service-https-enable-http-redirect" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable redirection of incoming HTTP requests (port 80) to HTTPS.</strong></p>
-<p>The redirect sends traffic to the default HTTPS port (443). If you
-have changed the HTTPS port, the redirect will not work.</p>
+<p><strong>启用将入站 HTTP 请求（端口 80）重定向至 HTTPS 的功能。</strong></p>
+<p>重定向将流量发送至默认 HTTPS 端口（443）。若您已更改 HTTPS 端口，则重定向将无法生效。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https enable-http-redirect
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service https request-body-size-limit <1-256>
+set service https request-body-size-limit &lt;1-256&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-https-request-body-size-limit-1-256" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the maximum size, in megabytes, of an HTTP request body
-accepted by the listener.</strong></p>
-<p>Requests exceeding this limit are rejected.</p>
-<p>The default is 1.</p>
+<p><strong>配置监听器所接受的 HTTP 请求体的最大大小（单位：MB）。</strong></p>
+<p>超出此限制的请求将被拒绝。</p>
+<p>默认值为 1。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https request-body-size-limit 10
 </pre></div>
 </div>
@@ -269,82 +256,71 @@ accepted by the listener.</strong></p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service https tls-version <1.2 | 1.3>
+set service https tls-version &lt;1.2 | 1.3&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-https-tls-version-1-2-1-3" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable a specific TLS protocol version for the HTTPS listener.</strong></p>
-<p>Repeat the command to enable multiple protocol versions.</p>
-<p>By default, both TLS 1.2 and TLS 1.3 are enabled.</p>
+<p><strong>为 HTTPS 监听器启用特定 TLS 协议版本。</strong></p>
+<p>重复执行该命令可启用多个协议版本。</p>
+<p>默认情况下，TLS 1.2 和 TLS 1.3 均已启用。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https tls-version 1.3
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service https certificates certificate <name>
+set service https certificates certificate &lt;name&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-https-certificates-certificate-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>绑定 a TLS certificate from the PKI subsystem to the HTTPS
-listener.</strong></p>
-<p>The certificate must already be defined under
-<code class="docutils literal notranslate">set pki certificate <name></code> with both a certificate and a private
-key.</p>
+<p><strong>将 PKI 子系统中的 TLS 证书绑定至 HTTPS 监听器。</strong></p>
+<p>该证书必须已在 <code class="docutils literal notranslate">set pki certificate &lt;name&gt;</code> 下定义，并同时包含证书和私钥。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https certificates certificate my-server-cert
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service https certificates ca-certificate <name>
+set service https certificates ca-certificate &lt;name&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-https-certificates-ca-certificate-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>绑定 a <abbr title="Certificate Authority">CA</abbr> certificate from the PKI
-subsystem to the HTTPS listener.</strong></p>
-<p>The CA must already be defined under <code class="docutils literal notranslate">set pki ca <name></code>. The CA
-certificate is appended to the TLS certificate to form a full chain
-presented to clients during the TLS handshake.</p>
+<p><strong>将 PKI 子系统中的 <abbr title="Certificate Authority">CA</abbr> 证书绑定至 HTTPS 监听器。</strong></p>
+<p>该 CA 必须已在 <code class="docutils literal notranslate">set pki ca &lt;name&gt;</code> 下定义。CA 证书将附加至 TLS 证书，以在 TLS 握手期间向客户端提供完整证书链。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https certificates ca-certificate my-internal-ca
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service https certificates dh-params <name>
+set service https certificates dh-params &lt;name&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-https-certificates-dh-params-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Choose Diffie-Hellman parameters from the PKI subsystem for the HTTPS
-listener.</strong></p>
-<p>The parameters must already be defined under <code class="docutils literal notranslate">set pki dh <name></code> with
-a key size of at least 2048 bits. The parameters are used by DHE
-cipher suites in TLS 1.2. TLS 1.3 does not use them.</p>
+<p><strong>从 PKI 子系统中选择 Diffie-Hellman 参数供 HTTPS 监听器使用。</strong></p>
+<p>该参数必须已在 <code class="docutils literal notranslate">set pki dh &lt;name&gt;</code> 下定义，且密钥长度至少为 2048 位。这些参数将被 TLS 1.2 中的 DHE 密码套件使用。TLS 1.3 不使用这些参数。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https certificates dh-params my-dh-2048
 </pre></div>
 </div>
 </section>
 <section id="api-authentication">
-<h3>API authentication</h3>
+<h3>API 身份验证</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service https api keys id <name> key <apikey>
+set service https api keys id &lt;name&gt; key &lt;apikey&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-https-api-keys-id-name-key-apikey" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure an HTTP API key to authenticate REST requests, and GraphQL
-requests unless GraphQL is switched to JWT token authentication.</strong></p>
-<p>The key is specified in plaintext and grants full access to the API.</p>
-<p>At least one key must be configured to use the REST API. GraphQL can
-run without keys if JWT token authentication is enabled.</p>
+<p><strong>配置 HTTP API 密钥，用于对 REST 请求进行身份验证；对于 GraphQL 请求，除非已将 GraphQL 切换为 JWT 令牌身份验证，否则也使用该密钥进行身份验证。</strong></p>
+<p>该密钥以明文形式指定，并授予对 API 的完全访问权限。</p>
+<p>至少需配置一个密钥才能使用 REST API。若启用了 JWT 令牌身份验证，GraphQL 可无需密钥运行。</p>
 </div>
 </div>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api keys id MY-HTTPS-API-ID key 'MY-HTTPS-API-PLAINTEXT-KEY'
+<p>示例：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set service https api keys id MY-HTTPS-API-ID key &#39;MY-HTTPS-API-PLAINTEXT-KEY&#39;
 </pre></div>
 </div>
 </section>
@@ -355,10 +331,10 @@ run without keys if JWT token authentication is enabled.</p>
 
 set service https api rest
 <a class="cmdlink" href="#cfgcmd-set-service-https-api-rest" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable the REST API for managing VyOS over HTTPS.</strong></p>
+<p><strong>启用 REST API，以便通过 HTTPS 管理 VyOS。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https api rest
 </pre></div>
 </div>
@@ -367,12 +343,11 @@ set service https api rest
 
 set service https api rest strict
 <a class="cmdlink" href="#cfgcmd-set-service-https-api-rest-strict" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>拒绝 delete requests on the <code class="docutils literal notranslate">/configure</code> endpoint when the target
-configuration path does not exist.</strong></p>
-<p>Without this flag, such requests succeed silently.</p>
+<p><strong>当目标配置路径不存在时，拒绝针对 <code class="docutils literal notranslate">/configure</code> 端点的删除请求。</strong></p>
+<p>若未启用此标志，此类请求将静默成功。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https api rest strict
 </pre></div>
 </div>
@@ -381,12 +356,11 @@ configuration path does not exist.</strong></p>
 
 set service https api rest debug
 <a class="cmdlink" href="#cfgcmd-set-service-https-api-rest-debug" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>日志 detailed error messages to the systemd journal when API
-configuration requests fail.</strong></p>
-<p>Without this flag, only short error messages are logged.</p>
+<p><strong>当 API 配置请求失败时，在 systemd 日志中记录详细的错误消息。</strong></p>
+<p>若未启用此标志，则仅记录简短的错误消息。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https api rest debug
 </pre></div>
 </div>
@@ -398,72 +372,67 @@ configuration requests fail.</strong></p>
 
 set service https api graphql introspection
 <a class="cmdlink" href="#cfgcmd-set-service-https-api-graphql-introspection" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable GraphQL schema introspection.</strong></p>
-<p>Authenticated clients can then query the endpoint for the full schema.
-已禁用 by default, and typically kept disabled in production due to
-security concerns.</p>
+<p><strong>启用 GraphQL 模式内省功能。</strong></p>
+<p>经身份验证的客户端随后可查询该端点以获取完整模式。默认情况下该功能处于禁用状态，出于安全考虑，生产环境中通常保持禁用。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https api graphql introspection
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service https api graphql authentication type <key | token>
+set service https api graphql authentication type &lt;key | token&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-https-api-graphql-authentication-type-key-token" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the authentication type for GraphQL requests:</strong></p>
+<p><strong>配置 GraphQL 请求的身份验证类型：</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">key</code>: Uses the API keys configured in <code class="docutils literal notranslate">service https api keys</code>.</p></li>
-<li><p><code class="docutils literal notranslate">token</code>: Uses <abbr title="JSON Web Token">JWT</abbr> tokens.</p></li>
+<li><p><code class="docutils literal notranslate">key</code>：使用在 <code class="docutils literal notranslate">service https api keys</code> 中配置的 API 密钥。</p></li>
+<li><p><code class="docutils literal notranslate">token</code>：使用 <abbr title="JSON Web Token">JWT</abbr> 令牌。</p></li>
 </ul>
-<p>The default is <code class="docutils literal notranslate">key</code>.</p>
+<p>默认值为 <code class="docutils literal notranslate">key</code>。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https api graphql authentication type token
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service https api graphql authentication expiration <60-31536000>
+set service https api graphql authentication expiration &lt;60-31536000&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-https-api-graphql-authentication-expiration-60-31536000" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the lifetime, in seconds, of JWT tokens.</strong></p>
-<p>The default is 3600.</p>
+<p><strong>配置 JWT 令牌的有效期（单位：秒）。</strong></p>
+<p>默认值为 3600。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https api graphql authentication expiration 86400
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service https api graphql authentication secret-length <16-65535>
+set service https api graphql authentication secret-length &lt;16-65535&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-https-api-graphql-authentication-secret-length-16-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the length, in bytes, of the shared secret used to sign
-JWT tokens.</strong></p>
-<p>The default is 32.</p>
+<p><strong>配置用于签署 JWT 令牌的共享密钥长度（单位：字节）。</strong></p>
+<p>默认值为 32。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https api graphql authentication secret-length 64
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service https api graphql cors allow-origin <origin>
+set service https api graphql cors allow-origin &lt;origin&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-https-api-graphql-cors-allow-origin-origin" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure which websites (origins) can read responses from the
-GraphQL API in a browser, using
-<abbr title="Cross-Origin Resource Sharing">CORS</abbr>.</strong></p>
-<p>Repeat the command to allow multiple origins.</p>
+<p><strong>配置允许通过 <abbr title="Cross-Origin Resource Sharing">CORS</abbr> 在浏览器中读取 GraphQL API 响应的网站（来源）。</strong></p>
+<p>重复执行该命令可允许多个来源。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https api graphql cors allow-origin https://app.example.com
 </pre></div>
 </div>
@@ -471,8 +440,7 @@ GraphQL API in a browser, using
 </section>
 <section id="example">
 <h2>示例</h2>
-<p>The minimal configuration for a working REST API requires enabling REST
-and configuring at least one API key:</p>
+<p>使 REST API 正常工作的最小配置要求启用 REST 功能并至少配置一个 API 密钥：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service https api keys id MY-HTTPS-API-ID key MY-HTTPS-API-PLAINTEXT-KEY
 set service https api rest
 </pre></div>

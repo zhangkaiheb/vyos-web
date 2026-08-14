@@ -346,7 +346,7 @@ set interfaces l2tpv3 &lt;interface&gt; ip enable-directed-broadcast
 интерфейсе.</strong></p>
 <p><strong>Стандартное поведение:</strong> IP-направленные широковещательные пакеты отбрасываются.</p>
 <p><strong>Если настроено:</strong> IP-направленные широковещательные пакеты передаются всем хостам
-на подсети назначения, как определено в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> и <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+на подсети назначения, как определено в <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> и <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
 <p>Пример:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ip enable-directed-broadcast
 </pre></div>
@@ -436,7 +436,7 @@ VLAN (PVLAN). В конфигурациях PVLAN, хосты на изолир�
 </div>
 <p>Локальный прокси ARP также известен как:</p>
 <ul class="simple">
-<li><p>VLAN агрегация (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>VLAN агрегация (<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
 <li><p>Частная VLAN (Cisco, Allied Telesyn).</p></li>
 <li><p>Фильтрация по источнику или изоляция порта (Hewlett-Packard).</p></li>
 <li><p>Перенаправление по MAC-адресу (Ericsson).</p></li>
@@ -448,7 +448,7 @@ VLAN (PVLAN). В конфигурациях PVLAN, хосты на изолир�
 
 set interfaces l2tpv3 &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
 <a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ip-source-validation-strict-loose-disable" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
-<p><strong>Настройте проверку исходного IP-адреса с использованием</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>на этом интерфейсе, как указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p><strong>Настройте проверку исходного IP-адреса с использованием</strong> <abbr title="Reverse Path Forwarding">RPF</abbr> <strong>на этом интерфейсе, как указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
 <p>Доступны следующие варианты:</p>
 <ul class="simple">
 <li><p><strong>strict:</strong> Каждый входящий пакет проверяет исходный IP-адрес против
@@ -471,7 +471,7 @@ set interfaces l2tpv3 &lt;interface&gt; ipv6 address autoconf
 <a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ipv6-address-autoconf" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
 <p><strong>Настройте интерфейс для автоматического получения IPv6-адреса с помощью</strong>
 <abbr title="Stateless Address Autoconfiguration">SLAAC</abbr>, <strong>как указано в</strong>
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
 <p>Хосты IPv6 могут настраивать себя автоматически при подключении к IPv6-сети с помощью
 протокола обнаружения соседей через ICMPv6 сообщения о маршрутизации. При первом подключении к сети, хост отправляет многоадресный запрос для своей конфигурации параметров.
 Роутер отвечает пакетом объявлений маршрутизатора, содержащим параметры конфигурации уровня интернета.</p>
@@ -493,7 +493,7 @@ set interfaces l2tpv3 &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
 <a class="cmdlink" href="#cfgcmd-set-interfaces-l2tpv3-interface-ipv6-address-eui64-prefix" title="Постоянная ссылка на эту команду"></a></div><div class="cfgcmd-body">
 <p><strong>Настройте интерфейс для присвоения себе IPv6-адреса с помощью метода</strong>
 <abbr title="64-Bit Extended Unique Identifier">EUI-64</abbr> <strong>, как
-указано</strong> в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+указано</strong> в <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
 <p>Пример:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces l2tpv3 l2tpeth0 ipv6 address eui64 2001:db8:beef::/64
 </pre></div>

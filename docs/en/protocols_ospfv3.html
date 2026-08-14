@@ -156,8 +156,8 @@
 <p><abbr title="Open Shortest Path First">OSPF</abbr> is a routing protocol for Internet
 Protocol (IP) networks. It uses a link state routing (LSR) algorithm and falls
 into the group of interior gateway protocols (IGPs), operating within a single
-autonomous system (AS). It is defined as OSPF Version 2 in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2328.html"><strong>RFC 2328</strong></a> (1998)
-for IPv4. Updates for IPv6 are specified as OSPF Version 3 in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5340.html"><strong>RFC 5340</strong></a>
+autonomous system (AS). It is defined as OSPF Version 2 in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2328.html"><strong>RFC 2328</strong></a> (1998)
+for IPv4. Updates for IPv6 are specified as OSPF Version 3 in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc5340.html"><strong>RFC 5340</strong></a>
 (2008). OSPF supports the <abbr title="Classless Inter-Domain Routing">CIDR</abbr>
 addressing model.</p>
 <p>OSPF is a widely used IGP in large enterprise networks.</p>
@@ -269,7 +269,7 @@ Without <code class="docutils literal notranslate">detail</code>, only changes t
 
 set protocols ospf max-metric router-lsa &lt;administrative|on-shutdown &lt;seconds&gt;|on-startup &lt;seconds&gt;&gt;
 <a class="cmdlink" href="#cfgcmd-set-protocols-ospf-max-metric-router-lsa-administrative-on-shutdown-seconds-on-startup-seconds" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This enables <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3137.html"><strong>RFC 3137</strong></a> support, where the OSPF process describes its
+<p>This enables <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3137.html"><strong>RFC 3137</strong></a> support, where the OSPF process describes its
 transit links in its router-LSA as having infinite distance so that other
 routers will avoid calculating transit paths through the router while
 still being able to reach networks through the router.</p>
@@ -297,7 +297,7 @@ may not be active.
 allowed to use a connected areas topology without involving a backbone
 area for inter-area connections.</p>
 <p>Detailed information about “cisco” and “ibm” models differences can be
-found in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3509.html"><strong>RFC 3509</strong></a>. A “shortcut” model allows ABR to create routes
+found in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3509.html"><strong>RFC 3509</strong></a>. A “shortcut” model allows ABR to create routes
 between areas based on the topology of the areas connected to this router
 but not using a backbone area in case if non-backbone route will be
 cheaper. For more information about “shortcut” model,
@@ -309,7 +309,7 @@ see ospf-shortcut-abr-02.txt</p>
 
 set protocols ospf parameters rfc1583-compatibility
 <a class="cmdlink" href="#cfgcmd-set-protocols-ospf-parameters-rfc1583-compatibility" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2328.html"><strong>RFC 2328</strong></a>, the successor to <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1583.html"><strong>RFC 1583</strong></a>, suggests according to section
+<p><a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2328.html"><strong>RFC 2328</strong></a>, the successor to <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1583.html"><strong>RFC 1583</strong></a>, suggests according to section
 G.2 (changes) in section 16.4.1 a change to the path preference algorithm
 that prevents possible routing loops that were possible in the old version
 of OSPFv2. More specifically it demands that inter-area paths and
@@ -386,7 +386,7 @@ consecutive SPF calculations. The default value is 10000 ms.</p>
 set protocols ospf ldp-sync
 <a class="cmdlink" href="#cfgcmd-set-protocols-ospf-ldp-sync" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p>This command will enable IGP-LDP synchronization globally for OSPF. This
-requires for LDP to be functional. This is described in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5443.html"><strong>RFC 5443</strong></a>. By
+requires for LDP to be functional. This is described in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc5443.html"><strong>RFC 5443</strong></a>. By
 default all interfaces operational in OSPF are enabled for synchronization.
 Loopbacks are exempt.</p>
 </div>
@@ -405,7 +405,7 @@ synchronization during convergence/interface flap events.</p>
 
 set protocols ospf capability opaque
 <a class="cmdlink" href="#cfgcmd-set-protocols-ospf-capability-opaque" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>ospfd supports Opaque LSA <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2370.html"><strong>RFC 2370</strong></a> as partial support for MPLS Traffic
+<p>ospfd supports Opaque LSA <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2370.html"><strong>RFC 2370</strong></a> as partial support for MPLS Traffic
 Engineering LSAs. The opaque-lsa capability must be enabled in the
 configuration.</p>
 <p>An alternate command could be “mpls-te on” (Traffic Engineering)</p>
@@ -826,7 +826,7 @@ external LSAs.</p>
 
 set protocols ospf graceful-restart [grace-period (1-1800)]
 <a class="cmdlink" href="#cfgcmd-set-protocols-ospf-graceful-restart-grace-period-1-1800" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure Graceful Restart <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3623.html"><strong>RFC 3623</strong></a> restarting support. When enabled,
+<p>Configure Graceful Restart <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3623.html"><strong>RFC 3623</strong></a> restarting support. When enabled,
 the default grace period is 120 seconds.</p>
 <p>To perform a graceful shutdown, the FRR <code class="docutils literal notranslate">graceful-restart prepare ip ospf</code> EXEC-level command needs to be issued before restarting the
 ospfd daemon.</p>
@@ -837,7 +837,7 @@ ospfd daemon.</p>
 
 set protocols ospf graceful-restart helper enable [router-id A.B.C.D]
 <a class="cmdlink" href="#cfgcmd-set-protocols-ospf-graceful-restart-helper-enable-router-id-a-b-c-d" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure Graceful Restart <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3623.html"><strong>RFC 3623</strong></a> helper support. By default, helper support
+<p>Configure Graceful Restart <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3623.html"><strong>RFC 3623</strong></a> helper support. By default, helper support
 is disabled for all neighbours. This config enables/disables helper support
 on this router for all neighbours.</p>
 <p>To enable/disable helper support for a specific neighbour, the router-id
@@ -1634,7 +1634,7 @@ default value is 1 seconds. The interval range is 3 to 65535.</p>
 
 set protocols ospfv3 graceful-restart [grace-period (1-1800)]
 <a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-graceful-restart-grace-period-1-1800" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure Graceful Restart <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3623.html"><strong>RFC 3623</strong></a> restarting support. When enabled,
+<p>Configure Graceful Restart <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3623.html"><strong>RFC 3623</strong></a> restarting support. When enabled,
 the default grace period is 120 seconds.</p>
 <p>To perform a graceful shutdown, the FRR <code class="docutils literal notranslate">graceful-restart prepare ip ospf</code> EXEC-level command needs to be issued before restarting the
 ospfd daemon.</p>
@@ -1645,7 +1645,7 @@ ospfd daemon.</p>
 
 set protocols ospfv3 graceful-restart helper enable [router-id A.B.C.D]
 <a class="cmdlink" href="#cfgcmd-set-protocols-ospfv3-graceful-restart-helper-enable-router-id-a-b-c-d" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Configure Graceful Restart <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3623.html"><strong>RFC 3623</strong></a> helper support. By default, helper support
+<p>Configure Graceful Restart <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3623.html"><strong>RFC 3623</strong></a> helper support. By default, helper support
 is disabled for all neighbours. This config enables/disables helper support
 on this router for all neighbours.</p>
 <p>To enable/disable helper support for a specific neighbour, the router-id

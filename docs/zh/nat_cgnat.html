@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -153,69 +153,57 @@
              
   <section id="cgnat">
 <h1>CGNAT</h1>
-<p><abbr title="Carrier-Grade Network Address Translation">CGNAT</abbr> , also known as
-Large-Scale NAT (LSN), is a type of network address translation used by
-Internet 服务 Providers (ISPs) to enable multiple private IP addresses to
-share a single public IP address. This technique helps to conserve the limited
-IPv4 address space.
-The 100.64.0.0/10 address block is reserved for use in carrier-grade NAT</p>
+<p><abbr title="运营商级网络地址转换">CGNAT</abbr>，也称为大规模 NAT（LSN），是一种由互联网服务提供商（ISP）使用的网络地址转换技术，用于使多个私有 IP 地址共享一个公共 IP 地址。该技术有助于节约有限的 IPv4 地址空间。
+100.64.0.0/10 地址块已为运营商级 NAT 预留。</p>
 <section id="overview">
-<h2>Overview</h2>
-<p>CGNAT works by placing a NAT device within the ISP’s network. This device
-translates private IP addresses from customer networks to a limited pool of
-public IP addresses assigned to the ISP. This allows many customers to share a
-smaller number of public IP addresses.</p>
-<p>Not all <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6888.html"><strong>RFC 6888</strong></a> requirements are implemented in CGNAT.</p>
-<p>Implemented the following <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6888.html"><strong>RFC 6888</strong></a> requirements:</p>
+<h2>概述</h2>
+<p>CGNAT 的工作原理是在 ISP 网络内部部署一台 NAT 设备。该设备将客户网络中的私有 IP 地址转换为分配给该 ISP 的有限公共 IP 地址池中的地址。这使得大量客户可以共享较少数量的公共 IP 地址。</p>
+<p>并非所有 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc6888.html"><strong>RFC 6888</strong></a> 要求均在 CGNAT 中实现。</p>
+<p>已实现以下 <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc6888.html"><strong>RFC 6888</strong></a> 要求：</p>
 <ul class="simple">
-<li><p>REQ 2: A CGN must have a default “IP address pooling” behavior of “Paired”.
-CGN must use the same external IP address mapping for all sessions associated
-with the same internal IP address, be they TCP, UDP, ICMP, something else,
-or a mix of different protocols.</p></li>
-<li><p>REQ 3: The CGN function should not have any limitations on the size or the
-contiguity of the external address pool.</p></li>
-<li><p>REQ 4: A CGN must support limiting the number of external ports (or,
-equivalently, “identifiers” for ICMP) that are assigned per subscriber</p></li>
+<li><p>REQ 2：CGN 必须默认采用“配对式”IP 地址池行为。对于与同一内部 IP 地址关联的所有会话（无论是 TCP、UDP、ICMP、其他协议或混合协议），CGN 必须使用相同的外部 IP 地址映射。</p></li>
+<li><p>REQ 3：CGN 功能不得对外部地址池的大小或连续性施加任何限制。</p></li>
+<li><p>REQ 4：CGN 必须支持按用户限制所分配的外部端口数（或等效地，ICMP 的“标识符”数量）</p></li>
 </ul>
 <section id="advantages-of-cgnat">
-<h3>Advantages of CGNAT</h3>
+<h3>CGNAT 的优势</h3>
 <ul class="simple">
-<li><p><strong>IPv4 地址 Conservation</strong>: CGNAT helps mitigate the exhaustion of IPv4 addresses by allowing multiple customers to share a single public IP address.</p></li>
-<li><p><strong>Scalability</strong>: ISPs can support more customers without needing a proportional increase in public IP addresses.</p></li>
-<li><p><strong>Cost-Effective</strong>: Reduces the cost associated with acquiring additional public IPv4 addresses.</p></li>
+<li><p><strong>IPv4 地址节约</strong>：CGNAT 通过允许多个客户共享单个公共 IP 地址，缓解了 IPv4 地址耗尽问题。</p></li>
+<li><p><strong>可扩展性</strong>：ISP 可在无需按比例增加公共 IP 地址数量的前提下支持更多客户。</p></li>
+<li><p><strong>成本效益</strong>：降低了获取额外公共 IPv4 地址的相关成本。</p></li>
 </ul>
 </section>
 <section id="considerations">
-<h3>Considerations</h3>
+<h3>注意事项</h3>
 <ul class="simple">
-<li><p><strong>Traceability Issues</strong>: Since multiple users share the same public IP address, tracking individual users for security and legal purposes 可以 challenging.</p></li>
-<li><p><strong>Performance Overheads</strong>: The translation process can introduce latency and potential performance bottlenecks, especially under high load.</p></li>
-<li><p><strong>Application Compatibility</strong>: Some applications and protocols may not work well with CGNAT due to their reliance on unique public IP addresses.</p></li>
-<li><p><strong>端口 Allocation Limits</strong>: Each public IP address has a limited number of ports, which 可以 exhausted, affecting the ability to establish new connections.</p></li>
-<li><p><strong>端口 Control 协议</strong>: PCP is not implemented.</p></li>
+<li><p><strong>可追溯性问题</strong>：由于多个用户共享同一公共 IP 地址，出于安全和法律目的追踪特定用户可能较为困难。</p></li>
+<li><p><strong>性能开销</strong>：地址转换过程可能引入延迟，并在高负载下造成潜在的性能瓶颈。</p></li>
+<li><p><strong>应用程序兼容性</strong>：某些依赖唯一公共 IP 地址的应用程序和协议可能无法很好地与 CGNAT 协同工作。</p></li>
+<li><p><strong>端口分配限制</strong>：每个公共 IP 地址的端口数量有限，可能被耗尽，从而影响新连接的建立能力。</p></li>
+<li><p><strong>端口控制协议</strong>：未实现 PCP（Port Control Protocol）。</p></li>
 </ul>
 </section>
 </section>
 <section id="port-calculation">
-<h2>端口 calculation</h2>
-<p>When implementing CGNAT, ensuring that there are enough ports allocated per subscriber is critical. Below is a summary based on RFC 6888.</p>
+<h2>端口计算</h2>
+<p>在实施 CGNAT 时，确保为每位用户分配足够的端口至关重要。以下总结基于 RFC 6888。</p>
 <ol class="arabic simple">
-<li><p><strong>Total 端口s Available</strong>:</p>
+<li><p><strong>可用端口总数</strong>：</p>
 <ul class="simple">
-<li><p>Total 端口s: 65536 (0 to 65535)</p></li>
-<li><p>Reserved 端口s: Assume 1024 ports are reserved for well-known services and administrative purposes.</p></li>
-<li><p>Usable 端口s: 65536 - 1024 = 64512</p></li>
+<li><p>总端口数：65536（0 至 65535）</p></li>
+<li><p>保留端口：假设有 1024 个端口为知名服务和管理用途而保留。</p></li>
+<li><p>可用端口数：65536 - 1024 = 64512</p></li>
 </ul>
 </li>
-<li><p><strong>Estimate 端口s Needed per Subscriber</strong>:</p>
+<li><p><strong>估算每位用户所需端口数</strong>：</p>
 <ul class="simple">
-<li><p>示例: A household might need 1000 ports to ensure smooth operation for multiple devices and applications.</p></li>
+<li><p>示例：一个家庭可能需要 1000 个端口，以确保多台设备及多种应用程序运行顺畅。</p></li>
 </ul>
 </li>
-<li><p><strong>Calculate the Number of Subscribers per Public IP</strong>:</p>
+<li><p><strong>计算每公共 IP 地址可支持的用户数</strong>：</p>
 <ul class="simple">
-<li><p>Usable 端口s / 端口s per Subscriber</p></li>
-<li><p>64512 / 1000 ≈ 64 subscribers per public IP</p></li>
+<li><p>可用端口数 / 每位用户端口数</p></li>
+<li><p>64512 / 1000 ≈ 每公共 IP 地址支持 64 位用户</p></li>
 </ul>
 </li>
 </ol>
@@ -225,52 +213,50 @@ equivalently, “identifiers” for ICMP) that are assigned per subscriber</p></
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set nat cgnat pool external <pool-name> external-port-range <port-range>
+set nat cgnat pool external &lt;pool-name&gt; external-port-range &lt;port-range&gt;
 <a class="cmdlink" href="#cfgcmd-set-nat-cgnat-pool-external-pool-name-external-port-range-port-range" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 an external port-range for the external pool, the default range is
-1024-65535. Multiple entries 可以 added to the same pool.</p>
+<p>为外部地址池设置外部端口范围，默认范围为 1024-65535。可向同一地址池添加多个条目。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set nat cgnat pool external <pool-name> per-user-limit port <num>
+set nat cgnat pool external &lt;pool-name&gt; per-user-limit port &lt;num&gt;
 <a class="cmdlink" href="#cfgcmd-set-nat-cgnat-pool-external-pool-name-per-user-limit-port-num" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 external source port limits that 将 allocated to each subscriber
-individually. The default value is 2000.</p>
+<p>为每位用户单独分配外部源端口限制。默认值为 2000。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set nat cgnat pool external <pool-name> range [address | address range | network] [seq]
+set nat cgnat pool external &lt;pool-name&gt; range [address | address range | network] [seq]
 <a class="cmdlink" href="#cfgcmd-set-nat-cgnat-pool-external-pool-name-range-address-address-range-network-seq" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the range of external IP addresses for the CGNAT pool.
-The sequence is optional; if set, a lower value means higher priority.</p>
+<p>设置 CGNAT 地址池的外部 IP 地址范围。
+序列号为可选项；若指定，则数值越小表示优先级越高。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set nat cgnat pool internal <pool-name> range [address range | network]
+set nat cgnat pool internal &lt;pool-name&gt; range [address range | network]
 <a class="cmdlink" href="#cfgcmd-set-nat-cgnat-pool-internal-pool-name-range-address-range-network" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the range of internal IP addresses for the CGNAT pool.</p>
+<p>设置 CGNAT 地址池的内部 IP 地址范围。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set nat cgnat rule <num> source pool <internal-pool-name>
+set nat cgnat rule &lt;num&gt; source pool &lt;internal-pool-name&gt;
 <a class="cmdlink" href="#cfgcmd-set-nat-cgnat-rule-num-source-pool-internal-pool-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the rule for the source pool.</p>
+<p>设置源地址池规则。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set nat cgnat rule <num> translation pool <external-pool-name>
+set nat cgnat rule &lt;num&gt; translation pool &lt;external-pool-name&gt;
 <a class="cmdlink" href="#cfgcmd-set-nat-cgnat-rule-num-translation-pool-external-pool-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the rule for the translation pool.</p>
+<p>设置转换地址池规则。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
@@ -278,79 +264,78 @@ set nat cgnat rule <num> translation pool <external-pool-name>
 
 set nat cgnat log-allocation
 <a class="cmdlink" href="#cfgcmd-set-nat-cgnat-log-allocation" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Enable logging of IP address and ports allocations.</p>
+<p>启用 IP 地址和端口分配日志记录功能。</p>
 </div>
 </div>
 </section>
 <section id="configuration-examples">
-<h2>配置 示例</h2>
+<h2>配置示例</h2>
 <section id="single-external-address">
-<h3>Single external address</h3>
-<p>示例 of setting up a basic CGNAT configuration:
-In the following example, we define an external pool named <code class="docutils literal notranslate">ext-1</code> with one
-external IP address.</p>
-<p>Each subscriber 将 allocated a maximum of 2000 ports from the external pool.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set nat cgnat pool external ext1 external-port-range '1024-65535'
-set nat cgnat pool external ext1 per-user-limit port '2000'
-set nat cgnat pool external ext1 range '192.0.2.222/32'
-set nat cgnat pool internal int1 range '100.64.0.0/28'
-set nat cgnat rule 10 source pool 'int1'
-set nat cgnat rule 10 translation pool 'ext1'
+<h3>单个外部地址</h3>
+<p>基本 CGNAT 配置示例：
+在以下示例中，我们定义一个名为 <code class="docutils literal notranslate">ext-1</code> 的外部地址池，其中包含一个外部 IP 地址。</p>
+<p>每位用户最多从外部地址池中分配 2000 个端口。</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat cgnat pool external ext1 external-port-range &#39;1024-65535&#39;
+set nat cgnat pool external ext1 per-user-limit port &#39;2000&#39;
+set nat cgnat pool external ext1 range &#39;192.0.2.222/32&#39;
+set nat cgnat pool internal int1 range &#39;100.64.0.0/28&#39;
+set nat cgnat rule 10 source pool &#39;int1&#39;
+set nat cgnat rule 10 translation pool &#39;ext1&#39;
 </pre></div>
 </div>
 </section>
 <section id="multiple-external-addresses">
-<h3>Multiple external addresses</h3>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set nat cgnat pool external ext1 external-port-range '1024-65535'
-set nat cgnat pool external ext1 per-user-limit port '8000'
-set nat cgnat pool external ext1 range '192.0.2.1-192.0.2.2'
-set nat cgnat pool external ext1 range '203.0.113.253-203.0.113.254'
-set nat cgnat pool internal int1 range '100.64.0.1-100.64.0.32'
-set nat cgnat rule 10 source pool 'int1'
-set nat cgnat rule 10 translation pool 'ext1'
+<h3>多个外部地址</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat cgnat pool external ext1 external-port-range &#39;1024-65535&#39;
+set nat cgnat pool external ext1 per-user-limit port &#39;8000&#39;
+set nat cgnat pool external ext1 range &#39;192.0.2.1-192.0.2.2&#39;
+set nat cgnat pool external ext1 range &#39;203.0.113.253-203.0.113.254&#39;
+set nat cgnat pool internal int1 range &#39;100.64.0.1-100.64.0.32&#39;
+set nat cgnat rule 10 source pool &#39;int1&#39;
+set nat cgnat rule 10 translation pool &#39;ext1&#39;
 </pre></div>
 </div>
 </section>
 <section id="external-address-sequences">
-<h3>External address sequences</h3>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set nat cgnat pool external ext-01 per-user-limit port '16000'
-set nat cgnat pool external ext-01 range 203.0.113.1/32 seq '10'
-set nat cgnat pool external ext-01 range 192.0.2.1/32 seq '20'
-set nat cgnat pool internal int-01 range '100.64.0.0/29'
-set nat cgnat rule 10 source pool 'int-01'
-set nat cgnat rule 10 translation pool 'ext-01'
+<h3>外部地址序列</h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set nat cgnat pool external ext-01 per-user-limit port &#39;16000&#39;
+set nat cgnat pool external ext-01 range 203.0.113.1/32 seq &#39;10&#39;
+set nat cgnat pool external ext-01 range 192.0.2.1/32 seq &#39;20&#39;
+set nat cgnat pool internal int-01 range &#39;100.64.0.0/29&#39;
+set nat cgnat rule 10 source pool &#39;int-01&#39;
+set nat cgnat rule 10 translation pool &#39;ext-01&#39;
 </pre></div>
 </div>
 </section>
 </section>
 <section id="operation-commands">
-<h2>Operation commands</h2>
+<h2>操作命令</h2>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show nat cgnat allocation
 <a class="cmdlink" href="#opcmd-show-nat-cgnat-allocation" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 address and port allocations</p>
+<p>显示地址和端口分配情况</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show nat cgnat allocation external-address <address>
+show nat cgnat allocation external-address &lt;address&gt;
 <a class="cmdlink" href="#opcmd-show-nat-cgnat-allocation-external-address-address" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 all allocations for an external IP address</p>
+<p>显示某一外部 IP 地址的所有分配信息</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-show nat cgnat allocation internal-address <address>
+show nat cgnat allocation internal-address &lt;address&gt;
 <a class="cmdlink" href="#opcmd-show-nat-cgnat-allocation-internal-address-address" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 all allocations for an internal IP address</p>
+<p>显示某一内部 IP 地址的所有分配信息</p>
 </div>
 </div>
 <section id="show-cgnat-allocations">
-<h3>显示 CGNAT allocations</h3>
+<h3>显示 CGNAT 分配信息</h3>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ show nat cgnat allocation
 Internal IP    External IP    Port range
 -------------  -------------  ------------
@@ -372,10 +357,10 @@ Internal IP    External IP    Port range
 </section>
 </section>
 <section id="further-reading">
-<h2>Further 读取ing</h2>
+<h2>延伸阅读</h2>
 <ul class="simple">
-<li><p><a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6598.html"><strong>RFC 6598</strong></a> - IANA-Reserved IPv4 Prefix for Shared 地址 Space</p></li>
-<li><p><a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6888.html"><strong>RFC 6888</strong></a> - Requirements for CGNAT</p></li>
+<li><p><a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc6598.html"><strong>RFC 6598</strong></a> — IANA 为共享地址空间预留的 IPv4 前缀</p></li>
+<li><p><a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc6888.html"><strong>RFC 6888</strong></a> — CGNAT 的需求规范</p></li>
 </ul>
 </section>
 </section>

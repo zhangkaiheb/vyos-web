@@ -138,6 +138,7 @@ import TaskSchedulerPage from '/src/pages/TaskSchedulerPage.js';
 import SystemIpPage from '/src/pages/SystemIpPage.js';
 import SystemIpv6Page from '/src/pages/SystemIpv6Page.js';
 import DnsServerPage from '/src/pages/DnsServerPage.js';
+import FeatureVisibilityPage from '/src/pages/FeatureVisibilityPage.js';
 
 const componentMap = {
   TablePage: GenericTablePage,
@@ -279,6 +280,7 @@ const componentMap = {
   SystemIpPage,
   SystemIpv6Page,
   DnsServerPage,
+  FeatureVisibilityPage,
 };
 
 function buildRoutes(menu, parentPath = '') {
@@ -304,6 +306,7 @@ function buildRoutes(menu, parentPath = '') {
 const staticRoutes = [
   { path: '/', redirect: '/monitor/dashboard' },
   { path: '/shell', name: '/shell', component: ShellPage, meta: { menuItem: { label: 'Web Shell', label_en: 'Web Shell' } } },
+  { path: '/system/feature-visibility', name: '/system/feature-visibility', component: FeatureVisibilityPage, meta: { menuItem: { label: '功能可见性', label_en: 'Feature Visibility', route: '/system/feature-visibility' } } },
 ];
 
 let router = null;

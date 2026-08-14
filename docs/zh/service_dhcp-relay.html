@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,108 +152,88 @@
 <div itemprop="articleBody">
              
   <section id="dhcp-relay">
-<h1>DHCP relay</h1>
-<p>A DHCP relay agent enables a single DHCP server to serve clients on
-remote subnets, eliminating the need for a separate server on each
-subnet.</p>
-<p>The DHCP relay agent receives client requests on one interface,
-forwards them as unicasts to the designated server on another network,
-and delivers the server’s replies back to the originating clients.</p>
-<p>VyOS provides two independent DHCP relay services:</p>
+<h1>DHCP 中继</h1>
+<p>DHCP 中继代理允许单个 DHCP 服务器为远程子网上的客户端提供服务，从而无需在每个子网上部署单独的服务器。</p>
+<p>DHCP 中继代理在一个接口上接收客户端请求，将其作为单播转发至另一网络上的指定服务器，并将服务器的响应返回给原始发起请求的客户端。</p>
+<p>VyOS 提供两种独立的 DHCP 中继服务：</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">service dhcp-relay</code>: Relays messages between IPv4 clients and
-servers.</p></li>
-<li><p><code class="docutils literal notranslate">service dhcpv6-relay</code>: Relays messages between IPv6 clients and
-servers.</p></li>
+<li><p><code class="docutils literal notranslate">service dhcp-relay</code>：在 IPv4 客户端与服务器之间中继消息。</p></li>
+<li><p><code class="docutils literal notranslate">service dhcpv6-relay</code>：在 IPv6 客户端与服务器之间中继消息。</p></li>
 </ul>
-<p>The two services are configured separately and share no settings. On a
-dual-stack network where clients of both address families need DHCP,
-configure both.</p>
+<p>这两项服务需分别配置，且不共享任何设置。在双协议栈网络中，若 IPv4 和 IPv6 客户端均需使用 DHCP，则必须同时配置两者。</p>
 <section id="ipv4-relay">
-<h2>IPv4 relay</h2>
+<h2>IPv4 中继</h2>
 <section id="configuration">
 <h3>配置</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service dhcp-relay listen-interface <interface>
+set service dhcp-relay listen-interface &lt;interface&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-listen-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a listen interface on which the DHCPv4 relay receives
-client broadcast requests.</strong></p>
-<p>Repeat the command to configure multiple listen interfaces.</p>
+<p><strong>配置一个监听接口，DHCPv4 中继将在该接口上接收客户端广播请求。</strong></p>
+<p>重复执行该命令可配置多个监听接口。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>At least one <code class="docutils literal notranslate">listen-interface</code> and one <code class="docutils literal notranslate">upstream-interface</code> 必须
-configured for a successful commit.</p>
+<p>为确保提交成功，至少需配置一个 <code class="docutils literal notranslate">listen-interface</code> 和一个 <code class="docutils literal notranslate">upstream-interface</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay listen-interface eth1
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service dhcp-relay upstream-interface <interface>
+set service dhcp-relay upstream-interface &lt;interface&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-upstream-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure an upstream interface through which the DHCPv4 relay
-forwards client requests toward the DHCP server.</strong></p>
-<p>Repeat the command to configure multiple upstream interfaces.</p>
+<p><strong>配置一个上游接口，DHCPv4 中继通过该接口将客户端请求转发至 DHCP 服务器。</strong></p>
+<p>重复执行该命令可配置多个上游接口。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>At least one <code class="docutils literal notranslate">listen-interface</code> and one <code class="docutils literal notranslate">upstream-interface</code> 必须
-configured for a successful commit.</p>
+<p>为确保提交成功，至少需配置一个 <code class="docutils literal notranslate">listen-interface</code> 和一个 <code class="docutils literal notranslate">upstream-interface</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay upstream-interface eth2
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service dhcp-relay server <ipv4-address>
+set service dhcp-relay server &lt;ipv4-address&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-server-ipv4-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IPv4 address of a DHCPv4 server to which the relay
-forwards client requests.</strong></p>
-<p>Repeat the command to forward client requests to multiple DHCPv4
-servers.</p>
+<p><strong>配置 DHCPv4 服务器的 IPv4 地址，DHCP 中继将客户端请求转发至该地址。</strong></p>
+<p>重复执行该命令可将客户端请求转发至多个 DHCPv4 服务器。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>At least one DHCPv4 server 必须 configured for a successful commit.</p>
+<p>为确保提交成功，至少需配置一个 DHCPv4 服务器。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay server 203.0.113.4
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service dhcp-relay interface <interface>
+set service dhcp-relay interface &lt;interface&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure an interface that participates in DHCPv4 relaying.</strong></p>
-<p>接口 configured under this legacy command operate
-bidirectionally, receiving DHCPv4 client broadcasts and forwarding
-requests to the server.</p>
+<p><strong>配置一个参与 DHCPv4 中继的接口。</strong></p>
+<p>在此传统命令下配置的接口以双向方式运行：既接收 DHCPv4 客户端广播，又将请求转发至服务器。</p>
 </div>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">警告</p>
-<p>This command is deprecated and remains available only to support
-existing configurations. New deployments should use
-<code class="docutils literal notranslate">listen-interface</code> and <code class="docutils literal notranslate">upstream-interface</code>, which cannot be combined
-with this command. A deprecation warning appears upon commit.</p>
+<p>该命令已弃用，仅保留以支持现有配置。新部署应使用 <code class="docutils literal notranslate">listen-interface</code> 和 <code class="docutils literal notranslate">upstream-interface</code>，二者不可与此命令混用。提交时将显示弃用警告。</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>The loopback interface (<code class="docutils literal notranslate">lo</code>) is not accepted as a valid value for
-this command.</p>
+<p>回环接口（<code class="docutils literal notranslate">lo</code>）不被接受为该命令的有效值。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay interface eth1
 set service dhcp-relay interface eth2
 </pre></div>
@@ -263,179 +243,153 @@ set service dhcp-relay interface eth2
 
 set service dhcp-relay disable
 <a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Administratively disable the DHCPv4 relay service without removing
-its configuration.</strong></p>
+<p><strong>在不删除其配置的情况下，管理性禁用 DHCPv4 中继服务。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay disable
 </pre></div>
 </div>
 </section>
 <section id="relay-options">
-<h3>Relay options</h3>
+<h3>中继选项</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service dhcp-relay relay-options hop-count <1-255>
+set service dhcp-relay relay-options hop-count &lt;1-255&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-relay-options-hop-count-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the DHCPv4 hop count at which relayed packets are
-discarded.</strong></p>
-<p>A DHCPv4 relay that receives a client message sets the hop count to
-0. Each subsequent DHCPv4 relay along the packet path increments it.
-数据包s whose hop count has reached the specified value are silently
-dropped.</p>
-<p>The default is 10.</p>
+<p><strong>配置 DHCPv4 跳数阈值，当转发数据包的跳数达到该值时即被丢弃。</strong></p>
+<p>接收到客户端消息的 DHCPv4 中继将跳数设为 0；此后每经过一个 DHCPv4 中继，跳数加 1。当数据包跳数达到所设定的值时，该数据包将被静默丢弃。</p>
+<p>默认值为 10。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay relay-options hop-count 4
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service dhcp-relay relay-options max-size <64-1400>
+set service dhcp-relay relay-options max-size &lt;64-1400&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-relay-options-max-size-64-1400" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the maximum size, in bytes, that a DHCPv4 packet may
-reach with the Relay Agent 信息rmation option added.</strong></p>
-<p>If the packet with the appended option exceeds this size, the option
-is omitted, and the packet is forwarded without it.</p>
-<p>The default is 576.</p>
+<p><strong>配置添加中继代理信息（Relay Agent Information）选项后，DHCPv4 数据包允许的最大字节数。</strong></p>
+<p>若添加该选项后的数据包超过此大小限制，则省略该选项，并直接转发不含该选项的数据包。</p>
+<p>默认值为 576。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay relay-options max-size 1400
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service dhcp-relay relay-options relay-agents-packets <append | discard | forward | replace>
+set service dhcp-relay relay-options relay-agents-packets &lt;append | discard | forward | replace&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-dhcp-relay-relay-options-relay-agents-packets-append-discard-forward-replace" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the policy applied to incoming DHCPv4 packets that
-already carry a Relay Agent 信息rmation option:</strong></p>
+<p><strong>配置对已携带中继代理信息（Relay Agent Information）选项的入站 DHCPv4 数据包所应用的策略：</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate">append</code>: 添加s the local Relay Agent 信息rmation option while
-preserving the existing Relay Agent 信息rmation option.</p></li>
-<li><p><code class="docutils literal notranslate">discard</code>: 丢弃s packets carrying a Relay Agent 信息rmation option.</p></li>
-<li><p><code class="docutils literal notranslate">forward</code>: Forwards packets with their existing Relay Agent
-信息rmation option unchanged.</p></li>
-<li><p><code class="docutils literal notranslate">replace</code>: Strips the existing Relay Agent 信息rmation option and
-inserts the local Relay Agent 信息rmation option.</p></li>
+<li><p><code class="docutils literal notranslate">append</code>：在保留原有中继代理信息选项的同时，添加本地中继代理信息选项。</p></li>
+<li><p><code class="docutils literal notranslate">discard</code>：丢弃携带中继代理信息选项的数据包。</p></li>
+<li><p><code class="docutils literal notranslate">forward</code>：原样转发携带原有中继代理信息选项的数据包。</p></li>
+<li><p><code class="docutils literal notranslate">replace</code>：移除原有中继代理信息选项，并插入本地中继代理信息选项。</p></li>
 </ul>
-<p>The default is <code class="docutils literal notranslate">forward</code>.</p>
+<p>默认值为 <code class="docutils literal notranslate">forward</code>。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcp-relay relay-options relay-agents-packets discard
 </pre></div>
 </div>
 </section>
 <section id="operation">
-<h3>Operation</h3>
+<h3>操作</h3>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 restart dhcp relay-agent
 <a class="cmdlink" href="#opcmd-restart-dhcp-relay-agent" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>Restart the DHCPv4 relay service.</p>
+<p>重启 DHCPv4 中继服务。</p>
 </div>
 </div>
 </section>
 <section id="example">
 <h3>示例</h3>
-<p>The following configuration forwards DHCP client requests received on
-<code class="docutils literal notranslate">eth1</code> (the client-facing interface) via <code class="docutils literal notranslate">eth2</code> (the server-facing
-interface) to a DHCP server at <code class="docutils literal notranslate">203.0.113.4</code>. 数据包s that already
-contain Relay Agent 信息rmation are dropped, so that only requests
-originating directly from clients are forwarded.</p>
+<p>以下配置将从 <code class="docutils literal notranslate">eth1</code>（面向客户端的接口）接收到的 DHCP 客户端请求，经由 <code class="docutils literal notranslate">eth2</code>（面向服务器的接口）转发至位于 <code class="docutils literal notranslate">203.0.113.4</code> 的 DHCP 服务器。对于已包含中继代理信息的数据包则予以丢弃，从而确保仅转发直接来自客户端的请求。</p>
 <figure class="align-default" id="id6">
-<a class="reference internal image-reference" href="https://docs.vyos.io/en/rolling/_images/service_dhcp-relay01.webp"><img alt="DHCPv4 relay topology" src="https://docs.vyos.io/en/rolling/_images/service_dhcp-relay01.webp" style="width: 505.6px; height: 203.20000000000002px;"></img></a>
+<a class="reference internal image-reference" href="https://docs.vyos.io/en/latest/_images/service_dhcp-relay01.webp"><img alt="DHCPv4 中继拓扑结构" src="https://docs.vyos.io/en/latest/_images/service_dhcp-relay01.webp" style="width: 505.6px; height: 203.20000000000002px;" /></a>
 <figcaption>
-<p>DHCPv4 relay topology</p>
+<p>DHCPv4 中继拓扑结构</p>
 </figcaption>
 </figure>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address '192.0.2.1/24'
-set interfaces ethernet eth2 address '198.51.100.1/24'
-set service dhcp-relay listen-interface 'eth1'
-set service dhcp-relay upstream-interface 'eth2'
-set service dhcp-relay server '203.0.113.4'
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address &#39;192.0.2.1/24&#39;
+set interfaces ethernet eth2 address &#39;198.51.100.1/24&#39;
+set service dhcp-relay listen-interface &#39;eth1&#39;
+set service dhcp-relay upstream-interface &#39;eth2&#39;
+set service dhcp-relay server &#39;203.0.113.4&#39;
 set service dhcp-relay relay-options relay-agents-packets discard
 </pre></div>
 </div>
-<p>The equivalent configuration using the deprecated <code class="docutils literal notranslate">interface</code> syntax,
-retained only for backward compatibility, is:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address '192.0.2.1/24'
-set interfaces ethernet eth2 address '198.51.100.1/24'
-set service dhcp-relay interface 'eth1'
-set service dhcp-relay interface 'eth2'
-set service dhcp-relay server '203.0.113.4'
+<p>使用已弃用的 <code class="docutils literal notranslate">interface</code> 语法（仅为向后兼容而保留）的等效配置如下：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address &#39;192.0.2.1/24&#39;
+set interfaces ethernet eth2 address &#39;198.51.100.1/24&#39;
+set service dhcp-relay interface &#39;eth1&#39;
+set service dhcp-relay interface &#39;eth2&#39;
+set service dhcp-relay server &#39;203.0.113.4&#39;
 set service dhcp-relay relay-options relay-agents-packets discard
 </pre></div>
 </div>
 </section>
 </section>
 <section id="ipv6-relay">
-<h2>IPv6 relay</h2>
+<h2>IPv6 中继</h2>
 <section id="dhcp-relay-ipv6-configuration">
 <h3>配置</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service dhcpv6-relay listen-interface <interface>
+set service dhcpv6-relay listen-interface &lt;interface&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-listen-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure a listen interface on which the DHCPv6 relay receives
-client multicast requests.</strong></p>
-<p>The interface must already have a global unicast IPv6 address
-assigned.</p>
-<p>Repeat the command to configure multiple listen interfaces.</p>
+<p><strong>配置一个监听接口，DHCPv6 中继将在该接口上接收客户端组播请求。</strong></p>
+<p>该接口必须已分配全局单播 IPv6 地址。</p>
+<p>重复执行该命令可配置多个监听接口。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>At least one <code class="docutils literal notranslate">listen-interface</code> and one <code class="docutils literal notranslate">upstream-interface</code> 必须
-configured for a successful commit.</p>
+<p>为确保提交成功，至少需配置一个 <code class="docutils literal notranslate">listen-interface</code> 和一个 <code class="docutils literal notranslate">upstream-interface</code>。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay listen-interface eth1
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service dhcpv6-relay listen-interface <interface> address <ipv6-address>
+set service dhcpv6-relay listen-interface &lt;interface&gt; address &lt;ipv6-address&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-listen-interface-interface-address-ipv6-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IPv6 address the DHCPv6 relay uses to identify the
-client-facing network to the DHCPv6 server.</strong></p>
-<p>The address 必须 a non-link-local IPv6 address already assigned to
-the specified listen interface.</p>
-<p>If the address is not set, the DHCPv6 relay uses the first
-non-link-local IPv6 address found on that listen interface.</p>
+<p><strong>配置 DHCPv6 中继用于向 DHCPv6 服务器标识客户端所在网络的 IPv6 地址。</strong></p>
+<p>该地址必须是已分配给指定监听接口的非链路本地 IPv6 地址。</p>
+<p>若未设置该地址，DHCPv6 中继将使用该监听接口上找到的第一个非链路本地 IPv6 地址。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay listen-interface eth1 address 2001:db8:1::1
 </pre></div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service dhcpv6-relay upstream-interface <interface> address <ipv6-address>
+set service dhcpv6-relay upstream-interface &lt;interface&gt; address &lt;ipv6-address&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-upstream-interface-interface-address-ipv6-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the IPv6 address of a DHCPv6 server (or another relay
-agent) to which the DHCPv6 relay forwards client messages via the
-specified upstream interface.</strong></p>
-<p>Repeat the command to forward client messages to multiple servers (or
-relay agents).</p>
+<p><strong>配置 DHCPv6 服务器（或另一个中继代理）的 IPv6 地址，DHCPv6 中继将通过指定的上游接口将客户端消息转发至该地址。</strong></p>
+<p>重复执行该命令可将客户端消息转发至多个服务器（或中继代理）。</p>
 </div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>At least one server (or relay agent) address 必须 configured for
-each upstream interface for a successful commit.</p>
+<p>为确保提交成功，每个上游接口至少需配置一个服务器（或中继代理）地址。</p>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay upstream-interface eth2 address 2001:db8:2::4
 </pre></div>
 </div>
@@ -444,32 +398,27 @@ each upstream interface for a successful commit.</p>
 
 set service dhcpv6-relay disable
 <a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-disable" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Administratively disable the DHCPv6 relay service without removing
-its configuration.</strong></p>
+<p><strong>在不删除其配置的情况下，管理性禁用 DHCPv6 中继服务。</strong></p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay disable
 </pre></div>
 </div>
 </section>
 <section id="dhcp-relay-v6-options">
-<h3>Relay options</h3>
+<h3>中继选项</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service dhcpv6-relay max-hop-count <1-255>
+set service dhcpv6-relay max-hop-count &lt;1-255&gt;
 <a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-max-hop-count-1-255" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Configure the DHCPv6 hop count at which relayed packets are
-discarded.</strong></p>
-<p>A DHCPv6 relay that receives a client message sets the hop count to
-0. Each subsequent DHCPv6 relay along the packet path increments it.
-数据包s whose hop count has reached the specified value are silently
-dropped.</p>
-<p>The default is 10.</p>
+<p><strong>配置 DHCPv6 跳数阈值，当转发数据包的跳数达到该值时即被丢弃。</strong></p>
+<p>接收到客户端消息的 DHCPv6 中继将跳数设为 0；此后每经过一个 DHCPv6 中继，跳数加 1。当数据包跳数达到所设定的值时，该数据包将被静默丢弃。</p>
+<p>默认值为 10。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay max-hop-count 4
 </pre></div>
 </div>
@@ -478,44 +427,39 @@ dropped.</p>
 
 set service dhcpv6-relay use-interface-id-option
 <a class="cmdlink" href="#cfgcmd-set-service-dhcpv6-relay-use-interface-id-option" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p><strong>Enable insertion of the 接口-ID option into every
-Relay-forward message.</strong></p>
-<p>The 接口-ID option is inserted automatically whenever more than
-one listen interface is configured on a relay, regardless of this
-setting.</p>
+<p><strong>启用在每个 Relay-forward 消息中插入接口 ID（Interface-ID）选项。</strong></p>
+<p>无论是否启用此设置，只要中继上配置了多个监听接口，系统将自动插入接口 ID 选项。</p>
 </div>
 </div>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service dhcpv6-relay use-interface-id-option
 </pre></div>
 </div>
 </section>
 <section id="dhcp-relay-ipv6-op-cmd">
-<h3>Operation</h3>
+<h3>操作</h3>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 restart dhcpv6 relay-agent
 <a class="cmdlink" href="#opcmd-restart-dhcpv6-relay-agent" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>Restart the DHCPv6 relay service.</p>
+<p>重启 DHCPv6 中继服务。</p>
 </div>
 </div>
 </section>
 <section id="dhcp-relay-ipv6-example">
 <h3>示例</h3>
-<p>The following configuration forwards DHCPv6 client requests received
-on <code class="docutils literal notranslate">eth1</code> (the client-facing interface) via <code class="docutils literal notranslate">eth2</code> (the server-facing
-interface) to a DHCPv6 server at <code class="docutils literal notranslate">2001:db8:2::4</code>.</p>
+<p>以下配置将从 <code class="docutils literal notranslate">eth1</code>（面向客户端的接口）接收到的 DHCPv6 客户端请求，经由 <code class="docutils literal notranslate">eth2</code>（面向服务器的接口）转发至位于 <code class="docutils literal notranslate">2001:db8:2::4</code> 的 DHCPv6 服务器。</p>
 <figure class="align-default" id="id7">
-<a class="reference internal image-reference" href="https://docs.vyos.io/en/rolling/_images/service_dhcpv6-relay01.webp"><img alt="DHCPv6 relay topology" src="https://docs.vyos.io/en/rolling/_images/service_dhcpv6-relay01.webp" style="width: 491.20000000000005px; height: 185.60000000000002px;"></img></a>
+<a class="reference internal image-reference" href="https://docs.vyos.io/en/latest/_images/service_dhcpv6-relay01.webp"><img alt="DHCPv6 中继拓扑结构" src="https://docs.vyos.io/en/latest/_images/service_dhcpv6-relay01.webp" style="width: 491.20000000000005px; height: 185.60000000000002px;" /></a>
 <figcaption>
-<p>DHCPv6 relay topology</p>
+<p>DHCPv6 中继拓扑结构</p>
 </figcaption>
 </figure>
-<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address '2001:db8:1::1/64'
-set interfaces ethernet eth2 address '2001:db8:2::1/64'
-set service dhcpv6-relay listen-interface 'eth1'
-set service dhcpv6-relay upstream-interface 'eth2' address '2001:db8:2::4'
+<div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces ethernet eth1 address &#39;2001:db8:1::1/64&#39;
+set interfaces ethernet eth2 address &#39;2001:db8:2::1/64&#39;
+set service dhcpv6-relay listen-interface &#39;eth1&#39;
+set service dhcpv6-relay upstream-interface &#39;eth2&#39; address &#39;2001:db8:2::4&#39;
 </pre></div>
 </div>
 </section>

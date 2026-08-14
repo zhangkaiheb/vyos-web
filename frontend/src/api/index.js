@@ -63,6 +63,34 @@ export const configApi = {
   suggestions: (path, field) => api.get('/config/suggestions', { path, field }),
   sessionChanged: () => api.get('/config/session-changed'),
   export: (password) => api.post('/config/export', { password }),
+  exportFile: async (password) => {
+    const headers = { 'Content-Type': 'application/json' };
+    const token = getToken();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(API_BASE + '/config/export-file', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ password }),
+    });
+    if (res.status === 401) {
+      localStorage.removeItem('vyos_token');
+      window.dispatchEvent(new CustomEvent('auth:expired'));
+      throw new Error('Token expired');
+    }
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}));
+      throw new Error(json.message || `HTTP ${res.status}`);
+    }
+    // Get filename from Content-Disposition header
+    const disposition = res.headers.get('Content-Disposition');
+    let filename = 'vyos_config.boot';
+    if (disposition) {
+      const match = disposition.match(/filename="?(.+?)"?$/);
+      if (match) filename = match[1];
+    }
+    const blob = await res.blob();
+    return { blob, filename };
+  },
   import: (type, data, password = '') => api.post('/config/import', { type, data, password }),
   rollback: (revision) => api.post('/config/rollback', { revision }),
 };

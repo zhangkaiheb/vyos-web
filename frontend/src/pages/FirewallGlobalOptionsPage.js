@@ -6,6 +6,7 @@ import { onMenuRefresh } from '/src/utils/eventBus.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
+import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 
 const ENABLE_OPTIONS = ['', 'enable', 'disable'];
 const VALIDATION_OPTIONS = ['', 'strict', 'loose', 'disable'];
@@ -352,8 +353,13 @@ export default defineComponent({
             <ConfigForm v-model="form" :schema="tab.schema" :disabled="writeDisabled" :formKey="'fw_global_' + tab.key" />
           </template>
         </TabGroup>
+        <div style="text-align:right;padding:16px 0;">
+          <ToolbarButton icon="save" primary :disabled="writeDisabled || saving" @click="save">
+            {{ saving ? $t('app.loading') : $t('app.confirm') }}
+          </ToolbarButton>
+        </div>
       </div>
     </div>
   `,
-  components: { ConfigForm, TabGroup },
+  components: { ConfigForm, TabGroup, ToolbarButton },
 });

@@ -167,7 +167,7 @@
 Cisco. Другие участники включают Huawei, Broadcom, Citrix, Pica8, Big Switch
 Networks, Cumulus Networks, Dell EMC, Ericsson, Mellanox, FreeBSD, OpenBSD, Red
 Hat, Joyent и Juniper Networks.</p>
-<p>VXLAN официально документирован IETF в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc7348.html"><strong>RFC 7348</strong></a>.</p>
+<p>VXLAN официально документирован IETF в <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc7348.html"><strong>RFC 7348</strong></a>.</p>
 <p>При настройке VXLAN в виртуальной машине VyOS убедитесь, что разрешено
 подделывание MAC-адреса (Hyper-V) или отправка фальшивых пакетов (ESX). В противном случае гипервизор
 может заблокировать переданные кадры.</p>
@@ -350,7 +350,7 @@ set interfaces vxlan &lt;interface&gt; ip enable-directed-broadcast
 интерфейсе.</strong></p>
 <p><strong>Стандартное поведение:</strong> Пакеты IP-направленного вещания удаляются.</p>
 <p><strong>Если настроено:</strong> Пакеты IP-направленного вещания передаются всем хостам
-на целевом подсети, как определено в <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> и <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
+на целевом подсети, как определено в <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1812.html"><strong>RFC 1812</strong></a> и <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2644.html"><strong>RFC 2644</strong></a>.</p>
 <p>Пример:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ip enable-directed-broadcast
 </pre></div>
@@ -435,7 +435,7 @@ VLAN (PVLAN). В конфигурациях PVLAN устройства на из
 </div>
 <p>Локальный прокси-ARP также известен как:</p>
 <ul class="simple">
-<li><p>Агрегация VLAN (<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
+<li><p>Агрегация VLAN (<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3069.html"><strong>RFC 3069</strong></a>).</p></li>
 <li><p>Частный VLAN (Cisco, Allied Telesyn).</p></li>
 <li><p>Фильтрация по источнику или изоляция порта (Hewlett-Packard).</p></li>
 <li><p>Перенаправление MAC-адреса (Ericsson).</p></li>
@@ -447,7 +447,7 @@ VLAN (PVLAN). В конфигурациях PVLAN устройства на из
 
 set interfaces vxlan &lt;interface&gt; ip source-validation &lt;strict | loose | disable&gt;
 <a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ip-source-validation-strict-loose-disable" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
-<p><strong>Настройте проверку исходного IP-адреса с использованием</strong> <abbr title="Обратное перенаправление">RPF</abbr> <strong>на этом интерфейсе, как указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
+<p><strong>Настройте проверку исходного IP-адреса с использованием</strong> <abbr title="Обратное перенаправление">RPF</abbr> <strong>на этом интерфейсе, как указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc3704.html"><strong>RFC 3704</strong></a>.</p>
 <p>Доступны следующие варианты:</p>
 <ul class="simple">
 <li><p><strong>strict:</strong> Каждый входящий пакет проверяется на соответствие исходному IP-адресу в таблице информации о маршрутизации (FIB). Если интерфейс не является лучшим маршрутом обратно к этому источнику, проверка не проходит, и пакет удаляется.</p></li>
@@ -464,7 +464,7 @@ set interfaces vxlan &lt;interface&gt; ipv6 address autoconf
 <a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-address-autoconf" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
 <p><strong>Настройте интерфейс на автоматическое получение IPv6-адреса с помощью</strong>
 <abbr title="Автоконфигурация без состояния">SLAAC</abbr>, <strong>как указано в</strong>
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4862.html"><strong>RFC 4862</strong></a>.</p>
 <p>Устройства IPv6 могут самостоятельно настраивать себя, когда подключены к сети IPv6, используя протокол обнаружения соседей через сообщения ICMPv6 о маршрутизаторе. При первом подключении к сети устройство отправляет многоадресный запрос на обнаружение маршрутизатора в локальной подсети для получения параметров своей конфигурации. Маршрутизатор отвечает пакетом объявлений маршрутизатора, содержащим параметры конфигурации уровня интернета.</p>
 <div class="admonition note">
 <p class="admonition-title">Примечание</p>
@@ -484,7 +484,7 @@ set interfaces vxlan &lt;interface&gt; ipv6 address eui64 &lt;prefix&gt;
 <a class="cmdlink" href="#cfgcmd-set-interfaces-vxlan-interface-ipv6-address-eui64-prefix" title="Перемещение к этой команде"></a></div><div class="cfgcmd-body">
 <p><strong>Настройте интерфейс на присвоение себе IPv6-адреса с помощью метода</strong>
 <abbr title="64-битный расширенный уникальный идентификатор">EUI-64</abbr> <strong>, как
-указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
+указано в</strong> <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4291.html"><strong>RFC 4291</strong></a>.</p>
 <p>Пример:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set interfaces vxlan vxlan0 ipv6 address eui64 2001:db8:beef::/64
 </pre></div>

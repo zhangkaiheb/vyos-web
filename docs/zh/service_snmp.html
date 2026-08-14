@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -89,101 +89,64 @@
              
   <section id="snmp">
 <h1>SNMP</h1>
-<p><abbr title="Simple Network Management Protocol">SNMP</abbr> is an Internet Standard
-protocol for collecting and organizing information about managed devices on
-IP networks and for modifying that information to change device behavior.
-Devices that typically support SNMP include cable modems, routers, switches,
-servers, workstations, printers, and more.</p>
-<p>SNMP is widely used in network management for network monitoring. SNMP exposes
-management data in the form of variables on the managed systems organized in
-a management information base (<a class="reference external" href="https://en.wikipedia.org/wiki/Management_information_base">MIB</a>) which describe the system status and
-configuration. These variables can then be remotely queried (and, in some
-circumstances, manipulated) by managing applications.</p>
-<p>Three significant versions of SNMP have been developed and deployed. SNMPv1 is
-the original version of the protocol. More recent versions, SNMPv2c and SNMPv3,
-feature improvements in performance, flexibility and security.</p>
-<p>SNMP is a component of the Internet Protocol Suite as defined by the Internet
-Engineering Task Force (IETF). It consists of a set of standards for network
-management, including an application layer protocol, a database schema, and a
-set of data objects.</p>
+<p><abbr title="简单网络管理协议">SNMP</abbr> 是一种互联网标准协议，用于收集和组织 IP 网络上受管设备的信息，并修改这些信息以改变设备行为。通常支持 SNMP 的设备包括电缆调制解调器、路由器、交换机、服务器、工作站、打印机等。</p>
+<p>SNMP 广泛应用于网络管理中的网络监控。SNMP 将管理数据以变量形式暴露在受管系统上，这些变量按管理信息库（<a class="reference external" href="https://en.wikipedia.org/wiki/Management_information_base">MIB</a>）组织，用于描述系统状态和配置。这些变量随后可由管理应用程序远程查询（在某些情况下还可被操作）。</p>
+<p>SNMP 已开发并部署了三个重要版本：SNMPv1 是该协议的原始版本；较新版本 SNMPv2c 和 SNMPv3 在性能、灵活性和安全性方面均有改进。</p>
+<p>SNMP 是互联网工程任务组（IETF）定义的互联网协议套件的一个组成部分。它包含一套网络管理标准，包括应用层协议、数据库模式以及一组数据对象。</p>
 <section id="overview-and-basic-concepts">
-<h2>Overview and basic concepts</h2>
-<p>In typical uses of SNMP, one or more administrative computers called managers
-have the task of monitoring or managing a group of hosts or devices on a
-computer network. Each managed system executes a software component called an
-agent which reports information via SNMP to the manager.</p>
-<p>An SNMP-managed network consists of three key components:</p>
+<h2>概述与基本概念</h2>
+<p>在典型的 SNMP 使用场景中，一台或多台称为“管理器”的管理计算机负责监控或管理计算机网络中的一组主机或设备。每个受管系统均运行一个称为“代理”的软件组件，该组件通过 SNMP 向管理器报告信息。</p>
+<p>一个受 SNMP 管理的网络由三个关键组件构成：</p>
 <ul class="simple">
-<li><p>Managed devices</p></li>
-<li><p>Agent - software which runs on managed devices</p></li>
-<li><p>网络 management station (NMS) - software which runs on the manager</p></li>
+<li><p>受管设备</p></li>
+<li><p>代理 — 运行于受管设备上的软件</p></li>
+<li><p>网络管理站（NMS）— 运行于管理器上的软件</p></li>
 </ul>
-<p>A managed device is a network node that implements an SNMP interface that
-allows unidirectional (read-only) or bidirectional (read and write) access to
-node-specific information. Managed devices exchange node-specific information
-with the NMSs. Sometimes called network elements, the managed devices 可以
-any type of device, including, but not limited to, routers, access servers,
-switches, cable modems, bridges, hubs, IP telephones, IP video cameras,
-computer hosts, and printers.</p>
-<p>An agent is a network-management software module that resides on a managed
-device. An agent has local knowledge of management information and translates
-that information to or from an SNMP-specific form.</p>
-<p>A network management station executes applications that monitor and control
-managed devices. NMSs provide the bulk of the processing and memory resources
-required for network management. One or more NMSs may exist on any managed
-network.</p>
+<p>受管设备是实现 SNMP 接口的网络节点，该接口允许单向（只读）或双向（读写）访问节点特定信息。受管设备与 NMS 交换节点特定信息。有时也称作网络单元，受管设备可以是任何类型的设备，包括但不限于路由器、接入服务器、交换机、电缆调制解调器、网桥、集线器、IP 电话、IP 视频摄像头、计算机主机及打印机。</p>
+<p>代理是一种驻留在受管设备上的网络管理软件模块。代理具备对管理信息的本地认知能力，并将该信息转换为 SNMP 特定格式，或从 SNMP 特定格式进行反向转换。</p>
+<p>网络管理站执行监控和控制受管设备的应用程序。NMS 提供网络管理所需的大部分处理能力和内存资源。在任一受管网络中，可存在一个或多个 NMS。</p>
 <figure class="align-default" id="id3">
-<a class="reference internal image-reference" href="https://docs.vyos.io/en/rolling/_images/service_snmp_communication_principles_diagram.webp"><img alt="Principle of SNMP Communication" src="https://docs.vyos.io/en/rolling/_images/service_snmp_communication_principles_diagram.webp" style="width: 735.8000000000001px; height: 340.0px;"></img></a>
+<a class="reference internal image-reference" href="https://docs.vyos.io/en/latest/_images/service_snmp_communication_principles_diagram.webp"><img alt="SNMP 通信原理" src="https://docs.vyos.io/en/latest/_images/service_snmp_communication_principles_diagram.webp" style="width: 735.8000000000001px; height: 340.0px;" /></a>
 <figcaption>
-<p>镜像 thankfully borrowed from
+<p>图片感谢来自
 <a class="reference external" href="https://en.wikipedia.org/wiki/File:SNMP_communication_principles_diagram.PNG">https://en.wikipedia.org/wiki/File:SNMP_communication_principles_diagram.PNG</a>
-which is under the GNU Free Documentation License</p>
+（遵循 GNU 自由文档许可证）</p>
 </figcaption>
 </figure>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>VyOS SNMP supports both IPv4 and IPv6.</p>
+<p>VyOS SNMP 同时支持 IPv4 和 IPv6。</p>
 </div>
 </section>
 <section id="snmp-protocol-versions">
-<h2>SNMP 协议 Versions</h2>
-<p>VyOS itself supports <a class="reference external" href="https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol#Version_2">SNMPv2</a> (version 2) and <a class="reference external" href="https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol#Version_3">SNMPv3</a> (version 3) where the
-later is recommended because of improved security (optional authentication and
-encryption).</p>
+<h2>SNMP 协议版本</h2>
+<p>VyOS 本身支持 <a class="reference external" href="https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol#Version_2">SNMPv2</a>（第 2 版）和 <a class="reference external" href="https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol#Version_3">SNMPv3</a>（第 3 版），其中推荐使用 SNMPv3，因其具有更完善的安全性（可选的身份验证和加密功能）。</p>
 <section id="snmpv2">
 <h3>SNMPv2</h3>
-<p>SNMPv2 is the original and most commonly used version. For authorizing clients,
-SNMP uses the concept of communities. Communities may have authorization set
-to read only (this is most common) or to read and write (this option is not
-actively used in VyOS).</p>
-<p>SNMP can work synchronously or asynchronously. In synchronous communication,
-the monitoring system queries the router periodically. In asynchronous, the
-router sends notification to the “trap” (the monitoring host).</p>
-<p>SNMPv2 does not support any authentication mechanisms, other than client source
-address, so you should specify addresses of clients allowed to monitor the
-router. 注意 that SNMPv2 also supports no encryption and always sends data in
-plain text.</p>
+<p>SNMPv2 是原始且最常用的版本。对于客户端授权，SNMP 使用“团体”（community）的概念。团体的授权级别可设为只读（这是最常见的情形）或读写（此选项在 VyOS 中未被积极使用）。</p>
+<p>SNMP 可同步或异步工作。在同步通信中，监控系统定期向路由器发起查询；在异步通信中，路由器向“陷阱”（trap，即监控主机）发送通知。</p>
+<p>SNMPv2 不支持除客户端源地址外的任何身份验证机制，因此您应指定获准监控路由器的客户端地址。请注意，SNMPv2 不支持任何加密，所有数据均以明文方式传输。</p>
 <section id="example">
 <h4>示例</h4>
-<div class="highlight-none notranslate"><div class="highlight"><pre># Define a community
+<div class="highlight-none notranslate"><div class="highlight"><pre># 定义一个团体
 set service snmp community routers authorization ro
 
-# Allow monitoring access from the entire network
+# 允许整个网络进行监控访问
 set service snmp community routers network 192.0.2.0/24
 set service snmp community routers network 2001::db8:ffff:eeee::/64
 
-# Allow monitoring access from specific addresses
+# 允许特定地址进行监控访问
 set service snmp community routers client 203.0.113.10
 set service snmp community routers client 203.0.113.20
 
-# Define optional router information
-set service snmp location "UK, London"
-set service snmp contact "<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="94f5f0f9fdfad4f1ecf5f9e4f8f1baf7fbf9">[email protected]</a>"
+# 定义可选的路由器信息
+set service snmp location &quot;英国，伦敦&quot;
+set service snmp contact &quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="94f5f0f9fdfad4f1ecf5f9e4f8f1baf7fbf9">[email&#160;protected]</a>&quot;
 
-# Trap target if you want asynchronous communication
+# 若需异步通信，则设置陷阱目标
 set service snmp trap-target 203.0.113.10
 
-# Listen only on specific IP addresses (port defaults to 161)
+# 仅监听特定 IP 地址（端口默认为 161）
 set service snmp listen-address 172.16.254.36 port 161
 set service snmp listen-address 2001:db8::f00::1
 </pre></div>
@@ -192,47 +155,38 @@ set service snmp listen-address 2001:db8::f00::1
 </section>
 <section id="snmpv3">
 <h3>SNMPv3</h3>
-<p>SNMPv3 (version 3 of the SNMP protocol) introduced a whole slew of new security
-related features that have been missing from the previous versions. Security
-was one of the biggest weakness of SNMP until v3. 认证 in SNMP
-Versions 1 and 2 amounts to nothing more than a password (community string)
-sent in clear text between a manager and agent. Each SNMPv3 message contains
-security parameters which are encoded as an octet string. The meaning of these
-security parameters depends on the security model being used.</p>
-<p>The security approach in SNMPv3 targets:</p>
+<p>SNMPv3（SNMP 协议第 3 版）引入了大量此前版本所缺失的安全相关特性。安全性曾是 SNMP v3 之前各版本的最大弱点。SNMP 第 1 版和第 2 版的身份验证仅相当于在管理器与代理之间以明文方式传输密码（即团体字符串）。每个 SNMPv3 消息均包含安全参数，这些参数被编码为八位字节串。这些安全参数的具体含义取决于所采用的安全模型。</p>
+<p>SNMPv3 的安全方法旨在实现以下目标：</p>
 <ul class="simple">
-<li><p>Confidentiality – Encryption of packets to prevent snooping by an
-unauthorized source.</p></li>
-<li><p>Integrity – Message integrity to ensure that a packet has not been tampered
-while in transit including an optional packet replay protection mechanism.</p></li>
-<li><p>认证 – to verify that the message is from a valid source.</p></li>
+<li><p>保密性 — 对数据包进行加密，防止未经授权的来源窃听。</p></li>
+<li><p>完整性 — 确保数据包在传输过程中未被篡改，并可选地提供数据包重放保护机制。</p></li>
+<li><p>身份验证 — 验证消息是否源自有效来源。</p></li>
 </ul>
 <section id="snmp-v3-example">
 <h4>示例</h4>
 <ul class="simple">
-<li><p>Let SNMP daemon listen only on IP address 192.0.2.1</p></li>
-<li><p>Configure new SNMP user named “vyos” with password “vyos12345678”</p></li>
-<li><p>New user will use SHA/AES for authentication and privacy</p></li>
+<li><p>让 SNMP 守护进程仅监听 IP 地址 192.0.2.1</p></li>
+<li><p>配置名为 “vyos” 的新 SNMP 用户，密码为 “vyos12345678”</p></li>
+<li><p>新用户将使用 SHA/AES 进行身份验证和隐私保护</p></li>
 </ul>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service snmp listen-address 192.0.2.1
-set service snmp location 'VyOS Datacenter'
-set service snmp v3 engineid '000000000000000000000002'
-set service snmp v3 group default mode 'ro'
-set service snmp v3 group default view 'default'
-set service snmp v3 user vyos auth plaintext-password 'vyos12345678'
-set service snmp v3 user vyos auth type 'sha'
-set service snmp v3 user vyos group 'default'
-set service snmp v3 user vyos privacy plaintext-password 'vyos12345678'
-set service snmp v3 user vyos privacy type 'aes'
+set service snmp location &#39;VyOS 数据中心&#39;
+set service snmp v3 engineid &#39;000000000000000000000002&#39;
+set service snmp v3 group default mode &#39;ro&#39;
+set service snmp v3 group default view &#39;default&#39;
+set service snmp v3 user vyos auth plaintext-password &#39;vyos12345678&#39;
+set service snmp v3 user vyos auth type &#39;sha&#39;
+set service snmp v3 user vyos group &#39;default&#39;
+set service snmp v3 user vyos privacy plaintext-password &#39;vyos12345678&#39;
+set service snmp v3 user vyos privacy type &#39;aes&#39;
 set service snmp v3 view default oid 1
 </pre></div>
 </div>
-<p>After commit the plaintext passwords 将 hashed and stored in your
-configuration. The resulting CLI config will look like:</p>
+<p>提交后，明文密码将被哈希化并存储于您的配置中。最终生成的 CLI 配置如下所示：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos# show service snmp
  listen-address 192.0.2.1 {
  }
- location "VyOS Datacenter"
+ location &quot;VyOS 数据中心&quot;
  v3 {
      engineid 000000000000000000000002
      group default {
@@ -257,61 +211,51 @@ configuration. The resulting CLI config will look like:</p>
  }
 </pre></div>
 </div>
-<p>You can test the SNMPv3 functionality from any linux based system, just run the
-following command: <code class="docutils literal notranslate">snmpwalk -v 3 -u vyos -a SHA -A vyos12345678 -x AES -X vyos12345678 -l authPriv 192.0.2.1 .1</code></p>
+<p>您可在任意基于 Linux 的系统上测试 SNMPv3 功能，只需运行以下命令：<code class="docutils literal notranslate">snmpwalk -v 3 -u vyos -a SHA -A vyos12345678 -x AES -X vyos12345678 -l authPriv 192.0.2.1 .1</code></p>
 </section>
 </section>
 </section>
 <section id="vyos-mibs">
-<h2>VyOS MIBs</h2>
-<p>All SNMP MIBs are located in each image of VyOS here: <code class="docutils literal notranslate">/usr/share/snmp/mibs/</code></p>
-<p>You are be able to download the files using SCP, once the SSH service
-has been activated like so</p>
+<h2>VyOS MIB</h2>
+<p>所有 SNMP MIB 均位于 VyOS 每个镜像的以下路径中：<code class="docutils literal notranslate">/usr/share/snmp/mibs/</code></p>
+<p>一旦启用了 SSH 服务，您即可使用 SCP 下载这些文件，例如：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>scp -r vyos@your_router:/usr/share/snmp/mibs /your_folder/mibs
 </pre></div>
 </div>
 </section>
 <section id="snmp-extensions">
-<h2>SNMP Extensions</h2>
-<p>To extend SNMP agent functionality, custom scripts 可以 executed every time
-the agent is being called. This 可以 achieved by using
-<code class="docutils literal notranslate">arbitrary extensioncommands</code>. The first step is to create a functional
-script of course, then upload it to your VyOS instance via the command
-<code class="docutils literal notranslate">scp your_script.sh vyos@your_router:/config/user-data</code>.
-Once the script is uploaded, it needs to be configured via the command below.</p>
+<h2>SNMP 扩展</h2>
+<p>为扩展 SNMP 代理的功能，可在每次调用代理时执行自定义脚本。这可通过使用 <code class="docutils literal notranslate">arbitrary extensioncommands</code> 实现。第一步当然是创建一个功能完备的脚本，然后通过命令 <code class="docutils literal notranslate">scp your_script.sh vyos&#64;your_router:/config/user-data</code> 将其上传至您的 VyOS 实例。脚本上传完成后，需通过以下命令进行配置。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>set service snmp script-extensions extension-name my-extension script your_script.sh
 commit
 </pre></div>
 </div>
-<p>The OID <code class="docutils literal notranslate">.1.3.6.1.4.1.8072.1.3.2.3.1.1.4.116.101.115.116</code>, once called, will
-contain the output of the extension.</p>
+<p>当调用 OID <code class="docutils literal notranslate">.1.3.6.1.4.1.8072.1.3.2.3.1.1.4.116.101.115.116</code> 时，其返回值即为该扩展脚本的输出结果。</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>root@vyos:/home/vyos# snmpwalk -v2c  -c public 127.0.0.1 nsExtendOutput1
-NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."my-extension" = STRING: hello
-NET-SNMP-EXTEND-MIB::nsExtendOutputFull."my-extension" = STRING: hello
-NET-SNMP-EXTEND-MIB::nsExtendOutNumLines."my-extension" = INTEGER: 1
-NET-SNMP-EXTEND-MIB::nsExtendResult."my-extension" = INTEGER: 0
+NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.&quot;my-extension&quot; = STRING: hello
+NET-SNMP-EXTEND-MIB::nsExtendOutputFull.&quot;my-extension&quot; = STRING: hello
+NET-SNMP-EXTEND-MIB::nsExtendOutNumLines.&quot;my-extension&quot; = INTEGER: 1
+NET-SNMP-EXTEND-MIB::nsExtendResult.&quot;my-extension&quot; = INTEGER: 0
 </pre></div>
 </div>
 </section>
 <section id="solarwinds">
 <h2>SolarWinds</h2>
-<p>If you happen to use SolarWinds Orion as NMS you can also use the Device
-Templates Management. A template for VyOS 可以 easily imported.</p>
-<p>创建 a file named <code class="docutils literal notranslate">VyOS-1.3.6.1.4.1.44641.ConfigMgmt-Commands</code> using the
-following content:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><Configuration-Management Device="VyOS" SystemOID="1.3.6.1.4.1.44641">
-    <Commands>
-        <Command Name="Reset" Value="set terminal width 0${CRLF}set terminal length 0"/>
-        <Command Name="Reboot" Value="reboot${CRLF}Yes"/>
-        <Command Name="EnterConfigMode" Value="configure"/>
-        <Command Name="ExitConfigMode" Value="commit${CRLF}exit"/>
-        <Command Name="DownloadConfig" Value="show configuration commands"/>
-        <Command Name="SaveConfig" Value="commit${CRLF}save"/>
-        <Command Name="Version" Value="show version"/>
-        <Command Name="MenuBased" Value="False"/>
-        <Command Name="VirtualPrompt" Value=":~"/>
-    </Commands>
-</Configuration-Management>
+<p>若您恰好使用 SolarWinds Orion 作为 NMS，还可使用设备模板管理功能。VyOS 的模板可轻松导入。</p>
+<p>请使用以下内容创建一个名为 <code class="docutils literal notranslate">VyOS-1.3.6.1.4.1.44641.ConfigMgmt-Commands</code> 的文件：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>&lt;Configuration-Management Device=&quot;VyOS&quot; SystemOID=&quot;1.3.6.1.4.1.44641&quot;&gt;
+    &lt;Commands&gt;
+        &lt;Command Name=&quot;Reset&quot; Value=&quot;set terminal width 0${CRLF}set terminal length 0&quot;/&gt;
+        &lt;Command Name=&quot;Reboot&quot; Value=&quot;reboot${CRLF}Yes&quot;/&gt;
+        &lt;Command Name=&quot;EnterConfigMode&quot; Value=&quot;configure&quot;/&gt;
+        &lt;Command Name=&quot;ExitConfigMode&quot; Value=&quot;commit${CRLF}exit&quot;/&gt;
+        &lt;Command Name=&quot;DownloadConfig&quot; Value=&quot;show configuration commands&quot;/&gt;
+        &lt;Command Name=&quot;SaveConfig&quot; Value=&quot;commit${CRLF}save&quot;/&gt;
+        &lt;Command Name=&quot;Version&quot; Value=&quot;show version&quot;/&gt;
+        &lt;Command Name=&quot;MenuBased&quot; Value=&quot;False&quot;/&gt;
+        &lt;Command Name=&quot;VirtualPrompt&quot; Value=&quot;:~&quot;/&gt;
+    &lt;/Commands&gt;
+&lt;/Configuration-Management&gt;
 </pre></div>
 </div>
 </section>

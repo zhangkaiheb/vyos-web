@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -153,233 +153,205 @@
              
   <section id="ssh">
 <h1>SSH</h1>
-<p><abbr title="Secure Shell">SSH</abbr> is a cryptographic network protocol for operating
-network services securely over an unsecured network. The standard TCP port for
-SSH is 22. The best known example application is for remote login to computer
-systems by users.</p>
-<p>SSH provides a secure channel over an unsecured network in a client-server
-architecture, connecting an SSH client application with an SSH server. Common
-applications include remote command-line login and remote command execution,
-but any network service 可以 secured with SSH. The protocol specification
-distinguishes between two major versions, referred to as SSH-1 and SSH-2.</p>
-<p>The most visible application of the protocol is for access to shell accounts
-on Unix-like operating systems, but it sees some limited use on Windows as
-well. In 2015, Microsoft announced that they would include native support for
-SSH in a future release.</p>
-<p>SSH was designed as a replacement for Telnet and for unsecured remote shell
-protocols such as the Berkeley rlogin, rsh, and rexec protocols.
-Those protocols send information, notably passwords, in plaintext,
-rendering them susceptible to interception and disclosure using packet
-analysis. The encryption used by SSH 旨在 provide confidentiality
-and integrity of data over an unsecured network, such as the Internet.</p>
+<p><abbr title="安全外壳">SSH</abbr> 是一种加密网络协议，用于在不安全的网络上安全地运行网络服务。SSH 的标准 TCP 端口为 22。最广为人知的应用示例是用户远程登录计算机系统。</p>
+<p>SSH 在客户端-服务器架构中，通过在 SSH 客户端应用程序与 SSH 服务器之间建立连接，在不安全的网络上提供安全通道。常见应用包括远程命令行登录和远程命令执行，但任何网络服务均可使用 SSH 进行保护。协议规范将 SSH 分为两个主要版本，即 SSH-1 和 SSH-2。</p>
+<p>该协议最显著的应用是访问类 Unix 操作系统上的 Shell 账户，但在 Windows 上也有一定范围的使用。2015 年，微软宣布将在未来版本中原生支持 SSH。</p>
+<p>SSH 的设计初衷是替代 Telnet 以及 Berkeley rlogin、rsh 和 rexec 等不安全的远程 Shell 协议。这些协议以明文形式传输信息（尤其是密码），因此容易被数据包分析技术截获和泄露。SSH 所采用的加密机制旨在为不安全网络（例如互联网）上的数据提供机密性和完整性保障。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>VyOS 1.1 supported login as user <code class="docutils literal notranslate">root</code>. This has been removed due
-to tighter security in VyOS 1.2.</p>
+<p>VyOS 1.1 支持以 <code class="docutils literal notranslate">root</code> 用户身份登录。由于 VyOS 1.2 实施了更严格的安全策略，此功能已被移除。</p>
 </div>
 <div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p>SSH <a class="reference internal" href="../system/login.html#ssh-key-based-authentication">密钥-based authentication</a></p>
+<p class="admonition-title">另请参阅</p>
+<p>SSH <a class="reference internal" href="../system/login.html#ssh-key-based-authentication">基于密钥的身份验证</a></p>
 </div>
 <section id="configuration">
 <h2>配置</h2>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ssh port <port>
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-port-port" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Enabling SSH only requires you to specify the port <code class="docutils literal notranslate"><port></code> you want SSH to
-listen on. By default, SSH runs on port 22.</p>
+set service ssh port &lt;port&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-port-port" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>启用 SSH 仅需指定 SSH 监听的端口号 <code class="docutils literal notranslate">&lt;port&gt;</code>。默认情况下，SSH 运行于端口 22。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ssh listen-address <address>
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-listen-address-address" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specify IPv4/IPv6 listen address of SSH server. Multiple addresses 可以
-defined.</p>
+set service ssh listen-address &lt;address&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-listen-address-address" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定 SSH 服务器的 IPv4/IPv6 监听地址。可定义多个地址。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ssh cipher <cipher>
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-cipher-cipher" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Define allowed ciphers used for the SSH connection. A number of allowed
-ciphers 可以 specified, use multiple occurrences to allow multiple ciphers.</p>
-<p>List of supported ciphers: <code class="docutils literal notranslate">3des-cbc</code>, <code class="docutils literal notranslate">aes128-cbc</code>, <code class="docutils literal notranslate">aes192-cbc</code>,
-<code class="docutils literal notranslate">aes256-cbc</code>, <code class="docutils literal notranslate">aes128-ctr</code>, <code class="docutils literal notranslate">aes192-ctr</code>, <code class="docutils literal notranslate">aes256-ctr</code>,
-<code class="docutils literal notranslate">aes128-gcm@openssh.com</code>, <code class="docutils literal notranslate">aes256-gcm@openssh.com</code>,
-<code class="docutils literal notranslate">chacha20-poly1305@openssh.com</code></p>
+set service ssh cipher &lt;cipher&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-cipher-cipher" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>定义 SSH 连接所允许使用的加密算法。可指定多个允许的加密算法，多次使用该命令即可启用多个算法。</p>
+<p>支持的加密算法列表：<code class="docutils literal notranslate">3des-cbc</code>、<code class="docutils literal notranslate">aes128-cbc</code>、<code class="docutils literal notranslate">aes192-cbc</code>、
+<code class="docutils literal notranslate">aes256-cbc</code>、<code class="docutils literal notranslate">aes128-ctr</code>、<code class="docutils literal notranslate">aes192-ctr</code>、<code class="docutils literal notranslate">aes256-ctr</code>、
+<code class="docutils literal notranslate">aes128-gcm&#64;openssh.com</code>、<code class="docutils literal notranslate">aes256-gcm&#64;openssh.com</code>、
+<code class="docutils literal notranslate">chacha20-poly1305&#64;openssh.com</code></p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set service ssh disable-password-authentication
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-disable-password-authentication" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Disable password based authentication. 日志in via SSH keys only. This hardens
-security!</p>
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-disable-password-authentication" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>禁用基于密码的身份验证，仅允许通过 SSH 密钥登录。此举可增强安全性！</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set service ssh fido pin-required
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-fido-pin-required" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Require FIDO2 keys to attest that a user has been verified (e.g. via a PIN).</p>
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-fido-pin-required" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>要求 FIDO2 密钥证明用户已通过验证（例如输入 PIN 码）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set service ssh fido touch-required
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-fido-touch-required" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Require FIDO2 keys to attest that a user is physically present.</p>
-<p>VyOS supports SSH authentication using FIDO2-backed keys generated by OpenSSH.
-Two FIDO2 key types are supported by OpenSSH: <code class="docutils literal notranslate">ed25519-sk</code>, <code class="docutils literal notranslate">ecdsa-sk</code></p>
-<p>Generic FIDO2-backed SSH key generation example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre>ssh-keygen -t ecdsa-sk -O verify-required -C "fido2-ssh-key"
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-fido-touch-required" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>要求 FIDO2 密钥证明用户物理存在。</p>
+<p>VyOS 支持使用 OpenSSH 生成的基于 FIDO2 的密钥进行 SSH 身份验证。OpenSSH 支持两种 FIDO2 密钥类型：<code class="docutils literal notranslate">ed25519-sk</code>、<code class="docutils literal notranslate">ecdsa-sk</code></p>
+<p>通用的基于 FIDO2 的 SSH 密钥生成示例：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre>ssh-keygen -t ecdsa-sk -O verify-required -C &quot;fido2-ssh-key&quot;
 </pre></div>
 </div>
 <dl class="simple">
-<dt>During key generation, OpenSSH will:</dt><dd><ul class="simple">
-<li><p>Request user presence (for example, a physical touch or confirmation)</p></li>
-<li><p>可选ly request user verification (PIN), if supported by the authenticator</p></li>
-<li><p>创建 a local key handle file and a corresponding public key (<code class="docutils literal notranslate">.pub</code>)</p></li>
+<dt>密钥生成过程中，OpenSSH 将执行以下操作：</dt><dd><ul class="simple">
+<li><p>请求用户确认（例如物理触摸或确认操作）</p></li>
+<li><p>如认证器支持，可选择性地请求用户验证（PIN 码）</p></li>
+<li><p>创建本地密钥句柄文件及对应的公钥文件（<code class="docutils literal notranslate">.pub</code>）</p></li>
 </ul>
 </dd>
 </dl>
-<p>The private key material never leaves the authenticator device.</p>
-<p>VyOS configuration example:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre># Generate a FIDO2 SSH key on the client system
-# Copy the public key to the VyOS instance
-set system login user vyos authentication public-keys fido key '<public-key>'
-set system login user vyos authentication public-keys fido type '<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e39088ce8680879082ce908b82d1ce8d8a909793d1d6d5a38c93868d90908bcd808c8e">[email protected]</a>'
+<p>私钥材料永远不会离开认证器设备。</p>
+<p>VyOS 配置示例：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># 在客户端系统上生成 FIDO2 SSH 密钥
+# 将公钥复制到 VyOS 实例
+set system login user vyos authentication public-keys fido key &#39;&lt;public-key&gt;&#39;
+set system login user vyos authentication public-keys fido type &#39;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e39088ce8680879082ce908b82d1ce8d8a909793d1d6d5a38c93868d90908bcd808c8e">[email&#160;protected]</a>&#39;
 set service ssh fido touch-required
 </pre></div>
 </div>
-<p>You can now log into the system using: <code class="docutils literal notranslate">ssh -i ~/.ssh/id_fido_key vyos@192.0.2.1</code></p>
+<p>现在可使用以下命令登录系统：<code class="docutils literal notranslate">ssh -i ~/.ssh/id_fido_key vyos&#64;192.0.2.1</code></p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set service ssh disable-host-validation
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-disable-host-validation" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Disable the host validation through reverse DNS lookups - can speedup login
-time when reverse lookup is not possible.</p>
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-disable-host-validation" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>禁用通过反向 DNS 查询进行的主机验证——当无法执行反向查询时，可加快登录速度。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ssh mac <mac>
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-mac-mac" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specifies the available <abbr title="Message Authentication Code">MAC</abbr> algorithms.
-The MAC algorithm is used in protocol version 2 for data integrity protection.
-Multiple algorithms 可以 provided by using multiple commands, defining
-one algorithm per command.</p>
-<p>List of supported MACs: <code class="docutils literal notranslate">hmac-md5</code>, <code class="docutils literal notranslate">hmac-md5-96</code>, <code class="docutils literal notranslate">hmac-ripemd160</code>,
-<code class="docutils literal notranslate">hmac-sha1</code>, <code class="docutils literal notranslate">hmac-sha1-96</code>, <code class="docutils literal notranslate">hmac-sha2-256</code>, <code class="docutils literal notranslate">hmac-sha2-512</code>,
-<code class="docutils literal notranslate">umac-64@openssh.com</code>, <code class="docutils literal notranslate">umac-128@openssh.com</code>,
-<code class="docutils literal notranslate">hmac-md5-etm@openssh.com</code>, <code class="docutils literal notranslate">hmac-md5-96-etm@openssh.com</code>,
-<code class="docutils literal notranslate">hmac-ripemd160-etm@openssh.com</code>, <code class="docutils literal notranslate">hmac-sha1-etm@openssh.com</code>,
-<code class="docutils literal notranslate">hmac-sha1-96-etm@openssh.com</code>, <code class="docutils literal notranslate">hmac-sha2-256-etm@openssh.com</code>,
-<code class="docutils literal notranslate">hmac-sha2-512-etm@openssh.com</code>, <code class="docutils literal notranslate">umac-64-etm@openssh.com</code>,
-<code class="docutils literal notranslate">umac-128-etm@openssh.com</code></p>
+set service ssh mac &lt;mac&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-mac-mac" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定可用的 <abbr title="消息认证码">MAC</abbr> 算法。MAC 算法在协议版本 2 中用于数据完整性保护。可通过多次执行该命令来指定多个算法，每次指定一个算法。</p>
+<p>支持的 MAC 算法列表：<code class="docutils literal notranslate">hmac-md5</code>、<code class="docutils literal notranslate">hmac-md5-96</code>、<code class="docutils literal notranslate">hmac-ripemd160</code>、
+<code class="docutils literal notranslate">hmac-sha1</code>、<code class="docutils literal notranslate">hmac-sha1-96</code>、<code class="docutils literal notranslate">hmac-sha2-256</code>、<code class="docutils literal notranslate">hmac-sha2-512</code>、
+<code class="docutils literal notranslate">umac-64&#64;openssh.com</code>、<code class="docutils literal notranslate">umac-128&#64;openssh.com</code>、
+<code class="docutils literal notranslate">hmac-md5-etm&#64;openssh.com</code>、<code class="docutils literal notranslate">hmac-md5-96-etm&#64;openssh.com</code>、
+<code class="docutils literal notranslate">hmac-ripemd160-etm&#64;openssh.com</code>、<code class="docutils literal notranslate">hmac-sha1-etm&#64;openssh.com</code>、
+<code class="docutils literal notranslate">hmac-sha1-96-etm&#64;openssh.com</code>、<code class="docutils literal notranslate">hmac-sha2-256-etm&#64;openssh.com</code>、
+<code class="docutils literal notranslate">hmac-sha2-512-etm&#64;openssh.com</code>、<code class="docutils literal notranslate">umac-64-etm&#64;openssh.com</code>、
+<code class="docutils literal notranslate">umac-128-etm&#64;openssh.com</code></p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ssh access-control <allow | deny> <group | user> <name>
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-access-control-allow-deny-group-user-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>添加 access-control directive to allow or deny users and groups. Directives
-are processed in the following order of precedence: <code class="docutils literal notranslate">deny-users</code>,
-<code class="docutils literal notranslate">allow-users</code>, <code class="docutils literal notranslate">deny-groups</code> and <code class="docutils literal notranslate">allow-groups</code>.</p>
+set service ssh access-control &lt;allow | deny&gt; &lt;group | user&gt; &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-access-control-allow-deny-group-user-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>添加访问控制指令以允许或拒绝特定用户和用户组。指令按如下优先级顺序处理：<code class="docutils literal notranslate">deny-users</code>、
+<code class="docutils literal notranslate">allow-users</code>、<code class="docutils literal notranslate">deny-groups</code> 和 <code class="docutils literal notranslate">allow-groups</code>。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ssh client-keepalive-interval <interval>
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-client-keepalive-interval-interval" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specify timeout interval for keepalive message （以秒为单位）。</p>
+set service ssh client-keepalive-interval &lt;interval&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-client-keepalive-interval-interval" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定保活消息超时间隔（单位：秒）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ssh key-exchange <kex>
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-key-exchange-kex" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specify allowed <abbr title="Key Exchange">KEX</abbr> algorithms.</p>
-<p>List of supported algorithms: <code class="docutils literal notranslate">diffie-hellman-group1-sha1</code>,
-<code class="docutils literal notranslate">diffie-hellman-group14-sha1</code>, <code class="docutils literal notranslate">diffie-hellman-group14-sha256</code>,
-<code class="docutils literal notranslate">diffie-hellman-group16-sha512</code>, <code class="docutils literal notranslate">diffie-hellman-group18-sha512</code>,
-<code class="docutils literal notranslate">diffie-hellman-group-exchange-sha1</code>,
-<code class="docutils literal notranslate">diffie-hellman-group-exchange-sha256</code>,
-<code class="docutils literal notranslate">ecdh-sha2-nistp256</code>, <code class="docutils literal notranslate">ecdh-sha2-nistp384</code>, <code class="docutils literal notranslate">ecdh-sha2-nistp521</code>,
-<code class="docutils literal notranslate">curve25519-sha256</code> and <code class="docutils literal notranslate">curve25519-sha256@libssh.org</code>.</p>
+set service ssh key-exchange &lt;kex&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-key-exchange-kex" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定允许的 <abbr title="密钥交换">KEX</abbr> 算法。</p>
+<p>支持的算法列表：<code class="docutils literal notranslate">diffie-hellman-group1-sha1</code>、
+<code class="docutils literal notranslate">diffie-hellman-group14-sha1</code>、<code class="docutils literal notranslate">diffie-hellman-group14-sha256</code>、
+<code class="docutils literal notranslate">diffie-hellman-group16-sha512</code>、<code class="docutils literal notranslate">diffie-hellman-group18-sha512</code>、
+<code class="docutils literal notranslate">diffie-hellman-group-exchange-sha1</code>、
+<code class="docutils literal notranslate">diffie-hellman-group-exchange-sha256</code>、
+<code class="docutils literal notranslate">ecdh-sha2-nistp256</code>、<code class="docutils literal notranslate">ecdh-sha2-nistp384</code>、<code class="docutils literal notranslate">ecdh-sha2-nistp521</code>、
+<code class="docutils literal notranslate">curve25519-sha256</code> 和 <code class="docutils literal notranslate">curve25519-sha256&#64;libssh.org</code>。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ssh loglevel <quiet | fatal | error | info | verbose>
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-loglevel-quiet-fatal-error-info-verbose" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the <code class="docutils literal notranslate">sshd</code> log level. The default is <code class="docutils literal notranslate">info</code>.</p>
+set service ssh loglevel &lt;quiet | fatal | error | info | verbose&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-loglevel-quiet-fatal-error-info-verbose" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>设置 <code class="docutils literal notranslate">sshd</code> 日志级别。默认值为 <code class="docutils literal notranslate">info</code>。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ssh vrf <name>
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-vrf-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specify name of the <abbr title="Virtual Routing and Forwarding">VRF</abbr> instance.</p>
+set service ssh vrf &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-vrf-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定 <abbr title="虚拟路由与转发">VRF</abbr> 实例的名称。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ssh pubkey-accepted-algorithm <name>
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-pubkey-accepted-algorithm-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specifies the signature algorithms that 将 accepted for public key
-authentication</p>
-<p>List of supported algorithms: <code class="docutils literal notranslate">ssh-ed25519</code>,
-<code class="docutils literal notranslate">ssh-ed25519-cert-v01@openssh.com</code>, <code class="docutils literal notranslate">sk-ssh-ed25519@openssh.com</code>,
-<code class="docutils literal notranslate">sk-ssh-ed25519-cert-v01@openssh.com</code>, <code class="docutils literal notranslate">ecdsa-sha2-nistp256</code>,
-<code class="docutils literal notranslate">ecdsa-sha2-nistp256-cert-v01@openssh.com</code>, <code class="docutils literal notranslate">ecdsa-sha2-nistp384</code>,
-<code class="docutils literal notranslate">ecdsa-sha2-nistp384-cert-v01@openssh.com</code>, <code class="docutils literal notranslate">ecdsa-sha2-nistp521</code>,
-<code class="docutils literal notranslate">ecdsa-sha2-nistp521-cert-v01@openssh.com</code>,
-<code class="docutils literal notranslate">sk-ecdsa-sha2-nistp256@openssh.com</code>,
-<code class="docutils literal notranslate">sk-ecdsa-sha2-nistp256-cert-v01@openssh.com</code>,
-<code class="docutils literal notranslate">webauthn-sk-ecdsa-sha2-nistp256@openssh.com</code>,
-<code class="docutils literal notranslate">ssh-dss</code>, <code class="docutils literal notranslate">ssh-dss-cert-v01@openssh.com</code>, <code class="docutils literal notranslate">ssh-rsa</code>,
-<code class="docutils literal notranslate">ssh-rsa-cert-v01@openssh.com</code>, <code class="docutils literal notranslate">rsa-sha2-256</code>,
-<code class="docutils literal notranslate">rsa-sha2-256-cert-v01@openssh.com</code>, <code class="docutils literal notranslate">rsa-sha2-512</code>,
-<code class="docutils literal notranslate">rsa-sha2-512-cert-v01@openssh.com</code></p>
+set service ssh pubkey-accepted-algorithm &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-pubkey-accepted-algorithm-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定接受用于公钥身份验证的签名算法</p>
+<p>支持的算法列表：<code class="docutils literal notranslate">ssh-ed25519</code>、
+<code class="docutils literal notranslate">ssh-ed25519-cert-v01&#64;openssh.com</code>、<code class="docutils literal notranslate">sk-ssh-ed25519&#64;openssh.com</code>、
+<code class="docutils literal notranslate">sk-ssh-ed25519-cert-v01&#64;openssh.com</code>、<code class="docutils literal notranslate">ecdsa-sha2-nistp256</code>、
+<code class="docutils literal notranslate">ecdsa-sha2-nistp256-cert-v01&#64;openssh.com</code>、<code class="docutils literal notranslate">ecdsa-sha2-nistp384</code>、
+<code class="docutils literal notranslate">ecdsa-sha2-nistp384-cert-v01&#64;openssh.com</code>、<code class="docutils literal notranslate">ecdsa-sha2-nistp521</code>、
+<code class="docutils literal notranslate">ecdsa-sha2-nistp521-cert-v01&#64;openssh.com</code>、
+<code class="docutils literal notranslate">sk-ecdsa-sha2-nistp256&#64;openssh.com</code>、
+<code class="docutils literal notranslate">sk-ecdsa-sha2-nistp256-cert-v01&#64;openssh.com</code>、
+<code class="docutils literal notranslate">webauthn-sk-ecdsa-sha2-nistp256&#64;openssh.com</code>、
+<code class="docutils literal notranslate">ssh-dss</code>、<code class="docutils literal notranslate">ssh-dss-cert-v01&#64;openssh.com</code>、<code class="docutils literal notranslate">ssh-rsa</code>、
+<code class="docutils literal notranslate">ssh-rsa-cert-v01&#64;openssh.com</code>、<code class="docutils literal notranslate">rsa-sha2-256</code>、
+<code class="docutils literal notranslate">rsa-sha2-256-cert-v01&#64;openssh.com</code>、<code class="docutils literal notranslate">rsa-sha2-512</code>、
+<code class="docutils literal notranslate">rsa-sha2-512-cert-v01&#64;openssh.com</code></p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ssh trusted-user-ca <name>
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-trusted-user-ca-name" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Specify the name of the OpenSSH key-pair that acts as certificate authority
-and 将 used to verify user certificates.</p>
-<p>You can use it by adding the OpenSSH key-pair under the PKI subsystem.</p>
-<p>示例:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre># Generate key-pair acting as CA
+set service ssh trusted-user-ca &lt;name&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-trusted-user-ca-name" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>指定作为证书颁发机构（CA）并用于验证用户证书的 OpenSSH 密钥对的名称。</p>
+<p>您可通过 PKI 子系统添加该 OpenSSH 密钥对。</p>
+<p>示例：</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre># 生成作为 CA 的密钥对
 $ ssh-keygen -f vyos-ssh-ca.key
 
-# Generate key for user: vyos_testca
-$ ssh-keygen -f vyos_testca  -C "<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="12646b7d614d667761717352646b7d613c7c7766">[email protected]</a>"
+# 为用户 vyos_testca 生成密钥
+$ ssh-keygen -f vyos_testca  -C &quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="12646b7d614d667761717352646b7d613c7c7766">[email&#160;protected]</a>&quot;
 
-# Sign public key from user vyos_testca and insert principal names: vyos, vyos_testca
-# with a key lifetime of two weeks - after which the key is unusable
-$ ssh-keygen -s vyos-ssh-ca.key -I <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="eb9d928498b49f8e989f888aab9d928498c5858e9f">[email protected]</a> -n vyos,vyos_testca -V +2w vyos_testca.pub
+# 对用户 vyos_testca 的公钥进行签名，并插入主体名称：vyos、vyos_testca
+# 密钥有效期为两周，到期后密钥将不可用
+$ ssh-keygen -s vyos-ssh-ca.key -I <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="eb9d928498b49f8e989f888aab9d928498c5858e9f">[email&#160;protected]</a> -n vyos,vyos_testca -V +2w vyos_testca.pub
 
 $ set system login user vyos_testca
 $ set pki openssh test_ca public key AAAAB3N.....
@@ -387,82 +359,73 @@ $ set pki openssh test_ca public type ssh-rsa
 $ set service ssh trusted-user-ca test_ca
 </pre></div>
 </div>
-<p>You can now log into the system using: <code class="docutils literal notranslate">ssh -i vyos_testca vyos_testca@vyos.test.com</code></p>
+<p>现在可使用以下命令登录系统：<code class="docutils literal notranslate">ssh -i vyos_testca vyos_testca&#64;vyos.test.com</code></p>
 </div>
 </div>
 </section>
 <section id="dynamic-protection">
-<h2>Dynamic-protection</h2>
-<p>Protects host from brute-force attacks against
-SSH. 日志 messages are parsed, line-by-line, for recognized patterns. If an
-attack, such as several login failures within a few seconds, is detected, the
-offending IP is blocked. Offenders are unblocked after a set interval.</p>
+<h2>动态防护</h2>
+<p>防止针对 SSH 的暴力破解攻击。日志消息将逐行解析，识别特定模式。若检测到攻击行为（例如数秒内发生多次登录失败），则阻止攻击源 IP 地址。被阻止的 IP 地址将在设定的时间间隔后自动解除封锁。</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
 set service ssh dynamic-protection
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-dynamic-protection" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>允许 <code class="docutils literal notranslate">ssh</code> dynamic-protection.</p>
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-dynamic-protection" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>启用 <code class="docutils literal notranslate">ssh</code> 动态防护功能。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ssh dynamic-protection allow-from <address | prefix>
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-dynamic-protection-allow-from-address-prefix" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Whitelist of addresses and networks. Always allow inbound connections from
-these systems.</p>
+set service ssh dynamic-protection allow-from &lt;address | prefix&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-dynamic-protection-allow-from-address-prefix" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>地址和网络白名单。始终允许来自这些系统的入站连接。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ssh dynamic-protection block-time <sec>
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-dynamic-protection-block-time-sec" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Block source IP （以秒为单位）。 Subsequent blocks increase by a factor of 1.5
-The default is 120.</p>
+set service ssh dynamic-protection block-time &lt;sec&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-dynamic-protection-block-time-sec" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>阻止源 IP 地址的持续时间（单位：秒）。后续封锁时间按 1.5 倍递增。默认值为 120。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ssh dynamic-protection detect-time <sec>
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-dynamic-protection-detect-time-sec" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Remember source IP in seconds before reset their score. The default is 1800.</p>
+set service ssh dynamic-protection detect-time &lt;sec&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-dynamic-protection-detect-time-sec" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>在重置其计分前记录源 IP 地址的持续时间（单位：秒）。默认值为 1800。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set service ssh dynamic-protection threshold <sec>
-<a class="cmdlink" href="#cfgcmd-set-service-ssh-dynamic-protection-threshold-sec" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>Block source IP when their cumulative attack score exceeds threshold. The
-default is 30.</p>
+set service ssh dynamic-protection threshold &lt;sec&gt;
+<a class="cmdlink" href="#cfgcmd-set-service-ssh-dynamic-protection-threshold-sec" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>当源 IP 地址累积攻击得分超过阈值时，将其封锁。默认值为 30。</p>
 </div>
 </div>
 </section>
 <section id="operation">
-<h2>Operation</h2>
+<h2>操作</h2>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 restart ssh
-<a class="cmdlink" href="#opcmd-restart-ssh" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>Restart the SSH daemon process, the current session is not affected, only the
-background daemon is restarted.</p>
+<a class="cmdlink" href="#opcmd-restart-ssh" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>重启 SSH 守护进程。当前会话不受影响，仅后台守护进程被重启。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 generate ssh server-key
-<a class="cmdlink" href="#opcmd-generate-ssh-server-key" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>Re-generated the public/private keyportion which SSH uses to secure
-connections.</p>
+<a class="cmdlink" href="#opcmd-generate-ssh-server-key" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>重新生成 SSH 用于保护连接的公钥/私钥对。</p>
 <div class="admonition note">
 <p class="admonition-title">注意</p>
-<p>Already learned known_hosts files of clients need an update as the
-public key will change.</p>
+<p>客户端已保存的 known_hosts 文件需要更新，因为公钥已发生变化。</p>
 </div>
 </div>
 </div>
@@ -470,17 +433,16 @@ public key will change.</p>
 <div class="opcmd-heading">
 
 generate ssh client-key /path/to/private_key
-<a class="cmdlink" href="#opcmd-generate-ssh-client-key-path-to-private-key" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>Re-generated a known pub/private keyfile which 可以用于 connect to
-other services (e.g. RPKI cache).</p>
-<p>示例:</p>
+<a class="cmdlink" href="#opcmd-generate-ssh-client-key-path-to-private-key" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>重新生成一个已知的公钥/私钥文件，可用于连接其他服务（例如 RPKI 缓存）。</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>vyos@vyos:~$ generate ssh client-key /config/auth/id_rsa_rpki
 Generating public/private rsa key pair.
 Your identification has been saved in /config/auth/id_rsa_rpki.
 Your public key has been saved in /config/auth/id_rsa_rpki.pub.
 The key fingerprint is:
 SHA256:XGv2PpdOzVCzpmEzJZga8hTRq7B/ZYL3fXaioLFLS5Q vyos@vyos
-The key's randomart image is:
+The key&#39;s randomart image is:
 +---[RSA 2048]----+
 |         oo      |
 |          ..o    |
@@ -494,34 +456,32 @@ The key's randomart image is:
 +----[SHA256]-----+
 </pre></div>
 </div>
-<p>Two new files <code class="docutils literal notranslate">/config/auth/id_rsa_rpki</code> and
-<code class="docutils literal notranslate">/config/auth/id_rsa_rpki.pub</code>
-将 created.</p>
+<p>将创建两个新文件：<code class="docutils literal notranslate">/config/auth/id_rsa_rpki</code> 和
+<code class="docutils literal notranslate">/config/auth/id_rsa_rpki.pub</code>。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
-generate public-key-command user <username> path <location>
-<a class="cmdlink" href="#opcmd-generate-public-key-command-user-username-path-location" title="Permalink to this Command"></a></div><div class="opcmd-body">
+generate public-key-command user &lt;username&gt; path &lt;location&gt;
+<a class="cmdlink" href="#opcmd-generate-public-key-command-user-username-path-location" title="此命令的永久链接"></a></div><div class="opcmd-body">
 <blockquote>
-<div><p>Generate the configuration mode commands to add a public key for
-<a class="reference internal" href="../system/login.html#ssh-key-based-authentication">密钥-based authentication</a>.
-<code class="docutils literal notranslate"><location></code> 可以 a local path or a URL pointing at a remote file.</p>
-<p>Supported remote protocols are FTP, FTPS, HTTP, HTTPS, SCP/SFTP and TFTP.</p>
+<div><p>生成用于添加公钥的配置模式命令，以实现 <a class="reference internal" href="../system/login.html#ssh-key-based-authentication">基于密钥的身份验证</a>。
+<code class="docutils literal notranslate">&lt;location&gt;</code> 可为本地路径，也可为指向远程文件的 URL。</p>
+<p>支持的远程协议包括 FTP、FTPS、HTTP、HTTPS、SCP/SFTP 和 TFTP。</p>
 </div></blockquote>
-<p>示例:</p>
+<p>示例：</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>alyssa@vyos:~$ generate public-key-command user alyssa path sftp://example.net/home/alyssa/.ssh/id_rsa.pub
-# To add this key as an embedded key, run the following commands:
+# 若要将此密钥作为嵌入式密钥添加，请运行以下命令：
 configure
-set system login user alyssa authentication public-keys <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c8a9a4b1bbbba988adb0a9a5b8a4ade6a6adbc">[email protected]</a> key AAA...
-set system login user alyssa authentication public-keys <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ccada0b5bfbfad8ca9b4ada1bca0a9e2a2a9b8">[email protected]</a> type ssh-rsa
+set system login user alyssa authentication public-keys <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c8a9a4b1bbbba988adb0a9a5b8a4ade6a6adbc">[email&#160;protected]</a> key AAA...
+set system login user alyssa authentication public-keys <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ccada0b5bfbfad8ca9b4ada1bca0a9e2a2a9b8">[email&#160;protected]</a> type ssh-rsa
 commit
 save
 exit
 
 ben@vyos:~$ generate public-key-command user ben path ~/.ssh/id_rsa.pub
-# To add this key as an embedded key, run the following commands:
+# 若要将此密钥作为嵌入式密钥添加，请运行以下命令：
 configure
 set system login user ben authentication public-keys ben@vyos key AAA...
 set system login user ben authentication public-keys ben@vyos type ssh-dss
@@ -536,56 +496,56 @@ exit
 <div class="opcmd-heading">
 
 show log ssh
-<a class="cmdlink" href="#opcmd-show-log-ssh" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 SSH server log.</p>
+<a class="cmdlink" href="#opcmd-show-log-ssh" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示 SSH 服务器日志。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 monitor log ssh
-<a class="cmdlink" href="#opcmd-monitor-log-ssh" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>Follow the SSH server log.</p>
+<a class="cmdlink" href="#opcmd-monitor-log-ssh" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>实时跟踪 SSH 服务器日志。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show log ssh dynamic-protection
-<a class="cmdlink" href="#opcmd-show-log-ssh-dynamic-protection" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 SSH dynamic-protection log.</p>
+<a class="cmdlink" href="#opcmd-show-log-ssh-dynamic-protection" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示 SSH 动态防护日志。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 monitor log ssh dynamic-protection
-<a class="cmdlink" href="#opcmd-monitor-log-ssh-dynamic-protection" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>Follow the SSH dynamic-protection log.</p>
+<a class="cmdlink" href="#opcmd-monitor-log-ssh-dynamic-protection" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>实时跟踪 SSH 动态防护日志。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show ssh dynamic-protection
-<a class="cmdlink" href="#opcmd-show-ssh-dynamic-protection" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 list of IPs currently blocked by SSH dynamic-protection.</p>
+<a class="cmdlink" href="#opcmd-show-ssh-dynamic-protection" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示当前被 SSH 动态防护功能封锁的 IP 地址列表。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show ssh fingerprints
-<a class="cmdlink" href="#opcmd-show-ssh-fingerprints" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 SSH server public key fingerprints.</p>
+<a class="cmdlink" href="#opcmd-show-ssh-fingerprints" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示 SSH 服务器公钥指纹。</p>
 </div>
 </div>
 <div class="cmd cmd-op">
 <div class="opcmd-heading">
 
 show ssh fingerprints ascii
-<a class="cmdlink" href="#opcmd-show-ssh-fingerprints-ascii" title="Permalink to this Command"></a></div><div class="opcmd-body">
-<p>显示 SSH server public key fingerprints, including a visual ASCII art representation.</p>
+<a class="cmdlink" href="#opcmd-show-ssh-fingerprints-ascii" title="此命令的永久链接"></a></div><div class="opcmd-body">
+<p>显示 SSH 服务器公钥指纹，包括可视化的 ASCII 艺术表示形式。</p>
 </div>
 </div>
 </section>

@@ -7,31 +7,117 @@ import { useI18n } from '/src/i18n/index.js';
 function drawLineChart(canvas, data, label, color = '#5B9BD5') {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  const width = canvas.width = canvas.clientWidth || 300;
-  const height = canvas.height = canvas.clientHeight || 160;
-  ctx.clearRect(0, 0, width, height);
+  const dpr = window.devicePixelRatio || 1;
+  const cssWidth = canvas.clientWidth || 600;
+  const cssHeight = canvas.clientHeight || 300;
+  canvas.width = cssWidth * dpr;
+  canvas.height = cssHeight * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssWidth, cssHeight);
+
   if (!data || !data.length) {
     ctx.fillStyle = '#999';
-    ctx.fillText('No data', 10, height / 2);
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('No data', cssWidth / 2, cssHeight / 2);
     return;
   }
+
+  const margin = { top: 40, right: 20, bottom: 50, left: 60 };
+  const chartWidth = cssWidth - margin.left - margin.right;
+  const chartHeight = cssHeight - margin.top - margin.bottom;
+
   const values = data.map(d => parseFloat(d.value) || 0);
   const max = Math.max(...values, 1);
   const min = Math.min(...values, 0);
   const range = max - min || 1;
+
+  // Title
+  ctx.fillStyle = '#333';
+  ctx.font = 'bold 14px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText(label, margin.left, 10);
+
+  // Y-axis grid lines and labels
+  const yTicks = 5;
+  ctx.strokeStyle = '#e0e0e0';
+  ctx.lineWidth = 1;
+  ctx.fillStyle = '#666';
+  ctx.font = '11px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  for (let i = 0; i <= yTicks; i++) {
+    const y = margin.top + chartHeight - (i / yTicks) * chartHeight;
+    ctx.beginPath();
+    ctx.moveTo(margin.left, y);
+    ctx.lineTo(margin.left + chartWidth, y);
+    ctx.stroke();
+    const val = min + (i / yTicks) * range;
+    ctx.fillText(val.toFixed(1) + '%', margin.left - 8, y);
+  }
+
+  // Y-axis line
+  ctx.strokeStyle = '#999';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(margin.left, margin.top);
+  ctx.lineTo(margin.left, margin.top + chartHeight);
+  ctx.stroke();
+
+  // Y-axis label
+  ctx.save();
+  ctx.translate(14, margin.top + chartHeight / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#666';
+  ctx.font = '12px sans-serif';
+  ctx.fillText('使用率 (%)', 0, 0);
+  ctx.restore();
+
+  // X-axis labels
+  const len = data.length;
+  const xLabelsCount = Math.min(len, 6);
+  ctx.fillStyle = '#666';
+  ctx.font = '10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  for (let i = 0; i < xLabelsCount; i++) {
+    const idx = Math.round((i / (xLabelsCount - 1 || 1)) * (len - 1));
+    const x = margin.left + (idx / (len - 1 || 1)) * chartWidth;
+    const d = new Date(data[idx].timestamp);
+    if (!isNaN(d.getTime())) {
+      const h = String(d.getHours()).padStart(2, '0');
+      const m = String(d.getMinutes()).padStart(2, '0');
+      ctx.fillText(`${h}:${m}`, x, margin.top + chartHeight + 8);
+    }
+  }
+
+  // X-axis line
+  ctx.strokeStyle = '#999';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(margin.left, margin.top + chartHeight);
+  ctx.lineTo(margin.left + chartWidth, margin.top + chartHeight);
+  ctx.stroke();
+
+  // X-axis label
+  ctx.fillStyle = '#666';
+  ctx.font = '12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('时间', margin.left + chartWidth / 2, cssHeight - 10);
+
+  // Draw line
   ctx.strokeStyle = color;
   ctx.lineWidth = 2;
   ctx.beginPath();
   values.forEach((v, i) => {
-    const x = (i / (values.length - 1 || 1)) * width;
-    const y = height - ((v - min) / range) * (height - 20) - 10;
+    const x = margin.left + (i / (len - 1 || 1)) * chartWidth;
+    const y = margin.top + chartHeight - ((v - min) / range) * chartHeight;
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   });
   ctx.stroke();
-  ctx.fillStyle = '#333';
-  ctx.font = '12px sans-serif';
-  ctx.fillText(label, 8, 16);
 }
 
 function formatBitrate(bps) {
@@ -822,14 +908,20 @@ export default defineComponent({
     function drawHistory() {
       const w = historyWidget.value;
       if (!w || !historyCanvas.value) return;
-      let label = t('monitorDashboard.labels.historyTitle', { title: w.title });
+      // Ensure canvas has proper dimensions before drawing
+      const canvas = historyCanvas.value;
+      if (!canvas.clientWidth || !canvas.clientHeight) {
+        requestAnimationFrame(drawHistory);
+        return;
+      }
+      let label = t('monitorDashboard.labels.historyTitle', { title: t(w.title) });
       if (w.type === 'cpu' || w.type === 'memory') label += ` (${w.value}%)`;
       else if (w.type === 'interface-traffic') label += ` (${w.value} bps)`;
-      drawLineChart(historyCanvas.value, w.data, label);
+      drawLineChart(canvas, w.data, label);
     }
 
     watch(historyModalVisible, (visible) => {
-      if (visible) nextTick().then(drawHistory);
+      if (visible) { nextTick().then(() => nextTick().then(drawHistory)); }
     });
 
     function canAddWidget(item) {
@@ -1049,7 +1141,7 @@ export default defineComponent({
           </div>
         </div>
       </DraggableModal>
-      <DraggableModal v-model:visible="historyModalVisible" :title="historyWidget ? t('monitorDashboard.labels.historyTitle', { title: historyWidget.title }) : t('monitorDashboard.labels.history')" width="720px" @confirm="historyModalVisible = false">
+      <DraggableModal v-model:visible="historyModalVisible" :title="historyWidget ? t('monitorDashboard.labels.historyTitle', { title: t(historyWidget.title) }) : t('monitorDashboard.labels.history')" width="720px" @confirm="historyModalVisible = false">
         <div style="padding:8px 0;">
           <div v-if="historyWidget" style="display:flex;justify-content:flex-end;margin-bottom:8px;">
             <select v-model="historyWidget.duration" @change="changeHistoryDuration" style="font-size:12px;">
@@ -1062,8 +1154,8 @@ export default defineComponent({
           </div>
           <canvas ref="historyCanvas" style="width:100%;height:300px;background:#fff;"></canvas>
           <div v-if="historyWidget && historyWidget.data && historyWidget.data.length" style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:#666;">
-            <span>{{ t('monitorDashboard.labels.start') }}: {{ historyTimeRange.start }}</span>
-            <span>{{ t('monitorDashboard.labels.end') }}: {{ historyTimeRange.end }}</span>
+            <span>{{ t('monitorDashboard.labels.start', { time: historyTimeRange.start }) }}</span>
+            <span>{{ t('monitorDashboard.labels.end', { time: historyTimeRange.end }) }}</span>
           </div>
         </div>
       </DraggableModal>

@@ -155,7 +155,7 @@
 <h1>BGP</h1>
 <p><abbr title="Border Gateway Protocol">BGP</abbr> is one of the Exterior 网关 协议s
 and the de facto standard interdomain routing protocol. The latest BGP version
-is 4. BGP-4 is described in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1771.html"><strong>RFC 1771</strong></a> and updated by <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4271.html"><strong>RFC 4271</strong></a>. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2858.html"><strong>RFC 2858</strong></a>
+is 4. BGP-4 is described in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1771.html"><strong>RFC 1771</strong></a> and updated by <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4271.html"><strong>RFC 4271</strong></a>. <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2858.html"><strong>RFC 2858</strong></a>
 adds multiprotocol support to BGP.</p>
 <p>VyOS makes use of <abbr title="Free Range Routing">FRR</abbr> and we would like to thank
 them for their effort!</p>
@@ -163,7 +163,7 @@ them for their effort!</p>
 <h2>Basic Concepts</h2>
 <section id="autonomous-systems">
 <h3>Autonomous 系统s</h3>
-<p>From <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc1930.html"><strong>RFC 1930</strong></a>:</p>
+<p>From <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc1930.html"><strong>RFC 1930</strong></a>:</p>
 <blockquote>
 <div><p>An AS is a connected group of one or more IP prefixes run by one or more
 network operators which has a SINGLE and CLEARLY DEFINED routing policy.</p>
@@ -173,7 +173,7 @@ called an <abbr title="Autonomous System Number">ASN</abbr>. This is a two octet
 ranging in value from 1 to 65535. The AS numbers 64512 through 65535 are defined
 as private AS numbers. Private AS numbers must not be advertised on the global
 Internet. The 2-byte AS number range has been exhausted. 4-byte AS numbers are
-specified in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc6793.html"><strong>RFC 6793</strong></a>, and provide a pool of 4294967296 AS numbers.</p>
+specified in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc6793.html"><strong>RFC 6793</strong></a>, and provide a pool of 4294967296 AS numbers.</p>
 <p>The <abbr title="Autonomous System Number">ASN</abbr> is one of the essential elements of
 BGP. BGP is a distance vector routing protocol, and the AS-路径 framework
 provides distance vector metric and loop detection to BGP.</p>
@@ -260,7 +260,7 @@ address, as a last-resort tie-breaker.</p>
 <p>When adding IPv6 routing information exchange feature to BGP. There were some
 proposals. <abbr title="Internet Engineering Task Force">IETF</abbr>
 <abbr title="Inter Domain Routing">IDR</abbr> adopted a proposal called Multiprotocol
-Extension for BGP. The specification is described in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2283.html"><strong>RFC 2283</strong></a>. The protocol
+Extension for BGP. The specification is described in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2283.html"><strong>RFC 2283</strong></a>. The protocol
 does not define new protocols. It defines new attributes to existing BGP. When
 it is used exchanging IPv6 routing information it is called BGP-4+. When it is
 used for exchanging multicast routing information it is called MBGP.</p>
@@ -269,7 +269,7 @@ the protocol, <em>bgpd</em> can exchange IPv6 and/or multicast routing informati
 <p>Traditional BGP did not have the feature to detect a remote peer’s
 capabilities, e.g. whether it can handle prefix types other than IPv4 unicast
 routes. This was a big problem using Multiprotocol Extension for BGP in an
-operational network. <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2842.html"><strong>RFC 2842</strong></a> adopted a feature called Capability
+operational network. <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2842.html"><strong>RFC 2842</strong></a> adopted a feature called Capability
 Negotiation. <em>bgpd</em> use this Capability Negotiation to detect the remote peer’s
 capabilities. If a peer is only configured as an IPv4 unicast neighbor, <em>bgpd</em>
 does not send these Capability Negotiation packets (at least not unless other
@@ -345,7 +345,7 @@ remote ASN is detected automatically from the OPEN message.</p>
 
 set protocols bgp neighbor <address|interface> local-role <role> [strict]
 <a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-local-role-role-strict" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>BGP roles are defined in RFC <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> and provide an easy way to
+<p>BGP roles are defined in RFC <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> and provide an easy way to
 add route leak prevention, detection and mitigation. The local Role
 value is negotiated with the new BGP Role capability which has a
 built-in check of the corresponding value. In case of a mismatch the
@@ -356,7 +356,7 @@ The correct Role pairs are:</p>
 <p>RS-服务器 - RS-客户端</p>
 <p>If <code class="docutils literal notranslate">strict</code> is set the BGP session won’t become established
 until the BGP neighbor sets local Role on its side. This
-configuration parameter is defined in RFC <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> and 用于
+configuration parameter is defined in RFC <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc9234.html"><strong>RFC 9234</strong></a> and 用于
 enforce the corresponding configuration at your counter-parts side.</p>
 <p>路由s that are sent from provider, rs-server, or the peer local-role
 (or if received by customer, rs-client, or the peer local-role) will
@@ -655,7 +655,7 @@ is being used to connect to the remote peer.</p>
 set protocols bgp neighbor <address|interface> ttl-security hops <number>
 <a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-ttl-security-hops-number" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p>This command enforces Generalized TTL Security Mechanism (GTSM),
-as specified in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5082.html"><strong>RFC 5082</strong></a>. With this command, only neighbors
+as specified in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc5082.html"><strong>RFC 5082</strong></a>. With this command, only neighbors
 that are specified number of hops away 将 allowed to
 become neighbors. The number of hops range is 1 to 254. This
 command is mutually exclusive with <code class="docutils literal notranslate">ebgp-multihop</code>.</p>
@@ -923,12 +923,12 @@ The limit range is 1 to 5000.</p>
 set protocols bgp parameters ebgp-requires-policy
 <a class="cmdlink" href="#cfgcmd-set-protocols-bgp-parameters-ebgp-requires-policy" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
 <p>This command changes the eBGP behavior of FRR. By default FRR enables
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc8212.html"><strong>RFC 8212</strong></a> functionality which affects how eBGP routes are advertised,
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc8212.html"><strong>RFC 8212</strong></a> functionality which affects how eBGP routes are advertised,
 namely no routes are advertised across eBGP sessions without some
 sort of egress route-map/policy in place. In VyOS however we have this
 RFC functionality disabled by default so that we can preserve backwards
 compatibility with older versions of VyOS. With this option one can
-enable <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc8212.html"><strong>RFC 8212</strong></a> functionality to operate.</p>
+enable <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc8212.html"><strong>RFC 8212</strong></a> functionality to operate.</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
@@ -1061,7 +1061,7 @@ network’s routing tables. When the route is re-enabled, the change in
 availability is also advertised. A route that continually fails and returns
 requires a great deal of network traffic to update the network about the
 route’s status.</p>
-<p>路由 dampening, described in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc2439.html"><strong>RFC 2439</strong></a>, 使您能够 identify routes
+<p>路由 dampening, described in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc2439.html"><strong>RFC 2439</strong></a>, 使您能够 identify routes
 that repeatedly fail and return. If route dampening is enabled, an unstable
 route accumulates penalties each time the route fails and returns. If the
 accumulated penalties exceed a threshold, the route is no longer advertised.
@@ -1307,7 +1307,7 @@ specify the direction in which the AS path access list are applied.</p>
 
 set protocols bgp neighbor <address|interface> address-family <ipv4-unicast|ipv6-unicast> capability orf <receive|send>
 <a class="cmdlink" href="#cfgcmd-set-protocols-bgp-neighbor-address-interface-address-family-ipv4-unicast-ipv6-unicast-capability-orf-receive-send" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>This command enables the ORF capability (described in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5291.html"><strong>RFC 5291</strong></a>) on the
+<p>This command enables the ORF capability (described in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc5291.html"><strong>RFC 5291</strong></a>) on the
 local router, and enables ORF capability advertisement to the specified BGP
 peer. The <code class="docutils literal notranslate">receive</code> keyword configures a router to advertise ORF
 receive capabilities. The <code class="docutils literal notranslate">send</code> keyword configures a router to
@@ -1346,8 +1346,8 @@ a network:</p>
 configure a route reflector you have to tell the router whether the other IBGP
 router is a client or non-client. A client is an IBGP router that the route
 reflector will “reflect” routes to, the non-client is just a regular IBGP
-neighbor. 路由 reflectors mechanism is described in <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc4456.html"><strong>RFC 4456</strong></a> and updated
-by <a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc7606.html"><strong>RFC 7606</strong></a>.</p>
+neighbor. 路由 reflectors mechanism is described in <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc4456.html"><strong>RFC 4456</strong></a> and updated
+by <a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc7606.html"><strong>RFC 7606</strong></a>.</p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
@@ -1374,7 +1374,7 @@ set to an arbitrary 32-bit value.</p>
 required IBGP peerings. Within a sub-AS we still require full-mesh IBGP but
 between these sub-ASes we use something that looks like EBGP but behaves like
 IBGP (called confederation BGP). Confederation mechanism is described in
-<a class="rfc reference external" href="https://docs.vyos.io/en/rolling/configuration/https://datatracker.ietf.org/doc/html/rfc5065.html"><strong>RFC 5065</strong></a></p>
+<a class="rfc reference external" href="https://docs.vyos.io/en/latest/configuration/https://datatracker.ietf.org/doc/html/rfc5065.html"><strong>RFC 5065</strong></a></p>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 

@@ -1,5 +1,5 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="Ch">
 <head>
 <meta charset="UTF-8">
 <style>
@@ -152,157 +152,157 @@
 <div itemprop="articleBody">
              
   <section id="local-route-policy">
-<h1>Local 路由 策略</h1>
-<p>Policies for local traffic are defined in this section.</p>
+<h1>本地路由策略</h1>
+<p>本节定义针对本地流量的策略。</p>
 <section id="configuration">
 <h2>配置</h2>
 <section id="local-route-ipv4">
-<h3>Local 路由 IPv4</h3>
+<h3>本地路由 IPv4</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route rule <1-32765> set table <1-200|main>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-set-table-1-200-main" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the routing table to use for forwarding matching packets.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set policy local-route rule <1-32765> set vrf <vrf|default>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-set-vrf-vrf-default" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the VRF to use for forwarding matching packets.</p>
+set policy local-route rule &lt;1-32765&gt; set table &lt;1-200|main&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-set-table-1-200-main" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为匹配的数据包设置用于转发的路由表。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route rule <1-32765> protocol <protocol>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-protocol-protocol" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 specified protocol (name or number).</p>
+set policy local-route rule &lt;1-32765&gt; set vrf &lt;vrf|default&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-set-vrf-vrf-default" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为匹配的数据包设置用于转发的 VRF。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route rule <1-32765> fwmark <1-2147483647>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-fwmark-1-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 specified firewall mark (fwmark).</p>
+set policy local-route rule &lt;1-32765&gt; protocol &lt;protocol&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-protocol-protocol" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配指定的协议（名称或编号）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route rule <1-32765> source address <x.x.x.x|x.x.x.x/x>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-source-address-x-x-x-x-x-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 specified source address or prefix.</p>
+set policy local-route rule &lt;1-32765&gt; fwmark &lt;1-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-fwmark-1-2147483647" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配指定的防火墙标记（fwmark）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route rule <1-32765> source port <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-source-port-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 specified source port.</p>
+set policy local-route rule &lt;1-32765&gt; source address &lt;x.x.x.x|x.x.x.x/x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-source-address-x-x-x-x-x-x-x-x-x" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配指定的源地址或前缀。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route rule <1-32765> destination address <x.x.x.x|x.x.x.x/x>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-destination-address-x-x-x-x-x-x-x-x-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 specified destination address or prefix.</p>
+set policy local-route rule &lt;1-32765&gt; source port &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-source-port-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配指定的源端口。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route rule <1-32765> destination port <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-destination-port-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 specified destination port.</p>
+set policy local-route rule &lt;1-32765&gt; destination address &lt;x.x.x.x|x.x.x.x/x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-destination-address-x-x-x-x-x-x-x-x-x" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配指定的目的地址或前缀。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route rule <1-32765> inbound-interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-inbound-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 specified inbound interface.</p>
+set policy local-route rule &lt;1-32765&gt; destination port &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-destination-port-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配指定的目的端口。</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy local-route rule &lt;1-32765&gt; inbound-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route-rule-1-32765-inbound-interface-interface" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配指定的入站接口。</p>
 </div>
 </div>
 </section>
 <section id="local-route-ipv6">
-<h3>Local 路由 IPv6</h3>
+<h3>本地路由 IPv6</h3>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route6 rule <1-32765> set table <1-200|main>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-set-table-1-200-main" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the routing table to use for forwarding matching packets.</p>
-</div>
-</div>
-<div class="cmd cmd-cfg">
-<div class="cfgcmd-heading">
-
-set policy local-route6 rule <1-32765> set vrf <vrf|default>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-set-vrf-vrf-default" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>设置 the VRF to use for forwarding matching packets.</p>
+set policy local-route6 rule &lt;1-32765&gt; set table &lt;1-200|main&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-set-table-1-200-main" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为匹配的数据包设置用于转发的路由表。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route6 rule <1-32765> protocol <protocol>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-protocol-protocol" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 specified protocol (name or number).</p>
+set policy local-route6 rule &lt;1-32765&gt; set vrf &lt;vrf|default&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-set-vrf-vrf-default" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>为匹配的数据包设置用于转发的 VRF。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route6 rule <1-32765> fwmark <1-2147483647>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-fwmark-1-2147483647" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 specified firewall mark (fwmark).</p>
+set policy local-route6 rule &lt;1-32765&gt; protocol &lt;protocol&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-protocol-protocol" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配指定的协议（名称或编号）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route6 rule <1-32765> source address <h:h:h:h:h:h:h:h|h:h:h:h:h:h:h:h/x>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-source-address-h-h-h-h-h-h-h-h-h-h-h-h-h-h-h-h-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 specified source address or prefix.</p>
+set policy local-route6 rule &lt;1-32765&gt; fwmark &lt;1-2147483647&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-fwmark-1-2147483647" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配指定的防火墙标记（fwmark）。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route6 rule <1-32765> source port <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-source-port-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 specified source port.</p>
+set policy local-route6 rule &lt;1-32765&gt; source address &lt;h:h:h:h:h:h:h:h|h:h:h:h:h:h:h:h/x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-source-address-h-h-h-h-h-h-h-h-h-h-h-h-h-h-h-h-x" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配指定的源地址或前缀。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route6 rule <1-32765> destination address <h:h:h:h:h:h:h:h|h:h:h:h:h:h:h:h/x>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-destination-address-h-h-h-h-h-h-h-h-h-h-h-h-h-h-h-h-x" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 specified destination address or prefix.</p>
+set policy local-route6 rule &lt;1-32765&gt; source port &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-source-port-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配指定的源端口。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route6 rule <1-32765> destination port <1-65535>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-destination-port-1-65535" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 specified destination port.</p>
+set policy local-route6 rule &lt;1-32765&gt; destination address &lt;h:h:h:h:h:h:h:h|h:h:h:h:h:h:h:h/x&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-destination-address-h-h-h-h-h-h-h-h-h-h-h-h-h-h-h-h-x" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配指定的目的地址或前缀。</p>
 </div>
 </div>
 <div class="cmd cmd-cfg">
 <div class="cfgcmd-heading">
 
-set policy local-route6 rule <1-32765> inbound-interface <interface>
-<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-inbound-interface-interface" title="Permalink to this Command"></a></div><div class="cfgcmd-body">
-<p>匹配 specified inbound interface.</p>
+set policy local-route6 rule &lt;1-32765&gt; destination port &lt;1-65535&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-destination-port-1-65535" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配指定的目的端口。</p>
+</div>
+</div>
+<div class="cmd cmd-cfg">
+<div class="cfgcmd-heading">
+
+set policy local-route6 rule &lt;1-32765&gt; inbound-interface &lt;interface&gt;
+<a class="cmdlink" href="#cfgcmd-set-policy-local-route6-rule-1-32765-inbound-interface-interface" title="此命令的永久链接"></a></div><div class="cfgcmd-body">
+<p>匹配指定的入站接口。</p>
 </div>
 </div>
 </section>

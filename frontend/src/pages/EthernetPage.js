@@ -1,6 +1,7 @@
 import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
+import { useVisibilityStore } from '/src/stores/visibility.js';
 import { interfaceApi } from '/src/api/index.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
 import { onMenuRefresh } from '/src/utils/eventBus.js';
@@ -358,9 +359,11 @@ export default defineComponent({
     const { t } = useI18n();
     const route = useRoute();
     const configStore = useConfigStore();
+    const visibilityStore = useVisibilityStore();
+    onMounted(() => { visibilityStore.load(); });
     const COLUMNS = computed(() => [
       { key: 'name', title: t('ethernet.columns.name') },
-      { key: 'type', title: t('ethernet.columns.type') },
+      { key: 'type', title: t('ethernet.columns.type'), width: '80px' },
       { key: 'address_mode', title: t('ethernet.columns.address_mode') },
       { key: 'ipv4_address', title: t('ethernet.columns.ipv4_address') },
       { key: 'ipv6_address', title: t('ethernet.columns.ipv6_address') },
@@ -385,7 +388,12 @@ export default defineComponent({
     const tabs = computed(() => {
       const interfaceNames = data.value.map(i => i.name);
       const isPhysical = isPhysicalEthernet(editingItem.value?.name);
-      return TAB_DEFS.map(tabDef => {
+      return TAB_DEFS.filter(tabDef => {
+        if (tabDef.key === 'eapol') {
+          return visibilityStore.isVisible('ethernet-eapol');
+        }
+        return true;
+      }).map(tabDef => {
         const title = t(tabDef.titleKey);
         if (tabDef.schemaBuilder) {
           const schema = tabDef.schemaBuilder(tabDef.key === 'basic' ? isPhysical : interfaceNames, t);
@@ -420,7 +428,7 @@ export default defineComponent({
 
     function edit() {
       if (!selected.value.length) return showError({ message: t('ethernet.errors.select_row') });
-      const row = data.value.find(r => r.id === selected.value[0]) || {};
+      const row = data.value.find(r => r.name === selected.value[0]) || {};
       editingItem.value = { ...configToForm({ ...row._config, name: row.name }), type: row.type };
       activeTab.value = 'basic';
       modalVisible.value = true;
@@ -428,14 +436,14 @@ export default defineComponent({
 
     async function remove() {
       if (!selected.value.length) return showError({ message: t('ethernet.errors.select_row') });
-      const selectedRows = data.value.filter(r => selected.value.includes(r.id));
+      const selectedRows = data.value.filter(r => selected.value.includes(r.name));
       const physical = selectedRows.filter(r => r.type === t('ethernet.types.physical_ethernet'));
       if (physical.length) {
         return showError({ message: t('ethernet.errors.cannot_delete_physical', { names: physical.map(r => r.name).join(', ') }) });
       }
-      pendingDeleteNames.value = selected.value.map(id => {
-        const row = data.value.find(r => r.id === id);
-        return row ? row.name : id;
+      pendingDeleteNames.value = selected.value.map(name => {
+        const row = data.value.find(r => r.name === name);
+        return row ? row.name : name;
       });
       deleteModalVisible.value = true;
     }
@@ -478,17 +486,17 @@ export default defineComponent({
     <div class="page-container">
       <DataTable :columns="COLUMNS" :data="data" :loading="loading" :disabled="writeDisabled"
                  :actions="['create', 'edit', 'delete', 'refresh']"
-                 tableKey="ethernet_interfaces"
+                 tableKey="ethernet_interfaces" rowKey="name"
                  @create="create" @edit="edit" @delete="remove" @refresh="load"
                  @selection-change="selected = $event">
         <template #operstate="{ value }">
           <span class="status-dot" :class="value === 'UP' ? 'status-up' : 'status-down'"></span>
         </template>
       </DataTable>
-      <DraggableModal v-model:visible="modalVisible" :title="editingItem?.name ? t('ethernet.modal.edit') + editingItem.name : t('ethernet.modal.create')" @confirm="save">
+      <DraggableModal v-model:visible="modalVisible" :title="editingItem?.name ? t('ethernet.modal.edit') + editingItem.name : t('ethernet.modal.create')" width="820px" @confirm="save">
         <TabGroup v-model="activeTab" :tabs="tabs">
-          <template v-for="tab in tabs" :key="tab.key" #[tab.key]="{ tab: tabData }">
-            <ConfigForm v-model="editingItem" :schema="tabData.schema" :disabled="writeDisabled" :formKey="'eth_' + tabData.key" />
+          <template v-for="tab in tabs" :key="tab.key" #[tab.key]>
+            <ConfigForm v-if="tab.schema" v-model="editingItem" :schema="tab.schema" :disabled="writeDisabled" :formKey="'eth_' + tab.key" />
           </template>
         </TabGroup>
       </DraggableModal>

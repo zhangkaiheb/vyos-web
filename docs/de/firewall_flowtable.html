@@ -166,7 +166,7 @@
 
 set firewall flowtable …
 <a class="cmdlink" href="#cfgcmd-set-firewall-flowtable" title="Permalink to this Command"></a></div></div>
-<p>Weitere Informationen über den allgemeinen Datenverkehr in VyOS Firewalls finden Sie unter <a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Firewall</a>.</p>
+<p>Weitere Informationen über den allgemeinen Datenverkehr in VyOS Firewalls finden Sie unter <a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">Firewall</a>.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre>- set firewall
     * flowtable
          - custom_flow_table
@@ -177,14 +177,14 @@ set firewall flowtable …
 Flowtables unterstützen Layer 3 (IPv4 und IPv6) und Layer 4 (TCP und UDP)
 Protokolle.</p>
 <figure class="align-default">
-<img alt="../../_images/firewall-flowtable-packet-flow.webp" src="https://docs.vyos.io/en/rolling/_images/firewall-flowtable-packet-flow.webp" />
+<img alt="../../_images/firewall-flowtable-packet-flow.webp" src="https://docs.vyos.io/en/latest/_images/firewall-flowtable-packet-flow.webp" />
 </figure>
 <p>Nachdem das erste Paket den IP-Weiterleitungs-Pfad erfolgreich durchläuft (schwarzer Kreis-Pfad), können Sie nachfolgende Pakete über Ihre Regelsammlung an den Flowtable weiterleiten. Sie bestimmen, wann ein Fluss dem Flowtable hinzugefügt wird während der Weiterleitungsfilterung (roter Kreisnummer 6).</p>
 <p>Wenn ein Paket einen passenden Eintrag im Flowtable findet (Flowtable-Hit), sendet das System es an das Ausgangs-Netzgerät. Dies bedeutet, dass Pakete den klassischen IP-Weiterleitungs-Pfad umgehen und den <strong>Schnellpfad</strong> (orangener Kreis-Pfad) verwenden. Als Ergebnis sehen Sie diese Pakete nicht mehr von irgendeinem Netfilter-Hook nach Eingang. Wenn kein passender Eintrag im Flowtable existiert (Flowtable-Miss), durchläuft das Paket den klassischen IP-Weiterleitungs-Pfad.</p>
 <div class="admonition note">
 <p class="admonition-title">Hinweis</p>
 <p><strong>Flowtable Referenz:</strong>
-<a class="reference external" href="https://docs.vyos.io/en/rolling/configuration/https://docs.kernel.org/networking/nf_flowtable.html">https://docs.kernel.org/networking/nf_flowtable.html</a></p>
+<a class="reference external" href="https://docs.vyos.io/en/latest/configuration/https://docs.kernel.org/networking/nf_flowtable.html">https://docs.kernel.org/networking/nf_flowtable.html</a></p>
 </div>
 </section>
 <section id="flowtable-configuration">
@@ -366,7 +366,7 @@ Pakete überspringen den Forward-Hook vollständig über den Schnellpfad</p></li
 von Client-zu-Server-Verkehr. In der Praxis verarbeitet jede Schnittstelle den Verkehr in beiden Richtungen, und der Flowtable verwaltet das Offloaden symmetrisch, sobald der Fluss etabliert ist.
 Um die Eingangs- und Ausgangsschnittstellen zu bestätigen, aktivieren Sie <code class="docutils literal notranslate">log</code> auf einer Regel im
 Forward-Hook und prüfen Sie die Firewall-Logs – siehe den
-<a class="reference internal" href="https://docs.vyos.io/en/rolling/configuration/index.html">Firewall</a> Abschnitt für die Konfiguration.</p>
+<a class="reference internal" href="https://docs.vyos.io/en/latest/configuration/index.html">Firewall</a> Abschnitt für die Konfiguration.</p>
 </div>
 </section>
 <section id="checks">
