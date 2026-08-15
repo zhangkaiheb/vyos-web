@@ -33,6 +33,7 @@ export default defineComponent({
     rowKey: { type: String, default: 'id' },
     actions: { type: Array, default: () => ['create', 'edit', 'delete', 'moveUp', 'moveDown', 'copy', 'refresh'] },
     disabled: { type: Boolean, default: false },
+    disabledActions: { type: Array, default: () => [] },
     tableKey: { type: String, default: '' },
     filterFields: { type: Array, default: null },
     externalToolbar: { type: Boolean, default: false },
@@ -186,6 +187,7 @@ export default defineComponent({
 
     function actionDisabled(a) {
       if (props.disabled) return true;
+      if (props.disabledActions.includes(a)) return true;
       if (!NEEDS_SELECTION.includes(a)) return false;
       if (selectedKeys.value.size === 0) return true;
       if (a === 'edit' && selectedKeys.value.size > 1) return true;

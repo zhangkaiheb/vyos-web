@@ -88,7 +88,7 @@ export default defineComponent({
       basic: [
         { key: 'id', title: t('destinationNat.field.ruleNumber'), type: 'number', min: 1, max: 999999, required: true, help: t('destinationNat.help.ruleNumber') },
         { key: 'description', title: t('destinationNat.field.description'), type: 'text', help: t('destinationNat.help.description') },
-        { key: 'protocol', title: t('destinationNat.field.protocol'), type: 'select', help: t('destinationNat.help.protocol'),
+        { key: 'protocol', title: t('destinationNat.field.protocol'), type: 'select', default: 'all', help: t('destinationNat.help.protocol'),
           options: protocols.value.length ? protocols.value.map(p => ({ value: p, label: p })) : [] },
         { key: 'packetType', title: t('destinationNat.field.packetType'), type: 'select', help: t('destinationNat.help.packetType'),
           options: PACKET_TYPE_OPTIONS.map(o => ({ value: o.value, label: o.label })) },

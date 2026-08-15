@@ -302,11 +302,17 @@ function buildRoutes(menu, parentPath = '') {
   return routes;
 }
 
+// Catch-all placeholder for hard refresh before menu loads
+const CatchAllPlaceholder = {
+  template: '<div></div>',
+};
+
 // Initial static routes; menu-based routes added after menu loaded
 const staticRoutes = [
   { path: '/', redirect: '/monitor/dashboard' },
   { path: '/shell', name: '/shell', component: ShellPage, meta: { menuItem: { label: 'Web Shell', label_en: 'Web Shell' } } },
   { path: '/system/feature-visibility', name: '/system/feature-visibility', component: FeatureVisibilityPage, meta: { menuItem: { label: '功能可见性', label_en: 'Feature Visibility', route: '/system/feature-visibility' } } },
+  { path: '/:pathMatch(.*)*', name: 'catch-all', component: CatchAllPlaceholder },
 ];
 
 let router = null;
@@ -322,20 +328,42 @@ export function createRouter(menu = []) {
 
 export function updateRouterMenu(menu) {
   if (!router) return;
-  // Remove all previously added menu routes
+  const newRoutes = buildRoutes(menu);
+  const newRouteNames = new Set(newRoutes.map(r => r.name));
+
+  let changed = false;
+
+  // Remove catch-all placeholder once menu routes are loaded
+  if (router.hasRoute('catch-all') && newRouteNames.size > 0) {
+    router.removeRoute('catch-all');
+    changed = true;
+  }
+
+  // Only remove routes that are no longer in the menu
   const currentRoutes = router.getRoutes();
   for (const r of currentRoutes) {
-    if (r.meta?.menuItem && r.name !== '/') {
+    if (r.meta?.menuItem && r.name !== '/' && !newRouteNames.has(r.name)) {
       router.removeRoute(r.name);
+      changed = true;
     }
   }
-  // Add routes from the current menu
-  const newRoutes = buildRoutes(menu);
+
+  // Only add routes that don't exist yet
   for (const r of newRoutes) {
-    router.addRoute(r);
+    if (!router.hasRoute(r.name)) {
+      router.addRoute(r);
+      changed = true;
+    }
   }
-  // Re-resolve current location so dynamically added routes match immediately
-  router.replace(router.currentRoute.value.fullPath).catch(() => {});
+
+  // After routes change, check if current path can now be resolved
+  if (changed) {
+    const currentPath = router.currentRoute.value.fullPath;
+    const resolved = router.resolve(currentPath);
+    if (resolved.matched && resolved.matched.length > 0) {
+      router.replace(currentPath).catch(() => {});
+    }
+  }
 }
 
 export { router };

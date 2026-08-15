@@ -15,28 +15,39 @@ function isPhysicalEthernet(name) {
   return name && name.indexOf('.') === -1;
 }
 
-function buildBasicSchema(isPhysical, t) {
-  return [
+function buildBasicSchema(isPhysical, t, vrfOptions = [], interfaceNames = []) {
+  const schema = [
     { key: 'name', title: t('ethernet.basic.name'), placeholder: t('ethernet.basic.name_placeholder'), disabled: isPhysical },
     { key: 'description', title: t('ethernet.basic.description') },
     { key: 'address', title: t('ethernet.basic.address'), type: 'textarea', placeholder: t('ethernet.basic.address_placeholder'), help: t('ethernet.basic.address_help') },
-    { key: 'mtu', title: t('ethernet.basic.mtu'), type: 'number', placeholder: t('ethernet.basic.mtu_placeholder') },
-    { key: 'speed', title: t('ethernet.basic.speed'), type: 'select', options: ['auto', '10', '100', '1000', '2500', '5000', '10000', '25000', '40000', '50000', '100000'] },
-    { key: 'duplex', title: t('ethernet.basic.duplex'), type: 'select', options: ['auto', 'half', 'full'] },
+    { key: 'mtu', title: t('ethernet.basic.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('ethernet.basic.mtu_placeholder'), help: t('ethernet.basic.mtu_help') },
+  ];
+
+  // Only show speed and duplex for physical ethernet interfaces
+  if (isPhysical) {
+    schema.push(
+      { key: 'speed', title: t('ethernet.basic.speed'), type: 'select', options: ['auto', '10', '100', '1000', '2500', '5000', '10000', '25000', '40000', '50000', '100000'] },
+      { key: 'duplex', title: t('ethernet.basic.duplex'), type: 'select', options: ['auto', 'half', 'full'] }
+    );
+  }
+
+  schema.push(
     { key: 'mac', title: t('ethernet.basic.mac_address'), placeholder: t('ethernet.basic.mac_address_placeholder') },
     { key: 'hw_id', title: t('ethernet.basic.hw_id'), placeholder: t('ethernet.basic.hw_id_placeholder') },
-    { key: 'vrf', title: t('ethernet.basic.vrf_instance'), placeholder: t('ethernet.basic.vrf_instance_placeholder') },
+    { key: 'vrf', title: t('ethernet.basic.vrf_instance'), type: 'select', options: ['', ...vrfOptions], placeholder: t('ethernet.basic.vrf_instance_placeholder'), default: '' },
     { key: 'disable', title: t('ethernet.basic.disable'), type: 'checkbox' },
     { key: 'disable_flow_control', title: t('ethernet.basic.disable_flow_control'), type: 'checkbox' },
     { key: 'disable_link_detect', title: t('ethernet.basic.disable_link_detect'), type: 'checkbox' },
-    { key: 'redirect', title: t('ethernet.basic.redirect'), placeholder: t('ethernet.basic.redirect_placeholder') },
-  ];
+    { key: 'redirect', title: t('ethernet.basic.redirect'), type: 'select', options: ['', ...interfaceNames], placeholder: t('ethernet.basic.redirect_placeholder'), default: '' }
+  );
+
+  return schema;
 }
 
 function buildDhcpSchema(_unused, t) {
   return [
     { key: 'dhcp_client_id', title: t('ethernet.dhcp.client_id') },
-    { key: 'dhcp_default_route_distance', title: t('ethernet.dhcp.default_route_distance'), type: 'number', placeholder: t('ethernet.dhcp.default_route_distance_placeholder') },
+    { key: 'dhcp_default_route_distance', title: t('ethernet.dhcp.default_route_distance'), type: 'number', min: 1, max: 255, default: 210, placeholder: t('ethernet.dhcp.default_route_distance_placeholder'), help: t('ethernet.dhcp.default_route_distance_help') },
     { key: 'dhcp_host_name', title: t('ethernet.dhcp.host_name'), placeholder: t('ethernet.dhcp.host_name_placeholder') },
     { key: 'dhcp_mtu', title: t('ethernet.dhcp.use_mtu'), type: 'checkbox', help: t('ethernet.dhcp.use_mtu_help') },
     { key: 'dhcp_no_default_route', title: t('ethernet.dhcp.no_default_route'), type: 'checkbox' },
@@ -67,8 +78,8 @@ function buildEapolSchema(_unused, t) {
 
 function buildIpSchema(_unused, t) {
   return [
-    { key: 'ip_adjust_mss', title: t('ethernet.ip.adjust_mss'), type: 'number', placeholder: t('ethernet.ip.adjust_mss_placeholder') },
-    { key: 'ip_arp_cache_timeout', title: t('ethernet.ip.arp_cache_timeout'), type: 'number', placeholder: t('ethernet.ip.arp_cache_timeout_placeholder') },
+    { key: 'ip_adjust_mss', title: t('ethernet.ip.adjust_mss'), type: 'number', min: 536, max: 65535, placeholder: t('ethernet.ip.adjust_mss_placeholder'), help: t('ethernet.ip.adjust_mss_help') },
+    { key: 'ip_arp_cache_timeout', title: t('ethernet.ip.arp_cache_timeout'), type: 'number', min: 1, max: 86400, default: 30, placeholder: t('ethernet.ip.arp_cache_timeout_placeholder'), help: t('ethernet.ip.arp_cache_timeout_help') },
     { key: 'ip_disable_arp_filter', title: t('ethernet.ip.disable_arp_filter'), type: 'checkbox' },
     { key: 'ip_disable_forwarding', title: t('ethernet.ip.disable_forwarding'), type: 'checkbox' },
     { key: 'ip_enable_arp_accept', title: t('ethernet.ip.enable_arp_accept'), type: 'checkbox' },
@@ -83,27 +94,62 @@ function buildIpSchema(_unused, t) {
 
 function buildIpv6Schema(_unused, t) {
   return [
-    { key: 'ipv6_accept_dad', title: t('ethernet.ipv6.accept_dad'), type: 'number', placeholder: t('ethernet.ipv6.accept_dad_placeholder') },
+    { key: 'ipv6_accept_dad', title: t('ethernet.ipv6.accept_dad'), type: 'select', options: [
+      { value: '0', label: '0 - ' + t('ethernet.ipv6.accept_dad_option_0') },
+      { value: '1', label: '1 - ' + t('ethernet.ipv6.accept_dad_option_1') },
+      { value: '2', label: '2 - ' + t('ethernet.ipv6.accept_dad_option_2') },
+    ], default: '1', help: t('ethernet.ipv6.accept_dad_help') },
     { key: 'ipv6_address', title: t('ethernet.ipv6.address_mode'), type: 'multi-select', options: ['autoconf', 'eui64', 'no-default-link-local'] },
-    { key: 'ipv6_adjust_mss', title: t('ethernet.ipv6.adjust_mss'), type: 'number', placeholder: t('ethernet.ipv6.adjust_mss_placeholder') },
-    { key: 'ipv6_base_reachable_time', title: t('ethernet.ipv6.base_reachable_time'), type: 'number', placeholder: t('ethernet.ipv6.base_reachable_time_placeholder') },
+    { key: 'ipv6_adjust_mss', title: t('ethernet.ipv6.adjust_mss'), type: 'number', min: 536, max: 65535, placeholder: t('ethernet.ipv6.adjust_mss_placeholder'), help: t('ethernet.ipv6.adjust_mss_help') },
+    { key: 'ipv6_base_reachable_time', title: t('ethernet.ipv6.base_reachable_time'), type: 'number', min: 1, max: 86400, default: 30, placeholder: t('ethernet.ipv6.base_reachable_time_placeholder'), help: t('ethernet.ipv6.base_reachable_time_help') },
     { key: 'ipv6_disable_forwarding', title: t('ethernet.ipv6.disable_forwarding'), type: 'checkbox' },
-    { key: 'ipv6_dup_addr_detect_transmits', title: t('ethernet.ipv6.dup_addr_detect_transmits'), type: 'number', placeholder: t('ethernet.ipv6.dup_addr_detect_transmits_placeholder') },
+    { key: 'ipv6_dup_addr_detect_transmits', title: t('ethernet.ipv6.dup_addr_detect_transmits'), type: 'number', min: 0, default: 1, placeholder: t('ethernet.ipv6.dup_addr_detect_transmits_placeholder'), help: t('ethernet.ipv6.dup_addr_detect_transmits_help') },
     { key: 'ipv6_source_validation', title: t('ethernet.ipv6.source_validation'), type: 'select', options: ['', 'strict', 'loose', 'disable'] },
   ];
 }
 
-function buildAdvancedSchema(interfaceNames, t) {
-  return [
-    { key: 'offload', title: t('ethernet.advanced.offload'), type: 'multi-select', options: ['gro', 'gso', 'sg', 'tso'] },
+function buildAdvancedSchema(interfaceNames, t, isPhysical) {
+  const schema = [
     { key: 'mirror_ingress', title: t('ethernet.advanced.mirror_ingress'), type: 'select', options: ['', ...interfaceNames], help: t('ethernet.advanced.mirror_ingress_help') },
     { key: 'mirror_egress', title: t('ethernet.advanced.mirror_egress'), type: 'select', options: ['', ...interfaceNames], help: t('ethernet.advanced.mirror_egress_help') },
-    { key: 'vif', title: t('ethernet.advanced.vif'), type: 'textarea', placeholder: t('ethernet.advanced.vif_placeholder'), help: t('ethernet.advanced.vif_help') },
-    { key: 'vif_s', title: t('ethernet.advanced.vif_s'), type: 'textarea', placeholder: t('ethernet.advanced.vif_s_placeholder'), help: t('ethernet.advanced.vif_s_help') },
-    { key: 'evpn', title: t('ethernet.advanced.evpn'), type: 'textarea', placeholder: t('ethernet.advanced.evpn_placeholder'), help: t('ethernet.advanced.evpn_help') },
-    { key: 'ring_buffer_rx', title: t('ethernet.advanced.ring_buffer_rx'), type: 'number', placeholder: t('ethernet.advanced.ring_buffer_placeholder'), help: t('ethernet.advanced.ring_buffer_rx_help') },
-    { key: 'ring_buffer_tx', title: t('ethernet.advanced.ring_buffer_tx'), type: 'number', placeholder: t('ethernet.advanced.ring_buffer_placeholder'), help: t('ethernet.advanced.ring_buffer_tx_help') },
   ];
+
+  // Only show offload and evpn for physical ethernet interfaces
+  if (isPhysical) {
+    schema.unshift(
+      { key: 'offload', title: t('ethernet.advanced.offload'), type: 'multi-select', options: [
+        { value: 'gro', label: t('ethernet.advanced.offload_gro') },
+        { value: 'gso', label: t('ethernet.advanced.offload_gso') },
+        { value: 'hw-tc-offload', label: t('ethernet.advanced.offload_hw_tc_offload') },
+        { value: 'lro', label: t('ethernet.advanced.offload_lro') },
+        { value: 'rfs', label: t('ethernet.advanced.offload_rfs') },
+        { value: 'rps', label: t('ethernet.advanced.offload_rps') },
+        { value: 'sg', label: t('ethernet.advanced.offload_sg') },
+        { value: 'tso', label: t('ethernet.advanced.offload_tso') },
+      ], help: t('ethernet.advanced.offload_help') }
+    );
+    schema.push(
+      { key: 'evpn', title: t('ethernet.advanced.evpn'), type: 'textarea', placeholder: t('ethernet.advanced.evpn_placeholder'), help: t('ethernet.advanced.evpn_help') }
+    );
+  }
+
+  // Only show VIF and VIF-S for physical ethernet interfaces
+  if (isPhysical) {
+    schema.push(
+      { key: 'vif', title: t('ethernet.advanced.vif'), type: 'number-list', placeholder: t('ethernet.advanced.vif_placeholder'), help: t('ethernet.advanced.vif_help') },
+      { key: 'vif_s', title: t('ethernet.advanced.vif_s'), type: 'number-list', placeholder: t('ethernet.advanced.vif_s_placeholder'), help: t('ethernet.advanced.vif_s_help') }
+    );
+  }
+
+  // Ring buffer at the bottom for physical ethernet interfaces
+  if (isPhysical) {
+    schema.push(
+      { key: 'ring_buffer_rx', title: t('ethernet.advanced.ring_buffer_rx'), type: 'number', min: 80, max: 16384, placeholder: t('ethernet.advanced.ring_buffer_placeholder'), help: t('ethernet.advanced.ring_buffer_rx_help') },
+      { key: 'ring_buffer_tx', title: t('ethernet.advanced.ring_buffer_tx'), type: 'number', min: 80, max: 16384, placeholder: t('ethernet.advanced.ring_buffer_placeholder'), help: t('ethernet.advanced.ring_buffer_tx_help') }
+    );
+  }
+
+  return schema;
 }
 
 const TAB_DEFS = [
@@ -235,8 +281,8 @@ function configToForm(cfg) {
     offload: Object.keys(cfg.offload || {}),
     mirror_ingress: extractLeaf(cfg.mirror || {}, ['ingress']),
     mirror_egress: extractLeaf(cfg.mirror || {}, ['egress']),
-    vif: formatJson(cfg.vif || {}),
-    vif_s: formatJson(cfg['vif-s'] || {}),
+    vif: Object.keys(cfg.vif || {}),
+    vif_s: Object.keys(cfg['vif-s'] || {}),
     evpn: formatJson(cfg.evpn || {}),
     ring_buffer_rx: extractLeaf(cfg['ring-buffer'] || {}, ['rx']),
     ring_buffer_tx: extractLeaf(cfg['ring-buffer'] || {}, ['tx']),
@@ -339,10 +385,18 @@ function formToConfig(form) {
   if (form.mirror_ingress) mirror.ingress = form.mirror_ingress;
   if (form.mirror_egress) mirror.egress = form.mirror_egress;
   if (Object.keys(mirror).length) value.mirror = mirror;
-  const vif = safeJsonParse(form.vif);
-  if (Object.keys(vif).length) value.vif = vif;
-  const vifS = safeJsonParse(form.vif_s);
-  if (Object.keys(vifS).length) value['vif-s'] = vifS;
+  const vifList = (form.vif || []).filter(s => s.trim() !== '');
+  if (vifList.length) {
+    const vif = {};
+    vifList.forEach(id => { vif[id] = {}; });
+    value.vif = vif;
+  }
+  const vifSList = (form.vif_s || []).filter(s => s.trim() !== '');
+  if (vifSList.length) {
+    const vifS = {};
+    vifSList.forEach(id => { vifS[id] = {}; });
+    value['vif-s'] = vifS;
+  }
   const evpn = safeJsonParse(form.evpn);
   if (Object.keys(evpn).length) value.evpn = evpn;
   const ringBuffer = {};
@@ -377,6 +431,7 @@ export default defineComponent({
       { key: 'operstate', title: t('ethernet.columns.operstate') },
     ]);
     const data = ref([]);
+    const vrfOptions = ref([]);
     const loading = ref(false);
     const modalVisible = ref(false);
     const editingItem = ref({});
@@ -396,12 +451,27 @@ export default defineComponent({
       }).map(tabDef => {
         const title = t(tabDef.titleKey);
         if (tabDef.schemaBuilder) {
-          const schema = tabDef.schemaBuilder(tabDef.key === 'basic' ? isPhysical : interfaceNames, t);
+          const schema = tabDef.key === 'basic'
+            ? tabDef.schemaBuilder(isPhysical, t, vrfOptions.value, interfaceNames)
+            : tabDef.key === 'advanced'
+            ? tabDef.schemaBuilder(interfaceNames, t, isPhysical)
+            : tabDef.schemaBuilder(interfaceNames, t);
           return { ...tabDef, title, schema };
         }
         return { ...tabDef, title };
       });
     });
+
+    async function loadVrfOptions() {
+      try {
+        const res = await configStore.getConfig('vrf', false);
+        const raw = res.data || {};
+        const nameData = raw.name || raw;
+        vrfOptions.value = Object.keys(nameData).filter(name => typeof nameData[name] === 'object');
+      } catch (e) {
+        console.error('Failed to load VRF options:', e);
+      }
+    }
 
     async function load() {
       loading.value = true;
@@ -417,6 +487,7 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      loadVrfOptions();
       onMenuRefresh(load);
     });
 
@@ -429,7 +500,7 @@ export default defineComponent({
     function edit() {
       if (!selected.value.length) return showError({ message: t('ethernet.errors.select_row') });
       const row = data.value.find(r => r.name === selected.value[0]) || {};
-      editingItem.value = { ...configToForm({ ...row._config, name: row.name }), type: row.type };
+      editingItem.value = { ...configToForm({ ...row._config, name: row.name }), name: row.name, type: row.type };
       activeTab.value = 'basic';
       modalVisible.value = true;
     }
@@ -437,7 +508,7 @@ export default defineComponent({
     async function remove() {
       if (!selected.value.length) return showError({ message: t('ethernet.errors.select_row') });
       const selectedRows = data.value.filter(r => selected.value.includes(r.name));
-      const physical = selectedRows.filter(r => r.type === t('ethernet.types.physical_ethernet'));
+      const physical = selectedRows.filter(r => isPhysicalEthernet(r.name));
       if (physical.length) {
         return showError({ message: t('ethernet.errors.cannot_delete_physical', { names: physical.map(r => r.name).join(', ') }) });
       }
@@ -451,11 +522,30 @@ export default defineComponent({
     async function confirmRemove() {
       deleteModalVisible.value = false;
       for (const name of pendingDeleteNames.value) {
-        await configStore.deleteConfig(`interfaces ethernet ${name}`);
+        // VLAN/QinQ: delete sub-interface from parent (e.g., delete interfaces ethernet eth1 vif 12)
+        const dotIndex = name.indexOf('.');
+        if (dotIndex !== -1) {
+          const parentName = name.substring(0, dotIndex);
+          const vlanId = name.substring(dotIndex + 1);
+          // Check if it's QinQ (has two dots, e.g., eth1.20.30)
+          const secondDot = vlanId.indexOf('.');
+          if (secondDot !== -1) {
+            // QinQ: delete vif-c from parent's vif-s
+            const outerVlan = vlanId.substring(0, secondDot);
+            const innerVlan = vlanId.substring(secondDot + 1);
+            await configStore.deleteConfig(`interfaces ethernet ${parentName} vif-s ${outerVlan} vif-c ${innerVlan}`);
+          } else {
+            // VLAN: delete vif from parent
+            await configStore.deleteConfig(`interfaces ethernet ${parentName} vif ${vlanId}`);
+          }
+        } else {
+          await configStore.deleteConfig(`interfaces ethernet ${name}`);
+        }
         configStore.markPending();
       }
       selected.value = [];
       pendingDeleteNames.value = [];
+      await configStore.loadCommands('interfaces ethernet');
       await configStore.checkSessionChanged();
       await load();
     }
@@ -475,9 +565,13 @@ export default defineComponent({
       }
     }
 
+    const hasEthernetSelected = computed(() => {
+      return selected.value.some(name => isPhysicalEthernet(name));
+    });
+
     return {
       data, loading, modalVisible, editingItem, selected, activeTab, writeDisabled,
-      deleteModalVisible, pendingDeleteNames,
+      deleteModalVisible, pendingDeleteNames, hasEthernetSelected,
       COLUMNS, tabs,
       load, create, edit, remove, confirmRemove, save, t,
     };
@@ -486,6 +580,7 @@ export default defineComponent({
     <div class="page-container">
       <DataTable :columns="COLUMNS" :data="data" :loading="loading" :disabled="writeDisabled"
                  :actions="['create', 'edit', 'delete', 'refresh']"
+                 :disabledActions="hasEthernetSelected ? ['delete'] : []"
                  tableKey="ethernet_interfaces" rowKey="name"
                  @create="create" @edit="edit" @delete="remove" @refresh="load"
                  @selection-change="selected = $event">
@@ -499,6 +594,9 @@ export default defineComponent({
             <ConfigForm v-if="tab.schema" v-model="editingItem" :schema="tab.schema" :disabled="writeDisabled" :formKey="'eth_' + tab.key" />
           </template>
         </TabGroup>
+      </DraggableModal>
+      <DraggableModal v-model:visible="deleteModalVisible" :title="t('ethernet.confirmDelete')" width="400px" @confirm="confirmRemove">
+        <p>{{ t('ethernet.confirmDeleteMessage', { names: pendingDeleteNames.join(', ') }) }}</p>
       </DraggableModal>
     </div>
   `,

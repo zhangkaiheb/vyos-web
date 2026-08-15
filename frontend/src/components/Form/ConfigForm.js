@@ -347,24 +347,38 @@ export default defineComponent({
         })));
       } else if (field.type === 'multi-select') {
         children.push(h('div', { class: 'checkbox-group' }, (field.options || []).map(opt => {
-          const checked = (formObj[field.key] || []).includes(opt);
-          return h('label', { key: opt, class: 'checkbox-item' }, [
+          const optValue = typeof opt === 'object' ? opt.value : opt;
+          const optLabel = typeof opt === 'object' ? (opt.label || opt.value) : opt;
+          const checked = (formObj[field.key] || []).includes(optValue);
+          return h('label', { key: optValue, class: 'checkbox-item' }, [
             h('input', {
               type: 'checkbox',
-              value: opt,
+              value: optValue,
               checked,
               disabled,
               onChange: (e) => {
                 if (e.target.checked) {
-                  formObj[field.key].push(opt);
+                  formObj[field.key].push(optValue);
                 } else {
-                  formObj[field.key] = formObj[field.key].filter(v => v !== opt);
+                  formObj[field.key] = formObj[field.key].filter(v => v !== optValue);
                 }
               },
             }),
-            h('span', {}, opt),
+            h('span', {}, optLabel),
           ]);
         })));
+      } else if (field.type === 'number-list') {
+        const listValue = (formObj[field.key] || []).join('\n');
+        children.push(h('textarea', {
+          value: listValue,
+          placeholder: field.placeholder || '',
+          disabled,
+          class: 'form-control',
+          rows: 3,
+          onInput: (e) => {
+            formObj[field.key] = e.target.value.split('\n').map(s => s.trim()).filter(s => s !== '');
+          },
+        }));
       } else if (field.type === 'dual-list') {
         children.push(h(DualListSelector, {
           modelValue: formObj[field.key] || [],
@@ -395,6 +409,25 @@ export default defineComponent({
             h('span', {}, optLabel),
           ]);
         })));
+      } else if (field.type === 'tri-state') {
+        // Tri-state selector: dropdown with 不配置 / Set / Not
+        const currentValue = formObj[field.key] || '';
+        const options = field.options || [
+          { value: '', label: '不配置' },
+          { value: 'set', label: 'Set' },
+          { value: 'not', label: 'Not' },
+        ];
+        children.push(h('select', {
+          class: 'form-control',
+          value: currentValue,
+          disabled,
+          onChange: (e) => { formObj[field.key] = e.target.value; },
+        }, [
+          h('option', { value: '' }, '不配置'),
+          ...options.filter(opt => opt.value).map(opt =>
+            h('option', { value: opt.value }, opt.label)
+          ),
+        ]));
       } else if (field.type === 'checkbox') {
         children.push(h('input', {
           type: 'checkbox',

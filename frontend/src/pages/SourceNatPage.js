@@ -80,7 +80,7 @@ export default defineComponent({
       basic: [
         { key: 'id', title: t('sourceNat.field.ruleNumber'), type: 'number', min: 1, max: 999999, required: true, help: t('sourceNat.help.ruleNumber') },
         { key: 'description', title: t('sourceNat.field.description'), type: 'text', help: t('sourceNat.help.description') },
-        { key: 'protocol', title: t('sourceNat.field.protocol'), type: 'select', help: t('sourceNat.help.protocol'),
+        { key: 'protocol', title: t('sourceNat.field.protocol'), type: 'select', default: 'all', help: t('sourceNat.help.protocol'),
           options: protocols.value.length ? protocols.value.map(p => ({ value: p, label: p })) : [] },
         { key: 'packetType', title: t('sourceNat.field.packetType'), type: 'select', help: t('sourceNat.help.packetType'),
           options: PACKET_TYPE_OPTIONS.map(o => ({ value: o.value, label: o.label })) },

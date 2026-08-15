@@ -343,6 +343,7 @@ export const FIREWALL_RULE_SCHEMA_IPV6 = [
         "title": "类型名称",
         "help": "firewall.rule.help.ipv6.icmpv6-type-name",
         "type": "select",
+        "default": "",
         "options": [
           "destination-unreachable",
           "packet-too-big",
@@ -827,127 +828,94 @@ export const FIREWALL_RULE_SCHEMA_IPV6 = [
         "title": "标志",
         "help": "firewall.rule.help.ipv6.flags",
         "type": "group",
-        "horizontal": true,
         "children": [
           {
             "key": "ack",
             "title": "Ack",
             "help": "firewall.rule.help.ipv6.ack",
-            "type": "checkbox",
-            "valueless": true
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
+            ]
           },
           {
             "key": "cwr",
             "title": "Cwr",
             "help": "firewall.rule.help.ipv6.cwr",
-            "type": "checkbox",
-            "valueless": true
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
+            ]
           },
           {
             "key": "ecn",
             "title": "Ecn",
             "help": "firewall.rule.help.ipv6.ecn",
-            "type": "checkbox",
-            "valueless": true
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
+            ]
           },
           {
             "key": "fin",
             "title": "Fin",
             "help": "firewall.rule.help.ipv6.fin",
-            "type": "checkbox",
-            "valueless": true
-          },
-          {
-            "key": "not",
-            "title": "Not",
-            "help": "firewall.rule.help.ipv6.not",
-            "type": "group",
-            "children": [
-              {
-                "key": "ack",
-                "title": "Ack",
-                "help": "firewall.rule.help.ipv6.ack",
-                "type": "checkbox",
-                "valueless": true
-              },
-              {
-                "key": "cwr",
-                "title": "Cwr",
-                "help": "firewall.rule.help.ipv6.cwr",
-                "type": "checkbox",
-                "valueless": true
-              },
-              {
-                "key": "ecn",
-                "title": "Ecn",
-                "help": "firewall.rule.help.ipv6.ecn",
-                "type": "checkbox",
-                "valueless": true
-              },
-              {
-                "key": "fin",
-                "title": "Fin",
-                "help": "firewall.rule.help.ipv6.fin",
-                "type": "checkbox",
-                "valueless": true
-              },
-              {
-                "key": "psh",
-                "title": "Psh",
-                "help": "firewall.rule.help.ipv6.psh",
-                "type": "checkbox",
-                "valueless": true
-              },
-              {
-                "key": "rst",
-                "title": "Rst",
-                "help": "firewall.rule.help.ipv6.rst",
-                "type": "checkbox",
-                "valueless": true
-              },
-              {
-                "key": "syn",
-                "title": "Syn",
-                "help": "firewall.rule.help.ipv6.syn",
-                "type": "checkbox",
-                "valueless": true
-              },
-              {
-                "key": "urg",
-                "title": "Urg",
-                "help": "firewall.rule.help.ipv6.urg",
-                "type": "checkbox",
-                "valueless": true
-              }
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
             ]
           },
           {
             "key": "psh",
             "title": "Psh",
             "help": "firewall.rule.help.ipv6.psh",
-            "type": "checkbox",
-            "valueless": true
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
+            ]
           },
           {
             "key": "rst",
             "title": "Rst",
             "help": "firewall.rule.help.ipv6.rst",
-            "type": "checkbox",
-            "valueless": true
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
+            ]
           },
           {
             "key": "syn",
             "title": "Syn",
             "help": "firewall.rule.help.ipv6.syn",
-            "type": "checkbox",
-            "valueless": true
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
+            ]
           },
           {
             "key": "urg",
             "title": "Urg",
             "help": "firewall.rule.help.ipv6.urg",
-            "type": "checkbox",
-            "valueless": true
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
+            ]
           }
         ]
       },

@@ -185,6 +185,15 @@ class VyOSWebApp:
 
         # API routes
         if not path.startswith('/api/'):
+            # SPA fallback: serve index.html for all non-API routes
+            if method == 'GET':
+                index_path = os.path.join(BASE_DIR, '..', 'frontend', 'index.html')
+                if os.path.exists(index_path):
+                    with open(index_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                    headers = [('Content-Type', 'text/html; charset=utf-8')]
+                    start_response('200 OK', headers)
+                    return [content.encode('utf-8')]
             return error_response(start_response, 404, 'Not Found')
 
         # CORS headers

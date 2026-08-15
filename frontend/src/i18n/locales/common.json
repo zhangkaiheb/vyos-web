@@ -132,6 +132,7 @@
       "confirmDeleteRules": "确认删除以下规则？"
     },
     "rule": {
+      "name": "名称",
       "ruleNumber": "规则编号",
       "description": "描述",
       "action": "动作",
@@ -2524,6 +2525,7 @@
       "confirmDeleteRules": "確認刪除以下規則？"
     },
     "rule": {
+      "name": "名稱",
       "ruleNumber": "規則編號",
       "description": "描述",
       "action": "動作",
@@ -5037,6 +5039,7 @@
       "confirmDeleteRules": "Confirm delete the following rules?"
     },
     "rule": {
+      "name": "Name",
       "ruleNumber": "Rule Number",
       "description": "Description",
       "action": "Action",
@@ -7420,6 +7423,7 @@
       "confirmDeleteRules": "Подтвердить удаление следующих правил?"
     },
     "rule": {
+      "name": "Имя",
       "ruleNumber": "Номер правила",
       "description": "Описание",
       "action": "Действие",
@@ -9868,6 +9872,7 @@
       "confirmDeleteRules": "Folgende Regeln löschen?"
     },
     "rule": {
+      "name": "Name",
       "ruleNumber": "Regelnummer",
       "description": "Beschreibung",
       "action": "Aktion",
@@ -12316,6 +12321,7 @@
       "confirmDeleteRules": "Confirmer la suppression des règles suivantes?"
     },
     "rule": {
+      "name": "Nom",
       "ruleNumber": "Numéro de règle",
       "description": "Description",
       "action": "Action",
@@ -14764,6 +14770,7 @@
       "confirmDeleteRules": "다음 규칙을 삭제하시겠습니까?"
     },
     "rule": {
+      "name": "이름",
       "ruleNumber": "규칙 번호",
       "description": "설명",
       "action": "동작",

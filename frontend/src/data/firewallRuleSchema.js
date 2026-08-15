@@ -317,6 +317,7 @@ export const FIREWALL_RULE_SCHEMA = [
         "title": "类型名称",
         "help": "firewall.rule.help.type-name",
         "type": "select",
+        "default": "",
         "options": [
           "echo-reply",
           "destination-unreachable",
@@ -818,127 +819,94 @@ export const FIREWALL_RULE_SCHEMA = [
         "title": "标志",
         "help": "firewall.rule.help.flags",
         "type": "group",
-        "horizontal": true,
         "children": [
           {
             "key": "ack",
             "title": "Ack",
             "help": "firewall.rule.help.ack",
-            "type": "checkbox",
-            "valueless": true
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
+            ]
           },
           {
             "key": "cwr",
             "title": "Cwr",
             "help": "firewall.rule.help.cwr",
-            "type": "checkbox",
-            "valueless": true
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
+            ]
           },
           {
             "key": "ecn",
             "title": "Ecn",
             "help": "firewall.rule.help.ecn",
-            "type": "checkbox",
-            "valueless": true
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
+            ]
           },
           {
             "key": "fin",
             "title": "Fin",
             "help": "firewall.rule.help.fin",
-            "type": "checkbox",
-            "valueless": true
-          },
-          {
-            "key": "not",
-            "title": "Not",
-            "help": "firewall.rule.help.not",
-            "type": "group",
-            "children": [
-              {
-                "key": "ack",
-                "title": "Ack",
-                "help": "firewall.rule.help.ack",
-                "type": "checkbox",
-                "valueless": true
-              },
-              {
-                "key": "cwr",
-                "title": "Cwr",
-                "help": "firewall.rule.help.cwr",
-                "type": "checkbox",
-                "valueless": true
-              },
-              {
-                "key": "ecn",
-                "title": "Ecn",
-                "help": "firewall.rule.help.ecn",
-                "type": "checkbox",
-                "valueless": true
-              },
-              {
-                "key": "fin",
-                "title": "Fin",
-                "help": "firewall.rule.help.fin",
-                "type": "checkbox",
-                "valueless": true
-              },
-              {
-                "key": "psh",
-                "title": "Psh",
-                "help": "firewall.rule.help.psh",
-                "type": "checkbox",
-                "valueless": true
-              },
-              {
-                "key": "rst",
-                "title": "Rst",
-                "help": "firewall.rule.help.rst",
-                "type": "checkbox",
-                "valueless": true
-              },
-              {
-                "key": "syn",
-                "title": "Syn",
-                "help": "firewall.rule.help.syn",
-                "type": "checkbox",
-                "valueless": true
-              },
-              {
-                "key": "urg",
-                "title": "Urg",
-                "help": "firewall.rule.help.urg",
-                "type": "checkbox",
-                "valueless": true
-              }
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
             ]
           },
           {
             "key": "psh",
             "title": "Psh",
             "help": "firewall.rule.help.psh",
-            "type": "checkbox",
-            "valueless": true
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
+            ]
           },
           {
             "key": "rst",
             "title": "Rst",
             "help": "firewall.rule.help.rst",
-            "type": "checkbox",
-            "valueless": true
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
+            ]
           },
           {
             "key": "syn",
             "title": "Syn",
             "help": "firewall.rule.help.syn",
-            "type": "checkbox",
-            "valueless": true
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
+            ]
           },
           {
             "key": "urg",
             "title": "Urg",
             "help": "firewall.rule.help.urg",
-            "type": "checkbox",
-            "valueless": true
+            "type": "tri-state",
+            "options": [
+              { "value": "", "label": "不配置" },
+              { "value": "set", "label": "Set" },
+              { "value": "not", "label": "Not" }
+            ]
           }
         ]
       },

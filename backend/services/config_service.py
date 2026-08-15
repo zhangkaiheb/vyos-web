@@ -506,7 +506,8 @@ class ConfigService:
                 detail={'references': refs},
                 suggestion='请先移除引用该配置项的规则或启用强制删除'
             )
-        session = _get_fresh_config_session()
+        # Use _get_config_session (same as set_config) to reuse existing session
+        session = _get_config_session()
         session.delete(path_list)
         _log_action(username, 'delete', _list_to_path(path_list), {})
         return {'success': True, 'message': '配置已删除'}

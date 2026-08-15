@@ -52,6 +52,39 @@ def _get_interface_config(path):
         return {}
 
 
+def _get_session_interface_config(path):
+    """Return VyOS session (proposed) config dict at path."""
+    try:
+        cfg = vyos.config.Config()
+        return cfg.get_config_dict(path, effective=False, get_first_key=True)
+    except Exception:
+        return {}
+
+
+def _get_deleted_ethernet_interfaces():
+    """Parse session config to find deleted ethernet interfaces.
+    
+    Returns a set of interface names that have been deleted in the current session.
+    """
+    deleted = set()
+    try:
+        import vyos.configsession
+        import os
+        session_id = str(os.getpid())
+        session = vyos.configsession.ConfigSession(session_id, app='vyos-web-config')
+        raw = session.show_config([], format='raw') or ''
+        for line in raw.split('\n'):
+            line = line.strip()
+            # Match: delete interfaces ethernet <name>
+            if line.startswith('delete interfaces ethernet '):
+                parts = line.split()
+                if len(parts) >= 4:
+                    deleted.add(parts[3])
+    except Exception:
+        pass
+    return deleted
+
+
 def _format_addresses(addr_info):
     """Format addr_info entries into ipv4/ipv6 address strings."""
     ipv4 = []
@@ -116,12 +149,18 @@ class InterfaceService:
         try:
             op_data = _run_op_mode_interfaces('ethernet')
             cfg_data = _get_interface_config(['interfaces', 'ethernet'])
+            deleted_ifaces = _get_deleted_ethernet_interfaces()
 
             rows = []
             for item in op_data:
                 name = item.get('ifname', '')
                 if not name:
                     continue
+
+                # Skip interfaces deleted in current session
+                if name in deleted_ifaces:
+                    continue
+
                 iface_cfg = cfg_data.get(name, {})
 
                 ipv4, ipv6 = _format_addresses(item.get('addr_info', []))

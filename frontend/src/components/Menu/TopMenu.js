@@ -222,7 +222,10 @@ export default defineComponent({
     function startNotificationPolling() {
       notifications.fetchUnreadCount();
       notificationInterval = setInterval(() => {
-        notifications.fetchUnreadCount();
+        // Only poll when page is visible
+        if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+          notifications.fetchUnreadCount();
+        }
       }, 30000);
     }
     function stopNotificationPolling() {

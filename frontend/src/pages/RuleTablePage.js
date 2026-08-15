@@ -79,6 +79,11 @@ function buildSaveValue(schema, source) {
       if (val === true || val === '' || val === 'enable') {
         result[field.key] = '';
       }
+    } else if (field.type === 'tri-state') {
+      // Tri-state fields are handled separately in transformTcpFlags
+      if (val && val !== '') {
+        result[field.key] = val;
+      }
     } else if (field.type === 'multi-select' || (field.type === 'textarea' && field.multi)) {
       if (Array.isArray(val) && val.length) result[field.key] = val;
     } else {
@@ -87,6 +92,92 @@ function buildSaveValue(schema, source) {
       }
     }
   }
+  return result;
+}
+
+// Transform tri-state TCP flags to VyOS format
+// Input: { ack: 'set', syn: 'not', fin: '' }
+// Output: { ack: '', not: { syn: '' } }
+function transformTcpFlagsToVyOS(flags) {
+  if (!flags || typeof flags !== 'object') return flags;
+  
+  const result = {};
+  const notFlags = {};
+  
+  for (const [key, value] of Object.entries(flags)) {
+    if (value === 'set') {
+      result[key] = '';
+    } else if (value === 'not') {
+      notFlags[key] = '';
+    }
+    // Skip empty values (not configured)
+  }
+  
+  if (Object.keys(notFlags).length > 0) {
+    result.not = notFlags;
+  }
+  
+  return Object.keys(result).length > 0 ? result : undefined;
+}
+
+// Transform VyOS TCP flags to tri-state format
+// Input: { ack: {}, not: { syn: {}, fin: {} } }
+// Output: { ack: 'set', syn: 'not', fin: 'not' }
+function transformTcpFlagsFromVyOS(flags) {
+  if (!flags || typeof flags !== 'object') return flags;
+  
+  const result = {};
+  
+  // Process regular flags (set state)
+  for (const key of Object.keys(flags)) {
+    if (key !== 'not') {
+      result[key] = 'set';
+    }
+  }
+  
+  // Process 'not' flags
+  if (flags.not && typeof flags.not === 'object') {
+    for (const key of Object.keys(flags.not)) {
+      result[key] = 'not';
+    }
+  }
+  
+  return result;
+}
+
+// Deep transform TCP flags in the data structure
+function transformDataForForm(data) {
+  if (!data || typeof data !== 'object') return data;
+  
+  const result = { ...data };
+  
+  if (result.tcp && result.tcp.flags) {
+    result.tcp = {
+      ...result.tcp,
+      flags: transformTcpFlagsFromVyOS(result.tcp.flags)
+    };
+  }
+  
+  return result;
+}
+
+function transformDataForSave(data) {
+  if (!data || typeof data !== 'object') return data;
+  
+  const result = { ...data };
+  
+  if (result.tcp && result.tcp.flags) {
+    const transformedFlags = transformTcpFlagsToVyOS(result.tcp.flags);
+    result.tcp = {
+      ...result.tcp,
+      flags: transformedFlags
+    };
+    // Remove tcp if flags is empty
+    if (!result.tcp.flags) {
+      delete result.tcp;
+    }
+  }
+  
   return result;
 }
 
@@ -253,7 +344,7 @@ export default defineComponent({
     function edit() {
       if (!selected.value.length) return showError({ message: t('msg.noSelection') });
       const row = data.value.find(r => r.id === selected.value[0]) || {};
-      editingItem.value = JSON.parse(JSON.stringify(row));
+      editingItem.value = transformDataForForm(JSON.parse(JSON.stringify(row)));
       editingOriginalId.value = row.id || null;
       modalVisible.value = true;
     }
@@ -279,7 +370,8 @@ export default defineComponent({
       const targetRule = editingItem.value.rule;
       if (!targetRule) return showError({ message: t('msg.ruleNumberRequired') });
       const originalId = editingOriginalId.value;
-      const value = buildSaveValue(ruleSchema, editingItem.value);
+      const transformed = transformDataForSave(editingItem.value);
+      const value = buildSaveValue(ruleSchema, transformed);
       try {
         if (originalId && String(originalId) !== String(targetRule)) {
           await configStore.deleteConfig(`${rulePath.value} ${originalId}`);
