@@ -82,12 +82,12 @@ export default defineComponent({
       { key: 'description', title: t('interface.bonding.description'), type: 'text', placeholder: t('interface.bonding.description_placeholder') },
       { key: 'mac', title: t('interface.bonding.mac'), type: 'text', placeholder: t('interface.bonding.mac_placeholder'), help: t('interface.bonding.mac_help') },
       { key: 'mode', title: t('interface.bonding.mode'), type: 'select', options: BOND_MODE_OPTIONS, help: t('interface.bonding.mode_help') },
-      { key: 'hash_policy', title: t('interface.bonding.hash_policy'), type: 'select', options: HASH_POLICY_OPTIONS, help: t('interface.bonding.hash_policy_help') },
-      { key: 'lacp_rate', title: t('interface.bonding.lacp_rate'), type: 'select', options: LACP_RATE_OPTIONS, help: t('interface.bonding.lacp_rate_help') },
-      { key: 'min_links', title: t('interface.bonding.min_links'), type: 'number', min: 0, max: 16, placeholder: t('interface.bonding.min_links_placeholder'), help: t('interface.bonding.min_links_help') },
+      { key: 'hash_policy', title: t('interface.bonding.hash_policy'), type: 'select', options: HASH_POLICY_OPTIONS, help: t('interface.bonding.hash_policy_help'), showWhen: { mode: ['balance-xor', '802.3ad', 'balance-tlb'] } },
+      { key: 'lacp_rate', title: t('interface.bonding.lacp_rate'), type: 'select', options: LACP_RATE_OPTIONS, help: t('interface.bonding.lacp_rate_help'), showWhen: { mode: '802.3ad' } },
+      { key: 'min_links', title: t('interface.bonding.min_links'), type: 'number', min: 0, max: 16, placeholder: t('interface.bonding.min_links_placeholder'), help: t('interface.bonding.min_links_help'), showWhen: { mode: '802.3ad' } },
       { key: 'mii_mon_interval', title: t('interface.bonding.mii_mon_interval'), type: 'number', min: 0, max: 1000, placeholder: t('interface.bonding.mii_mon_interval_placeholder'), help: t('interface.bonding.mii_mon_interval_help') },
       { key: 'mtu', title: t('interface.bonding.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('interface.bonding.mtu_placeholder'), help: t('interface.bonding.mtu_help') },
-      { key: 'system_mac', title: t('interface.bonding.system_mac'), type: 'text', placeholder: t('interface.bonding.system_mac_placeholder'), help: t('interface.bonding.system_mac_help') },
+      { key: 'system_mac', title: t('interface.bonding.system_mac'), type: 'text', placeholder: t('interface.bonding.system_mac_placeholder'), help: t('interface.bonding.system_mac_help'), showWhen: { mode: '802.3ad' } },
       { key: 'disable', title: t('interface.bonding.disable_interface'), type: 'checkbox', help: t('interface.bonding.disable_interface_help') },
       { key: 'disable_link_detect', title: t('interface.bonding.disable_link_detect'), type: 'checkbox', help: t('interface.bonding.disable_link_detect_help') },
     ]);
@@ -101,13 +101,13 @@ export default defineComponent({
           title: name,
           type: 'checkbox',
         })),
-        { key: 'primary', title: t('interface.bonding.primary'), type: 'select', options: ['', ...names], placeholder: t('interface.bonding.primary_placeholder'), help: t('interface.bonding.primary_help') },
+        { key: 'primary', title: t('interface.bonding.primary'), type: 'select', options: ['', ...names], placeholder: t('interface.bonding.primary_placeholder'), help: t('interface.bonding.primary_help'), showWhen: { mode: 'active-backup' } },
       ];
     });
 
     const arpMonitorSchema = computed(() => [
-      { key: 'arp_interval', title: t('interface.bonding.arp_interval'), type: 'number', min: 0, max: 4294967295, placeholder: t('interface.bonding.arp_interval_placeholder'), help: t('interface.bonding.arp_interval_help') },
-      { key: 'arp_targets', title: t('interface.bonding.arp_targets'), type: 'textarea', placeholder: t('interface.bonding.arp_targets_placeholder'), help: t('interface.bonding.arp_targets_help') },
+      { key: 'arp_interval', title: t('interface.bonding.arp_interval'), type: 'number', min: 0, max: 4294967295, placeholder: t('interface.bonding.arp_interval_placeholder'), help: t('interface.bonding.arp_interval_help'), showWhen: { mode: ['balance-rr', 'active-backup'] } },
+      { key: 'arp_targets', title: t('interface.bonding.arp_targets'), type: 'textarea', placeholder: t('interface.bonding.arp_targets_placeholder'), help: t('interface.bonding.arp_targets_help'), showWhen: { mode: ['balance-rr', 'active-backup'] } },
     ]);
 
     const dhcpSchema = computed(() => [
@@ -297,27 +297,27 @@ export default defineComponent({
       { key: 'other', title: t('interface.bonding.tab.other') },
     ]);
 
-    // Default form
+    // Default form - use empty values so formToConfig doesn't send defaults
     function getDefaultForm() {
       return {
         name: '',
         description: '',
         mac: '',
-        mode: '802.3ad',
-        hash_policy: 'layer2',
-        lacp_rate: 'slow',
+        mode: '',
+        hash_policy: '',
+        lacp_rate: '',
         members: [],
         primary: '',
-        min_links: 0,
-        mii_mon_interval: 100,
-        mtu: 1500,
+        min_links: '',
+        mii_mon_interval: '',
+        mtu: '',
         system_mac: '',
         disable: false,
         disable_link_detect: false,
-        arp_interval: null,
+        arp_interval: '',
         arp_targets: '',
         dhcp_client_id: '',
-        dhcp_default_route_distance: 210,
+        dhcp_default_route_distance: '',
         dhcp_host_name: '',
         dhcp_mtu: false,
         dhcp_no_default_route: false,
@@ -334,12 +334,12 @@ export default defineComponent({
         eapol_ca_certificate: '',
         eapol_certificate: '',
         eapol_passphrase: '',
-        evpn_es_df_pref: null,
+        evpn_es_df_pref: '',
         evpn_es_id: '',
         evpn_es_sys_mac: '',
         evpn_uplink: false,
         ip_adjust_mss: '',
-        ip_arp_cache_timeout: 30,
+        ip_arp_cache_timeout: '',
         ip_disable_arp_filter: false,
         ip_disable_forwarding: false,
         ip_enable_arp_accept: false,
@@ -349,14 +349,14 @@ export default defineComponent({
         ip_enable_proxy_arp: false,
         ip_proxy_arp_pvlan: false,
         ip_source_validation: '',
-        ipv6_accept_dad: '1',
+        ipv6_accept_dad: '',
         ipv6_autoconf: false,
         ipv6_eui64: '',
         ipv6_no_default_link_local: false,
         ipv6_adjust_mss: '',
-        ipv6_base_reachable_time: 30,
+        ipv6_base_reachable_time: '',
         ipv6_disable_forwarding: false,
-        ipv6_dup_addr_detect_transmits: 1,
+        ipv6_dup_addr_detect_transmits: '',
         ipv6_source_validation: '',
         mirror_egress: '',
         mirror_ingress: '',
@@ -478,7 +478,7 @@ export default defineComponent({
     async function load() {
       loading.value = true;
       try {
-        const res = await configApi.get('interfaces bonding');
+        const res = await configApi.get('interfaces bonding', false);
         bonds.value = Object.entries(res.data || {}).map(([name, cfg]) => ({
           name,
           ...cfg,
@@ -536,112 +536,159 @@ export default defineComponent({
       modalVisible.value = true;
     }
 
+    // Convert form to config object
+    function formToConfig(form) {
+      const value = {};
+
+      if (form.description) value.description = form.description;
+      if (form.mac) value.mac = form.mac;
+      if (form.mode) value.mode = form.mode;
+      // hash-policy only supported in balance-xor, 802.3ad, balance-tlb modes
+      if (form.hash_policy && ['balance-xor', '802.3ad', 'balance-tlb'].includes(form.mode)) value['hash-policy'] = form.hash_policy;
+      // lacp-rate only supported in 802.3ad mode
+      if (form.lacp_rate && form.mode === '802.3ad') value['lacp-rate'] = form.lacp_rate;
+      if (form.mtu !== undefined && form.mtu !== null && form.mtu !== '') value.mtu = String(form.mtu);
+      // min-links only supported in 802.3ad mode
+      if (form.min_links !== undefined && form.min_links !== null && form.min_links !== '' && form.mode === '802.3ad') value['min-links'] = String(form.min_links);
+      if (form.mii_mon_interval !== undefined && form.mii_mon_interval !== null && form.mii_mon_interval !== '') value['mii-mon-interval'] = String(form.mii_mon_interval);
+      // system-mac (ad-actor-system) only supported in 802.3ad mode
+      if (form.system_mac && form.mode === '802.3ad') value['system-mac'] = form.system_mac;
+      if (form.disable) value.disable = '';
+      if (form.disable_link_detect) value['disable-link-detect'] = '';
+
+      // Members
+      const selectedMembers = interfaceNames.value.filter(iface => form[`member_${iface}`]);
+      if (selectedMembers.length > 0) {
+        const memberInterfaces = {};
+        selectedMembers.forEach(iface => { memberInterfaces[iface] = {}; });
+        value.member = { interface: memberInterfaces };
+      }
+
+      // primary only supported in active-backup mode
+      if (form.primary && form.mode === 'active-backup') value.primary = form.primary;
+
+      // ARP monitor - only supported in balance-rr and active-backup modes
+      if (['balance-rr', 'active-backup'].includes(form.mode)) {
+        const arpMonitor = {};
+        if (form.arp_interval !== undefined && form.arp_interval !== null && form.arp_interval !== '') arpMonitor.interval = String(form.arp_interval);
+        if (form.arp_targets) {
+          const targets = form.arp_targets.split('\n').filter(t => t.trim());
+          if (targets.length) arpMonitor.target = targets;
+        }
+        if (Object.keys(arpMonitor).length) value['arp-monitor'] = arpMonitor;
+      }
+
+      // DHCP
+      const dhcp = {};
+      if (form.dhcp_client_id) dhcp['client-id'] = form.dhcp_client_id;
+      if (form.dhcp_default_route_distance) dhcp['default-route-distance'] = String(form.dhcp_default_route_distance);
+      if (form.dhcp_host_name) dhcp['host-name'] = form.dhcp_host_name;
+      if (form.dhcp_mtu) dhcp.mtu = '';
+      if (form.dhcp_no_default_route) dhcp['no-default-route'] = '';
+      if (form.dhcp_reject) {
+        const rejects = form.dhcp_reject.split('\n').filter(r => r.trim());
+        if (rejects.length) dhcp.reject = rejects;
+      }
+      if (form.dhcp_user_class) dhcp['user-class'] = form.dhcp_user_class;
+      if (form.dhcp_vendor_class_id) dhcp['vendor-class-id'] = form.dhcp_vendor_class_id;
+      if (Object.keys(dhcp).length) value['dhcp-options'] = dhcp;
+
+      // DHCPv6
+      const dhcpv6 = {};
+      if (form.dhcpv6_duid) dhcpv6.duid = form.dhcpv6_duid;
+      if (form.dhcpv6_no_release) dhcpv6['no-release'] = '';
+      if (form.dhcpv6_no_request_dns) dhcpv6['no-request-dns'] = '';
+      if (form.dhcpv6_no_request_domain) dhcpv6['no-request-domain-name'] = '';
+      if (form.dhcpv6_parameters_only) dhcpv6['parameters-only'] = '';
+      if (form.dhcpv6_rapid_commit) dhcpv6['rapid-commit'] = '';
+      if (form.dhcpv6_temporary) dhcpv6.temporary = '';
+      if (Object.keys(dhcpv6).length) value['dhcpv6-options'] = dhcpv6;
+
+      // EAPOL
+      const eapol = {};
+      if (form.eapol_ca_certificate) eapol['ca-certificate'] = form.eapol_ca_certificate;
+      if (form.eapol_certificate) eapol.certificate = form.eapol_certificate;
+      if (form.eapol_passphrase) eapol.passphrase = form.eapol_passphrase;
+      if (Object.keys(eapol).length) value.eapol = eapol;
+
+      // EVPN
+      const evpn = {};
+      if (form.evpn_es_df_pref !== undefined && form.evpn_es_df_pref !== null && form.evpn_es_df_pref !== '') evpn['es-df-pref'] = String(form.evpn_es_df_pref);
+      if (form.evpn_es_id) evpn['es-id'] = form.evpn_es_id;
+      if (form.evpn_es_sys_mac) evpn['es-sys-mac'] = form.evpn_es_sys_mac;
+      if (form.evpn_uplink) evpn.uplink = '';
+      if (Object.keys(evpn).length) value.evpn = evpn;
+
+      // IP
+      const ip = {};
+      if (form.ip_adjust_mss) ip['adjust-mss'] = form.ip_adjust_mss;
+      if (form.ip_arp_cache_timeout !== undefined && form.ip_arp_cache_timeout !== null && form.ip_arp_cache_timeout !== '') ip['arp-cache-timeout'] = String(form.ip_arp_cache_timeout);
+      if (form.ip_disable_arp_filter) ip['disable-arp-filter'] = '';
+      if (form.ip_disable_forwarding) ip['disable-forwarding'] = '';
+      if (form.ip_enable_arp_accept) ip['enable-arp-accept'] = '';
+      if (form.ip_enable_arp_announce) ip['enable-arp-announce'] = '';
+      if (form.ip_enable_arp_ignore) ip['enable-arp-ignore'] = '';
+      if (form.ip_enable_directed_broadcast) ip['enable-directed-broadcast'] = '';
+      if (form.ip_enable_proxy_arp) ip['enable-proxy-arp'] = '';
+      if (form.ip_proxy_arp_pvlan) ip['proxy-arp-pvlan'] = '';
+      if (form.ip_source_validation) ip['source-validation'] = form.ip_source_validation;
+      if (Object.keys(ip).length) value.ip = ip;
+
+      // IPv6
+      const ipv6 = {};
+      if (form.ipv6_accept_dad) ipv6['accept-dad'] = String(form.ipv6_accept_dad);
+      const ipv6Addr = {};
+      if (form.ipv6_autoconf) ipv6Addr.autoconf = '';
+      if (form.ipv6_eui64) ipv6Addr.eui64 = form.ipv6_eui64;
+      if (form.ipv6_no_default_link_local) ipv6Addr['no-default-link-local'] = '';
+      if (Object.keys(ipv6Addr).length) ipv6.address = ipv6Addr;
+      if (form.ipv6_adjust_mss) ipv6['adjust-mss'] = form.ipv6_adjust_mss;
+      if (form.ipv6_base_reachable_time !== undefined && form.ipv6_base_reachable_time !== null && form.ipv6_base_reachable_time !== '') ipv6['base-reachable-time'] = String(form.ipv6_base_reachable_time);
+      if (form.ipv6_disable_forwarding) ipv6['disable-forwarding'] = '';
+      if (form.ipv6_dup_addr_detect_transmits !== undefined && form.ipv6_dup_addr_detect_transmits !== null && form.ipv6_dup_addr_detect_transmits !== '') {
+        ipv6['dup-addr-detect-transmits'] = String(form.ipv6_dup_addr_detect_transmits);
+      }
+      if (form.ipv6_source_validation) ipv6['source-validation'] = form.ipv6_source_validation;
+      if (Object.keys(ipv6).length) value.ipv6 = ipv6;
+
+      // Mirror
+      const mirror = {};
+      if (form.mirror_egress) mirror.egress = form.mirror_egress;
+      if (form.mirror_ingress) mirror.ingress = form.mirror_ingress;
+      if (Object.keys(mirror).length) value.mirror = mirror;
+
+      // Other
+      if (form.redirect) value.redirect = form.redirect;
+      if (form.vrf) value.vrf = form.vrf;
+
+      return value;
+    }
+
     // Save
     async function save() {
-      if (!editingBond.value) return;
-      const b = editingBond.value;
-      const name = b.name;
-      if (!name) {
-        showError(t('interface.bonding.nameRequired'));
-        return;
+      const name = editingBond.value?.name;
+      if (!name) return showError({ message: t('interface.bonding.nameRequired') });
+
+      // Check for duplicate name (only when creating new bond)
+      if (!isEditMode.value && bonds.value.some(b => b.name === name)) {
+        return showError({ message: `链路聚合接口 "${name}" 已存在，请使用其他名称` });
       }
-
-      const commands = [];
-      const deleteCmd = `delete interfaces bonding ${name}`;
-
-      // Build commands from form
-      if (b.description) commands.push(`set interfaces bonding ${name} description "${b.description}"`);
-      if (b.mac) commands.push(`set interfaces bonding ${name} mac ${b.mac}`);
-      if (b.mode) commands.push(`set interfaces bonding ${name} mode ${b.mode}`);
-      if (b.hash_policy) commands.push(`set interfaces bonding ${name} hash-policy ${b.hash_policy}`);
-      if (b.lacp_rate) commands.push(`set interfaces bonding ${name} lacp-rate ${b.lacp_rate}`);
-      if (b.mtu) commands.push(`set interfaces bonding ${name} mtu ${b.mtu}`);
-      if (b.min_links) commands.push(`set interfaces bonding ${name} min-links ${b.min_links}`);
-      if (b.mii_mon_interval !== undefined && b.mii_mon_interval !== null) commands.push(`set interfaces bonding ${name} mii-mon-interval ${b.mii_mon_interval}`);
-      if (b.system_mac) commands.push(`set interfaces bonding ${name} system-mac ${b.system_mac}`);
-      if (b.disable) commands.push(`set interfaces bonding ${name} disable`);
-      if (b.disable_link_detect) commands.push(`set interfaces bonding ${name} disable-link-detect`);
-
-      // Collect member interfaces from checkboxes
-      const selectedMembers = interfaceNames.value.filter(iface => b[`member_${iface}`]);
-      selectedMembers.forEach(m => commands.push(`set interfaces bonding ${name} member interface ${m}`));
-      
-      if (b.primary) commands.push(`set interfaces bonding ${name} primary ${b.primary}`);
-
-      if (b.arp_interval !== undefined && b.arp_interval !== null) commands.push(`set interfaces bonding ${name} arp-monitor interval ${b.arp_interval}`);
-      if (b.arp_targets) {
-        b.arp_targets.split('\n').filter(t => t.trim()).forEach(t => commands.push(`set interfaces bonding ${name} arp-monitor target ${t.trim()}`));
-      }
-
-      if (b.dhcp_client_id) commands.push(`set interfaces bonding ${name} dhcp-options client-id ${b.dhcp_client_id}`);
-      if (b.dhcp_default_route_distance) commands.push(`set interfaces bonding ${name} dhcp-options default-route-distance ${b.dhcp_default_route_distance}`);
-      if (b.dhcp_host_name) commands.push(`set interfaces bonding ${name} dhcp-options host-name ${b.dhcp_host_name}`);
-      if (b.dhcp_mtu) commands.push(`set interfaces bonding ${name} dhcp-options mtu`);
-      if (b.dhcp_no_default_route) commands.push(`set interfaces bonding ${name} dhcp-options no-default-route`);
-      if (b.dhcp_reject) {
-        b.dhcp_reject.split('\n').filter(r => r.trim()).forEach(r => commands.push(`set interfaces bonding ${name} dhcp-options reject ${r.trim()}`));
-      }
-      if (b.dhcp_user_class) commands.push(`set interfaces bonding ${name} dhcp-options user-class ${b.dhcp_user_class}`);
-      if (b.dhcp_vendor_class_id) commands.push(`set interfaces bonding ${name} dhcp-options vendor-class-id ${b.dhcp_vendor_class_id}`);
-
-      if (b.dhcpv6_duid) commands.push(`set interfaces bonding ${name} dhcpv6-options duid ${b.dhcpv6_duid}`);
-      if (b.dhcpv6_no_release) commands.push(`set interfaces bonding ${name} dhcpv6-options no-release`);
-      if (b.dhcpv6_no_request_dns) commands.push(`set interfaces bonding ${name} dhcpv6-options no-request-dns`);
-      if (b.dhcpv6_no_request_domain) commands.push(`set interfaces bonding ${name} dhcpv6-options no-request-domain-name`);
-      if (b.dhcpv6_parameters_only) commands.push(`set interfaces bonding ${name} dhcpv6-options parameters-only`);
-      if (b.dhcpv6_rapid_commit) commands.push(`set interfaces bonding ${name} dhcpv6-options rapid-commit`);
-      if (b.dhcpv6_temporary) commands.push(`set interfaces bonding ${name} dhcpv6-options temporary`);
-
-      if (b.eapol_ca_certificate) commands.push(`set interfaces bonding ${name} eapol ca-certificate ${b.eapol_ca_certificate}`);
-      if (b.eapol_certificate) commands.push(`set interfaces bonding ${name} eapol certificate ${b.eapol_certificate}`);
-      if (b.eapol_passphrase) commands.push(`set interfaces bonding ${name} eapol passphrase ${b.eapol_passphrase}`);
-
-      if (b.evpn_es_df_pref) commands.push(`set interfaces bonding ${name} evpn es-df-pref ${b.evpn_es_df_pref}`);
-      if (b.evpn_es_id) commands.push(`set interfaces bonding ${name} evpn es-id ${b.evpn_es_id}`);
-      if (b.evpn_es_sys_mac) commands.push(`set interfaces bonding ${name} evpn es-sys-mac ${b.evpn_es_sys_mac}`);
-      if (b.evpn_uplink) commands.push(`set interfaces bonding ${name} evpn uplink`);
-
-      if (b.ip_adjust_mss) commands.push(`set interfaces bonding ${name} ip adjust-mss ${b.ip_adjust_mss}`);
-      if (b.ip_arp_cache_timeout) commands.push(`set interfaces bonding ${name} ip arp-cache-timeout ${b.ip_arp_cache_timeout}`);
-      if (b.ip_disable_arp_filter) commands.push(`set interfaces bonding ${name} ip disable-arp-filter`);
-      if (b.ip_disable_forwarding) commands.push(`set interfaces bonding ${name} ip disable-forwarding`);
-      if (b.ip_enable_arp_accept) commands.push(`set interfaces bonding ${name} ip enable-arp-accept`);
-      if (b.ip_enable_arp_announce) commands.push(`set interfaces bonding ${name} ip enable-arp-announce`);
-      if (b.ip_enable_arp_ignore) commands.push(`set interfaces bonding ${name} ip enable-arp-ignore`);
-      if (b.ip_enable_directed_broadcast) commands.push(`set interfaces bonding ${name} ip enable-directed-broadcast`);
-      if (b.ip_enable_proxy_arp) commands.push(`set interfaces bonding ${name} ip enable-proxy-arp`);
-      if (b.ip_proxy_arp_pvlan) commands.push(`set interfaces bonding ${name} ip proxy-arp-pvlan`);
-      if (b.ip_source_validation) commands.push(`set interfaces bonding ${name} ip source-validation ${b.ip_source_validation}`);
-
-      if (b.ipv6_accept_dad) commands.push(`set interfaces bonding ${name} ipv6 accept-dad ${b.ipv6_accept_dad}`);
-      if (b.ipv6_autoconf) commands.push(`set interfaces bonding ${name} ipv6 address autoconf`);
-      if (b.ipv6_eui64) commands.push(`set interfaces bonding ${name} ipv6 address eui64 ${b.ipv6_eui64}`);
-      if (b.ipv6_no_default_link_local) commands.push(`set interfaces bonding ${name} ipv6 address no-default-link-local`);
-      if (b.ipv6_adjust_mss) commands.push(`set interfaces bonding ${name} ipv6 adjust-mss ${b.ipv6_adjust_mss}`);
-      if (b.ipv6_base_reachable_time) commands.push(`set interfaces bonding ${name} ipv6 base-reachable-time ${b.ipv6_base_reachable_time}`);
-      if (b.ipv6_disable_forwarding) commands.push(`set interfaces bonding ${name} ipv6 disable-forwarding`);
-      if (b.ipv6_dup_addr_detect_transmits !== undefined && b.ipv6_dup_addr_detect_transmits !== null) commands.push(`set interfaces bonding ${name} ipv6 dup-addr-detect-transmits ${b.ipv6_dup_addr_detect_transmits}`);
-      if (b.ipv6_source_validation) commands.push(`set interfaces bonding ${name} ipv6 source-validation ${b.ipv6_source_validation}`);
-
-      if (b.mirror_egress) commands.push(`set interfaces bonding ${name} mirror egress ${b.mirror_egress}`);
-      if (b.mirror_ingress) commands.push(`set interfaces bonding ${name} mirror ingress ${b.mirror_ingress}`);
-
-      if (b.redirect) commands.push(`set interfaces bonding ${name} redirect ${b.redirect}`);
-      if (b.vrf) commands.push(`set interfaces bonding ${name} vrf ${b.vrf}`);
 
       try {
-        const allCommands = [deleteCmd, ...commands];
-        await configApi.configure(allCommands);
+        const value = formToConfig(editingBond.value);
+        const configPath = `interfaces bonding ${name}`;
+        await configStore.setConfig(configPath, value);
         configStore.markPending();
         modalVisible.value = false;
+        await configStore.checkSessionChanged();
         await load();
-      } catch (err) {
-        showError(err);
+      } catch (e) {
+        showError(e);
       }
     }
 
     // Delete
-    async function remove() {
+    function remove() {
       if (selected.value.length === 0) {
         showError(t('interface.bonding.selectInterfaceFirst'));
         return;
@@ -652,21 +699,28 @@ export default defineComponent({
 
     async function confirmRemove() {
       deleteModalVisible.value = false;
-      const commands = pendingDeleteNames.value.map(name => `delete interfaces bonding ${name}`);
       try {
-        await configApi.configure(commands);
-        configStore.markPending();
+        for (const name of pendingDeleteNames.value) {
+          const result = await configStore.deleteConfig(`interfaces bonding ${name}`);
+          if (result && !result.success) {
+            throw new Error(result.message || '删除失败');
+          }
+          configStore.markPending();
+        }
         pendingDeleteNames.value = [];
         selected.value = [];
+        await configStore.checkSessionChanged();
         await load();
-      } catch (err) {
-        showError(err);
+      } catch (e) {
+        console.error('Delete error:', e);
+        showError(e);
       }
     }
 
     onMounted(() => {
       load();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     return {

@@ -21,9 +21,11 @@ export default defineComponent({
     const message = ref('');
     const submitting = ref(false);
     const saving = ref(false);
+    const discarding = ref(false);
     const committed = ref(false);
     const submitted = ref(false);
     const saved = ref(false);
+    const discarded = ref(false);
 
     onMounted(() => {
       // No automatic check - only track changes from user actions
@@ -68,6 +70,7 @@ export default defineComponent({
       committed.value = false;
       submitted.value = false;
       saved.value = false;
+      discarded.value = false;
       message.value = '';
       await loadDiff();
     }
@@ -91,9 +94,11 @@ export default defineComponent({
     }
 
     async function discard() {
+      discarding.value = true;
       try {
         await config.discard();
         message.value = t('config.changeDiscarded');
+        discarded.value = true;
         // Do NOT auto-close modal
         // Refresh current page to update data
         if (route.path) {
@@ -102,6 +107,8 @@ export default defineComponent({
       } catch (e) {
         message.value = e.message;
         showError(e);
+      } finally {
+        discarding.value = false;
       }
     }
 
@@ -126,7 +133,7 @@ export default defineComponent({
 
     const diffText = computed(() => diff.value.join('\n'));
 
-    return { config, showDiffModal, diffLoading, diff, diffText, message, submitting, saving, committed, submitted, saved, openDiff, commit, discard, save, t };
+    return { config, showDiffModal, diffLoading, diff, diffText, message, submitting, saving, discarding, committed, submitted, saved, discarded, openDiff, commit, discard, save, t };
   },
   template: `
     <div class="pending-changes-icon" :title="$t('config.pendingChanges')" @click="openDiff">
@@ -135,10 +142,10 @@ export default defineComponent({
     <DraggableModal :title="$t('config.pendingChanges')" :visible="showDiffModal" width="700px" @update:visible="showDiffModal = $event" @close="showDiffModal = false">
       <template #footer>
         <div style="display:flex;gap:8px;justify-content:flex-end;">
-          <ToolbarButton icon="diff" :disabled="submitting || submitted" @click="openDiff">{{ $t('config.viewDiff') }}</ToolbarButton>
+          <ToolbarButton icon="diff" :disabled="submitting || submitted || discarded" @click="openDiff">{{ $t('config.viewDiff') }}</ToolbarButton>
           <ToolbarButton icon="save" :disabled="saving || !committed || saved" @click="save">{{ saving ? $t('config.saving') : $t('config.saveChanges') }}</ToolbarButton>
-          <ToolbarButton icon="commit" primary :disabled="submitting || submitted" @click="commit">{{ submitting ? $t('config.submitting') : $t('config.submitChanges') }}</ToolbarButton>
-          <ToolbarButton icon="discard" :disabled="committed || submitting" @click="discard">{{ $t('config.discardChanges') }}</ToolbarButton>
+          <ToolbarButton icon="commit" primary :disabled="submitting || submitted || discarded" @click="commit">{{ submitting ? $t('config.submitting') : $t('config.submitChanges') }}</ToolbarButton>
+          <ToolbarButton icon="discard" :disabled="discarding || submitting || committed || submitted || discarded" @click="discard">{{ discarding ? $t('config.discarding') : $t('config.discardChanges') }}</ToolbarButton>
         </div>
       </template>
       <div v-if="diffLoading" style="text-align:center;padding:20px;color:#999;">{{ $t('config.loading') }}<span class="dot1">.</span><span class="dot2">.</span><span class="dot3">.</span></div>

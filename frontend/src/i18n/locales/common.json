@@ -175,6 +175,7 @@
       "submitting": "提交中...",
       "submitChanges": "提交变更",
       "discardChanges": "丢弃变更",
+      "discarding": "丢弃中...",
       "loading": "加载中",
       "noDiffData": "暂无差异数据",
       "changeSubmitted": "变更已提交",

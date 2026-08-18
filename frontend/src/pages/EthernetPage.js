@@ -37,7 +37,7 @@ function mergeRanges(arr) {
 
 function buildBasicSchema(isPhysical, t, vrfOptions = [], interfaceNames = [], isL2 = false) {
   const schema = [
-    { key: 'name', title: t('ethernet.basic.name'), placeholder: t('ethernet.basic.name_placeholder'), disabled: isPhysical },
+    { key: 'name', title: t('ethernet.basic.name'), placeholder: t('ethernet.basic.name_placeholder'), disabled: true },
     { key: 'description', title: t('ethernet.basic.description') },
   ];
 
