@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, onMounted, watch } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, onUnmounted, watch } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { useVisibilityStore } from '/src/stores/visibility.js';
@@ -15,13 +15,46 @@ function isPhysicalEthernet(name) {
   return name && name.indexOf('.') === -1;
 }
 
-function buildBasicSchema(isPhysical, t, vrfOptions = [], interfaceNames = []) {
+function mergeRanges(arr) {
+  if (!arr) return '';
+  if (!Array.isArray(arr)) arr = [arr];
+  if (arr.length === 0) return '';
+  const nums = arr.map(s => parseInt(s)).filter(n => !isNaN(n)).sort((a, b) => a - b);
+  if (nums.length === 0) return '';
+  const ranges = [];
+  let start = nums[0], prev = nums[0];
+  for (let i = 1; i < nums.length; i++) {
+    if (nums[i] === prev + 1) {
+      prev = nums[i];
+    } else {
+      ranges.push(start === prev ? String(start) : `${start}-${prev}`);
+      start = prev = nums[i];
+    }
+  }
+  ranges.push(start === prev ? String(start) : `${start}-${prev}`);
+  return ranges.join(', ');
+}
+
+function buildBasicSchema(isPhysical, t, vrfOptions = [], interfaceNames = [], isL2 = false) {
   const schema = [
     { key: 'name', title: t('ethernet.basic.name'), placeholder: t('ethernet.basic.name_placeholder'), disabled: isPhysical },
     { key: 'description', title: t('ethernet.basic.description') },
-    { key: 'address', title: t('ethernet.basic.address'), type: 'textarea', placeholder: t('ethernet.basic.address_placeholder'), help: t('ethernet.basic.address_help') },
-    { key: 'mtu', title: t('ethernet.basic.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('ethernet.basic.mtu_placeholder'), help: t('ethernet.basic.mtu_help') },
   ];
+
+  // L2 interfaces (bridge members) cannot have IP addresses
+  if (!isL2) {
+    schema.push(
+      { key: 'address_mode', title: t('ethernet.basic.address_mode'), type: 'select', options: [
+        { value: 'static', label: t('ethernet.basic.address_mode_static') },
+        { value: 'dhcp_dhcpv6', label: t('ethernet.basic.address_mode_dhcp_dhcpv6') },
+      ], default: 'static' },
+      { key: 'address', title: t('ethernet.basic.address'), type: 'textarea', placeholder: t('ethernet.basic.address_placeholder'), help: t('ethernet.basic.address_help'), showWhen: { address_mode: ['static', 'dhcp_dhcpv6'] }, disabledWhen: { address_mode: 'dhcp_dhcpv6' } }
+    );
+  }
+
+  schema.push(
+    { key: 'mtu', title: t('ethernet.basic.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('ethernet.basic.mtu_placeholder'), help: t('ethernet.basic.mtu_help') },
+  );
 
   // Only show speed and duplex for physical ethernet interfaces
   if (isPhysical) {
@@ -137,7 +170,8 @@ function buildAdvancedSchema(interfaceNames, t, isPhysical) {
   if (isPhysical) {
     schema.push(
       { key: 'vif', title: t('ethernet.advanced.vif'), type: 'number-list', placeholder: t('ethernet.advanced.vif_placeholder'), help: t('ethernet.advanced.vif_help') },
-      { key: 'vif_s', title: t('ethernet.advanced.vif_s'), type: 'number-list', placeholder: t('ethernet.advanced.vif_s_placeholder'), help: t('ethernet.advanced.vif_s_help') }
+      { key: 'vif_s', title: t('ethernet.advanced.vif_s'), type: 'number-list', placeholder: t('ethernet.advanced.vif_s_placeholder'), help: t('ethernet.advanced.vif_s_help') },
+      { key: 'vif_c', title: t('ethernet.advanced.vif_c'), type: 'number-list', placeholder: t('ethernet.advanced.vif_c_placeholder'), help: t('ethernet.advanced.vif_c_help') }
     );
   }
 
@@ -216,6 +250,12 @@ function splitList(text) {
 
 function configToForm(cfg) {
   const addresses = Array.isArray(cfg.address) ? cfg.address : (cfg.address ? [cfg.address] : []);
+  const hasDhcp = addresses.includes('dhcp');
+  const hasDhcpv6 = addresses.includes('dhcpv6');
+  const staticAddrs = addresses.filter(a => a !== 'dhcp' && a !== 'dhcpv6');
+  const hasStatic = staticAddrs.length > 0 || (!hasDhcp && !hasDhcpv6);
+  const mode = hasDhcp && hasDhcpv6 ? 'dhcp_dhcpv6' : 'static';
+
   const dhcp = cfg['dhcp-options'] || {};
   const dhcpv6 = cfg['dhcpv6-options'] || {};
   const eapol = cfg.eapol || {};
@@ -223,10 +263,14 @@ function configToForm(cfg) {
   const ipv6 = cfg.ipv6 || {};
   const ipv6Addr = Array.isArray(ipv6.address) ? ipv6.address : (ipv6.address ? [ipv6.address] : []);
 
+  // Address field should only show static IP addresses, not dhcp/dhcpv6 flags
+  const addressDisplay = staticAddrs.join('\n');
+
   return {
     name: cfg.name || '',
     description: cfg.description || '',
-    address: addresses.join('\n'),
+    address_mode: mode,
+    address: addressDisplay,
     mtu: cfg.mtu || '',
     speed: cfg.speed || 'auto',
     duplex: cfg.duplex || 'auto',
@@ -283,6 +327,7 @@ function configToForm(cfg) {
     mirror_egress: extractLeaf(cfg.mirror || {}, ['egress']),
     vif: Object.keys(cfg.vif || {}),
     vif_s: Object.keys(cfg['vif-s'] || {}),
+    vif_c: Object.keys(cfg['vif-s'] || {}).flatMap(s => Object.keys(cfg['vif-s'][s]?.['vif-c'] || {})),
     evpn: formatJson(cfg.evpn || {}),
     ring_buffer_rx: extractLeaf(cfg['ring-buffer'] || {}, ['rx']),
     ring_buffer_tx: extractLeaf(cfg['ring-buffer'] || {}, ['tx']),
@@ -304,8 +349,25 @@ function formToConfig(form) {
 
   if (form.description) value.description = form.description;
 
+  // Handle address mode dropdown
   const addressLines = splitList(form.address);
-  if (addressLines.length) value.address = addressLines;
+  const mode = form.address_mode || 'static';
+  const useStatic = mode === 'static';
+  const useDhcpDhcpv6 = mode === 'dhcp_dhcpv6';
+  const addresses = [];
+  
+  // Add static IPs
+  if (useStatic) {
+    addresses.push(...addressLines);
+  }
+  
+  // Add dhcp+dhcpv6 flags
+  if (useDhcpDhcpv6) {
+    addresses.push('dhcp');
+    addresses.push('dhcpv6');
+  }
+  
+  if (addresses.length) value.address = addresses;
 
   if (form.mtu) value.mtu = String(form.mtu);
   if (form.speed && form.speed !== 'auto') value.speed = form.speed;
@@ -392,9 +454,17 @@ function formToConfig(form) {
     value.vif = vif;
   }
   const vifSList = (form.vif_s || []).filter(s => s.trim() !== '');
+  const vifCList = (form.vif_c || []).filter(s => s.trim() !== '');
   if (vifSList.length) {
     const vifS = {};
-    vifSList.forEach(id => { vifS[id] = {}; });
+    vifSList.forEach(id => {
+      vifS[id] = {};
+      // Add vif-c under each vif-s entry
+      if (vifCList.length) {
+        vifS[id]['vif-c'] = {};
+        vifCList.forEach(cid => { vifS[id]['vif-c'][cid] = {}; });
+      }
+    });
     value['vif-s'] = vifS;
   }
   const evpn = safeJsonParse(form.evpn);
@@ -418,6 +488,7 @@ export default defineComponent({
     const COLUMNS = computed(() => [
       { key: 'name', title: t('ethernet.columns.name') },
       { key: 'type', title: t('ethernet.columns.type'), width: '80px' },
+      { key: 'mode', title: t('ethernet.columns.mode'), width: '80px' },
       { key: 'address_mode', title: t('ethernet.columns.address_mode') },
       { key: 'ipv4_address', title: t('ethernet.columns.ipv4_address') },
       { key: 'ipv6_address', title: t('ethernet.columns.ipv6_address') },
@@ -425,8 +496,8 @@ export default defineComponent({
       { key: 'mtu', title: t('ethernet.columns.mtu') },
       { key: 'speed', title: t('ethernet.columns.speed') },
       { key: 'vrf', title: t('ethernet.columns.vrf') },
-      { key: 'vif', title: t('ethernet.columns.vif') },
-      { key: 'vif_s', title: t('ethernet.columns.vif_s') },
+      { key: 'vif', title: t('ethernet.columns.vif'), width: '100px', render: (val) => mergeRanges(val) },
+      { key: 'vif_s', title: t('ethernet.columns.vif_s'), width: '80px', render: (val) => mergeRanges(val) },
       { key: 'description', title: t('ethernet.columns.description') },
       { key: 'operstate', title: t('ethernet.columns.operstate') },
     ]);
@@ -440,9 +511,11 @@ export default defineComponent({
     const deleteModalVisible = ref(false);
     const pendingDeleteNames = ref([]);
     const writeDisabled = computed(() => route.meta?.menuItem?.permission === 'read');
+    const tableRef = ref(null);
     const tabs = computed(() => {
       const interfaceNames = data.value.map(i => i.name);
       const isPhysical = isPhysicalEthernet(editingItem.value?.name);
+      const isL2 = editingItem.value?.mode === 'L2';
       return TAB_DEFS.filter(tabDef => {
         if (tabDef.key === 'eapol') {
           return visibilityStore.isVisible('ethernet-eapol');
@@ -452,7 +525,7 @@ export default defineComponent({
         const title = t(tabDef.titleKey);
         if (tabDef.schemaBuilder) {
           const schema = tabDef.key === 'basic'
-            ? tabDef.schemaBuilder(isPhysical, t, vrfOptions.value, interfaceNames)
+            ? tabDef.schemaBuilder(isPhysical, t, vrfOptions.value, interfaceNames, isL2)
             : tabDef.key === 'advanced'
             ? tabDef.schemaBuilder(interfaceNames, t, isPhysical)
             : tabDef.schemaBuilder(interfaceNames, t);
@@ -489,6 +562,7 @@ export default defineComponent({
       load();
       loadVrfOptions();
       onMenuRefresh(load);
+      window.addEventListener('config-committed', load);
     });
 
     function create() {
@@ -500,7 +574,7 @@ export default defineComponent({
     function edit() {
       if (!selected.value.length) return showError({ message: t('ethernet.errors.select_row') });
       const row = data.value.find(r => r.name === selected.value[0]) || {};
-      editingItem.value = { ...configToForm({ ...row._config, name: row.name }), name: row.name, type: row.type };
+      editingItem.value = { ...configToForm({ ...row._config, name: row.name }), name: row.name, type: row.type, mode: row.mode };
       activeTab.value = 'basic';
       modalVisible.value = true;
     }
@@ -521,33 +595,54 @@ export default defineComponent({
 
     async function confirmRemove() {
       deleteModalVisible.value = false;
-      for (const name of pendingDeleteNames.value) {
-        // VLAN/QinQ: delete sub-interface from parent (e.g., delete interfaces ethernet eth1 vif 12)
-        const dotIndex = name.indexOf('.');
-        if (dotIndex !== -1) {
-          const parentName = name.substring(0, dotIndex);
-          const vlanId = name.substring(dotIndex + 1);
-          // Check if it's QinQ (has two dots, e.g., eth1.20.30)
-          const secondDot = vlanId.indexOf('.');
-          if (secondDot !== -1) {
-            // QinQ: delete vif-c from parent's vif-s
-            const outerVlan = vlanId.substring(0, secondDot);
-            const innerVlan = vlanId.substring(secondDot + 1);
-            await configStore.deleteConfig(`interfaces ethernet ${parentName} vif-s ${outerVlan} vif-c ${innerVlan}`);
+      try {
+        // Track parent interfaces to keep selected after deleting sub-interfaces
+        const parentNamesToKeep = new Set();
+        for (const name of pendingDeleteNames.value) {
+          // VLAN/QinQ: delete sub-interface from parent (e.g., delete interfaces ethernet eth1 vif 12)
+          const dotIndex = name.indexOf('.');
+          if (dotIndex !== -1) {
+            const parentName = name.substring(0, dotIndex);
+            parentNamesToKeep.add(parentName);
+            const vlanId = name.substring(dotIndex + 1);
+            // Check if it's QinQ (has two dots, e.g., eth1.20.30)
+            const secondDot = vlanId.indexOf('.');
+            if (secondDot !== -1) {
+              // QinQ: delete vif-c from parent's vif-s
+              const outerVlan = vlanId.substring(0, secondDot);
+              const innerVlan = vlanId.substring(secondDot + 1);
+              const result = await configStore.deleteConfig(`interfaces ethernet ${parentName} vif-s ${outerVlan} vif-c ${innerVlan}`);
+              if (result && !result.success) {
+                throw new Error(result.message || '删除失败');
+              }
+            } else {
+              // VLAN: delete vif from parent
+              const result = await configStore.deleteConfig(`interfaces ethernet ${parentName} vif ${vlanId}`);
+              if (result && !result.success) {
+                throw new Error(result.message || '删除失败');
+              }
+            }
           } else {
-            // VLAN: delete vif from parent
-            await configStore.deleteConfig(`interfaces ethernet ${parentName} vif ${vlanId}`);
+            const result = await configStore.deleteConfig(`interfaces ethernet ${name}`);
+            if (result && !result.success) {
+              throw new Error(result.message || '删除失败');
+            }
           }
-        } else {
-          await configStore.deleteConfig(`interfaces ethernet ${name}`);
+          configStore.markPending();
         }
-        configStore.markPending();
+        // Restore parent selection so the edit button stays enabled
+        selected.value = Array.from(parentNamesToKeep);
+        if (tableRef.value) {
+          tableRef.value.setSelection(Array.from(parentNamesToKeep));
+        }
+        pendingDeleteNames.value = [];
+        await configStore.loadCommands('interfaces ethernet');
+        await configStore.checkSessionChanged();
+        await load();
+      } catch (e) {
+        console.error('Delete error:', e);
+        showError(e);
       }
-      selected.value = [];
-      pendingDeleteNames.value = [];
-      await configStore.loadCommands('interfaces ethernet');
-      await configStore.checkSessionChanged();
-      await load();
     }
 
     async function save() {
@@ -555,7 +650,23 @@ export default defineComponent({
       if (!name) return showError({ message: t('ethernet.errors.name_required') });
       try {
         const value = formToConfig(editingItem.value);
-        await configStore.setConfig(`interfaces ethernet ${name}`, value);
+        // VLAN/QinQ interfaces use nested paths: eth1.10 → interfaces ethernet eth1 vif 10
+        // eth1.20.30 → interfaces ethernet eth1 vif-s 20 vif-c 30
+        let configPath = `interfaces ethernet ${name}`;
+        const firstDot = name.indexOf('.');
+        if (firstDot !== -1) {
+          const parentName = name.substring(0, firstDot);
+          const rest = name.substring(firstDot + 1);
+          const secondDot = rest.indexOf('.');
+          if (secondDot !== -1) {
+            // QinQ: eth1.20.30 → interfaces ethernet eth1 vif-s 20 vif-c 30
+            configPath = `interfaces ethernet ${parentName} vif-s ${rest.substring(0, secondDot)} vif-c ${rest.substring(secondDot + 1)}`;
+          } else {
+            // VLAN: eth1.10 → interfaces ethernet eth1 vif 10
+            configPath = `interfaces ethernet ${parentName} vif ${rest}`;
+          }
+        }
+        await configStore.setConfig(configPath, value);
         configStore.markPending();
         modalVisible.value = false;
         await configStore.checkSessionChanged();
@@ -578,7 +689,7 @@ export default defineComponent({
   },
   template: `
     <div class="page-container">
-      <DataTable :columns="COLUMNS" :data="data" :loading="loading" :disabled="writeDisabled"
+      <DataTable ref="tableRef" :columns="COLUMNS" :data="data" :loading="loading" :disabled="writeDisabled"
                  :actions="['create', 'edit', 'delete', 'refresh']"
                  :disabledActions="hasEthernetSelected ? ['delete'] : []"
                  tableKey="ethernet_interfaces" rowKey="name"

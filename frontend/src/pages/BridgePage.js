@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, onUnmounted, inject } from '/src/utils/vue-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
@@ -7,6 +7,7 @@ import DataTable from '/src/components/Table/DataTable.js';
 import DraggableModal from '/src/components/Modal/DraggableModal.js';
 import ConfigForm from '/src/components/Form/ConfigForm.js';
 import TabGroup from '/src/components/Layout/TabGroup.js';
+import ToolbarButton from '/src/components/Button/ToolbarButton.js';
 import { useI18n } from '/src/i18n/index.js';
 
 const SOURCE_VALIDATION_OPTIONS = [
@@ -15,19 +16,39 @@ const SOURCE_VALIDATION_OPTIONS = [
   { value: 'disable', label: 'disable - No source validation' },
 ];
 
+function emptyMember() {
+  return {
+    interface: '',
+    allowed_vlan: '',
+    bpdu_guard: false,
+    cost: '',
+    native_vlan: '',
+    priority: '',
+    root_guard: false,
+  };
+}
+
 export default defineComponent({
   name: 'BridgePage',
-  components: { DataTable, DraggableModal, ConfigForm, TabGroup },
+  components: { DataTable, DraggableModal, ConfigForm, TabGroup, ToolbarButton },
   setup() {
     const { t } = useI18n();
     const configStore = useConfigStore();
+
     const COLUMNS = computed(() => [
-      { key: 'name', title: t('interface.bridge.name'), dataIndex: 'name', width: 120 },
-      { key: 'description', title: t('interface.bridge.description'), dataIndex: 'description', width: 150 },
-      { key: 'member_count', title: t('interface.bridge.member_count'), dataIndex: 'member_count', width: 80 },
-      { key: 'stp', title: t('interface.bridge.stp'), dataIndex: 'stp', width: 80 },
-      { key: 'mtu', title: t('interface.bridge.mtu'), dataIndex: 'mtu', width: 80 },
-      { key: 'disable', title: t('interface.bridge.disable'), dataIndex: 'disable', width: 80 },
+      { key: 'name', title: t('interface.bridge.name'), dataIndex: 'name', width: 100 },
+      { key: 'description', title: t('interface.bridge.description'), dataIndex: 'description', width: 120 },
+      { key: 'mac', title: t('interface.bridge.mac'), dataIndex: 'mac', width: 130 },
+      { key: 'protocol', title: t('interface.bridge.protocol_label'), dataIndex: 'protocol', width: 80 },
+      { key: 'members', title: t('interface.bridge.members'), dataIndex: 'members', width: 150 },
+      { key: 'aging', title: t('interface.bridge.aging'), dataIndex: 'aging', width: 70 },
+      { key: 'forwarding_delay', title: t('interface.bridge.forwarding_delay'), dataIndex: 'forwarding_delay', width: 80 },
+      { key: 'hello_time', title: t('interface.bridge.hello_time'), dataIndex: 'hello_time', width: 70 },
+      { key: 'max_age', title: t('interface.bridge.max_age'), dataIndex: 'max_age', width: 70 },
+      { key: 'priority', title: t('interface.bridge.priority'), dataIndex: 'priority', width: 70 },
+      { key: 'stp', title: t('interface.bridge.stp'), dataIndex: 'stp', width: 70 },
+      { key: 'mtu', title: t('interface.bridge.mtu'), dataIndex: 'mtu', width: 70 },
+      { key: 'disable', title: t('interface.bridge.disable'), dataIndex: 'disable', width: 70 },
       { key: 'actions', title: t('interface.bridge.actions'), dataIndex: 'actions', width: 120 },
     ]);
     const loading = ref(false);
@@ -35,28 +56,35 @@ export default defineComponent({
     const selected = ref([]);
     const modalVisible = ref(false);
     const editingBridge = ref(null);
+    const isEditMode = ref(false);
     const interfaceOptions = ref([]);
+    const vrfOptions = ref([]);
     const activeTab = ref('basic');
 
-    // Options (moved inside setup to use t())
-    const PROTOCOL_OPTIONS = [
-      { value: '802.1q', label: t('interface.bridge.protocol.802.1q') },
-      { value: '802.1ad', label: '802.1ad' },
-    ];
-
-    const ACCEPT_DAD_OPTIONS = [
-      { value: '0', label: '0 - Disable DAD' },
-      { value: '1', label: t('interface.bridge.ipv6.accept_dad.1') },
-      { value: '2', label: '2 - Enable DAD, disable if duplicate MAC found' },
-    ];
+    // Member sub-table
+    const memberSelected = ref([]);
+    const memberModalVisible = ref(false);
+    const editingMember = ref(null);
+    const isMemberEditMode = ref(false);
 
     // Delete confirmation modal
     const deleteModalVisible = ref(false);
     const pendingDeleteNames = ref([]);
 
+    // Member columns for DataTable
+    const memberColumns = computed(() => [
+      { key: 'interface', title: t('interface.bridge.member_interface'), width: 120 },
+      { key: 'allowed_vlan', title: t('interface.bridge.member_allowed_vlan'), width: 100 },
+      { key: 'bpdu_guard', title: t('interface.bridge.member_bpdu_guard'), width: 80 },
+      { key: 'cost', title: t('interface.bridge.member_cost'), width: 80 },
+      { key: 'native_vlan', title: t('interface.bridge.member_native_vlan'), width: 100 },
+      { key: 'priority', title: t('interface.bridge.member_priority'), width: 80 },
+      { key: 'root_guard', title: t('interface.bridge.member_root_guard'), width: 80 },
+    ]);
+
     // Schema definitions
     const basicSchema = computed(() => [
-      { key: 'name', title: t('interface.bridge.name'), type: 'text', required: true, placeholder: t('interface.bridge.name_placeholder'), help: t('interface.bridge.name_help') },
+      { key: 'name', title: t('interface.bridge.name'), type: 'text', required: true, placeholder: t('interface.bridge.name_placeholder'), help: t('interface.bridge.name_help'), disabled: isEditMode.value },
       { key: 'description', title: t('interface.bridge.description'), type: 'text', placeholder: t('interface.bridge.description_placeholder') },
       { key: 'mac', title: t('interface.bridge.mac'), type: 'text', placeholder: t('interface.bridge.mac_placeholder'), help: t('interface.bridge.mac_help') },
       { key: 'aging', title: t('interface.bridge.aging'), type: 'number', min: 0, max: 1000000, placeholder: t('interface.bridge.aging_placeholder'), help: t('interface.bridge.aging_help') },
@@ -64,14 +92,56 @@ export default defineComponent({
       { key: 'hello_time', title: t('interface.bridge.hello_time'), type: 'number', min: 1, max: 10, placeholder: t('interface.bridge.hello_time_placeholder'), help: t('interface.bridge.hello_time_help') },
       { key: 'max_age', title: t('interface.bridge.max_age'), type: 'number', min: 6, max: 40, placeholder: t('interface.bridge.max_age_placeholder'), help: t('interface.bridge.max_age_help') },
       { key: 'priority', title: t('interface.bridge.priority'), type: 'number', min: 0, max: 61440, step: 4096, placeholder: t('interface.bridge.priority_placeholder'), help: t('interface.bridge.priority_help') },
-      { key: 'protocol', title: t('interface.bridge.protocol'), type: 'select', options: PROTOCOL_OPTIONS, help: t('interface.bridge.protocol_help') },
-      { key: 'members', title: t('interface.bridge.members'), type: 'dual-list', options: interfaceOptions.value, titleLeft: t('interface.bridge.available_interfaces'), titleRight: t('interface.bridge.selected_members'), help: t('interface.bridge.members_help') },
+      { key: 'protocol', title: t('interface.bridge.protocol_label'), type: 'select', options: [
+        { value: '802.1q', label: t('interface.bridge.protocol.802.1q') },
+        { value: '802.1ad', label: t('interface.bridge.protocol.802.1ad') },
+      ], help: t('interface.bridge.protocol_help') },
       { key: 'stp', title: t('interface.bridge.enable_stp'), type: 'checkbox', help: t('interface.bridge.enable_stp_help') },
       { key: 'enable_vlan', title: t('interface.bridge.enable_vlan'), type: 'checkbox', help: t('interface.bridge.enable_vlan_help') },
       { key: 'mtu', title: t('interface.bridge.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('interface.bridge.mtu_placeholder'), help: t('interface.bridge.mtu_help') },
       { key: 'disable', title: t('interface.bridge.disable_interface'), type: 'checkbox', help: t('interface.bridge.disable_interface_help') },
       { key: 'disable_link_detect', title: t('interface.bridge.disable_link_detect'), type: 'checkbox', help: t('interface.bridge.disable_link_detect_help') },
     ]);
+
+    const availableMemberOptions = computed(() => {
+      // Collect all interfaces that are already members of any bridge
+      const allUsed = new Set();
+      bridges.value.forEach(b => {
+        if (b.members) {
+          const m = b._raw?.member?.interface;
+          if (m) {
+            if (Array.isArray(m)) m.forEach(i => allUsed.add(i));
+            else Object.keys(m).forEach(i => allUsed.add(i));
+          }
+        }
+      });
+      const existing = new Set((editingBridge.value?.members || []).map(m => m.interface));
+      // When editing, keep the current member's interface in the list
+      if (editingMember.value?.interface) {
+        existing.delete(editingMember.value.interface);
+      }
+      return interfaceOptions.value.filter(opt => !existing.has(opt.value) && !allUsed.has(opt.value));
+    });
+
+    const memberSchema = computed(() => {
+      const vlanEnabled = editingBridge.value?.enable_vlan;
+      const fields = [
+        { key: 'interface', title: t('interface.bridge.member_interface'), type: 'select', options: availableMemberOptions.value, required: true, placeholder: t('interface.bridge.member_interface_placeholder'), help: t('interface.bridge.member_interface_help'), disabled: isMemberEditMode.value },
+        { key: 'bpdu_guard', title: t('interface.bridge.member_bpdu_guard'), type: 'checkbox', help: t('interface.bridge.member_bpdu_guard_help') },
+        { key: 'cost', title: t('interface.bridge.member_cost'), type: 'number', min: 1, max: 65535, placeholder: t('interface.bridge.member_cost_placeholder'), help: t('interface.bridge.member_cost_help') },
+        { key: 'priority', title: t('interface.bridge.member_priority'), type: 'number', min: 0, max: 63, placeholder: t('interface.bridge.member_priority_placeholder'), help: t('interface.bridge.member_priority_help') },
+        { key: 'root_guard', title: t('interface.bridge.member_root_guard'), type: 'checkbox', help: t('interface.bridge.member_root_guard_help') },
+      ];
+      if (vlanEnabled) {
+        fields.splice(1, 0,
+          { key: 'allowed_vlan', title: t('interface.bridge.member_allowed_vlan'), type: 'text', placeholder: t('interface.bridge.member_allowed_vlan_placeholder'), help: t('interface.bridge.member_allowed_vlan_help') },
+        );
+        fields.splice(3, 0,
+          { key: 'native_vlan', title: t('interface.bridge.member_native_vlan'), type: 'number', min: 1, max: 4094, placeholder: t('interface.bridge.member_native_vlan_placeholder'), help: t('interface.bridge.member_native_vlan_help') },
+        );
+      }
+      return fields;
+    });
 
     const dhcpSchema = computed(() => [
       { key: 'dhcp_client_id', title: t('interface.bridge.dhcp.client_id'), type: 'text', placeholder: t('interface.bridge.dhcp.client_id_placeholder'), help: t('interface.bridge.dhcp.client_id_help') },
@@ -99,7 +169,7 @@ export default defineComponent({
     ]);
 
     const ipSchema = computed(() => [
-      { key: 'ip_adjust_mss', title: t('interface.bridge.ip.adjust_mss'), type: 'select', options: [
+      { key: 'ip_adjust_mss', title: t('interface.bridge.ip.adjust_mss_label'), type: 'select', options: [
         { value: 'clamp-mss-to-pmtu', label: t('interface.bridge.ip.adjust_mss.clamp_mss') },
       ], placeholder: t('interface.bridge.ip.adjust_mss_placeholder'), help: t('interface.bridge.ip.adjust_mss_help') },
       { key: 'ip_arp_cache_timeout', title: t('interface.bridge.ip.arp_cache_timeout'), type: 'number', min: 1, max: 86400, placeholder: t('interface.bridge.ip.arp_cache_timeout_placeholder'), help: t('interface.bridge.ip.arp_cache_timeout_help') },
@@ -115,12 +185,16 @@ export default defineComponent({
     ]);
 
     const ipv6Schema = computed(() => [
-      { key: 'ipv6_accept_dad', title: t('interface.bridge.ipv6.accept_dad'), type: 'select', options: ACCEPT_DAD_OPTIONS, help: t('interface.bridge.ipv6.accept_dad_help') },
+      { key: 'ipv6_accept_dad', title: t('interface.bridge.ipv6.accept_dad'), type: 'select', options: [
+        { value: '0', label: '0 - Disable DAD' },
+        { value: '1', label: t('interface.bridge.ipv6.accept_dad_1') },
+        { value: '2', label: '2 - Enable DAD, disable if duplicate MAC found' },
+      ], help: t('interface.bridge.ipv6.accept_dad_help') },
       { key: 'ipv6_autoconf', title: t('interface.bridge.ipv6.autoconf'), type: 'checkbox', help: t('interface.bridge.ipv6.autoconf_help') },
       { key: 'ipv6_eui64', title: t('interface.bridge.ipv6.eui64'), type: 'text', placeholder: t('interface.bridge.ipv6.eui64_placeholder'), help: t('interface.bridge.ipv6.eui64_help') },
       { key: 'ipv6_no_default_link_local', title: t('interface.bridge.ipv6.no_default_link_local'), type: 'checkbox', help: t('interface.bridge.ipv6.no_default_link_local_help') },
       { key: 'ipv6_adjust_mss', title: t('interface.bridge.ipv6.adjust_mss'), type: 'select', options: [
-        { value: 'clamp-mss-to-pmtu', label: t('interface.bridge.ipv6.adjust_mss.clamp_mss') },
+        { value: 'clamp-mss-to-pmtu', label: t('interface.bridge.ipv6.adjust_mss_clamp_mss') },
       ], placeholder: t('interface.bridge.ipv6.adjust_mss_placeholder'), help: t('interface.bridge.ipv6.adjust_mss_help') },
       { key: 'ipv6_base_reachable_time', title: t('interface.bridge.ipv6.base_reachable_time'), type: 'number', min: 1, max: 86400, placeholder: t('interface.bridge.ipv6.base_reachable_time_placeholder'), help: t('interface.bridge.ipv6.base_reachable_time_help') },
       { key: 'ipv6_disable_forwarding', title: t('interface.bridge.ipv6.disable_forwarding'), type: 'checkbox', help: t('interface.bridge.ipv6.disable_forwarding_help') },
@@ -135,7 +209,7 @@ export default defineComponent({
 
     const otherSchema = computed(() => [
       { key: 'redirect', title: t('interface.bridge.other.redirect'), type: 'select', options: interfaceOptions.value, placeholder: t('interface.bridge.other.redirect_placeholder'), help: t('interface.bridge.other.redirect_help') },
-      { key: 'vrf', title: t('interface.bridge.other.vrf'), type: 'text', placeholder: t('interface.bridge.other.vrf_placeholder'), help: t('interface.bridge.other.vrf_help') },
+      { key: 'vrf', title: t('interface.bridge.other.vrf'), type: 'select', options: ['', ...vrfOptions.value], placeholder: t('interface.bridge.other.vrf_placeholder'), help: t('interface.bridge.other.vrf_help') },
     ]);
 
     // Command text
@@ -161,7 +235,16 @@ export default defineComponent({
 
       // Members
       if (b.members && b.members.length > 0) {
-        b.members.forEach(m => lines.push(`set interfaces bridge ${name} member interface ${m}`));
+        b.members.forEach(m => {
+          const ifaceName = m.interface;
+          if (!ifaceName) return;
+          if (m.allowed_vlan) lines.push(`set interfaces bridge ${name} member interface ${ifaceName} allowed-vlan ${m.allowed_vlan}`);
+          if (m.bpdu_guard) lines.push(`set interfaces bridge ${name} member interface ${ifaceName} bpdu-guard`);
+          if (m.cost) lines.push(`set interfaces bridge ${name} member interface ${ifaceName} cost ${m.cost}`);
+          if (m.native_vlan) lines.push(`set interfaces bridge ${name} member interface ${ifaceName} native-vlan ${m.native_vlan}`);
+          if (m.priority) lines.push(`set interfaces bridge ${name} member interface ${ifaceName} priority ${m.priority}`);
+          if (m.root_guard) lines.push(`set interfaces bridge ${name} member interface ${ifaceName} root-guard`);
+        });
       }
 
       // DHCP
@@ -226,6 +309,7 @@ export default defineComponent({
     // Tabs
     const modalTabs = computed(() => [
       { key: 'basic', title: t('interface.bridge.tab.basic') },
+      { key: 'members', title: t('interface.bridge.tab.members') },
       { key: 'dhcp', title: t('interface.bridge.tab.dhcp') },
       { key: 'dhcpv6', title: t('interface.bridge.tab.dhcpv6') },
       { key: 'igmp', title: t('interface.bridge.tab.igmp') },
@@ -235,26 +319,26 @@ export default defineComponent({
       { key: 'other', title: t('interface.bridge.tab.other') },
     ]);
 
-    // Default form
+    // Default form - no default values so formToConfig only sends changed fields
     function getDefaultForm() {
       return {
         name: '',
         description: '',
         mac: '',
-        aging: 300,
-        forwarding_delay: 14,
-        hello_time: 2,
-        max_age: 20,
-        priority: 32768,
-        protocol: '802.1q',
+        aging: '',
+        forwarding_delay: '',
+        hello_time: '',
+        max_age: '',
+        priority: '',
+        protocol: '',
         members: [],
         stp: false,
         enable_vlan: false,
-        mtu: 1500,
+        mtu: '',
         disable: false,
         disable_link_detect: false,
         dhcp_client_id: '',
-        dhcp_default_route_distance: 210,
+        dhcp_default_route_distance: '',
         dhcp_host_name: '',
         dhcp_mtu: false,
         dhcp_no_default_route: false,
@@ -270,7 +354,7 @@ export default defineComponent({
         dhcpv6_temporary: false,
         igmp_enable: false,
         ip_adjust_mss: '',
-        ip_arp_cache_timeout: 30,
+        ip_arp_cache_timeout: '',
         ip_disable_arp_filter: false,
         ip_disable_forwarding: false,
         ip_enable_arp_accept: false,
@@ -280,14 +364,14 @@ export default defineComponent({
         ip_enable_proxy_arp: false,
         ip_proxy_arp_pvlan: false,
         ip_source_validation: '',
-        ipv6_accept_dad: '1',
+        ipv6_accept_dad: '',
         ipv6_autoconf: false,
         ipv6_eui64: '',
         ipv6_no_default_link_local: false,
         ipv6_adjust_mss: '',
-        ipv6_base_reachable_time: 30,
+        ipv6_base_reachable_time: '',
         ipv6_disable_forwarding: false,
-        ipv6_dup_addr_detect_transmits: 1,
+        ipv6_dup_addr_detect_transmits: '',
         ipv6_source_validation: '',
         mirror_egress: '',
         mirror_ingress: '',
@@ -296,31 +380,52 @@ export default defineComponent({
       };
     }
 
-    // Convert config to form
-    function bridgeToForm(cfg) {
+    // Convert config to form - only set values that exist in config
+    function bridgeToForm(cfg, name) {
       const form = getDefaultForm();
-      form.name = cfg.name || '';
+      form.name = name || cfg.name || '';
       form.description = cfg.description || '';
       form.mac = cfg.mac || '';
-      form.aging = cfg.aging || 300;
-      form.forwarding_delay = cfg['forwarding-delay'] || 14;
-      form.hello_time = cfg['hello-time'] || 2;
-      form.max_age = cfg['max-age'] || 20;
-      form.priority = cfg.priority || 32768;
-      form.protocol = cfg.protocol || '802.1q';
-      form.mtu = cfg.mtu || 1500;
+      if (cfg.aging !== undefined) form.aging = cfg.aging;
+      if (cfg['forwarding-delay'] !== undefined) form.forwarding_delay = cfg['forwarding-delay'];
+      if (cfg['hello-time'] !== undefined) form.hello_time = cfg['hello-time'];
+      if (cfg['max-age'] !== undefined) form.max_age = cfg['max-age'];
+      if (cfg.priority !== undefined) form.priority = cfg.priority;
+      if (cfg.protocol) form.protocol = cfg.protocol;
+      if (cfg.mtu !== undefined) form.mtu = cfg.mtu;
       form.stp = !!cfg.stp;
       form.enable_vlan = !!cfg['enable-vlan'];
       form.disable = !!cfg.disable;
       form.disable_link_detect = !!cfg['disable-link-detect'];
 
-      // Members
-      form.members = (cfg.member?.interface || []).map(i => typeof i === 'string' ? i : Object.keys(i)[0]);
+      // Members - convert from nested config to table format
+      const rawMembers = cfg.member?.interface;
+      let memberList = [];
+      if (Array.isArray(rawMembers)) {
+        memberList = rawMembers;
+      } else if (rawMembers && typeof rawMembers === 'object') {
+        memberList = Object.entries(rawMembers).map(([name, config]) => ({ [name]: config }));
+      } else if (typeof rawMembers === 'string') {
+        memberList = [rawMembers];
+      }
+      form.members = memberList.map(iface => {
+        const ifaceName = typeof iface === 'string' ? iface : Object.keys(iface)[0];
+        const ifaceConfig = typeof iface === 'object' ? iface[ifaceName] || {} : {};
+        return {
+          interface: ifaceName,
+          allowed_vlan: ifaceConfig['allowed-vlan'] || '',
+          bpdu_guard: !!ifaceConfig['bpdu-guard'],
+          cost: ifaceConfig.cost || '',
+          native_vlan: ifaceConfig['native-vlan'] || '',
+          priority: ifaceConfig.priority || '',
+          root_guard: !!ifaceConfig['root-guard'],
+        };
+      });
 
       // DHCP
       if (cfg['dhcp-options']) {
         form.dhcp_client_id = cfg['dhcp-options']['client-id'] || '';
-        form.dhcp_default_route_distance = cfg['dhcp-options']['default-route-distance'] || 210;
+        if (cfg['dhcp-options']['default-route-distance'] !== undefined) form.dhcp_default_route_distance = cfg['dhcp-options']['default-route-distance'];
         form.dhcp_host_name = cfg['dhcp-options']['host-name'] || '';
         form.dhcp_mtu = !!cfg['dhcp-options'].mtu;
         form.dhcp_no_default_route = !!cfg['dhcp-options']['no-default-route'];
@@ -348,7 +453,7 @@ export default defineComponent({
       // IP
       if (cfg.ip) {
         form.ip_adjust_mss = cfg.ip['adjust-mss'] || '';
-        form.ip_arp_cache_timeout = cfg.ip['arp-cache-timeout'] || 30;
+        if (cfg.ip['arp-cache-timeout'] !== undefined) form.ip_arp_cache_timeout = cfg.ip['arp-cache-timeout'];
         form.ip_disable_arp_filter = !!cfg.ip['disable-arp-filter'];
         form.ip_disable_forwarding = !!cfg.ip['disable-forwarding'];
         form.ip_enable_arp_accept = !!cfg.ip['enable-arp-accept'];
@@ -362,14 +467,14 @@ export default defineComponent({
 
       // IPv6
       if (cfg.ipv6) {
-        form.ipv6_accept_dad = cfg.ipv6['accept-dad'] || '1';
+        if (cfg.ipv6['accept-dad'] !== undefined) form.ipv6_accept_dad = cfg.ipv6['accept-dad'];
         form.ipv6_autoconf = cfg.ipv6.address === 'autoconf' || !!cfg.ipv6.address?.autoconf;
         form.ipv6_eui64 = typeof cfg.ipv6.address === 'object' && cfg.ipv6.address.eui64 ? Object.keys(cfg.ipv6.address.eui64)[0] || '' : '';
         form.ipv6_no_default_link_local = cfg.ipv6.address === 'no-default-link-local' || !!cfg.ipv6.address?.['no-default-link-local'];
         form.ipv6_adjust_mss = cfg.ipv6['adjust-mss'] || '';
-        form.ipv6_base_reachable_time = cfg.ipv6['base-reachable-time'] || 30;
+        if (cfg.ipv6['base-reachable-time'] !== undefined) form.ipv6_base_reachable_time = cfg.ipv6['base-reachable-time'];
         form.ipv6_disable_forwarding = !!cfg.ipv6['disable-forwarding'];
-        form.ipv6_dup_addr_detect_transmits = cfg.ipv6['dup-addr-detect-transmits'] || 1;
+        if (cfg.ipv6['dup-addr-detect-transmits'] !== undefined) form.ipv6_dup_addr_detect_transmits = cfg.ipv6['dup-addr-detect-transmits'];
         form.ipv6_source_validation = cfg.ipv6['source-validation'] || '';
       }
 
@@ -386,15 +491,143 @@ export default defineComponent({
       return form;
     }
 
+    // Convert form to config object
+    function formToConfig(form) {
+      const value = {};
+
+      if (form.description) value.description = form.description;
+      if (form.mac) value.mac = form.mac;
+      if (form.aging !== undefined && form.aging !== null && form.aging !== '') value.aging = String(form.aging);
+      if (form.forwarding_delay !== undefined && form.forwarding_delay !== null && form.forwarding_delay !== '') value['forwarding-delay'] = String(form.forwarding_delay);
+      if (form.hello_time !== undefined && form.hello_time !== null && form.hello_time !== '') value['hello-time'] = String(form.hello_time);
+      if (form.max_age !== undefined && form.max_age !== null && form.max_age !== '') value['max-age'] = String(form.max_age);
+      if (form.priority !== undefined && form.priority !== null && form.priority !== '') value.priority = String(form.priority);
+      if (form.protocol) value.protocol = form.protocol;
+      if (form.mtu !== undefined && form.mtu !== null && form.mtu !== '') value.mtu = String(form.mtu);
+      if (form.stp) value.stp = '';
+      if (form.enable_vlan) value['enable-vlan'] = '';
+      if (form.disable) value.disable = '';
+      if (form.disable_link_detect) value['disable-link-detect'] = '';
+
+      // Members
+      if (form.members && form.members.length > 0) {
+        const memberInterfaces = {};
+        form.members.forEach(m => {
+          const ifaceName = m.interface;
+          if (!ifaceName) return;
+          const ifaceCfg = {};
+          if (m.allowed_vlan) ifaceCfg['allowed-vlan'] = m.allowed_vlan;
+          if (m.bpdu_guard) ifaceCfg['bpdu-guard'] = '';
+          if (m.cost) ifaceCfg.cost = String(m.cost);
+          if (m.native_vlan) ifaceCfg['native-vlan'] = String(m.native_vlan);
+          if (m.priority) ifaceCfg.priority = String(m.priority);
+          if (m.root_guard) ifaceCfg['root-guard'] = '';
+          memberInterfaces[ifaceName] = ifaceCfg;
+        });
+        if (Object.keys(memberInterfaces).length) {
+          value.member = { interface: memberInterfaces };
+        }
+      }
+
+      // DHCP
+      const dhcp = {};
+      if (form.dhcp_client_id) dhcp['client-id'] = form.dhcp_client_id;
+      if (form.dhcp_default_route_distance) dhcp['default-route-distance'] = String(form.dhcp_default_route_distance);
+      if (form.dhcp_host_name) dhcp['host-name'] = form.dhcp_host_name;
+      if (form.dhcp_mtu) dhcp.mtu = '';
+      if (form.dhcp_no_default_route) dhcp['no-default-route'] = '';
+      if (form.dhcp_reject) {
+        const rejects = form.dhcp_reject.split('\n').filter(r => r.trim());
+        if (rejects.length) dhcp.reject = rejects;
+      }
+      if (form.dhcp_user_class) dhcp['user-class'] = form.dhcp_user_class;
+      if (form.dhcp_vendor_class_id) dhcp['vendor-class-id'] = form.dhcp_vendor_class_id;
+      if (Object.keys(dhcp).length) value['dhcp-options'] = dhcp;
+
+      // DHCPv6
+      const dhcpv6 = {};
+      if (form.dhcpv6_duid) dhcpv6.duid = form.dhcpv6_duid;
+      if (form.dhcpv6_no_release) dhcpv6['no-release'] = '';
+      if (form.dhcpv6_no_request_dns) dhcpv6['no-request-dns'] = '';
+      if (form.dhcpv6_no_request_domain) dhcpv6['no-request-domain-name'] = '';
+      if (form.dhcpv6_parameters_only) dhcpv6['parameters-only'] = '';
+      if (form.dhcpv6_rapid_commit) dhcpv6['rapid-commit'] = '';
+      if (form.dhcpv6_temporary) dhcpv6.temporary = '';
+      if (Object.keys(dhcpv6).length) value['dhcpv6-options'] = dhcpv6;
+
+      // IGMP
+      if (form.igmp_enable) value.igmp = { enable: '' };
+
+      // IP
+      const ip = {};
+      if (form.ip_adjust_mss) ip['adjust-mss'] = form.ip_adjust_mss;
+      if (form.ip_arp_cache_timeout !== undefined && form.ip_arp_cache_timeout !== null && form.ip_arp_cache_timeout !== '') ip['arp-cache-timeout'] = String(form.ip_arp_cache_timeout);
+      if (form.ip_disable_arp_filter) ip['disable-arp-filter'] = '';
+      if (form.ip_disable_forwarding) ip['disable-forwarding'] = '';
+      if (form.ip_enable_arp_accept) ip['enable-arp-accept'] = '';
+      if (form.ip_enable_arp_announce) ip['enable-arp-announce'] = '';
+      if (form.ip_enable_arp_ignore) ip['enable-arp-ignore'] = '';
+      if (form.ip_enable_directed_broadcast) ip['enable-directed-broadcast'] = '';
+      if (form.ip_enable_proxy_arp) ip['enable-proxy-arp'] = '';
+      if (form.ip_proxy_arp_pvlan) ip['proxy-arp-pvlan'] = '';
+      if (form.ip_source_validation) ip['source-validation'] = form.ip_source_validation;
+      if (Object.keys(ip).length) value.ip = ip;
+
+      // IPv6
+      const ipv6 = {};
+      if (form.ipv6_accept_dad) ipv6['accept-dad'] = String(form.ipv6_accept_dad);
+      const ipv6Addr = {};
+      if (form.ipv6_autoconf) ipv6Addr.autoconf = '';
+      if (form.ipv6_eui64) ipv6Addr.eui64 = form.ipv6_eui64;
+      if (form.ipv6_no_default_link_local) ipv6Addr['no-default-link-local'] = '';
+      if (Object.keys(ipv6Addr).length) ipv6.address = ipv6Addr;
+      if (form.ipv6_adjust_mss) ipv6['adjust-mss'] = form.ipv6_adjust_mss;
+      if (form.ipv6_base_reachable_time) ipv6['base-reachable-time'] = String(form.ipv6_base_reachable_time);
+      if (form.ipv6_disable_forwarding) ipv6['disable-forwarding'] = '';
+      if (form.ipv6_dup_addr_detect_transmits !== undefined && form.ipv6_dup_addr_detect_transmits !== null && form.ipv6_dup_addr_detect_transmits !== '') {
+        ipv6['dup-addr-detect-transmits'] = String(form.ipv6_dup_addr_detect_transmits);
+      }
+      if (form.ipv6_source_validation) ipv6['source-validation'] = form.ipv6_source_validation;
+      if (Object.keys(ipv6).length) value.ipv6 = ipv6;
+
+      // Mirror
+      const mirror = {};
+      if (form.mirror_egress) mirror.egress = form.mirror_egress;
+      if (form.mirror_ingress) mirror.ingress = form.mirror_ingress;
+      if (Object.keys(mirror).length) value.mirror = mirror;
+
+      // Other
+      if (form.redirect) value.redirect = form.redirect;
+      if (form.vrf) value.vrf = form.vrf;
+
+      return value;
+    }
+
     // Load data
     async function load() {
       loading.value = true;
       try {
-        const res = await configApi.get('interfaces bridge');
+        const res = await configApi.get('interfaces bridge', false);
         bridges.value = Object.entries(res.data || {}).map(([name, cfg]) => ({
           name,
-          ...cfg,
-          member_count: (cfg.member?.interface || []).length,
+          description: cfg.description || '',
+          mac: cfg.mac || '',
+          protocol: cfg.protocol || '',
+          members: (() => {
+            const m = cfg.member?.interface;
+            if (!m) return '';
+            if (Array.isArray(m)) return m.join(', ');
+            return Object.keys(m).join(', ');
+          })(),
+          aging: cfg.aging || 300,
+          forwarding_delay: cfg['forwarding-delay'] || 14,
+          hello_time: cfg['hello-time'] || 2,
+          max_age: cfg['max-age'] || 20,
+          priority: cfg.priority || 32768,
+          stp: !!cfg.stp,
+          mtu: cfg.mtu || 1500,
+          disable: !!cfg.disable,
+          _raw: cfg,
         }));
 
         // Load interface options
@@ -404,6 +637,16 @@ export default defineComponent({
           value: iface.name || iface,
           label: iface.name || iface,
         }));
+
+        // Load VRF options
+        try {
+          const vrfRes = await configApi.get('vrf');
+          const raw = vrfRes.data || {};
+          const nameData = raw.name || raw;
+          vrfOptions.value = Object.keys(nameData).filter(name => typeof nameData[name] === 'object');
+        } catch (e) {
+          console.error('Failed to load VRF options:', e);
+        }
       } catch (err) {
         showError(err);
       } finally {
@@ -414,103 +657,125 @@ export default defineComponent({
     // Open modal
     function openModal(index = -1) {
       if (index >= 0) {
-        editingBridge.value = bridgeToForm(bridges.value[index]);
+        editingBridge.value = bridgeToForm(bridges.value[index]._raw, bridges.value[index].name);
+        isEditMode.value = true;
       } else {
         editingBridge.value = getDefaultForm();
+        isEditMode.value = false;
       }
       activeTab.value = 'basic';
+      memberSelected.value = [];
       modalVisible.value = true;
+    }
+
+    function openModalByRow(row) {
+      if (!row) {
+        openModal(-1);
+        return;
+      }
+      const index = bridges.value.findIndex(b => b.name === row.name);
+      openModal(index);
+    }
+
+    // Member CRUD
+    function createMember() {
+      editingMember.value = emptyMember();
+      isMemberEditMode.value = false;
+      memberModalVisible.value = true;
+    }
+
+    function editMember() {
+      if (!memberSelected.value.length) {
+        showError(t('interface.bridge.selectMemberFirst'));
+        return;
+      }
+      const row = editingBridge.value.members.find(m => m.interface === memberSelected.value[0]);
+      if (!row) return;
+      editingMember.value = JSON.parse(JSON.stringify(row));
+      isMemberEditMode.value = true;
+      memberModalVisible.value = true;
+    }
+
+    function removeMember() {
+      if (!memberSelected.value.length) {
+        showError(t('interface.bridge.selectMemberFirst'));
+        return;
+      }
+      editingBridge.value.members = editingBridge.value.members.filter(m => !memberSelected.value.includes(m.interface));
+      memberSelected.value = [];
+    }
+
+    function saveMember() {
+      if (!editingMember.value?.interface) {
+        showError(t('interface.bridge.selectInterface'));
+        return;
+      }
+      const existing = editingBridge.value.members.find(m => m.interface === editingMember.value.interface);
+      if (existing) {
+        Object.assign(existing, editingMember.value);
+      } else {
+        editingBridge.value.members.push(JSON.parse(JSON.stringify(editingMember.value)));
+      }
+      memberModalVisible.value = false;
+      memberSelected.value = [editingMember.value.interface];
     }
 
     // Save
     async function save() {
-      if (!editingBridge.value) return;
-      const b = editingBridge.value;
-      const name = b.name;
-      if (!name) {
-        showError(t('interface.bridge.nameRequired'));
-        return;
+      const name = editingBridge.value?.name;
+      if (!name) return showError({ message: t('interface.bridge.nameRequired') });
+      
+      // Check for duplicate name (only when creating new bridge)
+      if (!isEditMode.value && bridges.value.some(b => b.name === name)) {
+        return showError({ message: `桥接接口 "${name}" 已存在，请使用其他名称` });
       }
-
-      const commands = [];
-      const deleteCmd = `delete interfaces bridge ${name}`;
-
-      // Build commands from form
-      if (b.description) commands.push(`set interfaces bridge ${name} description "${b.description}"`);
-      if (b.mac) commands.push(`set interfaces bridge ${name} mac ${b.mac}`);
-      if (b.aging !== undefined && b.aging !== null) commands.push(`set interfaces bridge ${name} aging ${b.aging}`);
-      if (b.forwarding_delay) commands.push(`set interfaces bridge ${name} forwarding-delay ${b.forwarding_delay}`);
-      if (b.hello_time) commands.push(`set interfaces bridge ${name} hello-time ${b.hello_time}`);
-      if (b.max_age) commands.push(`set interfaces bridge ${name} max-age ${b.max_age}`);
-      if (b.priority) commands.push(`set interfaces bridge ${name} priority ${b.priority}`);
-      if (b.protocol) commands.push(`set interfaces bridge ${name} protocol ${b.protocol}`);
-      if (b.mtu) commands.push(`set interfaces bridge ${name} mtu ${b.mtu}`);
-      if (b.stp) commands.push(`set interfaces bridge ${name} stp`);
-      if (b.enable_vlan) commands.push(`set interfaces bridge ${name} enable-vlan`);
-      if (b.disable) commands.push(`set interfaces bridge ${name} disable`);
-      if (b.disable_link_detect) commands.push(`set interfaces bridge ${name} disable-link-detect`);
-
-      if (b.members && b.members.length > 0) {
-        b.members.forEach(m => commands.push(`set interfaces bridge ${name} member interface ${m}`));
-      }
-
-      if (b.dhcp_client_id) commands.push(`set interfaces bridge ${name} dhcp-options client-id ${b.dhcp_client_id}`);
-      if (b.dhcp_default_route_distance) commands.push(`set interfaces bridge ${name} dhcp-options default-route-distance ${b.dhcp_default_route_distance}`);
-      if (b.dhcp_host_name) commands.push(`set interfaces bridge ${name} dhcp-options host-name ${b.dhcp_host_name}`);
-      if (b.dhcp_mtu) commands.push(`set interfaces bridge ${name} dhcp-options mtu`);
-      if (b.dhcp_no_default_route) commands.push(`set interfaces bridge ${name} dhcp-options no-default-route`);
-      if (b.dhcp_reject) {
-        b.dhcp_reject.split('\n').filter(r => r.trim()).forEach(r => commands.push(`set interfaces bridge ${name} dhcp-options reject ${r.trim()}`));
-      }
-      if (b.dhcp_user_class) commands.push(`set interfaces bridge ${name} dhcp-options user-class ${b.dhcp_user_class}`);
-      if (b.dhcp_vendor_class_id) commands.push(`set interfaces bridge ${name} dhcp-options vendor-class-id ${b.dhcp_vendor_class_id}`);
-
-      if (b.dhcpv6_duid) commands.push(`set interfaces bridge ${name} dhcpv6-options duid ${b.dhcpv6_duid}`);
-      if (b.dhcpv6_no_release) commands.push(`set interfaces bridge ${name} dhcpv6-options no-release`);
-      if (b.dhcpv6_no_request_dns) commands.push(`set interfaces bridge ${name} dhcpv6-options no-request-dns`);
-      if (b.dhcpv6_no_request_domain) commands.push(`set interfaces bridge ${name} dhcpv6-options no-request-domain-name`);
-      if (b.dhcpv6_parameters_only) commands.push(`set interfaces bridge ${name} dhcpv6-options parameters-only`);
-      if (b.dhcpv6_rapid_commit) commands.push(`set interfaces bridge ${name} dhcpv6-options rapid-commit`);
-      if (b.dhcpv6_temporary) commands.push(`set interfaces bridge ${name} dhcpv6-options temporary`);
-
-      if (b.igmp_enable) commands.push(`set interfaces bridge ${name} igmp enable`);
-
-      if (b.ip_adjust_mss) commands.push(`set interfaces bridge ${name} ip adjust-mss ${b.ip_adjust_mss}`);
-      if (b.ip_arp_cache_timeout) commands.push(`set interfaces bridge ${name} ip arp-cache-timeout ${b.ip_arp_cache_timeout}`);
-      if (b.ip_disable_arp_filter) commands.push(`set interfaces bridge ${name} ip disable-arp-filter`);
-      if (b.ip_disable_forwarding) commands.push(`set interfaces bridge ${name} ip disable-forwarding`);
-      if (b.ip_enable_arp_accept) commands.push(`set interfaces bridge ${name} ip enable-arp-accept`);
-      if (b.ip_enable_arp_announce) commands.push(`set interfaces bridge ${name} ip enable-arp-announce`);
-      if (b.ip_enable_arp_ignore) commands.push(`set interfaces bridge ${name} ip enable-arp-ignore`);
-      if (b.ip_enable_directed_broadcast) commands.push(`set interfaces bridge ${name} ip enable-directed-broadcast`);
-      if (b.ip_enable_proxy_arp) commands.push(`set interfaces bridge ${name} ip enable-proxy-arp`);
-      if (b.ip_proxy_arp_pvlan) commands.push(`set interfaces bridge ${name} ip proxy-arp-pvlan`);
-      if (b.ip_source_validation) commands.push(`set interfaces bridge ${name} ip source-validation ${b.ip_source_validation}`);
-
-      if (b.ipv6_accept_dad) commands.push(`set interfaces bridge ${name} ipv6 accept-dad ${b.ipv6_accept_dad}`);
-      if (b.ipv6_autoconf) commands.push(`set interfaces bridge ${name} ipv6 address autoconf`);
-      if (b.ipv6_eui64) commands.push(`set interfaces bridge ${name} ipv6 address eui64 ${b.ipv6_eui64}`);
-      if (b.ipv6_no_default_link_local) commands.push(`set interfaces bridge ${name} ipv6 address no-default-link-local`);
-      if (b.ipv6_adjust_mss) commands.push(`set interfaces bridge ${name} ipv6 adjust-mss ${b.ipv6_adjust_mss}`);
-      if (b.ipv6_base_reachable_time) commands.push(`set interfaces bridge ${name} ipv6 base-reachable-time ${b.ipv6_base_reachable_time}`);
-      if (b.ipv6_disable_forwarding) commands.push(`set interfaces bridge ${name} ipv6 disable-forwarding`);
-      if (b.ipv6_dup_addr_detect_transmits !== undefined && b.ipv6_dup_addr_detect_transmits !== null) commands.push(`set interfaces bridge ${name} ipv6 dup-addr-detect-transmits ${b.ipv6_dup_addr_detect_transmits}`);
-      if (b.ipv6_source_validation) commands.push(`set interfaces bridge ${name} ipv6 source-validation ${b.ipv6_source_validation}`);
-
-      if (b.mirror_egress) commands.push(`set interfaces bridge ${name} mirror egress ${b.mirror_egress}`);
-      if (b.mirror_ingress) commands.push(`set interfaces bridge ${name} mirror ingress ${b.mirror_ingress}`);
-
-      if (b.redirect) commands.push(`set interfaces bridge ${name} redirect ${b.redirect}`);
-      if (b.vrf) commands.push(`set interfaces bridge ${name} vrf ${b.vrf}`);
-
+      
       try {
-        const allCommands = [deleteCmd, ...commands];
-        await configApi.configure(allCommands);
+        // Delete IP addresses from member interfaces (bridge members cannot have IP)
+        const b = editingBridge.value;
+        if (b.members && b.members.length > 0) {
+          for (const m of b.members) {
+            const iface = m.interface;
+            if (!iface) continue;
+            // Build correct config path based on interface type
+            // eth1 -> interfaces ethernet eth1
+            // eth1.10 -> interfaces ethernet eth1 vif 10
+            // eth1.20.30 -> interfaces ethernet eth1 vif-s 20 vif-c 30
+            let basePath;
+            const dotCount = (iface.match(/\./g) || []).length;
+            if (dotCount === 0) {
+              basePath = `interfaces ethernet ${iface}`;
+            } else if (dotCount === 1) {
+              const parts = iface.split('.');
+              basePath = `interfaces ethernet ${parts[0]} vif ${parts[1]}`;
+            } else if (dotCount === 2) {
+              const parts = iface.split('.');
+              basePath = `interfaces ethernet ${parts[0]} vif-s ${parts[1]} vif-c ${parts[2]}`;
+            } else {
+              continue;
+            }
+            try {
+              await configStore.deleteConfig(`${basePath} address`);
+            } catch (e) {
+              // Ignore if path doesn't exist
+            }
+            try {
+              await configStore.deleteConfig(`${basePath} ipv6 address`);
+            } catch (e) {
+              // Ignore if path doesn't exist
+            }
+          }
+        }
+
+        const value = formToConfig(editingBridge.value);
+        const configPath = `interfaces bridge ${name}`;
+        await configStore.setConfig(configPath, value);
         configStore.markPending();
         modalVisible.value = false;
+        await configStore.checkSessionChanged();
         await load();
-      } catch (err) {
-        showError(err);
+      } catch (e) {
+        showError(e);
       }
     }
 
@@ -520,15 +785,16 @@ export default defineComponent({
         showError(t('interface.bridge.selectInterfaceFirst'));
         return;
       }
-      pendingDeleteNames.value = selected.value.map(b => b.name);
+      pendingDeleteNames.value = selected.value.map(k => bridges.value.find(b => b.name === k)?.name).filter(Boolean);
       deleteModalVisible.value = true;
     }
 
     async function confirmRemove() {
       deleteModalVisible.value = false;
-      const commands = pendingDeleteNames.value.map(n => `delete interfaces bridge ${n}`);
       try {
-        await configApi.configure(commands);
+        for (const n of pendingDeleteNames.value) {
+          await configStore.deleteConfig(`interfaces bridge ${n}`);
+        }
         configStore.markPending();
         pendingDeleteNames.value = [];
         selected.value = [];
@@ -540,15 +806,22 @@ export default defineComponent({
 
     onMounted(() => {
       load();
+      window.addEventListener('config-committed', load);
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener('config-committed', load);
     });
 
     return {
-      loading, bridges, selected, modalVisible, editingBridge, interfaceOptions, activeTab,
+      loading, bridges, selected, modalVisible, editingBridge, isEditMode, interfaceOptions, vrfOptions, activeTab,
+      memberSelected, memberModalVisible, editingMember, isMemberEditMode, memberColumns, memberSchema,
       deleteModalVisible, pendingDeleteNames,
       COLUMNS,
       basicSchema, dhcpSchema, dhcpv6Schema, igmpSchema, ipSchema, ipv6Schema, mirrorSchema, otherSchema,
       commandText, modalTabs,
-      openModal, save, remove, confirmRemove, load, t,
+      openModal, openModalByRow, save, remove, confirmRemove, load, t,
+      createMember, editMember, removeMember, saveMember,
     };
   },
   template: `
@@ -560,7 +833,7 @@ export default defineComponent({
         :selectable="true"
         :actions="['create', 'edit', 'delete', 'refresh']"
         @create="openModal(-1)"
-        @edit="openModal(selected[0] ? bridges.indexOf(selected[0]) : -1)"
+        @edit="openModalByRow($event)"
         @delete="remove"
         @refresh="load"
         @selection-change="selected = $event"
@@ -578,7 +851,7 @@ export default defineComponent({
             </span>
           </template>
           <template v-if="column.key === 'actions'">
-            <a @click="openModal(bridges.indexOf(record))">{{ t('common.edit') }}</a>
+            <a @click="openModal(bridges.findIndex(b => b.name === record.name))">{{ t('common.edit') }}</a>
             <a @click="selected = [record]; remove()" style="color: #ff4d4f; margin-left: 8px;">{{ t('common.delete') }}</a>
           </template>
         </template>
@@ -586,7 +859,7 @@ export default defineComponent({
 
       <DraggableModal
         v-model:visible="modalVisible"
-        :title="editingBridge?.name ? t('interface.bridge.modal.edit') : t('interface.bridge.modal.create')"
+        :title="isEditMode ? t('interface.bridge.modal.edit') : t('interface.bridge.modal.create')"
         width="900px"
         @confirm="save"
       >
@@ -594,6 +867,22 @@ export default defineComponent({
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic>
               <ConfigForm v-model="editingBridge" :schema="basicSchema" />
+            </template>
+            <template #members>
+              <div style="padding:8px 0;">
+                <div class="toolbar toolbar-compact">
+                  <div class="toolbar-left">
+                    <ToolbarButton icon="create" @click="createMember">{{ t('interface.bridge.add_member') }}</ToolbarButton>
+                    <ToolbarButton icon="edit" @click="editMember" :disabled="!memberSelected.length || memberSelected.length > 1">{{ t('common.edit') }}</ToolbarButton>
+                    <ToolbarButton icon="delete" @click="removeMember" :disabled="!memberSelected.length">{{ t('common.delete') }}</ToolbarButton>
+                  </div>
+                </div>
+                <DataTable :columns="memberColumns" :data="editingBridge.members || []"
+                           @selection-change="memberSelected = $event" :selectable="true" :externalToolbar="true" rowKey="interface">
+                  <template #bpdu_guard="{ row }">{{ row.bpdu_guard ? t('common.yes') : '' }}</template>
+                  <template #root_guard="{ row }">{{ row.root_guard ? t('common.yes') : '' }}</template>
+                </DataTable>
+              </div>
             </template>
             <template #dhcp>
               <ConfigForm v-model="editingBridge" :schema="dhcpSchema" />
@@ -618,6 +907,11 @@ export default defineComponent({
             </template>
           </TabGroup>
         </div>
+      </DraggableModal>
+
+      <!-- Member edit modal -->
+      <DraggableModal v-model:visible="memberModalVisible" :title="isMemberEditMode ? t('interface.bridge.modal.edit_member') : t('interface.bridge.modal.create_member')" width="600px" @confirm="saveMember" modal-class="on-top">
+        <ConfigForm v-if="editingMember" v-model="editingMember" :schema="memberSchema" />
       </DraggableModal>
 
       <DraggableModal v-model:visible="deleteModalVisible" :title="t('common.confirm_delete')" width="400px" @confirm="confirmRemove">

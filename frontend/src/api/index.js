@@ -58,7 +58,7 @@ export const configApi = {
   discard: () => api.post('/config/discard', {}),
   save: (password) => api.post('/config/save', { password }),
   load: (source, password) => api.post('/config/load', { source, password }),
-  compare: (left, right) => api.post('/config/compare', { left, right }),
+  compare: (left, right, path = '') => api.post('/config/compare', { left, right, path }),
   commands: (path) => api.get('/config/commands', { path }),
   suggestions: (path, field) => api.get('/config/suggestions', { path, field }),
   sessionChanged: () => api.get('/config/session-changed'),

@@ -30,6 +30,8 @@ class AuthMiddleware:
             user = self.auth_service.get_user(username)
             if not user:
                 return {'success': False, 'message': 'User not found'}
+            # Attach token to user dict so config service can use it as session_id
+            user['_token'] = token
             return {'success': True, 'user': user}
         except jwt.ExpiredSignatureError:
             return {'success': False, 'message': 'Token expired'}

@@ -8,10 +8,12 @@ Wraps vyos.config.Config (read) and vyos.configsession.ConfigSession (write).
 import base64
 import glob
 import json
+import logging
 import os
 import re
 import subprocess
 import tempfile
+import threading
 import time
 import traceback
 from datetime import datetime
@@ -21,12 +23,195 @@ import vyos.config
 import vyos.configsession
 from utils.database import get_db_connection
 
-CONFIG_SESSIONS = {}
+_logger = logging.getLogger('config_service')
+
+# Token-based config session management
+# Each login token gets its own independent ConfigSession
+# {token: {'session': ConfigSession, 'username': str, 'last_active': float}}
+TOKEN_CONFIG_SESSIONS = {}
+_TOKEN_SESSIONS_LOCK = threading.Lock()
+_CONFIG_ENV_LOCK = threading.Lock()
 APP_NAME = "vyos-web-config"
+SESSION_TIMEOUT = 1800  # 30 minutes
+HEARTBEAT_INTERVAL = 300  # 5 minutes - keep sessions alive
 
 # Cache for session_changed to avoid expensive Config() creation on every poll
 _SESSION_CHANGED_CACHE = {'value': False, 'timestamp': 0}
 _SESSION_CHANGED_CACHE_TTL = 3  # seconds
+
+
+class _SafeConfigEnv:
+    """Context manager to safely use vyos.config.Config() without corrupting
+    the global os.environ that ConfigSession instances depend on.
+
+    vyos.config.Config() mutates os.environ on construction. Since
+    ConfigSession.__init__ stores a reference to os.environ (not a copy),
+    those mutations break existing sessions. We swap the os.environ object
+    reference (not mutate in-place) to avoid triggering putenv/unsetenv
+    syscalls that would create a window of empty process environment.
+    """
+
+    def __init__(self):
+        self._old_environ = None
+
+    def __enter__(self):
+        # Lock so concurrent threads don't interleave env swap
+        _CONFIG_ENV_LOCK.acquire()
+        # Save the current os.environ reference and replace with a copy.
+        # Config() will mutate this copy; the original reference is preserved.
+        self._old_environ = os.environ
+        _logger.debug(f'[SafeConfigEnv] ENTER: saved os.environ id={id(os.environ)}, replacing with new dict id={id(dict(os.environ))}')
+        os.environ = dict(os.environ)
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        try:
+            # Restore os.environ to the original object reference.
+            # No clear()/update() — that would trigger putenv/unsetenv syscalls
+            # and create a window where the process env is empty, which can
+            # break ConfigSession.__run_command subprocess calls.
+            _logger.debug(f'[SafeConfigEnv] EXIT: restoring os.environ id={id(self._old_environ)}, current id={id(os.environ)}')
+            os.environ = self._old_environ
+        finally:
+            _CONFIG_ENV_LOCK.release()
+
+
+def _get_token(user):
+    """Extract token from user dict. Falls back to PID for backward compat."""
+    return user.get('_token', str(os.getpid()))
+
+
+def _create_config_session(token):
+    """Create a new VyOS ConfigSession for the given token."""
+    session_id = f"web-{token[:32]}"
+    _logger.info(f'[ConfigSession] Creating new session: session_id={session_id}')
+    # CRITICAL: ConfigSession stores a reference to os.environ and modifies it
+    # during operations (session.set, show_config, etc.). If we use the global
+    # os.environ, these modifications corrupt the session for subsequent calls.
+    #
+    # Solution: Create an isolated copy of os.environ for each session.
+    # The session will modify its own copy, leaving the global os.environ intact.
+    with _CONFIG_ENV_LOCK:
+        # Save original os.environ
+        original_environ = os.environ
+        # Create isolated copy for this session
+        session_environ = dict(original_environ)
+        # Temporarily replace os.environ with the isolated copy
+        os.environ = session_environ
+        try:
+            session = vyos.configsession.ConfigSession(session_id, app=APP_NAME)
+            # Verify the session is using our isolated copy
+            session_env_attr = session._ConfigSession__session_env
+            _logger.info(f'[ConfigSession] Created: session.__session_env id={id(session_env_attr)}, is session_environ: {session_env_attr is session_environ}')
+        except Exception as e:
+            _logger.error(f'[ConfigSession] FAILED to create: {e}', exc_info=True)
+            raise
+        finally:
+            # Restore global os.environ. The session keeps its reference to session_environ.
+            os.environ = original_environ
+            _logger.info(f'[ConfigSession] Restored os.environ id={id(os.environ)}, session env id={id(session_environ)}')
+    return session
+
+
+def _get_config_session(token, _retry=False):
+    """Get or create a VyOS ConfigSession for the given token (lazy creation)."""
+    with _TOKEN_SESSIONS_LOCK:
+        if token not in TOKEN_CONFIG_SESSIONS:
+            session = _create_config_session(token)
+            TOKEN_CONFIG_SESSIONS[token] = {
+                'session': session,
+                'username': '',
+                'last_active': time.time()
+            }
+            _logger.info(f'[ConfigSession] Registered token session: token={token[:20]}..., sessions count={len(TOKEN_CONFIG_SESSIONS)}')
+        else:
+            _logger.debug(f'[ConfigSession] Reusing existing session: token={token[:20]}...')
+        TOKEN_CONFIG_SESSIONS[token]['last_active'] = time.time()
+        return TOKEN_CONFIG_SESSIONS[token]['session']
+
+
+def _invalidate_and_recreate_session(token):
+    """Invalidate expired session and create a new one. Called when session operations fail."""
+    with _TOKEN_SESSIONS_LOCK:
+        if token in TOKEN_CONFIG_SESSIONS:
+            _logger.warning(f'[ConfigSession] Invalidating expired session: token={token[:20]}...')
+            del TOKEN_CONFIG_SESSIONS[token]
+    return _get_config_session(token)
+
+
+def _heartbeat_sessions():
+    """Background thread to keep all active config sessions alive."""
+    _logger.info(f'[Heartbeat] Started with interval={HEARTBEAT_INTERVAL}s')
+    while True:
+        time.sleep(HEARTBEAT_INTERVAL)
+        try:
+            with _TOKEN_SESSIONS_LOCK:
+                tokens = list(TOKEN_CONFIG_SESSIONS.keys())
+            for token in tokens:
+                try:
+                    with _TOKEN_SESSIONS_LOCK:
+                        session = TOKEN_CONFIG_SESSIONS.get(token, {}).get('session')
+                    if session:
+                        # Perform a lightweight operation to keep session alive
+                        session.show_config([], format='raw')
+                        _logger.debug(f'[Heartbeat] Kept session alive: token={token[:20]}...')
+                except Exception as e:
+                    _logger.warning(f'[Heartbeat] Failed to keep session alive: token={token[:20]}..., error={e}')
+        except Exception as e:
+            _logger.error(f'[Heartbeat] Heartbeat loop error: {e}', exc_info=True)
+
+
+# Start heartbeat thread when module is imported
+_heartbeat_thread = threading.Thread(target=_heartbeat_sessions, daemon=True)
+_heartbeat_thread.start()
+
+
+def _update_session_username(token, username):
+    """Update the username associated with a token session."""
+    with _TOKEN_SESSIONS_LOCK:
+        if token in TOKEN_CONFIG_SESSIONS:
+            TOKEN_CONFIG_SESSIONS[token]['username'] = username
+
+
+def close_token_session(token):
+    """Close and clean up a token's config session (called on logout)."""
+    with _TOKEN_SESSIONS_LOCK:
+        if token in TOKEN_CONFIG_SESSIONS:
+            session_info = TOKEN_CONFIG_SESSIONS.pop(token)
+            session = session_info['session']
+            try:
+                session.discard()
+            except Exception:
+                pass
+            del session
+
+
+def _cleanup_expired_sessions():
+    """Background worker: clean up expired config sessions."""
+    while True:
+        try:
+            now = time.time()
+            with _TOKEN_SESSIONS_LOCK:
+                expired = [
+                    t for t, info in TOKEN_CONFIG_SESSIONS.items()
+                    if now - info['last_active'] > SESSION_TIMEOUT
+                ]
+                for token in expired:
+                    session_info = TOKEN_CONFIG_SESSIONS.pop(token)
+                    session = session_info['session']
+                    try:
+                        session.discard()
+                    except Exception:
+                        pass
+                    del session
+        except Exception:
+            pass
+        time.sleep(300)  # Check every 5 minutes
+
+
+# Start background cleanup thread (daemon so it exits with the process)
+_cleanup_thread = threading.Thread(target=_cleanup_expired_sessions, daemon=True)
+_cleanup_thread.start()
 
 # Sensitive path patterns that may contain secrets
 SENSITIVE_PATHS = [
@@ -35,29 +220,7 @@ SENSITIVE_PATHS = [
 ]
 
 
-def _get_config_session(session_id=None):
-    """Get or create a VyOS ConfigSession for the process."""
-    if session_id is None:
-        session_id = str(os.getpid())
-    if session_id not in CONFIG_SESSIONS:
-        CONFIG_SESSIONS[session_id] = vyos.configsession.ConfigSession(session_id, app=APP_NAME)
-    return CONFIG_SESSIONS[session_id]
 
-
-def _get_fresh_config_session(session_id=None):
-    """Get a fresh ConfigSession, always recreating to avoid stale session issues."""
-    if session_id is None:
-        session_id = str(os.getpid())
-    # Always recreate to avoid stale session issues
-    if session_id in CONFIG_SESSIONS:
-        try:
-            old = CONFIG_SESSIONS[session_id]
-            old.close()
-        except Exception:
-            pass
-        del CONFIG_SESSIONS[session_id]
-    CONFIG_SESSIONS[session_id] = vyos.configsession.ConfigSession(session_id, app=APP_NAME)
-    return CONFIG_SESSIONS[session_id]
 
 
 def _path_to_list(path):
@@ -72,6 +235,186 @@ def _path_to_list(path):
 
 def _list_to_path(path_list):
     return ' '.join(path_list)
+
+
+def _read_config_subprocess(path_list, effective=True):
+    """Read VyOS config in a subprocess to avoid corrupting ConfigSession state.
+    
+    vyos.config.Config() corrupts the C library state (libvyatta-cfg) which
+    breaks ConfigSession instances in the same process. Running in a subprocess
+    ensures complete isolation.
+    
+    Args:
+        path_list: List of config path components (e.g., ['interfaces', 'ethernet'])
+        effective: If True, read effective/running config; if False, read session config
+    
+    Returns:
+        Dict of config data, or empty dict on error
+    """
+    try:
+        _logger.info(f'[_read_config_subprocess] START: path={path_list}, effective={effective}')
+        # Build command to read config in subprocess
+        cmd = [
+            'python3', '-c',
+            f"""
+import sys, json
+sys.path.insert(0, '/usr/libexec/vyos')
+import vyos.config
+try:
+    cfg = vyos.config.Config()
+    path = {json.dumps(path_list)}
+    if not path:
+        data = cfg.get_cached_root_dict(effective={effective})
+    else:
+        data = cfg.get_config_dict(path, effective={effective}, key_mangling=('-', '_'), get_first_key=True, no_tag_node_value_mangle=True)
+    print(json.dumps(data))
+except Exception as e:
+    print(json.dumps({{'error': str(e)}}), file=sys.stderr)
+    sys.exit(1)
+"""
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+        if result.returncode == 0 and result.stdout.strip():
+            data = json.loads(result.stdout.strip())
+            _logger.info(f'[_read_config_subprocess] SUCCESS: got {len(data) if isinstance(data, dict) else "non-dict"} keys')
+            return data
+        else:
+            _logger.warning(f'[_read_config_subprocess] FAILED: rc={result.returncode}, stderr={result.stderr[:200]}')
+            return {}
+    except Exception as e:
+        _logger.error(f'[_read_config_subprocess] EXCEPTION: {e}', exc_info=True)
+        return {}
+
+
+def _read_working_config_subprocess(path_list):
+    """Read VyOS working (session) config in a subprocess.
+    
+    Returns (tree_dict, raw_text) where raw_text contains diff markers (+, -, >).
+    """
+    try:
+        _logger.info(f'[_read_working_config_subprocess] START: path={path_list}')
+        path_str = ' '.join(path_list) if path_list else ''
+        cmd = [
+            'python3', '-c',
+            f"""
+import sys, json, subprocess
+try:
+    args = ['/opt/vyatta/sbin/vyatta-cfg-cmd-wrapper', 'show', 'configuration', 'commands']
+    if '{path_str}':
+        args.extend('{path_str}'.split())
+    result = subprocess.run(args, capture_output=True, text=True, timeout=15)
+    if result.returncode == 0:
+        print(result.stdout)
+    else:
+        print(json.dumps({{'error': result.stderr}}), file=sys.stderr)
+        sys.exit(1)
+except Exception as e:
+    print(json.dumps({{'error': str(e)}}), file=sys.stderr)
+    sys.exit(1)
+"""
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+        if result.returncode == 0 and result.stdout.strip():
+            raw_text = result.stdout.strip()
+            working_dict = _parse_vyos_tree(raw_text)
+            _logger.info(f'[_read_working_config_subprocess] SUCCESS: got {len(working_dict) if isinstance(working_dict, dict) else "non-dict"} keys')
+            return working_dict, raw_text
+        else:
+            _logger.warning(f'[_read_working_config_subprocess] FAILED: rc={result.returncode}, stderr={result.stderr[:200]}')
+            return {}, ''
+    except Exception as e:
+        _logger.error(f'[_read_working_config_subprocess] EXCEPTION: {e}', exc_info=True)
+        return {}, ''
+
+
+def _parse_vyos_tree(text):
+    """Parse VyOS tree-format config into a nested dict.
+    
+    Handles space-separated keys in block openings:
+        address-group group01 {
+            address 1.1.1.1
+        }
+    -> {'address-group': {'group01': {'address': '1.1.1.1'}}}
+    """
+    result = {}
+    stack = [result]
+    indent_stack = [-1]
+    
+    for line in text.split('\n'):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        
+        indent = len(line) - len(line.lstrip())
+        
+        # Pop stack to correct level
+        while len(indent_stack) > 1 and indent <= indent_stack[-1]:
+            stack.pop()
+            indent_stack.pop()
+        
+        current = stack[-1]
+        
+        if stripped == '}':
+            if len(stack) > 1:
+                stack.pop()
+                indent_stack.pop()
+            continue
+        
+        if stripped.endswith('{'):
+            # Block opening - may contain multiple space-separated keys
+            keys_str = stripped[:-1].strip()
+            keys = keys_str.split()
+            
+            # Navigate/create nested dicts for all keys
+            for key in keys:
+                if key not in current:
+                    current[key] = {}
+                elif isinstance(current[key], str):
+                    current[key] = {'_value': current[key]}
+                elif not isinstance(current[key], dict):
+                    current[key] = {}
+                current = current[key]
+            
+            stack.append(current)
+            indent_stack.append(indent)
+        else:
+            # Leaf node: may have multiple space-separated keys before value
+            # e.g., "address-group group01" (tag node, no value)
+            # or "address 1.1.1.1" (key + value)
+            parts = stripped.split()
+            if len(parts) >= 2:
+                # Could be "key1 key2 value" or "key value"
+                # Last part is the value, rest are nested keys
+                value = parts[-1]
+                path_keys = parts[:-1]
+                
+                for key in path_keys[:-1]:
+                    if key not in current:
+                        current[key] = {}
+                    elif isinstance(current[key], str):
+                        current[key] = {'_value': current[key]}
+                    elif not isinstance(current[key], dict):
+                        current[key] = {}
+                    current = current[key]
+                
+                last_key = path_keys[-1]
+                if last_key in current:
+                    existing = current[last_key]
+                    if isinstance(existing, dict):
+                        existing['_value'] = value
+                    elif isinstance(existing, list):
+                        existing.append(value)
+                    else:
+                        current[last_key] = [existing, value]
+                else:
+                    current[last_key] = value
+            else:
+                # Single key, no value (e.g., "resolver-cache")
+                key = parts[0]
+                if key not in current:
+                    current[key] = ''
+    
+    return result
 
 
 def _run_op_show(args):
@@ -241,9 +584,8 @@ class ConfigService:
     def get_config(self, path):
         """Return config dict at path (effective/running config)."""
         try:
-            cfg = vyos.config.Config()
             path_list = _path_to_list(path)
-            data = self._get_config_data(cfg, path_list, effective=True)
+            data = _read_config_subprocess(path_list, effective=True)
             return {'success': True, 'path': path, 'data': data}
         except Exception as e:
             return _structured_error('CONFIG_GET_ERROR', str(e), traceback.format_exc(),
@@ -252,9 +594,8 @@ class ConfigService:
     def get_session_config(self, path):
         """Return session (proposed) config at path."""
         try:
-            cfg = vyos.config.Config()
             path_list = _path_to_list(path)
-            data = self._get_config_data(cfg, path_list, effective=False)
+            data = _read_config_subprocess(path_list, effective=False)
             return {'success': True, 'path': path, 'data': data}
         except Exception as e:
             return _structured_error('CONFIG_GET_ERROR', str(e), traceback.format_exc(),
@@ -461,42 +802,55 @@ class ConfigService:
 
     # ---------- write operations ----------
 
+    def _is_session_expired_error(self, e):
+        """Check if an exception indicates the config session has expired."""
+        msg = str(e)
+        return 'without config session' in msg or 'ConfigSessionError' in type(e).__name__
+
     @_handle_config_exception
     def set_config(self, user, path, value):
         username = user.get('username', 'unknown')
+        token = _get_token(user)
         path_list = _path_to_list(path)
-        session = _get_config_session()
-        cfg = vyos.config.Config()
-        try:
-            exists = cfg.exists(path_list)
-        except Exception:
-            exists = False
-        if not exists:
-            quota_error = self._check_quota(path_list)
-            if quota_error:
-                return quota_error
-        if isinstance(value, dict):
+        _logger.info(f'[set_config] START: user={username}, path={path}, token={token[:20]}..., value_type={type(value).__name__}')
+
+        # Retry loop: if session becomes invalid during operation, recreate and retry once
+        for attempt in range(2):
             try:
-                session.delete(path_list)
-            except vyos.configsession.ConfigSessionError:
-                pass
-            self._set_config_dict(session, path_list, value)
-        elif isinstance(value, list):
-            try:
-                session.delete(path_list)
-            except vyos.configsession.ConfigSessionError:
-                pass
-            for v in value:
-                session.set(path_list, v)
-        else:
-            session.set(path_list, value)
-        _log_action(username, 'set', _list_to_path(path_list), {'value': value})
-        return {'success': True, 'message': '配置已设置'}
+                session = _get_config_session(token)
+                _logger.info(f'[set_config] Got session: id={id(session)}, attempt={attempt+1}')
+
+                if isinstance(value, dict):
+                    # Directly set form values without merging with active config
+                    # VyOS will automatically overwrite existing values
+                    self._set_config_dict(session, path_list, value, token=token)
+                    _logger.info(f'[set_config] Set config dict')
+                elif isinstance(value, list):
+                    for v in value:
+                        session.set(path_list, v)
+                else:
+                    session.set(path_list, value)
+
+                _logger.info(f'[set_config] SUCCESS: path={path}')
+                _log_action(username, 'set', _list_to_path(path_list), {'value': value})
+                return {'success': True, 'message': '配置已设置'}
+
+            except vyos.configsession.ConfigSessionError as e:
+                if attempt == 0 and self._is_session_expired_error(e):
+                    _logger.warning(f'[set_config] Session expired, invalidating and retrying...')
+                    _invalidate_and_recreate_session(token)
+                    continue
+                raise
+
+        # Should not reach here
+        return {'success': False, 'message': '配置设置失败'}
 
     @_handle_config_exception
     def delete_config(self, user, path):
         username = user.get('username', 'unknown')
+        token = _get_token(user)
         path_list = _path_to_list(path)
+        _logger.info(f'[delete_config] START: user={username}, path={path}, token={token[:20]}...')
         # Check references before delete
         refs = self._get_references_for_path(_list_to_path(path_list))
         if refs and not user.get('force_delete'):
@@ -506,16 +860,27 @@ class ConfigService:
                 detail={'references': refs},
                 suggestion='请先移除引用该配置项的规则或启用强制删除'
             )
-        # Use _get_config_session (same as set_config) to reuse existing session
-        session = _get_config_session()
-        session.delete(path_list)
+        session = _get_config_session(token)
+        _logger.info(f'[delete_config] Got session: id={id(session)}')
+        try:
+            session.delete(path_list)
+        except Exception as e:
+            if self._is_session_expired_error(e):
+                _logger.warning(f'[delete_config] Session expired during delete, recreating...')
+                _invalidate_and_recreate_session(token)
+                session = _get_config_session(token)
+                session.delete(path_list)
+            else:
+                raise
+        _logger.info(f'[delete_config] SUCCESS: path={path}')
         _log_action(username, 'delete', _list_to_path(path_list), {})
         return {'success': True, 'message': '配置已删除'}
 
     @_handle_config_exception
     def commit_config(self, user):
         username = user.get('username', 'unknown')
-        session = _get_config_session()
+        token = _get_token(user)
+        session = _get_config_session(token)
         out = session.commit()
         _log_action(username, 'commit', '', {'output': out})
         return {'success': True, 'message': '配置提交成功', 'output': out}
@@ -523,7 +888,8 @@ class ConfigService:
     @_handle_config_exception
     def commit_config_with_comment(self, user, comment):
         username = user.get('username', 'unknown')
-        session = _get_config_session()
+        token = _get_token(user)
+        session = _get_config_session(token)
         out = session.commit(comment=comment)
         _log_action(username, 'commit', comment, {'output': out})
         return {'success': True, 'message': '配置提交成功', 'output': out}
@@ -564,7 +930,13 @@ class ConfigService:
     @_handle_config_exception
     def discard_config(self, user):
         username = user.get('username', 'unknown')
-        session = _get_config_session()
+        token = _get_token(user)
+        # Only discard if session exists
+        with _TOKEN_SESSIONS_LOCK:
+            if token not in TOKEN_CONFIG_SESSIONS:
+                return {'success': True, 'message': '没有未提交的变更'}
+            session = TOKEN_CONFIG_SESSIONS[token]['session']
+            TOKEN_CONFIG_SESSIONS[token]['last_active'] = time.time()
         session.discard()
         _log_action(username, 'discard', '', {})
         return {'success': True, 'message': '未提交变更已丢弃'}
@@ -572,7 +944,8 @@ class ConfigService:
     @_handle_config_exception
     def save_config(self, user, password=''):
         username = user.get('username', 'unknown')
-        session = _get_config_session()
+        token = _get_token(user)
+        session = _get_config_session(token)
         tmp_path = '/tmp/vyos_web_config_save.tmp'
         out = session.save_config(tmp_path)
         _log_action(username, 'save', '', {'output': out})
@@ -581,7 +954,8 @@ class ConfigService:
     @_handle_config_exception
     def save_config_to_file(self, user, target, target_type='system'):
         username = user.get('username', 'unknown')
-        session = _get_config_session()
+        token = _get_token(user)
+        session = _get_config_session(token)
 
         if target_type == 'system':
             # 保存到系统默认配置文件
@@ -607,7 +981,8 @@ class ConfigService:
     @_handle_config_exception
     def load_config_from_file(self, user, source, source_type='system'):
         username = user.get('username', 'unknown')
-        session = _get_config_session()
+        token = _get_token(user)
+        session = _get_config_session(token)
 
         if source_type == 'system':
             # 从系统默认配置文件加载
@@ -642,7 +1017,8 @@ class ConfigService:
             return _structured_error('MERGE_FILE_ERROR', result.stdout or result.stderr)
         else:
             # 本地文件 - 使用 load 命令实现合并
-            session = _get_config_session()
+            token = _get_token(user)
+            session = _get_config_session(token)
             out = session.migrate_and_load_config(source)
             _log_action(username, 'merge', source, {'output': out})
             return {'success': True, 'message': f'已从 {source} 合并配置', 'output': out}
@@ -650,7 +1026,8 @@ class ConfigService:
     @_handle_config_exception
     def add_comment(self, user, path, text):
         username = user.get('username', 'unknown')
-        session = _get_config_session()
+        token = _get_token(user)
+        session = _get_config_session(token)
 
         if path:
             # 为特定配置路径添加注释
@@ -666,7 +1043,8 @@ class ConfigService:
     @_handle_config_exception
     def rename_config(self, user, path, old_name, new_name):
         username = user.get('username', 'unknown')
-        session = _get_config_session()
+        token = _get_token(user)
+        session = _get_config_session(token)
 
         if not path:
             return _structured_error('RENAME_ERROR', '请指定配置路径')
@@ -685,13 +1063,14 @@ class ConfigService:
     @_handle_config_exception
     def load_config(self, user, source, password=''):
         username = user.get('username', 'unknown')
+        token = _get_token(user)
         if source.startswith('$') or source.startswith('U2FsdGVkX1'):
             source = _decrypt_config(source, password)
         fd, tmp_path = tempfile.mkstemp(prefix='vyos_load_', suffix='.cfg')
         try:
             with os.fdopen(fd, 'w') as f:
                 f.write(source)
-            session = _get_config_session()
+            session = _get_config_session(token)
             out = session.migrate_and_load_config(tmp_path)
             _log_action(username, 'load', '', {'output': out})
             return {'success': True, 'message': '配置已加载', 'output': out}
@@ -714,19 +1093,47 @@ class ConfigService:
         return _structured_error('ROLLBACK_ERROR', result.stdout or result.stderr,
                                  suggestion='请检查版本号是否有效')
 
-    def compare_config(self, left, right):
-        """Compare two configurations."""
+    def compare_config(self, user, left='working', right='active', path=''):
+        """Compare working config against active config and return VyOS-style diff.
+        
+        Uses ConfigSession.show_config() which returns working config with diff markers:
+        + (added), - (deleted), > (modified)
+        """
         try:
-            cfg = vyos.config.Config()
-            left_config = cfg.get_config_dict([], effective=True, get_first_key=True)
-            right_config = cfg.get_config_dict([], effective=False, get_first_key=True)
-            if not isinstance(left_config, dict):
-                left_config = {}
-            if not isinstance(right_config, dict):
-                right_config = {}
-            diff_lines = self._compute_diff(left_config, right_config)
+            token = _get_token(user)
+            _logger.info(f'[compare_config] START: token={token[:20]}..., path={path}')
+            
+            path_list = path.split() if path else []
+            
+            # Try up to 2 times in case session is expired
+            raw_text = ''
+            for attempt in range(2):
+                try:
+                    session = _get_config_session(token)
+                    raw_text = session.show_config(path_list, format='raw') or ''
+                    break
+                except Exception as e:
+                    if 'without config session' in str(e) and attempt == 0:
+                        _logger.warning(f'[compare_config] Session expired, recreating (attempt {attempt+1}/2)...')
+                        _invalidate_and_recreate_session(token)
+                    else:
+                        raise
+            
+            if not raw_text:
+                _logger.info(f'[compare_config] No working config changes')
+                return {'success': True, 'diff': []}
+            
+            # Extract lines with diff markers (+, -, >)
+            diff_lines = []
+            for line in raw_text.split('\n'):
+                stripped = line.strip()
+                if stripped and stripped[0] in ('+', '-', '>'):
+                    diff_lines.append(line.rstrip())
+            
+            _logger.info(f'[compare_config] SUCCESS: found {len(diff_lines)} diff lines')
             return {'success': True, 'diff': diff_lines}
         except Exception as e:
+            _logger.error(f'[compare_config] FAILED: {e}', exc_info=True)
             return _structured_error('COMPARE_ERROR', str(e), traceback.format_exc())
 
     def _compute_diff(self, old_dict, new_dict, prefix=''):
@@ -783,8 +1190,9 @@ class ConfigService:
     def _import_firewall_rules(self, user, path, data):
         """Import firewall rules from CSV/Excel rows into the VyOS session."""
         username = user.get('username', 'unknown')
+        token = _get_token(user)
         path_list = _path_to_list(path)
-        session = _get_config_session()
+        session = _get_config_session(token)
         imported = 0
         errors = []
 
@@ -840,15 +1248,12 @@ class ConfigService:
     def move_firewall_rule(self, user, path, from_rule, to_rule):
         """Move a firewall rule from one number to another."""
         username = user.get('username', 'unknown')
+        token = _get_token(user)
         path_list = _path_to_list(path)
-        session = _get_config_session()
+        session = _get_config_session(token)
         src_path = path_list + ['rule', str(from_rule)]
         dst_path = path_list + ['rule', str(to_rule)]
-        cfg = vyos.config.Config()
-        try:
-            rule_data = cfg.get_config_dict(src_path, effective=False, get_first_key=True)
-        except Exception:
-            rule_data = {}
+        rule_data = _read_config_subprocess(src_path, effective=False)
         if not rule_data:
             return _structured_error('RULE_NOT_FOUND', f'规则 {from_rule} 不存在')
         session.delete(src_path)
@@ -861,15 +1266,12 @@ class ConfigService:
     def copy_firewall_rule(self, user, path, from_rule, to_rule):
         """Copy a firewall rule to a new number."""
         username = user.get('username', 'unknown')
+        token = _get_token(user)
         path_list = _path_to_list(path)
-        session = _get_config_session()
+        session = _get_config_session(token)
         src_path = path_list + ['rule', str(from_rule)]
         dst_path = path_list + ['rule', str(to_rule)]
-        cfg = vyos.config.Config()
-        try:
-            rule_data = cfg.get_config_dict(src_path, effective=False, get_first_key=True)
-        except Exception:
-            rule_data = {}
+        rule_data = _read_config_subprocess(src_path, effective=False)
         if not rule_data:
             return _structured_error('RULE_NOT_FOUND', f'规则 {from_rule} 不存在')
         self._set_config_dict(session, dst_path, rule_data)
@@ -877,18 +1279,169 @@ class ConfigService:
                     {'from': from_rule, 'to': to_rule})
         return {'success': True, 'message': f'规则已从 {from_rule} 复制到 {to_rule}'}
 
-    def _set_config_dict(self, session, path, value):
-        """Recursively set a config dict using session.set for leafless nodes."""
+    def _parse_show_config(self, raw_output, path_list):
+        """Parse VyOS 'show config' output into a nested dict.
+        
+        Input format (from session.show_config - diff output with +/- markers):
+            + description test-br1
+            - description old-desc
+        
+        When parsing diff output:
+        - Keep both + and - lines to reconstruct full working config state
+        - + lines override - lines for the same key (new value wins)
+        
+        Output:
+            {'description': 'test-br1'}
+        """
+        _logger.info(f'[_parse_show_config] START: path={_list_to_path(path_list)}, raw_length={len(raw_output or "")}')
+        result = {}
+        if not raw_output or not raw_output.strip():
+            _logger.info(f'[_parse_show_config] Empty output, returning {{}}')
+            return result
+        
+        lines = raw_output.strip().split('\n')
+        _logger.info(f'[_parse_show_config] Parsing {len(lines)} lines')
+        # Stack: (current_dict, indent_level)
+        stack = [(result, -1)]
+        
+        # First pass: collect all lines grouped by their effective path
+        # This helps us handle + and - lines for the same key correctly
+        parsed_entries = []  # List of (indent, key_path_parts, value, is_add)
+        
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            if not stripped:
+                continue
+            
+            # Handle diff prefix markers
+            # + lines are new/modified values - keep them
+            # - lines are old values being removed - skip them entirely
+            if stripped.startswith('+'):
+                stripped = stripped[1:].lstrip()
+                if not stripped:
+                    continue
+            elif stripped.startswith('-'):
+                # Skip old values being removed
+                continue
+            
+            # Closing brace: pop back to parent
+            if stripped == '}':
+                if len(stack) > 1:
+                    stack.pop()
+                continue
+            
+            indent = len(line) - len(line.lstrip())
+            # Account for the diff marker offsetting indent by 1 char
+            if line.lstrip().startswith(('+', '-')):
+                indent += 1
+            
+            # Pop stack entries that are at same or deeper indent
+            while len(stack) > 1 and stack[-1][1] >= indent:
+                stack.pop()
+            
+            current_dict = stack[-1][0]
+            
+            # Parse: "key value {" or "key value" or "key {"
+            # Apply same key mangling as get_config_dict: convert hyphens to underscores
+            if stripped.endswith('{'):
+                inner = stripped[:-1].strip()
+                parts = inner.split(None, 1)
+                key = parts[0].replace('-', '_')
+                node = parts[1].replace('-', '_') if len(parts) > 1 else None
+                
+                if node:
+                    if key not in current_dict or not isinstance(current_dict[key], dict):
+                        current_dict[key] = {}
+                    nested = current_dict[key]
+                    if node not in nested or not isinstance(nested.get(node), dict):
+                        nested[node] = {}
+                    stack.append((nested[node], indent))
+                else:
+                    if key not in current_dict or not isinstance(current_dict.get(key), dict):
+                        current_dict[key] = {}
+                    stack.append((current_dict[key], indent))
+            else:
+                parts = stripped.split(None, 1)
+                key = parts[0].replace('-', '_')
+                value = parts[1] if len(parts) > 1 else None
+                
+                if value:
+                    if key in current_dict:
+                        if isinstance(current_dict[key], list):
+                            current_dict[key].append(value)
+                        else:
+                            current_dict[key] = [current_dict[key], value]
+                    else:
+                        current_dict[key] = value
+                else:
+                    if key not in current_dict:
+                        current_dict[key] = {}
+        
+        _logger.info(f'[_parse_show_config] Result keys: {list(result.keys())}')
+        return result
+
+    def _deep_merge(self, base, override):
+        """Deep merge two dicts. override values take precedence.
+        For list values, override replaces base (not concatenated).
+        """
+        if not isinstance(base, dict) or not isinstance(override, dict):
+            _logger.info(f'[_deep_merge] Non-dict input: base_type={type(base).__name__}, override_type={type(override).__name__}, returning override')
+            return override
+        result = dict(base)
+        for k, v in override.items():
+            if k in result and isinstance(result[k], dict) and isinstance(v, dict):
+                _logger.info(f'[_deep_merge] Deep merging key="{k}"')
+                result[k] = self._deep_merge(result[k], v)
+            else:
+                _logger.info(f'[_deep_merge] Override key="{k}", base_type={type(result.get(k)).__name__}, override_type={type(v).__name__}')
+                result[k] = v
+        return result
+
+    def _set_config_dict(self, session, path, value, token=None, max_retries=2):
+        """Recursively set a config dict using session.set for leafless nodes.
+        
+        Args:
+            session: ConfigSession instance
+            path: List of path components
+            value: Value to set
+            token: User token for session recreation (optional)
+            max_retries: Maximum retry attempts for session errors
+        """
         if isinstance(value, dict):
-            for k, v in value.items():
-                self._set_config_dict(session, path + [k], v)
+            if not value:
+                # Empty dict means a leafless node (e.g., "vif 10", "ipv6", "disable")
+                _logger.info(f'[_set_config_dict] Empty dict -> session.set({_list_to_path(path)})')
+                self._session_set_with_retry(session, path, None, token, max_retries)
+            else:
+                _logger.info(f'[_set_config_dict] Dict with keys={list(value.keys())} at {_list_to_path(path)}')
+                for k, v in value.items():
+                    self._set_config_dict(session, path + [k], v, token, max_retries)
         elif isinstance(value, list):
+            _logger.info(f'[_set_config_dict] List with {len(value)} items at {_list_to_path(path)}')
             for v in value:
-                self._set_config_dict(session, path, v)
+                self._set_config_dict(session, path, v, token, max_retries)
         elif value == '' or value is None or value is True:
-            session.set(path)
+            _logger.info(f'[_set_config_dict] Empty/None/True -> session.set({_list_to_path(path)})')
+            self._session_set_with_retry(session, path, None, token, max_retries)
         else:
-            session.set(path, str(value))
+            _logger.info(f'[_set_config_dict] session.set({_list_to_path(path)}, "{value}")')
+            self._session_set_with_retry(session, path, str(value), token, max_retries)
+
+    def _session_set_with_retry(self, session, path, value, token=None, max_retries=2):
+        """Call session.set with retry logic for session errors."""
+        for attempt in range(max_retries):
+            try:
+                if value is None:
+                    session.set(path)
+                else:
+                    session.set(path, value)
+                return  # Success
+            except vyos.configsession.ConfigSessionError as e:
+                if attempt < max_retries - 1 and self._is_session_expired_error(e) and token:
+                    _logger.warning(f'[_session_set_with_retry] Session expired, recreating (attempt {attempt+1}/{max_retries})...')
+                    session = _invalidate_and_recreate_session(token)
+                    continue
+                raise  # Re-raise if not retryable or max retries reached
 
     @_handle_config_exception
     def clear_firewall_counters(self, user, path):
@@ -916,8 +1469,26 @@ class ConfigService:
 
     def export_config(self, user, password='', include_sensitive=True):
         try:
-            cfg = vyos.config.Config()
-            data = cfg.show_config([], default='', effective=True)
+            data = _read_config_subprocess([], effective=True)
+            # Convert dict to show_config format
+            if isinstance(data, dict):
+                import io
+                output = io.StringIO()
+                def _dict_to_config(d, prefix=''):
+                    for k, v in sorted(d.items()):
+                        path = f'{prefix} {k}' if prefix else k
+                        if isinstance(v, dict):
+                            _dict_to_config(v, path)
+                        elif isinstance(v, list):
+                            for item in v:
+                                output.write(f'{path} {item}\n')
+                        else:
+                            output.write(f'{path} {v}\n' if v else f'{path}\n')
+                _dict_to_config(data)
+                data = output.getvalue()
+            else:
+                data = str(data) if data else ''
+            
             if not include_sensitive:
                 for pattern in SENSITIVE_PATHS:
                     data = re.sub(rf'(^|\n)({re.escape(pattern)} [^\n]+(\n(?!set )[^\n]+)*)', '', data)
@@ -929,8 +1500,26 @@ class ConfigService:
     def export_config_file(self, user, password='', include_sensitive=True):
         """Export config as file bytes. Returns (content_bytes, filename, content_type)."""
         try:
-            cfg = vyos.config.Config()
-            data = cfg.show_config([], default='', effective=True)
+            data = _read_config_subprocess([], effective=True)
+            # Convert dict to show_config format
+            if isinstance(data, dict):
+                import io
+                output = io.StringIO()
+                def _dict_to_config(d, prefix=''):
+                    for k, v in sorted(d.items()):
+                        path = f'{prefix} {k}' if prefix else k
+                        if isinstance(v, dict):
+                            _dict_to_config(v, path)
+                        elif isinstance(v, list):
+                            for item in v:
+                                output.write(f'{path} {item}\n')
+                        else:
+                            output.write(f'{path} {v}\n' if v else f'{path}\n')
+                _dict_to_config(data)
+                data = output.getvalue()
+            else:
+                data = str(data) if data else ''
+            
             if not include_sensitive:
                 for pattern in SENSITIVE_PATHS:
                     data = re.sub(rf'(^|\n)({re.escape(pattern)} [^\n]+(\n(?!set )[^\n]+)*)', '', data)
@@ -961,18 +1550,22 @@ class ConfigService:
         except Exception as e:
             raise RuntimeError(str(e))
 
-    def session_changed(self):
+    def session_changed(self, user=None):
         """Check if config session has changed, with caching to avoid expensive Config() creation."""
         now = time.time()
         cache = _SESSION_CHANGED_CACHE
         if now - cache['timestamp'] < _SESSION_CHANGED_CACHE_TTL:
             return {'success': True, 'changed': cache['value']}
         try:
-            session = _get_config_session()
-            if not session:
-                cache['value'] = False
-                cache['timestamp'] = now
-                return {'success': True, 'changed': False}
+            token = _get_token(user) if user else None
+            # Only check if a session already exists for this token
+            with _TOKEN_SESSIONS_LOCK:
+                if token is None or token not in TOKEN_CONFIG_SESSIONS:
+                    cache['value'] = False
+                    cache['timestamp'] = now
+                    return {'success': True, 'changed': False}
+                session = TOKEN_CONFIG_SESSIONS[token]['session']
+                TOKEN_CONFIG_SESSIONS[token]['last_active'] = now
             # Get session config
             session_text = session.show_config([], format='raw') or ''
             # Get running config from config.boot
@@ -1033,11 +1626,7 @@ class ConfigService:
             if not row:
                 return None
             max_entries = row['max_entries']
-            cfg = vyos.config.Config()
-            try:
-                existing = cfg.get_config_dict(parent_path, effective=False, get_first_key=True)
-            except Exception:
-                existing = {}
+            existing = _read_config_subprocess(parent_path, effective=False)
             if isinstance(existing, dict):
                 count = len(existing)
                 if count >= max_entries:
@@ -1223,8 +1812,7 @@ class ConfigService:
 
     def _list_config_keys(self, config_path):
         try:
-            cfg = vyos.config.Config()
-            data = cfg.get_config_dict(config_path, effective=True, get_first_key=True)
+            data = _read_config_subprocess(config_path, effective=True)
             if isinstance(data, dict):
                 return sorted(data.keys())
         except Exception:
@@ -1235,11 +1823,10 @@ class ConfigService:
         """List available firewall chains for jump target."""
         chains = []
         try:
-            cfg = vyos.config.Config()
             # Custom chains under firewall ipv4 name / ipv6 name / bridge name
             for family in ['ipv4', 'ipv6', 'bridge']:
                 try:
-                    data = cfg.get_config_dict(['firewall', family, 'name'], effective=True, get_first_key=True)
+                    data = _read_config_subprocess(['firewall', family, 'name'], effective=True)
                     if isinstance(data, dict):
                         chains.extend(data.keys())
                 except Exception:

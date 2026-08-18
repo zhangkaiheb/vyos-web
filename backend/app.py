@@ -6,6 +6,7 @@ WSGI compatible backend using standard Python libraries.
 """
 
 import json
+import logging
 import os
 import sys
 import re
@@ -17,6 +18,16 @@ from urllib.parse import parse_qs, urlparse
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE_DIR)
 sys.path.insert(0, '/usr/libexec/vyos')
+
+# Configure logging for config session debugging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(name)s] %(levelname)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+# Ensure config_service and interface_service loggers are at INFO level
+logging.getLogger('config_service').setLevel(logging.INFO)
+logging.getLogger('interface_service').setLevel(logging.INFO)
 
 from services.auth_service import AuthService
 from services.config_service import ConfigService
@@ -389,9 +400,11 @@ class VyOSWebApp:
         return self.config_service.rollback_config(user, revision)
 
     def handle_config_compare(self, environ, body):
+        user = environ.get('user', {})
         left = body.get('left', '')
         right = body.get('right', '')
-        return self.config_service.compare_config(left, right)
+        path = body.get('path', '')
+        return self.config_service.compare_config(user, left, right, path)
 
     def handle_config_discard(self, environ, body):
         user = environ.get('user', {})
@@ -537,13 +550,15 @@ class VyOSWebApp:
         return event_generator()
 
     def handle_session_changed(self, environ, body):
-        return self.config_service.session_changed()
+        user = environ.get('user', {})
+        return self.config_service.session_changed(user)
 
     def handle_system_interfaces(self, environ, body):
         return self.monitor_service.get_data('interface-list', '', '')
 
     def handle_ethernet_interfaces(self, environ, body):
-        return self.interface_service.get_ethernet_interfaces()
+        user = environ.get('user', {})
+        return self.interface_service.get_ethernet_interfaces(user)
 
     # ---------- users ----------
 

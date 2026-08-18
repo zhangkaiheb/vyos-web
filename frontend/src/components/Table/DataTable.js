@@ -136,6 +136,16 @@ export default defineComponent({
 
     const selectedRows = computed(() => props.data.filter(r => selectedKeys.value.has(r[props.rowKey])));
 
+    // Clean up stale selected keys that no longer exist in data
+    watch(() => props.data, (newData) => {
+      const validKeys = new Set(newData.map(r => r[props.rowKey]));
+      const cleaned = new Set([...selectedKeys.value].filter(k => validKeys.has(k)));
+      if (cleaned.size !== selectedKeys.value.size) {
+        selectedKeys.value = cleaned;
+        emit('selection-change', Array.from(cleaned));
+      }
+    }, { deep: true });
+
     const pageRange = computed(() => {
       const pages = [];
       const max = totalPages.value;
@@ -297,6 +307,10 @@ export default defineComponent({
       openFilter,
       openColumnSetting,
       clearFilters,
+      setSelection: (keys) => {
+        selectedKeys.value = new Set(keys || []);
+        emit('selection-change', Array.from(selectedKeys.value));
+      },
     });
 
     return {

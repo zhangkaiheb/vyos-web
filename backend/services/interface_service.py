@@ -5,11 +5,65 @@ Interface service: retrieve and parse Ethernet interface details from VyOS.
 """
 
 import json
+import logging
+import os
 import re
 import subprocess
 import traceback
 
 import vyos.config
+import vyos.configsession
+
+_logger = logging.getLogger('interface_service')
+
+
+def _read_config_subprocess(path_list, effective=True):
+    """Read VyOS config in a subprocess to avoid corrupting ConfigSession state.
+    
+    vyos.config.Config() corrupts the C library state (libvyatta-cfg) which
+    breaks ConfigSession instances in the same process. Running in a subprocess
+    ensures complete isolation.
+    
+    Args:
+        path_list: List of config path components (e.g., ['interfaces', 'ethernet'])
+        effective: If True, read effective/running config; if False, read session config
+    
+    Returns:
+        Dict of config data, or empty dict on error
+    """
+    try:
+        _logger.info(f'[_read_config_subprocess] START: path={path_list}, effective={effective}')
+        # Build command to read config in subprocess
+        cmd = [
+            'python3', '-c',
+            f"""
+import sys, json
+sys.path.insert(0, '/usr/libexec/vyos')
+import vyos.config
+try:
+    cfg = vyos.config.Config()
+    path = {json.dumps(path_list)}
+    if not path:
+        data = cfg.get_cached_root_dict(effective={effective})
+    else:
+        data = cfg.get_config_dict(path, effective={effective}, get_first_key=True)
+    print(json.dumps(data))
+except Exception as e:
+    print(json.dumps({{'error': str(e)}}), file=sys.stderr)
+    sys.exit(1)
+"""
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+        if result.returncode == 0 and result.stdout.strip():
+            data = json.loads(result.stdout.strip())
+            _logger.info(f'[_read_config_subprocess] SUCCESS: got {len(data) if isinstance(data, dict) else "non-dict"} keys')
+            return data
+        else:
+            _logger.warning(f'[_read_config_subprocess] FAILED: rc={result.returncode}, stderr={result.stderr[:200]}')
+            return {}
+    except Exception as e:
+        _logger.error(f'[_read_config_subprocess] EXCEPTION: {e}', exc_info=True)
+        return {}
 
 
 def _run_op_mode_interfaces(intf_type='ethernet', intf_name=''):
@@ -45,43 +99,77 @@ def _parse_ethtool_speed(ifname):
 
 def _get_interface_config(path):
     """Return VyOS config dict at path (effective)."""
-    try:
-        cfg = vyos.config.Config()
-        return cfg.get_config_dict(path, effective=True, get_first_key=True)
-    except Exception:
-        return {}
+    return _read_config_subprocess(path, effective=True)
 
 
 def _get_session_interface_config(path):
     """Return VyOS session (proposed) config dict at path."""
-    try:
-        cfg = vyos.config.Config()
-        return cfg.get_config_dict(path, effective=False, get_first_key=True)
-    except Exception:
-        return {}
+    return _read_config_subprocess(path, effective=False)
 
 
-def _get_deleted_ethernet_interfaces():
+def _get_deleted_ethernet_interfaces(user=None):
     """Parse session config to find deleted ethernet interfaces.
-    
+
+    Uses the token-based global config session when a user dict (with _token)
+    is provided; otherwise falls back to a safe subprocess-based probe that
+    does not create a new ConfigSession in this process.
+
     Returns a set of interface names that have been deleted in the current session.
     """
     deleted = set()
     try:
-        import vyos.configsession
-        import os
-        session_id = str(os.getpid())
-        session = vyos.configsession.ConfigSession(session_id, app='vyos-web-config')
-        raw = session.show_config([], format='raw') or ''
-        for line in raw.split('\n'):
-            line = line.strip()
-            # Match: delete interfaces ethernet <name>
-            if line.startswith('delete interfaces ethernet '):
-                parts = line.split()
-                if len(parts) >= 4:
-                    deleted.add(parts[3])
-    except Exception:
-        pass
+        _logger.info(f'[_get_deleted_ethernet_interfaces] START: user_has_token={bool(user and user.get("_token"))}')
+        raw = None
+        if user and user.get('_token'):
+            # Use token session via config_service so we don't spawn a second
+            # ConfigSession in this process (which would corrupt env state)
+            from services.config_service import _get_config_session, _get_token
+            token = _get_token(user)
+            _logger.info(f'[_get_deleted_ethernet_interfaces] Getting session for token={token[:20]}...')
+            session = _get_config_session(token)
+            _logger.info(f'[_get_deleted_ethernet_interfaces] Got session: id={id(session)}')
+            # Verify session env
+            try:
+                session_env = session._ConfigSession__session_env
+                _logger.info(f'[_get_deleted_ethernet_interfaces] Session env id={id(session_env)}, is dict: {isinstance(session_env, dict)}, keys count={len(session_env)}')
+            except Exception as e:
+                _logger.error(f'[_get_deleted_ethernet_interfaces] Cannot access session env: {e}')
+            
+            _logger.info(f'[_get_deleted_ethernet_interfaces] Calling show_config...')
+            try:
+                raw = session.show_config([], format='raw') or ''
+                _logger.info(f'[_get_deleted_ethernet_interfaces] show_config returned {len(raw)} chars')
+            except Exception as e:
+                _logger.warning(f'[_get_deleted_ethernet_interfaces] show_config failed (session may be expired): {e}')
+                raw = None
+        else:
+            # Fallback: run a subprocess to inspect the session via CLI so
+            # this process's global os.environ stays untouched.
+            _logger.info(f'[_get_deleted_ethernet_interfaces] No token, using CLI fallback')
+            cmd = ['/opt/vyatta/bin/vyatta-op-cmd-wrapper', 'show', 'configuration', 'commands']
+            try:
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+                if result.returncode == 0:
+                    raw = result.stdout
+                    _logger.info(f'[_get_deleted_ethernet_interfaces] CLI returned {len(raw)} chars')
+                else:
+                    _logger.warning(f'[_get_deleted_ethernet_interfaces] CLI failed: rc={result.returncode}, stderr={result.stderr[:200]}')
+            except Exception as e:
+                _logger.error(f'[_get_deleted_ethernet_interfaces] CLI exception: {e}')
+                raw = None
+        if raw:
+            for line in raw.split('\n'):
+                line = line.strip()
+                # Match: delete interfaces ethernet <name>
+                if line.startswith('delete interfaces ethernet '):
+                    parts = line.split()
+                    if len(parts) >= 4:
+                        deleted.add(parts[3])
+            _logger.info(f'[_get_deleted_ethernet_interfaces] Found {len(deleted)} deleted interfaces: {deleted}')
+        else:
+            _logger.info(f'[_get_deleted_ethernet_interfaces] No raw config data, returning empty set')
+    except Exception as e:
+        _logger.error(f'[_get_deleted_ethernet_interfaces] FAILED: {e}', exc_info=True)
     return deleted
 
 
@@ -125,10 +213,10 @@ def _detect_address_mode(iface_config):
 
 
 def _collect_vifs(iface_config):
-    """Return comma-separated VLAN IDs for vif and vif-s."""
+    """Return lists of VLAN IDs for vif and vif-s."""
     vif = sorted(str(k) for k in iface_config.get('vif', {}).keys())
     vif_s = sorted(str(k) for k in iface_config.get('vif-s', {}).keys())
-    return ', '.join(vif), ', '.join(vif_s)
+    return vif, vif_s
 
 
 def _detect_interface_type(ifname):
@@ -141,15 +229,46 @@ def _detect_interface_type(ifname):
     return 'QinQ'
 
 
+def _get_bridge_members():
+    """Return set of interface names that are bridge members (L2).
+    
+    Bridge configuration structure:
+    interfaces bridge <br-name> member interface <iface-name>
+    
+    Returns:
+        Set of interface names that are members of any bridge
+    """
+    try:
+        bridge_cfg = _read_config_subprocess(['interfaces', 'bridge'], effective=True)
+        members = set()
+        for br_name, br_cfg in bridge_cfg.items():
+            if not isinstance(br_cfg, dict):
+                continue
+            member_section = br_cfg.get('member', {})
+            if not isinstance(member_section, dict):
+                continue
+            iface_section = member_section.get('interface', {})
+            if isinstance(iface_section, dict):
+                for iface_name in iface_section.keys():
+                    members.add(iface_name)
+        _logger.info(f'[_get_bridge_members] Found {len(members)} bridge members: {members}')
+        return members
+    except Exception as e:
+        _logger.error(f'[_get_bridge_members] ERROR: {e}', exc_info=True)
+        return set()
+
+
 class InterfaceService:
     """Service for retrieving and parsing network interface details."""
 
-    def get_ethernet_interfaces(self):
+    def get_ethernet_interfaces(self, user=None):
         """Return enriched Ethernet interface list for the web table."""
         try:
             op_data = _run_op_mode_interfaces('ethernet')
             cfg_data = _get_interface_config(['interfaces', 'ethernet'])
-            deleted_ifaces = _get_deleted_ethernet_interfaces()
+            deleted_ifaces = _get_deleted_ethernet_interfaces(user)
+            bridge_members = _get_bridge_members()
+            _logger.info(f'[get_ethernet_interfaces] op_data count={len(op_data)}, cfg_data keys={list(cfg_data.keys())}, deleted={deleted_ifaces}, bridge_members={bridge_members}')
 
             rows = []
             for item in op_data:
@@ -159,19 +278,40 @@ class InterfaceService:
 
                 # Skip interfaces deleted in current session
                 if name in deleted_ifaces:
+                    _logger.info(f'[get_ethernet_interfaces] Skip deleted: {name}')
                     continue
 
+                # Get config for this interface
+                # For VLAN/QinQ interfaces, get nested config from parent
                 iface_cfg = cfg_data.get(name, {})
+                if not iface_cfg and '.' in name:
+                    # VLAN/QinQ: get config from parent's vif/vif-s
+                    parts = name.split('.')
+                    parent_name = parts[0]
+                    parent_cfg = cfg_data.get(parent_name, {})
+                    _logger.info(f'[get_ethernet_interfaces] VLAN/QinQ lookup: {name}, parent={parent_name}, parent_cfg_keys={list(parent_cfg.keys())}')
+                    if len(parts) == 2:
+                        # VLAN: eth1.10 → parent_cfg.vif.10
+                        iface_cfg = parent_cfg.get('vif', {}).get(parts[1], {})
+                        _logger.info(f'[get_ethernet_interfaces] VLAN config: vif.{parts[1]} = {iface_cfg}')
+                    elif len(parts) == 3:
+                        # QinQ: eth1.20.30 → parent_cfg.vif-s.20.vif-c.30
+                        iface_cfg = parent_cfg.get('vif-s', {}).get(parts[1], {}).get('vif-c', {}).get(parts[2], {})
+                        _logger.info(f'[get_ethernet_interfaces] QinQ config: vif-s.{parts[1]}.vif-c.{parts[2]} = {iface_cfg}')
 
                 ipv4, ipv6 = _format_addresses(item.get('addr_info', []))
-                mode = _detect_address_mode(iface_cfg)
+                address_mode = _detect_address_mode(iface_cfg)
                 vif, vif_s = _collect_vifs(iface_cfg)
+                
+                # Determine interface mode: L2 if bridge member, L3 otherwise
+                interface_mode = 'L2' if name in bridge_members else 'L3'
 
                 rows.append({
                     'id': name,
                     'name': name,
                     'type': _detect_interface_type(name),
-                    'address_mode': mode,
+                    'mode': interface_mode,
+                    'address_mode': address_mode,
                     'ipv4_address': ipv4,
                     'ipv6_address': ipv6,
                     'mac': item.get('address') or iface_cfg.get('hw-id') or iface_cfg.get('mac') or '',
@@ -185,18 +325,38 @@ class InterfaceService:
                     '_config': iface_cfg,
                 })
 
+            _logger.info(f'[get_ethernet_interfaces] Returning {len(rows)} interfaces')
             return {'success': True, 'interfaces': rows}
         except Exception as e:
+            _logger.error(f'[get_ethernet_interfaces] ERROR: {e}', exc_info=True)
             traceback.print_exc()
             return {'success': False, 'code': 'INTERFACE_ERROR', 'message': str(e)}
 
-    def get_ethernet_interface_detail(self, ifname):
+    def get_ethernet_interface_detail(self, ifname, user=None):
         """Return single Ethernet interface details including raw config."""
         try:
             op_data = _run_op_mode_interfaces('ethernet', ifname)
             cfg_data = _get_interface_config(['interfaces', 'ethernet'])
+            deleted_ifaces = _get_deleted_ethernet_interfaces(user)
+            if ifname in deleted_ifaces:
+                return {'success': False, 'code': 'INTERFACE_NOT_FOUND', 'message': f'接口 {ifname} 已删除'}
             item = op_data[0] if op_data else {}
+            
+            # Get config for this interface
+            # For VLAN/QinQ interfaces, get nested config from parent
             iface_cfg = cfg_data.get(ifname, {})
+            if not iface_cfg and '.' in ifname:
+                # VLAN/QinQ: get config from parent's vif/vif-s
+                parts = ifname.split('.')
+                parent_name = parts[0]
+                parent_cfg = cfg_data.get(parent_name, {})
+                if len(parts) == 2:
+                    # VLAN: eth1.10 → parent_cfg.vif.10
+                    iface_cfg = parent_cfg.get('vif', {}).get(parts[1], {})
+                elif len(parts) == 3:
+                    # QinQ: eth1.20.30 → parent_cfg.vif-s.20.vif-c.30
+                    iface_cfg = parent_cfg.get('vif-s', {}).get(parts[1], {}).get('vif-c', {}).get(parts[2], {})
+            
             ipv4, ipv6 = _format_addresses(item.get('addr_info', []))
             mode = _detect_address_mode(iface_cfg)
             vif, vif_s = _collect_vifs(iface_cfg)

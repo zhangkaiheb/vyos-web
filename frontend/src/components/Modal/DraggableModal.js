@@ -24,7 +24,12 @@ export default defineComponent({
     }
 
     watch(() => props.visible, (v) => {
-      if (v) resetPosition();
+      if (v) {
+        resetPosition();
+        document.body.classList.add('modal-open');
+      } else {
+        document.body.classList.remove('modal-open');
+      }
     });
 
     function onMouseDown(e) {

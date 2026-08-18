@@ -1,4 +1,4 @@
-import { defineComponent, ref, onMounted, inject } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
 import { useRoute } from '/src/utils/vue-router-import.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { configApi } from '/src/api/index.js';
@@ -32,13 +32,35 @@ export default defineComponent({
     async function loadDiff() {
       diffLoading.value = true;
       try {
-        const res = await configApi.compare('working', 'active');
+        // Determine current config path based on route
+        const configPath = getCurrentConfigPath();
+        console.log('[PendingChanges] configPath:', configPath, 'route:', route.path);
+        
+        // Pass path to compare API to filter changes
+        const res = await configApi.compare('working', 'active', configPath);
+        console.log('[PendingChanges] compare response:', res);
         diff.value = res.diff || res.lines || [];
+        console.log('[PendingChanges] diff lines:', diff.value);
       } catch (e) {
+        console.error('[PendingChanges] loadDiff error:', e);
         diff.value = [];
       } finally {
         diffLoading.value = false;
       }
+    }
+
+    function getCurrentConfigPath() {
+      // Map route to config path prefix for filtering
+      const pathMap = {
+        '/system/interfaces/bridge': 'interfaces bridge',
+        '/system/interfaces/ethernet': 'interfaces ethernet',
+        '/routing/policy-route': 'policy route',
+        '/firewall': 'firewall',
+      };
+      for (const [routePrefix, configPath] of Object.entries(pathMap)) {
+        if (route.path.startsWith(routePrefix)) return configPath;
+      }
+      return '';
     }
 
     async function openDiff() {
@@ -57,6 +79,8 @@ export default defineComponent({
         message.value = t('config.changeSubmitted');
         committed.value = true;
         submitted.value = true;
+        // Notify all pages to reload data after commit
+        window.dispatchEvent(new CustomEvent('config-committed'));
         // Do NOT auto-close modal
       } catch (e) {
         message.value = e.message;
@@ -100,7 +124,9 @@ export default defineComponent({
       }
     }
 
-    return { config, showDiffModal, diffLoading, diff, message, submitting, saving, committed, submitted, saved, openDiff, commit, discard, save, t };
+    const diffText = computed(() => diff.value.join('\n'));
+
+    return { config, showDiffModal, diffLoading, diff, diffText, message, submitting, saving, committed, submitted, saved, openDiff, commit, discard, save, t };
   },
   template: `
     <div class="pending-changes-icon" :title="$t('config.pendingChanges')" @click="openDiff">
@@ -116,8 +142,8 @@ export default defineComponent({
         </div>
       </template>
       <div v-if="diffLoading" style="text-align:center;padding:20px;color:#999;">{{ $t('config.loading') }}<span class="dot1">.</span><span class="dot2">.</span><span class="dot3">.</span></div>
-      <div v-else-if="diff.length" class="commit-diff-modal">
-        <div v-for="(line, i) in diff" :key="i" :class="{ 'diff-add': line.startsWith('+'), 'diff-del': line.startsWith('-') }">{{ line }}</div>
+      <div v-else-if="diff.length" class="commit-diff-modal" style="max-height:400px;overflow:auto;font-family:monospace;background:#f5f5f5;padding:12px;border:1px solid #ddd;">
+        <pre style="margin:0;white-space:pre-wrap;color:#333;">{{ diffText }}</pre>
       </div>
       <div v-else style="text-align:center;padding:20px;color:#999;">{{ $t('config.noDiffData') }}</div>
       <div v-if="message" style="text-align:center;padding:8px;color:#d48806;font-size:12px;">{{ message }}</div>

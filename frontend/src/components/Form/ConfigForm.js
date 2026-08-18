@@ -157,8 +157,15 @@ export default defineComponent({
       }
     }, { deep: true });
 
-    function fieldDisabled(field) {
+    function fieldDisabled(field, formObj) {
       if (props.disabled) return true;
+      if (field.disabledWhen && formObj) {
+        for (const [key, val] of Object.entries(field.disabledWhen)) {
+          const actual = formObj[key];
+          const expectedValues = Array.isArray(val) ? val : [val];
+          if (expectedValues.includes(actual)) return true;
+        }
+      }
       return !!field.disabled;
     }
 
@@ -247,7 +254,7 @@ export default defineComponent({
     function renderTextarea(field, formObj, path) {
       const key = errorKey(path, field.key);
       const error = fieldErrors.value[key];
-      const disabled = fieldDisabled(field);
+      const disabled = fieldDisabled(field, formObj);
       const children = [];
 
       if (field.multi) {
@@ -325,7 +332,7 @@ export default defineComponent({
     function renderInput(field, formObj, path) {
       const key = errorKey(path, field.key);
       const error = fieldErrors.value[key];
-      const disabled = fieldDisabled(field);
+      const disabled = fieldDisabled(field, formObj);
       const children = [];
 
       if (field.type === 'select') {
@@ -368,15 +375,58 @@ export default defineComponent({
           ]);
         })));
       } else if (field.type === 'number-list') {
-        const listValue = (formObj[field.key] || []).join('\n');
+        // Merge consecutive numbers into ranges for display (e.g., 23,24,25 → "23-25")
+        const mergeToRanges = (arr) => {
+          if (!arr || arr.length === 0) return '';
+          const nums = arr.map(s => parseInt(s)).filter(n => !isNaN(n)).sort((a, b) => a - b);
+          const ranges = [];
+          let start = nums[0], prev = nums[0];
+          for (let i = 1; i < nums.length; i++) {
+            if (nums[i] === prev + 1) {
+              prev = nums[i];
+            } else {
+              ranges.push(start === prev ? String(start) : `${start}-${prev}`);
+              start = prev = nums[i];
+            }
+          }
+          ranges.push(start === prev ? String(start) : `${start}-${prev}`);
+          return ranges.join('\n');
+        };
+        const listValue = mergeToRanges(formObj[field.key] || []);
         children.push(h('textarea', {
-          value: listValue,
+          defaultValue: listValue,
           placeholder: field.placeholder || '',
           disabled,
           class: 'form-control',
           rows: 3,
+          onKeydown: (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              const ta = e.target;
+              const start = ta.selectionStart;
+              const end = ta.selectionEnd;
+              const val = ta.value;
+              ta.value = val.substring(0, start) + '\n' + val.substring(end);
+              ta.selectionStart = ta.selectionEnd = start + 1;
+              ta.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+          },
           onInput: (e) => {
-            formObj[field.key] = e.target.value.split('\n').map(s => s.trim()).filter(s => s !== '');
+            const lines = e.target.value.split('\n').map(s => s.trim()).filter(s => s !== '');
+            const expanded = [];
+            for (const line of lines) {
+              const rangeMatch = line.match(/^(\d+)-(\d+)$/);
+              if (rangeMatch) {
+                const start = parseInt(rangeMatch[1]);
+                const end = parseInt(rangeMatch[2]);
+                for (let i = start; i <= end; i++) {
+                  expanded.push(String(i));
+                }
+              } else {
+                expanded.push(line);
+              }
+            }
+            formObj[field.key] = expanded;
           },
         }));
       } else if (field.type === 'dual-list') {
@@ -388,6 +438,84 @@ export default defineComponent({
           titleLeft: field.titleLeft || t('form.optional'),
           titleRight: field.titleRight || t('form.selected'),
         }));
+      } else if (field.type === 'table') {
+        // Table field type for complex nested data
+        const tableData = formObj[field.key] || [];
+        const columns = field.columns || [];
+        const tableActions = [
+          {
+            label: t('common.add'),
+            onClick: () => {
+              const newRow = {};
+              columns.forEach(col => {
+                if (col.default !== undefined) newRow[col.key] = col.default;
+              });
+              tableData.push(newRow);
+            }
+          }
+        ];
+        children.push(h('div', { class: 'form-table-container' }, [
+          h('div', { class: 'form-table-actions', style: 'margin-bottom: 8px;' }, [
+            h('button', {
+              type: 'button',
+              class: 'btn btn-sm btn-primary',
+              onClick: () => {
+                const newRow = {};
+                columns.forEach(col => {
+                  if (col.default !== undefined) newRow[col.key] = col.default;
+                });
+                tableData.push(newRow);
+              }
+            }, t('common.add'))
+          ]),
+          h('table', { class: 'form-table', style: 'width: 100%; border-collapse: collapse;' }, [
+            h('thead', {}, [
+              h('tr', {}, columns.map(col => h('th', { 
+                key: col.key,
+                style: 'border: 1px solid #ddd; padding: 8px; text-align: left; background: #f5f5f5;'
+              }, col.title || col.key)))
+            ]),
+            h('tbody', {}, tableData.map((row, idx) => h('tr', { key: idx }, [
+              ...columns.map(col => h('td', { 
+                key: col.key,
+                style: 'border: 1px solid #ddd; padding: 4px;'
+              }, [
+                col.type === 'checkbox' 
+                  ? h('input', {
+                      type: 'checkbox',
+                      checked: !!row[col.key],
+                      onChange: (e) => { row[col.key] = e.target.checked; }
+                    })
+                  : col.type === 'select'
+                  ? h('select', {
+                      value: row[col.key] || '',
+                      onChange: (e) => { row[col.key] = e.target.value; },
+                      style: 'width: 100%; padding: 4px;'
+                    }, (col.options || []).map(opt => {
+                      const optValue = typeof opt === 'object' ? opt.value : opt;
+                      const optLabel = typeof opt === 'object' ? (opt.label || opt.value) : opt;
+                      return h('option', { key: optValue, value: optValue }, optLabel);
+                    }))
+                  : h('input', {
+                      type: col.type === 'number' ? 'number' : 'text',
+                      value: row[col.key] || '',
+                      placeholder: col.placeholder || '',
+                      min: col.min,
+                      max: col.max,
+                      onChange: (e) => { row[col.key] = col.type === 'number' ? parseInt(e.target.value) : e.target.value; },
+                      style: 'width: 100%; padding: 4px;'
+                    })
+              ])),
+              h('td', { style: 'border: 1px solid #ddd; padding: 4px; text-align: center;' }, [
+                h('button', {
+                  type: 'button',
+                  class: 'btn btn-sm btn-danger',
+                  onClick: () => { tableData.splice(idx, 1); }
+                }, t('common.delete'))
+              ])
+            ])))
+          ])
+        ]));
       } else if (field.type === 'radio') {
         children.push(h('div', { class: 'radio-cards' }, (field.options || []).map(opt => {
           const optValue = typeof opt === 'object' ? opt.value : opt;
@@ -509,6 +637,26 @@ export default defineComponent({
     }
 
     function renderField(field, formObj, path, level = 0) {
+      // Support showWhen: hide field if condition not met
+      if (field.showWhen) {
+        if (Array.isArray(field.showWhen)) {
+          // and conditions: all must match
+          for (const cond of field.showWhen) {
+            const actual = formObj[cond.key];
+            const expected = cond.val;
+            // Treat undefined as false for boolean fields
+            if (!actual && expected) return null;
+            if (actual && !expected) return null;
+          }
+        } else {
+          // object format: single condition (value can be array for multi-value match)
+          for (const [key, val] of Object.entries(field.showWhen)) {
+            const actual = formObj[key];
+            const expectedValues = Array.isArray(val) ? val : [val];
+            if (!expectedValues.includes(actual)) return null;
+          }
+        }
+      }
       if (field.type === 'tab') {
         return null;
       }

@@ -2377,6 +2377,15 @@ input[type="time"]::-webkit-calendar-picker-indicator:hover {
   font-weight: 500;
 }
 
+/* Modal open: prevent top menu submenus from showing */
+body.modal-open .top-submenu {
+  display: none !important;
+}
+
+body.modal-open .top-menu-item:hover {
+  background: var(--color-bg-header);
+}
+
 /* Utility */
 .text-right { text-align: right; }
 .text-center { text-align: center; }

@@ -99,6 +99,10 @@ class AuthService:
 
     def logout(self, token):
         if token:
+            # Clean up config session for this token
+            from services.config_service import close_token_session
+            close_token_session(token)
+
             conn = get_db_connection()
             try:
                 row = conn.execute(
