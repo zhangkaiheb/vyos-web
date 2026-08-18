@@ -103,6 +103,8 @@ export default defineComponent({
       { key: 'disable_link_detect', title: t('interface.bridge.disable_link_detect'), type: 'checkbox', help: t('interface.bridge.disable_link_detect_help') },
     ]);
 
+    const bondingMembers = ref(new Set());
+
     const availableMemberOptions = computed(() => {
       // Collect all interfaces that are already members of any bridge
       const allUsed = new Set();
@@ -115,6 +117,9 @@ export default defineComponent({
           }
         }
       });
+      // Also exclude interfaces that are members of any bonding interface
+      bondingMembers.value.forEach(i => allUsed.add(i));
+      
       const existing = new Set((editingBridge.value?.members || []).map(m => m.interface));
       // When editing, keep the current member's interface in the list
       if (editingMember.value?.interface) {
@@ -630,13 +635,32 @@ export default defineComponent({
           _raw: cfg,
         }));
 
-        // Load interface options
+        // Load interface options - exclude interfaces with address configuration
         const ifRes = await interfaceApi.ethernet();
         const ifaces = ifRes.interfaces || [];
-        interfaceOptions.value = ifaces.map(iface => ({
-          value: iface.name || iface,
-          label: iface.name || iface,
-        }));
+        interfaceOptions.value = ifaces
+          .filter(iface => !iface.address_mode) // Exclude interfaces with any address mode
+          .map(iface => ({
+            value: iface.name || iface,
+            label: iface.name || iface,
+          }));
+
+        // Load bonding members to exclude them from bridge member options
+        try {
+          const bondRes = await configApi.get('interfaces bonding');
+          const bondMembers = new Set();
+          Object.values(bondRes.data || {}).forEach(cfg => {
+            const m = cfg.member?.interface;
+            if (m) {
+              if (Array.isArray(m)) m.forEach(i => bondMembers.add(i));
+              else Object.keys(m).forEach(i => bondMembers.add(i));
+            }
+          });
+          bondingMembers.value = bondMembers;
+        } catch (e) {
+          console.error('Failed to load bonding members:', e);
+          bondingMembers.value = new Set();
+        }
 
         // Load VRF options
         try {

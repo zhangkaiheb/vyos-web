@@ -159,7 +159,9 @@
           "evpn": "EVPN",
           "ipv4_params": "IPv4 参数",
           "ipv6_params": "IPv6 参数",
+          "members": "成员接口",
           "other": "其他",
+          "primary": "主接口",
           "traffic_mirror": "流量镜像"
         }
       },
@@ -904,7 +906,9 @@
           "evpn": "evpn",
           "ipv4_params": "ipv4_params",
           "ipv6_params": "ipv6_params",
+          "members": "members",
           "other": "other",
+          "primary": "primary",
           "traffic_mirror": "traffic_mirror"
         }
       },
@@ -1848,7 +1852,9 @@
           "evpn": "evpn",
           "ipv4_params": "ipv4_params",
           "ipv6_params": "ipv6_params",
+          "members": "members",
           "other": "other",
+          "primary": "primary",
           "traffic_mirror": "traffic_mirror"
         }
       },
@@ -2325,7 +2331,9 @@
           "evpn": "evpn",
           "ipv4_params": "ipv4_params",
           "ipv6_params": "ipv6_params",
+          "members": "members",
           "other": "other",
+          "primary": "primary",
           "traffic_mirror": "traffic_mirror"
         }
       },
@@ -2802,7 +2810,9 @@
           "evpn": "evpn",
           "ipv4_params": "ipv4_params",
           "ipv6_params": "ipv6_params",
+          "members": "members",
           "other": "other",
+          "primary": "primary",
           "traffic_mirror": "traffic_mirror"
         }
       },
@@ -3279,7 +3289,9 @@
           "evpn": "evpn",
           "ipv4_params": "ipv4_params",
           "ipv6_params": "ipv6_params",
+          "members": "members",
           "other": "other",
+          "primary": "primary",
           "traffic_mirror": "traffic_mirror"
         }
       },

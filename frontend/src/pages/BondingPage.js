@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, onMounted, inject } from '/src/utils/vue-import.js';
+import { defineComponent, ref, computed, onMounted, onUnmounted, inject } from '/src/utils/vue-import.js';
 import { configApi, interfaceApi } from '/src/api/index.js';
 import { useConfigStore } from '/src/stores/config.js';
 import { showError } from '/src/components/Layout/ErrorDisplay.js';
@@ -64,21 +64,26 @@ export default defineComponent({
     const selected = ref([]);
     const modalVisible = ref(false);
     const editingBond = ref(null);
+    const isEditMode = ref(false);
     const interfaceOptions = ref([]);
+    const vrfOptions = ref([]);
+    const bridgeMembers = ref(new Set());
     const activeTab = ref('basic');
     const deleteModalVisible = ref(false);
     const pendingDeleteNames = ref([]);
 
+    // Extract interface names from API response (objects have name, type, mode, etc.)
+    // Exclude interfaces that are already members of any bridge
+    const interfaceNames = computed(() => interfaceOptions.value.map(i => i.name || i).filter(name => name && !bridgeMembers.value.has(name)));
+
     // Schema definitions
     const basicSchema = computed(() => [
-      { key: 'name', title: t('interface.bonding.name'), type: 'text', required: true, placeholder: t('interface.bonding.name_placeholder'), help: t('interface.bonding.name_help') },
+      { key: 'name', title: t('interface.bonding.name'), type: 'text', required: true, placeholder: t('interface.bonding.name_placeholder'), help: t('interface.bonding.name_help'), disabled: isEditMode.value },
       { key: 'description', title: t('interface.bonding.description'), type: 'text', placeholder: t('interface.bonding.description_placeholder') },
       { key: 'mac', title: t('interface.bonding.mac'), type: 'text', placeholder: t('interface.bonding.mac_placeholder'), help: t('interface.bonding.mac_help') },
       { key: 'mode', title: t('interface.bonding.mode'), type: 'select', options: BOND_MODE_OPTIONS, help: t('interface.bonding.mode_help') },
       { key: 'hash_policy', title: t('interface.bonding.hash_policy'), type: 'select', options: HASH_POLICY_OPTIONS, help: t('interface.bonding.hash_policy_help') },
       { key: 'lacp_rate', title: t('interface.bonding.lacp_rate'), type: 'select', options: LACP_RATE_OPTIONS, help: t('interface.bonding.lacp_rate_help') },
-      { key: 'members', title: t('interface.bonding.members'), type: 'select', options: interfaceOptions.value.map(i => ({ value: i, label: i })), placeholder: t('interface.bonding.members_placeholder'), help: t('interface.bonding.members_help'), multiple: true },
-      { key: 'primary', title: t('interface.bonding.primary'), type: 'select', options: interfaceOptions.value.map(i => ({ value: i, label: i })), placeholder: t('interface.bonding.primary_placeholder'), help: t('interface.bonding.primary_help') },
       { key: 'min_links', title: t('interface.bonding.min_links'), type: 'number', min: 0, max: 16, placeholder: t('interface.bonding.min_links_placeholder'), help: t('interface.bonding.min_links_help') },
       { key: 'mii_mon_interval', title: t('interface.bonding.mii_mon_interval'), type: 'number', min: 0, max: 1000, placeholder: t('interface.bonding.mii_mon_interval_placeholder'), help: t('interface.bonding.mii_mon_interval_help') },
       { key: 'mtu', title: t('interface.bonding.mtu'), type: 'number', min: 68, max: 16000, placeholder: t('interface.bonding.mtu_placeholder'), help: t('interface.bonding.mtu_help') },
@@ -86,6 +91,19 @@ export default defineComponent({
       { key: 'disable', title: t('interface.bonding.disable_interface'), type: 'checkbox', help: t('interface.bonding.disable_interface_help') },
       { key: 'disable_link_detect', title: t('interface.bonding.disable_link_detect'), type: 'checkbox', help: t('interface.bonding.disable_link_detect_help') },
     ]);
+
+    // Members schema: checkbox list for all interfaces + primary select
+    const membersSchema = computed(() => {
+      const names = interfaceNames.value;
+      return [
+        ...names.map(name => ({
+          key: `member_${name}`,
+          title: name,
+          type: 'checkbox',
+        })),
+        { key: 'primary', title: t('interface.bonding.primary'), type: 'select', options: ['', ...names], placeholder: t('interface.bonding.primary_placeholder'), help: t('interface.bonding.primary_help') },
+      ];
+    });
 
     const arpMonitorSchema = computed(() => [
       { key: 'arp_interval', title: t('interface.bonding.arp_interval'), type: 'number', min: 0, max: 4294967295, placeholder: t('interface.bonding.arp_interval_placeholder'), help: t('interface.bonding.arp_interval_help') },
@@ -157,13 +175,13 @@ export default defineComponent({
     ]);
 
     const mirrorSchema = computed(() => [
-      { key: 'mirror_egress', title: t('interface.bonding.mirror.egress'), type: 'select', options: interfaceOptions.value.map(i => ({ value: i, label: i })), placeholder: t('interface.bonding.mirror.placeholder'), help: t('interface.bonding.mirror.egress_help') },
-      { key: 'mirror_ingress', title: t('interface.bonding.mirror.ingress'), type: 'select', options: interfaceOptions.value.map(i => ({ value: i, label: i })), placeholder: t('interface.bonding.mirror.placeholder'), help: t('interface.bonding.mirror.ingress_help') },
+      { key: 'mirror_egress', title: t('interface.bonding.mirror.egress'), type: 'select', options: ['', ...interfaceNames.value], placeholder: t('interface.bonding.mirror.placeholder'), help: t('interface.bonding.mirror.egress_help') },
+      { key: 'mirror_ingress', title: t('interface.bonding.mirror.ingress'), type: 'select', options: ['', ...interfaceNames.value], placeholder: t('interface.bonding.mirror.placeholder'), help: t('interface.bonding.mirror.ingress_help') },
     ]);
 
     const otherSchema = computed(() => [
-      { key: 'redirect', title: t('interface.bonding.other.redirect'), type: 'select', options: interfaceOptions.value.map(i => ({ value: i, label: i })), placeholder: t('interface.bonding.other.redirect_placeholder'), help: t('interface.bonding.other.redirect_help') },
-      { key: 'vrf', title: t('interface.bonding.other.vrf'), type: 'text', placeholder: t('interface.bonding.other.vrf_placeholder'), help: t('interface.bonding.other.vrf_help') },
+      { key: 'redirect', title: t('interface.bonding.other.redirect'), type: 'select', options: ['', ...interfaceNames.value], placeholder: t('interface.bonding.other.redirect_placeholder'), help: t('interface.bonding.other.redirect_help') },
+      { key: 'vrf', title: t('interface.bonding.other.vrf'), type: 'select', options: ['', ...vrfOptions.value], placeholder: t('interface.bonding.other.vrf_placeholder'), help: t('interface.bonding.other.vrf_help') },
     ]);
 
     // Command text
@@ -267,6 +285,7 @@ export default defineComponent({
     // Tabs
     const modalTabs = computed(() => [
       { key: 'basic', title: t('interface.bonding.tab.basic') },
+      { key: 'members', title: t('interface.bonding.tab.members') },
       { key: 'arp', title: t('interface.bonding.tab.arp_monitor') },
       { key: 'dhcp', title: t('interface.bonding.tab.dhcp') },
       { key: 'dhcpv6', title: t('interface.bonding.tab.dhcpv6') },
@@ -362,8 +381,12 @@ export default defineComponent({
       form.disable = !!cfg.disable;
       form.disable_link_detect = !!cfg['disable-link-detect'];
 
-      // Members
-      form.members = (cfg.member?.interface || []).map(i => typeof i === 'string' ? i : Object.keys(i)[0]);
+      // Members - set individual checkboxes
+      const memberIfaces = (cfg.member?.interface || []).map(i => typeof i === 'string' ? i : Object.keys(i)[0]);
+      form.members = memberIfaces;
+      interfaceNames.value.forEach(name => {
+        form[`member_${name}`] = memberIfaces.includes(name);
+      });
       form.primary = cfg.primary || '';
 
       // ARP monitor
@@ -462,9 +485,37 @@ export default defineComponent({
           member_count: (cfg.member?.interface || []).length,
         }));
 
-        // Load interface options
+        // Load interface options - only physical ethernet interfaces (no dots in name) without address configuration
         const ifRes = await interfaceApi.ethernet();
-        interfaceOptions.value = ifRes.interfaces || [];
+        interfaceOptions.value = (ifRes.interfaces || []).filter(i => {
+          const name = i.name || i;
+          return name && !name.includes('.') && !i.address_mode;
+        });
+        
+        // Load bridge members to exclude them from bonding member options
+        try {
+          const bridgeRes = await configApi.get('interfaces bridge');
+          const bridgeMemberSet = new Set();
+          Object.values(bridgeRes.data || {}).forEach(cfg => {
+            const m = cfg.member?.interface;
+            if (m) {
+              if (Array.isArray(m)) m.forEach(i => bridgeMemberSet.add(i));
+              else Object.keys(m).forEach(i => bridgeMemberSet.add(i));
+            }
+          });
+          bridgeMembers.value = bridgeMemberSet;
+        } catch (e) {
+          console.error('Failed to load bridge members:', e);
+          bridgeMembers.value = new Set();
+        }
+        
+        // Load VRF options
+        try {
+          const vrfRes = await configApi.get('vrf');
+          vrfOptions.value = Object.keys(vrfRes.data?.name || vrfRes.data || {}).filter(name => typeof (vrfRes.data?.name || vrfRes.data)[name] === 'object');
+        } catch (e) {
+          console.error('Failed to load VRF options:', e);
+        }
       } catch (err) {
         showError(err);
       } finally {
@@ -476,8 +527,10 @@ export default defineComponent({
     function openModal(index = -1) {
       if (index >= 0) {
         editingBond.value = bondToForm(bonds.value[index]);
+        isEditMode.value = true;
       } else {
         editingBond.value = getDefaultForm();
+        isEditMode.value = false;
       }
       activeTab.value = 'basic';
       modalVisible.value = true;
@@ -509,9 +562,10 @@ export default defineComponent({
       if (b.disable) commands.push(`set interfaces bonding ${name} disable`);
       if (b.disable_link_detect) commands.push(`set interfaces bonding ${name} disable-link-detect`);
 
-      if (b.members && b.members.length > 0) {
-        b.members.forEach(m => commands.push(`set interfaces bonding ${name} member interface ${m}`));
-      }
+      // Collect member interfaces from checkboxes
+      const selectedMembers = interfaceNames.value.filter(iface => b[`member_${iface}`]);
+      selectedMembers.forEach(m => commands.push(`set interfaces bonding ${name} member interface ${m}`));
+      
       if (b.primary) commands.push(`set interfaces bonding ${name} primary ${b.primary}`);
 
       if (b.arp_interval !== undefined && b.arp_interval !== null) commands.push(`set interfaces bonding ${name} arp-monitor interval ${b.arp_interval}`);
@@ -616,10 +670,10 @@ export default defineComponent({
     });
 
     return {
-      loading, bonds, selected, modalVisible, editingBond, interfaceOptions, activeTab,
+      loading, bonds, selected, modalVisible, editingBond, isEditMode, interfaceOptions, vrfOptions, activeTab,
       deleteModalVisible, pendingDeleteNames, confirmRemove,
       COLUMNS,
-      basicSchema, arpMonitorSchema, dhcpSchema, dhcpv6Schema, eapolSchema, evpnSchema,
+      basicSchema, membersSchema, arpMonitorSchema, dhcpSchema, dhcpv6Schema, eapolSchema, evpnSchema,
       ipSchema, ipv6Schema, mirrorSchema, otherSchema, commandText, modalTabs,
       openModal, save, remove, load, t,
     };
@@ -654,7 +708,7 @@ export default defineComponent({
 
       <DraggableModal
         v-model:visible="modalVisible"
-        :title="editingBond?.name ? t('interface.bonding.modal.edit') : t('interface.bonding.modal.create')"
+        :title="isEditMode ? t('interface.bonding.modal.edit') : t('interface.bonding.modal.create')"
         width="900px"
         @confirm="save"
       >
@@ -662,6 +716,9 @@ export default defineComponent({
           <TabGroup v-model="activeTab" :tabs="modalTabs">
             <template #basic>
               <ConfigForm v-model="editingBond" :schema="basicSchema" />
+            </template>
+            <template #members>
+              <ConfigForm v-model="editingBond" :schema="membersSchema" />
             </template>
             <template #arp>
               <ConfigForm v-model="editingBond" :schema="arpMonitorSchema" />
